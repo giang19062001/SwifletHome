@@ -1,0 +1,85 @@
+<header id="page-topbar">
+   <div class="navbar-header">
+      <div class="navbar-brand-container">
+         <!-- LOGO -->
+         <div class="navbar-brand-box topbar-box">
+            <p class="topbar-title">Swiftlet System</p>
+         </div>
+
+         <div class="topbar-info topbar-box">
+            <!-- | -->
+            <div class="topbar-info-gr">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                     d="M18 2H6C4.34 2 3 3.33 3 4.97V15.88C3 17.52 4.34 18.85 6 18.85H6.76C7.56 18.85 8.32 19.16 8.88 19.72L10.59 21.41C11.37 22.18 12.64 22.18 13.42 21.41L15.13 19.72C15.69 19.16 16.46 18.85 17.25 18.85H18C19.66 18.85 21 17.52 21 15.88V4.97C21 3.33 19.66 2 18 2ZM12 5.75C13.29 5.75 14.33 6.79 14.33 8.08C14.33 9.37 13.29 10.41 12 10.41C10.71 10.41 9.67 9.36 9.67 8.08C9.67 6.79 10.71 5.75 12 5.75ZM14.68 15.06H9.32C8.51 15.06 8.04 14.16 8.49 13.49C9.17 12.48 10.49 11.8 12 11.8C13.51 11.8 14.83 12.48 15.51 13.49C15.96 14.16 15.48 15.06 14.68 15.06Z"
+                     fill="#212529" />
+               </svg>
+               <span class="topbar-userid">
+                  <%= user ? user.userName : "" %>
+                  <br />
+               </span>
+            </div>
+            <!-- | -->
+            <span><svg width="2" height="24" viewBox="0 0 2 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 0L0.999999 24" stroke="#505050" />
+               </svg>
+            </span>
+            <!-- | -->
+            <div class="topbar-info-gr">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                     d="M7.2 2H9.8C13 2 15 4 15 7.2V11.25H8.75C8.34 11.25 8 11.59 8 12C8 12.41 8.34 12.75 8.75 12.75H15V16.8C15 20 13 22 9.8 22H7.21C4.01 22 2.01 20 2.01 16.8V7.2C2 4 4 2 7.2 2Z"
+                     fill="#FF352E" />
+                  <path
+                     d="M19.44 11.2498L17.37 9.17984C17.22 9.02984 17.15 8.83984 17.15 8.64984C17.15 8.45984 17.22 8.25984 17.37 8.11984C17.66 7.82984 18.14 7.82984 18.43 8.11984L21.78 11.4698C22.07 11.7598 22.07 12.2398 21.78 12.5298L18.43 15.8798C18.14 16.1698 17.66 16.1698 17.37 15.8798C17.08 15.5898 17.08 15.1098 17.37 14.8198L19.44 12.7498H15V11.2498H19.44Z"
+                     fill="#FF352E" />
+               </svg>
+
+               <a class="topbar-logout" href="/api/auth/logout"><i class="font-size-16 align-middle me-1"></i>
+                  <span>Đăng xuất</span></a>
+            </div>
+         </div>
+
+         <div class="topbar-icon-menu">
+            <div class="dropdown">
+               <button type="button" class="btn" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <rect x="7" y="9" width="17.999" height="2.99983" rx="1.49992" fill="#212529" />
+                     <rect x="7.1001" y="15" width="17.999" height="2.99983" rx="1.49992" fill="#212529" />
+                     <rect x="7.00049" y="20.999" width="17.999" height="2.99983" rx="1.49992" fill="#212529" />
+                  </svg>
+               </button>
+               <div class="dropdown-menu dropdown-menu-end" data-popper-placement="right">
+                  <div class="dropdown-topbar-info">
+                     <div class="topbar-info-gr">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                           <path
+                              d="M18 2H6C4.34 2 3 3.33 3 4.97V15.88C3 17.52 4.34 18.85 6 18.85H6.76C7.56 18.85 8.32 19.16 8.88 19.72L10.59 21.41C11.37 22.18 12.64 22.18 13.42 21.41L15.13 19.72C15.69 19.16 16.46 18.85 17.25 18.85H18C19.66 18.85 21 17.52 21 15.88V4.97C21 3.33 19.66 2 18 2ZM12 5.75C13.29 5.75 14.33 6.79 14.33 8.08C14.33 9.37 13.29 10.41 12 10.41C10.71 10.41 9.67 9.36 9.67 8.08C9.67 6.79 10.71 5.75 12 5.75ZM14.68 15.06H9.32C8.51 15.06 8.04 14.16 8.49 13.49C9.17 12.48 10.49 11.8 12 11.8C13.51 11.8 14.83 12.48 15.51 13.49C15.96 14.16 15.48 15.06 14.68 15.06Z"
+                              fill="#212529" />
+                        </svg>
+
+                        <span class="topbar-userid">
+                           <%= user ? user.userName : "" %>
+                           <br />
+                        </span>
+                     </div>
+                     <div class="topbar-info-gr">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                           <path
+                              d="M7.2 2H9.8C13 2 15 4 15 7.2V11.25H8.75C8.34 11.25 8 11.59 8 12C8 12.41 8.34 12.75 8.75 12.75H15V16.8C15 20 13 22 9.8 22H7.21C4.01 22 2.01 20 2.01 16.8V7.2C2 4 4 2 7.2 2Z"
+                              fill="#FF352E" />
+                           <path
+                              d="M19.4401 11.2498L17.3701 9.17984C17.2201 9.02984 17.1501 8.83984 17.1501 8.64984C17.1501 8.45984 17.2201 8.25984 17.3701 8.11984C17.6601 7.82984 18.1401 7.82984 18.4301 8.11984L21.7801 11.4698C22.0701 11.7598 22.0701 12.2398 21.7801 12.5298L18.4301 15.8798C18.1401 16.1698 17.6601 16.1698 17.3701 15.8798C17.0801 15.5898 17.0801 15.1098 17.3701 14.8198L19.4401 12.7498H15.0001V11.2498H19.4401Z"
+                              fill="#FF352E" />
+                        </svg>
+
+                        <a class="topbar-logout" href="/api/auth/logout"><i class="font-size-16 align-middle me-1"></i>
+                           <span>Đăng xuất</span></a>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</header>

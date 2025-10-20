@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title || "My Site" %></title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/axios.min.js"></script>
+
+<body>
+  <% if (noLayout) { %>
+      <%- body%>
+  <% } else{  %>
+    <%- include('./topbar') %>
+    <%- include('./sidebar') %>
+    <div class="main-content">
+      <div class="page-content">
+          <div class="container-fluid">
+              <%- body%>
+          </div>
+      </div>
+    </div>
+  <% }  %>
+
+  <%- include('./footer') %>
+</body>
+</html>
