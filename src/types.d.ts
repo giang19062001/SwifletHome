@@ -1,8 +1,8 @@
 import 'express-session';
-import { UserAuth } from './auth/auth.interface';
+import { IUserAuth } from './auth/auth.interface';
 
 declare module 'express-session' {
   interface SessionData {
-    user?: Omit<UserAuth, 'userPassword', 'accessToken'>;
+    user?: Omit<IUserAuth, 'userPassword', 'accessToken'>;
   }
 }

@@ -1,0 +1,56 @@
+<div id="answer-detail-container">
+  <div class="row">
+    <div class="col-4">
+      <div class="preview">
+        <div class="chat-box">
+          <div class="message user">
+            <div class="bubble">Câu hỏi của bạn ?</div>
+          </div>
+          <div class="message bot">
+            <div>
+              <div class="bot-info">
+                <span>ChatBot AI - Yến</span>
+              </div>
+
+              <div class="bubble" id="botMessage">
+                <%- dataPage.answerContent %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-button">
+          <button class="btn-common" onclick="updateAnswer()">Lưu</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="common-editor">
+        <div id="editor">
+            <%- dataPage.answerContentRaw %>
+        </div>
+
+        <div class="bottom-button">
+          <button class="btn-common" onclick="getContent()"><<</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="upload">
+        <p class="title">Danh sách File</p>
+        <input type="file" id="fileInput" hidden accept="image/*,audio/*" />
+        <div class="space-box">
+          <div class="file-list"></div>
+          <div class="bottom-button">
+            <button class="btn-common" id="uploadBtn">Upload File</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  let answerContent = `<%- dataPage.answerContent %>`;
+  let answerContentRaw = `<%- dataPage.answerContentRaw %>`;
+</script>
+<script src="/js/page-answer-detail.js"></script>

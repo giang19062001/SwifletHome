@@ -1,0 +1,439 @@
+[
+  {
+    "questions": ["chim yến làm tổ như thế nào"],
+    "answer": "Chim yến thường làm tổ bằng nước bọt trên các bề mặt cao và yên tĩnh.",
+    "imageUrl": "/images/toyen.jpg",
+    "related": []
+  },
+  {
+    "questions": [
+      "Nhiệt độ nhà yến",
+      "Nhiệt độ lý tưởng trong nhà yến",
+      "Nhiệt độ phù hợp cho chim yến",
+      "Nhà yến nên giữ nhiệt độ bao nhiêu",
+      "Nhiệt độ tối ưu để nuôi yến"
+    ],
+    "answer": "Nhiệt độ lý tưởng là từ 27°C đến 29°C để chim yến cảm thấy thoải mái.",
+    "related": [
+      "Độ ẩm nhà yến",
+      "Cách kiểm soát nhiệt độ",
+      "Thiết bị làm mát nhà yến"
+    ]
+  },
+  {
+    "questions": [
+      "Độ ẩm nhà yến",
+      "Độ ẩm lý tưởng để nuôi yến",
+      "Độ ẩm phù hợp cho chim yến",
+      "Nhà yến cần độ ẩm bao nhiêu",
+      "Độ ẩm tối ưu trong nhà yến"
+    ],
+    "answer": "Độ ẩm nên duy trì từ 75% đến 90% để đảm bảo môi trường lý tưởng.",
+    "related": [
+      "Nhiệt độ nhà yến",
+      "Thiết bị đo độ ẩm",
+      "Ảnh hưởng của độ ẩm đến chim yến"
+    ]
+  },
+  {
+    "questions": [
+      "Âm thanh dẫn dụ",
+      "Thời gian phát âm thanh",
+      "Phát âm thanh như thế nào",
+      "Âm thanh nào thu hút chim yến",
+      "Loa dẫn dụ cho nhà yến"
+    ],
+    "answer": "Âm thanh dẫn dụ nên phát từ 5h sáng đến 7h tối để thu hút chim yến.",
+    "related": [
+      "Loại loa phù hợp",
+      "Vị trí đặt loa",
+      "Âm thanh trong nhà yến ban đêm"
+    ]
+  },
+  {
+    "questions": [
+      "Ánh sáng trong nhà yến",
+      "Nhà yến cần ánh sáng như thế nào",
+      "Độ sáng lý tưởng cho chim yến",
+      "Có nên để ánh sáng trong nhà yến",
+      "Ánh sáng ảnh hưởng đến chim yến không"
+    ],
+    "answer": "Nhà yến nên có ánh sáng yếu, không quá chói để tạo cảm giác an toàn cho chim yến.",
+    "related": [
+      "Thiết kế lỗ ra vào",
+      "Màu sơn trong nhà yến",
+      "Thời gian bật tắt đèn"
+    ]
+  },
+  {
+    "questions": [
+      "Thiết kế nhà yến",
+      "Kích thước nhà yến tiêu chuẩn",
+      "Cách bố trí phòng trong nhà yến",
+      "Thiết kế lỗ ra vào cho chim yến",
+      "Chiều cao nhà yến bao nhiêu là hợp lý"
+    ],
+    "answer": "Nhà yến nên có chiều cao từ 5m trở lên, lỗ ra vào hướng về phía có ánh sáng nhẹ và ít gió.",
+    "related": [
+      "Vật liệu xây nhà yến",
+      "Cách chống nóng cho nhà yến",
+      "Thiết kế phòng lượn"
+    ]
+  },
+  {
+    "questions": [
+      "Vệ sinh nhà yến",
+      "Cách làm sạch nhà yến",
+      "Bao lâu nên vệ sinh nhà yến",
+      "Vệ sinh tổ yến như thế nào",
+      "Có cần khử trùng nhà yến không"
+    ],
+    "answer": "Nên vệ sinh nhà yến định kỳ mỗi 3–6 tháng để đảm bảo môi trường sạch sẽ, tránh nấm mốc và mầm bệnh.",
+    "related": [
+      "Phòng chống dịch bệnh",
+      "Thiết bị vệ sinh nhà yến",
+      "Ảnh hưởng của vệ sinh đến sản lượng"
+    ]
+  },
+  {
+    "questions": [
+      "Phòng chống dịch bệnh trong nhà yến",
+      "Nhà yến có cần khử trùng không",
+      "Cách ngăn ngừa bệnh cho chim yến",
+      "Dấu hiệu chim yến bị bệnh",
+      "Làm gì khi chim yến chết nhiều"
+    ],
+    "answer": "Cần kiểm tra định kỳ, giữ vệ sinh và tránh để chim tiếp xúc với nguồn bệnh. Có thể dùng đèn UV hoặc khử trùng bằng hơi nước.",
+    "related": [
+      "Vệ sinh nhà yến",
+      "Kiểm tra sức khỏe chim yến",
+      "Thiết bị khử trùng"
+    ]
+  },
+  {
+    "questions": [
+      "Thức ăn cho chim yến",
+      "Chim yến ăn gì",
+      "Có cần cho chim yến ăn không",
+      "Nguồn thức ăn tự nhiên của chim yến",
+      "Cách tạo môi trường có côn trùng"
+    ],
+    "answer": "Chim yến ăn côn trùng bay nhỏ như muỗi, ruồi, kiến cánh. Không cần cho ăn trực tiếp, nhưng có thể tạo môi trường sinh côn trùng tự nhiên.",
+    "related": [
+      "Môi trường sống của chim yến",
+      "Ảnh hưởng của thời tiết đến nguồn thức ăn",
+      "Nuôi côn trùng trong nhà yến"
+    ]
+  },
+  {
+    "questions": [
+      "Kiểm tra định kỳ nhà yến",
+      "Bao lâu nên kiểm tra nhà yến",
+      "Kiểm tra thiết bị trong nhà yến",
+      "Lịch bảo trì nhà yến",
+      "Những gì cần kiểm tra trong nhà yến"
+    ],
+    "answer": "Nên kiểm tra nhà yến mỗi tháng: nhiệt độ, độ ẩm, âm thanh, ánh sáng, số lượng chim, và tình trạng tổ yến.",
+    "related": [
+      "Thiết bị giám sát nhà yến",
+      "Lịch vệ sinh nhà yến",
+      "Báo cáo sản lượng yến"
+    ]
+  },
+  {
+    "questions": [
+      "Giám sát sản lượng tổ yến",
+      "Theo dõi số lượng tổ yến",
+      "Cách kiểm tra sản lượng yến",
+      "Làm sao biết số lượng tổ yến tăng hay giảm",
+      "Có phần mềm nào giám sát sản lượng không"
+    ],
+    "answer": "Bạn có thể giám sát sản lượng tổ yến bằng cách ghi nhận số lượng tổ mới hàng tuần, dùng camera hoặc phần mềm quản lý nhà yến.",
+    "related": [
+      "Kiểm tra định kỳ nhà yến",
+      "Thiết bị giám sát tổ yến",
+      "Báo cáo sản lượng tự động"
+    ]
+  },
+  {
+    "questions": [
+      "Thiết kế phòng lượn cho nhà yến",
+      "Phòng lượn là gì",
+      "Cách bố trí phòng lượn",
+      "Kích thước phòng lượn tiêu chuẩn",
+      "Phòng lượn ảnh hưởng đến chim yến như thế nào"
+    ],
+    "answer": "Phòng lượn là khu vực để chim yến bay vòng trước khi vào phòng ở. Nên thiết kế rộng rãi, cao thoáng, không có ánh sáng gắt.",
+    "related": [
+      "Thiết kế nhà yến",
+      "Lỗ ra vào nhà yến",
+      "Hướng gió và ánh sáng"
+    ]
+  },
+  {
+    "questions": [
+      "Âm thanh ban đêm trong nhà yến",
+      "Có nên phát âm thanh ban đêm",
+      "Âm thanh ban đêm có ảnh hưởng gì",
+      "Thời gian tắt âm thanh",
+      "Loại âm thanh ban đêm phù hợp"
+    ],
+    "answer": "Âm thanh ban đêm nên được tắt từ 7h tối để tránh làm chim yến mất ngủ. Một số hệ thống có chế độ tự động tắt theo giờ.",
+    "related": [
+      "Âm thanh dẫn dụ",
+      "Lịch phát âm thanh",
+      "Thiết bị điều khiển âm thanh"
+    ]
+  },
+  {
+    "questions": [
+      "Môi trường sống xung quanh nhà yến",
+      "Có cần cây xanh quanh nhà yến không",
+      "Vị trí xây nhà yến nên như thế nào",
+      "Yếu tố môi trường ảnh hưởng đến chim yến",
+      "Chim yến thích sống ở đâu"
+    ],
+    "answer": "Nhà yến nên đặt ở nơi yên tĩnh, gần nguồn nước, có cây xanh và ít tiếng ồn. Môi trường xung quanh ảnh hưởng lớn đến khả năng dẫn dụ.",
+    "related": [
+      "Thiết kế nhà yến",
+      "Chọn vị trí xây nhà yến",
+      "Ảnh hưởng của tiếng ồn"
+    ]
+  },
+  {
+    "questions": [
+      "Chi phí xây dựng nhà yến",
+      "Xây nhà yến hết bao nhiêu tiền",
+      "Dự toán chi phí nuôi yến",
+      "Chi phí ban đầu để nuôi yến",
+      "Có cần vốn lớn để nuôi yến không"
+    ],
+    "answer": "Chi phí xây dựng nhà yến dao động từ 300 triệu đến hơn 1 tỷ đồng tùy diện tích, vật liệu và thiết bị. Ngoài ra cần dự phòng chi phí vận hành và bảo trì.",
+    "related": [
+      "Phân tích lợi nhuận nuôi yến",
+      "Chi phí thiết bị nhà yến",
+      "Tư vấn đầu tư nuôi yến"
+    ]
+  },
+  {
+    "questions": [
+      "Phân tích lợi nhuận nuôi yến",
+      "Nuôi yến có lời không",
+      "Thời gian hoàn vốn khi nuôi yến",
+      "Lợi nhuận từ tổ yến",
+      "Có nên đầu tư nuôi yến"
+    ],
+    "answer": "Nuôi yến có thể mang lại lợi nhuận cao sau 2–3 năm nếu vị trí tốt và vận hành đúng kỹ thuật. Sản lượng tổ yến trung bình từ 1–2 kg/tháng tùy quy mô.",
+    "related": [
+      "Chi phí xây dựng nhà yến",
+      "Báo cáo sản lượng tổ yến",
+      "Tư vấn đầu tư nhà yến"
+    ]
+  },
+  {
+    "questions": [
+      "Các lỗi thường gặp khi nuôi yến",
+      "Sai lầm khi xây nhà yến",
+      "Lỗi kỹ thuật trong nhà yến",
+      "Tại sao chim yến không vào nhà",
+      "Nhà yến không có tổ"
+    ],
+    "answer": "Các lỗi phổ biến gồm: thiết kế sai lỗ ra vào, âm thanh không phù hợp, độ ẩm quá thấp, ánh sáng quá mạnh hoặc vị trí xây dựng không thuận lợi.",
+    "related": [
+      "Thiết kế nhà yến",
+      "Âm thanh dẫn dụ",
+      "Kiểm tra định kỳ nhà yến"
+    ]
+  },
+  {
+    "questions": [
+      "Tư vấn đầu tư nuôi yến",
+      "Có nên đầu tư nhà yến",
+      "Làm sao để bắt đầu nuôi yến",
+      "Tư vấn xây nhà yến",
+      "Đầu tư nuôi yến có rủi ro không"
+    ],
+    "answer": "Trước khi đầu tư, cần khảo sát vị trí, phân tích chi phí – lợi nhuận, và chuẩn bị kế hoạch vận hành. Nên tham khảo chuyên gia hoặc đơn vị thi công uy tín.",
+    "related": [
+      "Chi phí xây dựng nhà yến",
+      "Phân tích lợi nhuận",
+      "Các lỗi thường gặp khi nuôi yến"
+    ]
+  },
+  {
+    "questions": [
+      "Thiết bị nhà yến cần có",
+      "Nhà yến cần những thiết bị gì",
+      "Thiết bị cơ bản trong nhà yến",
+      "Trang bị nhà yến như thế nào",
+      "Có cần camera trong nhà yến không"
+    ],
+    "answer": "Một nhà yến hiện đại cần các thiết bị như máy amply phát âm thanh, hệ thống điều khiển nhiệt độ và độ ẩm, camera giám sát, hệ thống chiếu sáng và thông gió.",
+    "related": [
+      "Quản lý âm thanh tự động",
+      "Thiết bị giám sát nhà yến",
+      "Bảo trì thiết bị nhà yến"
+    ]
+  },
+  {
+    "questions": [
+      "Quản lý âm thanh tự động trong nhà yến",
+      "Hệ thống âm thanh nhà yến hoạt động thế nào",
+      "Cách điều khiển âm thanh dẫn dụ",
+      "Âm thanh nhà yến có cần tự động hóa không",
+      "Tự động tắt âm thanh ban đêm"
+    ],
+    "answer": "Hệ thống âm thanh nhà yến gồm âm ngoài, âm dẫn và âm trong. Việc tự động hóa giúp điều chỉnh thời gian phát âm, cường độ và loại âm phù hợp với từng giai đoạn trong ngày.",
+    "related": [
+      "Thiết bị phát âm thanh",
+      "Thời gian phát âm dụ yến",
+      "Âm thanh ban đêm"
+    ]
+  },
+  {
+    "questions": [
+      "Phân loại tổ yến",
+      "Có mấy loại tổ yến",
+      "Tổ yến thô và tổ yến tinh khác nhau thế nào",
+      "Tổ yến loại 1 là gì",
+      "Cách đánh giá chất lượng tổ yến"
+    ],
+    "answer": "Tổ yến được phân loại theo độ sạch, màu sắc và hình dạng. Loại phổ biến gồm tổ yến thô, tổ yến tinh chế, tổ yến rút lông và tổ yến huyết. Loại 1 thường có hình dáng đẹp, ít tạp chất và giá trị cao.",
+    "related": [
+      "Giám sát sản lượng tổ yến",
+      "Cách thu hoạch tổ yến",
+      "Bảo quản tổ yến sau khi thu"
+    ]
+  },
+  {
+    "questions": [
+      "Xuất khẩu tổ yến",
+      "Thị trường xuất khẩu tổ yến",
+      "Thủ tục xuất khẩu tổ yến",
+      "Yêu cầu chất lượng khi xuất khẩu tổ yến",
+      "Có nên xuất khẩu tổ yến sang Trung Quốc"
+    ],
+    "answer": "Xuất khẩu tổ yến cần đáp ứng tiêu chuẩn vệ sinh, kiểm dịch và truy xuất nguồn gốc. Các thị trường lớn gồm Trung Quốc, Hàn Quốc, Nhật Bản và Singapore. Nên đăng ký cơ sở sản xuất và tuân thủ quy định quốc tế.",
+    "related": ["Phân loại tổ yến", "Đóng gói tổ yến", "Giá tổ yến xuất khẩu"]
+  },
+  {
+    "questions": [
+      "Thu hoạch tổ yến đúng cách",
+      "Cách thu hoạch tổ yến hiệu quả",
+      "Thời điểm thu hoạch tổ yến",
+      "Thu hoạch tổ yến có ảnh hưởng đến chim không",
+      "Làm sao để thu hoạch tổ yến mà không làm chim hoảng sợ"
+    ],
+    "answer": "Nên thu hoạch tổ yến vào khoảng 9h–15h khi chim đi kiếm ăn. Tránh thu hoạch khi chim đang ấp trứng hoặc nghỉ ngơi để không gây xáo trộn đàn yến. Tổ nên được làm ẩm nhẹ trước khi gỡ để tránh vỡ vụn.",
+    "related": [
+      "Tần suất thu hoạch tổ yến",
+      "Bảo quản tổ yến sau khi thu",
+      "Phân loại tổ yến"
+    ]
+  },
+  {
+    "questions": [
+      "Giấy phép nuôi yến",
+      "Thủ tục đăng ký nuôi yến",
+      "Có cần xin phép khi xây nhà yến không",
+      "Nuôi yến có bị kiểm tra không",
+      "Pháp lý về nuôi yến tại Việt Nam"
+    ],
+    "answer": "Theo quy định hiện hành, người nuôi yến cần đăng ký với chính quyền địa phương và tuân thủ các quy định về môi trường, tiếng ồn và an toàn sinh học. Một số tỉnh yêu cầu giấy phép xây dựng và báo cáo đánh giá tác động môi trường.",
+    "related": [
+      "Chi phí xây dựng nhà yến",
+      "Tư vấn đầu tư nuôi yến",
+      "Quy định về âm thanh nhà yến"
+    ]
+  },
+  {
+    "questions": [
+      "Xử lý âm thanh bị lỗi trong nhà yến",
+      "Âm thanh nhà yến bị rè",
+      "Loa nhà yến không phát tiếng",
+      "Âm thanh dẫn dụ bị ngắt quãng",
+      "Cách kiểm tra hệ thống âm thanh nhà yến"
+    ],
+    "answer": "Âm thanh bị lỗi có thể do hỏng amply, dây loa bị đứt, hoặc file âm thanh bị lỗi. Nên kiểm tra định kỳ hệ thống âm thanh, thay thế thiết bị cũ và dùng bộ điều khiển tự động để đảm bảo phát âm đúng thời gian.",
+    "related": [
+      "Thiết bị phát âm thanh",
+      "Quản lý âm thanh tự động",
+      "Âm thanh ban đêm"
+    ]
+  },
+  {
+    "questions": [
+      "Tối ưu hóa sản lượng tổ yến",
+      "Làm sao để tăng sản lượng tổ yến",
+      "Cách cải thiện hiệu quả nuôi yến",
+      "Tăng số lượng chim yến trong nhà",
+      "Chiến lược nâng cao sản lượng tổ yến"
+    ],
+    "answer": "Để tối ưu sản lượng, cần duy trì môi trường ổn định (nhiệt độ, độ ẩm, ánh sáng), phát âm thanh đúng thời điểm, vệ sinh định kỳ và tránh thu hoạch sai thời điểm. Có thể dùng hệ thống giám sát để theo dõi và điều chỉnh tự động.",
+    "related": [
+      "Giám sát sản lượng tổ yến",
+      "Thiết kế nhà yến hiệu quả",
+      "Kiểm tra định kỳ nhà yến"
+    ]
+  },
+  {
+    "questions": [
+      "Bảo quản tổ yến sau thu hoạch",
+      "Cách giữ tổ yến không bị mốc",
+      "Làm sao bảo quản tổ yến đúng cách",
+      "Tổ yến sau khi thu cần xử lý thế nào",
+      "Có nên để tổ yến trong tủ lạnh không"
+    ],
+    "answer": "Tổ yến nên được bảo quản trong môi trường khô, thoáng mát, tránh ánh nắng trực tiếp. Yến tinh chế có thể để trong hộp kín kèm túi hút ẩm. Yến đã ngâm nên dùng trong vòng 24–48 giờ nếu để tủ lạnh.",
+    "related": [
+      "Thu hoạch tổ yến đúng cách",
+      "Phân loại tổ yến",
+      "Bảo quản yến đã chưng"
+    ]
+  },
+  {
+    "questions": [
+      "Phân tích dữ liệu nhà yến",
+      "Theo dõi thông số nhà yến",
+      "Phân tích sản lượng tổ yến",
+      "Dữ liệu cảm biến nhà yến dùng để làm gì",
+      "Có phần mềm nào phân tích dữ liệu nhà yến không"
+    ],
+    "answer": "Dữ liệu từ cảm biến như nhiệt độ, độ ẩm, ánh sáng và âm thanh có thể được phân tích để tối ưu môi trường sống. Phân tích sản lượng tổ yến giúp đánh giá hiệu quả vận hành và điều chỉnh kịp thời.",
+    "related": [
+      "Ứng dụng IoT trong nhà yến",
+      "Giám sát sản lượng tổ yến",
+      "Tối ưu hóa sản lượng"
+    ]
+  },
+  {
+    "questions": [
+      "Ứng dụng IoT trong nuôi yến",
+      "Cảm biến nhà yến hoạt động thế nào",
+      "Có nên dùng IoT để giám sát nhà yến",
+      "Thiết bị thông minh cho nhà yến",
+      "Tự động hóa nhà yến bằng công nghệ"
+    ],
+    "answer": "IoT giúp giám sát nhiệt độ, độ ẩm, ánh sáng và âm thanh trong nhà yến theo thời gian thực. Hệ thống có thể cảnh báo khi thông số vượt ngưỡng và điều chỉnh tự động để bảo vệ đàn yến.",
+    "related": [
+      "Phân tích dữ liệu nhà yến",
+      "Thiết bị nhà yến",
+      "Quản lý âm thanh tự động"
+    ]
+  },
+  {
+    "questions": [
+      "Đào tạo nhân viên vận hành nhà yến",
+      "Nhân viên cần biết gì khi vận hành nhà yến",
+      "Có khóa học nào về nuôi yến không",
+      "Làm sao để vận hành nhà yến hiệu quả",
+      "Kỹ năng cần thiết để quản lý nhà yến"
+    ],
+    "answer": "Nhân viên vận hành cần hiểu về môi trường sống của chim yến, cách kiểm tra thiết bị, xử lý sự cố âm thanh, vệ sinh nhà yến và ghi nhận sản lượng. Nên được đào tạo định kỳ để cập nhật kỹ thuật mới.",
+    "related": [
+      "Kiểm tra định kỳ nhà yến",
+      "Xử lý âm thanh bị lỗi",
+      "Tối ưu hóa sản lượng"
+    ]
+  }
+]

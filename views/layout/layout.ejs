@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <title><%= title || "My Site" %></title>
-  <link rel="stylesheet" href="/css/app.css">
+   <%- include('./vendor-css') %>
 </head>
-<script src="/js/bootstrap.bundle.min.js"></script>
-<script src="/js/axios.min.js"></script>
+<%- include('./vendor-script') %>
 
 <body>
   <% if (noLayout) { %>

@@ -17,9 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "copy-js": "cpx \"node_modules/bootstrap/dist/js/bootstrap.bundle.min.js\" public/js/ && cpx \"node_modules/axios/dist/axios.min.js\" public/js/"
-
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -38,10 +36,14 @@
     "ejs": "^3.1.10",
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.18.2",
+    "fuse.js": "^7.1.0",
+    "moment": "^2.30.1",
+    "multer": "^2.0.2",
     "mysql2": "^3.15.2",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -54,6 +56,7 @@
     "@types/express": "^5.0.3",
     "@types/express-session": "^1.18.2",
     "@types/jest": "^30.0.0",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "concurrently": "^9.2.1",
