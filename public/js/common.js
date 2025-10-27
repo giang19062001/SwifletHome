@@ -61,8 +61,9 @@ function toastOk(text) {
     position: 'right',
     stopOnFocus: true,
     style: {
-      background: '#4CAF50',
+      background: '#449d48',
       color: '#fff',
+      borderRadius: '0.25rem',
     },
   }).showToast();
 }
@@ -77,7 +78,7 @@ function toastErr(text) {
     position: 'right',
     stopOnFocus: true,
     style: {
-      background: '#f44336', 
+      background: '#f44336',
       color: '#fff',
     },
   }).showToast();

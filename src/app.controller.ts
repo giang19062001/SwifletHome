@@ -8,10 +8,7 @@ import { PageAuthGuard } from './auth/admin/auth.page.guard';
 @ApiExcludeController() // hide from swagger
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly answerService: AnswerAdminService,
-  ) {}
+  constructor(private readonly appService: AppService) {}
 
   @Get('/')
   @UseGuards(PageAuthGuard)
@@ -48,14 +45,18 @@ export class AppController {
   @UseGuards(PageAuthGuard)
   @Render('pages/answer-detail')
   async renderAnswerDetail(@Req() req: Request) {
-    const result = await this.answerService.getDetail(req.params.id);
+    const answer = await this.appService.getDetailAnswer(req.params.id);
+    const categoryQuestion = await this.appService.getAllCateQues();
     return {
       title: 'Answer',
       noLayout: false,
       user: req.session.user,
-      dataPage: {
-        answerContent: result?.answerContent,
-        answerContentRaw: result?.answerContentRaw,
+      content: {
+        answerContent: answer?.answerContent,
+        answerContentRaw: answer?.answerContentRaw,
+        answerObject: answer?.answerObject,
+        categoryAnsCode: answer?.categoryAnsCode,
+        categoryQuestion: categoryQuestion
       },
     };
   }

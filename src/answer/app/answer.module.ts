@@ -5,7 +5,7 @@ import { AnswerAppService } from './answer.service';
 import { AnswerAppController } from './answer.controller';
 import { AnswerAppRepository } from './answer.repository';
 import { QuestionAppModule } from 'src/question/app/question.module';
-import { SearchModule } from 'src/search/search.module';
+import { SearchModule } from 'src/common/services/search/search.module';
 @Module({
   imports: [DatabaseModule, AuthModule, QuestionAppModule, SearchModule],
   controllers: [AnswerAppController],

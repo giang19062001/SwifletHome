@@ -2,6 +2,17 @@
 
    <div class="common-table-container row" id="question-container">
       <div class="col-xl-12">
+         <div class="row mb-2">
+            <div class="col-12">
+               <div class="card">
+                  <div class="card-body">
+                     <div class="d-flex justify-content-end">
+                        <button class="btn-common" onclick="showQuestionModal('create', {})">Thêm</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
          <div class="row">
             <div class="col-12">
                <div class="container-table">
@@ -47,26 +58,50 @@
       </div>
    </div>
    </div>
-   <!-- modal -->
-<div class="modal common-modal question-edit-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal" aria-hidden="true">
-   <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-      <div class="modal-content">
-         <div class="modal-header">
-            <p class="modal-header-title">Cập nhập câu hỏi</p>
-            <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
-               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
-                  <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
-               </svg>
-            </button>
-         </div>
-         <div class="modal-body">
-         
-         </div>
-         <div class="modal-footer">
-            <button type="button" class="btn-common">Cập nhập</button>
+   <!-- modal create-->
+   <div class="modal common-modal question-create-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <p class="modal-header-title">Cập nhập câu hỏi</p>
+               <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                     <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                  </svg>
+               </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn-common">Thêm</button>
+            </div>
          </div>
       </div>
    </div>
-</div>
+   <!-- modal update-->
+   <div class="modal common-modal question-update-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <p class="modal-header-title">Cập nhập câu hỏi</p>
+               <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                     <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                  </svg>
+               </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn-common">Cập nhập</button>
+            </div>
+         </div>
+      </div>
+   </div>
    <script src="/js/page-question.js"></script>

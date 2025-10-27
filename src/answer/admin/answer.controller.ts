@@ -9,6 +9,7 @@ import {
   HttpCode,
   UseGuards,
   Put,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/common/interface/dto';
@@ -19,6 +20,7 @@ import { AnswerAdminService } from './answer.service';
 import { IAnswer } from '../answer.interface';
 import {
   AnswerDetailDto,
+  CreateAnswerDto,
   GetAllAnswerDto,
   UpdateAnswerDto,
 } from './answer.dto';
@@ -42,19 +44,29 @@ export class AnswerAdminController {
   @ApiBody({ type: AnswerDetailDto })
   @Post('getDetail')
   @HttpCode(HttpStatus.OK)
-  async getDetail(
-    @Body() body: AnswerDetailDto,
-  ): Promise<IAnswer | null> {
+  async getDetail(@Body() body: AnswerDetailDto): Promise<IAnswer | null> {
     const result = await this.answerService.getDetail(body.answerCode);
     return result;
   }
 
+  @ApiBody({ type: CreateAnswerDto })
+  @Post('createAnswer')
+  @HttpCode(HttpStatus.OK)
+  async createAnswer(@Body() body: CreateAnswerDto): Promise<number> {
+    const result = await this.answerService.createAnswer(body);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+    return result;
+  }
   @ApiBody({ type: UpdateAnswerDto })
   @Put('updateAnswer')
   @HttpCode(HttpStatus.OK)
   async updateAnswer(@Body() body: UpdateAnswerDto): Promise<number> {
-    console.log(body);
     const result = await this.answerService.updateAnswer(body);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
     return result;
   }
 }

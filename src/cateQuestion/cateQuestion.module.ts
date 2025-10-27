@@ -9,5 +9,6 @@ import { AuthModule } from 'src/auth/admin/auth.module';
   imports: [DatabaseModule, AuthModule],
   controllers: [CateQuestionController],
   providers: [CateQuestionService, CateQuestionRepository],
+  exports:[CateQuestionService]
 })
 export class CateQuestionModule {}

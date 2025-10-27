@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AnswerAppService } from './answer.service';
-import { SearchService } from 'src/search/search.service';
+import { SearchService } from 'src/common/services/search/search.service';
 
 @ApiTags('app/answer')
 @Controller('/api/app/answer')
@@ -28,7 +28,7 @@ export class AnswerAppController {
     type: String,
     example: 'Mái chống nóng là gì?',
   })
-  @Post('reply/:question')
+  @Get('reply/:question')
   @HttpCode(HttpStatus.OK)
   async reply(@Param('question') question: string): Promise<string> {
     const faqData = await this.answerService.reply();

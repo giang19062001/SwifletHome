@@ -53,6 +53,10 @@ export class UploadController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'filename', type: String })
   async deleteFile(@Param('filename') filename: string): Promise<number> {
-    return await this.uploadService.deleteFile(filename);
+    const result = await this.uploadService.deleteFile(filename);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+    return result;
   }
 }

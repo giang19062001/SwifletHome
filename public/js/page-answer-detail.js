@@ -90,7 +90,7 @@ function renderContentHtml() {
   // replace [[payment]]
   answerContent = answerContent.replace(
     /\[\[payment\]\]/g,
-    `<img src="/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`,
+    `<img src="${window.location.origin}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`,
   );
 
   bot.innerHTML = answerContent;
@@ -153,11 +153,6 @@ const createFileCard = (container, fileData) => {
   const card = document.createElement('div');
   card.className = 'file-card';
 
-  const cardButtons =  fileData.filename !== 'PAYMENT' ?
-        ` <button class="btn-common-out-err" 
-        onclick="copyData('${fileData.filename}', '${fileData.mimetype}')">
-        Xóa
-      </button>` : null
   card.innerHTML = `
     <div class="file-icon">${fileData.icon}</div>
     <div class="file-info">
@@ -167,14 +162,15 @@ const createFileCard = (container, fileData) => {
     <div class="file-button">
       <button class="copy-btn btn-common-out" 
         onclick="copyData('${fileData.filename}', '${fileData.mimetype}')">
-        Copy
+        Sao chép
       </button>
       ${
-        fileData.filename !== 'PAYMENT' ?
-        ` <button class="btn-common-out-err" 
+        fileData.filename !== 'PAYMENT'
+          ? ` <button class="btn-out-err" 
         onclick="deleteFile('${fileData.filename}')">
         Xóa
-      </button>` : ''
+      </button>`
+          : ''
       }
      
     </div>
@@ -185,11 +181,15 @@ const createFileCard = (container, fileData) => {
 // API
 async function updateAnswer() {
   try {
+    const categoryAnsCode = document.getElementById('categoryAnsCode').value;
+    const answerObject = document.getElementById('answerObject').value;
     await axios
       .put(window.location.origin + '/api/admin/answer/updateAnswer', {
         answerCode,
         answerContent,
         answerContentRaw,
+        categoryAnsCode,
+        answerObject,
       })
       .then(function (response) {
         console.log('response', response);
@@ -199,7 +199,7 @@ async function updateAnswer() {
         console.log('error', error);
       });
   } catch (error) {
-    console.log(error);
+    console.log("err", error);
   }
 }
 async function uploadFile(file, type) {
@@ -209,11 +209,15 @@ async function uploadFile(file, type) {
   formData.append('file', file);
 
   try {
-    const response = await axios.post('/api/admin/uploadFile/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    const response = await axios.post(
+      '/api/admin/uploadFile/upload',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
-    });
+    );
 
     if (response.data) {
       // reload file list
@@ -228,7 +232,9 @@ async function uploadFile(file, type) {
 }
 async function deleteFile(filename) {
   await axios
-    .delete(window.location.origin + '/api/admin/uploadFile/deleteFile/' + filename)
+    .delete(
+      window.location.origin + '/api/admin/uploadFile/deleteFile/' + filename,
+    )
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

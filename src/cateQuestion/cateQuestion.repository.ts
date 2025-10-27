@@ -18,8 +18,10 @@ export class CateQuestionRepository {
   async getAll(dto: PagingDto): Promise<ICategoryQuestion[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table} LIMIT ? OFFSET ? `,
-      [dto.limit, (dto.page - 1) * dto.limit],
+        FROM ${this.table}  ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
+      dto.limit == 0 && dto.page == 0
+        ? []
+        : [dto.limit, (dto.page - 1) * dto.limit],
     );
     return rows as ICategoryQuestion[];
   }

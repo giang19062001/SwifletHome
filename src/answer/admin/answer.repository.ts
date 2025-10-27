@@ -2,7 +2,12 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/common/interface/dto';
 import { IAnswer } from '../answer.interface';
-import { GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
+import {
+  CreateAnswerDto,
+  GetAllAnswerDto,
+  UpdateAnswerDto,
+} from './answer.dto';
+import { generateCode } from 'src/common/helper/func';
 
 @Injectable()
 export class AnswerAdminRepository {
@@ -79,14 +84,37 @@ export class AnswerAdminRepository {
     );
     return rows ? (rows[0] as IAnswer) : null;
   }
+  async createAnswer(dto: CreateAnswerDto): Promise<number> {
+    const sqlLast = ` SELECT answerCode FROM ${this.table} ORDER BY answerCode DESC LIMIT 1`;
+    const [rows] = await this.db.execute<any[]>(sqlLast);
+    let answerCode = 'ANS000001';
+    if (rows.length > 0) {
+      answerCode = generateCode(rows[0].answerCode, 'ANS', 6);
+    }
+    const sql = `
+        INSERT INTO ${this.table}  (answerCode, answerContent, answerContentRaw, answerObject, categoryAnsCode) 
+        VALUES(?, ?, ?, ?, ?)
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      answerCode,
+      dto.answerContent,
+      dto.answerContentRaw,
+      dto.answerObject,
+      dto.categoryAnsCode
+    ]);
+
+    return result.insertId;
+  }
   async updateAnswer(dto: UpdateAnswerDto): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET answerContent = ?, answerContentRaw = ?
+      UPDATE ${this.table} SET answerContent = ?, answerContentRaw = ?, answerObject = ?, categoryAnsCode = ?
       WHERE answerCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       dto.answerContent,
       dto.answerContentRaw,
+      dto.answerObject,
+      dto.categoryAnsCode,
       dto.answerCode,
     ]);
 

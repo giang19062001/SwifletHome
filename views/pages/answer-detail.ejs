@@ -1,4 +1,36 @@
+<!-- css -->
+<link rel="stylesheet" href="/css/quill.snow.css" />
+<!-- html -->
 <div id="answer-detail-container">
+  <div class="row mb-2">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <label for="categoryAnsCode" class="form-label">Thể loại</label>
+              <select class="form-select" id="categoryAnsCode" name="categoryAnsCode">
+                <% content.categoryQuestion.forEach(function(cate) { %>
+                  <option value="<%= cate.categoryCode %>" <%=(content.categoryAnsCode &&
+                    content.categoryAnsCode===cate.categoryCode) ? 'selected' : '' %>
+                    >
+                    <%= cate.categoryName %>
+                  </option>
+                  <% }); %>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label for="answerObject" class="form-label">Đối tượng</label>
+              <select class="form-select" id="answerObject">
+                <option value="YEN"  <%= content.answerObject==='YEN' ? 'selected' : '' %>>Yến</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-4">
       <div class="preview">
@@ -13,7 +45,7 @@
               </div>
 
               <div class="bubble" id="botMessage">
-                <%- dataPage.answerContent %>
+                <%- content.answerContent %>
               </div>
             </div>
           </div>
@@ -25,12 +57,12 @@
     </div>
     <div class="col-4">
       <div class="common-editor">
-        <div id="editor">
-            <%- dataPage.answerContentRaw %>
-        </div>
+        <div id="editor"><%- content.answerContentRaw %></div>
 
         <div class="bottom-button">
-          <button class="btn-common" onclick="getContent()"><<</button>
+          <button class="btn-common" onclick="getContent()">
+            << 
+          </button>
         </div>
       </div>
     </div>
@@ -50,7 +82,9 @@
   </div>
 </div>
 <script>
-  let answerContent = `<%- dataPage.answerContent %>`;
-  let answerContentRaw = `<%- dataPage.answerContentRaw %>`;
+  let answerContent = `<%- content.answerContent %>`;
+  let answerContentRaw = `<%- content.answerContentRaw %>`;
+  console.log('a',<%- JSON.stringify(content) %>);
 </script>
+<script src="/js/quill.js"></script>
 <script src="/js/page-answer-detail.js"></script>

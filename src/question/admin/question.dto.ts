@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class QuestionDetailDto {
@@ -9,6 +9,8 @@ export class QuestionDetailDto {
   @IsNotEmpty()
   questionCode: string;
 }
+
+
 
 export class UpdateQuestionDto {
   @ApiProperty({
@@ -48,3 +50,12 @@ export class UpdateQuestionDto {
   @IsNotEmpty()
   questionCode: string;
 }
+
+
+export class CreateQuestionDto extends OmitType(UpdateQuestionDto, ['questionCode'] as const) {}
+
+
+
+
+
+

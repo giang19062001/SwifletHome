@@ -8,7 +8,7 @@ import { AuthRepository } from './auth.repository';
 import { IUserAuth } from './auth.interface';
 import { AuthLoginDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
-import { messageErr } from 'src/common/message';
+import { messageErr } from 'src/common/helper/message';
 
 @Injectable()
 export class AuthService {
