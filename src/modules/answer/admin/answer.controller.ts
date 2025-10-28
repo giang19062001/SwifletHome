@@ -14,7 +14,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/interfaces/dto';
+import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
 
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';

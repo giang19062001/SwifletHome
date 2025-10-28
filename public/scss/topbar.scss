@@ -224,6 +224,7 @@
    // padding: calc(#{$header-height} + #{$grid-gutter-width}) calc(#{$grid-gutter-width} * 0.75) $footer-height calc(#{$grid-gutter-width} * 0.75);
    padding: calc(var(--header-height) + #{$grid-gutter-width}) calc(#{$grid-gutter-width} * 0.75) $footer-height calc(#{$grid-gutter-width} * 0.75);
    background-color: $page-conten-bg;
+   height: "auto";
 }
 
 .header-item {

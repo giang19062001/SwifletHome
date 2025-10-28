@@ -1,11 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { ICategoryQuestion } from './cateQuestion.interface';
 import { PagingDto } from 'src/dto/common';
+import { IHome } from '../home.interface';
 
 @Injectable()
-export class CateQuestionRepository {
-  private readonly table = 'tbl_category_ques_ans';
+export class HomeRepository {
+  private readonly table = 'tbl_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -15,14 +15,14 @@ export class CateQuestionRepository {
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<ICategoryQuestion[]> {
+  async getAll(dto: PagingDto): Promise<IHome[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table}  ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
-      dto.limit == 0 && dto.page == 0
+      ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.latitude, A.longitude, A.seqMainImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
+        FROM ${this.table} A  ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
+        dto.limit == 0 && dto.page == 0
         ? []
         : [dto.limit, (dto.page - 1) * dto.limit],
     );
-    return rows as ICategoryQuestion[];
+    return rows as IHome[];
   }
 }

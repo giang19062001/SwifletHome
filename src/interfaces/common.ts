@@ -5,7 +5,7 @@ export interface IPaging {
 }
 
 export interface IList<T> {
-  count: number;
+  total: number;
   list: T[];
 }
 

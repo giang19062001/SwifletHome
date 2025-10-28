@@ -1,12 +1,12 @@
 .common-table-container {
   .table {
     border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
+    border-radius: 15px;
     overflow: hidden;
     border-collapse: separate;
     border-spacing: 0;
     .table-dark {
-      --bs-table-bg: #505050 !important;
+      --bs-table-bg: #121927b3 !important;
       tr {
         th {
           font-family: 'Pretendard';
@@ -21,30 +21,14 @@
       }
     }
     tr:nth-of-type(odd) {
-      &:hover {
-        td {
-          --bs-table-bg-type: #f5fcff !important;
-          color: #212529;
-          border-top: 1.5px solid $main-color;
-          border-bottom: 1.5px solid $main-color;
-        }
-      }
       td {
         --bs-table-bg-type: #ffffff !important;
         color: #212529;
       }
     }
     tr:nth-of-type(even) {
-      &:hover {
-        td {
-          --bs-table-bg-type: #f5fcff !important;
-          color: #212529;
-          border-top: 1.5px solid $main-color;
-          border-bottom: 1.5px solid $main-color;
-        }
-      }
       td {
-        --bs-table-bg-type: #f5fcff !important;
+        --bs-table-bg-type: #ffffff !important;
         color: #212529;
       }
     }

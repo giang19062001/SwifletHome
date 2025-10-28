@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/interfaces/dto';
+import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
 import { AnswerAppRepository } from './answer.repository';
 import { IAnswer } from '../answer.interface';

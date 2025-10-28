@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { PagingDto } from 'src/interfaces/dto';
+import { PagingDto } from 'src/dto/common';
 
 export class GetAllAnswerDto extends PagingDto {
   @ApiProperty({

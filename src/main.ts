@@ -12,6 +12,9 @@ import { NotFoundExceptionFilter } from './filter/NotFoundExceptionFilter';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  //CORS
+  app.enableCors();
+  
   // (CSS, JS, IMG), views , engine
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));

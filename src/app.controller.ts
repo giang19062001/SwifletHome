@@ -14,7 +14,7 @@ export class AppController {
   @UseGuards(PageAuthGuard)
   @Render('pages/login')
   renderLogin() {
-    return { title: 'Login', isLayout: false };
+    return { title: 'Đăng nhập', isLayout: false };
   }
 
   @Get('/dashboard/question/category')
@@ -22,7 +22,7 @@ export class AppController {
   @Render('pages/category-question')
   renderCateQuestion(@Req() req: Request) {
     return {
-      title: 'Category of question',
+      title: 'Danh sách thể loại',
       isLayout: true,
       user: req.session.user,
     };
@@ -31,14 +31,14 @@ export class AppController {
   @UseGuards(PageAuthGuard)
   @Render('pages/question')
   renderQuestion(@Req() req: Request) {
-    return { title: 'Question', isLayout: true, user: req.session.user };
+    return { title: 'Danh sách câu hỏi', isLayout: true, user: req.session.user };
   }
 
   @Get('/dashboard/answer/list')
   @UseGuards(PageAuthGuard)
   @Render('pages/answer')
   renderAnswer(@Req() req: Request) {
-    return { title: 'Answer', isLayout: true, user: req.session.user };
+    return { title: 'Danh sách trả lời', isLayout: true, user: req.session.user };
   }
   @Get('/dashboard/answer/create')
   @UseGuards(PageAuthGuard)
@@ -46,7 +46,7 @@ export class AppController {
   async renderCreateAnswer(@Req() req: Request) {
     const values = await this.appService.renderCreateAnswer();
     return {
-      title: 'Creating Answer',
+      title: 'Thêm câu trả lời',
       isLayout: true,
       user: req.session.user,
       values: values,
@@ -59,7 +59,7 @@ export class AppController {
   async renderAnswerUpdate(@Req() req: Request) {
     const values = await this.appService.renderAnswerUpdate(req.params.id);
     return {
-      title: 'Answer',
+      title: 'Chỉnh sửa câu trả lời',
       isLayout: true,
       user: req.session.user,
       values: values,
@@ -70,7 +70,15 @@ export class AppController {
   @UseGuards(PageAuthGuard)
   @Render('pages/home')
   renderHome(@Req() req: Request) {
-    return { title: 'Swiftlet Home', isLayout: true, user: req.session.user };
+    return { title: 'Danh sách nhà yến', isLayout: true, user: req.session.user };
+  }
+
+  
+  @Get('/dashboard/home/create')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/home-create')
+  renderHomeCreate(@Req() req: Request) {
+    return { title: 'Thêm nhà yến', isLayout: true, user: req.session.user };
   }
 
   @Get('/404')

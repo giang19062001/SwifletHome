@@ -1,6 +1,6 @@
 let page = 1;
 let limit = 10;
-let pageElement = 'question-container';
+let pageElement = 'page-question';
 let categoryQuestions = [];
 
 // TODO: INIT
@@ -168,7 +168,7 @@ function renderAllQuestion(data, objElement) {
     objElement.innerHTML = HTML;
 
     // render paging
-    let pagerHTML = createPagerHTML(data.count, limit, page, 5, 'changePage');
+    let pagerHTML = createPagerHTML(data.total, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     //clear

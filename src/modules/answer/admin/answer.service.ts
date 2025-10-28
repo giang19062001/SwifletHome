@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/interfaces/dto';
+import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
 import { AnswerAdminRepository } from './answer.repository';
 import { IAnswer } from '../answer.interface';
@@ -17,9 +17,9 @@ export class AnswerAdminService {
     private readonly questionAdminService: QuestionAdminService,
   ) {}
   async getAll(dto: GetAllAnswerDto): Promise<IList<IAnswer>> {
-    const count = await this.answerAdminRepository.getCountAnswer(dto);
+    const total = await this.answerAdminRepository.getTotal(dto);
     const list = await this.answerAdminRepository.getAll(dto);
-    return { count, list };
+    return { total, list };
   }
   async getDetail(answerCode: string): Promise<IAnswer | null> {
     const result = await this.answerAdminRepository.getDetail(answerCode);

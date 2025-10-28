@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/interfaces/dto';
+import { PagingDto } from 'src/dto/common';
 import { IAnswer } from '../answer.interface';
 import {
   CreateAnswerDto,
@@ -15,7 +15,7 @@ export class AnswerAdminRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getCountAnswer(dto: GetAllAnswerDto): Promise<number> {
+  async getTotal(dto: GetAllAnswerDto): Promise<number> {
     const params: any[] = [];
 
     let whereClause = 'WHERE 1 = 1';
@@ -31,10 +31,10 @@ export class AnswerAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(seq) AS CNT FROM ${this.table} ${whereClause}`,
+      ` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`,
       params,
     );
-    return rows.length ? (rows[0].CNT as number) : 0;
+    return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: GetAllAnswerDto): Promise<IAnswer[]> {
     const params: any[] = [];

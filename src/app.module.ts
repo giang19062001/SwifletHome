@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/admin/auth.module';
 import { CateQuestionModule } from './modules/cateQuestion/cateQuestion.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { QuestionAppModule } from './modules/question/app/question.module';
+import { HomeModule } from './modules/home/admin/home.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { QuestionAppModule } from './modules/question/app/question.module';
     QuestionAppModule,
     AnswerAdminModule,
     AnswerAppModule,
-    UploadModule
+    UploadModule,
+    HomeModule
   ],
   controllers: [AppController],
   providers: [AppService],

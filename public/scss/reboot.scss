@@ -1,93 +1,30 @@
 p {
   margin-bottom: 0 !important;
 }
-
-.card{
-  border-color: #e1e0e080 !important;
-  border-radius: 0.25rem !important;
+textarea,
+input,
+select {
+  border-radius: 15px !important;
 }
-[class^="invalid-"] {
+
+.card {
+  border-color: #e1e0e080 !important;
+  border-radius: 15px !important;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+}
+[class^='invalid-'] {
   color: red;
   font-size: 0.875rem;
   margin-top: 4px;
   display: none;
 }
 
-
-audio{
-  padding: 5px !important;
-  background-color: white !important;
+audio {
+  padding: 3px !important;
+  border-radius: 15px;
+  border: 1px solid rgb(216, 216, 216);
   width: 20em !important;
-}
-
-.btn-common {
-  padding: 7px 15px;
-  border-radius: 0.25rem;
-  font-family: Pretendard;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  border-width: 0.13em;
-  background-color: $main-color;
-  border-color: $main-color;
-  outline: auto;
-  color: #ffffff;
-  &:hover {
-    background-color: $main-color-hover;
-  }
-}
-
-.btn-common-out {
-  padding: 7px 15px;
-  border-radius: 0.25rem;
-  font-family: Pretendard;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  border-width: 0.13em;
-  background-color: #ffffff;
-  border-color: #ffffff;
-  outline: auto;
-  color: $main-color;
-  &:hover {
-    background-color: $main-color;
-    color: #ffffff;
-  }
-}
-
-
-
-.btn-err {
-  padding: 7px 15px;
-  border-radius: 0.25rem;
-  font-family: Pretendard;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  border-width: 0.13em;
-  background-color: $err-color;
-  border-color: $err-color;
-  outline: auto;
-  color: #ffffff;
-  &:hover {
-    background-color: $err-color-hover;
-  }
-}
-
-.btn-out-err {
-  padding: 7px 15px;
-  border-radius: 0.25rem;
-  font-family: Pretendard;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  border-width: 0.13em;
-  background-color: #ffffff;
-  border-color: #ffffff;
-  outline: auto;
-  color: $err-color;
-  &:hover {
-    background-color: $err-color;
-    color: #ffffff;
-  }
+  outline: none;
+  background: #f0f0f0;
+  transition: all 0.3s ease;
 }

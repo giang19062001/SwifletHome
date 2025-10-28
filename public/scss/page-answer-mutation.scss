@@ -1,4 +1,4 @@
-#answer-mutation-container {
+#page-answer-mutation {
   .bottom-button {
     display: flex;
     justify-content: center;
@@ -6,6 +6,8 @@
   }
 
   .preview {
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 15px;
     background-color: white;
     padding: 15px;
     height: 80vh;
@@ -81,6 +83,8 @@
     }
   }
   .upload {
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 15px;
     background-color: white;
     padding: 15px;
     height: 80vh;
@@ -118,7 +122,7 @@
       scroll-snap-align: start;
       flex-shrink: 0;
       background: #fff;
-      border-radius: 0.25rem;
+      border-radius: 15px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
       display: flex;
       align-items: center;
@@ -136,7 +140,6 @@
       flex-shrink: 0;
       width: 48px;
       height: 48px;
-      border-radius: 0.25rem;
       display: flex;
       align-items: center;
       justify-content: center;

@@ -4,13 +4,22 @@
   margin: 0 auto;
   background: white;
   padding: 20px 20px 0 20px;
-  border-radius: 0.25rem;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 15px;
   #editor {
     height: 85%;
     margin-bottom: 10px;
   }
 }
 
-.ql-video{
+.ql-video {
   max-width: 20em !important;
+}
+.ql-container {
+  border-bottom-left-radius: 15px !important;
+  border-bottom-right-radius: 15px !important;
+}
+.ql-toolbar{
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
 }

@@ -90,7 +90,7 @@ CREATE TABLE `tbl_home` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeCode` varchar(45) NOT NULL,
   `homeName` char(10) NOT NULL,
-  `location` TEXT NOT NULL,
+  `homeAddress` TEXT NOT NULL,
   `latitude` FLOAT NOT NULL,
   `longitude` FLOAT NOT NULL,
   `seqMainImage` INT NOT NULL,

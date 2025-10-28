@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/interfaces/dto';
+import { PagingDto } from 'src/dto/common';
 import { IQuestion } from '../question.interface';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { generateCode } from 'src/helpers/func';
@@ -11,11 +11,11 @@ export class QuestionAdminRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getCountQuestion(): Promise<number> {
+  async getTotal(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(seq) AS CNT FROM ${this.table}`,
+      ` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`,
     );
-    return rows.length ? (rows[0].CNT as number) : 0;
+    return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IQuestion[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(

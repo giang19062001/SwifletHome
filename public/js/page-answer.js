@@ -1,6 +1,6 @@
 let page = 1;
 let limit = 10;
-let pageElement = 'answer-container';
+let pageElement = 'page-answer';
 
 document.addEventListener('DOMContentLoaded', function () {
   getAllAnswer(page, limit);
@@ -45,7 +45,7 @@ const renderAllAnswer = (data, objElement) => {
     objElement.innerHTML = HTML;
 
     // render paging
-    let pagerHTML = createPagerHTML(data.count, limit, page, 5, 'changePage');
+    let pagerHTML = createPagerHTML(data.total, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     //clear

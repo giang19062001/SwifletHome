@@ -1,0 +1,79 @@
+.error-message {
+  color: #e72c2c;
+  font-family: Pretendard;
+  font-size: 15px;
+}
+
+.title-page {
+  font-family: PretendardBold;
+  font-size: 1.5rem;
+}
+.btn-common {
+  padding: 7px 15px;
+  border-radius: 15px;
+  font-family: Pretendard;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+  border-width: 0.13em;
+  background-color: $main-color;
+  border-color: $main-color;
+  outline: auto;
+  color: #ffffff;
+  &:hover {
+    background-color: $main-color-hover;
+  }
+}
+
+.btn-common-out {
+  padding: 7px 15px;
+  border-radius: 15px;
+  font-family: Pretendard;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+  border-width: 0.13em;
+  background-color: #ffffff;
+  border-color: #ffffff;
+  outline: auto;
+  color: $main-color;
+  &:hover {
+    background-color: $main-color;
+    color: #ffffff;
+  }
+}
+
+.btn-err {
+  padding: 7px 15px;
+  border-radius: 15px;
+  font-family: Pretendard;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+  border-width: 0.13em;
+  background-color: $err-color;
+  border-color: $err-color;
+  outline: auto;
+  color: #ffffff;
+  &:hover {
+    background-color: $err-color-hover;
+  }
+}
+
+.btn-out-err {
+  padding: 7px 15px;
+  border-radius: 15px;
+  font-family: Pretendard;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+  border-width: 0.13em;
+  background-color: #ffffff;
+  border-color: #ffffff;
+  outline: auto;
+  color: $err-color;
+  &:hover {
+    background-color: $err-color;
+    color: #ffffff;
+  }
+}
