@@ -1,3 +1,6 @@
+const currentPath = window.location.pathname;
+const currentUrl = window.location.origin;
+
 document.addEventListener('DOMContentLoaded', () => {
   initMenu();
 });
@@ -6,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function initMenu() {
   const allLinks = document.querySelectorAll('#side-menu a');
   const topLinks = document.querySelectorAll('#side-menu > li > a');
-  const currentPath = window.location.pathname;
   const partCut = currentPath.split('/');
   const partType = partCut[2]; // "question" or "answer"
 

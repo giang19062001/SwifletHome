@@ -1,5 +1,5 @@
 import 'express-session';
-import { IUserAuth } from './auth/auth.interface';
+import { IUserAuth } from './modules/auth/auth.interface';
 
 declare module 'express-session' {
   interface SessionData {

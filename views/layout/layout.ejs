@@ -8,7 +8,7 @@
 <%- include('./vendor-script') %>
 
 <body>
-  <% if (noLayout) { %>
+  <% if (!isLayout) { %>
       <%- body%>
   <% } else{  %>
     <%- include('./topbar') %>
@@ -20,6 +20,10 @@
           </div>
       </div>
     </div>
+    <script>
+      const user = <%- JSON.stringify(user) %>;
+      console.log("user ===> ", user)
+    </script>
   <% }  %>
 
   <%- include('./footer') %>

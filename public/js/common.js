@@ -1,3 +1,17 @@
+function axiosAuth(config) {
+  const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('swf-token='))
+    ?.split('=')[1];
+
+  return {
+    headers: {
+      ...config,
+      Authorization: `Bearer ${token}`,
+    },
+  };
+}
+
 function createPagerHTML(
   totalCount,
   offset,

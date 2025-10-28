@@ -1,9 +1,9 @@
-import { AnswerAdminService } from './answer/admin/answer.service';
+import { AnswerAdminService } from './modules/answer/admin/answer.service';
 import { AppService } from './app.service';
 import { Controller, Get, Render, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
-import { PageAuthGuard } from './auth/admin/auth.page.guard';
+import { PageAuthGuard } from './modules/auth/admin/auth.page.guard';
 
 @ApiExcludeController() // hide from swagger
 @Controller()
@@ -14,7 +14,7 @@ export class AppController {
   @UseGuards(PageAuthGuard)
   @Render('pages/login')
   renderLogin() {
-    return { title: 'Login', noLayout: true };
+    return { title: 'Login', isLayout: false };
   }
 
   @Get('/dashboard/question/category')
@@ -23,7 +23,7 @@ export class AppController {
   renderCateQuestion(@Req() req: Request) {
     return {
       title: 'Category of question',
-      noLayout: false,
+      isLayout: true,
       user: req.session.user,
     };
   }
@@ -31,39 +31,51 @@ export class AppController {
   @UseGuards(PageAuthGuard)
   @Render('pages/question')
   renderQuestion(@Req() req: Request) {
-    return { title: 'Question', noLayout: false, user: req.session.user };
+    return { title: 'Question', isLayout: true, user: req.session.user };
   }
 
   @Get('/dashboard/answer/list')
   @UseGuards(PageAuthGuard)
   @Render('pages/answer')
   renderAnswer(@Req() req: Request) {
-    return { title: 'Answer', noLayout: false, user: req.session.user };
+    return { title: 'Answer', isLayout: true, user: req.session.user };
+  }
+  @Get('/dashboard/answer/create')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/answer-create')
+  async renderCreateAnswer(@Req() req: Request) {
+    const values = await this.appService.renderCreateAnswer();
+    return {
+      title: 'Creating Answer',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
   }
 
-  @Get('/dashboard/answer/detail/:id')
+  @Get('/dashboard/answer/update/:id')
   @UseGuards(PageAuthGuard)
-  @Render('pages/answer-detail')
-  async renderAnswerDetail(@Req() req: Request) {
-    const answer = await this.appService.getDetailAnswer(req.params.id);
-    const categoryQuestion = await this.appService.getAllCateQues();
+  @Render('pages/answer-update')
+  async renderAnswerUpdate(@Req() req: Request) {
+    const values = await this.appService.renderAnswerUpdate(req.params.id);
     return {
       title: 'Answer',
-      noLayout: false,
+      isLayout: true,
       user: req.session.user,
-      content: {
-        answerContent: answer?.answerContent,
-        answerContentRaw: answer?.answerContentRaw,
-        answerObject: answer?.answerObject,
-        categoryAnsCode: answer?.categoryAnsCode,
-        categoryQuestion: categoryQuestion
-      },
+      values: values,
     };
+  }
+
+  @Get('/dashboard/home/list')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/home')
+  renderHome(@Req() req: Request) {
+    return { title: 'Swiftlet Home', isLayout: true, user: req.session.user };
   }
 
   @Get('/404')
   @Render('pages/404')
   render404(@Req() req: Request) {
-    return { title: '404', noLayout: true, user: req.session?.user };
+    return { title: '404', isLayout: false, user: req.session?.user };
   }
 }

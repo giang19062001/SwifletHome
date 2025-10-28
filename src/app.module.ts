@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseModule } from './common/database/database.module';
-import { QuestionAdminModule } from './question/admin/question.module';
-import { AnswerAdminModule } from './answer/admin/answer.module';
-import { UploadModule } from './upload/upload.module';
-import { AuthModule } from './auth/admin/auth.module';
-import { CateQuestionModule } from './cateQuestion/cateQuestion.module';
-import { AnswerAppModule } from './answer/app/answer.module';
-import { QuestionAppModule } from './question/app/question.module';
+import { DatabaseModule } from './database/database.module';
+import { QuestionAdminModule } from './modules/question/admin/question.module';
+import { AnswerAdminModule } from './modules/answer/admin/answer.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { AuthModule } from './modules/auth/admin/auth.module';
+import { CateQuestionModule } from './modules/cateQuestion/cateQuestion.module';
+import { AnswerAppModule } from './modules/answer/app/answer.module';
+import { QuestionAppModule } from './modules/question/app/question.module';
 
 @Module({
   imports: [

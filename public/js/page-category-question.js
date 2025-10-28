@@ -2,13 +2,13 @@ let page = 1;
 let limit = 10;
 let pageElement = 'category-question-container'
 document.addEventListener('DOMContentLoaded', function () {
-    getAll(page, limit);
+    getAllCategoryQuestion(page, limit);
 });
 // FUNC
 function changePage(p) {
    page = p;
    document.getElementById("privacy-main-pager").innerHTML = "";
-   getAll(page, limit);
+   getAllCategoryQuestion(page, limit);
 }
 // RENDER
 const renderAllQuestion = (data, objElement) => {
@@ -33,14 +33,14 @@ const renderAllQuestion = (data, objElement) => {
     }
 };
 // API
-async function getAll(currentPage, limit) {
+async function getAllCategoryQuestion(currentPage, limit) {
     const objElement = document.querySelector(`#${pageElement} .body-table`);
 
     await axios
-        .post(window.location.origin + '/api/admin/categoryQuestion/getAll', {
+        .post(currentUrl + '/api/admin/categoryQuestion/getAll', {
             page: currentPage,
             limit: limit,
-        })
+        },axiosAuth())
         .then(function (response) {
             console.log('response', response);
             if (response.status === 200 && response.data) {

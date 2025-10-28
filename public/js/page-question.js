@@ -6,7 +6,7 @@ let categoryQuestions = [];
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllQuestion(page, limit);
-  getAllCategory(page, limit);
+  getAllCategoryQuestion(page, limit);
 });
 
 // TODO: FUNC
@@ -94,7 +94,7 @@ async function showQuestionModal(type, questionData) {
     const selected = this.options[this.selectedIndex];
     const code = selected.getAttribute('data-answer-code');
     if (code) {
-      answerDetailLink.href = `/dashboard/answer/detail/${code}`;
+      answerDetailLink.href = `/dashboard/answer/update/${code}`;
       answerDetailLink.style.display = 'inline-block';
     } else {
       answerDetailLink.style.display = 'none';
@@ -159,7 +159,7 @@ function renderAllQuestion(data, objElement) {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-common-out"  onclick="getDetail('${ele.questionCode}')">Cập nhập</button>
+                <button class="btn-common-out"  onclick="getDetailQuestion('${ele.questionCode}')">Cập nhập</button>
                 <button class="btn-out-err"  onclick="deleteQuestion('${ele.questionCode}')">Xóa</button>
             </td>
          </tr>`;
@@ -170,17 +170,24 @@ function renderAllQuestion(data, objElement) {
     // render paging
     let pagerHTML = createPagerHTML(data.count, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
+  } else {
+    //clear
+    objElement.innerHTML = ``;
+    document.getElementById('privacy-main-pager').innerHTML = ``;
   }
 }
 // TODO: API
 async function getAllQuestion(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
-
   await axios
-    .post(window.location.origin + '/api/admin/question/getAll', {
-      page: currentPage,
-      limit: limit,
-    })
+    .post(
+      currentUrl + '/api/admin/question/getAll',
+      {
+        page: currentPage,
+        limit: limit,
+      },
+      axiosAuth(),
+    )
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -191,12 +198,16 @@ async function getAllQuestion(currentPage, limit) {
       console.log('error', error);
     });
 }
-async function getAllCategory(currentPage, limit) {
+async function getAllCategoryQuestion(currentPage, limit) {
   await axios
-    .post(window.location.origin + '/api/admin/categoryQuestion/getAll', {
-      page: currentPage,
-      limit: limit,
-    })
+    .post(
+      currentUrl + '/api/admin/categoryQuestion/getAll',
+      {
+        page: currentPage,
+        limit: limit,
+      },
+      axiosAuth(),
+    )
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -207,11 +218,15 @@ async function getAllCategory(currentPage, limit) {
       console.log('error', error);
     });
 }
-async function getDetail(questionCode) {
+async function getDetailQuestion(questionCode) {
   await axios
-    .post(window.location.origin + '/api/admin/question/getDetail', {
-      questionCode: questionCode,
-    })
+    .post(
+      currentUrl + '/api/admin/question/getDetail',
+      {
+        questionCode: questionCode,
+      },
+      axiosAuth(),
+    )
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -225,12 +240,16 @@ async function getDetail(questionCode) {
 
 async function getAllAnswer(currentPage, limit, categoryAnsCode, answerObject) {
   return await axios
-    .post(window.location.origin + '/api/admin/answer/getAll', {
-      page: currentPage,
-      limit: limit,
-      categoryAnsCode: categoryAnsCode,
-      answerObject: answerObject,
-    })
+    .post(
+      currentUrl + '/api/admin/answer/getAll',
+      {
+        page: currentPage,
+        limit: limit,
+        categoryAnsCode: categoryAnsCode,
+        answerObject: answerObject,
+      },
+      axiosAuth(),
+    )
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -253,8 +272,9 @@ async function deleteQuestion(questionCode) {
   }
   await axios
     .delete(
-      window.location.origin +
-        `/api/admin/question/deleteQuestion/${questionCode}`,
+      currentUrl + `/api/admin/question/deleteQuestion/${questionCode}`,
+      {},
+      axiosAuth(),
     )
     .then(function (response) {
       console.log('response', response);
@@ -282,12 +302,17 @@ async function createQuestion() {
       return;
     }
     await axios
-      .post(window.location.origin + '/api/admin/question/createQuestion', {
-        questionContent: questionContent,
-        categoryQuesCode: categoryQuesCode,
-        questionObject: questionObject,
-        answerCode: answerCode,
-      })
+      .post(
+        currentUrl + '/api/admin/question/createQuestion',
+        {
+          questionContent: questionContent,
+          categoryQuesCode: categoryQuesCode,
+          questionObject: questionObject,
+          answerCode: answerCode,
+          createdId: user.userId,
+        },
+        axiosAuth(),
+      )
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -321,13 +346,17 @@ async function updateQuestion() {
       return;
     }
     await axios
-      .put(window.location.origin + '/api/admin/question/updateQuestion', {
-        questionContent: questionContent,
-        categoryQuesCode: categoryQuesCode,
-        questionObject: questionObject,
-        answerCode: answerCode,
-        questionCode: questionCode,
-      })
+      .put(
+        currentUrl + '/api/admin/question/updateQuestion',
+        {
+          questionContent: questionContent,
+          categoryQuesCode: categoryQuesCode,
+          questionObject: questionObject,
+          answerCode: answerCode,
+          questionCode: questionCode,
+        },
+        axiosAuth(),
+      )
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {

@@ -23,7 +23,7 @@
     tr:nth-of-type(odd) {
       &:hover {
         td {
-          --bs-table-bg-type: #fffaf5 !important;
+          --bs-table-bg-type: #f5fcff !important;
           color: #212529;
           border-top: 1.5px solid $main-color;
           border-bottom: 1.5px solid $main-color;
@@ -37,14 +37,14 @@
     tr:nth-of-type(even) {
       &:hover {
         td {
-          --bs-table-bg-type: #fffaf5 !important;
+          --bs-table-bg-type: #f5fcff !important;
           color: #212529;
           border-top: 1.5px solid $main-color;
           border-bottom: 1.5px solid $main-color;
         }
       }
       td {
-        --bs-table-bg-type: #f8f9fa !important;
+        --bs-table-bg-type: #f5fcff !important;
         color: #212529;
       }
     }

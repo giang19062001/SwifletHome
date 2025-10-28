@@ -7,7 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-import { NotFoundExceptionFilter } from './common/filter/NotFoundExceptionFilter';
+import { NotFoundExceptionFilter } from './filter/NotFoundExceptionFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -44,14 +44,14 @@ async function bootstrap() {
     .setDescription('The Swiftlet API description')
     .setVersion('1.0')
     .addTag('APIs')
-    // .addBearerAuth(
-    //   {
-    //     type: 'http',
-    //     scheme: 'bearer',
-    //     bearerFormat: 'JWT',
-    //   },
-    //   'access-token',
-    // )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'swf-token',
+    )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, documentFactory);

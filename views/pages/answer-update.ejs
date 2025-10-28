@@ -1,0 +1,70 @@
+<!-- html -->
+<div id="answer-mutation-container">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <label for="categoryAnsCode" class="form-label">Thể loại</label>
+              <select class="form-select" id="categoryAnsCode" name="categoryAnsCode">
+                <% values.categoryQuestion.forEach(function(cate) { %>
+                  <option value="<%= cate.categoryCode %>" <%=(values.categoryAnsCode &&
+                    values.categoryAnsCode===cate.categoryCode) ? 'selected' : '' %>
+                    >
+                    <%= cate.categoryName %>
+                  </option>
+                  <% }); %>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label for="answerObject" class="form-label">Đối tượng</label>
+              <select class="form-select" id="answerObject">
+                <option value="YEN" <%=values.answerObject==='YEN' ? 'selected' : '' %>>Yến</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      <div class="preview">
+        <div class="chat-box">
+          <div class="message user">
+            <div class="bubble">Câu hỏi của bạn ?</div>
+          </div>
+          <div class="message bot">
+            <div>
+              <div class="bot-info">
+                <span>ChatBot AI - Yến</span>
+              </div>
+
+              <div class="bubble" id="content-message">
+                <%- values.answerContent %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-button">
+          <button class="btn-common" onclick="updateAnswer()">Lưu</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <%- include('./editor', { answerContentRaw: values.answerContentRaw}) %>
+    </div>
+
+    <div class="col-4">
+
+      <%- include('./upload') %>
+    </div>
+  </div>
+</div>
+<script>
+  let answerContent = `<%- values.answerContent %>`;
+  let answerContentRaw = `<%- values.answerContentRaw %>`;
+</script>
+<script src="/js/page-answer-mutation.js"></script>
