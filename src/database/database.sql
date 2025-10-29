@@ -89,23 +89,25 @@ CREATE TABLE `tbl_uploads` (
 CREATE TABLE `tbl_home` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeCode` varchar(45) NOT NULL,
-  `homeName` char(10) NOT NULL,
-  `homeAddress` TEXT NOT NULL,
-  `latitude` FLOAT NOT NULL,
-  `longitude` FLOAT NOT NULL,
-  `seqMainImage` INT NOT NULL,
+  `homeName` varchar(255) NOT NULL,
+  `homeAddress` text NOT NULL,
+  `homeDescription` text NOT NULL,
+  `latitude` float NOT NULL,
+  `longitude` float NOT NULL,
+  `homeImage` varchar(255) NOT NULL,
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
   `createdId` varchar(45) DEFAULT NULL,
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
-  UNIQUE KEY `homeCode_UNIQUE` (`homeCode`)
+  UNIQUE KEY `homeCode_UNIQUE` (`homeCode`),
+  UNIQUE KEY `homeImage_UNIQUE` (`homeImage`)
 )
 
 CREATE TABLE `tbl_home_img` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `homeCode` varchar(45) NOT NULL,
+  `homeSeq` int NOT NULL,
   `filename` varchar(255) DEFAULT NULL,
   `originalname` text NOT NULL,
   `source` varchar(45) NOT NULL,

@@ -2,12 +2,13 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from 'src/database/database.module';
 import { AuthModule } from 'src/modules/auth/admin/auth.module';
 import { HomeController } from './home.controller';
-import { HomeRepository } from './home.repository';
-import { HomeService } from './home.service';
+import { HomeAdminRepository } from './home.repository';
+import { HomeAdminService } from './home.service';
+import { UploadModule } from 'src/modules/upload/upload.module';
 
 @Module({
-  imports: [DatabaseModule, AuthModule],
+  imports: [DatabaseModule, AuthModule, UploadModule],
   controllers: [HomeController],
-  providers: [HomeService, HomeRepository],
+  providers: [HomeAdminService, HomeAdminRepository],
 })
 export class HomeModule {}

@@ -83,7 +83,7 @@ async function deleteAnswer(answerCode) {
     return;
   }
   await axios
-    .delete(currentUrl + `/api/admin/answer/deleteAnswer/${answerCode}`,{},axiosAuth())
+    .delete(currentUrl + `/api/admin/answer/deleteAnswer/${answerCode}`,axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

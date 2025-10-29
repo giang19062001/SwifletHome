@@ -153,7 +153,6 @@ async function deleteFile(filename) {
   await axios
     .delete(
       currentUrl + '/api/admin/uploadFile/deleteFile/' + filename,
-      {},
       axiosAuth(),
     )
     .then(function (response) {

@@ -73,14 +73,6 @@ export class AppController {
     return { title: 'Danh sách nhà yến', isLayout: true, user: req.session.user };
   }
 
-  
-  @Get('/dashboard/home/create')
-  @UseGuards(PageAuthGuard)
-  @Render('pages/home-create')
-  renderHomeCreate(@Req() req: Request) {
-    return { title: 'Thêm nhà yến', isLayout: true, user: req.session.user };
-  }
-
   @Get('/404')
   @Render('pages/404')
   render404(@Req() req: Request) {

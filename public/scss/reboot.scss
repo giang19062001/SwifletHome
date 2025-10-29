@@ -12,12 +12,6 @@ select {
   border-radius: 15px !important;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
 }
-[class^='invalid-'] {
-  color: red;
-  font-size: 0.875rem;
-  margin-top: 4px;
-  display: none;
-}
 
 audio {
   padding: 3px !important;

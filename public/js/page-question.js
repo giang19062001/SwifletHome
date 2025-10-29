@@ -42,7 +42,7 @@ async function showQuestionModal(type, questionData) {
       <div class="form-group mb-3">
         <label for="questionContent" class="form-label">Câu hỏi</label>
         <textarea class="form-control" id="questionContent">${questionData.questionContent || ''}</textarea>
-        <div class="invalid-questionContent">Vui lòng nhập nội dung câu hỏi.</div>
+        <div class="err-questionContent">Vui lòng nhập nội dung câu hỏi.</div>
       </div>
 
       <div class="row mb-3">
@@ -82,7 +82,7 @@ async function showQuestionModal(type, questionData) {
   modalBody
     .querySelector('#questionContent')
     ?.addEventListener('input', (e) => {
-      modalBody.querySelector('.invalid-questionContent').style.display =
+      modalBody.querySelector('.err-questionContent').style.display =
         String(e.target.value).trim() == '' ? 'block' : 'none';
     });
 
@@ -194,8 +194,8 @@ async function getAllQuestion(currentPage, limit) {
         renderAllQuestion(response.data, objElement);
       }
     })
-    .catch(function (error) {
-      console.log('error', error);
+    .catch(function (err) {
+      console.log('err', err);
     });
 }
 async function getAllCategoryQuestion(currentPage, limit) {
@@ -214,17 +214,14 @@ async function getAllCategoryQuestion(currentPage, limit) {
         categoryQuestions = response.data.list;
       }
     })
-    .catch(function (error) {
-      console.log('error', error);
+    .catch(function (err) {
+      console.log('err', err);
     });
 }
 async function getDetailQuestion(questionCode) {
   await axios
-    .post(
-      currentUrl + '/api/admin/question/getDetail',
-      {
-        questionCode: questionCode,
-      },
+    .get(
+      currentUrl + '/api/admin/question/getDetail/' + questionCode,
       axiosAuth(),
     )
     .then(function (response) {
@@ -233,8 +230,8 @@ async function getDetailQuestion(questionCode) {
         showQuestionModal('update', response.data);
       }
     })
-    .catch(function (error) {
-      console.log('error', error);
+    .catch(function (err) {
+      console.log('err', err);
     });
 }
 
@@ -259,8 +256,8 @@ async function getAllAnswer(currentPage, limit, categoryAnsCode, answerObject) {
         return [];
       }
     })
-    .catch(function (error) {
-      console.log('error', error);
+    .catch(function (err) {
+      console.log('err', err);
     });
 }
 async function deleteQuestion(questionCode) {
@@ -273,7 +270,6 @@ async function deleteQuestion(questionCode) {
   await axios
     .delete(
       currentUrl + `/api/admin/question/deleteQuestion/${questionCode}`,
-      {},
       axiosAuth(),
     )
     .then(function (response) {
@@ -283,8 +279,8 @@ async function deleteQuestion(questionCode) {
         getAllQuestion(page, limit);
       }
     })
-    .catch(function (error) {
-      console.log('error', error);
+    .catch(function (err) {
+      console.log('err', err);
     });
 }
 async function createQuestion() {
@@ -297,8 +293,7 @@ async function createQuestion() {
     const questionObject = modalBody.querySelector('#questionObject').value;
     const answerCode = modalBody.querySelector('#answerCode').value;
     if (String(questionContent).trim() == '') {
-      modalBody.querySelector('.invalid-questionContent').style.display =
-        'block';
+      modalBody.querySelector('.err-questionContent').style.display = 'block';
       return;
     }
     await axios
@@ -319,16 +314,16 @@ async function createQuestion() {
           toastOk('Thêm thành công');
           setTimeout(() => {
             location.reload();
-          }, 2000);
+          }, 1500);
         } else {
           toastErr('Thêm thất bại');
         }
       })
-      .catch(function (error) {
-        console.log('error', error);
+      .catch(function (err) {
+        console.log('err', err);
       });
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -368,10 +363,10 @@ async function updateQuestion() {
           toastErr('Cập nhập thất bại');
         }
       })
-      .catch(function (error) {
-        console.log('error', error);
+      .catch(function (err) {
+        console.log('err', err);
       });
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
   }
 }

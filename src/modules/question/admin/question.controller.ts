@@ -26,7 +26,7 @@ import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { QuestionAdminService } from './question.service';
 import { IQuestion } from '../question.interface';
 
-@ApiBearerAuth('swf-token') 
+@ApiBearerAuth('swf-token')
 @ApiTags('admin/question')
 @UseGuards(ApiAuthGuard)
 @Controller('/api/admin/question')
@@ -43,11 +43,13 @@ export class QuestionAdminController {
     return result;
   }
 
-  @ApiBody({ type: QuestionDetailDto })
-  @Post('getDetail')
+  @ApiParam({ name: 'questionCode', type: String })
+  @Get('getDetail/:questionCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Body() body: QuestionDetailDto): Promise<IQuestion | null> {
-    const result = await this.questionAdminService.getDetail(body.questionCode);
+  async getDetail(
+    @Param('questionCode') questionCode: string,
+  ): Promise<IQuestion | null> {
+    const result = await this.questionAdminService.getDetail(questionCode);
     return result;
   }
 
@@ -56,7 +58,7 @@ export class QuestionAdminController {
   @HttpCode(HttpStatus.OK)
   async createQuestion(@Body() body: CreateQuestionDto): Promise<number> {
     const result = await this.questionAdminService.createQuestion(body);
-      if (result === 0) {
+    if (result === 0) {
       throw new BadRequestException();
     }
     return result;

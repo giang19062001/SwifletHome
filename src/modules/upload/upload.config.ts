@@ -1,4 +1,3 @@
-
 import { BadRequestException } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
@@ -7,15 +6,16 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const multerConfig = {
   storage: diskStorage({
-     destination: (req, file, callback) => {
+    destination: (req, file, callback) => {
+      console.log("req.body.source", req.body.source)
       const source = req.body.source;
       const folderPath = `./public/uploads/${source}`;
-      
+
       // create path folder
       if (!existsSync(folderPath)) {
         mkdirSync(folderPath, { recursive: true });
       }
-      
+
       callback(null, folderPath);
     },
     filename: (req, file, callback) => {

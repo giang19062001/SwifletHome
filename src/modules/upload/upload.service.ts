@@ -24,7 +24,7 @@ export class UploadService {
     }
   }
 
-  private async deletePhysicalFile(filepath: string): Promise<void> {
+  public async deletePhysicalFile(filepath: string): Promise<void> {
     try {
       const filePath = path.join(process.cwd(), this.uploadPath, filepath);
 

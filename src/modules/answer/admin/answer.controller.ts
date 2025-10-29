@@ -27,7 +27,7 @@ import {
   UpdateAnswerDto,
 } from './answer.dto';
 
-@ApiBearerAuth('swf-token') 
+@ApiBearerAuth('swf-token')
 @ApiTags('admin/answer')
 @UseGuards(ApiAuthGuard)
 @Controller('/api/admin/answer')
@@ -44,11 +44,13 @@ export class AnswerAdminController {
     return result;
   }
 
-  @ApiBody({ type: AnswerDetailDto })
-  @Post('getDetail')
+  @Get('getDetail/:answerCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Body() body: AnswerDetailDto): Promise<IAnswer | null> {
-    const result = await this.answerAdminService.getDetail(body.answerCode);
+  @ApiParam({ name: 'answerCode', type: String })
+  async getDetail(
+    @Param('answerCode') answerCode: string,
+  ): Promise<IAnswer | null> {
+    const result = await this.answerAdminService.getDetail(answerCode);
     return result;
   }
 

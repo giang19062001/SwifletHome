@@ -3,7 +3,13 @@
   font-family: Pretendard;
   font-size: 15px;
 }
-
+[class^='err-'] {
+  color: #e72c2c;
+  font-family: Pretendard;
+  font-size: 15px;
+  margin-top: 4px;
+  display: none;
+}
 .title-page {
   font-family: PretendardBold;
   font-size: 1.5rem;
