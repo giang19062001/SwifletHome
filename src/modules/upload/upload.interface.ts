@@ -5,5 +5,10 @@ export interface IFileUpload {
   size: number;
   mimetype: string;
   isActive: string;
-  source: string
+  source: string;
+  urlLink?: string;
+  createdAt?: string;
+  updatedAt: string;
+  createdId?: string;
+  updatedId?: string;
 }

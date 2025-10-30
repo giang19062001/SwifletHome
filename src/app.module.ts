@@ -10,7 +10,8 @@ import { AuthModule } from './modules/auth/admin/auth.module';
 import { CateQuestionModule } from './modules/cateQuestion/cateQuestion.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { QuestionAppModule } from './modules/question/app/question.module';
-import { HomeModule } from './modules/home/admin/home.module';
+import { HomeAdminModule } from './modules/home/admin/home.module';
+import { HomeAppModule } from './modules/home/app/home.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { HomeModule } from './modules/home/admin/home.module';
     AnswerAdminModule,
     AnswerAppModule,
     UploadModule,
-    HomeModule
+    HomeAdminModule,
+    HomeAppModule
   ],
   controllers: [AppController],
   providers: [AppService],

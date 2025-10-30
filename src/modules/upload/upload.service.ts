@@ -9,6 +9,7 @@ import { promises as fs } from 'fs';
 import { UploadRepository } from './upload.repository';
 import { IFileUpload } from './upload.interface';
 import * as path from 'path';
+import { UploadVideoLinkDto } from './upload.dto';
 
 @Injectable()
 export class UploadService {
@@ -63,21 +64,25 @@ export class UploadService {
     }
   }
 
-  async getAllFile(): Promise<IFileUpload[]> {
-    try {
-      const result = await this.uploadRepository.getAllFile();
-      return result;
-    } catch (error) {
-      console.error('Error getting all files:', error);
-      throw new InternalServerErrorException('Failed to get files');
-    }
+  async uploadVideoLink(dto: UploadVideoLinkDto): Promise<number> {
+    const result = await this.uploadRepository.uploadVideoLink(dto);
+    return result;
   }
 
+  async getAllFile(): Promise<IFileUpload[]> {
+    const files = await this.uploadRepository.getAllFile();
+    const videos = await this.uploadRepository.getAllVideoLink();
+    return [...files, ...videos];
+  }
+  async deleteVideoLink(seq: number): Promise<number> {
+    const result = await this.uploadRepository.deleteVideoLink(seq);
+    return result;
+  }
   async deleteFile(filename: string): Promise<number> {
     try {
       // const file = await this.uploadRepository.getFile(filename);
       // console.log("file  ==>'", file);
-      
+
       const result = await this.uploadRepository.deleteFile(filename);
 
       if (result === 0) {

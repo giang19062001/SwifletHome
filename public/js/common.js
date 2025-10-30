@@ -11,6 +11,23 @@ function axiosAuth(config) {
     },
   };
 }
+function getShortTextFromHtml(html) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+
+    const text = tempDiv.textContent || tempDiv.innerText || "";
+    return text.slice(0, 50);
+}
+
+async function ChangeUrlToFile(filename, source) {
+  try {
+    const response = await fetch(`${currentUrl}/Uploads/${source}/${filename}`);
+    const blob = await response.blob();
+    return new File([blob], filename, { type: blob.type });
+  } catch (error) {
+    return null;
+  }
+}
 
 function createPagerHTML(
   totalCount,
@@ -96,4 +113,18 @@ function toastErr(text) {
       color: '#fff',
     },
   }).showToast();
+}
+
+function reloadPage(url) {
+  setTimeout(() => {
+    if (url) {
+      window.location.href = url;
+    } else {
+      location.reload();
+    }
+  }, 1500);
+}
+
+function gotoPage(url){
+  window.location.href = url
 }

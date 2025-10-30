@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/common';
 import { IHome, IHomeImg } from '../home.interface';
-import { CreateHomeDto } from './home.dto';
+import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import { generateCode } from 'src/helpers/func';
 
 @Injectable()
@@ -20,7 +20,8 @@ export class HomeAdminRepository {
   async getAll(dto: PagingDto): Promise<IHome[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
-        FROM ${this.table} A  ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
+        FROM ${this.table} A  
+        ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
       dto.limit == 0 && dto.page == 0
         ? []
         : [dto.limit, (dto.page - 1) * dto.limit],
@@ -29,7 +30,7 @@ export class HomeAdminRepository {
   }
   async getDetail(homeCode: string): Promise<IHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.homeCode, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive
+      ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive
           FROM ${this.table} A 
           WHERE A.homeCode = ? `,
       [homeCode],
@@ -49,7 +50,7 @@ export class HomeAdminRepository {
     seq: number,
     source: string,
     createdId: string,
-    file: Express.Multer.File,
+    file: Express.Multer.File | IHomeImg,
   ): Promise<number> {
     const sql = `
       INSERT INTO tbl_home_img (filename, originalname, source, size, mimetype, homeSeq, createdId)
@@ -93,6 +94,23 @@ export class HomeAdminRepository {
 
     return result.insertId;
   }
+  async updateHome(dto: UpdateHomeDto, homeCode: string): Promise<number> {
+    const sql = `
+        UPDATE ${this.table} SET homeName = ?, homeAddress = ?, homeDescription = ?, latitude = ?, longitude = ?, homeImage = ?
+        WHERE homeCode = ?
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      dto.homeName,
+      dto.homeAddress,
+      dto.homeDescription,
+      dto.latitude,
+      dto.longitude,
+      dto.homeImage.filename,
+      homeCode,
+    ]);
+
+    return result.affectedRows;
+  }
 
   async deleteHome(homeCode: string): Promise<number> {
     const sql = `
@@ -110,6 +128,25 @@ export class HomeAdminRepository {
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
 
+    return result.affectedRows;
+  }
+  async deleteHomeImagesOne(seq: number): Promise<number> {
+    const sql = `
+      DELETE FROM  tbl_home_img
+      WHERE seq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
+
+    return result.affectedRows;
+  }
+  async deleteHomeImagesMulti(seqList: number[]): Promise<number> {
+    const placeholders = seqList.map(() => '?').join(', ');
+    const sql = `
+    DELETE FROM tbl_home_img
+    WHERE seq IN (${placeholders})
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, seqList);
     return result.affectedRows;
   }
 }

@@ -7,8 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 export const multerConfig = {
   storage: diskStorage({
     destination: (req, file, callback) => {
-      console.log("req.body.source", req.body.source)
-      const source = req.body.source;
+      let source = req.body.source;
+      if (!source) {
+        if (file.fieldname === 'homeImage' || file.fieldname === 'homeImages') {
+          source = 'home';
+        }
+      }
+
       const folderPath = `./public/uploads/${source}`;
 
       // create path folder
@@ -19,9 +24,25 @@ export const multerConfig = {
       callback(null, folderPath);
     },
     filename: (req, file, callback) => {
-      const ext = extname(file.originalname);
-      const filename = `${file.fieldname}-${uuidv4()}${ext}`;
-      callback(null, filename);
+      const filename = file.originalname;
+      let source = req.body.source;
+      if (!source) {
+        if (file.fieldname === 'homeImage' || file.fieldname === 'homeImages') {
+          source = 'home';
+        }
+      }
+
+      const filePath = join(`./public/uploads/${source}`, filename);
+
+      if (existsSync(filePath)) {
+        return callback(null, filename); // keep old file
+      } else {
+        const ext = extname(file.originalname);
+        const uniquename = `${file.fieldname}-${uuidv4()}${ext}`;
+        callback(null, uniquename); // store new file
+        // callback(null, "_"); // store new file
+
+      }
     },
   }),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB

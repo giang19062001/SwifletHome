@@ -1,0 +1,107 @@
+<div class="page-home-mutaion">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <p class="title-page">Chỉnh sửa nhà yến</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="home-update-form" novalidate>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-md-12 form-group">
+                                                <label for="homeName" class="form-label">Tên nhà yến</label>
+                                                <input type="text" class="form-control" id="homeName" name="homeName" />
+                                                <div class="error-message" data-error="homeName"></div>
+                                            </div>
+
+                                            <div class="col-md-12 form-group">
+                                                <label for="homeAddress" class="form-label">Vị trí</label>
+                                                <input type="text" class="form-control" id="homeAddress"
+                                                    name="homeAddress" />
+                                                <div class="error-message" data-error="homeAddress"></div>
+                                            </div>
+
+                                            <div class="col-md-12 form-group">
+                                                <label for="latitude" class="form-label">Kinh độ</label>
+                                                <input type="text" class="form-control" id="latitude" name="latitude" />
+                                                <div class="error-message" data-error="latitude"></div>
+                                            </div>
+
+                                            <div class="col-md-12 form-group">
+                                                <label for="longitude" class="form-label">Vĩ độ</label>
+                                                <input type="text" class="form-control" id="longitude"
+                                                    name="longitude" />
+                                                <div class="error-message" data-error="longitude"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="homeDescription" class="form-label">Mô tả</label>
+                                            <textarea type="text" class="form-control" id="homeDescription"
+                                                name="homeDescription" rows="10"></textarea>
+                                            <!-- %<- include('./editor', { content: ""}) %> -->
+                                            <div class="error-message mt-2" data-error="homeDescription"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-12 form-group">
+                                        <label for="homeImage" class="form-label">Ảnh chính</label>
+                                        <br />
+                                        <label for="homeImage" class="file-label">
+                                            <span class="file-button">Chọn ảnh chính</span>
+                                        </label>
+                                        <input type="file" class="form-control" id="homeImage" name="homeImage"
+                                            accept="image/*" style="display: none;" />
+                                        <div class="error-message mt-2" data-error="homeImage"></div>
+                                        <div class="mt-2 mb-2" id="homeImagePreview"></div>
+                                    </div>
+
+                                    <div class="col-12 form-group">
+                                        <label for="homeImages" class="form-label">Ảnh phụ</label>
+                                        <br />
+                                        <label for="homeImages" class="file-label">
+                                            <span class="file-button">Chọn ảnh phụ</span>
+                                        </label>
+                                        <input type="file" class="form-control" id="homeImages" name="homeImages"
+                                            multiple accept="image/*" style="display: none;" />
+                                        <div class="error-message mt-2" data-error="homeImages"></div>
+
+                                        <div class="image-preview-container" id="homeImagesPreview"></div>
+                                    </div>
+
+                                    <div class="col-12 form-group d-flex justify-content-center">
+                                        <button type="submit" class="btn-common">Cập nhập</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+  const homeData = JSON.parse('<%- JSON.stringify(values.homeData) %>');
+  console.log('homeData', homeData);
+</script>
+
+<script src="/lib/validate.min.js"></script>
+<script src="/js/common-validate.js"></script>
+<script src="/js/page-home-mutation.js"></script>

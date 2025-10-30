@@ -19,7 +19,6 @@ import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
 import {
   CreateQuestionDto,
-  QuestionDetailDto,
   UpdateQuestionDto,
 } from './question.dto';
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
@@ -56,8 +55,8 @@ export class QuestionAdminController {
   @ApiBody({ type: CreateQuestionDto })
   @Post('createQuestion')
   @HttpCode(HttpStatus.OK)
-  async createQuestion(@Body() body: CreateQuestionDto): Promise<number> {
-    const result = await this.questionAdminService.createQuestion(body);
+  async createQuestion(@Body() dto: CreateQuestionDto): Promise<number> {
+    const result = await this.questionAdminService.createQuestion(dto);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -65,10 +64,11 @@ export class QuestionAdminController {
   }
 
   @ApiBody({ type: UpdateQuestionDto })
-  @Put('updateQuestion')
+  @ApiParam({ name: 'questionCode', type: String })
+  @Put('updateQuestion/:questionCode')
   @HttpCode(HttpStatus.OK)
-  async updateQuestion(@Body() body: UpdateQuestionDto): Promise<number> {
-    const result = await this.questionAdminService.updateQuestion(body);
+  async updateQuestion(@Body() dto: UpdateQuestionDto,  @Param('questionCode') questionCode: string): Promise<number> {
+    const result = await this.questionAdminService.updateQuestion(dto, questionCode);
     if (result === 0) {
       throw new BadRequestException();
     }

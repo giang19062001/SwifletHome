@@ -25,8 +25,8 @@ export class QuestionAdminService {
     const result = await this.questionAdminRepository.createQuestion(dto);
     return result;
   }
-  async updateQuestion(dto: UpdateQuestionDto): Promise<number> {
-    const result = await this.questionAdminRepository.updateQuestion(dto);
+  async updateQuestion(dto: UpdateQuestionDto, questionCode:string): Promise<number> {
+    const result = await this.questionAdminRepository.updateQuestion(dto, questionCode);
     return result;
   }
   async updateAnswerQuestionNull(questionCode: string): Promise<number> {

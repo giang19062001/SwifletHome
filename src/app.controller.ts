@@ -31,14 +31,22 @@ export class AppController {
   @UseGuards(PageAuthGuard)
   @Render('pages/question')
   renderQuestion(@Req() req: Request) {
-    return { title: 'Danh sách câu hỏi', isLayout: true, user: req.session.user };
+    return {
+      title: 'Danh sách câu hỏi',
+      isLayout: true,
+      user: req.session.user,
+    };
   }
 
   @Get('/dashboard/answer/list')
   @UseGuards(PageAuthGuard)
   @Render('pages/answer')
   renderAnswer(@Req() req: Request) {
-    return { title: 'Danh sách trả lời', isLayout: true, user: req.session.user };
+    return {
+      title: 'Danh sách trả lời',
+      isLayout: true,
+      user: req.session.user,
+    };
   }
   @Get('/dashboard/answer/create')
   @UseGuards(PageAuthGuard)
@@ -70,7 +78,31 @@ export class AppController {
   @UseGuards(PageAuthGuard)
   @Render('pages/home')
   renderHome(@Req() req: Request) {
-    return { title: 'Danh sách nhà yến', isLayout: true, user: req.session.user };
+    return {
+      title: 'Danh sách nhà yến',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+
+  @Get('/dashboard/home/create')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/home-create')
+  renderHomeCreate(@Req() req: Request) {
+    return { title: 'Thêm nhà yến', isLayout: true, user: req.session.user };
+  }
+
+  @Get('/dashboard/home/update/:id')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/home-update')
+  async renderHomeUpdate(@Req() req: Request) {
+    const values = await this.appService.renderHomeUpdate(req.params.id);
+    return {
+      title: 'Chỉnh sửa nhà yến',
+      isLayout: true,
+      user: req.session.user,
+      values: values
+    };
   }
 
   @Get('/404')

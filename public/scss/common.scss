@@ -14,7 +14,7 @@
   font-family: PretendardBold;
   font-size: 1.5rem;
 }
-.btn-common {
+#btn-common {
   padding: 7px 15px;
   border-radius: 15px;
   font-family: Pretendard;
@@ -22,26 +22,51 @@
   font-size: 15px;
   line-height: 20px;
   border-width: 0.13em;
+  outline: auto;
+}
+.btn-common {
+  @extend #btn-common;
   background-color: $main-color;
   border-color: $main-color;
-  outline: auto;
   color: #ffffff;
   &:hover {
     background-color: $main-color-hover;
   }
 }
 
+.btn-common-image {
+  @extend #btn-common;
+  background-color: #59ac77;
+  border-color: #59ac77;
+  color: #ffffff;
+  &:hover {
+    background-color: #59ac77;
+  }
+}
+.btn-common-audio {
+  @extend #btn-common;
+  background-color: #279eff;
+  border-color: #279eff;
+  color: #ffffff;
+  &:hover {
+    background-color: #279eff;
+  }
+}
+
+.btn-common-video {
+  @extend #btn-common;
+  background-color: #f75270;
+  border-color: #f75270;
+  color: #ffffff;
+  &:hover {
+    background-color: #f75270;
+  }
+}
+
 .btn-common-out {
-  padding: 7px 15px;
-  border-radius: 15px;
-  font-family: Pretendard;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  border-width: 0.13em;
+  @extend #btn-common;
   background-color: #ffffff;
   border-color: #ffffff;
-  outline: auto;
   color: $main-color;
   &:hover {
     background-color: $main-color;
@@ -50,16 +75,9 @@
 }
 
 .btn-err {
-  padding: 7px 15px;
-  border-radius: 15px;
-  font-family: Pretendard;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  border-width: 0.13em;
+  @extend #btn-common;
   background-color: $err-color;
   border-color: $err-color;
-  outline: auto;
   color: #ffffff;
   &:hover {
     background-color: $err-color-hover;
@@ -67,16 +85,9 @@
 }
 
 .btn-out-err {
-  padding: 7px 15px;
-  border-radius: 15px;
-  font-family: Pretendard;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  border-width: 0.13em;
+  @extend #btn-common;
   background-color: #ffffff;
   border-color: #ffffff;
-  outline: auto;
   color: $err-color;
   &:hover {
     background-color: $err-color;

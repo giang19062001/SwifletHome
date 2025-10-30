@@ -8,7 +8,7 @@
                   <div class="card-body">
                      <div class="d-flex justify-content-between">
                         <p class="title-page">Danh sách nhà yến</p>
-                        <button class="btn-common" onclick="showHomeModal('create',{})">Thêm</button>
+                        <button class="btn-common" onclick="gotoHomeCreate()">Thêm</button>
                      </div>
                   </div>
                </div>
@@ -23,6 +23,9 @@
                            <tr class="text-center">
                               <th>
                                  <p>STT</p>
+                              </th>
+                               <th>
+                                 <p>Ảnh</p>
                               </th>
                               <th>
                                  <p>Tên</p>
@@ -59,140 +62,4 @@
       </div>
    </div>
    </div>
-   <!-- modal create-->
-   <div class="modal common-modal home-create-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
-      aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-         <div class="modal-content">
-            <div class="modal-header">
-               <p class="modal-header-title">Thêm nhà yến</p>
-               <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                     <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
-                     <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
-                  </svg>
-               </button>
-            </div>
-            <div class="modal-body">
-               <form id="home-create-form" class="row g-3" novalidate>
-                  <div class="col-md-6 form-group">
-                     <label for="homeName" class="form-label">Tên nhà yến</label>
-                     <input type="text" class="form-control" id="homeName" name="homeName" />
-                     <div class="error-message" data-error="homeName"></div>
-                  </div>
-
-                  <div class="col-md-6 form-group">
-                     <label for="homeAddress" class="form-label">Vị trí</label>
-                     <input type="text" class="form-control" id="homeAddress" name="homeAddress" />
-                     <div class="error-message" data-error="homeAddress"></div>
-                  </div>
-
-                  <div class="col-md-6 form-group">
-                     <label for="latitude" class="form-label">Kinh độ</label>
-                     <input type="text" class="form-control" id="latitude" name="latitude" />
-                     <div class="error-message" data-error="latitude"></div>
-                  </div>
-
-                  <div class="col-md-6 form-group">
-                     <label for="longitude" class="form-label">Vĩ độ</label>
-                     <input type="text" class="form-control" id="longitude" name="longitude" />
-                     <div class="error-message" data-error="longitude"></div>
-                  </div>
-                  <div class="col-md-12 form-group">
-                     <label for="homeDescription" class="form-label">Mô tả</label>
-                     <input type="text" class="form-control" id="homeDescription" name="homeDescription" />
-                     <div class="error-message" data-error="homeDescription"></div>
-                  </div>
-                  <div class="col-md-12 form-group">
-                     <label for="homeImage" class="form-label">Ảnh chính</label>
-                     <input type="file" class="form-control" id="homeImage" name="homeImage" />
-                     <div class="error-message mt-2" data-error="homeImage"></div>
-                  </div>
-                  <div class="col-md-12 form-group">
-                     <label for="homeImages" class="form-label">Ảnh phụ</label>
-                     <br />
-                     <label for="homeImages" class="file-label"><span class="file-button">Chọn ảnh phụ</span></label>
-                     <input type="file" class="form-control" id="homeImages" name="homeImages" multiple accept="image/*"
-                        style="display: none;" />
-                     <div class="error-message mt-2" data-error="homeImages"></div>
-
-                     <!-- Container để hiển thị preview ảnh -->
-                     <div class="image-preview-container" id="homeImagesPreview"></div>
-                  </div>
-               </form>
-            </div>
-            <div class="modal-footer">
-               <button type="submit" form="home-create-form" class="btn-common">Thêm</button>
-            </div>
-         </div>
-      </div>
-   </div>
-   <!-- modal edit-->
-   <div class="modal common-modal home-update-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
-      aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-         <div class="modal-content">
-            <div class="modal-header">
-               <p class="modal-header-title">Thêm nhà yến</p>
-               <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                     <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
-                     <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
-                  </svg>
-               </button>
-            </div>
-            <div class="modal-body">
-               <form id="home-update-form" class="row g-3" novalidate>
-                  <div class="col-md-6 form-group">
-                     <label for="homeName" class="form-label">Tên nhà yến</label>
-                     <input type="text" class="form-control" id="homeName" name="homeName" />
-                     <div class="error-message" data-error="homeName"></div>
-                  </div>
-
-                  <div class="col-md-6 form-group">
-                     <label for="homeAddress" class="form-label">Vị trí</label>
-                     <input type="text" class="form-control" id="homeAddress" name="homeAddress" />
-                     <div class="error-message" data-error="homeAddress"></div>
-                  </div>
-
-                  <div class="col-md-6 form-group">
-                     <label for="latitude" class="form-label">Kinh độ</label>
-                     <input type="text" class="form-control" id="latitude" name="latitude" />
-                     <div class="error-message" data-error="latitude"></div>
-                  </div>
-
-                  <div class="col-md-6 form-group">
-                     <label for="longitude" class="form-label">Vĩ độ</label>
-                     <input type="text" class="form-control" id="longitude" name="longitude" />
-                     <div class="error-message" data-error="longitude"></div>
-                  </div>
-
-                  <div class="col-md-12 form-group">
-                     <label for="homeImage" class="form-label">Ảnh chính</label>
-                     <input type="file" class="form-control" id="homeImage" name="homeImage" />
-                     <div class="error-message mt-2" data-error="homeImage"></div>
-                  </div>
-                  <div class="col-md-12 form-group">
-                     <label for="homeImages" class="form-label">Ảnh phụ</label>
-                     <br />
-                     <label for="homeImages" class="file-label"><span class="file-button">Chọn ảnh phụ</span></label>
-                     <input type="file" class="form-control" id="homeImages" name="homeImages" multiple accept="image/*"
-                        style="display: none;" />
-                     <div class="error-message mt-2" data-error="homeImages"></div>
-
-                     <!-- Container để hiển thị preview ảnh -->
-                     <div class="image-preview-container" id="homeImagesPreview"></div>
-                  </div>
-               </form>
-            </div>
-            <div class="modal-footer">
-               <button type="submit" form="home-update-form" class="btn-common">Thêm</button>
-            </div>
-         </div>
-      </div>
-   </div>
-
-   <!-- https://validatejs.org/ -->
-   <script src="/lib/validate.min.js"></script>
-   <script src="/js/validate.js"></script>
    <script src="/js/page-home.js"></script>

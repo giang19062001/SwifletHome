@@ -11,7 +11,7 @@ export interface IHome {
   updatedAt: string;
   createdId: string;
   updatedId: string;
-  homeImage: number;
+  homeImage: string | IHomeImg;
   homeImages: IHomeImg[]
 }
 

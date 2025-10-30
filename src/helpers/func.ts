@@ -8,3 +8,8 @@ export const generateCode =  (code, keyword, lengthNum) => {
 
   return `${keyword}${nextNumberString}`;
 };
+
+export function diffByTwoArr(arr1, arr2, field) {
+  const arrCompare = new Set(arr1.map(item => item[field]));
+  return arr2.filter(item => !arrCompare.has(item[field]));
+}

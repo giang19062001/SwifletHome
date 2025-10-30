@@ -2,7 +2,6 @@ export interface IAnswer {
   seq: number;
   answerCode: string;
   answerObject: string;
-  answerContent: string;
   answerContentRaw: string;
   categoryAnsCode: string;
   isActive: string;

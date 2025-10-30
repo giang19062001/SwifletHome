@@ -45,7 +45,7 @@ export class AnswerAppService {
     answers.forEach((answer) => {
       const answerCode = (answer as any).answerCode;
       if (answerCode && !answerMap.has(answerCode)) {
-        answerMap.set(answerCode, answer.answerContent);
+        answerMap.set(answerCode, answer.answerContentRaw);
       }
     });
 

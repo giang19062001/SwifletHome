@@ -59,7 +59,7 @@ export class AnswerAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.answerCode, A.answerContent, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
+      ` SELECT A.seq, A.answerCode, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
       B.categoryName, C.objectName
       FROM ${this.table} A 
       LEFT JOIN tbl_category_ques_ans B ON A.categoryAnsCode = B.categoryCode
@@ -72,7 +72,7 @@ export class AnswerAdminRepository {
   }
   async getDetail(answerCode: string): Promise<IAnswer | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.answerCode, A.answerContent, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
+      ` SELECT A.seq, A.answerCode, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category_ques_ans B
@@ -92,12 +92,11 @@ export class AnswerAdminRepository {
       answerCode = generateCode(rows[0].answerCode, 'ANS', 6);
     }
     const sql = `
-        INSERT INTO ${this.table}  (answerCode, answerContent, answerContentRaw, answerObject, categoryAnsCode, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?)
+        INSERT INTO ${this.table}  (answerCode, answerContentRaw, answerObject, categoryAnsCode, createdId) 
+        VALUES(?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       answerCode,
-      dto.answerContent,
       dto.answerContentRaw,
       dto.answerObject,
       dto.categoryAnsCode,
@@ -106,17 +105,16 @@ export class AnswerAdminRepository {
 
     return result.insertId;
   }
-  async updateAnswer(dto: UpdateAnswerDto): Promise<number> {
+  async updateAnswer(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET answerContent = ?, answerContentRaw = ?, answerObject = ?, categoryAnsCode = ?
+      UPDATE ${this.table} SET answerContentRaw = ?, answerObject = ?, categoryAnsCode = ?
       WHERE answerCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.answerContent,
       dto.answerContentRaw,
       dto.answerObject,
       dto.categoryAnsCode,
-      dto.answerCode,
+      answerCode,
     ]);
 
     return result.affectedRows;

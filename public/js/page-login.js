@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (response.status === 200 && response.data) {
-        window.location.href = '/dashboard/question/list';
+          gotoPage('/dashboard/question/list');
       }
     } catch (error) {
       const resultErr = error.response?.data ?? error;

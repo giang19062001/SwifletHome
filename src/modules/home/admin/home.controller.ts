@@ -17,6 +17,7 @@ import {
   BadRequestException,
   Delete,
   Param,
+  Put,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -30,9 +31,10 @@ import { IList } from 'src/interfaces/common';
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeAdminService } from './home.service';
 import { IHome } from '../home.interface';
-import { CreateHomeDto } from './home.dto';
+import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import {
   AnyFilesInterceptor,
+  FileFieldsInterceptor,
   FileInterceptor,
   FilesInterceptor,
 } from '@nestjs/platform-express';
@@ -66,12 +68,27 @@ export class HomeController {
   @Post('createHome')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateHomeDto })
-  @UseInterceptors(AnyFilesInterceptor(multerConfig))
+  // @UseInterceptors(AnyFilesInterceptor(multerConfig))
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'homeImage', maxCount: 1 },
+        { name: 'homeImages', maxCount: 10 },
+      ],
+      multerConfig,
+    ),
+  )
   async createHome(
     @Body() createHomeDto: CreateHomeDto,
-    @UploadedFiles() files: Express.Multer.File[],
+    // @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles()
+    files: {
+      homeImage?: Express.Multer.File[];
+      homeImages?: Express.Multer.File[];
+    },
   ) {
-    const [homeImage, homeImages] = this.homeAdminService.parseHomeImg(files);
+    const homeImage = files.homeImage?.[0] || null;
+    const homeImages = files.homeImages || [];
     const body = {
       ...createHomeDto,
       homeImage,
@@ -84,6 +101,42 @@ export class HomeController {
     }
     return result;
   }
+
+  @Put('updateHome/:homeCode')
+  @ApiParam({ name: 'homeCode', type: String })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateHomeDto })
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'homeImage', maxCount: 1 },
+        { name: 'homeImages', maxCount: 10 },
+      ],
+      multerConfig,
+    ),
+  )
+  async updateHome(
+    @Body() createHomeDto: UpdateHomeDto,
+    @Param('homeCode') homeCode: string,
+    @UploadedFiles()
+    files: {
+      homeImage?: Express.Multer.File[];
+      homeImages?: Express.Multer.File[];
+    },
+  ) {
+
+    const homeImage = files.homeImage?.[0] || null;
+    const homeImages = files.homeImages || [];
+    const dto = {
+      ...createHomeDto,
+      homeImage,
+      homeImages,
+    };
+
+    const result =  await this.homeAdminService.updateHome(dto, homeCode)
+    return result;
+  }
+
   @Delete('deleteHome/:homeCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'homeCode', type: String })

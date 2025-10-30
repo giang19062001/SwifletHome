@@ -1,12 +1,30 @@
-  <div class="upload">
-    <p class="title">Danh sách File</p>
-    <input type="file" id="fileInput" hidden accept="image/*,audio/*" />
-    <div class="space-box">
-      <div class="file-list"></div>
-      <div class="bottom-button">
-        <button class="btn-common" id="uploadBtn">Upload File</button>
-      </div>
+<div class="upload">
+  <p class="title">Danh sách File</p>
+  
+  <input type="file" id="fileInput" hidden />
+
+  <div class="space-box">
+    <div class="file-list"></div>
+      
+  <div class="video-input-box" id="videoInputBox" style="visibility: hidden;">
+  <input
+    type="text"
+    id="urlLink"
+    placeholder="Nhập link video (YouTube)"
+  />
+  <button id="videoAddBtn" class="btn-common">Xác nhận</button>
+  <button id="videoCancelBtn" class="btn-err">Hủy</button>
+</div>
+
+    <div class="bottom-button">
+      <button class="btn-common-image" id="btnImage">Tải ảnh</button>
+      <button class="btn-common-audio" id="btnAudio">Tải audio</button>
+      <button class="btn-common-video" id="btnVideo">Thêm video</button>
     </div>
   </div>
+
+
+</div>
+
 
 <script src="/js/component-upload.js"></script>

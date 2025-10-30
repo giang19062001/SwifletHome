@@ -8,7 +8,7 @@ const quillAnswer = new Quill('#editor', {
         ['bold', 'italic', 'underline', 'strike'],
         [{ color: [] }, { background: [] }],
         [{ list: 'ordered' }],
-        ['link', 'video'],
+        ['link'],
       ],
     },
   },

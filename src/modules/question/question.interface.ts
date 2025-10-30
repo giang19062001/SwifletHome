@@ -11,5 +11,5 @@ export interface IQuestion {
   updatedId: string;
   answerCode: string;
   categoryQuesName?: string;
-  answerContent?: string
+  answerContentRaw?: string
 }

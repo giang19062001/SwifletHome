@@ -16,25 +16,7 @@ export class GetAllAnswerDto extends PagingDto {
   answerObject: string;
 }
 
-export class AnswerDetailDto {
-  @ApiProperty({
-    example: 'ANS000001',
-  })
-  @IsString()
-  @IsNotEmpty()
-  answerCode: string;
-}
-
 export class UpdateAnswerDto {
-  @ApiProperty({ example: 'ANS000001' })
-  @IsNotEmpty()
-  @IsString()
-  answerCode: string;
-
-  @ApiProperty({ example: '<p>Hello word</p>' })
-  @IsNotEmpty()
-  @IsString()
-  answerContent: string;
 
   @ApiProperty({ example: '<p>Hello word</p>' })
   @IsNotEmpty()
@@ -56,9 +38,7 @@ export class UpdateAnswerDto {
   categoryAnsCode: string;
 }
 
-export class CreateAnswerDto extends OmitType(UpdateAnswerDto, [
-  'answerCode',
-] as const) {
+export class CreateAnswerDto extends UpdateAnswerDto {
   @ApiProperty({
     example: 'admin',
   })

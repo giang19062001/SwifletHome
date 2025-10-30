@@ -1,55 +1,66 @@
-// FUNC
+// TODO:INIT
 const answerCode = currentPath.includes('/update')
   ? currentPath.split('/').pop()
   : null;
 const pageElement = 'page-answer-mutation';
 
-//RENDER
+document.addEventListener('DOMContentLoaded', function () {
+  renderContentHtml();
+});
+
+// TODO:RENDER
 function renderContentHtml() {
   const bot = document.getElementById('content-message');
-  answerContent = bot.innerHTML;
+  contentHtml = bot.innerHTML;
   answerContentRaw = bot.innerHTML;
 
-  // replace [[image-src=...]]
-  answerContent = answerContent.replace(
-    /\[\[image-src=(.*?)\]\]/g,
+  // replace [[image-data=...]]
+  contentHtml = contentHtml.replace(
+    /\[\[image-data=(.*?)\]\]/g,
     `<img src="$1" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`,
   );
 
-  // replace [[audio-src=...]]
-  answerContent = answerContent.replace(
-    /\[\[audio-src=(.*?)\]\]/g,
-    `<audio controls style="width:100%; margin:8px 0;"><source src="$1" type="audio/mpeg">Trình duyệt không hỗ trợ audio</audio>`,
+  // replace [[audio-data=...]]
+  contentHtml = contentHtml.replace(
+    /\[\[audio-data=(.*?)\]\]/g,
+    `<audio controls style="width:100%; margin:8px 0;"><source src="$1" type="audio/mpeg"></audio>`,
+  );
+
+  // replace [[video-data=...]]
+  contentHtml = contentHtml.replace(
+    /\[\[video-data=(.*?)\]\]/g,
+    `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="$1"></iframe>`,
   );
 
   // replace [[payment]]
-  answerContent = answerContent.replace(
+  contentHtml = contentHtml.replace(
     /\[\[payment\]\]/g,
     `<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`,
   );
 
-  bot.innerHTML = answerContent;
+  ;
+  bot.innerHTML = contentHtml;
 }
-// API
+// TODO:API
 async function createAnswer() {
   try {
     const categoryAnsCode = document.getElementById('categoryAnsCode').value;
     const answerObject = document.getElementById('answerObject').value;
     await axios
-      .post(currentUrl + '/api/admin/answer/createAnswer', {
-        answerContent,
-        answerContentRaw,
-        categoryAnsCode,
-        answerObject,
-        createdId: user.userId,
-      },axiosAuth())
+      .post(
+        currentUrl + '/api/admin/answer/createAnswer',
+        {
+          answerContentRaw,
+          categoryAnsCode,
+          answerObject,
+          createdId: user.userId,
+        },
+        axiosAuth(),
+      )
       .then(function (response) {
         console.log('response', response);
         toastOk('Cập nhập thành công');
-        // back to list
-        setTimeout(() => {
-          window.location.href = '/dashboard/answer/list';
-        }, 1500);
+        reloadPage('/dashboard/answer/list');
       })
       .catch(function (error) {
         console.log('error', error);
@@ -64,16 +75,19 @@ async function updateAnswer() {
     const categoryAnsCode = document.getElementById('categoryAnsCode').value;
     const answerObject = document.getElementById('answerObject').value;
     await axios
-      .put(currentUrl + '/api/admin/answer/updateAnswer', {
-        answerCode,
-        answerContent,
-        answerContentRaw,
-        categoryAnsCode,
-        answerObject,
-      },axiosAuth())
+      .put(
+        currentUrl + '/api/admin/answer/updateAnswer/' + answerCode,
+        {
+          answerContentRaw,
+          categoryAnsCode,
+          answerObject,
+        },
+        axiosAuth(),
+      )
       .then(function (response) {
         console.log('response', response);
         toastOk('Cập nhập thành công');
+        reloadPage();
       })
       .catch(function (error) {
         console.log('error', error);

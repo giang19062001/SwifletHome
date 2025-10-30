@@ -1,3 +1,5 @@
+#page-answer {
+}
 #page-answer-mutation {
   .bottom-button {
     display: flex;
@@ -95,6 +97,19 @@
       flex-direction: column;
       justify-content: space-between;
     }
+    .video-input-box {
+      margin-top: 10px;
+      display: flex;
+      gap: 5px;
+    }
+    .video-input-box input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
     .title {
       font-family: 'PretendardBold';
       font-weight: 700;
@@ -110,7 +125,7 @@
       flex-direction: column;
       gap: 20px;
       margin-top: 10px;
-      max-height: 50vh;
+      max-height: 55vh;
       overflow: auto;
       padding-right: 8px;
       width: 100%;

@@ -43,7 +43,7 @@
               </div>
 
               <div class="bubble" id="content-message">
-                <%- values.answerContent %>
+                <%- values.answerContentRaw %>
               </div>
             </div>
           </div>
@@ -54,7 +54,15 @@
       </div>
     </div>
     <div class="col-12 col-md-4">
-      <%- include('./editor', { answerContentRaw: values.answerContentRaw}) %>
+      <div class="common-editor">
+        <%- include('./editor', { content: values.answerContentRaw}) %>
+
+        <div class="bottom-button">
+          <button class="btn-common" onclick="getContent()">
+            Xem trước  
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="col-12 col-md-4">
@@ -64,7 +72,6 @@
   </div>
 </div>
 <script>
-  let answerContent = `<%- values.answerContent %>`;
   let answerContentRaw = `<%- values.answerContentRaw %>`;
 </script>
 <script src="/js/page-answer-mutation.js"></script>

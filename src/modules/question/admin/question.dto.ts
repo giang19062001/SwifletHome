@@ -1,14 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class QuestionDetailDto {
-  @ApiProperty({
-    example: 'QUS000001',
-  })
-  @IsString()
-  @IsNotEmpty()
-  questionCode: string;
-}
 
 export class UpdateQuestionDto {
   @ApiProperty({
@@ -28,7 +20,7 @@ export class UpdateQuestionDto {
   questionObject: string;
 
   @ApiProperty({
-    example: '?',
+    example: 'Hello word?',
   })
   @IsString()
   @IsNotEmpty()
@@ -41,17 +33,9 @@ export class UpdateQuestionDto {
   @IsNotEmpty()
   categoryQuesCode: string;
 
-  @ApiProperty({
-    example: 'QUS000001',
-  })
-  @IsString()
-  @IsNotEmpty()
-  questionCode: string;
 }
 
-export class CreateQuestionDto extends OmitType(UpdateQuestionDto, [
-  'questionCode',
-] as const) {
+export class CreateQuestionDto extends UpdateQuestionDto {
   @ApiProperty({
     example: 'admin',
   })

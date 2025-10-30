@@ -10,5 +10,6 @@ import { UploadModule } from 'src/modules/upload/upload.module';
   imports: [DatabaseModule, AuthModule, UploadModule],
   controllers: [HomeController],
   providers: [HomeAdminService, HomeAdminRepository],
+  exports:[HomeAdminService]
 })
-export class HomeModule {}
+export class HomeAdminModule {}

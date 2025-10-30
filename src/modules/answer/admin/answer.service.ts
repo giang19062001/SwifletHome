@@ -25,18 +25,18 @@ export class AnswerAdminService {
     const result = await this.answerAdminRepository.getDetail(answerCode);
     return result;
   }
-  async createAnswer(body: CreateAnswerDto): Promise<number> {
-    const result = await this.answerAdminRepository.createAnswer(body);
+  async createAnswer(dto: CreateAnswerDto): Promise<number> {
+    const result = await this.answerAdminRepository.createAnswer(dto);
     return result;
   }
-  async updateAnswer(body: UpdateAnswerDto): Promise<number> {
+  async updateAnswer(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
     const questions = await this.questionAdminService.getAllByAnswer(
-      body.answerCode,
+      answerCode,
     );
     // set answerCode is 'null' If any questions are assigning this answer ( when change "category" || "object" )
     if (
       questions.length > 0 &&
-      body.categoryAnsCode !== questions[0].categoryQuesCode
+      dto.categoryAnsCode !== questions[0].categoryQuesCode
     ) {
       for (const ques of questions) {
         await this.questionAdminService.updateAnswerQuestionNull(
@@ -44,7 +44,7 @@ export class AnswerAdminService {
         );
       }
     }
-    const result = await this.answerAdminRepository.updateAnswer(body);
+    const result = await this.answerAdminRepository.updateAnswer(dto, answerCode);
     return result;
   }
   async deleteAnswer(answerCode: string): Promise<number> {

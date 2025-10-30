@@ -122,7 +122,7 @@ async function renderAllAnswer(modalBody, answerCode, categoryQuesCode) {
         (ans) => `
           <option value="${ans.answerCode}" data-answer-code="${ans.answerCode}"
             ${answerCode === ans.answerCode ? 'selected' : ''}>
-            ${ans.answerContentRaw.length > 30 ? ans.answerContentRaw.slice(0, 30) + '...' : ans.answerContentRaw}
+            ${getShortTextFromHtml(ans.answerContentRaw)}
           </option>
         `,
       )
@@ -312,9 +312,7 @@ async function createQuestion() {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Thêm thành công');
-          setTimeout(() => {
-            location.reload();
-          }, 1500);
+          reloadPage()
         } else {
           toastErr('Thêm thất bại');
         }
@@ -342,13 +340,12 @@ async function updateQuestion() {
     }
     await axios
       .put(
-        currentUrl + '/api/admin/question/updateQuestion',
+        currentUrl + '/api/admin/question/updateQuestion/' + questionCode,
         {
           questionContent: questionContent,
           categoryQuesCode: categoryQuesCode,
           questionObject: questionObject,
           answerCode: answerCode,
-          questionCode: questionCode,
         },
         axiosAuth(),
       )
@@ -356,9 +353,7 @@ async function updateQuestion() {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Cập nhập thành công');
-          setTimeout(() => {
-            location.reload();
-          }, 2000);
+          reloadPage()
         } else {
           toastErr('Cập nhập thất bại');
         }

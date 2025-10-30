@@ -1,8 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateHomeDto {
+  @ApiProperty({
+    example: 'home',
+    enum: ['home'],
+    default: 'home',
+  })
+  @IsEnum(['home'])
+  @IsNotEmpty()
+  source: 'home';
+
   @ApiProperty({
     example: 'New',
   })
@@ -51,15 +60,6 @@ export class CreateHomeDto {
   longitude: number;
 
   @ApiProperty({
-    example: 'home',
-    enum: ['home'],
-    default: 'home',
-  })
-  @IsEnum(['home'])
-  @IsNotEmpty()
-  source: 'home';
-
-  @ApiProperty({
     example: 'admin',
   })
   @IsString()
@@ -69,7 +69,6 @@ export class CreateHomeDto {
   @ApiProperty({
     type: 'string',
     format: 'binary',
-    required: false,
   })
   homeImage: any;
 
@@ -79,7 +78,8 @@ export class CreateHomeDto {
       type: 'string',
       format: 'binary',
     },
-    required: false,
   })
   homeImages: any[];
 }
+
+export class UpdateHomeDto extends OmitType(CreateHomeDto, ['createdId']) {}

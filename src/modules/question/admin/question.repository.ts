@@ -48,7 +48,7 @@ export class QuestionAdminRepository {
   async getDetail(questionCode: string): Promise<IQuestion | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
-        B.categoryName, C.objectName, D.answerContent
+        B.categoryName, C.objectName, D.answerContentRaw
         FROM ${this.table} A 
         LEFT JOIN tbl_category_ques_ans B
         ON A.categoryQuesCode = B.categoryCode
@@ -96,7 +96,7 @@ export class QuestionAdminRepository {
 
     return result.affectedRows;
   }
-  async updateQuestion(dto: UpdateQuestionDto): Promise<number> {
+  async updateQuestion(dto: UpdateQuestionDto, questionCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET answerCode = ?, questionObject = ?, questionContent = ?, categoryQuesCode = ? 
       WHERE questionCode = ?
@@ -106,7 +106,7 @@ export class QuestionAdminRepository {
       dto.questionObject,
       dto.questionContent,
       dto.categoryQuesCode,
-      dto.questionCode,
+      questionCode,
     ]);
 
     return result.affectedRows;

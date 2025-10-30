@@ -56,7 +56,6 @@ CREATE TABLE `tbl_answer` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `answerCode` varchar(45) NOT NULL,
   `answerObject` char(10) NOT NULL,
-  `answerContent` text NOT NULL,
   `answerContentRaw` text NOT NULL,
   `categoryAnsCode` varchar(45) NOT NULL,
   `isActive` char(1) DEFAULT 'Y',
@@ -85,6 +84,17 @@ CREATE TABLE `tbl_uploads` (
   UNIQUE KEY `filename_UNIQUE` (`filename`)
 ) 
 
+CREATE TABLE `tbl_uploads_video` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `urlLink` varchar(255) DEFAULT NULL,
+  `isActive` char(1) DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `videoUrl_UNIQUE` (`urlLink`)
+) 
 
 CREATE TABLE `tbl_home` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -108,7 +118,7 @@ CREATE TABLE `tbl_home` (
 CREATE TABLE `tbl_home_img` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeSeq` int NOT NULL,
-  `filename` varchar(255) DEFAULT NULL,
+  `filename` varchar(255) NOT NULL,
   `originalname` text NOT NULL,
   `source` varchar(45) NOT NULL,
   `size` int NOT NULL,
@@ -118,5 +128,6 @@ CREATE TABLE `tbl_home_img` (
   `updatedAt` datetime DEFAULT NULL,
   `createdId` varchar(45) DEFAULT NULL,
   `updatedId` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`seq`)
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `filename_UNIQUE` (`filename`)
 )

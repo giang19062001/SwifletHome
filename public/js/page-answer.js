@@ -12,10 +12,10 @@ function changePage(p) {
   getAllAnswer(page, limit);
 }
 function gotoCreateAnswer() {
-  window.location.href = '/dashboard/answer/create';
+  gotoPage('/dashboard/answer/create');
 }
 function gotoDetailAnswer(answerCode) {
-  window.location.href = '/dashboard/answer/update/' + answerCode;
+  gotoPage('/dashboard/answer/update/' + answerCode);
 }
 // RENDER
 const renderAllAnswer = (data, objElement) => {
@@ -28,11 +28,7 @@ const renderAllAnswer = (data, objElement) => {
             <td><p>${page * i++}</p></td>
             <td><p>${ele.categoryName}</p></td>
             <td><p>${ele.objectName}</p></td>
-            <td><p>${
-              ele.answerContentRaw.length > 30
-                ? ele.answerContentRaw.substring(0, 30) + '...'
-                : ele.answerContentRaw
-            }</p></td>
+            <td><p>${getShortTextFromHtml(ele.answerContentRaw)}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
@@ -58,12 +54,16 @@ async function getAllAnswer(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
 
   await axios
-    .post(currentUrl + '/api/admin/answer/getAll', {
-      page: currentPage,
-      limit: limit,
-      categoryAnsCode: '',
-      answerObject: '',
-    },axiosAuth())
+    .post(
+      currentUrl + '/api/admin/answer/getAll',
+      {
+        page: currentPage,
+        limit: limit,
+        categoryAnsCode: '',
+        answerObject: '',
+      },
+      axiosAuth(),
+    )
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -83,7 +83,10 @@ async function deleteAnswer(answerCode) {
     return;
   }
   await axios
-    .delete(currentUrl + `/api/admin/answer/deleteAnswer/${answerCode}`,axiosAuth())
+    .delete(
+      currentUrl + `/api/admin/answer/deleteAnswer/${answerCode}`,
+      axiosAuth(),
+    )
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

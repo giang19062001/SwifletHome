@@ -21,7 +21,6 @@ import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { AnswerAdminService } from './answer.service';
 import { IAnswer } from '../answer.interface';
 import {
-  AnswerDetailDto,
   CreateAnswerDto,
   GetAllAnswerDto,
   UpdateAnswerDto,
@@ -57,18 +56,20 @@ export class AnswerAdminController {
   @ApiBody({ type: CreateAnswerDto })
   @Post('createAnswer')
   @HttpCode(HttpStatus.OK)
-  async createAnswer(@Body() body: CreateAnswerDto): Promise<number> {
-    const result = await this.answerAdminService.createAnswer(body);
+  async createAnswer(@Body() dto: CreateAnswerDto): Promise<number> {
+    const result = await this.answerAdminService.createAnswer(dto);
     if (result === 0) {
       throw new BadRequestException();
     }
     return result;
   }
+
   @ApiBody({ type: UpdateAnswerDto })
-  @Put('updateAnswer')
+  @ApiParam({ name: 'answerCode', type: String })
+  @Put('updateAnswer/:answerCode')
   @HttpCode(HttpStatus.OK)
-  async updateAnswer(@Body() body: UpdateAnswerDto): Promise<number> {
-    const result = await this.answerAdminService.updateAnswer(body);
+  async updateAnswer(@Body() dto: UpdateAnswerDto, @Param('answerCode') answerCode: string): Promise<number> {
+    const result = await this.answerAdminService.updateAnswer(dto, answerCode);
     if (result === 0) {
       throw new BadRequestException();
     }
