@@ -1,12 +1,12 @@
 let page = 1;
 let limit = 10;
 let pageElement = 'page-question';
-let categoryQuestions = [];
+let categoriesFaq = [];
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllQuestion(page, limit);
-  getAllCategoryQuestion(page, limit);
+  getAllCategoryFaq(page, limit);
 });
 
 // TODO: FUNC
@@ -18,13 +18,12 @@ function changePage(p) {
 // TODO: RENDER
 async function showQuestionModal(type, questionData) {
   // init modal
-  const modalSelector =
-    type === 'create' ? '.question-create-modal' : '.question-update-modal';
+  const modalSelector = type === 'create' ? '.question-create-modal' : '.question-update-modal';
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body');
 
   // render <option> category
-  const categoryOptions = categoryQuestions
+  const categoryOptions = categoriesFaq
     .map(
       (cate) => `
       <option value="${cate.categoryCode}" 
@@ -36,55 +35,16 @@ async function showQuestionModal(type, questionData) {
     .join('');
 
   // form
-  modalBody.innerHTML = `
-    <form>
-      <input type="hidden" id="questionCode" value="${questionData.questionCode || ''}">
-      <div class="form-group mb-3">
-        <label for="questionContent" class="form-label">Câu hỏi</label>
-        <textarea class="form-control" id="questionContent">${questionData.questionContent || ''}</textarea>
-        <div class="err-questionContent">Vui lòng nhập nội dung câu hỏi.</div>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label for="categoryQuesCode" class="form-label">Thể loại</label>
-          <select class="form-select" id="categoryQuesCode">${categoryOptions}</select>
-        </div>
-        <div class="col-md-6">
-          <label for="questionObject" class="form-label">Đối tượng</label>
-          <select class="form-select" id="questionObject">
-            <option value="YEN" ${questionData.target === 'YEN' ? 'selected' : ''}>Yến</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group mb-3">
-        <label for="answerCode" class="form-label">Câu trả lời</label>
-        <select class="form-select" id="answerCode">
-          <option value="">Chọn câu trả lời</option>
-        </select>
-        <div class="mt-2">
-          <a href="#" id="answerDetailLink" target="_blank" class="btn btn-sm btn-outline-primary" style="display: none;">
-            <i class="fas fa-external-link-alt"></i> Xem chi tiết câu trả lời
-          </a>
-        </div>
-      </div>
-    </form>
-  `;
+  modalBody.querySelector('#questionCode').value = questionData.questionCode || '';
+  modalBody.querySelector('#questionContent').value = questionData.questionContent || '';
+  modalBody.querySelector('#categoryQuesCode').innerHTML = categoryOptions;
 
   // render answer list
-  await renderAllAnswer(
-    modalBody,
-    questionData ? questionData.answerCode : '',
-    modalBody.querySelector('#categoryQuesCode').value,
-  );
+  await renderAllAnswer(modalBody, questionData ? questionData.answerCode : '', modalBody.querySelector('#categoryQuesCode').value);
   // validate
-  modalBody
-    .querySelector('#questionContent')
-    ?.addEventListener('input', (e) => {
-      modalBody.querySelector('.err-questionContent').style.display =
-        String(e.target.value).trim() == '' ? 'block' : 'none';
-    });
+  modalBody.querySelector('#questionContent')?.addEventListener('input', (e) => {
+    modalBody.querySelector('.err-questionContent').style.display = String(e.target.value).trim() == '' ? 'block' : 'none';
+  });
 
   // assign event show link "Xem chi tiết"
   const answerSelect = modalBody.querySelector('#answerCode');
@@ -105,8 +65,7 @@ async function showQuestionModal(type, questionData) {
   setTimeout(() => answerSelect.dispatchEvent(new Event('change')), 0);
 
   // assign <event> update
-  modalEl.querySelector('.modal-footer button').onclick =
-    type === 'create' ? createQuestion : updateQuestion;
+  modalEl.querySelector('.modal-footer button').onclick = type === 'create' ? createQuestion : updateQuestion;
 
   // show modal
   const modal = new bootstrap.Modal(modalEl);
@@ -137,11 +96,9 @@ async function renderAllAnswer(modalBody, answerCode, categoryQuesCode) {
   await renderAnswer(categoryQuesCode);
 
   // render when category change
-  modalBody
-    .querySelector('#categoryQuesCode')
-    .addEventListener('change', async (e) => {
-      await renderAnswer(e.target.value);
-    });
+  modalBody.querySelector('#categoryQuesCode').addEventListener('change', async (e) => {
+    await renderAnswer(e.target.value);
+  });
 }
 
 function renderAllQuestion(data, objElement) {
@@ -198,10 +155,10 @@ async function getAllQuestion(currentPage, limit) {
       console.log('err', err);
     });
 }
-async function getAllCategoryQuestion(currentPage, limit) {
+async function getAllCategoryFaq(currentPage, limit) {
   await axios
     .post(
-      currentUrl + '/api/admin/categoryQuestion/getAll',
+      currentUrl + '/api/admin/categoryFaq/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -211,7 +168,7 @@ async function getAllCategoryQuestion(currentPage, limit) {
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
-        categoryQuestions = response.data.list;
+        categoriesFaq = response.data.list;
       }
     })
     .catch(function (err) {
@@ -220,10 +177,7 @@ async function getAllCategoryQuestion(currentPage, limit) {
 }
 async function getDetailQuestion(questionCode) {
   await axios
-    .get(
-      currentUrl + '/api/admin/question/getDetail/' + questionCode,
-      axiosAuth(),
-    )
+    .get(currentUrl + '/api/admin/question/getDetail/' + questionCode, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -261,17 +215,12 @@ async function getAllAnswer(currentPage, limit, categoryAnsCode, answerObject) {
     });
 }
 async function deleteQuestion(questionCode) {
-  const confirmed = window.confirm(
-    `Bạn có chắc chắn muốn xóa câu hỏi này không?`,
-  );
+  const confirmed = window.confirm(`Bạn có chắc chắn muốn xóa câu hỏi này không?`);
   if (!confirmed) {
     return;
   }
   await axios
-    .delete(
-      currentUrl + `/api/admin/question/deleteQuestion/${questionCode}`,
-      axiosAuth(),
-    )
+    .delete(currentUrl + `/api/admin/question/deleteQuestion/${questionCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -285,9 +234,7 @@ async function deleteQuestion(questionCode) {
 }
 async function createQuestion() {
   try {
-    const modalBody = document.querySelector(
-      '.question-create-modal .modal-body form',
-    );
+    const modalBody = document.querySelector('.question-create-modal .modal-body form');
     const questionContent = modalBody.querySelector('#questionContent').value;
     const categoryQuesCode = modalBody.querySelector('#categoryQuesCode').value;
     const questionObject = modalBody.querySelector('#questionObject').value;
@@ -312,7 +259,7 @@ async function createQuestion() {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Thêm thành công');
-          reloadPage()
+          reloadPage();
         } else {
           toastErr('Thêm thất bại');
         }
@@ -327,9 +274,7 @@ async function createQuestion() {
 
 async function updateQuestion() {
   try {
-    const modalBody = document.querySelector(
-      '.question-update-modal .modal-body form',
-    );
+    const modalBody = document.querySelector('.question-update-modal .modal-body form');
     const questionContent = modalBody.querySelector('#questionContent').value;
     const categoryQuesCode = modalBody.querySelector('#categoryQuesCode').value;
     const questionObject = modalBody.querySelector('#questionObject').value;
@@ -346,6 +291,8 @@ async function updateQuestion() {
           categoryQuesCode: categoryQuesCode,
           questionObject: questionObject,
           answerCode: answerCode,
+          updatedId: user.userId,
+
         },
         axiosAuth(),
       )
@@ -353,7 +300,7 @@ async function updateQuestion() {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Cập nhập thành công');
-          reloadPage()
+          reloadPage();
         } else {
           toastErr('Cập nhập thất bại');
         }

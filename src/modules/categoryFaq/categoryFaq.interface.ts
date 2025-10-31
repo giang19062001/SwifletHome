@@ -1,4 +1,4 @@
-export interface ICategoryQuestion {
+export interface ICategoryFaq {
   seq: number;
   categoryCode: string;
   categoryName: string;

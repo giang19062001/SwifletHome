@@ -1,0 +1,24 @@
+#page-home-submit {
+  a {
+    text-decoration: none;
+  }
+  .txt-status-waiting {
+    color: #ffc50f;
+  }
+  .txt-status-approved {
+    color: #59ac77;
+  }
+  .txt-status-cancel {
+    color: #f75270;
+  }
+}
+.home-submit-update-modal {
+  img {
+    width: 250px;
+    border-radius: 15px;
+  }
+  .homeName{
+    font-size: 18px !important;
+    font-weight: 600;
+  }
+}

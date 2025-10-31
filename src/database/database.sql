@@ -11,7 +11,7 @@ CREATE TABLE `tbl_user_admin` (
 )
 
 
-CREATE TABLE `tbl_category_ques_ans` (
+CREATE TABLE `tbl_category_faq` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `categoryCode` varchar(45) NOT NULL,
   `categoryName` varchar(45) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE `tbl_category_ques_ans` (
   UNIQUE KEY `categoryCode_UNIQUE` (`categoryCode`)
 )
 
-CREATE TABLE `tbl_object_ques_ans` (
+CREATE TABLE `tbl_object_faq` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `objectCharacter` varchar(45) NOT NULL,
   `objectName` varchar(45) NOT NULL,
@@ -131,3 +131,52 @@ CREATE TABLE `tbl_home_img` (
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
 )
+
+CREATE TABLE `tbl_home_submit` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `homeCode` varchar(45) NOT NULL,
+  `userCode` varchar(45) NOT NULL,
+  `userName` char(10) NOT NULL,
+  `userPhone` text NOT NULL,
+  `numberAttendCode` char(15) NOT NULL,
+  `statusCode` char(15) NOT NULL,
+  `note` text,
+  `cancelReason` text,
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`)
+)
+
+
+CREATE TABLE `tbl_user_app` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `userCode` varchar(45) DEFAULT NULL,
+  `userName` varchar(45) DEFAULT NULL,
+  `userPhone` varchar(255) NOT NULL,
+  `isActive` char(1) NOT NULL DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `userCode_UNIQUE` (`userCode`)
+)
+
+
+CREATE TABLE `tbl_code_common` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `code` varchar(15) NOT NULL,
+  `mainCode` varchar(15) NOT NULL,
+  `subCode` varchar(15) NOT NULL,
+  `keyCode` varchar(15) NOT NULL,
+  `valueCode` varchar(255) NOT NULL,
+  `sortOrder` int DEFAULT '0',
+  `isActive` char(1) DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `mainCode` (`mainCode`,`subCode`,`keyCode`),
+  UNIQUE KEY `code_UNIQUE` (`code`)
+) 

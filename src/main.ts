@@ -4,10 +4,10 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import expressLayouts from 'express-ejs-layouts';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import { NotFoundExceptionFilter } from './filter/NotFoundExceptionFilter';
+import { initSwagger } from './config/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,22 +42,7 @@ async function bootstrap() {
   );
 
   //swagger
-  const config = new DocumentBuilder()
-    .setTitle('Swiftlet APIs')
-    .setDescription('The Swiftlet API description')
-    .setVersion('1.0')
-    .addTag('APIs')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-      },
-      'swf-token',
-    )
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, documentFactory);
+  initSwagger(app)
 
   // port
   await app.listen(process.env.PORT ?? '');

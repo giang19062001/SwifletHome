@@ -32,7 +32,8 @@ export class HomeAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive
           FROM ${this.table} A 
-          WHERE A.homeCode = ? `,
+          WHERE A.homeCode = ?
+          LIMIT 1 `,
       [homeCode],
     );
     return rows ? (rows[0] as IHome) : null;
@@ -96,7 +97,8 @@ export class HomeAdminRepository {
   }
   async updateHome(dto: UpdateHomeDto, homeCode: string): Promise<number> {
     const sql = `
-        UPDATE ${this.table} SET homeName = ?, homeAddress = ?, homeDescription = ?, latitude = ?, longitude = ?, homeImage = ?
+        UPDATE ${this.table} SET homeName = ?, homeAddress = ?, homeDescription = ?, latitude = ?, longitude = ?, homeImage = ?,
+        updatedId = ?, updatedAt = ?
         WHERE homeCode = ?
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
@@ -106,6 +108,8 @@ export class HomeAdminRepository {
       dto.latitude,
       dto.longitude,
       dto.homeImage.filename,
+      dto.updatedId,
+      new Date(),
       homeCode,
     ]);
 

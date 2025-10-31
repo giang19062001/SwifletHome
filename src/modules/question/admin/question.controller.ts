@@ -49,6 +49,9 @@ export class QuestionAdminController {
     @Param('questionCode') questionCode: string,
   ): Promise<IQuestion | null> {
     const result = await this.questionAdminService.getDetail(questionCode);
+     if(!result){
+      throw new BadRequestException()
+    }
     return result;
   }
 

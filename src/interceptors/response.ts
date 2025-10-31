@@ -28,12 +28,12 @@ export class ResponseInterceptor<T>
 
     return next.handle().pipe(
       map((data) => {
-        if (data === undefined || data === null) {
+        if (data === undefined || data === null || data === 0) {
           return {
-            success: true,
-            message: 'Success',
+            success: false,
+            message: 'Failed',
             data: null,
-            statusCode: response.statusCode,
+            statusCode: 400,
           
           };
         }

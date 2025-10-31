@@ -19,6 +19,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiBody({
+    description: '**cookies:** `swf-token`',
     type: AuthLoginDto,
   })
   @Post('login')

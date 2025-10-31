@@ -8,7 +8,7 @@
             <div class="col-md-3">
               <label for="categoryAnsCode" class="form-label">Thể loại</label>
               <select class="form-select" id="categoryAnsCode" name="categoryAnsCode">
-                <% values.categoryQuestion.forEach(function(cate) { %>
+                <% values.categoriesFaq.forEach(function(cate) { %>
                   <option value="<%= cate.categoryCode %>" <%=(values.categoryAnsCode &&
                     values.categoryAnsCode===cate.categoryCode) ? 'selected' : '' %>
                     >
@@ -48,20 +48,19 @@
             </div>
           </div>
         </div>
-        <div class="bottom-button">
-          <button class="btn-common" onclick="createAnswer()">Lưu</button>
-        </div>
+
       </div>
     </div>
     <div class="col-4">
-       <div class="common-editor">
+      <div class="common-editor">
         <%- include('./editor', { content: values.answerContentRaw}) %>
 
-        <div class="bottom-button">
-          <button class="btn-common" onclick="getContent()">
-            Xem trước 
-          </button>
-        </div>
+          <div class="bottom-button">
+            <button class="btn-common-audio" onclick="getContent()">
+              Xem trước
+            </button>
+            <button class="btn-common" onclick="createAnswer()">Thêm</button>
+          </div>
       </div>
     </div>
 

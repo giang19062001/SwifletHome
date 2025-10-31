@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
 import { IAnswer } from './modules/answer/answer.interface';
-import { CateQuestionService } from './modules/cateQuestion/cateQuestion.service';
+import { CateFaqService } from './modules/categoryFaq/categoryFaq.service';
 import { HomeAdminService } from './modules/home/admin/home.service';
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly answerAdminService: AnswerAdminService,
-    private readonly cateQuestionService: CateQuestionService,
+    private readonly cateFaqService: CateFaqService,
     private readonly homeAdminService: HomeAdminService,
   ) {}
   async getDetailAnswer(answerCode: string): Promise<IAnswer | null> {
@@ -16,7 +16,7 @@ export class AppService {
     return result;
   }
   async renderCreateAnswer(): Promise<any> {
-    const { list } = await this.cateQuestionService.getAll({
+    const { list } = await this.cateFaqService.getAll({
       limit: 0,
       page: 0,
     });
@@ -24,12 +24,12 @@ export class AppService {
       answerContentRaw: '',
       answerObject: '',
       categoryAnsCode: '',
-      categoryQuestion: list,
+      categoriesFaq: list,
     };
   }
   async renderAnswerUpdate(answerCode: string): Promise<any> {
     const answer = await this.answerAdminService.getDetail(answerCode);
-    const { list } = await this.cateQuestionService.getAll({
+    const { list } = await this.cateFaqService.getAll({
       limit: 0,
       page: 0,
     });
@@ -37,7 +37,7 @@ export class AppService {
       answerContentRaw: answer?.answerContentRaw,
       answerObject: answer?.answerObject,
       categoryAnsCode: answer?.categoryAnsCode,
-      categoryQuestion: list,
+      categoriesFaq: list,
     };
   }
   async renderHomeUpdate(answerCode: string): Promise<any> {

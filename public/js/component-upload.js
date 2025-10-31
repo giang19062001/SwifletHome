@@ -227,9 +227,10 @@ async function uploadFile(file, type) {
 
     if (response.data) {
       // reload file list
+      toastOk('Thêm file thành công');
       getAllFile();
     } else {
-      toastErr('Thêm thất bại');
+      toastErr('Thêm file thất bại');
     }
   } catch (error) {
     console.error('Upload error:', error);
@@ -249,6 +250,7 @@ async function uploadVideoLink(urlLink) {
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
+          toastOk('Thêm thành công');
           getAllFile();
         } else {
           toastErr('Thêm thất bại');

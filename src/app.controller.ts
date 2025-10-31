@@ -101,10 +101,20 @@ export class AppController {
       title: 'Chỉnh sửa nhà yến',
       isLayout: true,
       user: req.session.user,
-      values: values
+      values: values,
     };
   }
 
+  @Get('/dashboard/home-submit/list')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/home-submit')
+  renderHomeSubmit(@Req() req: Request) {
+    return {
+      title: 'Danh sách đăng ký tham quan',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   @Get('/404')
   @Render('pages/404')
   render404(@Req() req: Request) {

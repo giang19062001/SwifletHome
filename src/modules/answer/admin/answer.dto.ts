@@ -17,7 +17,6 @@ export class GetAllAnswerDto extends PagingDto {
 }
 
 export class UpdateAnswerDto {
-
   @ApiProperty({ example: '<p>Hello word</p>' })
   @IsNotEmpty()
   @IsString()
@@ -36,9 +35,16 @@ export class UpdateAnswerDto {
   @IsString()
   @IsNotEmpty()
   categoryAnsCode: string;
+
+  @ApiProperty({
+    example: 'admin',
+  })
+  @IsString()
+  @IsNotEmpty()
+  updatedId: string;
 }
 
-export class CreateAnswerDto extends UpdateAnswerDto {
+export class CreateAnswerDto extends OmitType(UpdateAnswerDto, ['updatedId']) {
   @ApiProperty({
     example: 'admin',
   })

@@ -1,6 +1,4 @@
-const pageType = window.location.pathname.includes('/update')
-  ? 'update'
-  : 'create';
+const pageType = window.location.pathname.includes('/update') ? 'update' : 'create';
 let homeImagesFiles = []; // Track newly added files for homeImages
 
 const homeFormConstraints = {
@@ -39,9 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initializeForm() {
-  const form = document.getElementById(
-    pageType === 'create' ? 'home-create-form' : 'home-update-form',
-  );
+  const form = document.getElementById(pageType === 'create' ? 'home-create-form' : 'home-update-form');
   const homeImagePreview = form.querySelector('#homeImagePreview');
   const homeImagesPreview = form.querySelector('#homeImagesPreview');
   const homeImageInput = form.querySelector('#homeImage');
@@ -50,19 +46,25 @@ function initializeForm() {
   // Handle form submission
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-
+    const descriptionHTML = quillGlobal.root.innerHTML;
+    const descriptionText = quillGlobal.getText().trim();
     const formData = {
       homeName: form.querySelector('#homeName').value,
       homeAddress: form.querySelector('#homeAddress').value,
       latitude: form.querySelector('#latitude').value,
       longitude: form.querySelector('#longitude').value,
-      homeDescription: form.querySelector('#homeDescription').value,
+      // homeDescription: form.querySelector('#homeDescription').value,
+      homeDescription: descriptionHTML,
       homeImage: form.querySelector('#homeImage').files,
       homeImages: form.querySelector('#homeImages').files,
       homeCode: pageType === 'update' ? homeData.homeCode : undefined,
     };
 
     const errors = validate(formData, homeFormConstraints);
+    if (!descriptionText) {
+      if (!errors) errors = {};
+      errors.homeDescription = ['Vui lòng nhập mô tả.']; // set error
+    }
     if (errors) {
       displayErrors(errors);
       return;
@@ -78,11 +80,23 @@ function initializeForm() {
 
   // Real-time validation for inputs
   form.querySelectorAll('input, textarea').forEach((input) => {
-    input.addEventListener('input', () =>
-      validateField(homeFormConstraints, input),
-    );
+    input.addEventListener('input', () => validateField(homeFormConstraints, input));
   });
 
+  // validate for homeDescription
+  if (quillGlobal) {
+    quillGlobal.on('text-change', () => {
+      const errEl = form.querySelector('[data-error="homeDescription"]');
+      const hasText = quillGlobal.getText().trim().length > 0;
+      if (hasText) {
+        errEl.textContent = '';
+        errEl.style.display = 'none';
+      } else {
+        errEl.textContent = 'Vui lòng nhập mô tả.';
+        errEl.style.display = 'block';
+      }
+    });
+  }
   // Preview home images 'CHANGE EVENT'
   homeImagesInput.addEventListener('change', () => {
     // Append new files to homeImagesFiles
@@ -96,15 +110,7 @@ function initializeForm() {
 
     // Re-render all previews
     homeImagesPreview.innerHTML = '';
-    homeImagesFiles.forEach((file, index) =>
-      renderImagePreview(
-        file,
-        index,
-        homeImagesInput,
-        homeImagesPreview,
-        'homeImages',
-      ),
-    );
+    homeImagesFiles.forEach((file, index) => renderImagePreview(file, index, homeImagesInput, homeImagesPreview, 'homeImages'));
 
     validateField(homeFormConstraints, homeImagesInput);
   });
@@ -113,13 +119,7 @@ function initializeForm() {
   homeImageInput.addEventListener('change', () => {
     homeImagePreview.innerHTML = '';
     if (homeImageInput.files.length > 0) {
-      renderImagePreview(
-        homeImageInput.files[0],
-        0,
-        homeImageInput,
-        homeImagePreview,
-        'homeImage',
-      );
+      renderImagePreview(homeImageInput.files[0], 0, homeImageInput, homeImagePreview, 'homeImage');
     }
     validateField(homeFormConstraints, homeImageInput);
   });
@@ -137,8 +137,12 @@ async function assignForm(homeData) {
   form.querySelector('#homeAddress').value = homeData.homeAddress || '';
   form.querySelector('#latitude').value = homeData.latitude || '';
   form.querySelector('#longitude').value = homeData.longitude || '';
-  form.querySelector('#homeDescription').value = homeData.homeDescription || '';
+  // form.querySelector('#homeDescription').value = homeData.homeDescription || '';
 
+  // set homeDescription value
+  if (quillGlobal && homeData.homeDescription) {
+    quillGlobal.root.innerHTML = homeData.homeDescription;
+  }
   // Clear existing error messages
   document.querySelectorAll('.error-message').forEach((el) => {
     el.textContent = '';
@@ -158,13 +162,7 @@ async function assignForm(homeData) {
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
       homeImageInput.files = dataTransfer.files;
-      renderImagePreview(
-        file,
-        0,
-        homeImageInput,
-        homeImagePreview,
-        'homeImage',
-      );
+      renderImagePreview(file, 0, homeImageInput, homeImagePreview, 'homeImage');
       validateField(homeFormConstraints, homeImageInput);
     }
   }
@@ -172,7 +170,7 @@ async function assignForm(homeData) {
   // Handle homeImages
   if (pageType === 'update' && homeData.homeImages && Array.isArray(homeData.homeImages)) {
     // assign homeImagesFiles from 'homeData'
-    const files = await Promise.all(homeData.homeImages.map((img) => ChangeUrlToFile(img.filename,'home')));
+    const files = await Promise.all(homeData.homeImages.map((img) => ChangeUrlToFile(img.filename, 'home')));
     homeImagesFiles = files.filter((file) => file !== null);
     if (homeImagesFiles.length > 0) {
       // Update FileList for  homeImages
@@ -180,15 +178,7 @@ async function assignForm(homeData) {
       homeImagesFiles.forEach((file) => dataTransfer.items.add(file));
       homeImagesInput.files = dataTransfer.files;
       homeImagesPreview.innerHTML = '';
-      homeImagesFiles.forEach((file, index) =>
-        renderImagePreview(
-          file,
-          index,
-          homeImagesInput,
-          homeImagesPreview,
-          'homeImages',
-        ),
-      );
+      homeImagesFiles.forEach((file, index) => renderImagePreview(file, index, homeImagesInput, homeImagesPreview, 'homeImages'));
       validateField(homeFormConstraints, homeImagesInput);
     }
   }
@@ -229,9 +219,7 @@ function renderImagePreview(file, index, input, preview, field) {
     // Re-render previews
     preview.innerHTML = '';
     if (field === 'homeImages') {
-      homeImagesFiles.forEach((file, i) =>
-        renderImagePreview(file, i, input, preview, field),
-      );
+      homeImagesFiles.forEach((file, i) => renderImagePreview(file, i, input, preview, field));
     } else if (field === 'homeImage' && input.files.length > 0) {
       renderImagePreview(input.files[0], 0, input, preview, field);
     }
@@ -256,14 +244,18 @@ async function updateHome(formData) {
 }
 
 async function submitHome(formData, url, method, successMessage) {
+  console.log('formData', formData);
   const postData = new FormData();
   const fields = ['homeName', 'homeAddress', 'homeDescription', 'latitude', 'longitude'];
   fields.forEach((field) => postData.append(field, formData[field]));
   postData.append('source', 'home');
-  postData.append('createdId', user.userId);
-  if (formData.homeImage.length) postData.append('homeImage', formData.homeImage[0]);
-  formData.homeImages.forEach((file) => postData.append('homeImages', file));
-
+  postData.append(method == 'post' ? 'createdId' : 'updatedId', user.userId);
+  if (formData.homeImage?.length) {
+    postData.append('homeImage', formData.homeImage[0]);
+    Array.from(formData.homeImages).forEach((file) => {
+      postData.append('homeImages', file);
+    });
+  }
   try {
     const response = await axios[method](url, postData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
     if (response.data) {

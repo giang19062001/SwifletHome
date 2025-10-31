@@ -7,7 +7,7 @@
 
 .page-home-mutaion {
   #editor{
-    height: 22.5vh;
+    height: 30vh;
   }
   .file-label {
     display: inline-flex;
@@ -18,7 +18,7 @@
   }
 
   .file-button {
-    background: $main-color;
+    background: #59ac77;
     color: white;
     border-radius: 15px;
     padding: 7px 15px;
@@ -28,7 +28,7 @@
   }
 
   .file-button:hover {
-    background: $main-color-hover;
+    background: #4a9164
   }
 
   .image-preview-container {

@@ -1,0 +1,120 @@
+<%- include ('../layout/sidebar-vertical') %>
+
+   <div class="common-table-container row" id="page-home-submit">
+      <div class="col-xl-12">
+         <div class="row mb-3">
+            <div class="col-12">
+               <div class="card">
+                  <div class="card-body">
+                     <div class="d-flex justify-content-between">
+                        <p class="title-page">Danh sách nhà yến</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-12">
+               <div class="container-table">
+                  <div class="table-responsive">
+                     <table class="table table-striped">
+                        <thead class="table-dark">
+                           <tr class="text-center">
+                              <th>
+                                 <p>STT</p>
+                              </th>
+                              <th>
+                                 <p>Nhà yến</p>
+                              </th>
+                              <th>
+                                 <p>Tên khách hàng</p>
+                              </th>
+                              <th>
+                                 <p>Số điện thoại</p>
+                              </th>
+                              <th>
+                                 <p>Số lượng tham quan</p>
+                              </th>
+                              <th>
+                                 <p>Trạng thái</p>
+                              </th>
+                              <th>
+                                 <p>Ngày tạo</p>
+                              </th>
+                              <th>
+
+                              </th>
+                           </tr>
+                        </thead>
+                        <tbody class="body-table"></tbody>
+                     </table>
+                  </div>
+                  <nav>
+                     <ul class="pagination" id="privacy-main-pager"></ul>
+                  </nav>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   </div>
+   <!-- modal update-->
+   <div class="modal common-modal home-submit-update-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <p class="modal-header-title">Cập nhập trạng thái</p>
+               <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                     <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                  </svg>
+               </button>
+            </div>
+            <div class="modal-body">
+               <form>
+                  <input type="hidden" id="seq" value="">
+                  <div class="row mb-3">
+                     <div class="col-md-5">
+                        <img src="" class="homeImage" />
+                     </div>
+                     <div class="col-md-7">
+                        <div class="row mb-2">
+                           <p class="homeName col-12"></p>
+                        </div>
+                        <div class="row mb-2">
+                           <label class="col-5">Tên khách đăng ký:</label>
+                           <p class="col-7 userName"></p>
+                        </div>
+                        <div class="row mb-2">
+                           <label class="col-5">Số điện thoại đăng ký:</label>
+                           <p class="col-7 userPhone"></p>
+                        </div>
+                        <div class="row mb-2">
+                           <label class="col-5">Số lượng người đăng ký:</label>
+                           <p class="col-7 numberAttend"></p>
+                        </div>
+                        
+                        <div class="row mb-2">
+                           <label class="col-5">Trạng thái:</label>
+                           <div class="col-7">
+                              <select class="form-select" id="statusCode"></select>
+                           </div>
+                        </div>
+                        <div class="row mb-1">
+                           <label class="col-5">Ghi chú:</label>
+                           <p class="col-7 note"></p>
+                        </div>
+                     </div>
+                  </div>
+
+               </form>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn-common">Cập nhập</button>
+            </div>
+         </div>
+      </div>
+   </div>
+   <script src="/js/page-home-submit.js"></script>

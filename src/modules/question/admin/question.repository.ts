@@ -22,9 +22,9 @@ export class QuestionAdminRepository {
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
-        LEFT JOIN tbl_category_ques_ans B
+        LEFT JOIN tbl_category_faq B
         ON A.categoryQuesCode = B.categoryCode
-        LEFT JOIN tbl_object_ques_ans C
+        LEFT JOIN tbl_object_faq C
         ON A.questionObject = C.objectCharacter
         LIMIT ? OFFSET ? `,
       [dto.limit, (dto.page - 1) * dto.limit],
@@ -36,9 +36,9 @@ export class QuestionAdminRepository {
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
-        LEFT JOIN tbl_category_ques_ans B
+        LEFT JOIN tbl_category_faq B
         ON A.categoryQuesCode = B.categoryCode
-        LEFT JOIN tbl_object_ques_ans C
+        LEFT JOIN tbl_object_faq C
         ON A.questionObject = C.objectCharacter
         WHERE A.answerCode IS NOT NULL AND A.answerCode = ?`,
       [answerCode],
@@ -50,13 +50,14 @@ export class QuestionAdminRepository {
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName, D.answerContentRaw
         FROM ${this.table} A 
-        LEFT JOIN tbl_category_ques_ans B
+        LEFT JOIN tbl_category_faq B
         ON A.categoryQuesCode = B.categoryCode
-        LEFT JOIN tbl_object_ques_ans C
+        LEFT JOIN tbl_object_faq C
         ON A.questionObject = C.objectCharacter
         LEFT JOIN tbl_answer D
         ON A.answerCode = D.answerCode
-        WHERE A.questionCode = ? `,
+        WHERE A.questionCode = ? 
+        LIMIT 1`,
       [questionCode],
     );
     return rows ? (rows[0] as IQuestion) : null;
@@ -98,7 +99,8 @@ export class QuestionAdminRepository {
   }
   async updateQuestion(dto: UpdateQuestionDto, questionCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET answerCode = ?, questionObject = ?, questionContent = ?, categoryQuesCode = ? 
+      UPDATE ${this.table} SET answerCode = ?, questionObject = ?, questionContent = ?, categoryQuesCode = ?,
+      updatedId = ?, updatedAt = ?
       WHERE questionCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
@@ -106,6 +108,8 @@ export class QuestionAdminRepository {
       dto.questionObject,
       dto.questionContent,
       dto.categoryQuesCode,
+      dto.updatedId,
+      new Date(),
       questionCode,
     ]);
 

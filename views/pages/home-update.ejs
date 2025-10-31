@@ -17,8 +17,8 @@
                     <div class="card">
                         <div class="card-body">
                             <form id="home-update-form" novalidate>
-                                <div class="row">
-                                    <div class="col-lg-6">
+                               <div class="row">
+                                    <div class="col-lg-4">
                                         <div class="row">
                                             <div class="col-md-12 form-group">
                                                 <label for="homeName" class="form-label">Tên nhà yến</label>
@@ -48,45 +48,53 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label for="homeDescription" class="form-label">Mô tả</label>
-                                            <textarea type="text" class="form-control" id="homeDescription"
-                                                name="homeDescription" rows="10"></textarea>
-                                            <!-- %<- include('./editor', { content: ""}) %> -->
-                                            <div class="error-message mt-2" data-error="homeDescription"></div>
+                                    <div class="col-lg-8">
+                                        <div class="row">
+                                            <div class="col-md-2 form-group">
+                                                <label for="homeImage" class="form-label">Ảnh chính</label>
+                                                <br />
+                                                <label for="homeImage" class="file-label">
+                                                    <span class="file-button">Chọn ảnh chính</span>
+                                                </label>
+                                                <input type="file" class="form-control" id="homeImage" name="homeImage"
+                                                    accept="image/*" style="display: none;" />
+                                                <div class="error-message mt-2" data-error="homeImage"></div>
+                                                <div class="mt-3 mb-2" id="homeImagePreview"></div>
+                                            </div>
+
+                                            <div class="col-md-10 form-group">
+                                                <label for="homeImages" class="form-label">Ảnh phụ</label>
+                                                <br />
+                                                <label for="homeImages" class="file-label">
+                                                    <span class="file-button">Chọn ảnh phụ</span>
+                                                </label>
+                                                <input type="file" class="form-control" id="homeImages"
+                                                    name="homeImages" multiple accept="image/*"
+                                                    style="display: none;" />
+                                                <div class="error-message mt-2" data-error="homeImages"></div>
+
+                                                <div class="image-preview-container" id="homeImagesPreview"></div>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
 
                                 <div class="row mt-2">
-                                    <div class="col-12 form-group">
-                                        <label for="homeImage" class="form-label">Ảnh chính</label>
-                                        <br />
-                                        <label for="homeImage" class="file-label">
-                                            <span class="file-button">Chọn ảnh chính</span>
-                                        </label>
-                                        <input type="file" class="form-control" id="homeImage" name="homeImage"
-                                            accept="image/*" style="display: none;" />
-                                        <div class="error-message mt-2" data-error="homeImage"></div>
-                                        <div class="mt-2 mb-2" id="homeImagePreview"></div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label for="homeDescription" class="form-label">Mô tả</label>
+                                            <!-- <textarea type="text" class="form-control" id="homeDescription"
+                                                name="homeDescription" rows="10"></textarea> -->
+                                            <%- include('./editor', { content: "" }) %>
+                                                <div class="error-message" data-error="homeDescription"></div>
+                                        </div>
                                     </div>
 
-                                    <div class="col-12 form-group">
-                                        <label for="homeImages" class="form-label">Ảnh phụ</label>
-                                        <br />
-                                        <label for="homeImages" class="file-label">
-                                            <span class="file-button">Chọn ảnh phụ</span>
-                                        </label>
-                                        <input type="file" class="form-control" id="homeImages" name="homeImages"
-                                            multiple accept="image/*" style="display: none;" />
-                                        <div class="error-message mt-2" data-error="homeImages"></div>
 
-                                        <div class="image-preview-container" id="homeImagesPreview"></div>
-                                    </div>
 
-                                    <div class="col-12 form-group d-flex justify-content-center">
-                                        <button type="submit" class="btn-common">Cập nhập</button>
+                                    <div class="col-12 form-group d-flex justify-content-center mt-4">
+                                        <button type="submit" class="btn-common">Lưu</button>
                                     </div>
                                 </div>
                             </form>
@@ -98,7 +106,7 @@
     </div>
 </div>
 <script>
-  const homeData = JSON.parse('<%- JSON.stringify(values.homeData) %>');
+  const homeData = <%- JSON.stringify(values.homeData) %>
   console.log('homeData', homeData);
 </script>
 

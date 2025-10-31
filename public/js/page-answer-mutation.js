@@ -1,7 +1,5 @@
 // TODO:INIT
-const answerCode = currentPath.includes('/update')
-  ? currentPath.split('/').pop()
-  : null;
+const answerCode = currentPath.includes('/update') ? currentPath.split('/').pop() : null;
 const pageElement = 'page-answer-mutation';
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -15,34 +13,22 @@ function renderContentHtml() {
   answerContentRaw = bot.innerHTML;
 
   // replace [[image-data=...]]
-  contentHtml = contentHtml.replace(
-    /\[\[image-data=(.*?)\]\]/g,
-    `<img src="$1" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`,
-  );
+  contentHtml = contentHtml.replace(/\[\[image-data=(.*?)\]\]/g, `<img src="$1" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`);
 
   // replace [[audio-data=...]]
-  contentHtml = contentHtml.replace(
-    /\[\[audio-data=(.*?)\]\]/g,
-    `<audio controls style="width:100%; margin:8px 0;"><source src="$1" type="audio/mpeg"></audio>`,
-  );
+  contentHtml = contentHtml.replace(/\[\[audio-data=(.*?)\]\]/g, `<audio controls style="width:100%; margin:8px 0;"><source src="$1" type="audio/mpeg"></audio>`);
 
   // replace [[video-data=...]]
-  contentHtml = contentHtml.replace(
-    /\[\[video-data=(.*?)\]\]/g,
-    `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="$1"></iframe>`,
-  );
+  contentHtml = contentHtml.replace(/\[\[video-data=(.*?)\]\]/g, `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="$1"></iframe>`);
 
   // replace [[payment]]
-  contentHtml = contentHtml.replace(
-    /\[\[payment\]\]/g,
-    `<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`,
-  );
+  contentHtml = contentHtml.replace(/\[\[payment\]\]/g, `<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`);
 
-  ;
   bot.innerHTML = contentHtml;
 }
 // TODO:API
 async function createAnswer() {
+  getContent(); // assisgn value
   try {
     const categoryAnsCode = document.getElementById('categoryAnsCode').value;
     const answerObject = document.getElementById('answerObject').value;
@@ -71,6 +57,8 @@ async function createAnswer() {
 }
 
 async function updateAnswer() {
+  getContent(); // assisgn value
+
   try {
     const categoryAnsCode = document.getElementById('categoryAnsCode').value;
     const answerObject = document.getElementById('answerObject').value;
@@ -81,6 +69,7 @@ async function updateAnswer() {
           answerContentRaw,
           categoryAnsCode,
           answerObject,
+          updatedId: user.userId,
         },
         axiosAuth(),
       )

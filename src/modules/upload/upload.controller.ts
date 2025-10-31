@@ -24,9 +24,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UploadFileDto, UploadVideoLinkDto } from './upload.dto';
-import { multerConfig } from './upload.config';
 import { IFileUpload } from './upload.interface';
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { multerConfig } from 'src/config/multer';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/uploadFile')

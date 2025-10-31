@@ -62,8 +62,8 @@ export class AnswerAdminRepository {
       ` SELECT A.seq, A.answerCode, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
       B.categoryName, C.objectName
       FROM ${this.table} A 
-      LEFT JOIN tbl_category_ques_ans B ON A.categoryAnsCode = B.categoryCode
-      LEFT JOIN tbl_object_ques_ans C ON A.answerObject = C.objectCharacter
+      LEFT JOIN tbl_category_faq B ON A.categoryAnsCode = B.categoryCode
+      LEFT JOIN tbl_object_faq C ON A.answerObject = C.objectCharacter
       ${whereClause}
       ${limitClause}`,
       params,
@@ -75,11 +75,12 @@ export class AnswerAdminRepository {
       ` SELECT A.seq, A.answerCode, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
         B.categoryName, C.objectName
         FROM ${this.table} A 
-        LEFT JOIN tbl_category_ques_ans B
+        LEFT JOIN tbl_category_faq B
         ON A.categoryAnsCode = B.categoryCode
-        LEFT JOIN tbl_object_ques_ans C
+        LEFT JOIN tbl_object_faq C
         ON A.answerObject = C.objectCharacter
-        WHERE A.answerCode = ? `,
+        WHERE A.answerCode = ? 
+        LIMIT 1 `,
       [answerCode],
     );
     return rows ? (rows[0] as IAnswer) : null;
@@ -107,13 +108,16 @@ export class AnswerAdminRepository {
   }
   async updateAnswer(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET answerContentRaw = ?, answerObject = ?, categoryAnsCode = ?
+      UPDATE ${this.table} SET answerContentRaw = ?, answerObject = ?, categoryAnsCode = ?,
+      updatedId = ?, updatedAt = ?
       WHERE answerCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       dto.answerContentRaw,
       dto.answerObject,
       dto.categoryAnsCode,
+      dto.updatedId,
+      new Date(),
       answerCode,
     ]);
 

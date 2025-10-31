@@ -13,4 +13,8 @@ export class HomeAppService {
     const list = await this.homeAppRepository.getAll(dto);
     return { limit: dto.limit, page: dto.page, total, list };
   }
+  async getDetail(homeCode: string): Promise<IHome | null> {
+    const result = await this.homeAppRepository.getDetail(homeCode);
+    return result;
+  }
 }

@@ -19,26 +19,15 @@ import {
   Param,
   Put,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeAdminService } from './home.service';
 import { IHome } from '../home.interface';
 import { CreateHomeDto, UpdateHomeDto } from './home.dto';
-import {
-  AnyFilesInterceptor,
-  FileFieldsInterceptor,
-  FileInterceptor,
-  FilesInterceptor,
-} from '@nestjs/platform-express';
-import { multerConfig } from 'src/modules/upload/upload.config';
+import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/config/multer';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/home')
@@ -62,6 +51,9 @@ export class HomeController {
   @HttpCode(HttpStatus.OK)
   async getDetail(@Param('homeCode') homeCode: string): Promise<IHome | null> {
     const result = await this.homeAdminService.getDetail(homeCode);
+    if (!result) {
+      throw new BadRequestException();
+    }
     return result;
   }
 
@@ -124,7 +116,6 @@ export class HomeController {
       homeImages?: Express.Multer.File[];
     },
   ) {
-
     const homeImage = files.homeImage?.[0] || null;
     const homeImages = files.homeImages || [];
     const dto = {
@@ -133,7 +124,10 @@ export class HomeController {
       homeImages,
     };
 
-    const result =  await this.homeAdminService.updateHome(dto, homeCode)
+    const result = await this.homeAdminService.updateHome(dto, homeCode);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
     return result;
   }
 

@@ -29,7 +29,7 @@ export class AnswerAppController {
   @ApiParam({
     name: 'question',
     type: String,
-    example: 'Mái chống nóng là gì?',
+    example: 'Âm thanh dẫn dụ chim yến ?',
   })
   @Get('reply/:question')
   @HttpCode(HttpStatus.OK)

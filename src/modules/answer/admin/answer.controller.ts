@@ -50,6 +50,9 @@ export class AnswerAdminController {
     @Param('answerCode') answerCode: string,
   ): Promise<IAnswer | null> {
     const result = await this.answerAdminService.getDetail(answerCode);
+     if(!result){
+      throw new BadRequestException()
+    }
     return result;
   }
 

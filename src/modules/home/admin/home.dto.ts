@@ -82,4 +82,11 @@ export class CreateHomeDto {
   homeImages: any[];
 }
 
-export class UpdateHomeDto extends OmitType(CreateHomeDto, ['createdId']) {}
+export class UpdateHomeDto extends OmitType(CreateHomeDto, ['createdId']) {
+  @ApiProperty({
+    example: 'admin',
+  })
+  @IsString()
+  @IsNotEmpty()
+  updatedId: string;
+}
