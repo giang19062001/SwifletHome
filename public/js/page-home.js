@@ -30,7 +30,7 @@ function renderAllHome(data, objElement) {
       const rowHtml = `
          <tr class="text-center">
             <td><p>${page * i++}</p></td>
-            <td><img class="home-img" src="${currentUrl}/uploads/home/${ele.homeImage}"></img></td>
+            <td><img class="home-img" src="${currentUrl}/uploads/images/homes/${ele.homeImage}"></img></td>
             <td><p>${ele.homeName}</p></td>
             <td><p>${ele.homeAddress}</p></td>
             <td><p>${ele.latitude}</p></td>

@@ -68,21 +68,39 @@ CREATE TABLE `tbl_answer` (
   UNIQUE KEY `answerCode_UNIQUE` (`answerCode`)
 )
 
-CREATE TABLE `tbl_uploads` (
+CREATE TABLE `tbl_uploads_image` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `filename` varchar(255) DEFAULT NULL,
   `originalname` text NOT NULL,
-  `source` varchar(45) NOT NULL,
   `size` int NOT NULL,
   `mimetype` varchar(45) NOT NULL,
   `isActive` char(1) DEFAULT 'Y',
+  `isFree` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
   `createdId` varchar(45) DEFAULT NULL,
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
-) 
+)
+
+CREATE TABLE `tbl_uploads_audio` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `seqPay` int, 
+  `filename` varchar(255) DEFAULT NULL,
+  `originalname` text NOT NULL,
+  `size` int NOT NULL,
+  `mimetype` varchar(45) NOT NULL,
+  `isActive` char(1) DEFAULT 'Y',
+  `isFree` char(1) DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `filename_UNIQUE` (`filename`)
+)
+
 
 CREATE TABLE `tbl_uploads_video` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -120,7 +138,6 @@ CREATE TABLE `tbl_home_img` (
   `homeSeq` int NOT NULL,
   `filename` varchar(255) NOT NULL,
   `originalname` text NOT NULL,
-  `source` varchar(45) NOT NULL,
   `size` int NOT NULL,
   `mimetype` varchar(45) NOT NULL,
   `isActive` char(1) DEFAULT 'Y',

@@ -40,7 +40,7 @@ export class HomeAdminRepository {
   }
   async getImages(seq: number): Promise<IHomeImg[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.homeSeq, A.filename, A.originalname, A.source, A.size, A.mimetype, A.isActive
+      ` SELECT A.seq, A.homeSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive
           FROM tbl_home_img A 
           WHERE A.homeSeq = ? `,
       [seq],
@@ -49,19 +49,17 @@ export class HomeAdminRepository {
   }
   async createImages(
     seq: number,
-    source: string,
     createdId: string,
     file: Express.Multer.File | IHomeImg,
   ): Promise<number> {
     const sql = `
-      INSERT INTO tbl_home_img (filename, originalname, source, size, mimetype, homeSeq, createdId)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tbl_home_img (filename, originalname, size, mimetype, homeSeq, createdId)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       file.filename,
       file.originalname,
-      source,
       file.size,
       file.mimetype,
       seq,

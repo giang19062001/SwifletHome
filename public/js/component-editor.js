@@ -3,7 +3,7 @@ const quillGlobal = new Quill('#editor', {
   theme: 'snow',
   modules: {
     toolbar: {
-      container: [[{ header: [1, 2, 3, false] }], ['bold', 'italic', 'underline', 'strike'], [{ color: [] }, { background: [] }], [{ list: 'ordered' }], ['link']],
+      container: [[{ header: [1, 2, 3, false] }], ['bold', 'italic', 'underline', 'strike'], [{ color: [] }, { background: [] }], [{ list: 'ordered' }], ['link','size']],
     },
   },
   placeholder: 'Nhập nội dung của bạn...',

@@ -46,7 +46,6 @@ export class HomeAdminService {
       if (dto.homeImage) {
         await this.homeAdminRepository.createImages(
           seq,
-          dto.source,
           dto.createdId,
           dto.homeImage,
         );
@@ -56,7 +55,6 @@ export class HomeAdminService {
         for (const file of dto.homeImages) {
           await this.homeAdminRepository.createImages(
             seq,
-            dto.source,
             dto.createdId,
             file,
           );
@@ -76,7 +74,7 @@ export class HomeAdminService {
       // homeImage is changed -> delete old file
       if (dto.homeImage.filename !== (home.homeImage as IHomeImg).filename) {
         // delete old physical file
-        const homeImagePath = `/${dto.source}/${(home.homeImage as IHomeImg).filename}`;
+        const homeImagePath = `/images/homes/${(home.homeImage as IHomeImg).filename}`;
         await this.uploadService.deletePhysicalFile(homeImagePath);
 
         // delete old db file
@@ -87,7 +85,6 @@ export class HomeAdminService {
         //insert new homeImage
         await this.homeAdminRepository.createImages(
           home.seq,
-          dto.source,
           'admin',
           dto.homeImage,
         );
@@ -115,7 +112,7 @@ export class HomeAdminService {
         );
         // delete physical
         for (const file of fileNeedDeletes) {
-          const filepath = `/${dto.source}/${file.filename}`;
+          const filepath = `/images/homes/${file.filename}`;
           await this.uploadService.deletePhysicalFile(filepath);
         }
       }
@@ -123,7 +120,6 @@ export class HomeAdminService {
         for (const file of fileNeedCreates) {
           await this.homeAdminRepository.createImages(
             home.seq,
-            dto.source,
             'admin',
             file,
           );
@@ -145,12 +141,12 @@ export class HomeAdminService {
       if (resultHome) {
         await this.homeAdminRepository.deleteHomeImages(home?.seq ?? 0);
       }
-      const homeImagePath = `/home/${home.homeImage}`;
+      const homeImagePath = `/image/homes/${home.homeImage}`;
       await this.uploadService.deletePhysicalFile(homeImagePath);
       if (images.length) {
         // delete physical
         for (const file of images) {
-          const filepath = `/home/${file.filename}`;
+          const filepath = `/images/homes/${file.filename}`;
           await this.uploadService.deletePhysicalFile(filepath);
         }
       }

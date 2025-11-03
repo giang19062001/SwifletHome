@@ -12258,6 +12258,13 @@ textarea.form-control-lg {
     display: none;
   }
 }
+@media (max-width: 992px) {
+  .sidebar-vertical-tab {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+}
 .sidebar-vertical-tab {
   padding: 0px 0 0px 0 !important;
 }
@@ -18917,7 +18924,7 @@ audio {
   background-color: rgba(240, 240, 240, 0.7450980392);
   color: #333;
   border-bottom-left-radius: 4px;
-  max-width: 350px;
+  max-width: 305px;
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: normal;
@@ -18929,9 +18936,6 @@ audio {
   font-size: 13px;
   color: #666;
   margin-bottom: 4px;
-}
-#page-answer-mutation .preview {
-  /* Input area cố định ở dưới */
 }
 #page-answer-mutation .preview .input-container {
   margin-top: 16px;
@@ -18950,15 +18954,41 @@ audio {
   flex-direction: column;
   justify-content: space-between;
 }
-#page-answer-mutation .upload .video-input-box {
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+#page-answer-mutation .upload .audio-input-box {
   border-radius: 15px;
   padding: 5px;
   margin-top: 10px;
   display: flex;
-  gap: 2px;
+  flex-direction: column;
 }
-#page-answer-mutation .upload .video-input-box input {
+#page-answer-mutation .upload .audio-input-box .audio-btn-box {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#page-answer-mutation .upload .audio-input-box #audioInputFree, #page-answer-mutation .upload .audio-input-box #audioInputPay {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+#page-answer-mutation .upload .video-input-box {
+  border-radius: 15px;
+  padding: 5px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+#page-answer-mutation .upload .video-input-box .video-btn-box {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#page-answer-mutation .upload .video-input-box #videoInput {
   flex: 1;
   padding: 8px 10px;
   border: 1px solid #ccc;
@@ -18974,7 +19004,7 @@ audio {
   padding-bottom: 10px;
   border-bottom: 1px solid #bdbdbd;
 }
-#page-answer-mutation .upload .file-list {
+#page-answer-mutation .upload .file-box {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -18983,6 +19013,7 @@ audio {
   overflow: auto;
   padding-right: 8px;
   width: 100%;
+  border-bottom: 1px solid #bdbdbd;
 }
 #page-answer-mutation .upload .file-card {
   min-width: max-content;
@@ -19000,10 +19031,7 @@ audio {
   position: relative;
   overflow: hidden;
 }
-#page-answer-mutation .upload .file-card:hover {
-  transform: translateY(-4px);
-}
-#page-answer-mutation .upload .file-icon {
+#page-answer-mutation .upload .file-card .file-icon {
   flex-shrink: 0;
   width: 48px;
   height: 48px;
@@ -19012,18 +19040,18 @@ audio {
   justify-content: center;
   color: #555;
 }
-#page-answer-mutation .upload .file-icon svg {
+#page-answer-mutation .upload .file-card .file-icon svg {
   width: 48px;
   height: 48px;
   stroke-width: 1.5;
 }
-#page-answer-mutation .upload .file-info {
+#page-answer-mutation .upload .file-card .file-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 4px;
 }
-#page-answer-mutation .upload .file-name {
+#page-answer-mutation .upload .file-card .file-info .file-name {
   font-weight: 600;
   font-size: 14px;
   color: #333;
@@ -19033,14 +19061,17 @@ audio {
   text-overflow: ellipsis;
   width: 12.5em;
 }
-#page-answer-mutation .upload .file-date {
+#page-answer-mutation .upload .file-card .file-info .file-date {
   font-size: 12px;
   color: #888;
 }
-#page-answer-mutation .upload .file-button {
+#page-answer-mutation .upload .file-card .file-info .file-button {
   display: flex;
   flex-direction: row;
   gap: 15px;
+}
+#page-answer-mutation .upload .file-card:hover {
+  transform: translateY(-4px);
 }
 
 /*# sourceMappingURL=app.css.map */

@@ -27,7 +27,7 @@ import { HomeAdminService } from './home.service';
 import { IHome } from '../home.interface';
 import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { multerConfig } from 'src/config/multer';
+import { multerImgConfig } from 'src/config/multer';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/home')
@@ -60,14 +60,14 @@ export class HomeController {
   @Post('createHome')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateHomeDto })
-  // @UseInterceptors(AnyFilesInterceptor(multerConfig))
+  // @UseInterceptors(AnyFilesInterceptor(multerImgConfig))
   @UseInterceptors(
     FileFieldsInterceptor(
       [
         { name: 'homeImage', maxCount: 1 },
         { name: 'homeImages', maxCount: 10 },
       ],
-      multerConfig,
+      multerImgConfig,
     ),
   )
   async createHome(
@@ -104,7 +104,7 @@ export class HomeController {
         { name: 'homeImage', maxCount: 1 },
         { name: 'homeImages', maxCount: 10 },
       ],
-      multerConfig,
+      multerImgConfig,
     ),
   )
   async updateHome(

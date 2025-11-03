@@ -4,19 +4,29 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-export const multerConfig = {
+const getLocation = (mimetype: string, fieldname: string) => {
+  if (mimetype.startsWith('image/')) {
+    if(fieldname === "answerImage"){
+      return 'images/answers'
+    }
+    if(fieldname === "homeImage" || fieldname === "homeImages"){
+      return 'images/homes'
+    }
+  } else if (mimetype.startsWith('audio/')) {
+     if(fieldname.includes("answerAudio")){
+      return 'audios/answers'
+    }
+  }
+  return 'documents'; // orther
+};
+
+// Common configuration generator
+export const createMulterConfig = (allowedMimeTypes: string[]) => ({
   storage: diskStorage({
     destination: (req, file, callback) => {
-      let source = req.body.source;
-      if (!source) {
-        if (file.fieldname === 'homeImage' || file.fieldname === 'homeImages') {
-          source = 'home';
-        }
-      }
+      const location = getLocation(file.mimetype, file.fieldname);
+      const folderPath = `./public/uploads/${location}`;
 
-      const folderPath = `./public/uploads/${source}`;
-
-      // create path folder
       if (!existsSync(folderPath)) {
         mkdirSync(folderPath, { recursive: true });
       }
@@ -25,36 +35,32 @@ export const multerConfig = {
     },
     filename: (req, file, callback) => {
       const filename = file.originalname;
-      let source = req.body.source;
-      if (!source) {
-        if (file.fieldname === 'homeImage' || file.fieldname === 'homeImages') {
-          source = 'home';
-        }
-      }
-
-      const filePath = join(`./public/uploads/${source}`, filename);
+      const location = getLocation(file.mimetype, file.fieldname);
+      const filePath = join(`./public/uploads/${location}`, filename);
 
       if (existsSync(filePath)) {
-        return callback(null, filename); // keep old file
+        return callback(null, filename);
       } else {
         const ext = extname(file.originalname);
         const uniquename = `${file.fieldname}-${uuidv4()}${ext}`;
-        callback(null, uniquename); // store new file
-        // callback(null, "_"); // store new file
-
+        callback(null, uniquename);
       }
     },
   }),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, callback) => {
-    if (
-      file.mimetype.startsWith('image/') ||
-      file.mimetype.startsWith('video/') ||
-      file.mimetype.startsWith('audio/')
-    ) {
+    const isAllowed = allowedMimeTypes.some((type) => 
+      file.mimetype.startsWith(type)
+    );
+
+    if (isAllowed) {
       callback(null, true);
     } else {
       callback(new BadRequestException('File type not supported'), false);
     }
   },
-};
+});
+
+// Specific configurations
+export const multerImgConfig = createMulterConfig(['image/']);
+export const multerAudioConfig = createMulterConfig(['audio/']);

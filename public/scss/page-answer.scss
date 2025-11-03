@@ -63,7 +63,7 @@
       background-color: #f0f0f0be;
       color: #333;
       border-bottom-left-radius: 4px;
-      max-width: 350px;
+      max-width: 305px;
       word-wrap: break-word;
       overflow-wrap: break-word;
       white-space: normal;
@@ -78,7 +78,6 @@
       margin-bottom: 4px;
     }
 
-    /* Input area cố định ở dưới */
     .input-container {
       margin-top: 16px;
       flex-shrink: 0;
@@ -97,20 +96,46 @@
       flex-direction: column;
       justify-content: space-between;
     }
-    .video-input-box {
-      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    .audio-input-box {
       border-radius: 15px;
       padding: 5px;
       margin-top: 10px;
       display: flex;
-      gap: 2px;
+      flex-direction: column;
+      .audio-btn-box{
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #audioInputFree, #audioInputPay {
+        flex: 1;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
     }
-    .video-input-box input {
-      flex: 1;
-      padding: 8px 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
+    .video-input-box {
+      border-radius: 15px;
+      padding: 5px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      .video-btn-box{
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #videoInput {
+        flex: 1;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+      }
     }
 
     .title {
@@ -123,7 +148,7 @@
       border-bottom: 1px solid #bdbdbd;
     }
 
-    .file-list {
+    .file-box {
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -132,6 +157,7 @@
       overflow: auto;
       padding-right: 8px;
       width: 100%;
+      border-bottom: 1px solid #bdbdbd;
     }
 
     .file-card {
@@ -149,53 +175,49 @@
       transition: transform 0.2s;
       position: relative;
       overflow: hidden;
+      .file-icon {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        svg {
+          width: 48px;
+          height: 48px;
+          stroke-width: 1.5;
+        }
+      }
+      .file-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        .file-name {
+          font-weight: 600;
+          font-size: 14px;
+          color: #333;
+          word-break: break-word;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 12.5em;
+        }
+
+        .file-date {
+          font-size: 12px;
+          color: #888;
+        }
+        .file-button {
+          display: flex;
+          flex-direction: row;
+          gap: 15px;
+        }
+      }
     }
     .file-card:hover {
       transform: translateY(-4px);
-    }
-
-    .file-icon {
-      flex-shrink: 0;
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #555;
-    }
-
-    .file-icon svg {
-      width: 48px;
-      height: 48px;
-      stroke-width: 1.5;
-    }
-
-    .file-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .file-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: #333;
-      word-break: break-word;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 12.5em;
-    }
-
-    .file-date {
-      font-size: 12px;
-      color: #888;
-    }
-    .file-button {
-      display: flex;
-      flex-direction: row;
-      gap: 15px;
     }
   }
 }

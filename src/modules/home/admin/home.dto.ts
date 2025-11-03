@@ -8,9 +8,6 @@ export class CreateHomeDto {
     enum: ['home'],
     default: 'home',
   })
-  @IsEnum(['home'])
-  @IsNotEmpty()
-  source: 'home';
 
   @ApiProperty({
     example: 'New',

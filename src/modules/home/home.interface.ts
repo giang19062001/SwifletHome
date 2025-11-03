@@ -21,7 +21,6 @@ export interface IHomeImg {
   homeName: string;
   filename: string;
   originalname: string;
-  source: string;
   size: number;
   mimetype: string;
   isActive: string;

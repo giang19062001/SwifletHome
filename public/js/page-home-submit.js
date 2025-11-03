@@ -25,7 +25,7 @@ async function showHomeSubmitModal(homeData) {
   const modalBody = modalEl.querySelector('.modal-body');
 
   modalEl.querySelector('#seq').value = homeData.seq;
-  modalBody.querySelector('.homeImage').src = currentUrl + '/uploads/home/' + homeData.homeImage;
+  modalBody.querySelector('.homeImage').src = currentUrl + '/uploads/images/homes/' + homeData.homeImage;
   modalEl.querySelector('.homeName').innerText = homeData.homeName;
   modalEl.querySelector('.userName').innerText = homeData.userName;
   modalEl.querySelector('.userPhone').innerText = homeData.userPhone;

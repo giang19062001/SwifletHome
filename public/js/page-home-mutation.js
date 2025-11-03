@@ -156,7 +156,7 @@ async function assignForm(homeData) {
 
   // Handle homeImage
   if (pageType === 'update' && homeData.homeImage) {
-    const file = await ChangeUrlToFile(homeData.homeImage.filename, 'home');
+    const file = await ChangeUrlToFile(homeData.homeImage.filename, 'images/homes');
     if (file) {
       // Update FileList for homeImage
       const dataTransfer = new DataTransfer();
@@ -170,7 +170,7 @@ async function assignForm(homeData) {
   // Handle homeImages
   if (pageType === 'update' && homeData.homeImages && Array.isArray(homeData.homeImages)) {
     // assign homeImagesFiles from 'homeData'
-    const files = await Promise.all(homeData.homeImages.map((img) => ChangeUrlToFile(img.filename, 'home')));
+    const files = await Promise.all(homeData.homeImages.map((img) => ChangeUrlToFile(img.filename, 'images/homes')));
     homeImagesFiles = files.filter((file) => file !== null);
     if (homeImagesFiles.length > 0) {
       // Update FileList for  homeImages
@@ -248,7 +248,6 @@ async function submitHome(formData, url, method, successMessage) {
   const postData = new FormData();
   const fields = ['homeName', 'homeAddress', 'homeDescription', 'latitude', 'longitude'];
   fields.forEach((field) => postData.append(field, formData[field]));
-  postData.append('source', 'home');
   postData.append(method == 'post' ? 'createdId' : 'updatedId', user.userId);
   if (formData.homeImage?.length) {
     postData.append('homeImage', formData.homeImage[0]);

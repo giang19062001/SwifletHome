@@ -5,10 +5,16 @@ export interface IFileUpload {
   size: number;
   mimetype: string;
   isActive: string;
-  source: string;
-  urlLink?: string;
-  createdAt?: string;
+  urlLink: string;
+  createdAt: string;
   updatedAt: string;
   createdId?: string;
   updatedId?: string;
+}
+
+export interface IAudioFreePay {
+  filenameFree: string;
+  mimetypeFree: string;
+  filenamePay: string;
+  mimetypePay: string;
 }

@@ -1,20 +1,48 @@
 <div class="upload">
   <p class="title">Danh sách File</p>
-  
-  <input type="file" id="fileInput" hidden />
+
 
   <div class="space-box">
-    <div class="file-list"></div>
-      
-  <div class="video-input-box" id="videoInputBox" style="visibility: hidden;">
-  <input
-    type="text"
-    id="urlLink"
-    placeholder="Nhập link video (YouTube)"
-  />
-  <button id="videoAddBtn" class="btn-common">Xác nhận</button>
-  <button id="videoCancelBtn" class="btn-err">Hủy</button>
-</div>
+    <div class="file-box"></div>
+
+    <input type="file" id="imgInput" hidden accept="image/*" />
+
+
+
+    <div class="audio-input-box" style="display: none;">
+      <div class="container mt-3">
+        <div class="mb-3">
+          <label for="audioInputFree" class="form-label fw-semibold">Tải audio miễn phí</label>
+          <input type="file" class="form-control" id="audioInputFree" accept="audio/*" />
+        </div>
+
+        <div class="mb-3">
+          <label for="audioInputPay" class="form-label fw-semibold">Tải audio tính phí</label>
+          <input type="file" class="form-control" id="audioInputPay" accept="audio/*" />
+        </div>
+      </div>
+
+      <div class="audio-btn-box">
+        <button id="audioAddBtn" class="btn-common">Xác nhận</button>
+        <button id="audioCancelBtn" class="btn-err">Hủy</button>
+      </div>
+    </div>
+
+    <div class="video-input-box" style="display: none;">
+      <div class="container mt-3">
+        <div class="row mb-3">
+          <label for="videoInput" class="form-label fw-semibold">Youtube</label>
+          <input type="text" id="videoInput" placeholder="Nhập link video (YouTube)" />
+
+        </div>
+
+        <div class="video-btn-box">
+          <button id="videoAddBtn" class="btn-common">Xác nhận</button>
+          <button id="videoCancelBtn" class="btn-err">Hủy</button>
+        </div>
+      </div>
+
+    </div>
 
     <div class="bottom-button">
       <button class="btn-common-image" id="btnImage">Tải ảnh</button>

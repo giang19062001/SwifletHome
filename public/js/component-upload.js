@@ -1,56 +1,84 @@
-const fileInput = document.getElementById('fileInput');
-const videoInputBox = document.getElementById('videoInputBox');
-const urlLink = document.getElementById('urlLink');
+// Elements
+const imgInput = document.getElementById('imgInput');
+const fileBox = document.querySelector('.file-box');
 
-const acceptMap = {
-  image: 'image/*',
-  audio: 'audio/*',
+// Audio
+const audioInputBox = document.querySelector('.audio-input-box');
+const audioInputFree = document.getElementById('audioInputFree');
+const audioInputPay = document.getElementById('audioInputPay');
+const audioCancelBtn = document.getElementById('audioCancelBtn');
+const audioAddBtn = document.getElementById('audioAddBtn');
+
+// Video
+const videoInputBox = document.querySelector('.video-input-box');
+const videoInput = document.getElementById('videoInput');
+const videoCancelBtn = document.getElementById('videoCancelBtn');
+
+// Buttons
+const btnImage = document.getElementById('btnImage');
+const btnAudio = document.getElementById('btnAudio');
+const btnVideo = document.getElementById('btnVideo');
+
+// Helper functions
+const showBox = (boxToShow) => {
+  [fileBox, audioInputBox, videoInputBox].forEach((box) => {
+    box.style.display = box === boxToShow ? 'flex' : 'none';
+  });
 };
 
-// image
-document.getElementById('btnImage').addEventListener('click', () => {
-  fileInput.accept = acceptMap.image;
-  fileInput.click();
-  videoInputBox.style.visibility = 'hidden'; // ẩn ô nhập video nếu đang mở
+const resetInputs = (...inputs) => inputs.forEach((el) => (el.value = ''));
+
+// Event: image
+btnImage.addEventListener('click', () => imgInput.click());
+
+// Event: audio
+btnAudio.addEventListener('click', () => showBox(audioInputBox));
+audioCancelBtn.addEventListener('click', () => {
+  resetInputs(audioInputFree, audioInputPay);
+  showBox(fileBox);
 });
 
-//  audio
-document.getElementById('btnAudio').addEventListener('click', () => {
-  fileInput.accept = acceptMap.audio;
-  fileInput.click();
-  videoInputBox.style.visibility = 'hidden';
+// Event: video
+btnVideo.addEventListener('click', () => showBox(videoInputBox));
+videoCancelBtn.addEventListener('click', () => {
+  resetInputs(videoInput);
+  showBox(fileBox);
 });
 
-// add video
-document.getElementById('btnVideo').addEventListener('click', () => {
-  videoInputBox.style.visibility =
-    videoInputBox.style.visibility === 'hidden' ? 'visible' : 'hidden';
-});
+// Push: audio
+audioAddBtn.addEventListener('click', async () => {
+  const freeFile = audioInputFree.files[0];
+  const payFile = audioInputPay.files[0];
 
-// choose file image, audio
-fileInput.addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    await uploadFile(file);
+  if (!freeFile || !payFile) {
+    toastErr('Vui lòng chọn cả hai file audio!');
+    return;
   }
-  e.target.value = '';
+  await uploadAudios(freeFile, payFile);
+
+  resetInputs(videoInput);
+  showBox(fileBox);
 });
 
-// push video
-document.getElementById('videoAddBtn').addEventListener('click', async () => {
-  const url = urlLink.value.trim();
+// Push: video
+videoAddBtn.addEventListener('click', async () => {
+  const url = videoInput.value.trim();
   if (!url) return alert('Vui lòng nhập link video!');
 
   await uploadVideoLink(url);
 
-  urlLink.value = '';
-  videoInputBox.style.visibility = 'hidden';
+  resetInputs(videoInput);
+  showBox(fileBox);
 });
 
-// cancel video
-document.getElementById('videoCancelBtn').addEventListener('click', () => {
-  urlLink.value = '';
-  videoInputBox.style.visibility = 'hidden';
+// Push: image
+imgInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    await uploadImg(file);
+  }
+  resetInputs(imgInput);
+  showBox(fileBox);
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -60,11 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // TODO: FUNC
 function convertToEmbedUrl(youtubeUrl) {
   function extractVideoId(url) {
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?#/]+)/,
-      /youtube\.com\/watch\?.*v=([^&?#/]+)/,
-      /youtu\.be\/([^&?#/]+)/,
-    ];
+    const patterns = [/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?#/]+)/, /youtube\.com\/watch\?.*v=([^&?#/]+)/, /youtu\.be\/([^&?#/]+)/];
 
     for (const pattern of patterns) {
       const match = url.match(pattern);
@@ -83,16 +107,19 @@ function convertToEmbedUrl(youtubeUrl) {
 
   return `https://www.youtube.com/embed/${videoId}?showinfo=0`;
 }
-function copyData(filename, source, mimetype) {
+function copyData(filename, mimetype) {
   console.log('filename', filename);
-  console.log('source', source);
   console.log('mimetype', mimetype);
 
   let copiedName = '';
   if (mimetype.startsWith('audio/')) {
-    copiedName = `[[audio-data=${currentUrl}/uploads/${source}/${filename}]]`;
+    if (filename.includes('answerAudio')) {
+      copiedName = `[[audio-data=${currentUrl}/uploads/audios/answers/${filename}]]`;
+    }
   } else if (mimetype.startsWith('image/')) {
-    copiedName = `[[image-data=${currentUrl}/uploads/${source}/${filename}]]`;
+    if (filename.includes('answerImage-')) {
+      copiedName = `[[image-data=${currentUrl}/uploads/images/answers/${filename}]]`;
+    }
   } else if (mimetype.startsWith('video/')) {
     copiedName = `[[video-data=${convertToEmbedUrl(filename)}]]`;
   } else if (mimetype.startsWith('payment/')) {
@@ -108,6 +135,60 @@ function copyData(filename, source, mimetype) {
 
 // TODO: RENDER
 const renderAllFile = (data, objElement) => {
+  const getFileIcon = (mimetype) => {
+    const icons = {
+      image: `
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#59AC77">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+        <polyline points="21 15 16 10 5 21"></polyline>
+      </svg>
+    `,
+      audio: `
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#279EFF">
+        <path d="M9 18V5l12-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="18" cy="16" r="3"></circle>
+      </svg>
+    `,
+    };
+
+    if (mimetype.startsWith('image/')) return icons.image;
+    if (mimetype.startsWith('audio/')) return icons.audio;
+
+    return icons.image;
+  };
+
+  const createFileCard = (container, fileData) => {
+    const card = document.createElement('div');
+    card.className = 'file-card';
+
+    card.innerHTML = `
+    <div class="file-icon">${fileData.icon}</div>
+    <div class="file-info">
+      <div class="file-name">${fileData.name}</div>
+      ${fileData.date ? `<div class="file-meta"><span class="file-date">${fileData.date}</span></div>` : ''}
+    </div>
+    <div class="file-button">
+      <button class="copy-btn btn-common-out" 
+        onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
+        Sao chép
+      </button>
+      ${
+        fileData.filename !== 'PAYMENT'
+          ? ` <button class="btn-out-err" 
+        onclick="deleteFile('${fileData.filename}','${fileData.seq}','${fileData.mimetype}')">
+        Xóa
+      </button>`
+          : ''
+      }
+     
+    </div>
+  `;
+
+    container.appendChild(card);
+  };
+
   objElement.innerHTML = '';
 
   // payment card
@@ -147,78 +228,50 @@ const renderAllFile = (data, objElement) => {
         name: file.originalname,
         filename: file.filename,
         mimetype: file.mimetype,
-        source: file.source,
         date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
       });
     }
   });
 };
 
-const getFileIcon = (mimetype) => {
-  const icons = {
-    image: `
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#59AC77">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-        <polyline points="21 15 16 10 5 21"></polyline>
-      </svg>
-    `,
-    audio: `
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#279EFF">
-        <path d="M9 18V5l12-2v13"></path>
-        <circle cx="6" cy="18" r="3"></circle>
-        <circle cx="18" cy="16" r="3"></circle>
-      </svg>
-    `,
-  };
-
-  if (mimetype.startsWith('image/')) return icons.image;
-  if (mimetype.startsWith('audio/')) return icons.audio;
-
-  return icons.image;
-};
-
-const createFileCard = (container, fileData) => {
-  const card = document.createElement('div');
-  card.className = 'file-card';
-
-  card.innerHTML = `
-    <div class="file-icon">${fileData.icon}</div>
-    <div class="file-info">
-      <div class="file-name">${fileData.name}</div>
-      ${fileData.date ? `<div class="file-meta"><span class="file-date">${fileData.date}</span></div>` : ''}
-    </div>
-    <div class="file-button">
-      <button class="copy-btn btn-common-out" 
-        onclick="copyData('${fileData.filename}','${fileData.source ?? ''}','${fileData.mimetype}')">
-        Sao chép
-      </button>
-      ${
-        fileData.filename !== 'PAYMENT'
-          ? ` <button class="btn-out-err" 
-        onclick="deleteFile('${fileData.filename}','${fileData.seq}','${fileData.mimetype}')">
-        Xóa
-      </button>`
-          : ''
-      }
-     
-    </div>
-  `;
-
-  container.appendChild(card);
-};
-
 // TODO:API
-async function uploadFile(file, type) {
+async function uploadImg(file) {
   if (!file) return;
 
   const formData = new FormData();
-  formData.append('source', 'answer');
-  formData.append('file', file);
+  formData.append('createdId', user.userId);
+  formData.append('answerImage', file);
 
   try {
     const response = await axios.post(
-      '/api/admin/uploadFile/upload',
+      '/api/admin/uploadFile/uploadImg',
+      formData,
+      axiosAuth({
+        'Content-Type': 'multipart/form-data',
+      }),
+    );
+
+    if (response.data) {
+      // reload file list
+      toastOk('Thêm file thành công');
+      getAllFile();
+    } else {
+      toastErr('Thêm file thất bại');
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+  }
+}
+async function uploadAudios(freeFile, payFile) {
+  // Tạo FormData
+  const formData = new FormData();
+  formData.append('createdId', user.userId);
+  formData.append('answerAudioFree', freeFile);
+  formData.append('answerAudioPay', payFile);
+
+  try {
+    const response = await axios.post(
+      '/api/admin/uploadFile/uploadAudios',
       formData,
       axiosAuth({
         'Content-Type': 'multipart/form-data',
@@ -268,13 +321,11 @@ async function deleteFile(filename, seq, mimetype) {
   if (mimetype.startsWith('video/')) {
     // video youyube
     await axios
-      .delete(
-        currentUrl + '/api/admin/uploadFile/deleteVideoLink/' + seq,
-        axiosAuth(),
-      )
+      .delete(currentUrl + '/api/admin/uploadFile/deleteVideoLink/' + seq, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
+          toastOk('Xóa thành công');
           getAllFile();
         } else {
           toastErr('Xóa thất bại');
@@ -283,16 +334,30 @@ async function deleteFile(filename, seq, mimetype) {
       .catch(function (error) {
         console.log('error', error);
       });
-  } else {
-    // audio, image
+  } else if (mimetype.startsWith('audio/')) {
+    // audio
     await axios
-      .delete(
-        currentUrl + '/api/admin/uploadFile/deleteFile/' + filename,
-        axiosAuth(),
-      )
+      .delete(currentUrl + '/api/admin/uploadFile/deleteAudio/' + filename, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
+          toastOk('Xóa thành công');
+          getAllFile();
+        } else {
+          toastErr('Xóa thất bại');
+        }
+      })
+      .catch(function (error) {
+        console.log('error', error);
+      });
+  } else if (mimetype.startsWith('image/')) {
+    // audio
+    await axios
+      .delete(currentUrl + '/api/admin/uploadFile/deleteImg/' + filename, axiosAuth())
+      .then(function (response) {
+        console.log('response', response);
+        if (response.status === 200 && response.data) {
+          toastOk('Xóa thành công');
           getAllFile();
         } else {
           toastErr('Xóa thất bại');
@@ -305,7 +370,7 @@ async function deleteFile(filename, seq, mimetype) {
 }
 
 async function getAllFile() {
-  const objElement = document.querySelector(`#${pageElement} .file-list`);
+  const objElement = document.querySelector(`#${pageElement} .file-box`);
 
   await axios
     .post(currentUrl + '/api/admin/uploadFile/getAllFile', {}, axiosAuth())
