@@ -22,9 +22,9 @@ export class QuestionAdminRepository {
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
-        LEFT JOIN tbl_category_faq B
+        LEFT JOIN tbl_category B
         ON A.categoryQuesCode = B.categoryCode
-        LEFT JOIN tbl_object_faq C
+        LEFT JOIN tbl_object C
         ON A.questionObject = C.objectCharacter
         LIMIT ? OFFSET ? `,
       [dto.limit, (dto.page - 1) * dto.limit],
@@ -36,9 +36,9 @@ export class QuestionAdminRepository {
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
-        LEFT JOIN tbl_category_faq B
+        LEFT JOIN tbl_category B
         ON A.categoryQuesCode = B.categoryCode
-        LEFT JOIN tbl_object_faq C
+        LEFT JOIN tbl_object C
         ON A.questionObject = C.objectCharacter
         WHERE A.answerCode IS NOT NULL AND A.answerCode = ?`,
       [answerCode],
@@ -50,9 +50,9 @@ export class QuestionAdminRepository {
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName, D.answerContentRaw
         FROM ${this.table} A 
-        LEFT JOIN tbl_category_faq B
+        LEFT JOIN tbl_category B
         ON A.categoryQuesCode = B.categoryCode
-        LEFT JOIN tbl_object_faq C
+        LEFT JOIN tbl_object C
         ON A.questionObject = C.objectCharacter
         LEFT JOIN tbl_answer D
         ON A.answerCode = D.answerCode

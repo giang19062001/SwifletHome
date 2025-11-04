@@ -3,7 +3,7 @@ import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestj
 import { UploadService } from './upload.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UploadAudioFilesDto, UploadImgFileDto, UploadVideoLinkDto } from './upload.dto';
-import { IFileUpload } from './upload.interface';
+import { IAudioFreePay, IFileUpload } from './upload.interface';
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { multerAudioConfig, multerImgConfig } from 'src/config/multer';
 import { messageErr } from 'src/helpers/message';
@@ -74,10 +74,19 @@ export class UploadController {
     return result;
   }
 
-  @Post('getAllFile')
+  @Get('getAllFile')
   @HttpCode(HttpStatus.OK)
   async getAll(): Promise<IFileUpload[]> {
     const result = await this.uploadService.getAllFile();
+    return result;
+  }
+
+  @Get('getFileAudio/:filename')
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({ name: 'filename', type: String })
+  async getFileAudio(@Param('filename') filename: string): Promise<IAudioFreePay | null> {
+    console.log(filename);
+    const result = await this.uploadService.getFileAudio(filename);
     return result;
   }
 

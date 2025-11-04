@@ -11,7 +11,7 @@ CREATE TABLE `tbl_user_admin` (
 )
 
 
-CREATE TABLE `tbl_category_faq` (
+CREATE TABLE `tbl_category` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `categoryCode` varchar(45) NOT NULL,
   `categoryName` varchar(45) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE `tbl_category_faq` (
   UNIQUE KEY `categoryCode_UNIQUE` (`categoryCode`)
 )
 
-CREATE TABLE `tbl_object_faq` (
+CREATE TABLE `tbl_object` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `objectCharacter` varchar(45) NOT NULL,
   `objectName` varchar(45) NOT NULL,

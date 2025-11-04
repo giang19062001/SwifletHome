@@ -48,18 +48,27 @@
             </div>
           </div>
         </div>
+        <div class="bottom-button">
+          <div class="d-flex align-items-center gap-2">
+            <label for="isFreeViewSwitch" class="form-check-label mb-0">Chế độ xem miễn phí</label>
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input" type="checkbox" role="switch" id="isFreeViewSwitch" checked>
+            </div>
+            <label for="isFreeViewSwitch" class="form-check-label mb-0">Chế độ xem trả phí</label>
+          </div>
+        </div>
       </div>
     </div>
     <div class="col-12 col-md-4">
       <div class="common-editor">
         <%- include('./editor', { content: values.answerContentRaw}) %>
 
-        <div class="bottom-button">
-          <button class="btn-common-audio" onclick="getContent()">
-            Xem trước  
-          </button>
+          <div class="bottom-button">
+            <button class="btn-common-audio" onclick="getContent()">
+              Xem trước
+            </button>
             <button class="btn-common" onclick="updateAnswer()">Lưu</button>
-        </div>
+          </div>
       </div>
     </div>
 

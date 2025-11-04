@@ -5,7 +5,7 @@ import { PagingDto } from 'src/dto/common';
 
 @Injectable()
 export class CateFaqRepository {
-  private readonly table = 'tbl_category_faq';
+  private readonly table = 'tbl_category';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 

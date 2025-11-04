@@ -62,8 +62,8 @@ export class AnswerAdminRepository {
       ` SELECT A.seq, A.answerCode, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
       B.categoryName, C.objectName
       FROM ${this.table} A 
-      LEFT JOIN tbl_category_faq B ON A.categoryAnsCode = B.categoryCode
-      LEFT JOIN tbl_object_faq C ON A.answerObject = C.objectCharacter
+      LEFT JOIN tbl_category B ON A.categoryAnsCode = B.categoryCode
+      LEFT JOIN tbl_object C ON A.answerObject = C.objectCharacter
       ${whereClause}
       ${limitClause}`,
       params,
@@ -75,9 +75,9 @@ export class AnswerAdminRepository {
       ` SELECT A.seq, A.answerCode, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
         B.categoryName, C.objectName
         FROM ${this.table} A 
-        LEFT JOIN tbl_category_faq B
+        LEFT JOIN tbl_category B
         ON A.categoryAnsCode = B.categoryCode
-        LEFT JOIN tbl_object_faq C
+        LEFT JOIN tbl_object C
         ON A.answerObject = C.objectCharacter
         WHERE A.answerCode = ? 
         LIMIT 1 `,
@@ -93,14 +93,15 @@ export class AnswerAdminRepository {
       answerCode = generateCode(rows[0].answerCode, 'ANS', 6);
     }
     const sql = `
-        INSERT INTO ${this.table}  (answerCode, answerContentRaw, answerObject, categoryAnsCode, createdId) 
-        VALUES(?, ?, ?, ?, ?)
+        INSERT INTO ${this.table}  (answerCode, answerContentRaw, answerObject, categoryAnsCode, isFree, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       answerCode,
       dto.answerContentRaw,
       dto.answerObject,
       dto.categoryAnsCode,
+      dto.isFree,
       dto.createdId
     ]);
 
@@ -108,7 +109,7 @@ export class AnswerAdminRepository {
   }
   async updateAnswer(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET answerContentRaw = ?, answerObject = ?, categoryAnsCode = ?,
+      UPDATE ${this.table} SET answerContentRaw = ?, answerObject = ?, categoryAnsCode = ?, isFree = ?,
       updatedId = ?, updatedAt = ?
       WHERE answerCode = ?
     `;
@@ -116,6 +117,7 @@ export class AnswerAdminRepository {
       dto.answerContentRaw,
       dto.answerObject,
       dto.categoryAnsCode,
+      dto.isFree,
       dto.updatedId,
       new Date(),
       answerCode,

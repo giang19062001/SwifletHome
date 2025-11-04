@@ -18359,6 +18359,10 @@ p {
   margin-bottom: 0 !important;
 }
 
+label {
+  font-family: "Pretendard" !important;
+}
+
 textarea,
 input,
 select {
@@ -18405,7 +18409,7 @@ audio {
   border-radius: 15px;
   font-family: Pretendard;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 20px;
   border-width: 0.13em;
   outline: auto;
@@ -18474,6 +18478,18 @@ audio {
 .btn-out-err:hover {
   background-color: #DC3545;
   color: #ffffff;
+}
+
+.txt-status-waiting {
+  color: #ffc50f;
+}
+
+.txt-status-approved, .txt-free {
+  color: #59ac77;
+}
+
+.txt-status-cancel, .txt-pay {
+  color: #f75270;
 }
 
 .common-table-container .table {
@@ -18610,7 +18626,9 @@ audio {
   width: 100%;
   margin: 0 auto;
   background: white;
-  padding: 20px 20px 0 20px;
+  padding-top: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
   border-radius: 15px;
 }
@@ -18851,15 +18869,6 @@ audio {
 #page-home-submit a {
   text-decoration: none;
 }
-#page-home-submit .txt-status-waiting {
-  color: #ffc50f;
-}
-#page-home-submit .txt-status-approved {
-  color: #59ac77;
-}
-#page-home-submit .txt-status-cancel {
-  color: #f75270;
-}
 
 .home-submit-update-modal img {
   width: 250px;
@@ -18967,7 +18976,8 @@ audio {
   justify-content: center;
   align-items: center;
 }
-#page-answer-mutation .upload .audio-input-box #audioInputFree, #page-answer-mutation .upload .audio-input-box #audioInputPay {
+#page-answer-mutation .upload .audio-input-box #audioInputFree,
+#page-answer-mutation .upload .audio-input-box #audioInputPay {
   flex: 1;
   padding: 8px 10px;
   border: 1px solid #ccc;
@@ -19050,6 +19060,7 @@ audio {
   flex-direction: column;
   justify-content: center;
   gap: 4px;
+  width: 150px;
 }
 #page-answer-mutation .upload .file-card .file-info .file-name {
   font-weight: 600;
@@ -19059,7 +19070,7 @@ audio {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 12.5em;
+  width: 150px;
 }
 #page-answer-mutation .upload .file-card .file-info .file-date {
   font-size: 12px;
@@ -19068,7 +19079,7 @@ audio {
 #page-answer-mutation .upload .file-card .file-info .file-button {
   display: flex;
   flex-direction: row;
-  gap: 15px;
+  gap: 5px;
 }
 #page-answer-mutation .upload .file-card:hover {
   transform: translateY(-4px);

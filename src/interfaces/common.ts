@@ -15,3 +15,10 @@ export interface IListApp<T> {
   page: number;
   list: T[];
 }
+
+
+
+export enum IsFreeEnum {
+  Y = 'Y',
+  N = 'N',
+}

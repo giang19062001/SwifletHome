@@ -3,7 +3,7 @@ const quillGlobal = new Quill('#editor', {
   theme: 'snow',
   modules: {
     toolbar: {
-      container: [[{ header: [1, 2, 3, false] }], ['bold', 'italic', 'underline', 'strike'], [{ color: [] }, { background: [] }], [{ list: 'ordered' }], ['link','size']],
+      container: [[{ header: [1, 2, 3, false] }], ['bold', 'italic', 'underline', 'strike'], [{ color: [] }, { background: [] }], [{ list: 'ordered' }], ['link']],
     },
   },
   placeholder: 'Nhập nội dung của bạn...',
@@ -17,6 +17,23 @@ quillGlobal.root.addEventListener('paste', (e) => {
     getContent();
   }
 });
+
+function checkIsFree() {
+  const content = quillGlobal.root.innerHTML || '';
+  if (content.includes('[[payment]]')) {
+    return 'N';
+  } else {
+    return 'Y';
+  }
+}
+
+function validateContent() {
+  const text = quillGlobal.root.textContent.trim();
+  if (!text || text === '' || text === '\n') {
+    return false;
+  }
+  return true;
+}
 
 function getContent() {
   document.getElementById('content-message').innerHTML = quillGlobal.root.innerHTML;

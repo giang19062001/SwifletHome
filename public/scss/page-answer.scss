@@ -102,13 +102,14 @@
       margin-top: 10px;
       display: flex;
       flex-direction: column;
-      .audio-btn-box{
+      .audio-btn-box {
         margin-top: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
       }
-      #audioInputFree, #audioInputPay {
+      #audioInputFree,
+      #audioInputPay {
         flex: 1;
         padding: 8px 10px;
         border: 1px solid #ccc;
@@ -123,7 +124,7 @@
       margin-top: 10px;
       display: flex;
       flex-direction: column;
-      .video-btn-box{
+      .video-btn-box {
         margin-top: 10px;
         display: flex;
         justify-content: center;
@@ -194,6 +195,7 @@
         flex-direction: column;
         justify-content: center;
         gap: 4px;
+        width: 150px;
         .file-name {
           font-weight: 600;
           font-size: 14px;
@@ -202,7 +204,7 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          width: 12.5em;
+          width: 150px;
         }
 
         .file-date {
@@ -212,7 +214,7 @@
         .file-button {
           display: flex;
           flex-direction: row;
-          gap: 15px;
+          gap: 5px;
         }
       }
     }

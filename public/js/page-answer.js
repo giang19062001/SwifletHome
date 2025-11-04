@@ -28,6 +28,7 @@ const renderAllAnswer = (data, objElement) => {
             <td><p>${page * i++}</p></td>
             <td><p>${ele.categoryName}</p></td>
             <td><p>${ele.objectName}</p></td>
+            <td><p class="${ele.isFree == "Y" ? "txt-free" : "txt-pay"}">${ele.isFree == "Y" ? "Miễn phí" : "Tính phí"}</p></td>
             <td><p>${getShortTextFromHtml(ele.answerContentRaw)}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>

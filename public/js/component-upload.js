@@ -1,3 +1,4 @@
+let fileList = [];
 // Elements
 const imgInput = document.getElementById('imgInput');
 const fileBox = document.querySelector('.file-box');
@@ -135,6 +136,8 @@ function copyData(filename, mimetype) {
 
 // TODO: RENDER
 const renderAllFile = (data, objElement) => {
+  fileList = data; // set global
+
   const getFileIcon = (mimetype) => {
     const icons = {
       image: `
@@ -161,13 +164,16 @@ const renderAllFile = (data, objElement) => {
 
   const createFileCard = (container, fileData) => {
     const card = document.createElement('div');
-    card.className = 'file-card';
+    if (fileData.filename == 'PAYMENT') {
+    }
+    card.className = `file-card`;
 
     card.innerHTML = `
     <div class="file-icon">${fileData.icon}</div>
     <div class="file-info">
       <div class="file-name">${fileData.name}</div>
-      ${fileData.date ? `<div class="file-meta"><span class="file-date">${fileData.date}</span></div>` : ''}
+      ${fileData.date ? `<div class="file-meta"><span class="file-date">${fileData.date}</span></div>` : ``}
+      ${fileData.filename == 'PAYMENT' ? `<div class="file-meta"><span class="file-date text-danger">** Câu trả lời sẽ được coi là tính phí nếu thêm nút này</span></div>` : ''}
     </div>
     <div class="file-button">
       <button class="copy-btn btn-common-out" 
@@ -192,6 +198,7 @@ const renderAllFile = (data, objElement) => {
   objElement.innerHTML = '';
 
   // payment card
+
   createFileCard(objElement, {
     icon: `
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFC50F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -251,6 +258,7 @@ async function uploadImg(file) {
       }),
     );
 
+    console.log('responseresponseresponseresponseresponseresponse', response);
     if (response.data) {
       // reload file list
       toastOk('Thêm file thành công');
@@ -260,6 +268,9 @@ async function uploadImg(file) {
     }
   } catch (error) {
     console.error('Upload error:', error);
+    if (error.response.data) {
+      toastErr(error.response.data.message);
+    }
   }
 }
 async function uploadAudios(freeFile, payFile) {
@@ -286,7 +297,10 @@ async function uploadAudios(freeFile, payFile) {
       toastErr('Thêm file thất bại');
     }
   } catch (error) {
-    console.error('Upload error:', error);
+    console.error('Upload error:', error.response.data);
+    if (error.response.data) {
+      toastErr(error.response.data.message);
+    }
   }
 }
 async function uploadVideoLink(urlLink) {
@@ -373,7 +387,7 @@ async function getAllFile() {
   const objElement = document.querySelector(`#${pageElement} .file-box`);
 
   await axios
-    .post(currentUrl + '/api/admin/uploadFile/getAllFile', {}, axiosAuth())
+    .get(currentUrl + '/api/admin/uploadFile/getAllFile', axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

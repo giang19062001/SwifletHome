@@ -19,7 +19,7 @@
   border-radius: 15px;
   font-family: Pretendard;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 20px;
   border-width: 0.13em;
   outline: auto;
@@ -93,4 +93,16 @@
     background-color: $err-color;
     color: #ffffff;
   }
+}
+
+
+
+.txt-status-waiting {
+  color: #ffc50f;
+}
+.txt-status-approved, .txt-free {
+  color: #59ac77;
+}
+.txt-status-cancel, .txt-pay {
+  color: #f75270;
 }

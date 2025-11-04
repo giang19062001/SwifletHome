@@ -6,22 +6,22 @@ import { v4 as uuidv4 } from 'uuid';
 
 const getLocation = (mimetype: string, fieldname: string) => {
   if (mimetype.startsWith('image/')) {
-    if(fieldname === "answerImage"){
-      return 'images/answers'
+    if (fieldname === 'answerImage') {
+      return 'images/answers';
     }
-    if(fieldname === "homeImage" || fieldname === "homeImages"){
-      return 'images/homes'
+    if (fieldname === 'homeImage' || fieldname === 'homeImages') {
+      return 'images/homes';
     }
   } else if (mimetype.startsWith('audio/')) {
-     if(fieldname.includes("answerAudio")){
-      return 'audios/answers'
+    if (fieldname.includes('answerAudio')) {
+      return 'audios/answers';
     }
   }
-  return 'documents'; // orther
+  return 'documents'; // other
 };
 
 // Common configuration generator
-export const createMulterConfig = (allowedMimeTypes: string[]) => ({
+export const createMulterConfig = (allowedExts: string[]) => ({
   storage: diskStorage({
     destination: (req, file, callback) => {
       const location = getLocation(file.mimetype, file.fieldname);
@@ -49,18 +49,19 @@ export const createMulterConfig = (allowedMimeTypes: string[]) => ({
   }),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, callback) => {
-    const isAllowed = allowedMimeTypes.some((type) => 
-      file.mimetype.startsWith(type)
-    );
+    const fileExt = extname(file.originalname).toLowerCase(); // vd: ".png"
+    const isAllowed = allowedExts.includes(fileExt);
 
     if (isAllowed) {
       callback(null, true);
     } else {
-      callback(new BadRequestException('File type not supported'), false);
+      callback(
+        new BadRequestException(`File không được hỗ trợ (${fileExt}). Chỉ cho phép: ${allowedExts.join(', ')}`),
+        false
+      );
     }
   },
 });
 
-// Specific configurations
-export const multerImgConfig = createMulterConfig(['image/']);
-export const multerAudioConfig = createMulterConfig(['audio/']);
+export const multerImgConfig = createMulterConfig(['.png', '.jpg', '.jpeg', '.heic']);
+export const multerAudioConfig = createMulterConfig(['.mp3']);

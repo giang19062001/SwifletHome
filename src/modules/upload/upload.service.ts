@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, InternalServerErrorException, NotFound
 import { existsSync, mkdirSync, unlinkSync } from 'fs';
 import { promises as fs } from 'fs';
 import { UploadRepository } from './upload.repository';
-import { IFileUpload } from './upload.interface';
+import { IAudioFreePay, IFileUpload } from './upload.interface';
 import * as path from 'path';
 import { UploadAudioFilesDto, UploadVideoLinkDto } from './upload.dto';
 import { sortByDate } from 'src/helpers/func';
@@ -95,6 +95,12 @@ export class UploadService {
     const videos = await this.uploadRepository.getAllVideoLink();
     return sortByDate('createdAt', [...files, ...audios, ...videos]);
   }
+
+  async getFileAudio(filename: string): Promise<IAudioFreePay | null> {
+    console.log(filename);
+    const files = await this.uploadRepository.getFileAudio(filename);
+    return files;
+  }
   async deleteVideoLink(seq: number): Promise<number> {
     const result = await this.uploadRepository.deleteVideoLink(seq);
     return result;
@@ -113,7 +119,7 @@ export class UploadService {
       // const filepath = `${file?.filename.startsWith('answerImage-') ? 'images/answers' : 'images/homes'}/${filename}`;
       // await this.deletePhysicalFile(filepath);
 
-       const result = await this.uploadRepository.deleteImg(filename);
+      const result = await this.uploadRepository.deleteImg(filename);
 
       if (result === 0) {
         throw new NotFoundException(`File ${filename} not found in database`);
@@ -139,8 +145,8 @@ export class UploadService {
       // await this.deletePhysicalFile(`/audios/answers/${file?.filenamePay}`);
       // await this.deletePhysicalFile(`/audios/answers/${file?.filenameFree}`);
 
-      await this.uploadRepository.deleteAudio(file?.filenamePay ?? "");
-      await this.uploadRepository.deleteAudio(file?.filenameFree ?? "");
+      await this.uploadRepository.deleteAudio(file?.filenamePay ?? '');
+      await this.uploadRepository.deleteAudio(file?.filenameFree ?? '');
 
       return 1;
     } catch (error) {
