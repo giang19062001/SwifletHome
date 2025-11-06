@@ -116,7 +116,7 @@ export class UploadService {
       // if (result === 0) {
       //   throw new NotFoundException(`File ${filename} not found in database`);
       // }
-      // const filepath = `${file?.filename.startsWith('answerImage-') ? 'images/answers' : 'images/homes'}/${filename}`;
+      // const filepath = `${file?.filename.startsWith('editorImg-') ? 'images/editor' : 'images/homes'}/${filename}`;
       // await this.deletePhysicalFile(filepath);
 
       const result = await this.uploadRepository.deleteImg(filename);
@@ -142,8 +142,8 @@ export class UploadService {
       // await this.uploadRepository.terminalAudio(file?.filenamePay ?? '');
       // await this.uploadRepository.terminalAudio(file?.filenameFree ?? '');
 
-      // await this.deletePhysicalFile(`/audios/answers/${file?.filenamePay}`);
-      // await this.deletePhysicalFile(`/audios/answers/${file?.filenameFree}`);
+      // await this.deletePhysicalFile(`/audios/editor/${file?.filenamePay}`);
+      // await this.deletePhysicalFile(`/audios/editor/${file?.filenameFree}`);
 
       await this.uploadRepository.deleteAudio(file?.filenamePay ?? '');
       await this.uploadRepository.deleteAudio(file?.filenameFree ?? '');

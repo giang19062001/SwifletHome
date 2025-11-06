@@ -87,6 +87,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // TODO: FUNC
+/// Hàm hiển thị/ẩn nút PAYMENT theo radio isFree
+function togglePaymentButton() {
+  const isFree = document.querySelector('input[name="isFree"]:checked')?.value;
+  document.querySelector('button.PAYMENT').style.display = (isFree === 'Y') ? 'none' : 'block';
+}
+// convert embed sang watch của youtube
 function convertToEmbedUrl(youtubeUrl) {
   function extractVideoId(url) {
     const patterns = [/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?#/]+)/, /youtube\.com\/watch\?.*v=([^&?#/]+)/, /youtu\.be\/([^&?#/]+)/];
@@ -108,18 +114,20 @@ function convertToEmbedUrl(youtubeUrl) {
 
   return `https://www.youtube.com/embed/${videoId}?showinfo=0`;
 }
+
+// copy data để paste vào editor
 function copyData(filename, mimetype) {
   console.log('filename', filename);
   console.log('mimetype', mimetype);
 
   let copiedName = '';
   if (mimetype.startsWith('audio/')) {
-    if (filename.includes('answerAudio')) {
-      copiedName = `[[audio-data=${currentUrl}/uploads/audios/answers/${filename}]]`;
+    if (filename.includes('editorAudio')) {
+      copiedName = `[[audio-data=${currentUrl}/uploads/audios/editor/${filename}]]`;
     }
   } else if (mimetype.startsWith('image/')) {
-    if (filename.includes('answerImage-')) {
-      copiedName = `[[image-data=${currentUrl}/uploads/images/answers/${filename}]]`;
+    if (filename.includes('editorImg')) {
+      copiedName = `[[image-data=${currentUrl}/uploads/images/editor/${filename}]]`;
     }
   } else if (mimetype.startsWith('video/')) {
     copiedName = `[[video-data=${convertToEmbedUrl(filename)}]]`;
@@ -136,6 +144,7 @@ function copyData(filename, mimetype) {
 
 // TODO: RENDER
 const renderAllFile = (data, objElement) => {
+  console.log(objElement);
   fileList = data; // set global
 
   const getFileIcon = (mimetype) => {
@@ -173,20 +182,24 @@ const renderAllFile = (data, objElement) => {
     <div class="file-info">
       <div class="file-name">${fileData.name}</div>
       ${fileData.date ? `<div class="file-meta"><span class="file-date">${fileData.date}</span></div>` : ``}
-      ${fileData.filename == 'PAYMENT' ? `<div class="file-meta"><span class="file-date text-danger">** Câu trả lời sẽ được coi là tính phí nếu thêm nút này</span></div>` : ''}
     </div>
     <div class="file-button">
-      <button class="copy-btn btn-common-out" 
+         ${fileData.filename == 'PAYMENT'
+        ? `<button style="display:none" class="copy-btn btn-common-out PAYMENT" 
         onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
         Sao chép
-      </button>
-      ${
-        fileData.filename !== 'PAYMENT'
-          ? ` <button class="btn-out-err" 
+      </button>`
+        : `<button class="copy-btn btn-common-out" 
+        onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
+        Sao chép
+      </button>`
+      }
+      ${fileData.filename !== 'PAYMENT'
+        ? ` <button class="btn-out-err" 
         onclick="deleteFile('${fileData.filename}','${fileData.seq}','${fileData.mimetype}')">
         Xóa
       </button>`
-          : ''
+        : ''
       }
      
     </div>
@@ -247,7 +260,7 @@ async function uploadImg(file) {
 
   const formData = new FormData();
   formData.append('createdId', user.userId);
-  formData.append('answerImage', file);
+  formData.append('editorImg', file);
 
   try {
     const response = await axios.post(
@@ -258,7 +271,6 @@ async function uploadImg(file) {
       }),
     );
 
-    console.log('responseresponseresponseresponseresponseresponse', response);
     if (response.data) {
       // reload file list
       toastOk('Thêm file thành công');
@@ -277,8 +289,8 @@ async function uploadAudios(freeFile, payFile) {
   // Tạo FormData
   const formData = new FormData();
   formData.append('createdId', user.userId);
-  formData.append('answerAudioFree', freeFile);
-  formData.append('answerAudioPay', payFile);
+  formData.append('editorAudioFree', freeFile);
+  formData.append('editorAudioPay', payFile);
 
   try {
     const response = await axios.post(
@@ -384,7 +396,7 @@ async function deleteFile(filename, seq, mimetype) {
 }
 
 async function getAllFile() {
-  const objElement = document.querySelector(`#${pageElement} .file-box`);
+  const objElement = document.querySelector(`.file-box`);
 
   await axios
     .get(currentUrl + '/api/admin/uploadFile/getAllFile', axiosAuth())

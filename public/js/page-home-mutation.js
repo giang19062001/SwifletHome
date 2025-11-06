@@ -264,7 +264,10 @@ async function submitHome(formData, url, method, successMessage) {
       toastErr(`Lỗi khi ${method === 'post' ? 'tạo' : 'cập nhật'} nhà yến`);
     }
   } catch (error) {
-    console.error(`${method.toUpperCase()} error:`, error);
-    toastErr(`Lỗi khi ${method === 'post' ? 'tạo' : 'cập nhật'} nhà yến`);
+    console.error(`error:`, error);
+     if (error.response.data) {
+      toastErr(error.response.data.message);
+    }
   }
+  
 }

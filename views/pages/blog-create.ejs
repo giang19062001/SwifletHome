@@ -1,0 +1,89 @@
+<!-- html -->
+<div id="page-blog-mutation">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <label for="blogCategory" class="form-label">Thể loại</label>
+              <select class="form-select form-select-sm" id="blogCategory" name="blogCategory">
+                <% values.categories.forEach(function(cate) { %>
+                  <option value="<%= cate.categoryCode %>" <%=(values.blogCategory &&
+                    values.blogCategory===cate.categoryCode) ? 'selected' : '' %>
+                    >
+                    <%= cate.categoryName %>
+                  </option>
+                  <% }); %>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label for="blogObject" class="form-label">Đối tượng</label>
+              <select class="form-select form-select-sm" id="blogObject">
+                <option value="YEN" <%=values.blogObject==='YEN' ? 'selected' : '' %>>Yến</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="blogObject" class="form-label">Loại</label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="isFree" id="free" value="Y" checked>
+                  <label class="form-check-label" for="free">Miễn phí</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="isFree" id="pay" value="N">
+                  <label class="form-check-label" for="pay">Tính phí</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      <div class="preview">
+        <div class="chat-box">
+          <div class="message bot">
+              <div class="bubble" id="content-message">
+                <%- values.blogContent %>
+              </div>
+          </div>
+        </div>
+        <div class="bottom-button bottom-swtich">
+          <div class="align-items-center gap-3 preview-box" style="display: none;">
+            <label for="isPaidPreview" class="form-check-label mb-0">Chế độ xem chưa trả phí</label>
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input" type="checkbox" role="switch" id="isPaidPreview">
+            </div>
+            <label for="isPaidPreview" class="form-check-label mb-0">Chế độ xem đã trả phí</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="component-editor">
+        <%- include('./editor', { content: values.blogContent}) %>
+
+          <div class="bottom-button">
+            <button class="btn-common-audio" onclick="getEditorContent()">
+              Xem trước
+            </button>
+            <button class="btn-common" onclick="createBlog()">Thêm</button>
+          </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+
+      <%- include('./upload') %>
+    </div>
+  </div>
+</div>
+<script>
+  let blogContent = `<%- values.blogContent %>`;
+</script>
+<script src="/js/page-blog-mutation.js"></script>

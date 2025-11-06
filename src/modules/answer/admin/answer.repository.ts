@@ -25,9 +25,9 @@ export class AnswerAdminRepository {
       params.push(dto.answerObject);
     }
 
-    if (dto.categoryAnsCode) {
-      whereClause += ' AND categoryAnsCode = ?';
-      params.push(dto.categoryAnsCode);
+    if (dto.answerCategory) {
+      whereClause += ' AND answerCategory = ?';
+      params.push(dto.answerCategory);
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(
@@ -46,9 +46,9 @@ export class AnswerAdminRepository {
       params.push(dto.answerObject);
     }
 
-    if (dto.categoryAnsCode) {
-      whereClause += ' AND A.categoryAnsCode = ?';
-      params.push(dto.categoryAnsCode);
+    if (dto.answerCategory) {
+      whereClause += ' AND A.answerCategory = ?';
+      params.push(dto.answerCategory);
     }
 
     // ALL
@@ -59,10 +59,10 @@ export class AnswerAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.answerCode, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
+      ` SELECT A.seq, A.answerCode, A.answerContent, A.answerObject, A.answerCategory, A.isActive, A.isFree, A.createdAt, A.createdId,
       B.categoryName, C.objectName
       FROM ${this.table} A 
-      LEFT JOIN tbl_category B ON A.categoryAnsCode = B.categoryCode
+      LEFT JOIN tbl_category B ON A.answerCategory = B.categoryCode
       LEFT JOIN tbl_object C ON A.answerObject = C.objectCharacter
       ${whereClause}
       ${limitClause}`,
@@ -72,11 +72,11 @@ export class AnswerAdminRepository {
   }
   async getDetail(answerCode: string): Promise<IAnswer | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.answerCode, A.answerContentRaw, A.answerObject, A.categoryAnsCode, A.isActive, A.isFree, A.createdAt, A.createdId,
+      ` SELECT A.seq, A.answerCode, A.answerContent, A.answerObject, A.answerCategory, A.isActive, A.isFree, A.createdAt, A.createdId,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
-        ON A.categoryAnsCode = B.categoryCode
+        ON A.answerCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.answerObject = C.objectCharacter
         WHERE A.answerCode = ? 
@@ -93,14 +93,14 @@ export class AnswerAdminRepository {
       answerCode = generateCode(rows[0].answerCode, 'ANS', 6);
     }
     const sql = `
-        INSERT INTO ${this.table}  (answerCode, answerContentRaw, answerObject, categoryAnsCode, isFree, createdId) 
+        INSERT INTO ${this.table}  (answerCode, answerContent, answerObject, answerCategory, isFree, createdId) 
         VALUES(?, ?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       answerCode,
-      dto.answerContentRaw,
+      dto.answerContent,
       dto.answerObject,
-      dto.categoryAnsCode,
+      dto.answerCategory,
       dto.isFree,
       dto.createdId
     ]);
@@ -109,14 +109,14 @@ export class AnswerAdminRepository {
   }
   async updateAnswer(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET answerContentRaw = ?, answerObject = ?, categoryAnsCode = ?, isFree = ?,
+      UPDATE ${this.table} SET answerContent = ?, answerObject = ?, answerCategory = ?, isFree = ?,
       updatedId = ?, updatedAt = ?
       WHERE answerCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.answerContentRaw,
+      dto.answerContent,
       dto.answerObject,
-      dto.categoryAnsCode,
+      dto.answerCategory,
       dto.isFree,
       dto.updatedId,
       new Date(),

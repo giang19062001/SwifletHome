@@ -8,7 +8,7 @@ export class GetAllAnswerDto extends PagingDto {
     example: '',
   })
   @IsString()
-  categoryAnsCode: string;
+  answerCategory: string;
 
   @ApiProperty({
     example: '',
@@ -21,7 +21,7 @@ export class UpdateAnswerDto {
   @ApiProperty({ example: '<p>Hello word</p>' })
   @IsNotEmpty()
   @IsString()
-  answerContentRaw: string;
+  answerContent: string;
 
   @ApiProperty({
     example: 'YEN',
@@ -35,7 +35,7 @@ export class UpdateAnswerDto {
   })
   @IsString()
   @IsNotEmpty()
-  categoryAnsCode: string;
+  answerCategory: string;
 
    @ApiProperty({
     example: IsFreeEnum.Y,

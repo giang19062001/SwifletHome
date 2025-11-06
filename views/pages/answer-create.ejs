@@ -6,11 +6,11 @@
         <div class="card-body">
           <div class="row">
             <div class="col-md-3">
-              <label for="categoryAnsCode" class="form-label">Thể loại</label>
-              <select class="form-select" id="categoryAnsCode" name="categoryAnsCode">
-                <% values.categoriesFaq.forEach(function(cate) { %>
-                  <option value="<%= cate.categoryCode %>" <%=(values.categoryAnsCode &&
-                    values.categoryAnsCode===cate.categoryCode) ? 'selected' : '' %>
+              <label for="answerCategory" class="form-label">Thể loại</label>
+              <select class="form-select form-select-sm" id="answerCategory" name="answerCategory">
+                <% values.categories.forEach(function(cate) { %>
+                  <option value="<%= cate.categoryCode %>" <%=(values.answerCategory &&
+                    values.answerCategory===cate.categoryCode) ? 'selected' : '' %>
                     >
                     <%= cate.categoryName %>
                   </option>
@@ -20,9 +20,23 @@
 
             <div class="col-md-3">
               <label for="answerObject" class="form-label">Đối tượng</label>
-              <select class="form-select" id="answerObject">
+              <select class="form-select form-select-sm" id="answerObject">
                 <option value="YEN" <%=values.answerObject==='YEN' ? 'selected' : '' %>>Yến</option>
               </select>
+            </div>
+            <div class="col-md-3">
+              <label for="answerObject" class="form-label">Loại</label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="isFree" id="free" value="Y" checked>
+                  <label class="form-check-label" for="free">Miễn phí</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="isFree" id="pay" value="N">
+                  <label class="form-check-label" for="pay">Tính phí</label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -43,28 +57,28 @@
               </div>
 
               <div class="bubble" id="content-message">
-                <%- values.answerContentRaw %>
+                <%- values.answerContent %>
               </div>
             </div>
           </div>
         </div>
-        <div class="bottom-button">
-          <div class="d-flex align-items-center gap-2">
-            <label for="isFreeViewSwitch" class="form-check-label mb-0">Chế độ xem miễn phí</label>
+        <div class="bottom-button bottom-swtich">
+          <div class="align-items-center gap-3 preview-box" style="display: none;">
+            <label for="isPaidPreview" class="form-check-label mb-0">Chế độ xem chưa trả phí</label>
             <div class="form-check form-switch m-0">
-              <input class="form-check-input" type="checkbox" role="switch" id="isFreeViewSwitch" checked>
+              <input class="form-check-input" type="checkbox" role="switch" id="isPaidPreview">
             </div>
-            <label for="isFreeViewSwitch" class="form-check-label mb-0">Chế độ xem trả phí</label>
+            <label for="isPaidPreview" class="form-check-label mb-0">Chế độ xem đã trả phí</label>
           </div>
         </div>
       </div>
     </div>
     <div class="col-4">
-      <div class="common-editor">
-        <%- include('./editor', { content: values.answerContentRaw}) %>
+      <div class="component-editor">
+        <%- include('./editor', { content: values.answerContent}) %>
 
           <div class="bottom-button">
-            <button class="btn-common-audio" onclick="getContent()">
+            <button class="btn-common-audio" onclick="getEditorContent()">
               Xem trước
             </button>
             <button class="btn-common" onclick="createAnswer()">Thêm</button>
@@ -79,6 +93,6 @@
   </div>
 </div>
 <script>
-  let answerContentRaw = `<%- values.answerContentRaw %>`;
+  let answerContent = `<%- values.answerContent %>`;
 </script>
 <script src="/js/page-answer-mutation.js"></script>

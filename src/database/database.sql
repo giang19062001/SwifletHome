@@ -42,7 +42,7 @@ CREATE TABLE `tbl_question` (
   `answerCode` varchar(45) DEFAULT NULL,
   `questionObject` char(10) NOT NULL,
   `questionContent` text NOT NULL,
-  `categoryQuesCode` varchar(45) NOT NULL,
+  `questionCategory` varchar(45) NOT NULL,
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
@@ -55,9 +55,9 @@ CREATE TABLE `tbl_question` (
 CREATE TABLE `tbl_answer` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `answerCode` varchar(45) NOT NULL,
+  `answerContent` text NOT NULL,
   `answerObject` char(10) NOT NULL,
-  `answerContentRaw` text NOT NULL,
-  `categoryAnsCode` varchar(45) NOT NULL,
+  `answerCategory` varchar(45) NOT NULL,
   `isActive` char(1) DEFAULT 'Y',
   `isFree` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -66,6 +66,23 @@ CREATE TABLE `tbl_answer` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `answerCode_UNIQUE` (`answerCode`)
+)
+
+CREATE TABLE `tbl_blog` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `blogCode` varchar(45) NOT NULL,
+  `blogObject` char(10) NOT NULL,
+  `blogCategory` varchar(45) NOT NULL,
+  `blogContent` text NOT NULL,
+  `blogScreenCode` char(15) DEFAULT ''
+  `isActive` char(1) DEFAULT 'Y',
+  `isFree` char(1) DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `blogCode_UNIQUE` (`blogCode`)
 )
 
 CREATE TABLE `tbl_uploads_image` (

@@ -11,7 +11,7 @@ export class AnswerAppRepository {
 
     async getAnswerContent(answerCode: string): Promise<IAnswer | null> {
       const [rows] = await this.db.query<RowDataPacket[]>(
-        ` SELECT A.answerCode, A.answerContentRaw
+        ` SELECT A.answerCode, A.answerContent
           FROM ${this.table} A
           WHERE A.answerCode = ? `,
         [answerCode],

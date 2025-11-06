@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { ICategoryFaq } from './categoryFaq.interface';
+import { ICategory } from './category.interface';
 import { PagingDto } from 'src/dto/common';
 
 @Injectable()
-export class CateFaqRepository {
+export class CategoryRepository {
   private readonly table = 'tbl_category';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -15,7 +15,7 @@ export class CateFaqRepository {
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<ICategoryFaq[]> {
+  async getAll(dto: PagingDto): Promise<ICategory[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table}  ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
@@ -23,6 +23,6 @@ export class CateFaqRepository {
         ? []
         : [dto.limit, (dto.page - 1) * dto.limit],
     );
-    return rows as ICategoryFaq[];
+    return rows as ICategory[];
   }
 }

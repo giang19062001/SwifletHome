@@ -3,7 +3,7 @@
    color: $main-color;
    font-weight: 700;
    font-size: 28px;
-   font-family: "PretendardBold";
+   font-family: "PretendardBold" !important;
    letter-spacing: 0px;
    line-height: 100%;
 }
@@ -224,7 +224,7 @@
    // padding: calc(#{$header-height} + #{$grid-gutter-width}) calc(#{$grid-gutter-width} * 0.75) $footer-height calc(#{$grid-gutter-width} * 0.75);
    padding: calc(var(--header-height) + #{$grid-gutter-width}) calc(#{$grid-gutter-width} * 0.75) $footer-height calc(#{$grid-gutter-width} * 0.75);
    background-color: $page-conten-bg;
-   height: "auto";
+     min-height: 100vh; 
 }
 
 .header-item {

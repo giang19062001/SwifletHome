@@ -29,7 +29,7 @@ export class UploadImgFileDto {
     type: 'string',
     format: 'binary',
   })
-  answerImage: any;
+  editorImg: any;
 }
 
 export class UploadAudioFilesDto {
@@ -44,11 +44,11 @@ export class UploadAudioFilesDto {
     type: 'string',
     format: 'binary',
   })
-  answerAudioFree: any;
+  editorAudioFree: any;
 
   @ApiProperty({
     type: 'string',
     format: 'binary',
   })
-  answerAudioPay: any;
+  editorAudioPay: any;
 }

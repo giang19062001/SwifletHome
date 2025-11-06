@@ -21,6 +21,7 @@ export class HomeAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A  
+        WHERE A.isActive = 'Y'
         ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
       dto.limit == 0 && dto.page == 0
         ? []
@@ -32,7 +33,7 @@ export class HomeAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive
           FROM ${this.table} A 
-          WHERE A.homeCode = ?
+          WHERE A.homeCode = ? AND A.isActive = 'Y'
           LIMIT 1 `,
       [homeCode],
     );
@@ -115,8 +116,12 @@ export class HomeAdminRepository {
   }
 
   async deleteHome(homeCode: string): Promise<number> {
-    const sql = `
-      DELETE FROM ${this.table}
+    // const sql = `
+    //   DELETE FROM ${this.table}
+    //   WHERE homeCode = ?
+    // `;
+      const sql = `
+      UPDATE ${this.table} SET isActive = "N"
       WHERE homeCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [homeCode]);

@@ -1,102 +1,123 @@
 // TODO:INIT
 const answerCode = currentPath.includes('/update') ? currentPath.split('/').pop() : null;
 const pageElement = 'page-answer-mutation';
-const isFreeViewSwitch = document.getElementById('isFreeViewSwitch');
 
-// preview
-isFreeViewSwitch.addEventListener('change', (event) => {
-  if (event.target.checked) {
-    // pay
-    console.log('pay');
-    getContent(); // getContent() -> renderContentHtml() FROM component-editor.js
-  } else {
-    // free
-    console.log('free');
-    renderFreeContentHtml();
-  }
+// Theo dõi nút chế độ xem
+document.getElementById('isPaidPreview').addEventListener('change', (event) => {
+  getEditorContent(); // getEditorContent() -> renderContentHtml()
 });
 
-// check fileList until that has data
-document.addEventListener('DOMContentLoaded', function () {
+// Theo dõi radio isFree thay đổi
+document.querySelectorAll('input[name="isFree"]').forEach((radio) => {
+  radio.addEventListener('change', () => {
+    // set chế độ xem là NOT_PAID_YET
+    document.getElementById('isPaidPreview').checked = false;
+    //re-render
+    getEditorContent(); // getEditorContent() -> renderContentHtml()
+    // ẩn/ hiện nút thanh toán
+    togglePaymentButton();
+
+    // ẩn/ hiện chế độ xem
+    togglePreview();
+  });
+});
+
+// Chờ fileList sẵn sàng và re-render
+document.addEventListener('DOMContentLoaded', () => {
   const waitForFileList = setInterval(() => {
     if (Array.isArray(fileList) && fileList.length > 0) {
       clearInterval(waitForFileList);
-
-      if (isFreeViewSwitch.checked) {
-        renderContentHtml();
-      } else {
-        renderFreeContentHtml();
-      }
+      // re-render editor content
+      getEditorContent();
+      // ẩn/ hiện nút thanh toán
+      togglePaymentButton();
+      // ẩn/ hiện chế độ xem
+      togglePreview();
     }
   }, 100);
 });
+// TODO: FUNC
+
+/// Hàm hiển thị/ẩn hộp chế độ xem
+function togglePreview() {
+  const isFree = document.querySelector('input[name="isFree"]:checked')?.value;
+  console.log(isFree);
+  if (isFree == 'Y') {
+    document.querySelector('.preview-box').style.display = 'none';
+  } else {
+    document.querySelector('.preview-box').style.display = 'flex';
+  }
+}
 
 // TODO:RENDER
-function renderFreeContentHtml() {
-  const bot = document.getElementById('content-message');
-  contentHtml = bot.innerHTML;
-
-  // payment
-  contentHtml = contentHtml.replaceAll(`<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`, '');
-
-  // audio
-  contentHtml = contentHtml.replace(/<audio[^>]*><source[^>]*src="(.*?)"[^>]*><\/audio>/g, (match, src) => {
-    const lastSlashIndex = src.lastIndexOf('/');
-    const fileUrl = src.substring(0, lastSlashIndex);
-    const filename = src.substring(lastSlashIndex + 1);
-
-    const fileInfo = fileList?.find((ele) => ele.filenamePay === filename);
-    if (fileInfo && fileInfo.filename) {
-      return `<audio controls style="width:100%; margin:8px 0;"><source src="${fileUrl}/${fileInfo.filename}" type="audio/mpeg"></audio>`;
-    }
-  });
-  bot.innerHTML = contentHtml;
-}
 function renderContentHtml() {
-  const bot = document.getElementById('content-message');
-  contentHtml = bot.innerHTML;
-  // assign data to POST
-  answerContentRaw = bot.innerHTML;
 
-  // replace [[image-data=...]]
+  const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
+  const isPaidPreview = document.getElementById('isPaidPreview').checked ? 'PAID' : 'NOT_PAID_YET';
+
+  // lấy content từ bong bóng message html
+  const bot = document.getElementById('content-message');
+  let contentHtml = bot.innerHTML;
+  answerContent = contentHtml;   // ! DATA để gửi đến API
+
+  // xóa nút thanh toán ra khỏi editor
+  if (isFree == 'Y') {
+    contentHtml = removeText('[[payment]]');
+  }
+  console.log(isPaidPreview);
+
+  // Xóa nút thanh toán nếu  chế độ xem là đã trả phí
+  if (isPaidPreview == 'PAID') {
+    contentHtml = contentHtml.replaceAll(`<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`, '');
+  }
+
+  // Replace [[payment]]
+  if (isPaidPreview == 'NOT_PAID_YET') {
+    // chưa trả phí → hiển nút thanh toán
+    if (contentHtml.includes('[[payment]]')) {
+      // Lấy phần trước [[payment]]
+      const parts = contentHtml.split('[[payment]]');
+
+      // Chỉ giữ phần trước + nút thanh toán
+      contentHtml = parts[0] + `<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`;
+    }
+    // Nếu không có [[payment]], giữ nguyên contentHtml
+  } else {
+    // đã trả phí rồi → ẩn nút thanh toán
+    contentHtml = contentHtml.replace(/\[\[payment\]\]/g, ``);
+  }
+
+  // Replace [[image-data=...]]
   contentHtml = contentHtml.replace(/\[\[image-data=(.*?)\]\]/g, (match, url) => {
     return `<img src="${url}" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`;
   });
 
-  // replace [[audio-data=...]]
+  // Replace [[audio-data=...]]
   contentHtml = contentHtml.replace(/\[\[audio-data=(.*?)\]\]/g, (match, url) => {
     const lastSlashIndex = url.lastIndexOf('/');
     const fileUrl = url.substring(0, lastSlashIndex);
     const filename = url.substring(lastSlashIndex + 1);
-    const audioPay = fileList?.find((ele) => ele.filename === filename)?.filenamePay ?? 0;
-    if (isFreeViewSwitch.checked) {
-      //pay
-      return `<audio controls style="width:100%; margin:8px 0;"><source src="${fileUrl}/${audioPay}" type="audio/mpeg"></audio>`;
-    } else {
-      //free
-      return `<audio controls style="width:100%; margin:8px 0;"><source src="${url}" type="audio/mpeg"></audio>`;
-    }
+    const fileInfo = fileList?.find((ele) => ele.filename === filename);
+    const audioPay = fileInfo?.filenamePay ?? filename; // audio miễn phí
+
+    const audioSrc = isPaidPreview == 'NOT_PAID_YET' ? `${url}` : `${fileUrl}/${audioPay}`;
+    return `<audio controls style="width:100%; margin:8px 0;">
+              <source src="${audioSrc}" type="audio/mpeg">
+            </audio>`;
   });
 
-  // replace [[video-data=...]]
+  // Replace [[video-data=...]]
   contentHtml = contentHtml.replace(/\[\[video-data=(.*?)\]\]/g, (match, url) => {
     return `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="${url}"></iframe>`;
   });
 
-  // replace [[payment]]
-  if (isFreeViewSwitch.checked) {
-    //pay
-    contentHtml = contentHtml.replace(/\[\[payment\]\]/g, `<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`);
-  } else {
-    //free
-    contentHtml = contentHtml.replace(/\[\[payment\]\]/g, ``);
-  }
-
+  // RE-RENDER bong bóng tin nhắn
   bot.innerHTML = contentHtml;
 }
+
 // TODO:API
 async function createAnswer() {
-  getContent(); // assisgn value
+  getEditorContent(); // assisgn value
 
   // validate
   if (validateContent() == false) {
@@ -104,23 +125,24 @@ async function createAnswer() {
     return;
   }
   try {
-    const categoryAnsCode = document.getElementById('categoryAnsCode').value;
+    const answerCategory = document.getElementById('answerCategory').value;
     const answerObject = document.getElementById('answerObject').value;
+    const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
     await axios
       .post(
         currentUrl + '/api/admin/answer/createAnswer',
         {
-          answerContentRaw,
-          categoryAnsCode,
+          answerContent,
+          answerCategory,
           answerObject,
-          isFree: checkIsFree(),
+          isFree: isFree,
           createdId: user.userId,
         },
         axiosAuth(),
       )
       .then(function (response) {
         console.log('response', response);
-        toastOk('Cập nhập thành công');
+        toastOk('Thêm thành công');
         reloadPage('/dashboard/answer/list');
       })
       .catch(function (error) {
@@ -132,7 +154,7 @@ async function createAnswer() {
 }
 
 async function updateAnswer() {
-  getContent(); // assisgn value
+  getEditorContent(); // assisgn value
 
   // validate
   if (validateContent() == false) {
@@ -140,16 +162,18 @@ async function updateAnswer() {
     return;
   }
   try {
-    const categoryAnsCode = document.getElementById('categoryAnsCode').value;
+    const answerCategory = document.getElementById('answerCategory').value;
     const answerObject = document.getElementById('answerObject').value;
+    const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
+
     await axios
       .put(
         currentUrl + '/api/admin/answer/updateAnswer/' + answerCode,
         {
-          answerContentRaw,
-          categoryAnsCode,
+          answerContent,
+          answerCategory,
           answerObject,
-          isFree: checkIsFree(),
+          isFree: isFree,
           updatedId: user.userId,
         },
         axiosAuth(),

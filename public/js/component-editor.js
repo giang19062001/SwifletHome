@@ -13,18 +13,14 @@ const quillGlobal = new Quill('#editor', {
 quillGlobal.root.addEventListener('paste', (e) => {
   e.preventDefault();
   // >> santizer string >> html
-  if (window.location.pathname.includes('/dashboard/answer/')) {
-    getContent();
-  }
+  getEditorContent();
 });
 
-function checkIsFree() {
-  const content = quillGlobal.root.innerHTML || '';
-  if (content.includes('[[payment]]')) {
-    return 'N';
-  } else {
-    return 'Y';
-  }
+function removeText(text) {
+  let html = quillGlobal.root.innerHTML;
+  html = html.replaceAll(text, '');
+  quillGlobal.root.innerHTML = html;
+  return quillGlobal.root.innerHTML;
 }
 
 function validateContent() {
@@ -35,7 +31,7 @@ function validateContent() {
   return true;
 }
 
-function getContent() {
+function getEditorContent() {
   document.getElementById('content-message').innerHTML = quillGlobal.root.innerHTML;
 
   // >> santizer string >> html

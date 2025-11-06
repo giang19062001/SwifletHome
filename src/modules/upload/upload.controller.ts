@@ -18,7 +18,7 @@ export class UploadController {
   @Post('uploadImg')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadImgFileDto })
-  @UseInterceptors(FileInterceptor('answerImage', multerImgConfig))
+  @UseInterceptors(FileInterceptor('editorImg', multerImgConfig))
   async uploadImg(@Body() dto: UploadImgFileDto, @UploadedFile() file: Express.Multer.File): Promise<number> {
     if (!file) {
       throw new BadRequestException(messageErr.fileEmpty);
@@ -33,8 +33,8 @@ export class UploadController {
   @UseInterceptors(
     FileFieldsInterceptor(
       [
-        { name: 'answerAudioFree', maxCount: 1 },
-        { name: 'answerAudioPay', maxCount: 1 },
+        { name: 'editorAudioFree', maxCount: 1 },
+        { name: 'editorAudioPay', maxCount: 1 },
       ],
       multerAudioConfig,
     ),
@@ -43,20 +43,20 @@ export class UploadController {
     @Body() dto: UploadAudioFilesDto,
     @UploadedFiles()
     files: {
-      answerAudioFree?: Express.Multer.File;
-      answerAudioPay?: Express.Multer.File;
+      editorAudioFree?: Express.Multer.File;
+      editorAudioPay?: Express.Multer.File;
     },
   ) {
-    if (!files.answerAudioFree || !files.answerAudioPay) {
+    if (!files.editorAudioFree || !files.editorAudioPay) {
       throw new BadRequestException(messageErr.fileAudioRequire);
     }
 
-    console.log(files.answerAudioPay[0], files.answerAudioFree[0]);
+    console.log(files.editorAudioPay[0], files.editorAudioFree[0]);
     try {
-      const seqPay = await this.uploadService.uploadAudioPay(files.answerAudioPay[0], dto.createdId);
+      const seqPay = await this.uploadService.uploadAudioPay(files.editorAudioPay[0], dto.createdId);
       console.log('seqPay', seqPay);
       if (seqPay) {
-        await this.uploadService.uploadAudioFree(files.answerAudioFree[0], dto.createdId, seqPay);
+        await this.uploadService.uploadAudioFree(files.editorAudioFree[0], dto.createdId, seqPay);
       }
       return 1;
     } catch (error) {

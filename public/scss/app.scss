@@ -20,10 +20,13 @@
 @import 'common-table';
 @import 'common-modal';
 @import 'common-paing';
-@import 'common-editor';
 //page css
 @import 'page-login';
 @import 'page-question';
 @import 'page-home';
 @import 'page-home-submit';
-@import 'page-answer'
+@import 'page-answer';
+@import 'page-blog';
+// component css
+@import 'component-upload';
+@import 'component-editor';

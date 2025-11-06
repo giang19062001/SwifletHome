@@ -17,7 +17,8 @@ export class AppController {
     return { title: 'Đăng nhập', isLayout: false };
   }
 
-  @Get('/dashboard/question/category')
+  // question
+  @Get('/dashboard/category/list')
   @UseGuards(PageAuthGuard)
   @Render('pages/category-question')
   renderCateQuestion(@Req() req: Request) {
@@ -38,6 +39,7 @@ export class AppController {
     };
   }
 
+  // answer
   @Get('/dashboard/answer/list')
   @UseGuards(PageAuthGuard)
   @Render('pages/answer')
@@ -74,6 +76,45 @@ export class AppController {
     };
   }
 
+  //blog
+  @Get('/dashboard/blog/list')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/blog')
+  renderBlog(@Req() req: Request) {
+    return {
+      title: 'Danh sách bài viết',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+
+  @Get('/dashboard/blog/create')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/blog-create')
+  async renderCreateBlog(@Req() req: Request) {
+    const values = await this.appService.renderCreateBlog();
+    return {
+      title: 'Thêm bài viết',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
+  @Get('/dashboard/blog/update/:id')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/blog-update')
+  async renderBlogUpdate(@Req() req: Request) {
+    const values = await this.appService.renderBlogUpdate(req.params.id);
+    return {
+      title: 'Chỉnh sửa bài viết',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
+  //home
   @Get('/dashboard/home/list')
   @UseGuards(PageAuthGuard)
   @Render('pages/home')

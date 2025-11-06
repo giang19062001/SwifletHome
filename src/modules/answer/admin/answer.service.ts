@@ -36,7 +36,7 @@ export class AnswerAdminService {
     // set answerCode is 'null' If any questions are assigning this answer ( when change "category" || "object" )
     if (
       questions.length > 0 &&
-      dto.categoryAnsCode !== questions[0].categoryQuesCode
+      dto.answerCategory !== questions[0].questionCategory
     ) {
       for (const ques of questions) {
         await this.questionAdminService.updateAnswerQuestionNull(

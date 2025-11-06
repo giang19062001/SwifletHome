@@ -65,11 +65,15 @@ function renderAllHomeSubmit(data, objElement) {
       const rowHtml = `
          <tr class="text-center">
             <td><p>${page * i++}</p></td>
-            <td><a target="_blank" href="/dashboard/home/update/${ele.homeCode}">${ele.homeName}</a></td>
+            <td style="max-width: 150px;">
+              <a target="_blank" href="/dashboard/home/update/${ele.homeCode}">
+                <u>${ele.homeName}</u>
+              </a>
+            </td>
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td><p>${ele.numberAttend}</p></td>
-            <td><p class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.status}</p></td>
+            <td><b class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.status}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-common-out" onclick="getDetailHomeSubmit('${ele.seq}')">Cập nhập</button>

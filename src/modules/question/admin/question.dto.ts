@@ -30,7 +30,7 @@ export class UpdateQuestionDto {
   })
   @IsString()
   @IsNotEmpty()
-  categoryQuesCode: string;
+  questionCategory: string;
 
   @ApiProperty({
     example: 'admin',

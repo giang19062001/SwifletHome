@@ -1,55 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
+import { fuseConfig, ISearchItem } from 'src/config/fuse';
 import { messageErr } from 'src/helpers/message';
-import { ISearchItem } from './search.interface';
 
 @Injectable()
 export class SearchService {
-  private readonly fuseOptions: IFuseOptions<ISearchItem> = {
-    keys: ['questions'],
-    threshold: 0.3, // Smaller → more accurate result
-    includeScore: true,
-    ignoreLocation: true,
-    ignoreFieldNorm: true,
-  };
+  private readonly fuseOptions: IFuseOptions<ISearchItem> = fuseConfig;
 
   // Standardize text for search comparison
   private normalizeText(text: string): string {
     return (
       text
         .toLowerCase()
-        // .normalize('NFD') // split accented characters into letters + separator: yen => y + ̂ (caret) + e + ́ (sharp accent) + n
-        // .replace(/[\u0300-\u036f]/g, '') // remove Vietnamese accents after separating accents
-        // .replace(/[^a-z0-9\s]/g, '') // remove special characters
+        // .normalize('NFD') // tách các ký tự có dấu thành các chữ cái + dấu phân cách: yen => y + ̂ (dấu mũ) + e + ́ (dấu thăng) + n
+        // .replace(/[\u0300-\u036f]/g, '') // xóa dấu tiếng Việt sau khi tách dấu
+        // .replace(/[^a-z0-9\s]/g, '') // xóa ký tự đặc biệt
         .trim()
     );
   }
 
-  /*Find the closest answer in the FAQ list*/
+  /*Tìm câu trả lời gần nhất trong danh sách Câu hỏi thường gặp*/
   findAnswer(query: string, faqData: ISearchItem[]): string {
     if (!faqData?.length) {
       return messageErr.faqEmpty;
     }
 
-    // normalized data
+    // dữ liệu đã chuẩn hóa
     const normalizedData = faqData.map((item) => ({
       ...item,
       questions: item.questions.map((q) => this.normalizeText(q)),
     }));
 
-    // Initialize Fuse.js with normalized data
+    // Khởi tạo Fuse.js với dữ liệu đã chuẩn hóa
     const fuse = new Fuse(normalizedData, this.fuseOptions);
     const normalizedQuery = this.normalizeText(query);
 
-    // finding...
+    // tìm kiếm...
     const results = fuse.search(normalizedQuery);
 
-    // If no suitable results are found
+    // Nếu không tìm thấy kết quả phù hợp
     if (results.length === 0) {
       return messageErr.cannotReply;
     }
 
-    // Get the most relevant results
+    // Lấy kết quả phù hợp nhất
     return results[0].item.answer;
   }
 }

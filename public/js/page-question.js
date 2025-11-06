@@ -1,7 +1,7 @@
 let page = 1;
 let limit = 10;
 let pageElement = 'page-question';
-let categoriesFaq = [];
+let categories = [];
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
@@ -23,11 +23,11 @@ async function showQuestionModal(type, questionData) {
   const modalBody = modalEl.querySelector('.modal-body');
 
   // render <option> category
-  const categoryOptions = categoriesFaq
+  const categoryOptions = categories
     .map(
       (cate) => `
       <option value="${cate.categoryCode}" 
-        ${questionData.categoryQuesCode === cate.categoryCode ? 'selected' : ''}>
+        ${questionData.questionCategory === cate.categoryCode ? 'selected' : ''}>
         ${cate.categoryName}
       </option>
     `,
@@ -37,10 +37,10 @@ async function showQuestionModal(type, questionData) {
   // form
   modalBody.querySelector('#questionCode').value = questionData.questionCode || '';
   modalBody.querySelector('#questionContent').value = questionData.questionContent || '';
-  modalBody.querySelector('#categoryQuesCode').innerHTML = categoryOptions;
+  modalBody.querySelector('#questionCategory').innerHTML = categoryOptions;
 
   // render answer list
-  await renderAllAnswer(modalBody, questionData ? questionData.answerCode : '', modalBody.querySelector('#categoryQuesCode').value);
+  await renderAllAnswer(modalBody, questionData ? questionData.answerCode : '', modalBody.querySelector('#questionCategory').value);
   // validate
   modalBody.querySelector('#questionContent')?.addEventListener('input', (e) => {
     modalBody.querySelector('.err-questionContent').style.display = String(e.target.value).trim() == '' ? 'block' : 'none';
@@ -72,7 +72,7 @@ async function showQuestionModal(type, questionData) {
   modal.show();
 }
 
-async function renderAllAnswer(modalBody, answerCode, categoryQuesCode) {
+async function renderAllAnswer(modalBody, answerCode, questionCategory) {
   // sub function
   async function renderAnswer(currentCategoryCode) {
     const answers = await getAllAnswer(0, 0, currentCategoryCode, 'YEN');
@@ -81,7 +81,7 @@ async function renderAllAnswer(modalBody, answerCode, categoryQuesCode) {
         (ans) => `
           <option value="${ans.answerCode}" data-answer-code="${ans.answerCode}"
             ${answerCode === ans.answerCode ? 'selected' : ''}>
-            ${getShortTextFromHtml(ans.answerContentRaw)}
+            ${getShortTextFromHtml(ans.answerContent)}
           </option>
         `,
       )
@@ -93,10 +93,10 @@ async function renderAllAnswer(modalBody, answerCode, categoryQuesCode) {
   }
 
   // render frist
-  await renderAnswer(categoryQuesCode);
+  await renderAnswer(questionCategory);
 
   // render when category change
-  modalBody.querySelector('#categoryQuesCode').addEventListener('change', async (e) => {
+  modalBody.querySelector('#questionCategory').addEventListener('change', async (e) => {
     await renderAnswer(e.target.value);
   });
 }
@@ -168,7 +168,7 @@ async function getAllCategoryFaq(currentPage, limit) {
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
-        categoriesFaq = response.data.list;
+        categories = response.data.list;
       }
     })
     .catch(function (err) {
@@ -189,14 +189,14 @@ async function getDetailQuestion(questionCode) {
     });
 }
 
-async function getAllAnswer(currentPage, limit, categoryAnsCode, answerObject) {
+async function getAllAnswer(currentPage, limit, answerCategory, answerObject) {
   return await axios
     .post(
       currentUrl + '/api/admin/answer/getAll',
       {
         page: currentPage,
         limit: limit,
-        categoryAnsCode: categoryAnsCode,
+        answerCategory: answerCategory,
         answerObject: answerObject,
       },
       axiosAuth(),
@@ -236,7 +236,7 @@ async function createQuestion() {
   try {
     const modalBody = document.querySelector('.question-create-modal .modal-body form');
     const questionContent = modalBody.querySelector('#questionContent').value;
-    const categoryQuesCode = modalBody.querySelector('#categoryQuesCode').value;
+    const questionCategory = modalBody.querySelector('#questionCategory').value;
     const questionObject = modalBody.querySelector('#questionObject').value;
     const answerCode = modalBody.querySelector('#answerCode').value;
     if (String(questionContent).trim() == '') {
@@ -248,7 +248,7 @@ async function createQuestion() {
         currentUrl + '/api/admin/question/createQuestion',
         {
           questionContent: questionContent,
-          categoryQuesCode: categoryQuesCode,
+          questionCategory: questionCategory,
           questionObject: questionObject,
           answerCode: answerCode,
           createdId: user.userId,
@@ -276,7 +276,7 @@ async function updateQuestion() {
   try {
     const modalBody = document.querySelector('.question-update-modal .modal-body form');
     const questionContent = modalBody.querySelector('#questionContent').value;
-    const categoryQuesCode = modalBody.querySelector('#categoryQuesCode').value;
+    const questionCategory = modalBody.querySelector('#questionCategory').value;
     const questionObject = modalBody.querySelector('#questionObject').value;
     const answerCode = modalBody.querySelector('#answerCode').value;
     const questionCode = modalBody.querySelector('#questionCode').value;
@@ -288,7 +288,7 @@ async function updateQuestion() {
         currentUrl + '/api/admin/question/updateQuestion/' + questionCode,
         {
           questionContent: questionContent,
-          categoryQuesCode: categoryQuesCode,
+          questionCategory: questionCategory,
           questionObject: questionObject,
           answerCode: answerCode,
           updatedId: user.userId,

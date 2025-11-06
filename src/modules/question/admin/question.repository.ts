@@ -19,11 +19,11 @@ export class QuestionAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<IQuestion[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
+      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
-        ON A.categoryQuesCode = B.categoryCode
+        ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.questionObject = C.objectCharacter
         LIMIT ? OFFSET ? `,
@@ -33,11 +33,11 @@ export class QuestionAdminRepository {
   }
   async getAllByAnswer(answerCode: string): Promise<IQuestion[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
+      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
-        ON A.categoryQuesCode = B.categoryCode
+        ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.questionObject = C.objectCharacter
         WHERE A.answerCode IS NOT NULL AND A.answerCode = ?`,
@@ -47,11 +47,11 @@ export class QuestionAdminRepository {
   }
   async getDetail(questionCode: string): Promise<IQuestion | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.categoryQuesCode, A.isActive, A.createdAt, A.createdId, A.answerCode,
-        B.categoryName, C.objectName, D.answerContentRaw
+      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
+        B.categoryName, C.objectName, D.answerContent
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
-        ON A.categoryQuesCode = B.categoryCode
+        ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.questionObject = C.objectCharacter
         LEFT JOIN tbl_answer D
@@ -70,7 +70,7 @@ export class QuestionAdminRepository {
       questionCode = generateCode(rows[0].questionCode, 'QUS', 6);
     }
     const sql = `
-      INSERT INTO ${this.table}  (questionCode, answerCode, questionObject, questionContent, categoryQuesCode, createdId) 
+      INSERT INTO ${this.table}  (questionCode, answerCode, questionObject, questionContent, questionCategory, createdId) 
       VALUES(?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
@@ -78,7 +78,7 @@ export class QuestionAdminRepository {
       dto.answerCode,
       dto.questionObject,
       dto.questionContent,
-      dto.categoryQuesCode,
+      dto.questionCategory,
       dto.createdId
     ]);
 
@@ -99,7 +99,7 @@ export class QuestionAdminRepository {
   }
   async updateQuestion(dto: UpdateQuestionDto, questionCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET answerCode = ?, questionObject = ?, questionContent = ?, categoryQuesCode = ?,
+      UPDATE ${this.table} SET answerCode = ?, questionObject = ?, questionContent = ?, questionCategory = ?,
       updatedId = ?, updatedAt = ?
       WHERE questionCode = ?
     `;
@@ -107,7 +107,7 @@ export class QuestionAdminRepository {
       dto.answerCode,
       dto.questionObject,
       dto.questionContent,
-      dto.categoryQuesCode,
+      dto.questionCategory,
       dto.updatedId,
       new Date(),
       questionCode,

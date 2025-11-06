@@ -12,17 +12,17 @@ import {
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { PagingDto } from 'src/dto/common';
-import { CateFaqService } from './categoryFaq.service';
+import { CategoryService } from './category.service';
 import { IList } from 'src/interfaces/common';
-import { ICategoryFaq } from './categoryFaq.interface';
+import { ICategory } from './category.interface';
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
 
 @ApiBearerAuth('swf-token') 
 @ApiTags('admin/categoryFaq')
 @UseGuards(ApiAuthGuard)
 @Controller('/api/admin/categoryFaq')
-export class CateFaqController {
-  constructor(private readonly cateFaqService: CateFaqService) {}
+export class CategoryController {
+  constructor(private readonly catetegoryService: CategoryService) {}
 
   @ApiBody({
     type: PagingDto,
@@ -31,8 +31,8 @@ export class CateFaqController {
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Body() dto: PagingDto,
-  ): Promise<IList<ICategoryFaq>> {
-    const result = await this.cateFaqService.getAll(dto);
+  ): Promise<IList<ICategory>> {
+    const result = await this.catetegoryService.getAll(dto);
     return result;
   }
 }

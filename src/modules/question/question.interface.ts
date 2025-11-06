@@ -3,7 +3,7 @@ export interface IQuestion {
   questionCode: string;
   questionContent: string;
   questionObject: string;
-  categoryQuesCode: string;
+  questionCategory: string;
   isActive: string;
   createdAt: string;
   updatedAt: string;
@@ -11,5 +11,5 @@ export interface IQuestion {
   updatedId: string;
   answerCode: string;
   categoryQuesName?: string;
-  answerContentRaw?: string
+  answerContent?: string
 }

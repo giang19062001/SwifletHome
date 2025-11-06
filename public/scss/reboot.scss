@@ -1,8 +1,11 @@
 p {
   margin-bottom: 0 !important;
 }
-label {
+label, p, span, a, li, td {
   font-family: 'Pretendard' !important;
+}
+b{
+  font-weight: 600 !important;
 }
 textarea,
 input,

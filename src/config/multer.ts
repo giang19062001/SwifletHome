@@ -6,15 +6,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 const getLocation = (mimetype: string, fieldname: string) => {
   if (mimetype.startsWith('image/')) {
-    if (fieldname === 'answerImage') {
-      return 'images/answers';
+    if (fieldname === 'editorImg') {
+      return 'images/editor';
     }
     if (fieldname === 'homeImage' || fieldname === 'homeImages') {
       return 'images/homes';
     }
   } else if (mimetype.startsWith('audio/')) {
-    if (fieldname.includes('answerAudio')) {
-      return 'audios/answers';
+    if (fieldname.includes('editorAudio')) {
+      return 'audios/editor';
     }
   }
   return 'documents'; // other
