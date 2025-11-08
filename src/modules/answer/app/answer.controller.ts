@@ -15,11 +15,11 @@ import {
 import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AnswerAppService } from './answer.service';
 import { SearchService } from 'src/modules/search/search.service';
-import { ResponseInterceptor } from 'src/interceptors/response';
+import { ResponseAppInterceptor } from 'src/interceptors/response';
 
 @ApiTags('app/answer')
 @Controller('/api/app/answer')
-@UseInterceptors(ResponseInterceptor)
+@UseInterceptors(ResponseAppInterceptor)
 export class AnswerAppController {
   constructor(
     private readonly answerAppService: AnswerAppService,

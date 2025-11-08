@@ -6,7 +6,7 @@ let categories = [];
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllQuestion(page, limit);
-  getAllCategoryFaq(page, limit);
+  getAllCategory(page, limit);
 });
 
 // TODO: FUNC
@@ -15,6 +15,26 @@ function changePage(p) {
   document.getElementById('privacy-main-pager').innerHTML = '';
   getAllQuestion(page, limit);
 }
+
+function closeQuestionModal(type) {
+  // Xác định modal theo loại
+  const modalSelector = type === 'create' ? '.question-create-modal' : '.question-update-modal';
+  const modalEl = document.querySelector(modalSelector);
+
+  if (!modalEl) return;
+
+  // Lấy instance modal hiện tại
+  const modalInstance = bootstrap.Modal.getInstance(modalEl);
+
+  if (modalInstance) {
+    modalInstance.hide(); // Đóng modal
+  } else {
+    // Nếu chưa có instance (trường hợp modal chưa được show trước đó)
+    const modal = new bootstrap.Modal(modalEl);
+    modal.hide();
+  }
+}
+
 // TODO: RENDER
 async function showQuestionModal(type, questionData) {
   // init modal
@@ -116,8 +136,8 @@ function renderAllQuestion(data, objElement) {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-common-out"  onclick="getDetailQuestion('${ele.questionCode}')">Cập nhập</button>
-                <button class="btn-out-err"  onclick="deleteQuestion('${ele.questionCode}')">Xóa</button>
+                <button class="btn-main-out"  onclick="getDetailQuestion('${ele.questionCode}')">Cập nhập</button>
+                <button class="btn-err-out"  onclick="deleteQuestion('${ele.questionCode}')">Xóa</button>
             </td>
          </tr>`;
       HTML += rowHtml;
@@ -155,10 +175,10 @@ async function getAllQuestion(currentPage, limit) {
       console.log('err', err);
     });
 }
-async function getAllCategoryFaq(currentPage, limit) {
+async function getAllCategory(currentPage, limit) {
   await axios
     .post(
-      currentUrl + '/api/admin/categoryFaq/getAll',
+      currentUrl + '/api/admin/category/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -224,12 +244,15 @@ async function deleteQuestion(questionCode) {
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
+        toastOk('Xóa thành công');
+        // refresh list
         page = 1;
         getAllQuestion(page, limit);
       }
     })
     .catch(function (err) {
       console.log('err', err);
+      toastOk('Xóa thất bại');
     });
 }
 async function createQuestion() {
@@ -259,7 +282,11 @@ async function createQuestion() {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Thêm thành công');
-          reloadPage();
+          // đóng modal
+          closeQuestionModal('create');
+          // refresh list
+          page = 1;
+          getAllQuestion(page, limit);
         } else {
           toastErr('Thêm thất bại');
         }
@@ -292,7 +319,6 @@ async function updateQuestion() {
           questionObject: questionObject,
           answerCode: answerCode,
           updatedId: user.userId,
-
         },
         axiosAuth(),
       )
@@ -300,7 +326,11 @@ async function updateQuestion() {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Cập nhập thành công');
-          reloadPage();
+          // đóng modal
+          closeQuestionModal('update');
+          // refresh list
+          page = 1;
+          getAllQuestion(page, limit);
         } else {
           toastErr('Cập nhập thất bại');
         }

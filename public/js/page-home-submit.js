@@ -76,7 +76,7 @@ function renderAllHomeSubmit(data, objElement) {
             <td><b class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.status}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
-                <button class="btn-common-out" onclick="getDetailHomeSubmit('${ele.seq}')">Cập nhập</button>
+                <button class="btn-main-out" onclick="getDetailHomeSubmit('${ele.seq}')">Cập nhập</button>
             </td>
          </tr>`;
       HTML += rowHtml;

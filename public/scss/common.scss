@@ -13,9 +13,9 @@
 .title-page {
   font-family: PretendardBold !important;
   font-size: 1.3rem;
-  color: #565C66;
+  color: #565c66;
 }
-#btn-common {
+#btn-main {
   padding: 7px 15px;
   border-radius: 15px;
   font-family: Pretendard;
@@ -25,8 +25,20 @@
   border-width: 0.13em;
   outline: auto;
 }
-.btn-common {
-  @extend #btn-common;
+.btn-main-lg {
+  @extend #btn-main;
+  font-size: medium;
+  min-width: 200px;
+  min-height: 40px;
+  background-color: $main-color;
+  border-color: $main-color;
+  color: #ffffff;
+  &:hover {
+    background-color: $main-color-hover;
+  }
+}
+.btn-main {
+  @extend #btn-main;
   background-color: $main-color;
   border-color: $main-color;
   color: #ffffff;
@@ -35,8 +47,8 @@
   }
 }
 
-.btn-common-image {
-  @extend #btn-common;
+.btn-main-image {
+  @extend #btn-main;
   background-color: #59ac77;
   border-color: #59ac77;
   color: #ffffff;
@@ -44,8 +56,8 @@
     background-color: #59ac77;
   }
 }
-.btn-common-audio {
-  @extend #btn-common;
+.btn-main-audio {
+  @extend #btn-main;
   background-color: #279eff;
   border-color: #279eff;
   color: #ffffff;
@@ -54,8 +66,8 @@
   }
 }
 
-.btn-common-video {
-  @extend #btn-common;
+.btn-main-video {
+  @extend #btn-main;
   background-color: #f75270;
   border-color: #f75270;
   color: #ffffff;
@@ -64,8 +76,8 @@
   }
 }
 
-.btn-common-out {
-  @extend #btn-common;
+.btn-main-out {
+  @extend #btn-main;
   background-color: #ffffff;
   border-color: #ffffff;
   color: $main-color;
@@ -76,7 +88,7 @@
 }
 
 .btn-err {
-  @extend #btn-common;
+  @extend #btn-main;
   background-color: $err-color;
   border-color: $err-color;
   color: #ffffff;
@@ -85,8 +97,8 @@
   }
 }
 
-.btn-out-err {
-  @extend #btn-common;
+.btn-err-out {
+  @extend #btn-main;
   background-color: #ffffff;
   border-color: #ffffff;
   color: $err-color;
@@ -96,14 +108,14 @@
   }
 }
 
-
-
 .txt-status-waiting {
   color: #ffc50f;
 }
-.txt-status-approved, .txt-free {
+.txt-status-approved,
+.txt-free {
   color: #59ac77;
 }
-.txt-status-cancel, .txt-pay {
+.txt-status-cancel,
+.txt-pay {
   color: #f75270;
 }

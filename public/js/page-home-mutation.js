@@ -189,7 +189,7 @@ function renderImagePreview(file, index, input, preview, field) {
   const previewHtml = `
     <div class="image-preview" data-index="${index}">
       <img src="" alt="Preview ${index + 1}">
-      <button class="delete-btn" type="button" data-index="${index}">×</button>
+      <button class="delete-btn" type="button" data-index="${index}">x</button>
     </div>
   `;
   preview.insertAdjacentHTML('beforeend', previewHtml);

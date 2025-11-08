@@ -12,10 +12,11 @@ import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { QuestionAppModule } from './modules/question/app/question.module';
 import { HomeAdminModule } from './modules/home/admin/home.module';
 import { HomeAppModule } from './modules/home/app/home.module';
-import { CodeAppModule } from './modules/code/app/code.module';
 import { HomeSubmitAppModule } from './modules/homeSubmit/app/homeSubmit.module';
 import { HomeSubmitAdminModule } from './modules/homeSubmit/admin/homeSubmit.module';
 import { BlogAdminModule } from './modules/blog/admin/blog.module';
+import { CodeModule } from './modules/code/code.module';
+import { DoctorAppModule } from './modules/doctor/app/doctor.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { BlogAdminModule } from './modules/blog/admin/blog.module';
     DatabaseModule,
     AuthModule,
     CategoryModule,
+    CodeModule,
     QuestionAdminModule,
     QuestionAppModule,
     AnswerAdminModule,
@@ -34,8 +36,8 @@ import { BlogAdminModule } from './modules/blog/admin/blog.module';
     HomeAppModule,
     HomeSubmitAppModule,
     HomeSubmitAdminModule,
-    CodeAppModule,
-    BlogAdminModule
+    BlogAdminModule,
+    DoctorAppModule
   ],
   controllers: [AppController],
   providers: [AppService],

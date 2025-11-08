@@ -18,9 +18,9 @@ import { ICategory } from './category.interface';
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
 
 @ApiBearerAuth('swf-token') 
-@ApiTags('admin/categoryFaq')
+@ApiTags('admin/category')
 @UseGuards(ApiAuthGuard)
-@Controller('/api/admin/categoryFaq')
+@Controller('/api/admin/category')
 export class CategoryController {
   constructor(private readonly catetegoryService: CategoryService) {}
 

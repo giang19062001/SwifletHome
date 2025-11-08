@@ -8,7 +8,7 @@ import { AuthRepository } from './auth.repository';
 import { IUserAuth } from './auth.interface';
 import { AuthLoginDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
-import { messageErr } from 'src/helpers/message';
+import { MsgErr } from 'src/helpers/message';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
     const user = await this.authRepository.findByUsername(dto.userId);
 
     if (!user) {
-      throw new UnauthorizedException(messageErr.accountWrong);
+      throw new UnauthorizedException(MsgErr.AccountWrong);
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -29,11 +29,11 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException(messageErr.accountWrong);
+      throw new UnauthorizedException(MsgErr.AccountWrong);
     }
 
     if (user.isActive === 'N') {
-      throw new ForbiddenException(messageErr.accountBlock);
+      throw new ForbiddenException(MsgErr.AccountBlock);
     }
     // hide password
     const { userPassword, ...userWithoutPassword } = user;

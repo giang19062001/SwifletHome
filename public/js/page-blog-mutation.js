@@ -108,7 +108,7 @@ function renderContentHtml() {
 
   // Replace [[video-data=...]]
   contentHtml = contentHtml.replace(/\[\[video-data=(.*?)\]\]/g, (match, url) => {
-    return `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="${url}"></iframe>`;
+    return `<iframe class="if-video" frameborder="0" allowfullscreen="true" src="${url}"></iframe>`;
   });
 
   // RE-RENDER bong bóng tin nhắn

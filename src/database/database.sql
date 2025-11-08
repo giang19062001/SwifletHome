@@ -49,7 +49,7 @@ CREATE TABLE `tbl_question` (
   `createdId` varchar(45) DEFAULT NULL,
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
-  UNIQUE KEY `questionCode_UNIQUE` (`questionCode`)
+  UNIQUE KEY `questionCode_UNIQUE` (`questionCode`),
 )
 
 CREATE TABLE `tbl_answer` (
@@ -182,6 +182,41 @@ CREATE TABLE `tbl_home_submit` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`)
 )
+
+CREATE TABLE `tbl_doctor_file` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `doctorSeq` int DEFAULT NULL,
+  `uniqueId` char(255) NOT NULL,
+  `filename` varchar(255) NOT NULL,
+  `originalname` text NOT NULL,
+  `size` int NOT NULL,
+  `mimetype` varchar(45) NOT NULL,
+  `isActive` char(1) DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `filename_UNIQUE` (`filename`)
+)
+
+CREATE TABLE `tbl_doctor` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `userCode` varchar(45) NOT NULL,
+  `userName` varchar(45) NOT NULL,
+  `userPhone` varchar(255) NOT NULL,
+  `note` text NOT NULL,
+  `noteAnswered` text,
+  `statusCode` char(15) NOT NULL,
+  `uniqueId` char(255) NOT NULL,
+  `isActive` char(1) DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
+) 
 
 
 CREATE TABLE `tbl_user_app` (

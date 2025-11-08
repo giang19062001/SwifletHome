@@ -1,67 +1,85 @@
-import { BadRequestException } from '@nestjs/common';
-import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import { extname } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+import { BadRequestException, Logger } from '@nestjs/common';
+import { AUDIO_TYPES, IMG_TYPES, VIDEO_TYPES } from 'src/helpers/const';
+import { MsgErr } from 'src/helpers/message';
 
-const getLocation = (mimetype: string, fieldname: string) => {
+interface MulterLimits {
+  fileSize?: number;
+  files?: number;
+  fields?: number;
+  parts?: number;
+  fieldNameSize?: number;
+  fieldSize?: number;
+  headerPairs?: number;
+}
+
+export const getFileLocation = (mimetype: string, fieldname: string) => {
   if (mimetype.startsWith('image/')) {
-    if (fieldname === 'editorImg') {
-      return 'images/editor';
-    }
-    if (fieldname === 'homeImage' || fieldname === 'homeImages') {
-      return 'images/homes';
-    }
-  } else if (mimetype.startsWith('audio/')) {
-    if (fieldname.includes('editorAudio')) {
-      return 'audios/editor';
-    }
+    if (fieldname === 'editorImg') return 'images/editor';
+    if (fieldname === 'homeImage' || fieldname === 'homeImages') return 'images/homes';
+    if (fieldname === 'doctorFiles') return 'images/doctors';
+    return 'images/others';
   }
-  return 'documents'; // other
+  if (mimetype.startsWith('video/')) {
+    if (fieldname === 'doctorFiles') return 'videos/doctors';
+    return 'videos/others';
+  }
+  if (mimetype.startsWith('audio/')) {
+    if (fieldname.includes('editorAudio')) return 'audios/editor';
+    return 'audios/others';
+  }
+  return 'others';
 };
 
-// Common configuration generator
-export const createMulterConfig = (allowedExts: string[]) => ({
-  storage: diskStorage({
-    destination: (req, file, callback) => {
-      const location = getLocation(file.mimetype, file.fieldname);
-      const folderPath = `./public/uploads/${location}`;
+export const createMulterConfig = (allowedExts: string[], customLimits?: MulterLimits) => {
+  const defaultLimits: MulterLimits = {
+    fileSize: 10 * 1024 * 1024, // 10MB mặc định
+    files: undefined, // không giới hạn nếu không truyền
+  };
 
-      if (!existsSync(folderPath)) {
-        mkdirSync(folderPath, { recursive: true });
-      }
+  const limits = { ...defaultLimits, ...customLimits }; // ghi dè limits nếu có
 
-      callback(null, folderPath);
-    },
-    filename: (req, file, callback) => {
-      const filename = file.originalname;
-      const location = getLocation(file.mimetype, file.fieldname);
-      const filePath = join(`./public/uploads/${location}`, filename);
-
-      if (existsSync(filePath)) {
-        return callback(null, filename);
-      } else {
+  return {
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const location = getFileLocation(file.mimetype, file.fieldname);
+        const folderPath = `./public/uploads/${location}`;
+        if (!existsSync(folderPath)) {
+          mkdirSync(folderPath, { recursive: true });
+        }
+        cb(null, folderPath);
+      },
+      filename: (req, file, cb) => {
         const ext = extname(file.originalname);
-        const uniquename = `${file.fieldname}-${uuidv4()}${ext}`;
-        callback(null, uniquename);
+        const uniqueName = `${file.fieldname}-${uuidv4()}${ext}`;
+        cb(null, uniqueName);
+      },
+    }),
+    limits,
+    fileFilter: (req, file, cb) => {
+      const ext = extname(file.originalname).toLowerCase();
+      if (allowedExts.includes(ext)) {
+        cb(null, true);
+      } else {
+        cb(new BadRequestException(MsgErr.fileWrongType(ext, allowedExts)), false);
       }
     },
-  }),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (req, file, callback) => {
-    const fileExt = extname(file.originalname).toLowerCase(); // vd: ".png"
-    const isAllowed = allowedExts.includes(fileExt);
+  };
+};
 
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(
-        new BadRequestException(`File không được hỗ trợ (${fileExt}). Chỉ cho phép: ${allowedExts.join(', ')}`),
-        false
-      );
-    }
-  },
+export const multerImgConfig = createMulterConfig(IMG_TYPES, {
+  fileSize: 5 * 1024 * 1024, // 5MB cho ảnh
 });
 
-export const multerImgConfig = createMulterConfig(['.png', '.jpg', '.jpeg', '.heic']);
-export const multerAudioConfig = createMulterConfig(['.mp3']);
+export const multerAudioConfig = createMulterConfig(AUDIO_TYPES, {
+  fileSize: 15 * 1024 * 1024, // 15MB cho audio
+});
+
+export const multerVideoConfig = createMulterConfig(VIDEO_TYPES, {
+  fileSize: 50 * 1024 * 1024, // 50MB cho media
+});
+
+export const getDoctorMulterConfig = () => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES], { fileSize: 50 * 1024 * 1024, files: 5 });

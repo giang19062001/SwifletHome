@@ -18,7 +18,6 @@ export interface IHome {
 export interface IHomeImg {
   seq: number;
   homeSeq: number;
-  homeName: string;
   filename: string;
   originalname: string;
   size: number;

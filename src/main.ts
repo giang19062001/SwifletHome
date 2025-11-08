@@ -6,7 +6,7 @@ import expressLayouts from 'express-ejs-layouts';
 import { ValidationPipe } from '@nestjs/common';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-import { NotFoundExceptionFilter } from './filter/NotFoundExceptionFilter';
+import { NotFoundExceptionFilter } from './filter/notFound';
 import { initSwagger } from './config/swagger';
 
 async function bootstrap() {

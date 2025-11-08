@@ -20,7 +20,6 @@ export const initSwagger = (app) => {
 SwaggerModule.setup('api-docs', app, document, {
   customCss: `
     .opblock-tag[data-tag^="app/"] {
-      color: darkorchid !important;
       position: relative;
       padding-left: 35px;
     }

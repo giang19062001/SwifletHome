@@ -4,12 +4,6 @@ import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateHomeDto {
   @ApiProperty({
-    example: 'home',
-    enum: ['home'],
-    default: 'home',
-  })
-
-  @ApiProperty({
     example: 'New',
   })
   @IsString()

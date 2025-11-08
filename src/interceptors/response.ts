@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
-export class ResponseInterceptor<T>
+export class ResponseAppInterceptor<T>
   implements NestInterceptor<T, ApiResponse<T>>
 {
   intercept(

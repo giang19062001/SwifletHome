@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
 import { fuseConfig, ISearchItem } from 'src/config/fuse';
-import { messageErr } from 'src/helpers/message';
+import { MsgErr } from 'src/helpers/message';
 
 @Injectable()
 export class SearchService {
@@ -20,13 +20,13 @@ export class SearchService {
   }
 
   /*Tìm câu trả lời gần nhất trong danh sách Câu hỏi thường gặp*/
-  findAnswer(query: string, faqData: ISearchItem[]): string {
-    if (!faqData?.length) {
-      return messageErr.faqEmpty;
+  findAnswer(query: string, data: ISearchItem[]): string {
+    if (!data?.length) {
+      return MsgErr.DataEmpty;
     }
 
     // dữ liệu đã chuẩn hóa
-    const normalizedData = faqData.map((item) => ({
+    const normalizedData = data.map((item) => ({
       ...item,
       questions: item.questions.map((q) => this.normalizeText(q)),
     }));
@@ -40,7 +40,7 @@ export class SearchService {
 
     // Nếu không tìm thấy kết quả phù hợp
     if (results.length === 0) {
-      return messageErr.cannotReply;
+      return MsgErr.CannotReply;
     }
 
     // Lấy kết quả phù hợp nhất

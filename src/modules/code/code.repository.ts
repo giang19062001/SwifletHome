@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { ICode } from '../code.interface';
 import { GetAllCodeDto } from './code.dto';
+import { ICode } from './code.interface';
 
 @Injectable()
-export class CodeAppRepository {
+export class CodeRepository {
   private readonly table = 'tbl_code_common';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}

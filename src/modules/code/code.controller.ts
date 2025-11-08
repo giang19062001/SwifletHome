@@ -3,16 +3,16 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
-import { CodeAppService } from './code.service';
-import { ICode } from '../code.interface';
 import { GetAllCodeDto } from './code.dto';
-import { ResponseInterceptor } from 'src/interceptors/response';
+import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { ICode } from './code.interface';
+import { CodeService } from './code.service';
 
 @ApiTags('app/code')
 @Controller('/api/app/code')
-@UseInterceptors(ResponseInterceptor)
-export class CodeAppController {
-  constructor(private readonly questionAdminService: CodeAppService) {}
+@UseInterceptors(ResponseAppInterceptor)
+export class CodeController {
+  constructor(private readonly codeService: CodeService) {}
 
   @ApiBody({
     description: '**subCode:** `STATUS`, `NUMBER_PERSON`',
@@ -21,7 +21,7 @@ export class CodeAppController {
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
   async getAll(@Body() dto: GetAllCodeDto): Promise<ICode[]> {
-    const result = await this.questionAdminService.getAll(dto);
+    const result = await this.codeService.getAll(dto);
     return result;
   }
 }

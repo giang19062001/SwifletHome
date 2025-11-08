@@ -6,7 +6,7 @@ import { UploadAudioFilesDto, UploadImgFileDto, UploadVideoLinkDto } from './upl
 import { IAudioFreePay, IFileUpload } from './upload.interface';
 import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { multerAudioConfig, multerImgConfig } from 'src/config/multer';
-import { messageErr } from 'src/helpers/message';
+import { MsgErr } from 'src/helpers/message';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/uploadFile')
@@ -21,7 +21,7 @@ export class UploadController {
   @UseInterceptors(FileInterceptor('editorImg', multerImgConfig))
   async uploadImg(@Body() dto: UploadImgFileDto, @UploadedFile() file: Express.Multer.File): Promise<number> {
     if (!file) {
-      throw new BadRequestException(messageErr.fileEmpty);
+      throw new BadRequestException(MsgErr.FileEmpty);
     }
 
     return this.uploadService.uploadImg(file, dto.createdId);
@@ -48,7 +48,7 @@ export class UploadController {
     },
   ) {
     if (!files.editorAudioFree || !files.editorAudioPay) {
-      throw new BadRequestException(messageErr.fileAudioRequire);
+      throw new BadRequestException(MsgErr.FileAudioRequire);
     }
 
     console.log(files.editorAudioPay[0], files.editorAudioFree[0]);

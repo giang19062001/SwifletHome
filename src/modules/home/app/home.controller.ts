@@ -24,11 +24,11 @@ import { PagingDto } from 'src/dto/common';
 import { IListApp } from 'src/interfaces/common';
 import { IHome } from '../home.interface';
 import { HomeAppService } from './home.service';
-import { ResponseInterceptor } from 'src/interceptors/response';
+import { ResponseAppInterceptor } from 'src/interceptors/response';
 
 @ApiTags('app/home')
 @Controller('/api/app/home')
-@UseInterceptors(ResponseInterceptor)
+@UseInterceptors(ResponseAppInterceptor)
 export class HomeAppController {
   constructor(private readonly homeAppService: HomeAppService) {}
 

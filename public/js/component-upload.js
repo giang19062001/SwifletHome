@@ -185,17 +185,17 @@ const renderAllFile = (data, objElement) => {
     </div>
     <div class="file-button">
          ${fileData.filename == 'PAYMENT'
-        ? `<button style="display:none" class="copy-btn btn-common-out PAYMENT" 
+        ? `<button style="display:none" class="copy-btn btn-main-out PAYMENT" 
         onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
         Sao chép
       </button>`
-        : `<button class="copy-btn btn-common-out" 
+        : `<button class="copy-btn btn-main-out" 
         onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
         Sao chép
       </button>`
       }
       ${fileData.filename !== 'PAYMENT'
-        ? ` <button class="btn-out-err" 
+        ? ` <button class="btn-err-out" 
         onclick="deleteFile('${fileData.filename}','${fileData.seq}','${fileData.mimetype}')">
         Xóa
       </button>`
