@@ -181,7 +181,7 @@ async function updateBlog() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Cập nhập thành công');
-        reloadPage();
+        reloadPage('/dashboard/blog/list');
       })
       .catch(function (error) {
         console.log('error', error);

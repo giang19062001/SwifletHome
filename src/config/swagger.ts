@@ -17,21 +17,20 @@ export const initSwagger = (app) => {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-SwaggerModule.setup('api-docs', app, document, {
-  customCss: `
+  SwaggerModule.setup('api-docs', app, document, {
+    customCss: `
     .opblock-tag[data-tag^="app/"] {
       position: relative;
-      padding-left: 35px;
+      padding-left: 50px;
     }
 
     .opblock-tag[data-tag^="app/"]::before {
-      content: "📱";
+        content: "⚛️";
       position: absolute;
       left: 0;
       top: 0;
       font-size: 32px;
     }
   `,
-});
-
+  });
 };

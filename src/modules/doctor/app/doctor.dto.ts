@@ -65,13 +65,6 @@ export class CreateDoctorDto {
   note: string;
 
   @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  statusCode: string;
-
-  @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     format: 'uuid',
   })
@@ -92,20 +85,4 @@ export class CreateDoctorDto {
   @IsArray()
   @ArrayMinSize(1)
   doctorFiles: DoctorFileStrDto[];
-}
-
-export class UpdateDoctorDto extends OmitType(CreateDoctorDto, ['createdId']) {
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  noteAnswered: string;
-
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  updatedId: string;
 }

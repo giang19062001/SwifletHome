@@ -1,0 +1,12 @@
+import { Module } from "@nestjs/common";
+import { AuthModule } from "src/modules/auth/admin/auth.module";
+import { DoctorAdminController } from "./doctor.controller";
+import { DoctorAdminRepository } from "./doctor.repository";
+import { DoctorAdminService } from "./doctor.service";
+
+@Module({
+  imports: [AuthModule],
+  controllers: [DoctorAdminController],
+  providers: [DoctorAdminService, DoctorAdminRepository],
+})
+export class DoctorAdminModule {}

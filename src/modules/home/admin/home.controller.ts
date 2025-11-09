@@ -33,7 +33,7 @@ import { multerImgConfig } from 'src/config/multer';
 @ApiTags('admin/home')
 @UseGuards(ApiAuthGuard)
 @Controller('/api/admin/home')
-export class HomeController {
+export class HomeAdminController {
   constructor(private readonly homeAdminService: HomeAdminService) {}
 
   @ApiBody({

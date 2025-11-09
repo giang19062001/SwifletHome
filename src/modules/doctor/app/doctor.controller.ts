@@ -52,7 +52,7 @@ export class DoctorAdminController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: DoctorFileDto })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('doctorFiles', 5, getDoctorMulterConfig()))
+  @UseInterceptors(FilesInterceptor('doctorFiles', 5, getDoctorMulterConfig(5)))
   async uploadFileDoctor(@Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {
     const result = await this.doctorAppService.insertDoctorFile(dto, doctorFiles);
     return result;

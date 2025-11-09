@@ -17,6 +17,18 @@ export class AppController {
     return { title: 'Đăng nhập', isLayout: false };
   }
 
+  
+  // dashboard
+  @Get('/dashboard/main')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/main')
+  renderIndex(@Req() req: Request) {
+    return {
+      title: 'Trang chủ',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   // question
   @Get('/dashboard/category/list')
   @UseGuards(PageAuthGuard)
@@ -152,6 +164,18 @@ export class AppController {
   renderHomeSubmit(@Req() req: Request) {
     return {
       title: 'Danh sách đăng ký tham quan',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+
+  // doctor
+  @Get('/dashboard/doctor/list')
+  @UseGuards(PageAuthGuard)
+  @Render('pages/doctor')
+  renderDoctor(@Req() req: Request) {
+    return {
+      title: 'Danh sách khám bệnh nhà yến',
       isLayout: true,
       user: req.session.user,
     };

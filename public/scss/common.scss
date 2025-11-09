@@ -111,11 +111,14 @@
 .txt-status-waiting {
   color: #ffc50f;
 }
+.txt-status-answered,
 .txt-status-approved,
-.txt-free {
+.txt-free,
+.txt-ok {
   color: #59ac77;
 }
 .txt-status-cancel,
-.txt-pay {
+.txt-pay,
+.txt-not-ok {
   color: #f75270;
 }

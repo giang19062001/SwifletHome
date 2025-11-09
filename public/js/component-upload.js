@@ -115,7 +115,7 @@ function convertToEmbedUrl(youtubeUrl) {
   return `https://www.youtube.com/embed/${videoId}?showinfo=0`;
 }
 
-// copy data để paste vào editor
+// copy data để paste vào editors
 function copyData(filename, mimetype) {
   console.log('filename', filename);
   console.log('mimetype', mimetype);
@@ -123,11 +123,11 @@ function copyData(filename, mimetype) {
   let copiedName = '';
   if (mimetype.startsWith('audio/')) {
     if (filename.includes('editorAudio')) {
-      copiedName = `[[audio-data=${currentUrl}/uploads/audios/editor/${filename}]]`;
+      copiedName = `[[audio-data=${currentUrl}/uploads/audios/editors/${filename}]]`;
     }
   } else if (mimetype.startsWith('image/')) {
     if (filename.includes('editorImg')) {
-      copiedName = `[[image-data=${currentUrl}/uploads/images/editor/${filename}]]`;
+      copiedName = `[[image-data=${currentUrl}/uploads/images/editors/${filename}]]`;
     }
   } else if (mimetype.startsWith('video/')) {
     copiedName = `[[video-data=${convertToEmbedUrl(filename)}]]`;

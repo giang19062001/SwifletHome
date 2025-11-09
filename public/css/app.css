@@ -18491,13 +18491,16 @@ select {
   color: #ffc50f;
 }
 
+.txt-status-answered,
 .txt-status-approved,
-.txt-free {
+.txt-free,
+.txt-ok {
   color: #59ac77;
 }
 
 .txt-status-cancel,
-.txt-pay {
+.txt-pay,
+.txt-not-ok {
   color: #f75270;
 }
 
@@ -18554,7 +18557,7 @@ select {
 .common-modal .modal-content .modal-header .modal-header-title {
   font-family: "PretendardBold";
   font-weight: 700;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 32px;
   color: #333333;
 }
@@ -18567,7 +18570,7 @@ select {
 .common-modal .modal-content .modal-title {
   font-family: "PretendardBold";
   font-weight: 700;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 32px;
   color: #333333;
 }
@@ -19009,6 +19012,25 @@ select {
 #page-blog-mutation .preview .input-container {
   margin-top: 16px;
   flex-shrink: 0;
+}
+
+.doctor-update-modal #doctorFiles-images,
+.doctor-update-modal #doctorFiles-videos {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.doctor-update-modal .file-item {
+  display: inline-block;
+}
+.doctor-update-modal .file-item img {
+  width: 250px;
+  min-height: 200px;
+}
+.doctor-update-modal .file-item video {
+  width: 250px;
+  height: "auto";
 }
 
 .component-upload {

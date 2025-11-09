@@ -6,12 +6,14 @@ import { IHome, IHomeImg } from '../home.interface';
 import { HomeAdminRepository } from './home.repository';
 import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import { diffByTwoArr } from 'src/helpers/func';
+import { WinstonLoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class HomeAdminService {
   constructor(
     private readonly homeAdminRepository: HomeAdminRepository,
     private readonly uploadService: UploadService,
+    private readonly logger: WinstonLoggerService,
   ) {}
   async getAll(dto: PagingDto): Promise<IList<IHome>> {
     const total = await this.homeAdminRepository.getTotal();
@@ -55,11 +57,9 @@ export class HomeAdminService {
   }
 
   async updateHome(dto: UpdateHomeDto, homeCode: string): Promise<number> {
-    console.log('dto', dto, homeCode);
+    const logbase = 'HomeAdminService/updateHome:';
 
     const home = await this.getDetail(homeCode);
-    console.log('home', home);
-
     if (home) {
       // homeImage is changed -> delete old file
       if (dto.homeImage.filename !== (home.homeImage as IHomeImg).filename) {
@@ -75,10 +75,10 @@ export class HomeAdminService {
       }
 
       const fileNeedDeletes: IHomeImg[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
-      console.log('fileNeedDeletes -->', fileNeedDeletes);
+      this.logger.log(`${logbase} fileNeedDeletes -->`, fileNeedDeletes);
 
       const fileNeedCreates: IHomeImg[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
-      console.log('fileNeedCreates -->', fileNeedCreates);
+      this.logger.log(`${logbase} fileNeedCreates -->`, fileNeedDeletes);
 
       // homeImages is changed -> delete old file
       if (fileNeedDeletes.length) {
@@ -115,7 +115,7 @@ export class HomeAdminService {
       // const homeImagePath = `/image/homes/${home.homeImage}`;
       // await this.uploadService.deletePhysicalFile(homeImagePath);
       // if (images.length) {
-        // xóa các file ảnh của nhà yến trong thư mục uploads
+      // xóa các file ảnh của nhà yến trong thư mục uploads
       //   for (const file of images) {
       //     const filepath = `/images/homes/${file.filename}`;
       //     await this.uploadService.deletePhysicalFile(filepath);

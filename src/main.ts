@@ -8,13 +8,15 @@ import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import { NotFoundExceptionFilter } from './filter/notFound';
 import { initSwagger } from './config/swagger';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const configService = app.get(ConfigService);
 
   //CORS
   app.enableCors();
-  
+
   // (CSS, JS, IMG), views , engine
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
@@ -22,7 +24,7 @@ async function bootstrap() {
   app.use(expressLayouts);
   app.set('layout', 'layout/layout'); // file layout (views/layout/layout.ejs)
 
-  // global validation pipe
+  // bật bắt lỗi global dựa vào cấu hình DTO
   app.useGlobalPipes(new ValidationPipe());
 
   // filter
@@ -34,7 +36,7 @@ async function bootstrap() {
   //session
   app.use(
     session({
-      secret: 'secret-session-key',
+      secret: configService.get<string>('SESSION_KEY') ?? "",
       resave: false,
       saveUninitialized: false,
       cookie: { maxAge: 60 * 60 * 1000 }, // 1 hrs
@@ -42,7 +44,7 @@ async function bootstrap() {
   );
 
   //swagger
-  initSwagger(app)
+  initSwagger(app);
 
   // port
   await app.listen(process.env.PORT ?? '');

@@ -1,0 +1,244 @@
+let page = 1;
+let limit = 10;
+let pageElement = 'page-doctor';
+let statusOptions = [];
+
+// TODO: INIT
+document.addEventListener('DOMContentLoaded', function () {
+  getAllDoctor(page, limit);
+  getStatusCode();
+});
+
+// TODO: FUNC
+function changePage(p) {
+  page = p;
+  document.getElementById('privacy-main-pager').innerHTML = '';
+  getAllDoctor(page, limit);
+}
+
+// TODO: RENDER
+function closeDoctorModal(type) {
+  // Xác định modal theo loại
+  const modalSelector = type === 'create' ? '.doctor-create-modal' : '.doctor-update-modal';
+  const modalEl = document.querySelector(modalSelector);
+
+  if (!modalEl) return;
+
+  // Lấy instance modal hiện tại
+  const modalInstance = bootstrap.Modal.getInstance(modalEl);
+
+  if (modalInstance) {
+    modalInstance.hide(); // Đóng modal
+  } else {
+    // Nếu chưa có instance (trường hợp modal chưa được show trước đó)
+    const modal = new bootstrap.Modal(modalEl);
+    modal.hide();
+  }
+}
+async function showDoctorModal(doctorData) {
+  // init modal
+  const modalSelector = '.doctor-update-modal';
+  const modalEl = document.querySelector(modalSelector);
+  const modalBody = modalEl.querySelector('.modal-body');
+
+  modalEl.querySelector('#seq').value = doctorData.seq;
+  modalEl.querySelector('#userName').innerText = doctorData.userName;
+  modalEl.querySelector('#userPhone').innerText = doctorData.userPhone;
+  modalEl.querySelector('#note').innerText = doctorData.note ?? '';
+
+  // theo dõi noteAnswered
+  modalBody.querySelector('#noteAnswered').innerText = doctorData.noteAnswered;
+  modalBody.querySelector('#noteAnswered')?.addEventListener('input', (e) => {
+    modalBody.querySelector('.err-noteAnswered').style.display = String(e.target.value).trim() == '' ? 'block' : 'none';
+  });
+
+  // render danh sách img,video
+  if (doctorData.doctorFiles?.length) {
+    const imageContainer = modalBody.querySelector('#doctorFiles-images');
+    const videoContainer = modalBody.querySelector('#doctorFiles-videos');
+
+    // Lọc và render ảnh
+    const imageHTML = doctorData.doctorFiles
+      .filter((file) => file.mimetype.startsWith('image/'))
+      .map((file) => {
+        const fileUrl = `/uploads/images/doctors/${file.filename}`;
+        return `
+        <div class="file-item">
+          <img src="${fileUrl}" alt="${file.filename}">
+        </div>
+      `;
+      })
+      .join('');
+
+    // Lọc và render video
+    const videoHTML = doctorData.doctorFiles
+      .filter((file) => file.mimetype.startsWith('video/'))
+      .map((file) => {
+        const fileUrl = `/uploads/videos/doctors/${file.filename}`;
+        return `
+        <div class="file-item">
+          <video controls>
+            <source src="${fileUrl}" type="${file.mimetype}">
+            Trình duyệt không hỗ trợ video.
+          </video>
+        </div>
+      `;
+      })
+      .join('');
+
+    imageContainer.innerHTML = imageHTML || '<p>Không có hình ảnh.</p>';
+    videoContainer.innerHTML = videoHTML || '<p>Không có video.</p>';
+  }
+
+  // render danh sách status
+  const selectStatus = modalEl.querySelector('#statusCode');
+  selectStatus.innerHTML = '';
+
+  statusOptions.forEach((ele) => {
+    const option = document.createElement('option');
+    option.value = ele.code;
+    option.textContent = ele.valueCode;
+    if (doctorData.statusKey !== 'WAITING' && ele.keyCode == 'WAITING') {
+      option.disabled = true;
+    }
+    if (ele.code === doctorData.statusCode) {
+      option.selected = true;
+    }
+
+    selectStatus.appendChild(option);
+  });
+
+  // assign <event> update
+  modalEl.querySelector('.modal-footer button').onclick = updateDoctor;
+
+  // show modal
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+}
+function renderAllDoctor(data, objElement) {
+  let HTML = '';
+  if (data?.list?.length) {
+    let i = 1;
+    data?.list.forEach((ele) => {
+      const rowHtml = `
+         <tr class="text-center">
+            <td><p>${page * i++}</p></td>
+            <td><p>${ele.userName}</p></td>
+            <td><p>${ele.userPhone}</p></td>
+            <td><p>${ele.note}</p></td>
+            <td><b class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.statusValue}</b></td>
+            <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
+            <td>
+                <button class="btn-main-out"  onclick="getDetailDoctor('${ele.seq}')">Cập nhập</button>
+            </td>
+         </tr>`;
+      HTML += rowHtml;
+    });
+    objElement.innerHTML = HTML;
+
+    // render paging
+    let pagerHTML = createPagerHTML(data.total, limit, page, 5, 'changePage');
+    document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
+  } else {
+    //clear
+    objElement.innerHTML = ``;
+    document.getElementById('privacy-main-pager').innerHTML = ``;
+  }
+}
+// TODO: API
+async function getStatusCode() {
+  await axios
+    .post(
+      currentUrl + '/api/app/code/getAll',
+      {
+        mainCode: 'DOCTOR',
+        subCode: 'STATUS',
+      },
+      axiosAuth(),
+    )
+    .then(function (response) {
+      console.log('response', response);
+      if (response.status === 200 && response.data.data) {
+        statusOptions = response.data.data;
+      }
+    })
+    .catch(function (error) {
+      console.log('error', error);
+    });
+}
+async function getAllDoctor(currentPage, limit) {
+  const objElement = document.querySelector(`#${pageElement} .body-table`);
+  await axios
+    .post(
+      currentUrl + '/api/admin/doctor/getAll',
+      {
+        page: currentPage,
+        limit: limit,
+      },
+      axiosAuth(),
+    )
+    .then(function (response) {
+      console.log('response', response);
+      if (response.status === 200 && response.data) {
+        renderAllDoctor(response.data, objElement);
+      }
+    })
+    .catch(function (err) {
+      console.log('err', err);
+    });
+}
+
+async function getDetailDoctor(seq) {
+  await axios
+    .get(currentUrl + '/api/admin/doctor/getDetail/' + seq, axiosAuth())
+    .then(function (response) {
+      console.log('response', response);
+      if (response.status === 200 && response.data) {
+        showDoctorModal(response.data);
+      }
+    })
+    .catch(function (err) {
+      console.log('err', err);
+    });
+}
+
+async function updateDoctor() {
+  try {
+    const modalBody = document.querySelector('.doctor-update-modal .modal-body form');
+    const seq = modalBody.querySelector('#seq').value;
+    const statusCode = modalBody.querySelector('#statusCode').value;
+    const noteAnswered = modalBody.querySelector('#noteAnswered').value;
+    if (String(noteAnswered).trim() == '') {
+      modalBody.querySelector('.err-noteAnswered').style.display = 'block';
+      return;
+    }
+    await axios
+      .put(
+        currentUrl + '/api/admin/doctor/updateDoctor/' + seq,
+        {
+          statusCode: statusCode,
+          noteAnswered: noteAnswered,
+          updatedId: user.userId,
+        },
+        axiosAuth(),
+      )
+      .then(function (response) {
+        console.log('response', response);
+        if (response.status === 200 && response.data) {
+          toastOk('Cập nhập thành công');
+          // đóng modal
+          closeDoctorModal();
+          // refresh list
+          page = 1;
+          getAllDoctor(page, limit);
+        } else {
+          toastErr('Cập nhập thất bại');
+        }
+      })
+      .catch(function (error) {
+        console.log('error', error);
+      });
+  } catch (error) {
+    console.log(error);
+  }
+}

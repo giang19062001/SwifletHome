@@ -12,6 +12,7 @@ import {
   BadRequestException,
   Delete,
   Param,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/common';

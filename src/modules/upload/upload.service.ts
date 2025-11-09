@@ -6,12 +6,16 @@ import { IAudioFreePay, IFileUpload } from './upload.interface';
 import * as path from 'path';
 import { UploadAudioFilesDto, UploadVideoLinkDto } from './upload.dto';
 import { sortByDate } from 'src/helpers/func';
+import { WinstonLoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class UploadService {
   private readonly uploadPath = 'public/uploads';
 
-  constructor(private readonly uploadRepository: UploadRepository) {
+  constructor(
+    private readonly uploadRepository: UploadRepository,
+    private readonly logger: WinstonLoggerService,
+  ) {
     this.ensureUploadDirectoryExists();
   }
 
@@ -28,12 +32,12 @@ export class UploadService {
       try {
         await fs.access(filePath);
       } catch {
-        console.warn(`File ${filepath} not found in uploads directory`);
+        this.logger.error('UploadService/deletePhysicalFile:', `File ${filepath} not found in uploads directory`);
         return;
       }
 
       await fs.unlink(filePath);
-      console.log(`File ${filepath} deleted successfully from uploads directory`);
+      this.logger.log('UploadService/deletePhysicalFile:', `File ${filepath} deleted successfully from uploads directory`);
     } catch (error) {
       console.error(`Error deleting physical file ${filepath}:`, error);
       throw new InternalServerErrorException(`Failed to delete physical file: ${error.message}`);
@@ -42,8 +46,6 @@ export class UploadService {
 
   async uploadImg(file: Express.Multer.File, createdId: string): Promise<number> {
     try {
-      console.log('file ==> ', file);
-
       const result = await this.uploadRepository.uploadImg(file, createdId);
       return result;
     } catch (error) {
@@ -56,8 +58,6 @@ export class UploadService {
   }
   async uploadAudioPay(file: Express.Multer.File, createdId: string): Promise<number> {
     try {
-      console.log('file ==> ', file);
-
       const result = await this.uploadRepository.uploadAudioPay(file, createdId);
       return result;
     } catch (error) {
@@ -71,8 +71,6 @@ export class UploadService {
 
   async uploadAudioFree(file: Express.Multer.File, createdId: string, seqPay: number): Promise<number> {
     try {
-      console.log('file ==> ', file);
-
       const result = await this.uploadRepository.uploadAudioFree(file, createdId, seqPay);
       return result;
     } catch (error) {
@@ -97,7 +95,6 @@ export class UploadService {
   }
 
   async getFileAudio(filename: string): Promise<IAudioFreePay | null> {
-    console.log(filename);
     const files = await this.uploadRepository.getFileAudio(filename);
     return files;
   }
@@ -107,16 +104,14 @@ export class UploadService {
   }
   async deleteImg(filename: string): Promise<number> {
     try {
-      console.log('filename', filename);
       const file = await this.uploadRepository.getFileImg(filename);
-      console.log("file  ==>'", file);
 
       // const result = await this.uploadRepository.terminalImg(filename);
 
       // if (result === 0) {
       //   throw new NotFoundException(`File ${filename} not found in database`);
       // }
-      // const filepath = `${file?.filename.startsWith('editorImg-') ? 'images/editor' : 'images/homes'}/${filename}`;
+      // const filepath = `${file?.filename.startsWith('editorImg-') ? 'images/editors' : 'images/homes'}/${filename}`;
       // await this.deletePhysicalFile(filepath);
 
       const result = await this.uploadRepository.deleteImg(filename);
@@ -135,15 +130,13 @@ export class UploadService {
   }
   async deleteAudio(filename: string): Promise<number> {
     try {
-      console.log('filename', filename);
       const file = await this.uploadRepository.getFileAudio(filename);
-      console.log("file  ==>'", file);
 
       // await this.uploadRepository.terminalAudio(file?.filenamePay ?? '');
       // await this.uploadRepository.terminalAudio(file?.filenameFree ?? '');
 
-      // await this.deletePhysicalFile(`/audios/editor/${file?.filenamePay}`);
-      // await this.deletePhysicalFile(`/audios/editor/${file?.filenameFree}`);
+      // await this.deletePhysicalFile(`/audios/editors/${file?.filenamePay}`);
+      // await this.deletePhysicalFile(`/audios/editors/${file?.filenameFree}`);
 
       await this.uploadRepository.deleteAudio(file?.filenamePay ?? '');
       await this.uploadRepository.deleteAudio(file?.filenameFree ?? '');

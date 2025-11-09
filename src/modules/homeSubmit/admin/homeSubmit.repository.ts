@@ -17,7 +17,7 @@ export class HomeSubmitAdminRepository {
   async getAll(dto: PagingDto): Promise<IHomeSubmit[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
-        B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS status, D.keyCode as statusKey
+        B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
         FROM ${this.table} A 
         LEFT JOIN tbl_home B
         ON A.homeCode = B.homeCode
@@ -34,7 +34,7 @@ export class HomeSubmitAdminRepository {
   async getDetail(seq: number): Promise<IHomeSubmit | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
-        B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS status, D.keyCode as statusKey
+        B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
         FROM ${this.table} A 
         LEFT JOIN tbl_home B
         ON A.homeCode = B.homeCode

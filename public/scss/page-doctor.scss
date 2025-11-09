@@ -1,0 +1,21 @@
+.doctor-update-modal {
+  #doctorFiles-images,
+  #doctorFiles-videos {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .file-item {
+    display: inline-block;
+    img {
+      width: 250px;
+      min-height: 200px;
+    }
+    video {
+      width: 250px;
+      height: "auto";
+    }
+  }
+}

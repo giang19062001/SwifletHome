@@ -132,7 +132,7 @@ function renderAllQuestion(data, objElement) {
             <td><p>${ele.categoryName}</p></td>
             <td><p>${ele.objectName}</p></td>
             <td><p>${ele.questionContent}</p></td>
-            <td><p>${ele.answerCode ? 'Đã trả lời' : 'Chưa trả lời'}</p></td>
+            <td><b class="txt-${ele.answerCode ? 'ok' : 'not-ok'}">${ele.answerCode ? 'Đã trả lời' : 'Chưa trả lời'}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>

@@ -18,7 +18,7 @@ interface MulterLimits {
 
 export const getFileLocation = (mimetype: string, fieldname: string) => {
   if (mimetype.startsWith('image/')) {
-    if (fieldname === 'editorImg') return 'images/editor';
+    if (fieldname === 'editorImg') return 'images/editors';
     if (fieldname === 'homeImage' || fieldname === 'homeImages') return 'images/homes';
     if (fieldname === 'doctorFiles') return 'images/doctors';
     return 'images/others';
@@ -28,7 +28,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     return 'videos/others';
   }
   if (mimetype.startsWith('audio/')) {
-    if (fieldname.includes('editorAudio')) return 'audios/editor';
+    if (fieldname.includes('editorAudio')) return 'audios/editors';
     return 'audios/others';
   }
   return 'others';
@@ -82,4 +82,4 @@ export const multerVideoConfig = createMulterConfig(VIDEO_TYPES, {
   fileSize: 50 * 1024 * 1024, // 50MB cho media
 });
 
-export const getDoctorMulterConfig = () => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES], { fileSize: 50 * 1024 * 1024, files: 5 });
+export const getDoctorMulterConfig = (files: number) => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES], { fileSize: 50 * 1024 * 1024, files: files });

@@ -17,6 +17,25 @@ function changePage(p) {
   getAllHomeSubmit(page, limit);
 }
 
+function closeHomeSubmitModal() {
+  // Xác định modal theo loại
+  const modalSelector = '.home-submit-update-modal'
+  const modalEl = document.querySelector(modalSelector);
+
+  if (!modalEl) return;
+
+  // Lấy instance modal hiện tại
+  const modalInstance = bootstrap.Modal.getInstance(modalEl);
+
+  if (modalInstance) {
+    modalInstance.hide(); // Đóng modal
+  } else {
+    // Nếu chưa có instance (trường hợp modal chưa được show trước đó)
+    const modal = new bootstrap.Modal(modalEl);
+    modal.hide();
+  }
+}
+
 // TODO: RENDER
 async function showHomeSubmitModal(homeData) {
   // init modal
@@ -67,13 +86,13 @@ function renderAllHomeSubmit(data, objElement) {
             <td><p>${page * i++}</p></td>
             <td style="max-width: 150px;">
               <a target="_blank" href="/dashboard/home/update/${ele.homeCode}">
-                <u>${ele.homeName}</u>
+                ${ele.homeName}
               </a>
             </td>
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td><p>${ele.numberAttend}</p></td>
-            <td><b class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.status}</b></td>
+            <td><b class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.statusValue}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-main-out" onclick="getDetailHomeSubmit('${ele.seq}')">Cập nhập</button>
@@ -169,7 +188,11 @@ async function updateStatusHomeSubmit() {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Cập nhập thành công');
-          reloadPage();
+          // đóng modal
+          closeHomeSubmitModal();
+          // refresh list
+          page = 1;
+          getAllHomeSubmit(page, limit);
         } else {
           toastErr('Cập nhập thất bại');
         }

@@ -181,6 +181,7 @@ async function updateAnswer() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Cập nhập thành công');
+        reloadPage('/dashboard/answer/list');
       })
       .catch(function (error) {
         console.log('error', error);

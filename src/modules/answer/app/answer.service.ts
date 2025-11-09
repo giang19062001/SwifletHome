@@ -5,27 +5,25 @@ import { AnswerAppRepository } from './answer.repository';
 import { IAnswer } from '../answer.interface';
 import { QuestionAppService } from 'src/modules/question/app/question.service';
 import { IQuestion } from 'src/modules/question/question.interface';
-
+import { WinstonLoggerService } from 'src/logger/logger.service';
 @Injectable()
 export class AnswerAppService {
   constructor(
     private readonly answerAppRepository: AnswerAppRepository,
     private readonly questionAppService: QuestionAppService,
+    private readonly logger: WinstonLoggerService,
   ) {}
 
   async reply(): Promise<any[]> {
     // get question
-    const questions: IQuestion[] =
-      await this.questionAppService.getQuestionReplied();
+    const questions: IQuestion[] = await this.questionAppService.getQuestionReplied();
 
     let answers: IAnswer[] = [];
 
     if (questions.length) {
       for (const ques of questions) {
         // get answer
-        const answer = await this.answerAppRepository.getAnswerContent(
-          ques.answerCode,
-        );
+        const answer = await this.answerAppRepository.getAnswerContent(ques.answerCode);
         if (answer) {
           answers.push(answer);
         }
@@ -43,23 +41,21 @@ export class AnswerAppService {
     });
 
     answers.forEach((answer) => {
-      const answerCode = (answer as any).answerCode;
+      const answerCode = (answer as any).answerCode; 
       if (answerCode && !answerMap.has(answerCode)) {
         answerMap.set(answerCode, answer.answerContent);
       }
     });
 
     //  merged
-    const mergedResults = Array.from(questionMap.entries()).map(
-      ([answerCode, questionContents]) => {
-        return {
-          questions: questionContents,
-          answer: answerMap.get(answerCode)
-        };
-      },
-    );
+    const mergedResults = Array.from(questionMap.entries()).map(([answerCode, questionContents]) => {
+      return {
+        questions: questionContents,
+        answer: answerMap.get(answerCode),
+      };
+    });
 
-    console.log(mergedResults)
+    console.log("mergedResults", mergedResults);
     return mergedResults;
   }
 }

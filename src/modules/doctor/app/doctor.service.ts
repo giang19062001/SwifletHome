@@ -4,38 +4,39 @@ import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
 import { IDoctorFileStr } from '../doctor.interface';
 import { getFileLocation } from 'src/config/multer';
+import { WinstonLoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class DoctorAppService {
   constructor(
     private readonly doctorAppRepository: DoctorAppRepository,
-    private readonly uploadService: UploadService,
+    private readonly logger: WinstonLoggerService,
   ) {}
 
   async createDoctor(dto: CreateDoctorDto): Promise<number> {
     try {
-      let result = 1
+      let result = 1;
       const seq = await this.doctorAppRepository.createDoctor(dto);
       if (seq) {
         const doctor = await this.doctorAppRepository.getDetail(seq);
         if (doctor) {
           // tìm tất cả file đã upload cùng uniqueId
-          const filesUploaded : { seq: number }[] = await this.doctorAppRepository.findFilesByUniqueId(doctor.uniqueId);
+          const filesUploaded: { seq: number }[] = await this.doctorAppRepository.findFilesByUniqueId(doctor.uniqueId);
           if (filesUploaded.length) {
             for (const file of filesUploaded) {
               // update doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created
               await this.doctorAppRepository.updateSeqFiles(seq, file.seq, doctor.uniqueId);
             }
-          }else{
+          } else {
             // những files có uniqueId của doctor hiện tại không tồn tại -> xóa doctor để đông nhất dữ liệu
             await this.doctorAppRepository.deleteDoctor(seq);
-            result = 0
+            result = 0;
           }
         }
       }
       return result;
     } catch (error) {
-      console.log(error);
+      this.logger.error('DoctorAppService/createDoctor', error);
       return 0;
     }
   }
@@ -44,7 +45,6 @@ export class DoctorAppService {
       let filesResponse: IDoctorFileStr[] = [];
       if (doctorFiles.length > 0) {
         for (const file of doctorFiles) {
-          console.log(file);
           const result = await this.doctorAppRepository.insertDoctorFile(0, dto.uniqueId, dto.createdId, file);
           if (result > 0) {
             const location = getFileLocation(file.mimetype, file.fieldname);
@@ -54,6 +54,7 @@ export class DoctorAppService {
       }
       return filesResponse;
     } catch (error) {
+      this.logger.error('DoctorAppService/insertDoctorFile', error);
       return [];
     }
   }

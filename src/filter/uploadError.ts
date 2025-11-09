@@ -17,7 +17,7 @@ export class MulterBadRequestFilter implements ExceptionFilter {
 
     const originalMessage = exception.message;
 
-    console.log(originalMessage);
+    // Lỗi từ Multer
     if (originalMessage === 'Too many files') {
       return response.status(status).json({
         statusCode: status,

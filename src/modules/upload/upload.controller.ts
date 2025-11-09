@@ -51,10 +51,8 @@ export class UploadController {
       throw new BadRequestException(MsgErr.FileAudioRequire);
     }
 
-    console.log(files.editorAudioPay[0], files.editorAudioFree[0]);
     try {
       const seqPay = await this.uploadService.uploadAudioPay(files.editorAudioPay[0], dto.createdId);
-      console.log('seqPay', seqPay);
       if (seqPay) {
         await this.uploadService.uploadAudioFree(files.editorAudioFree[0], dto.createdId, seqPay);
       }
@@ -85,7 +83,6 @@ export class UploadController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'filename', type: String })
   async getFileAudio(@Param('filename') filename: string): Promise<IAudioFreePay | null> {
-    console.log(filename);
     const result = await this.uploadService.getFileAudio(filename);
     return result;
   }
@@ -105,7 +102,6 @@ export class UploadController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'filename', type: String })
   async deleteAudio(@Param('filename') filename: string): Promise<number> {
-    console.log(filename);
     const result = await this.uploadService.deleteAudio(filename);
     if (result === 0) {
       throw new BadRequestException();
@@ -116,7 +112,6 @@ export class UploadController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'filename', type: String })
   async deleteImg(@Param('filename') filename: string): Promise<number> {
-    console.log(filename);
     const result = await this.uploadService.deleteImg(filename);
     if (result === 0) {
       throw new BadRequestException();

@@ -17,13 +17,16 @@ import { HomeSubmitAdminModule } from './modules/homeSubmit/admin/homeSubmit.mod
 import { BlogAdminModule } from './modules/blog/admin/blog.module';
 import { CodeModule } from './modules/code/code.module';
 import { DoctorAppModule } from './modules/doctor/app/doctor.module';
+import { DoctorAdminModule } from './modules/doctor/admin/doctor.module';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // all module
     }),
-    DatabaseModule,
+    DatabaseModule, // global
+    LoggerModule, // global
     AuthModule,
     CategoryModule,
     CodeModule,
@@ -37,7 +40,8 @@ import { DoctorAppModule } from './modules/doctor/app/doctor.module';
     HomeSubmitAppModule,
     HomeSubmitAdminModule,
     BlogAdminModule,
-    DoctorAppModule
+    DoctorAppModule,
+    DoctorAdminModule
   ],
   controllers: [AppController],
   providers: [AppService],
