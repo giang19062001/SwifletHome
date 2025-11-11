@@ -1,4 +1,4 @@
-export interface IUserAuth {
+export interface IUserAdmin {
   seq: number;
   userId: string;
   userPassword: string;

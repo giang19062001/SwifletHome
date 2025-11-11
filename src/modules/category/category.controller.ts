@@ -15,11 +15,11 @@ import { PagingDto } from 'src/dto/common';
 import { CategoryService } from './category.service';
 import { IList } from 'src/interfaces/common';
 import { ICategory } from './category.interface';
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 
 @ApiBearerAuth('swf-token') 
 @ApiTags('admin/category')
-@UseGuards(ApiAuthGuard)
+@UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/category')
 export class CategoryController {
   constructor(private readonly catetegoryService: CategoryService) {}

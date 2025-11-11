@@ -6,7 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { QuestionAdminModule } from './modules/question/admin/question.module';
 import { AnswerAdminModule } from './modules/answer/admin/answer.module';
 import { UploadModule } from './modules/upload/upload.module';
-import { AuthModule } from './modules/auth/admin/auth.module';
+import { AuthAdminModule } from './modules/auth/admin/auth.module';
 import { CategoryModule } from './modules/category/category.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { QuestionAppModule } from './modules/question/app/question.module';
@@ -19,6 +19,8 @@ import { CodeModule } from './modules/code/code.module';
 import { DoctorAppModule } from './modules/doctor/app/doctor.module';
 import { DoctorAdminModule } from './modules/doctor/admin/doctor.module';
 import { LoggerModule } from './logger/logger.module';
+import { AuthAppModule } from './modules/auth/app/auth.module';
+import { OtpModule } from './modules/otp/otp.module';
 
 @Module({
   imports: [
@@ -27,7 +29,8 @@ import { LoggerModule } from './logger/logger.module';
     }),
     DatabaseModule, // global
     LoggerModule, // global
-    AuthModule,
+    AuthAdminModule,
+    AuthAppModule,
     CategoryModule,
     CodeModule,
     QuestionAdminModule,
@@ -41,7 +44,8 @@ import { LoggerModule } from './logger/logger.module';
     HomeSubmitAdminModule,
     BlogAdminModule,
     DoctorAppModule,
-    DoctorAdminModule
+    DoctorAdminModule,
+    OtpModule
   ],
   controllers: [AppController],
   providers: [AppService],

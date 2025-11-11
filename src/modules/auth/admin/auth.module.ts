@@ -1,20 +1,25 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { AuthRepository } from './auth.repository';
+import { AuthAdminController } from './auth.controller';
+import { AuthAdminService } from './auth.service';
+import { AuthAdminRepository } from './auth.repository';
 import { JwtModule } from '@nestjs/jwt';
-import { PageAuthGuard } from './auth.page.guard';
-import { ApiAuthGuard } from './auth.api.guard';
+import { PageAuthAdminGuard } from './auth.page.guard';
+import { ApiAuthAdminGuard } from './auth.api.guard';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: 'jwt-swiftlet-key',
-      signOptions: { expiresIn: '1h' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_KEY'),
+        signOptions: { expiresIn: '1h' },
+      }),
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, AuthRepository, PageAuthGuard, ApiAuthGuard],
-  exports: [AuthService, PageAuthGuard, ApiAuthGuard],
+  controllers: [AuthAdminController],
+  providers: [AuthAdminService, AuthAdminRepository, PageAuthAdminGuard, ApiAuthAdminGuard],
+  exports: [AuthAdminService, PageAuthAdminGuard, ApiAuthAdminGuard],
 })
-export class AuthModule {}
+export class AuthAdminModule {}

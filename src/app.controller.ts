@@ -3,7 +3,7 @@ import { AppService } from './app.service';
 import { Controller, Get, Render, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
-import { PageAuthGuard } from './modules/auth/admin/auth.page.guard';
+import { PageAuthAdminGuard } from './modules/auth/admin/auth.page.guard';
 
 @ApiExcludeController() // hide from swagger
 @Controller()
@@ -11,7 +11,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/login')
   renderLogin() {
     return { title: 'Đăng nhập', isLayout: false };
@@ -20,7 +20,7 @@ export class AppController {
   
   // dashboard
   @Get('/dashboard/main')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/main')
   renderIndex(@Req() req: Request) {
     return {
@@ -31,7 +31,7 @@ export class AppController {
   }
   // question
   @Get('/dashboard/category/list')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/category-question')
   renderCateQuestion(@Req() req: Request) {
     return {
@@ -41,7 +41,7 @@ export class AppController {
     };
   }
   @Get('/dashboard/question/list')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/question')
   renderQuestion(@Req() req: Request) {
     return {
@@ -53,7 +53,7 @@ export class AppController {
 
   // answer
   @Get('/dashboard/answer/list')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer')
   renderAnswer(@Req() req: Request) {
     return {
@@ -63,7 +63,7 @@ export class AppController {
     };
   }
   @Get('/dashboard/answer/create')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer-create')
   async renderCreateAnswer(@Req() req: Request) {
     const values = await this.appService.renderCreateAnswer();
@@ -76,7 +76,7 @@ export class AppController {
   }
 
   @Get('/dashboard/answer/update/:id')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer-update')
   async renderAnswerUpdate(@Req() req: Request) {
     const values = await this.appService.renderAnswerUpdate(req.params.id);
@@ -90,7 +90,7 @@ export class AppController {
 
   //blog
   @Get('/dashboard/blog/list')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/blog')
   renderBlog(@Req() req: Request) {
     return {
@@ -101,7 +101,7 @@ export class AppController {
   }
 
   @Get('/dashboard/blog/create')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/blog-create')
   async renderCreateBlog(@Req() req: Request) {
     const values = await this.appService.renderCreateBlog();
@@ -114,7 +114,7 @@ export class AppController {
   }
 
   @Get('/dashboard/blog/update/:id')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/blog-update')
   async renderBlogUpdate(@Req() req: Request) {
     const values = await this.appService.renderBlogUpdate(req.params.id);
@@ -128,7 +128,7 @@ export class AppController {
 
   //home
   @Get('/dashboard/home/list')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/home')
   renderHome(@Req() req: Request) {
     return {
@@ -139,14 +139,14 @@ export class AppController {
   }
 
   @Get('/dashboard/home/create')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-create')
   renderHomeCreate(@Req() req: Request) {
     return { title: 'Thêm nhà yến', isLayout: true, user: req.session.user };
   }
 
   @Get('/dashboard/home/update/:id')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-update')
   async renderHomeUpdate(@Req() req: Request) {
     const values = await this.appService.renderHomeUpdate(req.params.id);
@@ -159,7 +159,7 @@ export class AppController {
   }
 
   @Get('/dashboard/home-submit/list')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-submit')
   renderHomeSubmit(@Req() req: Request) {
     return {
@@ -171,7 +171,7 @@ export class AppController {
 
   // doctor
   @Get('/dashboard/doctor/list')
-  @UseGuards(PageAuthGuard)
+  @UseGuards(PageAuthAdminGuard)
   @Render('pages/doctor')
   renderDoctor(@Req() req: Request) {
     return {

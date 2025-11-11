@@ -22,7 +22,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeAdminService } from './home.service';
 import { IHome } from '../home.interface';
 import { CreateHomeDto, UpdateHomeDto } from './home.dto';
@@ -31,7 +31,7 @@ import { multerImgConfig } from 'src/config/multer';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/home')
-@UseGuards(ApiAuthGuard)
+@UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/home')
 export class HomeAdminController {
   constructor(private readonly homeAdminService: HomeAdminService) {}

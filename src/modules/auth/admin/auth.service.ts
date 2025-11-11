@@ -4,23 +4,23 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { AuthRepository } from './auth.repository';
-import { IUserAuth } from './auth.interface';
-import { AuthLoginDto } from './auth.dto';
+import { AuthAdminRepository } from './auth.repository';
+import { IUserAdmin } from './auth.interface';
+import { LoginAdminDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { MsgErr } from 'src/helpers/message';
 
 @Injectable()
-export class AuthService {
+export class AuthAdminService {
   constructor(
-    private readonly authRepository: AuthRepository,
+    private readonly authAdminRepository: AuthAdminRepository,
     private readonly jwtService: JwtService,
   ) {}
-  async login(dto: AuthLoginDto): Promise<Omit<IUserAuth, 'userPassword'>> {
-    const user = await this.authRepository.findByUsername(dto.userId);
+  async login(dto: LoginAdminDto): Promise<Omit<IUserAdmin, 'userPassword'>> {
+    const user = await this.authAdminRepository.findByUsername(dto.userId);
 
     if (!user) {
-      throw new UnauthorizedException(MsgErr.AccountWrong);
+      throw new UnauthorizedException(MsgErr.AccountLoginWrong);
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -29,11 +29,11 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException(MsgErr.AccountWrong);
+      throw new UnauthorizedException(MsgErr.AccountLoginWrong);
     }
 
     if (user.isActive === 'N') {
-      throw new ForbiddenException(MsgErr.AccountBlock);
+      throw new ForbiddenException(MsgErr.AccountLoginBlock);
     }
     // hide password
     const { userPassword, ...userWithoutPassword } = user;
@@ -49,7 +49,7 @@ export class AuthService {
       const payload = this.jwtService.verify(token);
       return payload;
     } catch (err) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException(MsgErr.TokenInvalid);
     }
   }
 }

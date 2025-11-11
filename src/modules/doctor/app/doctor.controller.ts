@@ -23,7 +23,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppService } from './doctor.service';

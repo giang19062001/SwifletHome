@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { UploadService } from './upload.service';
 import { UploadController } from './upload.controller';
 import { UploadRepository } from './upload.repository';
-import { AuthModule } from 'src/modules/auth/admin/auth.module';
+import { AuthAdminModule } from 'src/modules/auth/admin/auth.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthAdminModule],
   controllers: [UploadController],
   providers: [UploadService, UploadRepository],
   exports: [UploadService],

@@ -1,12 +1,12 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { DoctorAdminController } from './doctor.controller';
 import { UploadModule } from 'src/modules/upload/upload.module';
-import { AuthModule } from 'src/modules/auth/admin/auth.module';
+import { AuthAdminModule } from 'src/modules/auth/admin/auth.module';
 import { DoctorAppService } from './doctor.service';
 import { DoctorAppRepository } from './doctor.repository';
 
 @Module({
-  imports: [AuthModule, UploadModule],
+  imports: [AuthAdminModule, UploadModule],
   controllers: [DoctorAdminController],
   providers: [DoctorAppService, DoctorAppRepository],
 })

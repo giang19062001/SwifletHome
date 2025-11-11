@@ -3,14 +3,14 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeSubmitAdminService } from './homeSubmit.service';
 import { IHomeSubmit } from '../homeSubmit.interface';
 import { UpdateStatusDto } from './homeSubmit.dto';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/homeSubmit')
-@UseGuards(ApiAuthGuard)
+@UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/homeSubmit')
 export class HomeSubmitAdminController {
   constructor(private readonly homeSubmitAdminService: HomeSubmitAdminService) {}

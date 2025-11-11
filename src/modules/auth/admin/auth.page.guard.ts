@@ -1,10 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
+import { AuthAdminService } from './auth.service';
 
 @Injectable()
-export class PageAuthGuard implements CanActivate {
-  constructor(private readonly authService: AuthService) {}
+export class PageAuthAdminGuard implements CanActivate {
+  constructor(private readonly authAdminService: AuthAdminService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest();
@@ -24,7 +24,7 @@ export class PageAuthGuard implements CanActivate {
     } else {
       // have token
       try {
-        const payload = await this.authService.verifyToken(token);
+        const payload = await this.authAdminService.verifyToken(token);
         req.session.user = payload; // save user into session server to EJS render
 
         if (req.originalUrl === '/') {

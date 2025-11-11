@@ -18,7 +18,7 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
 
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { AnswerAdminService } from './answer.service';
 import { IAnswer } from '../answer.interface';
 import {
@@ -29,7 +29,7 @@ import {
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/answer')
-@UseGuards(ApiAuthGuard)
+@UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/answer')
 export class AnswerAdminController {
   constructor(private readonly answerAdminService: AnswerAdminService) {}

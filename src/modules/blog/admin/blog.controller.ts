@@ -16,7 +16,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { IBlog } from '../blog.interface';
 import {
   CreateBlogDto,
@@ -27,7 +27,7 @@ import { BlogAdminService } from './blog.service';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/blog')
-@UseGuards(ApiAuthGuard)
+@UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/blog')
 export class BlogAdminController {
   constructor(private readonly blogAdminService: BlogAdminService) {}

@@ -3,14 +3,14 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { DoctorAdminService } from './doctor.service';
 import { IDoctor } from '../doctor.interface';
 import { UpdateDoctorDto } from './doctor.dto';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/doctor')
-@UseGuards(ApiAuthGuard)
+@UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/doctor')
 export class DoctorAdminController {
   constructor(private readonly doctorAdminService: DoctorAdminService) {}

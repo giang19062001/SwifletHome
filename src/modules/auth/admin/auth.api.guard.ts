@@ -6,11 +6,11 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService } from './auth.service';
+import { AuthAdminService } from './auth.service';
 
 @Injectable()
-export class ApiAuthGuard implements CanActivate {
-  constructor(private readonly authService: AuthService) {}
+export class ApiAuthAdminGuard implements CanActivate {
+  constructor(private readonly authAdminService: AuthAdminService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
@@ -21,7 +21,7 @@ export class ApiAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.authService.verifyToken(token);
+      const payload = await this.authAdminService.verifyToken(token);
       req['user'] = payload;
       return true;
     } catch {

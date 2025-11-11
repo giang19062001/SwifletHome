@@ -8,28 +8,28 @@ import {
   Get,
   HttpCode,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthLoginDto } from './auth.dto';
+import { AuthAdminService } from './auth.service';
+import { LoginAdminDto } from './auth.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 
 @ApiTags('admin/auth')
 @Controller('/api/admin/auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+export class AuthAdminController {
+  constructor(private readonly authAdminService: AuthAdminService) {}
 
   @ApiBody({
     description: '**cookies:** `swf-token`',
-    type: AuthLoginDto,
+    type: LoginAdminDto,
   })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
-    @Body() dto: AuthLoginDto,
+    @Body() dto: LoginAdminDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.authService.login(dto);
+    const user = await this.authAdminService.login(dto);
 
     // save token into cookie
     res.cookie('swf-token', user.accessToken, {

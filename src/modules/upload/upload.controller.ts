@@ -4,13 +4,13 @@ import { UploadService } from './upload.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UploadAudioFilesDto, UploadImgFileDto, UploadVideoLinkDto } from './upload.dto';
 import { IAudioFreePay, IFileUpload } from './upload.interface';
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { multerAudioConfig, multerImgConfig } from 'src/config/multer';
 import { MsgErr } from 'src/helpers/message';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/uploadFile')
-@UseGuards(ApiAuthGuard)
+@UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/uploadFile')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}

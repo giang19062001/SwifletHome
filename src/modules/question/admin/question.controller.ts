@@ -21,13 +21,13 @@ import {
   CreateQuestionDto,
   UpdateQuestionDto,
 } from './question.dto';
-import { ApiAuthGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { QuestionAdminService } from './question.service';
 import { IQuestion } from '../question.interface';
 
 @ApiBearerAuth('swf-token')
 @ApiTags('admin/question')
-@UseGuards(ApiAuthGuard)
+@UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/question')
 export class QuestionAdminController {
   constructor(private readonly questionAdminService: QuestionAdminService) {}

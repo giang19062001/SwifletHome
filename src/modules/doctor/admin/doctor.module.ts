@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
-import { AuthModule } from "src/modules/auth/admin/auth.module";
+import { AuthAdminModule } from "src/modules/auth/admin/auth.module";
 import { DoctorAdminController } from "./doctor.controller";
 import { DoctorAdminRepository } from "./doctor.repository";
 import { DoctorAdminService } from "./doctor.service";
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthAdminModule],
   controllers: [DoctorAdminController],
   providers: [DoctorAdminService, DoctorAdminRepository],
 })

@@ -218,20 +218,6 @@ CREATE TABLE `tbl_doctor` (
   UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
 ) 
 
-
-CREATE TABLE `tbl_user_app` (
-  `seq` int NOT NULL AUTO_INCREMENT,
-  `userCode` varchar(45) DEFAULT NULL,
-  `userName` varchar(45) DEFAULT NULL,
-  `userPhone` varchar(255) NOT NULL,
-  `isActive` char(1) NOT NULL DEFAULT 'Y',
-  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` datetime DEFAULT NULL,
-  PRIMARY KEY (`seq`),
-  UNIQUE KEY `userCode_UNIQUE` (`userCode`)
-)
-
-
 CREATE TABLE `tbl_code_common` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `code` varchar(15) NOT NULL,
@@ -249,3 +235,72 @@ CREATE TABLE `tbl_code_common` (
   UNIQUE KEY `mainCode` (`mainCode`,`subCode`,`keyCode`),
   UNIQUE KEY `code_UNIQUE` (`code`)
 ) 
+
+CREATE TABLE tbl_otp (
+    seq INT AUTO_INCREMENT PRIMARY KEY,
+    phoneNumber VARCHAR(15) NOT NULL,
+    otpCode VARCHAR(6) NOT NULL,
+    attemptCount INT DEFAULT 0,
+    maxAttempts INT DEFAULT 5,
+    expiresAt TIMESTAMP NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    isUsed BOOLEAN DEFAULT FALSE,
+    INDEX idx_phone_number (phoneNumber),
+    INDEX idx_expires_at (expiresAt)
+);
+
+
+CREATE TABLE `tbl_user_app` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `userCode` varchar(45) DEFAULT NULL,
+  `userName` varchar(45) NOT NULL,
+  `userPassword` varchar(255) NOT NULL,
+  `userPhone` varchar(15) NOT NULL,
+  `userDevice` text NOT NULL,
+  `isActive` char(1) NOT NULL DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `userPhone_UNIQUE` (`userPhone`),
+  UNIQUE KEY `userCode_UNIQUE` (`userCode`)
+)
+
+CREATE TABLE tbl_notification_topics (
+  seq INT AUTO_INCREMENT PRIMARY KEY,
+  topicCode VARCHAR(45) NOT NULL UNIQUE,
+  topicName VARCHAR(45) NOT NULL UNIQUE,
+  description TEXT,
+  isActive char(1) NOT NULL DEFAULT 'Y',
+  createdAt datetime DEFAULT CURRENT_TIMESTAMP,
+  updatedAt datetime DEFAULT NULL,
+  createdId varchar(45) DEFAULT NULL,
+  updatedId varchar(45) DEFAULT NULL
+);
+
+CREATE TABLE tbl_user_topics (
+  seq INT AUTO_INCREMENT PRIMARY KEY,
+  userCode varchar(45) NOT NULL,
+  topicCode varchar(45) NOT NULL,
+  isActive char(1) NOT NULL DEFAULT 'Y',
+  createdAt datetime DEFAULT CURRENT_TIMESTAMP,
+  updatedAt datetime DEFAULT NULL,
+  createdId varchar(45) DEFAULT NULL,
+  updatedId varchar(45) DEFAULT NULL
+);
+
+CREATE TABLE tbl_notifications (
+  seq INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  body TEXT NOT NULL,
+  data JSON,
+  userCode varchar(45), 
+  topicCode varchar(45),
+  status ENUM('SENT','READ','FAIL') DEFAULT 'SENT',
+  isActive char(1) NOT NULL DEFAULT 'Y',
+  createdAt datetime DEFAULT CURRENT_TIMESTAMP,
+  updatedAt datetime DEFAULT NULL,
+  createdId varchar(45) DEFAULT NULL,
+  updatedId varchar(45) DEFAULT NULL
+);
