@@ -4,6 +4,7 @@ import { AuthAppRepository } from "./auth.repository";
 import { AuthAppService } from "./auth.service";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { OtpAppModule } from "src/modules/otp/otp.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         signOptions: { expiresIn: '24h' },
       }),
     }),
+    OtpAppModule
   ],
   controllers: [AuthAppController],
   providers: [AuthAppService, AuthAppRepository],

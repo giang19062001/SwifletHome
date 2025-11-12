@@ -236,19 +236,20 @@ CREATE TABLE `tbl_code_common` (
   UNIQUE KEY `code_UNIQUE` (`code`)
 ) 
 
-CREATE TABLE tbl_otp (
-    seq INT AUTO_INCREMENT PRIMARY KEY,
-    phoneNumber VARCHAR(15) NOT NULL,
-    otpCode VARCHAR(6) NOT NULL,
-    attemptCount INT DEFAULT 0,
-    maxAttempts INT DEFAULT 5,
-    expiresAt TIMESTAMP NOT NULL,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isUsed BOOLEAN DEFAULT FALSE,
-    INDEX idx_phone_number (phoneNumber),
-    INDEX idx_expires_at (expiresAt)
-);
-
+CREATE TABLE `tbl_otp` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `userPhone` varchar(15) NOT NULL,
+  `otpCode` varchar(6) NOT NULL,
+  `purpose` enum('REGISTER','FORGOT_PASSWORD') NOT NULL DEFAULT 'REGISTER',
+  `attemptCount` int DEFAULT '0',
+  `maxAttempts` int DEFAULT '5',
+  `expiresAt` timestamp NOT NULL,
+  `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `isUsed` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`seq`),
+  KEY `idx_phone_number` (`userPhone`),
+  KEY `idx_expires_at` (`expiresAt`)
+) 
 
 CREATE TABLE `tbl_user_app` (
   `seq` int NOT NULL AUTO_INCREMENT,

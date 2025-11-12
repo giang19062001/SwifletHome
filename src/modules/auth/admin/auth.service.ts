@@ -8,7 +8,7 @@ import { AuthAdminRepository } from './auth.repository';
 import { IUserAdmin } from './auth.interface';
 import { LoginAdminDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
-import { MsgErr } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message';
 
 @Injectable()
 export class AuthAdminService {
@@ -20,7 +20,7 @@ export class AuthAdminService {
     const user = await this.authAdminRepository.findByUsername(dto.userId);
 
     if (!user) {
-      throw new UnauthorizedException(MsgErr.AccountLoginWrong);
+      throw new UnauthorizedException(Msg.AccountLoginWrong);
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -29,11 +29,11 @@ export class AuthAdminService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException(MsgErr.AccountLoginWrong);
+      throw new UnauthorizedException(Msg.AccountLoginWrong);
     }
 
     if (user.isActive === 'N') {
-      throw new ForbiddenException(MsgErr.AccountLoginBlock);
+      throw new ForbiddenException(Msg.AccountLoginBlock);
     }
     // hide password
     const { userPassword, ...userWithoutPassword } = user;
@@ -49,7 +49,7 @@ export class AuthAdminService {
       const payload = this.jwtService.verify(token);
       return payload;
     } catch (err) {
-      throw new UnauthorizedException(MsgErr.TokenInvalid);
+      throw new UnauthorizedException(Msg.TokenInvalid);
     }
   }
 }

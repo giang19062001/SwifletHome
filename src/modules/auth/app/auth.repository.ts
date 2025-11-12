@@ -8,15 +8,15 @@ import { generateCode } from 'src/helpers/func';
 @Injectable()
 export class AuthAppRepository {
   private readonly table = 'tbl_user_app';
-  private readonly updator = 'SYSTEM'
+  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async findByPhone(userId: string): Promise<IUserApp | null> {
+  async findByPhone(userPhone: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, userCode, userName, userPhone, userDevice, userPassword
      FROM ${this.table} WHERE userPhone = ? AND isActive = 'Y' LIMIT 1`,
-      [userId],
+      [userPhone],
     );
     return rows.length ? (rows[0] as IUserApp) : null;
   }
@@ -36,7 +36,16 @@ export class AuthAppRepository {
     return result.insertId;
   }
 
-  async updateDevice(userDevice: string, userPhone: string): Promise<number> {
+  async updatePassword(newPassword: string, userPhone: string): Promise<number> {
+    const sql = `
+        UPDATE ${this.table} SET userPassword = ?, updatedAt = NOW(), updatedId = ?
+        WHERE userPhone = ?
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [newPassword, this.updator, userPhone]);
+
+    return result.affectedRows;
+  }
+  async updateDeviceToken(userDevice: string, userPhone: string): Promise<number> {
     const sql = `
         UPDATE ${this.table} SET userDevice = ?, updatedAt = NOW(), updatedId = ?
         WHERE userPhone = ?

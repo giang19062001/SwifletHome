@@ -7,10 +7,12 @@ import * as path from 'path';
 import { UploadAudioFilesDto, UploadVideoLinkDto } from './upload.dto';
 import { sortByDate } from 'src/helpers/func';
 import { WinstonLoggerService } from 'src/logger/logger.service';
+import { Msg } from 'src/helpers/message';
 
 @Injectable()
 export class UploadService {
-  private readonly uploadPath = 'public/uploads';
+  private readonly UPLOAD_PATH = 'public/uploads';
+  private readonly SERVICE_NAME = 'UploadService';
 
   constructor(
     private readonly uploadRepository: UploadRepository,
@@ -20,27 +22,27 @@ export class UploadService {
   }
 
   private ensureUploadDirectoryExists(): void {
-    if (!existsSync(this.uploadPath)) {
-      mkdirSync(this.uploadPath, { recursive: true });
+    if (!existsSync(this.UPLOAD_PATH)) {
+      mkdirSync(this.UPLOAD_PATH, { recursive: true });
     }
   }
 
   public async deletePhysicalFile(filepath: string): Promise<void> {
+    const logbase = `${this.SERVICE_NAME}/deletePhysicalFile`;
     try {
-      const filePath = path.join(process.cwd(), this.uploadPath, filepath);
+      const filePath = path.join(process.cwd(), this.UPLOAD_PATH, filepath);
 
       try {
         await fs.access(filePath);
       } catch {
-        this.logger.error('UploadService/deletePhysicalFile:', `File ${filepath} not found in uploads directory`);
+        this.logger.error(logbase, `File ${filepath} not found in directory`);
         return;
       }
 
       await fs.unlink(filePath);
-      this.logger.log('UploadService/deletePhysicalFile:', `File ${filepath} deleted successfully from uploads directory`);
+      this.logger.log(logbase, `File ${filepath} deleted successfully from directory`);
     } catch (error) {
-      console.error(`Error deleting physical file ${filepath}:`, error);
-      throw new InternalServerErrorException(`Failed to delete physical file: ${error.message}`);
+      this.logger.error(logbase, `File ${filepath} deleted failed  from directory -> ${error}`);
     }
   }
 
@@ -52,8 +54,7 @@ export class UploadService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      console.error('Error uploading file:', error);
-      throw new InternalServerErrorException('Failed to upload file');
+      throw new InternalServerErrorException(Msg.FileUploadFail);
     }
   }
   async uploadAudioPay(file: Express.Multer.File, createdId: string): Promise<number> {
@@ -64,8 +65,7 @@ export class UploadService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      console.error('Error uploading file:', error);
-      throw new InternalServerErrorException('Failed to upload file');
+      throw new InternalServerErrorException(Msg.FileUploadFail);
     }
   }
 
@@ -77,8 +77,7 @@ export class UploadService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      console.error('Error uploading file:', error);
-      throw new InternalServerErrorException('Failed to upload file');
+      throw new InternalServerErrorException(Msg.FileUploadFail);
     }
   }
 
@@ -104,12 +103,12 @@ export class UploadService {
   }
   async deleteImg(filename: string): Promise<number> {
     try {
-      const file = await this.uploadRepository.getFileImg(filename);
+      // const file = await this.uploadRepository.getFileImg(filename);
 
       // const result = await this.uploadRepository.terminalImg(filename);
 
       // if (result === 0) {
-      //   throw new NotFoundException(`File ${filename} not found in database`);
+      //   throw new NotFoundException();
       // }
       // const filepath = `${file?.filename.startsWith('editorImg-') ? 'images/editors' : 'images/homes'}/${filename}`;
       // await this.deletePhysicalFile(filepath);
@@ -117,15 +116,14 @@ export class UploadService {
       const result = await this.uploadRepository.deleteImg(filename);
 
       if (result === 0) {
-        throw new NotFoundException(`File ${filename} not found in database`);
+        throw new NotFoundException();
       }
       return result;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      console.error('Error deleting file:', error);
-      throw new InternalServerErrorException('Failed to delete file');
+      throw new InternalServerErrorException(Msg.FileDeleteFail);
     }
   }
   async deleteAudio(filename: string): Promise<number> {
@@ -146,8 +144,7 @@ export class UploadService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      console.error('Error deleting file:', error);
-      throw new InternalServerErrorException('Failed to delete file');
+      throw new InternalServerErrorException(Msg.FileDeleteFail);
     }
   }
 }

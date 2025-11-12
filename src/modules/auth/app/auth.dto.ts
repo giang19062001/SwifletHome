@@ -1,5 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, Matches } from 'class-validator';
+
+
+
+export class UpdatePasswordDto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  newPassword: string;
+}
+
+export class UpdateDeviceTokenDto {
+  @ApiProperty({
+    example: 'token_efg123',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userDevice: string;
+}
 
 export class LoginAppDto {
   @ApiProperty({
@@ -7,6 +27,7 @@ export class LoginAppDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d+$/, { message:'Số điện thoại phải là số'})
   userPhone: string;
 
   @ApiProperty({
@@ -16,15 +37,13 @@ export class LoginAppDto {
   @IsNotEmpty()
   userPassword: string;
 
-    @ApiProperty({
+  @ApiProperty({
     example: 'token_efg123',
   })
   @IsString()
   @IsNotEmpty()
   userDevice: string;
 }
-
-
 
 export class RegisterAppDto {
   @ApiProperty({
@@ -34,12 +53,14 @@ export class RegisterAppDto {
   @IsNotEmpty()
   userName: string;
 
-@ApiProperty({
+  @ApiProperty({
     example: '',
   })
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d+$/, { message:'Số điện thoại phải là số'})
   userPhone: string;
+
   @ApiProperty({
     example: '',
   })

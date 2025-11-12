@@ -1,4 +1,5 @@
 import { Injectable, LoggerService, LogLevel } from '@nestjs/common';
+import { winstonConfig } from 'src/config/logger';
 import { createLogger, format, transports, Logger } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
@@ -7,30 +8,7 @@ export class WinstonLoggerService implements LoggerService {
   private readonly logger: Logger;
 
   constructor() {
-    this.logger = createLogger({
-      level: 'info',
-      format: format.combine(format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), format.errors({ stack: true }), format.splat(), format.json()),
-      transports: [
-        new transports.Console({
-          format: format.combine(format.colorize(), format.simple()),
-        }),
-        new DailyRotateFile({
-          filename: 'logs/%DATE%-info.log',
-          datePattern: 'YYYY-MM-DD',
-          zippedArchive: true,
-          maxSize: '20m',
-          maxFiles: '14d',
-        }),
-        new DailyRotateFile({
-          filename: 'logs/%DATE%-error.log',
-          level: 'error',
-          datePattern: 'YYYY-MM-DD',
-          zippedArchive: true,
-          maxSize: '20m',
-          maxFiles: '14d',
-        }),
-      ],
-    });
+    this.logger = createLogger(winstonConfig);
   }
   warn(message: any, ...optionalParams: any[]) {
     throw new Error('Method not implemented.');
@@ -48,31 +26,12 @@ export class WinstonLoggerService implements LoggerService {
     throw new Error('Method not implemented.');
   }
 
-  log(message: string, context?: any) {
-    let contextData: string | object | undefined = context;
-
-    if (typeof context === 'object' && context !== null) {
-      try {
-        contextData = JSON.stringify(context);
-      } catch (e) {
-        contextData = '';
-      }
-    }
-
-    this.logger.info(message, { context: contextData });
+  log(message: string, context: any) {
+    this.logger.info(message, { context: context });
   }
 
-  error(message: string, context?: any) {
-    let contextData: string | object | undefined = context;
-
-    if (typeof context === 'object' && context !== null) {
-      try {
-        contextData = JSON.stringify(context);
-      } catch (e) {
-        contextData = '[Serialization Error]';
-      }
-    }
-
-    this.logger.error(message, { context: contextData });
+  error(message: string, context: any) {
+    this.logger.error(message, { context: context });
   }
+
 }

@@ -10,6 +10,7 @@ import { WinstonLoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class HomeAdminService {
+  private readonly SERVICE_NAME = "HomeAdminService"
   constructor(
     private readonly homeAdminRepository: HomeAdminRepository,
     private readonly uploadService: UploadService,
@@ -57,7 +58,7 @@ export class HomeAdminService {
   }
 
   async updateHome(dto: UpdateHomeDto, homeCode: string): Promise<number> {
-    const logbase = 'HomeAdminService/updateHome:';
+    const logbase = `${this.SERVICE_NAME}/updateHome`;
 
     const home = await this.getDetail(homeCode);
     if (home) {
@@ -75,10 +76,10 @@ export class HomeAdminService {
       }
 
       const fileNeedDeletes: IHomeImg[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
-      this.logger.log(`${logbase} fileNeedDeletes -->`, fileNeedDeletes);
+      this.logger.log(logbase, `fileNeedDeletes --> ${JSON.stringify(fileNeedDeletes)}`);
 
       const fileNeedCreates: IHomeImg[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
-      this.logger.log(`${logbase} fileNeedCreates -->`, fileNeedDeletes);
+      this.logger.log(logbase, `fileNeedCreates --> ${JSON.stringify(fileNeedCreates)}`);
 
       // homeImages is changed -> delete old file
       if (fileNeedDeletes.length) {

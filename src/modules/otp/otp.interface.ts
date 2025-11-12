@@ -1,6 +1,6 @@
 export interface IOtp {
   seq: number;
-  phoneNumber: string;
+  userPhone: string;
   otpCode: string;
   attemptCount: number;
   maxAttempts: number;

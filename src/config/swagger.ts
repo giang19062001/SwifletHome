@@ -18,14 +18,18 @@ export const initSwagger = (app) => {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document, {
+    swaggerOptions: {
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+    },
     customCss: `
     .opblock-tag[data-tag^="app/"] {
       position: relative;
-      padding-left: 50px;
+      padding-left: 40px;
     }
 
     .opblock-tag[data-tag^="app/"]::before {
-        content: "⚛️";
+      content: "📱";
       position: absolute;
       left: 0;
       top: 0;

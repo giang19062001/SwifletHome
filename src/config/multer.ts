@@ -4,7 +4,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { BadRequestException, Logger } from '@nestjs/common';
 import { AUDIO_TYPES, IMG_TYPES, VIDEO_TYPES } from 'src/helpers/const';
-import { MsgErr } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message';
 
 interface MulterLimits {
   fileSize?: number;
@@ -64,7 +64,7 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
       if (allowedExts.includes(ext)) {
         cb(null, true);
       } else {
-        cb(new BadRequestException(MsgErr.fileWrongType(ext, allowedExts)), false);
+        cb(new BadRequestException(Msg.fileWrongType(ext, allowedExts)), false);
       }
     },
   };

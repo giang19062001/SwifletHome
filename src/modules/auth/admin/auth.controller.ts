@@ -51,9 +51,6 @@ export class AuthAdminController {
 
     // cancel session
     req.session.destroy((err) => {
-      if (err) {
-        console.error('Error destroying session: ', err);
-      }
       // Redirect về trang login
       res.redirect('/');
     });

@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { MsgErr } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message';
 
 @Catch(BadRequestException)
 export class MulterBadRequestFilter implements ExceptionFilter {
@@ -21,7 +21,7 @@ export class MulterBadRequestFilter implements ExceptionFilter {
     if (originalMessage === 'Too many files') {
       return response.status(status).json({
         statusCode: status,
-        message: MsgErr.FileOvertake,
+        message: Msg.FileOvertake,
         error: 'Bad Request',
       });
     }

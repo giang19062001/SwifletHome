@@ -10,4 +10,4 @@ import { AuthAdminModule } from 'src/modules/auth/admin/auth.module';
   providers: [UploadService, UploadRepository],
   exports: [UploadService],
 })
-export class UploadModule {}
+export class UploadAdminModule {}

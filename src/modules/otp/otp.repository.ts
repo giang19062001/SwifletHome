@@ -8,26 +8,41 @@ export class OtpRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async createOtp(otpData: { phoneNumber: string; otpCode: string; expiresAt: Date }): Promise<void> {
+  async createOtp(userPhone: string, otpCode: string, expiresAt: Date, purpose: string): Promise<void> {
     const sql = `
-      INSERT INTO ${this.table} (phoneNumber, otpCode, expiresAt)
-      VALUES (?, ?, ?)
+      INSERT INTO ${this.table} (userPhone, otpCode, expiresAt, purpose)
+      VALUES (?, ?, ?, ?)
     `;
 
-    await this.db.query(sql, [otpData.phoneNumber, otpData.otpCode, otpData.expiresAt]);
+    await this.db.query(sql, [userPhone, otpCode, expiresAt, purpose]);
   }
 
-  async findValidOtp(phoneNumber: string): Promise<IOtp | null> {
+  async checkPhoneVarified(userPhone: string, purpose: string): Promise<IOtp | null> {
     const sql = `
       SELECT * FROM ${this.table} 
-      WHERE phoneNumber = ? 
+      WHERE userPhone = ? 
+        AND purpose = ?
+        AND isUsed = TRUE
+      ORDER BY createdAt DESC 
+      LIMIT 1
+    `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, purpose]);
+    return rows ? (rows[0] as IOtp) : null;
+  }
+
+  async findValidOtp(userPhone: string, purpose: string): Promise<IOtp | null> {
+    const sql = `
+      SELECT * FROM ${this.table} 
+      WHERE userPhone = ? 
+        AND purpose = ?
         AND expiresAt > NOW() 
         AND isUsed = FALSE
       ORDER BY createdAt DESC 
       LIMIT 1
     `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(sql, [phoneNumber]);
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, purpose]);
     return rows ? (rows[0] as IOtp) : null;
   }
 
@@ -41,7 +56,7 @@ export class OtpRepository {
     await this.db.query(sql, [attemptCount, otpId]);
   }
 
-  async markOtpAsUsed(otpId: number): Promise<void> {
+  async updateOtpAsUsed(otpId: number): Promise<void> {
     const sql = `
       UPDATE ${this.table} 
       SET isUsed = TRUE 
@@ -50,8 +65,17 @@ export class OtpRepository {
 
     await this.db.query(sql, [otpId]);
   }
+  async deleteOtp(userPhone: string, purpose: string): Promise<void> {
+    const sql = `
+      DELETE FROM ${this.table} 
+      WHERE userPhone = ? AND purpose = ?
+    `;
 
-  async deleteExpiredOtps(): Promise<void> {
+    await this.db.query(sql, [userPhone, purpose]);
+  }
+
+  
+  async cleanupExpiredOtps(): Promise<void> {
     const sql = `
       DELETE FROM ${this.table} 
       WHERE expiresAt < NOW() 
@@ -61,12 +85,4 @@ export class OtpRepository {
     await this.db.query(sql);
   }
 
-  async deleteOtpsByPhoneNumber(phoneNumber: string): Promise<void> {
-    const sql = `
-      DELETE FROM ${this.table} 
-      WHERE phoneNumber = ?
-    `;
-
-    await this.db.query(sql, [phoneNumber]);
-  }
 }

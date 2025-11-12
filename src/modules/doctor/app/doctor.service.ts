@@ -8,12 +8,16 @@ import { WinstonLoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class DoctorAppService {
+  private readonly SERVICE_NAME = 'DoctorAppService';
+
   constructor(
     private readonly doctorAppRepository: DoctorAppRepository,
     private readonly logger: WinstonLoggerService,
   ) {}
 
   async createDoctor(dto: CreateDoctorDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/createDoctor:`;
+
     try {
       let result = 1;
       const seq = await this.doctorAppRepository.createDoctor(dto);
@@ -36,11 +40,12 @@ export class DoctorAppService {
       }
       return result;
     } catch (error) {
-      this.logger.error('DoctorAppService/createDoctor', error);
+      this.logger.error(logbase, error);
       return 0;
     }
   }
   async insertDoctorFile(dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<IDoctorFileStr[]> {
+    const logbase = `${this.SERVICE_NAME}/insertDoctorFile:`;
     try {
       let filesResponse: IDoctorFileStr[] = [];
       if (doctorFiles.length > 0) {
@@ -54,7 +59,7 @@ export class DoctorAppService {
       }
       return filesResponse;
     } catch (error) {
-      this.logger.error('DoctorAppService/insertDoctorFile', error);
+      this.logger.error(logbase, error);
       return [];
     }
   }

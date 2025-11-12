@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
+export enum PurposeEnum {
+  REGISTER = 'REGISTER',
+  FORGOT_PASSWORD = 'FORGOT_PASSWORD',
+}
 export class RequestOtpDto {
   @ApiProperty({
     example: '0334644324',
@@ -8,7 +12,15 @@ export class RequestOtpDto {
   @IsString()
   @IsNotEmpty()
   @Matches(/^\d+$/, { message: 'Số điện thoại phải là số' })
-  phoneNumber: string;
+  userPhone: string;
+
+  @ApiProperty({
+    example: PurposeEnum.REGISTER,
+    enum: PurposeEnum,
+  })
+  @IsNotEmpty()
+  @IsEnum(PurposeEnum)
+  purpose: PurposeEnum;
 }
 
 export class VerifyOtpDto {
@@ -17,14 +29,22 @@ export class VerifyOtpDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+$/, { message:'Số điện thoại phải là số'})
-  phoneNumber: string;
+  @Matches(/^\d+$/, { message: 'Số điện thoại phải là số' })
+  userPhone: string;
 
   @ApiProperty({
-    example: '123456',
+    example: '1234',
   })
   @IsString()
   @IsNotEmpty()
   @Matches(/^\d+$/, { message: 'otp phải là số' })
   otpCode: string;
+
+  @ApiProperty({
+    example: PurposeEnum.REGISTER,
+    enum: PurposeEnum,
+  })
+  @IsNotEmpty()
+  @IsEnum(PurposeEnum)
+  purpose: PurposeEnum;
 }
