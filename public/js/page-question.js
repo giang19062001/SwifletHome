@@ -95,7 +95,7 @@ async function showQuestionModal(type, questionData) {
 async function renderAllAnswer(modalBody, answerCode, questionCategory) {
   // sub function
   async function renderAnswer(currentCategoryCode) {
-    const answers = await getAllAnswer(0, 0, currentCategoryCode, 'YEN');
+    const answers = await getAllAnswer(0, 0, currentCategoryCode, 'SWIFTLET');
     const answerOptions = answers
       ?.map(
         (ans) => `

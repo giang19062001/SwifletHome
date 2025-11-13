@@ -12,7 +12,7 @@ export class UpdateQuestionDto {
   answerCode: string | null;
 
   @ApiProperty({
-    example: 'YEN',
+    example: 'SWIFTLET',
   })
   @IsString()
   @IsNotEmpty()

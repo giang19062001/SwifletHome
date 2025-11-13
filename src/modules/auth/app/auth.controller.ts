@@ -1,12 +1,14 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto } from './auth.dto';
 import { AuthAppService } from './auth.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
 import { RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { Msg } from 'src/helpers/message';
+import { ApiAuthAppGuard } from './auth.guard';
 
+@ApiBearerAuth('app-auth')
 @ApiTags('app/auth')
 @Controller('/api/app/auth')
 @UseInterceptors(ResponseAppInterceptor)
@@ -44,6 +46,10 @@ export class AuthAppController {
     return result;
   }
 
+  @UseGuards(ApiAuthAppGuard)
+  @ApiOperation({
+    summary: 'Cần đăng nhập và xác thực token',
+  })
   @ApiParam({ name: 'userPhone', type: String })
   @ApiBody({ type: UpdatePasswordDto })
   @Put('updatePassword/:userPhone')

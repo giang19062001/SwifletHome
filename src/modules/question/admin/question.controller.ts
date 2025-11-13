@@ -25,7 +25,7 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { QuestionAdminService } from './question.service';
 import { IQuestion } from '../question.interface';
 
-@ApiBearerAuth('swf-token')
+@ApiBearerAuth('admin-auth')
 @ApiTags('admin/question')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/question')

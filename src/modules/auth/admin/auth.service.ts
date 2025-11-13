@@ -4,20 +4,20 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { AuthAdminRepository } from './auth.repository';
-import { IUserAdmin } from './auth.interface';
+import { IUserAuthAdmin } from './auth.interface';
 import { LoginAdminDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message';
+import { UserAdminService } from 'src/modules/user/admin/user.service';
 
 @Injectable()
 export class AuthAdminService {
   constructor(
-    private readonly authAdminRepository: AuthAdminRepository,
+    private readonly userAdminService: UserAdminService,
     private readonly jwtService: JwtService,
   ) {}
-  async login(dto: LoginAdminDto): Promise<Omit<IUserAdmin, 'userPassword'>> {
-    const user = await this.authAdminRepository.findByUsername(dto.userId);
+  async login(dto: LoginAdminDto): Promise<Omit<IUserAuthAdmin, 'userPassword'>> {
+    const user = await this.userAdminService.findByUserId(dto.userId);
 
     if (!user) {
       throw new UnauthorizedException(Msg.AccountLoginWrong);
@@ -49,7 +49,7 @@ export class AuthAdminService {
       const payload = this.jwtService.verify(token);
       return payload;
     } catch (err) {
-      throw new UnauthorizedException(Msg.TokenInvalid);
+      throw new ForbiddenException(Msg.TokenInvalid);
     }
   }
 }

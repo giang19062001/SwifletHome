@@ -29,7 +29,7 @@ import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer';
 
-@ApiBearerAuth('swf-token')
+@ApiBearerAuth('admin-auth')
 @ApiTags('admin/home')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/home')

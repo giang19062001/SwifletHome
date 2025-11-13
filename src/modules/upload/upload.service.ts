@@ -6,7 +6,7 @@ import { IAudioFreePay, IFileUpload } from './upload.interface';
 import * as path from 'path';
 import { UploadAudioFilesDto, UploadVideoLinkDto } from './upload.dto';
 import { sortByDate } from 'src/helpers/func';
-import { WinstonLoggerService } from 'src/logger/logger.service';
+import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class UploadService {
 
   constructor(
     private readonly uploadRepository: UploadRepository,
-    private readonly logger: WinstonLoggerService,
+    private readonly logger: LoggingService,
   ) {
     this.ensureUploadDirectoryExists();
   }

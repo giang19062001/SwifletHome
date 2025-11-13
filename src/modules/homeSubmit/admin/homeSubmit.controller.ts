@@ -8,7 +8,7 @@ import { HomeSubmitAdminService } from './homeSubmit.service';
 import { IHomeSubmit } from '../homeSubmit.interface';
 import { UpdateStatusDto } from './homeSubmit.dto';
 
-@ApiBearerAuth('swf-token')
+@ApiBearerAuth('admin-auth')
 @ApiTags('admin/homeSubmit')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/homeSubmit')

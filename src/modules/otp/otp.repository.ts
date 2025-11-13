@@ -17,12 +17,42 @@ export class OtpRepository {
     await this.db.query(sql, [userPhone, otpCode, expiresAt, purpose]);
   }
 
-  async checkPhoneVarified(userPhone: string, purpose: string): Promise<IOtp | null> {
+  async resetOtp(userPhone: string, otpCode: string, expiresAt: Date, purpose: string): Promise<void> {
     const sql = `
-      SELECT * FROM ${this.table} 
+      UPDATE ${this.table} SET purpose = ?, otpCode = ?, expiresAt = ?, createdAt = ?, attemptCount = 0, isUsed = FALSE 
+      WHERE userPhone = ?
+    `;
+
+    await this.db.query(sql, [purpose, otpCode, expiresAt, new Date(), userPhone]);
+  }
+
+  async deleteOtp(userPhone: string, purpose: string): Promise<void> {
+    const sql = `
+      DELETE FROM ${this.table} 
+      WHERE userPhone = ? AND purpose = ?
+    `;
+
+    await this.db.query(sql, [userPhone, purpose]);
+  }
+
+  async findOtpExist(userPhone: string): Promise<IOtp | null> {
+    const sql = `
+      SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed  FROM ${this.table} 
+      WHERE userPhone = ? 
+      LIMIT 1
+    `;
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone]);
+    return rows ? (rows[0] as IOtp) : null;
+  }
+
+  async findValidOtp(userPhone: string, purpose: string): Promise<IOtp | null> {
+    const sql = `
+      SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed FROM ${this.table} 
       WHERE userPhone = ? 
         AND purpose = ?
-        AND isUsed = TRUE
+        AND expiresAt > NOW() 
+        AND isUsed = FALSE
+        AND otpCode != '0000'
       ORDER BY createdAt DESC 
       LIMIT 1
     `;
@@ -31,13 +61,13 @@ export class OtpRepository {
     return rows ? (rows[0] as IOtp) : null;
   }
 
-  async findValidOtp(userPhone: string, purpose: string): Promise<IOtp | null> {
+  async checkPhoneVarified(userPhone: string, purpose: string): Promise<IOtp | null> {
     const sql = `
-      SELECT * FROM ${this.table} 
+      SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed 
+      FROM ${this.table} 
       WHERE userPhone = ? 
         AND purpose = ?
-        AND expiresAt > NOW() 
-        AND isUsed = FALSE
+        AND isUsed = TRUE
       ORDER BY createdAt DESC 
       LIMIT 1
     `;
@@ -64,25 +94,6 @@ export class OtpRepository {
     `;
 
     await this.db.query(sql, [otpId]);
-  }
-  async deleteOtp(userPhone: string, purpose: string): Promise<void> {
-    const sql = `
-      DELETE FROM ${this.table} 
-      WHERE userPhone = ? AND purpose = ?
-    `;
-
-    await this.db.query(sql, [userPhone, purpose]);
-  }
-
-  
-  async cleanupExpiredOtps(): Promise<void> {
-    const sql = `
-      DELETE FROM ${this.table} 
-      WHERE expiresAt < NOW() 
-         OR (attemptCount >= maxAttempts AND isUsed = FALSE)
-    `;
-
-    await this.db.query(sql);
   }
 
 }

@@ -1,11 +1,33 @@
-import { Injectable, LoggerService, LogLevel } from '@nestjs/common';
-import { createLogger, format, transports, Logger } from 'winston';
+import { createLogger, format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+
+
+// log ghi trong file
+const customFormat = format.printf(({ timestamp, level, message, context, stack }) => {
+  const logEntry: any = {
+    level,
+    timestamp,
+    caller: message,
+    context
+  };
+
+  if (stack) {
+    logEntry.stack = stack;
+  }
+
+  return JSON.stringify(logEntry);
+});
 
 export const winstonConfig = {
   level: 'info',
-  format: format.combine(format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), format.errors({ stack: true }), format.splat(), format.json()),
+  format: format.combine(
+    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    format.errors({ stack: true }),
+    format.splat(),
+    customFormat
+  ),
   transports: [
+    // log ghi trong console
     new transports.Console({
       format: format.combine(
         format.colorize(),
@@ -21,7 +43,7 @@ export const winstonConfig = {
             }
           }
 
-          return `${level}: [${timestamp}] [${message}]${contextStr ? ` CONTEXT: ${contextStr}` : ''}${stack ? ` STACK: ${stack}` : ''}`;
+          return `${level}: [${timestamp}]-[${message}]:\t${stack ? `${stack}` : `${contextStr}`}`;
         }),
       ),
     }),
@@ -30,7 +52,7 @@ export const winstonConfig = {
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
-      maxFiles: '30d', // TỒN TẠI 30 NGÀY KỂ CẢ .gz
+      maxFiles: '30d',
     }),
     new DailyRotateFile({
       filename: 'logs/%DATE%-error.log',
@@ -38,7 +60,11 @@ export const winstonConfig = {
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
-      maxFiles: '30d', // TỒN TẠI 30 NGÀY KỂ CẢ .gz
+      maxFiles: '30d',
     }),
   ],
+  
+  // Thêm exitOnError false để tránh crash app khi có lỗi ghi log
+  exitOnError: false,
+  
 };

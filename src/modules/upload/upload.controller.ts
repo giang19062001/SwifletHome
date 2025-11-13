@@ -8,7 +8,7 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { multerAudioConfig, multerImgConfig } from 'src/config/multer';
 import { Msg } from 'src/helpers/message';
 
-@ApiBearerAuth('swf-token')
+@ApiBearerAuth('admin-auth')
 @ApiTags('admin/uploadFile')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/uploadFile')

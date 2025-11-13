@@ -1,7 +1,7 @@
 CREATE TABLE `tbl_user_admin` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `userId` varchar(45) DEFAULT NULL,
-  `userName` varchar(45) DEFAULT NULL,
+  `userId` varchar(45) NOT NULL,
+  `userName` varchar(45) NOT NULL,
   `userPassword` varchar(255) NOT NULL,
   `isActive` char(1) NOT NULL DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -18,7 +18,7 @@ CREATE TABLE `tbl_category` (
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `categoryCode_UNIQUE` (`categoryCode`)
@@ -26,11 +26,11 @@ CREATE TABLE `tbl_category` (
 
 CREATE TABLE `tbl_object` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `objectCharacter` varchar(45) NOT NULL,
+  `objectCharacter` enum('SWIFTLET','TEA','COFFEE') NOT NULL DEFAULT 'SWIFTLET',
   `objectName` varchar(45) NOT NULL,
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `objectCharacter_UNIQUE` (`objectCharacter`)
@@ -46,7 +46,7 @@ CREATE TABLE `tbl_question` (
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `questionCode_UNIQUE` (`questionCode`),
@@ -62,7 +62,7 @@ CREATE TABLE `tbl_answer` (
   `isFree` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `answerCode_UNIQUE` (`answerCode`)
@@ -79,7 +79,7 @@ CREATE TABLE `tbl_blog` (
   `isFree` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `blogCode_UNIQUE` (`blogCode`)
@@ -87,7 +87,7 @@ CREATE TABLE `tbl_blog` (
 
 CREATE TABLE `tbl_uploads_image` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `filename` varchar(255) DEFAULT NULL,
+  `filename` varchar(255) NOT NULL,
   `originalname` text NOT NULL,
   `size` int NOT NULL,
   `mimetype` varchar(45) NOT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE `tbl_uploads_image` (
   `isFree` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
@@ -104,7 +104,7 @@ CREATE TABLE `tbl_uploads_image` (
 CREATE TABLE `tbl_uploads_audio` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `seqPay` int, 
-  `filename` varchar(255) DEFAULT NULL,
+  `filename` varchar(255) NOT NULL,
   `originalname` text NOT NULL,
   `size` int NOT NULL,
   `mimetype` varchar(45) NOT NULL,
@@ -112,7 +112,7 @@ CREATE TABLE `tbl_uploads_audio` (
   `isFree` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
@@ -121,11 +121,11 @@ CREATE TABLE `tbl_uploads_audio` (
 
 CREATE TABLE `tbl_uploads_video` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `urlLink` varchar(255) DEFAULT NULL,
+  `urlLink` varchar(255) NOT NULL,
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `videoUrl_UNIQUE` (`urlLink`)
@@ -143,7 +143,7 @@ CREATE TABLE `tbl_home` (
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `homeCode_UNIQUE` (`homeCode`),
@@ -160,7 +160,7 @@ CREATE TABLE `tbl_home_img` (
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
@@ -178,7 +178,7 @@ CREATE TABLE `tbl_home_submit` (
   `cancelReason` text,
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`)
 )
@@ -194,7 +194,7 @@ CREATE TABLE `tbl_doctor_file` (
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
@@ -212,7 +212,7 @@ CREATE TABLE `tbl_doctor` (
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
@@ -229,7 +229,7 @@ CREATE TABLE `tbl_code_common` (
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `mainCode` (`mainCode`,`subCode`,`keyCode`),
@@ -243,8 +243,8 @@ CREATE TABLE `tbl_otp` (
   `purpose` enum('REGISTER','FORGOT_PASSWORD') NOT NULL DEFAULT 'REGISTER',
   `attemptCount` int DEFAULT '0',
   `maxAttempts` int DEFAULT '5',
-  `expiresAt` timestamp NOT NULL,
-  `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `expiresAt` datetime NOT NULL,
+  `createdAt` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   `isUsed` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`seq`),
   KEY `idx_phone_number` (`userPhone`),
@@ -253,7 +253,7 @@ CREATE TABLE `tbl_otp` (
 
 CREATE TABLE `tbl_user_app` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `userCode` varchar(45) DEFAULT NULL,
+  `userCode` varchar(45) NOT NULL,
   `userName` varchar(45) NOT NULL,
   `userPassword` varchar(255) NOT NULL,
   `userPhone` varchar(15) NOT NULL,
@@ -261,12 +261,76 @@ CREATE TABLE `tbl_user_app` (
   `isActive` char(1) NOT NULL DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `userPhone_UNIQUE` (`userPhone`),
   UNIQUE KEY `userCode_UNIQUE` (`userCode`)
 )
+CREATE TABLE `tbl_user_payment` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `userCode` varchar(45) NOT NULL,
+  `packageCode` varchar(45) DEFAULT NULL,
+  `startDate` datetime DEFAULT NULL,
+  `endDate` datetime DEFAULT NULL,
+  `isActive` char(1) NOT NULL DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `userPhone_UNIQUE` (`userPhone`),
+  UNIQUE KEY `userCode_UNIQUE` (`userCode`)
+)
+
+CREATE TABLE `tbl_package` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `packageCode` varchar(45) NOT NULL,
+  `packageName` varchar(45) NOT NULL,
+  `packagePrice` decimal(10,3) NOT NULL,
+  `packageExpireDay` int NOT NULL,
+  `packageDescription` varchar(255) NOT NULL,
+  `isActive` char(1) NOT NULL DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `packageCode_UNIQUE` (`packageCode`)
+)
+
+-- thông tin chuyển khoản, fcm key, s3 key
+CREATE TABLE `tbl_config_system` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `configCharacter` enum('BANK') NOT NULL DEFAULT 'BANK',
+  `configName` varchar(45) NOT NULL,
+  `configContent` json NOT NULL,
+  `configDescription` varchar(255) NOT NULL,
+  `isActive` char(1) NOT NULL DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`)
+)
+
+-- giao diện dynamic cho app từ db
+-- SIGNUP_SERVICE: đăng kí dịch vụ
+CREATE TABLE `tbl_design_system` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `designCharacter` enum('SIGNUP_SERVICE') NOT NULL DEFAULT 'SIGNUP_SERVICE', 
+  `designName` varchar(45) NOT NULL,
+  `designContent` JSON NOT NULL,
+  `designDescription` varchar(255) NOT NULL,
+  `isActive` char(1) NOT NULL DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`)
+)
+
+
 
 CREATE TABLE tbl_notification_topics (
   seq INT AUTO_INCREMENT PRIMARY KEY,
@@ -276,7 +340,7 @@ CREATE TABLE tbl_notification_topics (
   isActive char(1) NOT NULL DEFAULT 'Y',
   createdAt datetime DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime DEFAULT NULL,
-  createdId varchar(45) DEFAULT NULL,
+  createdId varchar(45) DEFAULT 'SYSTEM',
   updatedId varchar(45) DEFAULT NULL
 );
 
@@ -287,7 +351,7 @@ CREATE TABLE tbl_user_topics (
   isActive char(1) NOT NULL DEFAULT 'Y',
   createdAt datetime DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime DEFAULT NULL,
-  createdId varchar(45) DEFAULT NULL,
+  createdId varchar(45) DEFAULT 'SYSTEM',
   updatedId varchar(45) DEFAULT NULL
 );
 
@@ -302,6 +366,6 @@ CREATE TABLE tbl_notifications (
   isActive char(1) NOT NULL DEFAULT 'Y',
   createdAt datetime DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime DEFAULT NULL,
-  createdId varchar(45) DEFAULT NULL,
+  createdId varchar(45) DEFAULT 'SYSTEM',
   updatedId varchar(45) DEFAULT NULL
 );

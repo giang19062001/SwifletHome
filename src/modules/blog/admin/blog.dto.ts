@@ -24,7 +24,7 @@ export class UpdateBlogDto {
   blogContent: string;
 
   @ApiProperty({
-    example: 'YEN',
+    example: 'SWIFTLET',
   })
   @IsString()
   @IsNotEmpty()

@@ -1,0 +1,51 @@
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { LoggingService } from 'src/common/logger/logger.service';
+import { IUserApp } from 'dist/modules/user/user.interface';
+import { UserAppRepository } from './user.repository';
+import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
+import { UserPaymentService } from 'src/modules/userPayment/userPayment.service';
+import { CreateUserPaymentDto } from 'src/modules/userPayment/userPayment.dto';
+
+@Injectable()
+export class UserAppService {
+  private readonly SERVICE_NAME = 'UserAppService';
+
+  constructor(
+    private readonly userAppRepository: UserAppRepository,
+    private readonly userPaymentService: UserPaymentService,
+    private readonly logger: LoggingService,
+  ) {}
+
+  async findByPhone(userPhone: string): Promise<IUserApp | null> {
+    return await this.userAppRepository.findByPhone(userPhone);
+  }
+
+  async create(dto: RegisterAppDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/create`;
+
+    const insertId = await this.userAppRepository.create(dto);
+    if (insertId) {
+      const user = await this.userAppRepository.findBySeq(insertId);
+      if (user) {
+        this.logger.log(logbase, 'Thiết lập gói miễn phí cho người dùng đăng kí mới');
+        // mặc định user mới sẽ sử dụng gói miễn phí
+        const dto: CreateUserPaymentDto = {
+          userCode: user.userCode,
+          packageCode: null,
+          endDate: null,
+          startDate: null,
+        };
+        await this.userPaymentService.create(dto);
+      }
+    }
+    return 1;
+  }
+
+  async updatePassword(newPassword: string, userPhone: string): Promise<number> {
+    return await this.userAppRepository.updatePassword(newPassword, userPhone);
+  }
+
+  async updateDeviceToken(userDevice: string, userPhone: string): Promise<number> {
+    return await this.userAppRepository.updateDeviceToken(userDevice, userPhone);
+  }
+}

@@ -31,7 +31,7 @@ import { getDoctorMulterConfig } from 'src/config/multer';
 import { MulterBadRequestFilter } from 'src/filter/uploadError';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
 
-@ApiBearerAuth('swf-token')
+@ApiBearerAuth('admin-auth')
 @ApiTags('app/doctor')
 @UseInterceptors(ResponseAppInterceptor)
 @Controller('/api/app/doctor')

@@ -27,7 +27,7 @@ import {
   UpdateAnswerDto,
 } from './answer.dto';
 
-@ApiBearerAuth('swf-token')
+@ApiBearerAuth('admin-auth')
 @ApiTags('admin/answer')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/answer')

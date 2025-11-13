@@ -1,10 +1,10 @@
 import { Injectable, LoggerService, LogLevel } from '@nestjs/common';
 import { winstonConfig } from 'src/config/logger';
 import { createLogger, format, transports, Logger } from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
+import * as fs from 'fs';
 
 @Injectable()
-export class WinstonLoggerService implements LoggerService {
+export class LoggingService implements LoggerService {
   private readonly logger: Logger;
 
   constructor() {
@@ -33,5 +33,4 @@ export class WinstonLoggerService implements LoggerService {
   error(message: string, context: any) {
     this.logger.error(message, { context: context });
   }
-
 }

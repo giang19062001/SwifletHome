@@ -17,7 +17,7 @@ import { IList } from 'src/interfaces/common';
 import { ICategory } from './category.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 
-@ApiBearerAuth('swf-token') 
+@ApiBearerAuth('admin-auth') 
 @ApiTags('admin/category')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/category')

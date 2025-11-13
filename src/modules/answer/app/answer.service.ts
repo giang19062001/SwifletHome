@@ -5,13 +5,13 @@ import { AnswerAppRepository } from './answer.repository';
 import { IAnswer } from '../answer.interface';
 import { QuestionAppService } from 'src/modules/question/app/question.service';
 import { IQuestion } from 'src/modules/question/question.interface';
-import { WinstonLoggerService } from 'src/logger/logger.service';
+import { LoggingService } from 'src/common/logger/logger.service';
 @Injectable()
 export class AnswerAppService {
   constructor(
     private readonly answerAppRepository: AnswerAppRepository,
     private readonly questionAppService: QuestionAppService,
-    private readonly logger: WinstonLoggerService,
+    private readonly logger: LoggingService,
   ) {}
 
   async reply(): Promise<any[]> {

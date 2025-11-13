@@ -10,7 +10,7 @@ export class GetAllCodeDto {
   mainCode: string;
 
   @ApiProperty({
-    example: 'NUMBER_PERSON',
+    example: 'NUMBER_ATTEND',
   })
   @IsString()
   @IsNotEmpty()

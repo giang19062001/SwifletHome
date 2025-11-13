@@ -8,7 +8,7 @@ import { DoctorAdminService } from './doctor.service';
 import { IDoctor } from '../doctor.interface';
 import { UpdateDoctorDto } from './doctor.dto';
 
-@ApiBearerAuth('swf-token')
+@ApiBearerAuth('admin-auth')
 @ApiTags('admin/doctor')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/doctor')

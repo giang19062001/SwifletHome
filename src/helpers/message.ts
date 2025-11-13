@@ -1,4 +1,5 @@
 export const Msg = {
+  TokenMissing: 'Vui lòng xác thực token',
   TokenInvalid: 'Token không hợp lệ',
   PhoneExist: 'Số điện thoại đã tồn tại',
   PhoneExistForNew: 'Số điện thoại đã tồn tại cho việc đăng ký mới',

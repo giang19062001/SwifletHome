@@ -6,7 +6,7 @@ import { IHome, IHomeImg } from '../home.interface';
 import { HomeAdminRepository } from './home.repository';
 import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import { diffByTwoArr } from 'src/helpers/func';
-import { WinstonLoggerService } from 'src/logger/logger.service';
+import { LoggingService } from 'src/common/logger/logger.service';
 
 @Injectable()
 export class HomeAdminService {
@@ -14,7 +14,7 @@ export class HomeAdminService {
   constructor(
     private readonly homeAdminRepository: HomeAdminRepository,
     private readonly uploadService: UploadService,
-    private readonly logger: WinstonLoggerService,
+    private readonly logger: LoggingService,
   ) {}
   async getAll(dto: PagingDto): Promise<IList<IHome>> {
     const total = await this.homeAdminRepository.getTotal();

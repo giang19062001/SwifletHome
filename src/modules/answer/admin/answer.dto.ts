@@ -24,7 +24,7 @@ export class UpdateAnswerDto {
   answerContent: string;
 
   @ApiProperty({
-    example: 'YEN',
+    example: 'SWIFTLET',
   })
   @IsString()
   @IsNotEmpty()

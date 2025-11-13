@@ -15,7 +15,7 @@ export class CodeController {
   constructor(private readonly codeService: CodeService) {}
 
   @ApiBody({
-    description: '**subCode:** `STATUS`, `NUMBER_PERSON`',
+    description: '**subCode:** `STATUS`, `NUMBER_ATTEND`',
     type: GetAllCodeDto,
   })
   @Post('getAll')

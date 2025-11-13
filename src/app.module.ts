@@ -18,33 +18,42 @@ import { BlogAdminModule } from './modules/blog/admin/blog.module';
 import { CodeModule } from './modules/code/code.module';
 import { DoctorAppModule } from './modules/doctor/app/doctor.module';
 import { DoctorAdminModule } from './modules/doctor/admin/doctor.module';
-import { LoggerModule } from './logger/logger.module';
+import { LoggerModule } from './common/logger/logger.module';
 import { AuthAppModule } from './modules/auth/app/auth.module';
 import { OtpAppModule } from './modules/otp/otp.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UserAppModule } from './modules/user/app/user.module';
+import { UserPaymentModule } from './modules/userPayment/user.module';
+import { UserAdminModule } from './modules/user/admin/user.module';
 
 @Module({
   imports: [
+    // global
     ConfigModule.forRoot({
-      isGlobal: true, // all module
+      isGlobal: true,
     }),
     ScheduleModule.forRoot(),
-    DatabaseModule, // global
-    LoggerModule, // global
+    DatabaseModule,
+    LoggerModule,
+
     //app
     AuthAppModule,
     OtpAppModule,
+    UserAppModule,
+    UserPaymentModule,
     QuestionAppModule,
     AnswerAppModule,
     DoctorAppModule,
     HomeAppModule,
     HomeSubmitAppModule,
+
     //common
     CodeModule,
     CategoryModule,
 
     //admin
     AuthAdminModule,
+    UserAdminModule,
     QuestionAdminModule,
     AnswerAdminModule,
     UploadAdminModule,

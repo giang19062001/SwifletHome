@@ -1,47 +1,59 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { AuthAppRepository } from './auth.repository';
-import { IUserApp } from './auth.interface';
 import { JwtService } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message';
 import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto } from './auth.dto';
 import { hashPassword } from 'src/helpers/auth';
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
+import { LoggingService } from 'src/common/logger/logger.service';
+import { IUserApp } from 'dist/modules/user/user.interface';
+import { IUserAuthApp } from './auth.interface';
+import { UserAppService } from 'src/modules/user/app/user.service';
 
 @Injectable()
 export class AuthAppService {
+  private readonly SERVICE_NAME = 'AuthAppService';
+
   constructor(
-    private readonly authAppRepository: AuthAppRepository,
+    private readonly userAppService: UserAppService,
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
+    private readonly logger: LoggingService,
   ) {}
 
   private async verifyPhoneBeforeOtp(userPhone: string, purpose: string) {
+    const logbase = `${this.SERVICE_NAME}/verifyPhoneBeforeOtp`;
+
     // nếu đăng ký mới cần kiểm tra số điện thoại đã được sử dụng hay chưa
     if (purpose == 'REGISTER') {
-      const phone = await this.authAppRepository.findByPhone(userPhone);
+      const phone = await this.userAppService.findByPhone(userPhone);
 
       // lỗi -> số điện thoại đã tồn tại -> không thể tạo mới nữa -> ko phải gửi sms xác thực nữa
       if (phone) {
+        this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneExistForNew}`);
         throw new BadRequestException(Msg.PhoneExistForNew);
       }
     }
 
     // quên password
     if (purpose == 'FORGOT_PASSWORD') {
-      const phone = await this.authAppRepository.findByPhone(userPhone);
+      const phone = await this.userAppService.findByPhone(userPhone);
 
       // lỗi -> số điện thoại không tồn tại -> không thể đổi mật khẩu -> ko phải gửi sms xác thực nữa
       if (!phone) {
+        this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneNotExist}`);
         throw new BadRequestException(Msg.PhoneNotExist);
       }
     }
   }
-  async login(dto: LoginAppDto): Promise<Omit<IUserApp, 'userPassword'>> {
-    const user = await this.authAppRepository.findByPhone(dto.userPhone);
+  async login(dto: LoginAppDto): Promise<IUserAuthApp> {
+    const logbase = `${this.SERVICE_NAME}/login`;
+
+    const user = await this.userAppService.findByPhone(dto.userPhone);
     // số điện không tồn tại | sai
     if (!user) {
+      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.PhoneLoginWrong}`);
       throw new UnauthorizedException(Msg.PhoneLoginWrong);
     }
 
@@ -49,16 +61,18 @@ export class AuthAppService {
 
     // sai mật khẩu
     if (!isPasswordValid) {
+      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.PhoneLoginWrong}`);
       throw new UnauthorizedException(Msg.PhoneLoginWrong);
     }
 
     // tài khoản bị khóa
     if (user.isActive === 'N') {
+      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.AccountLoginBlock}`);
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
 
     // cập nhập lại device mỗi lần đăng nhập
-    await this.authAppRepository.updateDeviceToken(dto.userDevice, dto.userPhone);
+    await this.userAppService.updateDeviceToken(dto.userDevice, dto.userPhone);
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
 
@@ -69,10 +83,12 @@ export class AuthAppService {
   }
 
   async register(dto: RegisterAppDto): Promise<number> {
-    const user = await this.authAppRepository.findByPhone(dto.userPhone);
+    const logbase = `${this.SERVICE_NAME}/register`;
+    const user = await this.userAppService.findByPhone(dto.userPhone);
 
     // lỗi -> số điện thoại đã tồn tại
     if (user) {
+      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.PhoneExist}`);
       throw new BadRequestException(Msg.PhoneExist);
     }
 
@@ -81,24 +97,28 @@ export class AuthAppService {
 
     // lỗi -> chưa xác thực OTP
     if (!verified) {
+      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.OtpNotVerify}`);
       throw new UnauthorizedException(Msg.OtpNotVerify);
     }
 
     // hash -> insert thông tin bao gồm cả device token
     const hashedPassword = await hashPassword(dto.userPassword);
-    const result = await this.authAppRepository.create({
+    const result = await this.userAppService.create({
       ...dto,
       userPassword: hashedPassword,
     });
 
+    this.logger.log(logbase, `${dto.userPhone} -> ${result ? Msg.RegisterOk : Msg.RegisterErr}`);
     return result;
   }
 
   async updatePassword(dto: UpdatePasswordDto, userPhone: string): Promise<number> {
-    const user = await this.authAppRepository.findByPhone(userPhone);
+    const logbase = `${this.SERVICE_NAME}/updatePassword`;
+    const user = await this.userAppService.findByPhone(userPhone);
 
     // tài khoản của sđt không tồn tại -> không thể update
     if (!user) {
+      this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneNotExist}`);
       throw new BadRequestException(Msg.PhoneNotExist);
     }
 
@@ -107,35 +127,43 @@ export class AuthAppService {
 
     // lỗi -> chưa xác thực OTP
     if (!verified) {
+      this.logger.error(logbase, `${userPhone} -> ${Msg.OtpNotVerify}`);
       throw new UnauthorizedException(Msg.OtpNotVerify);
     }
 
     // hash -> update pasword
     const hashedNewPassword = await hashPassword(dto.newPassword);
-    const result = await this.authAppRepository.updatePassword(hashedNewPassword, userPhone);
+    const result = await this.userAppService.updatePassword(hashedNewPassword, userPhone);
 
-    // xóa thông tin OTP của password để lần tiếp theo muốn đổi password lần nữa phải xác thực lại OTP
-    await this.otpService.deleteOtp(userPhone, PurposeEnum.FORGOT_PASSWORD);
+    // reset thông tin OTP của password để lần tiếp theo muốn đổi password lần nữa phải xác thực lại OTP
+    await this.otpService.resetOtp(userPhone, '0000', new Date(), PurposeEnum.FORGOT_PASSWORD);
+
+    this.logger.log(logbase, `${userPhone} -> ${result ? Msg.PasswordChangeOk : Msg.PasswordChangeErr}`);
     return result;
   }
 
   async updateDeviceToken(dto: UpdateDeviceTokenDto, userPhone: string): Promise<number> {
-    const user = await this.authAppRepository.findByPhone(userPhone);
+    const logbase = `${this.SERVICE_NAME}/updateDeviceToken`;
+
+    const user = await this.userAppService.findByPhone(userPhone);
 
     // tài khoản của sđt không tồn tại -> không thể update
     if (!user) {
+      this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneNotExist}`);
       throw new BadRequestException(Msg.PhoneNotExist);
     }
 
-    const result = await this.authAppRepository.updateDeviceToken(dto.userDevice, userPhone);
+    const result = await this.userAppService.updateDeviceToken(dto.userDevice, userPhone);
     return result;
   }
 
   async checkPhoneDuplicate(userPhone: string): Promise<number> {
-    const phone = await this.authAppRepository.findByPhone(userPhone);
+    const logbase = `${this.SERVICE_NAME}/checkPhoneDuplicate`;
+    const phone = await this.userAppService.findByPhone(userPhone);
 
     // lỗi -> số điện thoại đã tồn tại
     if (phone) {
+      this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneExist}`);
       throw new BadRequestException(Msg.PhoneExist);
     }
     return 1;
@@ -156,7 +184,7 @@ export class AuthAppService {
       const payload = this.jwtService.verify(token);
       return payload;
     } catch (err) {
-      throw new UnauthorizedException(Msg.TokenInvalid);
+      throw new ForbiddenException(Msg.TokenInvalid);
     }
   }
 }

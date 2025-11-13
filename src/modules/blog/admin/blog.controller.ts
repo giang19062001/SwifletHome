@@ -25,7 +25,7 @@ import {
 } from './blog.dto';
 import { BlogAdminService } from './blog.service';
 
-@ApiBearerAuth('swf-token')
+@ApiBearerAuth('admin-auth')
 @ApiTags('admin/blog')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/blog')

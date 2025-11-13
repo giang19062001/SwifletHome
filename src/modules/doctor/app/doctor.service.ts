@@ -4,7 +4,7 @@ import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
 import { IDoctorFileStr } from '../doctor.interface';
 import { getFileLocation } from 'src/config/multer';
-import { WinstonLoggerService } from 'src/logger/logger.service';
+import { LoggingService } from 'src/common/logger/logger.service';
 
 @Injectable()
 export class DoctorAppService {
@@ -12,7 +12,7 @@ export class DoctorAppService {
 
   constructor(
     private readonly doctorAppRepository: DoctorAppRepository,
-    private readonly logger: WinstonLoggerService,
+    private readonly logger: LoggingService,
   ) {}
 
   async createDoctor(dto: CreateDoctorDto): Promise<number> {

@@ -6,8 +6,6 @@ import { Msg } from 'src/helpers/message';
 @Injectable()
 export class SearchService {
   private readonly fuseOptions: IFuseOptions<ISearchItem> = fuseConfig;
-
-  // Standardize text for search comparison
   private normalizeText(text: string): string {
     return (
       text
@@ -19,7 +17,6 @@ export class SearchService {
     );
   }
 
-  /*Tìm câu trả lời gần nhất trong danh sách Câu hỏi thường gặp*/
   findAnswer(query: string, data: ISearchItem[]): string {
     if (!data?.length) {
       return Msg.DataEmpty;
@@ -31,7 +28,7 @@ export class SearchService {
       questions: item.questions.map((q) => this.normalizeText(q)),
     }));
 
-    // Khởi tạo Fuse.js với dữ liệu đã chuẩn hóa
+    // Khởi tạo fuse với dữ liệu đã chuẩn hóa
     const fuse = new Fuse(normalizedData, this.fuseOptions);
     const normalizedQuery = this.normalizeText(query);
 

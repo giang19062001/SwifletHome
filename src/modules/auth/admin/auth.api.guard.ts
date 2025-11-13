@@ -1,12 +1,7 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, ForbiddenException, forwardRef, Inject } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthAdminService } from './auth.service';
+import { Msg } from 'src/helpers/message';
 
 @Injectable()
 export class ApiAuthAdminGuard implements CanActivate {
@@ -17,7 +12,7 @@ export class ApiAuthAdminGuard implements CanActivate {
     const token = req.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
-      throw new UnauthorizedException('Missing authentication token');
+      throw new UnauthorizedException(Msg.TokenMissing);
     }
 
     try {
@@ -25,7 +20,7 @@ export class ApiAuthAdminGuard implements CanActivate {
       req['user'] = payload;
       return true;
     } catch {
-      throw new ForbiddenException('Invalid or expired token');
+      throw new ForbiddenException(Msg.TokenInvalid);
     }
   }
 }

@@ -41,7 +41,7 @@ export class AuthAdminController {
     const { accessToken, ...userWithoutToken } = user;
     // save user into session server to EJS render
     req.session.user = userWithoutToken;
-    return userWithoutToken;
+    return user;
   }
 
   @Get('logout')

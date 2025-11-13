@@ -11,8 +11,18 @@ export const initSwagger = (app) => {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
+        description: 'Admin token (cookie: swf-token)',
       },
-      'swf-token',
+      'admin-auth',
+    )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'App token (Authorization header)',
+      },
+      'app-auth',
     )
     .build();
 
@@ -25,15 +35,15 @@ export const initSwagger = (app) => {
     customCss: `
     .opblock-tag[data-tag^="app/"] {
       position: relative;
-      padding-left: 40px;
+      padding-left: 30px;
     }
 
     .opblock-tag[data-tag^="app/"]::before {
-      content: "📱";
+      content: "✨";
       position: absolute;
       left: 0;
       top: 0;
-      font-size: 32px;
+      font-size: 20px;
     }
   `,
   });
