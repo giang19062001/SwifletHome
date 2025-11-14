@@ -49,7 +49,7 @@ export class HomeSubmitAdminRepository {
     return rows ? (rows[0] as IHomeSubmit) : null;
   }
 
-  async updateStatus(dto: UpdateStatusDto, seq: number): Promise<number> {
+  async update(dto: UpdateStatusDto, seq: number): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET statusCode = ?, updatedId = ?, updatedAt = ?
       WHERE seq = ?

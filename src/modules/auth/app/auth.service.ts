@@ -7,12 +7,12 @@ import { hashPassword } from 'src/helpers/auth';
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IUserApp } from 'dist/modules/user/user.interface';
 import { IUserAuthApp } from './auth.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
+import { AbAuthService } from '../auth.abstract';
 
 @Injectable()
-export class AuthAppService {
+export class AuthAppService extends AbAuthService{
   private readonly SERVICE_NAME = 'AuthAppService';
 
   constructor(
@@ -20,7 +20,9 @@ export class AuthAppService {
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
     private readonly logger: LoggingService,
-  ) {}
+  ) {
+    super();
+  }
 
   private async verifyPhoneBeforeOtp(userPhone: string, purpose: string) {
     const logbase = `${this.SERVICE_NAME}/verifyPhoneBeforeOtp`;

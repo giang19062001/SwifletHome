@@ -4,10 +4,13 @@ import { IList } from 'src/interfaces/common';
 import { IQuestion } from '../question.interface';
 import { QuestionAdminRepository } from './question.repository';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
+import { AbAdminService } from 'src/abstract/common';
 
 @Injectable()
-export class QuestionAdminService {
-  constructor(private readonly questionAdminRepository: QuestionAdminRepository) {}
+export class QuestionAdminService extends AbAdminService {
+  constructor(private readonly questionAdminRepository: QuestionAdminRepository) {
+    super();
+  }
   async getAll(dto: PagingDto): Promise<IList<IQuestion>> {
     const total = await this.questionAdminRepository.getTotal();
     const list = await this.questionAdminRepository.getAll(dto);
@@ -21,21 +24,20 @@ export class QuestionAdminService {
     const result = await this.questionAdminRepository.getDetail(questionCode);
     return result;
   }
-  async createQuestion(dto: CreateQuestionDto): Promise<number> {
-    const result = await this.questionAdminRepository.createQuestion(dto);
+  async create(dto: CreateQuestionDto): Promise<number> {
+    const result = await this.questionAdminRepository.create(dto);
     return result;
   }
-  async updateQuestion(dto: UpdateQuestionDto, questionCode:string): Promise<number> {
-    const result = await this.questionAdminRepository.updateQuestion(dto, questionCode);
+  async update(dto: UpdateQuestionDto, questionCode: string): Promise<number> {
+    const result = await this.questionAdminRepository.update(dto, questionCode);
+    return result;
+  }
+  async delete(questionCode: string): Promise<number> {
+    const result = await this.questionAdminRepository.delete(questionCode);
     return result;
   }
   async updateAnswerQuestionNull(questionCode: string): Promise<number> {
-    const result =
-      await this.questionAdminRepository.updateAnswerQuestionNull(questionCode);
-    return result;
-  }
-  async deleteQuestion(questionCode: string): Promise<number> {
-    const result = await this.questionAdminRepository.deleteQuestion(questionCode);
+    const result = await this.questionAdminRepository.updateAnswerQuestionNull(questionCode);
     return result;
   }
 }

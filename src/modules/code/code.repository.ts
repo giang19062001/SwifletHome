@@ -2,12 +2,15 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { GetAllCodeDto } from './code.dto';
 import { ICode } from './code.interface';
+import { AbAdminRepo } from 'src/abstract/common';
 
 @Injectable()
-export class CodeRepository {
+export class CodeRepository extends AbAdminRepo {
   private readonly table = 'tbl_code_common';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
+    super();
+  }
 
   async getAll(dto: GetAllCodeDto): Promise<ICode[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
@@ -15,9 +18,25 @@ export class CodeRepository {
         FROM ${this.table} A
         WHERE A.mainCode = ? AND A.subCode = ?
         AND A.isActive = 'Y' 
-        ORDER BY A.sortOrder ASC`,[dto.mainCode, dto.subCode],
+        ORDER BY A.sortOrder ASC`,
+      [dto.mainCode, dto.subCode],
     );
     return rows as ICode[];
   }
- 
+
+  getTotal(dto?: any): Promise<number> {
+    throw new Error('Method not implemented.');
+  }
+  getDetail(dto: string | number): Promise<any | null> {
+    throw new Error('Method not implemented.');
+  }
+  create(dto: any): Promise<number> {
+    throw new Error('Method not implemented.');
+  }
+  update(dto: any, id: string | number): Promise<number> {
+    throw new Error('Method not implemented.');
+  }
+  delete(dto: string | number): Promise<number> {
+    throw new Error('Method not implemented.');
+  }
 }

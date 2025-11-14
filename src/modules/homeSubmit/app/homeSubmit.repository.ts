@@ -9,7 +9,7 @@ export class HomeSubmitAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async createHomeSubmit(dto: CreateHomeSubmitDto): Promise<number> {
+  async create(dto: CreateHomeSubmitDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.table}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, statusCode, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)

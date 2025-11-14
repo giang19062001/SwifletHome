@@ -14,10 +14,10 @@ export class HomeSubmitAppController {
   @ApiBody({
     type: CreateHomeSubmitDto,
   })
-  @Post('createHomeSubmit')
+  @Post('create')
   @HttpCode(HttpStatus.OK)
-  async createHomeSubmit(@Body() dto: CreateHomeSubmitDto): Promise<number> {
-    const result = await this.homeSubmitAppService.createHomeSubmit(dto);
+  async create(@Body() dto: CreateHomeSubmitDto): Promise<number> {
+    const result = await this.homeSubmitAppService.create(dto);
     return result;
   }
 }

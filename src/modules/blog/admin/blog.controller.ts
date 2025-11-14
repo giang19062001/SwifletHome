@@ -56,10 +56,10 @@ export class BlogAdminController {
   }
 
   @ApiBody({ type: CreateBlogDto })
-  @Post('createBlog')
+  @Post('create')
   @HttpCode(HttpStatus.OK)
-  async createBlog(@Body() dto: CreateBlogDto): Promise<number> {
-    const result = await this.blogAdminService.createBlog(dto);
+  async create(@Body() dto: CreateBlogDto): Promise<number> {
+    const result = await this.blogAdminService.create(dto);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -68,21 +68,21 @@ export class BlogAdminController {
 
   @ApiBody({ type: UpdateBlogDto })
   @ApiParam({ name: 'blogCode', type: String })
-  @Put('updateBlog/:blogCode')
+  @Put('update/:blogCode')
   @HttpCode(HttpStatus.OK)
-  async updateBlog(@Body() dto: UpdateBlogDto, @Param('blogCode') blogCode: string): Promise<number> {
-    const result = await this.blogAdminService.updateBlog(dto, blogCode);
+  async update(@Body() dto: UpdateBlogDto, @Param('blogCode') blogCode: string): Promise<number> {
+    const result = await this.blogAdminService.update(dto, blogCode);
     if (result === 0) {
       throw new BadRequestException();
     }
     return result;
   }
 
-  @Delete('deleteBlog/:blogCode')
+  @Delete('delete/:blogCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'blogCode', type: String })
-  async deleteBlog(@Param('blogCode') blogCode: string): Promise<number> {
-    const result = await this.blogAdminService.deleteBlog(blogCode);
+  async delete(@Param('blogCode') blogCode: string): Promise<number> {
+    const result = await this.blogAdminService.delete(blogCode);
     if (result === 0) {
       throw new BadRequestException();
     }

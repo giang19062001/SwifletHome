@@ -28,10 +28,10 @@ export class HomeSubmitAdminController {
   
     @ApiBody({ type: UpdateStatusDto })
     @ApiParam({ name: 'seq', type: Number })
-    @Put('updateStatus/:seq')
+    @Put('update/:seq')
     @HttpCode(HttpStatus.OK)
-    async updateStatus(@Body() dto: UpdateStatusDto,  @Param('seq') seq: number): Promise<number> {
-      const result = await this.homeSubmitAdminService.updateStatus(dto, seq);
+    async update(@Body() dto: UpdateStatusDto,  @Param('seq') seq: number): Promise<number> {
+      const result = await this.homeSubmitAdminService.update(dto, seq);
       if (result === 0) {
         throw new BadRequestException();
       }

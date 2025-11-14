@@ -87,7 +87,7 @@ async function deleteHome(homeCode) {
     return;
   }
   await axios
-    .delete(currentUrl + `/api/admin/home/deleteHome/${homeCode}`, axiosAuth())
+    .delete(currentUrl + `/api/admin/home/delete/${homeCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

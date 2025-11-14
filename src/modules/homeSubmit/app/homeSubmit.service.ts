@@ -5,8 +5,8 @@ import { CreateHomeSubmitDto } from './homeSubmit.dto';
 @Injectable()
 export class HomeSubmitAppService {
   constructor(private readonly homeSubmitAppRepository: HomeSubmitAppRepository) {}
-  async createHomeSubmit(dto: CreateHomeSubmitDto): Promise<number> {
-    const result = await this.homeSubmitAppRepository.createHomeSubmit(dto);
+  async create(dto: CreateHomeSubmitDto): Promise<number> {
+    const result = await this.homeSubmitAppRepository.create(dto);
     return result;
   }
 }

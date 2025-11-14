@@ -25,8 +25,8 @@ export class DoctorAdminService {
     return result;
   }
 
-  async updateDoctor(dto: UpdateDoctorDto, seq: number): Promise<number> {
-    const result = await this.doctorAdminRepository.updateDoctor(dto, seq);
+  async update(dto: UpdateDoctorDto, seq: number): Promise<number> {
+    const result = await this.doctorAdminRepository.update(dto, seq);
     return result;
   }
 }

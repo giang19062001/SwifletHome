@@ -1,9 +1,9 @@
-import { IUserApp } from './../../../../dist/modules/user/user.interface.d';
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { generateCode } from 'src/helpers/func';
 import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
+import { IUserApp } from './user.interface';
 
 @Injectable()
 export class UserAppRepository {

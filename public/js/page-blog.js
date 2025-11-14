@@ -85,7 +85,7 @@ async function deleteBlog(blogCode) {
   }
   await axios
     .delete(
-      currentUrl + `/api/admin/blog/deleteBlog/${blogCode}`,
+      currentUrl + `/api/admin/blog/delete/${blogCode}`,
       axiosAuth(),
     )
     .then(function (response) {

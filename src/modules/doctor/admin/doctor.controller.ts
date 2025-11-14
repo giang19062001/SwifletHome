@@ -38,10 +38,10 @@ export class DoctorAdminController {
 
   @ApiBody({ type: UpdateDoctorDto })
   @ApiParam({ name: 'seq', type: Number })
-  @Put('updateDoctor/:seq')
+  @Put('update/:seq')
   @HttpCode(HttpStatus.OK)
-  async updateDoctor(@Body() dto: UpdateDoctorDto, @Param('seq') seq: number): Promise<number> {
-    const result = await this.doctorAdminService.updateDoctor(dto, seq);
+  async update(@Body() dto: UpdateDoctorDto, @Param('seq') seq: number): Promise<number> {
+    const result = await this.doctorAdminService.update(dto, seq);
     if (result === 0) {
       throw new BadRequestException();
     }

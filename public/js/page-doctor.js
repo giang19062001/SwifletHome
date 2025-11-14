@@ -214,7 +214,7 @@ async function updateDoctor() {
     }
     await axios
       .put(
-        currentUrl + '/api/admin/doctor/updateDoctor/' + seq,
+        currentUrl + '/api/admin/doctor/update/' + seq,
         {
           statusCode: statusCode,
           noteAnswered: noteAnswered,

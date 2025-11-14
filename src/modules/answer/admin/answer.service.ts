@@ -9,13 +9,16 @@ import {
   UpdateAnswerDto,
 } from './answer.dto';
 import { QuestionAdminService } from 'src/modules/question/admin/question.service';
+import { AbAdminService } from 'src/abstract/common';
 
 @Injectable()
-export class AnswerAdminService {
+export class AnswerAdminService extends AbAdminService{
   constructor(
     private readonly answerAdminRepository: AnswerAdminRepository,
     private readonly questionAdminService: QuestionAdminService,
-  ) {}
+  ) {
+    super();
+  }
   async getAll(dto: GetAllAnswerDto): Promise<IList<IAnswer>> {
     const total = await this.answerAdminRepository.getTotal(dto);
     const list = await this.answerAdminRepository.getAll(dto);
@@ -25,11 +28,11 @@ export class AnswerAdminService {
     const result = await this.answerAdminRepository.getDetail(answerCode);
     return result;
   }
-  async createAnswer(dto: CreateAnswerDto): Promise<number> {
-    const result = await this.answerAdminRepository.createAnswer(dto);
+  async create(dto: CreateAnswerDto): Promise<number> {
+    const result = await this.answerAdminRepository.create(dto);
     return result;
   }
-  async updateAnswer(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
+  async update(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
     const questions = await this.questionAdminService.getAllByAnswer(
       answerCode,
     );
@@ -44,10 +47,10 @@ export class AnswerAdminService {
         );
       }
     }
-    const result = await this.answerAdminRepository.updateAnswer(dto, answerCode);
+    const result = await this.answerAdminRepository.update(dto, answerCode);
     return result;
   }
-  async deleteAnswer(answerCode: string): Promise<number> {
+  async delete(answerCode: string): Promise<number> {
     const questions =
       await this.questionAdminService.getAllByAnswer(answerCode);
     // set answerCode is 'null' If any questions are assigning this answer
@@ -58,7 +61,7 @@ export class AnswerAdminService {
         );
       }
     }
-    const result = await this.answerAdminRepository.deleteAnswer(answerCode);
+    const result = await this.answerAdminRepository.delete(answerCode);
     return result;
   }
 }

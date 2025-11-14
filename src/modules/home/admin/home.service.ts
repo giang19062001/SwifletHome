@@ -7,15 +7,18 @@ import { HomeAdminRepository } from './home.repository';
 import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import { diffByTwoArr } from 'src/helpers/func';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { AbAdminService } from 'src/abstract/common';
 
 @Injectable()
-export class HomeAdminService {
+export class HomeAdminService extends AbAdminService{
   private readonly SERVICE_NAME = "HomeAdminService"
   constructor(
     private readonly homeAdminRepository: HomeAdminRepository,
     private readonly uploadService: UploadService,
     private readonly logger: LoggingService,
-  ) {}
+  ) {
+    super();
+  }
   async getAll(dto: PagingDto): Promise<IList<IHome>> {
     const total = await this.homeAdminRepository.getTotal();
     const list = await this.homeAdminRepository.getAll(dto);
@@ -40,8 +43,8 @@ export class HomeAdminService {
       return null;
     }
   }
-  async createHome(dto: CreateHomeDto): Promise<number> {
-    const seq = await this.homeAdminRepository.createHome(dto);
+  async create(dto: CreateHomeDto): Promise<number> {
+    const seq = await this.homeAdminRepository.create(dto);
     if (seq) {
       //homeImage
       if (dto.homeImage) {
@@ -57,8 +60,8 @@ export class HomeAdminService {
     return seq;
   }
 
-  async updateHome(dto: UpdateHomeDto, homeCode: string): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/updateHome`;
+  async update(dto: UpdateHomeDto, homeCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/update`;
 
     const home = await this.getDetail(homeCode);
     if (home) {
@@ -96,18 +99,18 @@ export class HomeAdminService {
           await this.homeAdminRepository.createImages(home.seq, 'admin', file);
         }
       }
-      const result = await this.homeAdminRepository.updateHome(dto, homeCode);
+      const result = await this.homeAdminRepository.update(dto, homeCode);
       return result;
     } else {
       return 0;
     }
   }
-  async deleteHome(homeCode: string): Promise<number> {
+  async delete(homeCode: string): Promise<number> {
     const home = await this.homeAdminRepository.getDetail(homeCode);
     if (home) {
       // const images = await this.homeAdminRepository.getImages(home?.seq ?? 0);
 
-      const resultHome = await this.homeAdminRepository.deleteHome(homeCode);
+      const resultHome = await this.homeAdminRepository.delete(homeCode);
 
       // xóa các file ảnh của nhà yến trong databse
       // if (resultHome) {

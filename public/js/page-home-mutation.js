@@ -236,11 +236,11 @@ function renderImagePreview(file, index, input, preview, field) {
 
 // TODO: API
 async function createHome(formData) {
-  await submitHome(formData, '/api/admin/home/createHome', 'post', 'Thêm thành công');
+  await submitHome(formData, '/api/admin/home/create', 'post', 'Thêm thành công');
 }
 
 async function updateHome(formData) {
-  await submitHome(formData, `/api/admin/home/updateHome/${formData.homeCode}`, 'put', 'Cập nhật thành công');
+  await submitHome(formData, `/api/admin/home/update/${formData.homeCode}`, 'put', 'Cập nhật thành công');
 }
 
 async function submitHome(formData, url, method, successMessage) {

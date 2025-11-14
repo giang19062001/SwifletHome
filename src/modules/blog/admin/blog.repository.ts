@@ -2,18 +2,17 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/common';
 import { IBlog } from '../blog.interface';
-import {
-  CreateBlogDto,
-  GetAllBlogDto,
-  UpdateBlogDto,
-} from './blog.dto';
+import { CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { generateCode } from 'src/helpers/func';
+import { AbAdminRepo } from 'src/abstract/common';
 
 @Injectable()
-export class BlogAdminRepository {
+export class BlogAdminRepository extends AbAdminRepo {
   private readonly table = 'tbl_blog';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
+    super();
+  }
 
   async getTotal(dto: GetAllBlogDto): Promise<number> {
     const params: any[] = [];
@@ -30,10 +29,7 @@ export class BlogAdminRepository {
       params.push(dto.blogCategory);
     }
 
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`,
-      params,
-    );
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: GetAllBlogDto): Promise<IBlog[]> {
@@ -85,7 +81,7 @@ export class BlogAdminRepository {
     );
     return rows ? (rows[0] as IBlog) : null;
   }
-  async createBlog(dto: CreateBlogDto): Promise<number> {
+  async create(dto: CreateBlogDto): Promise<number> {
     const sqlLast = ` SELECT blogCode FROM ${this.table} ORDER BY blogCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let blogCode = 'BLG000001';
@@ -96,44 +92,27 @@ export class BlogAdminRepository {
         INSERT INTO ${this.table}  (blogCode, blogContent, blogObject, blogCategory, isFree, createdId) 
         VALUES(?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      blogCode,
-      dto.blogContent,
-      dto.blogObject,
-      dto.blogCategory,
-      dto.isFree,
-      dto.createdId
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode, dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, dto.createdId]);
 
     return result.insertId;
   }
-  async updateBlog(dto: UpdateBlogDto, blogCode: string): Promise<number> {
+  async update(dto: UpdateBlogDto, blogCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET blogContent = ?, blogObject = ?, blogCategory = ?, isFree = ?,
       updatedId = ?, updatedAt = ?
       WHERE blogCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.blogContent,
-      dto.blogObject,
-      dto.blogCategory,
-      dto.isFree,
-      dto.updatedId,
-      new Date(),
-      blogCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, dto.updatedId, new Date(), blogCode]);
 
     return result.affectedRows;
   }
 
-  async deleteBlog(blogCode: string): Promise<number> {
+  async delete(blogCode: string): Promise<number> {
     const sql = `
       DELETE FROM ${this.table}
       WHERE blogCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      blogCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode]);
 
     return result.affectedRows;
   }

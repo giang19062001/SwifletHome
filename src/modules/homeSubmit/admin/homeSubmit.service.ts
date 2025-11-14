@@ -17,8 +17,8 @@ export class HomeSubmitAdminService {
     const result = await this.homeSubmitAdminRepository.getDetail(seq);
     return result
   }
-  async updateStatus(dto: UpdateStatusDto, seq: number): Promise<number> {
-    const result = await this.homeSubmitAdminRepository.updateStatus(dto, seq);
+  async update(dto: UpdateStatusDto, seq: number): Promise<number> {
+    const result = await this.homeSubmitAdminRepository.update(dto, seq);
     return result
   }
 }

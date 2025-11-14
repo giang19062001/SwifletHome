@@ -16,8 +16,6 @@ export interface IListApp<T> {
   list: T[];
 }
 
-
-
 export enum IsFreeEnum {
   Y = 'Y',
   N = 'N',

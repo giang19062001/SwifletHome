@@ -40,8 +40,16 @@ export class DoctorAdminRepository {
     );
     return rows ? (rows[0] as IDoctor) : null;
   }
+  async update(dto: UpdateDoctorDto, seq: number): Promise<number> {
+    const sql = `
+          UPDATE ${this.table} SET noteAnswered = ?, statusCode = ?, updatedId = ?, updatedAt = ?
+          WHERE seq = ?
+        `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.noteAnswered, dto.statusCode, dto.updatedId, new Date(), seq]);
 
-   async getFilesBySeq(seq: number): Promise<IDoctorFile[]> {
+    return result.affectedRows;
+  }
+  async getFilesBySeq(seq: number): Promise<IDoctorFile[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT B.seq, B.filename,  B.mimetype
         FROM ${this.table} A 
@@ -53,20 +61,4 @@ export class DoctorAdminRepository {
     );
     return rows as IDoctorFile[];
   }
-
-   async updateDoctor(dto: UpdateDoctorDto, seq: number): Promise<number> {
-      const sql = `
-          UPDATE ${this.table} SET noteAnswered = ?, statusCode = ?, updatedId = ?, updatedAt = ?
-          WHERE seq = ?
-        `;
-      const [result] = await this.db.execute<ResultSetHeader>(sql, [
-        dto.noteAnswered,
-        dto.statusCode,
-        dto.updatedId,
-        new Date(),
-        seq,
-      ]);
-  
-      return result.affectedRows;
-    }
 }

@@ -8,12 +8,15 @@ import {
   UpdateAnswerDto,
 } from './answer.dto';
 import { generateCode } from 'src/helpers/func';
+import { AbAdminRepo } from 'src/abstract/common';
 
 @Injectable()
-export class AnswerAdminRepository {
+export class AnswerAdminRepository extends AbAdminRepo {
   private readonly table = 'tbl_answer';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
+    super();
+  }
 
   async getTotal(dto: GetAllAnswerDto): Promise<number> {
     const params: any[] = [];
@@ -85,7 +88,7 @@ export class AnswerAdminRepository {
     );
     return rows ? (rows[0] as IAnswer) : null;
   }
-  async createAnswer(dto: CreateAnswerDto): Promise<number> {
+  async create(dto: CreateAnswerDto): Promise<number> {
     const sqlLast = ` SELECT answerCode FROM ${this.table} ORDER BY answerCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let answerCode = 'ANS000001';
@@ -107,7 +110,7 @@ export class AnswerAdminRepository {
 
     return result.insertId;
   }
-  async updateAnswer(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
+  async update(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET answerContent = ?, answerObject = ?, answerCategory = ?, isFree = ?,
       updatedId = ?, updatedAt = ?
@@ -126,7 +129,7 @@ export class AnswerAdminRepository {
     return result.affectedRows;
   }
 
-  async deleteAnswer(answerCode: string): Promise<number> {
+  async delete(answerCode: string): Promise<number> {
     const sql = `
       DELETE FROM ${this.table}
       WHERE answerCode = ?

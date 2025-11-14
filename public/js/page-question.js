@@ -240,7 +240,7 @@ async function deleteQuestion(questionCode) {
     return;
   }
   await axios
-    .delete(currentUrl + `/api/admin/question/deleteQuestion/${questionCode}`, axiosAuth())
+    .delete(currentUrl + `/api/admin/question/delete/${questionCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -268,7 +268,7 @@ async function createQuestion() {
     }
     await axios
       .post(
-        currentUrl + '/api/admin/question/createQuestion',
+        currentUrl + '/api/admin/question/create',
         {
           questionContent: questionContent,
           questionCategory: questionCategory,
@@ -312,7 +312,7 @@ async function updateQuestion() {
     }
     await axios
       .put(
-        currentUrl + '/api/admin/question/updateQuestion/' + questionCode,
+        currentUrl + '/api/admin/question/update/' + questionCode,
         {
           questionContent: questionContent,
           questionCategory: questionCategory,

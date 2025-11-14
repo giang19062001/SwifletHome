@@ -69,7 +69,7 @@ async function showHomeSubmitModal(homeData) {
   });
 
   // assign <event> update
-  modalEl.querySelector('.modal-footer button').onclick = updateStatusHomeSubmit;
+  modalEl.querySelector('.modal-footer button').onclick = updateHomeSubmit;
 
   // show modal
   const modal = new bootstrap.Modal(modalEl);
@@ -168,7 +168,7 @@ async function getDetailHomeSubmit(seq) {
     });
 }
 
-async function updateStatusHomeSubmit() {
+async function updateHomeSubmit() {
   try {
     const modalBody = document.querySelector('.home-submit-update-modal .modal-body form');
     const seq = modalBody.querySelector('#seq').value;
@@ -177,7 +177,7 @@ async function updateStatusHomeSubmit() {
 
     await axios
       .put(
-        currentUrl + '/api/admin/homeSubmit/updateStatus/' + seq,
+        currentUrl + '/api/admin/homeSubmit/update/' + seq,
         {
           statusCode: statusCode,
           updatedId: user.userId,

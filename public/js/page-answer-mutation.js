@@ -130,7 +130,7 @@ async function createAnswer() {
     const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
     await axios
       .post(
-        currentUrl + '/api/admin/answer/createAnswer',
+        currentUrl + '/api/admin/answer/create',
         {
           answerContent,
           answerCategory,
@@ -168,7 +168,7 @@ async function updateAnswer() {
 
     await axios
       .put(
-        currentUrl + '/api/admin/answer/updateAnswer/' + answerCode,
+        currentUrl + '/api/admin/answer/update/' + answerCode,
         {
           answerContent,
           answerCategory,

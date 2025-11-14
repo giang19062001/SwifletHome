@@ -85,7 +85,7 @@ async function deleteAnswer(answerCode) {
   }
   await axios
     .delete(
-      currentUrl + `/api/admin/answer/deleteAnswer/${answerCode}`,
+      currentUrl + `/api/admin/answer/delete/${answerCode}`,
       axiosAuth(),
     )
     .then(function (response) {

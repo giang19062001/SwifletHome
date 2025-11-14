@@ -130,7 +130,7 @@ async function createBlog() {
     const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
     await axios
       .post(
-        currentUrl + '/api/admin/blog/createBlog',
+        currentUrl + '/api/admin/blog/create',
         {
           blogContent,
           blogCategory,
@@ -168,7 +168,7 @@ async function updateBlog() {
 
     await axios
       .put(
-        currentUrl + '/api/admin/blog/updateBlog/' + blogCode,
+        currentUrl + '/api/admin/blog/update/' + blogCode,
         {
           blogContent,
           blogCategory,

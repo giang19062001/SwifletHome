@@ -57,7 +57,7 @@ export class HomeAdminController {
     return result;
   }
 
-  @Post('createHome')
+  @Post('create')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateHomeDto })
   // @UseInterceptors(AnyFilesInterceptor(multerImgConfig))
@@ -70,7 +70,7 @@ export class HomeAdminController {
       multerImgConfig,
     ),
   )
-  async createHome(
+  async create(
     @Body() createHomeDto: CreateHomeDto,
     // @UploadedFiles() files: Express.Multer.File[],
     @UploadedFiles()
@@ -87,14 +87,14 @@ export class HomeAdminController {
       homeImages,
     };
 
-    const result = await this.homeAdminService.createHome(body);
+    const result = await this.homeAdminService.create(body);
     if (result === 0) {
       throw new BadRequestException();
     }
     return result;
   }
 
-  @Put('updateHome/:homeCode')
+  @Put('update/:homeCode')
   @ApiParam({ name: 'homeCode', type: String })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateHomeDto })
@@ -107,7 +107,7 @@ export class HomeAdminController {
       multerImgConfig,
     ),
   )
-  async updateHome(
+  async update(
     @Body() createHomeDto: UpdateHomeDto,
     @Param('homeCode') homeCode: string,
     @UploadedFiles()
@@ -124,18 +124,18 @@ export class HomeAdminController {
       homeImages,
     };
 
-    const result = await this.homeAdminService.updateHome(dto, homeCode);
+    const result = await this.homeAdminService.update(dto, homeCode);
     if (result === 0) {
       throw new BadRequestException();
     }
     return result;
   }
 
-  @Delete('deleteHome/:homeCode')
+  @Delete('delete/:homeCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'homeCode', type: String })
-  async deleteHome(@Param('homeCode') homeCode: string): Promise<number> {
-    const result = await this.homeAdminService.deleteHome(homeCode);
+  async delete(@Param('homeCode') homeCode: string): Promise<number> {
+    const result = await this.homeAdminService.delete(homeCode);
     if (result === 0) {
       throw new BadRequestException();
     }

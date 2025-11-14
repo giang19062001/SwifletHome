@@ -4,17 +4,18 @@ import { PagingDto } from 'src/dto/common';
 import { IQuestion } from '../question.interface';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { generateCode } from 'src/helpers/func';
+import { AbAdminRepo } from 'src/abstract/common';
 
 @Injectable()
-export class QuestionAdminRepository {
+export class QuestionAdminRepository extends AbAdminRepo {
   private readonly table = 'tbl_question';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
+    super();
+  }
 
   async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`,
-    );
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IQuestion[]> {
@@ -28,20 +29,6 @@ export class QuestionAdminRepository {
         ON A.questionObject = C.objectCharacter
         LIMIT ? OFFSET ? `,
       [dto.limit, (dto.page - 1) * dto.limit],
-    );
-    return rows as IQuestion[];
-  }
-  async getAllByAnswer(answerCode: string): Promise<IQuestion[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
-        B.categoryName, C.objectName
-        FROM ${this.table} A 
-        LEFT JOIN tbl_category B
-        ON A.questionCategory = B.categoryCode
-        LEFT JOIN tbl_object C
-        ON A.questionObject = C.objectCharacter
-        WHERE A.answerCode IS NOT NULL AND A.answerCode = ?`,
-      [answerCode],
     );
     return rows as IQuestion[];
   }
@@ -62,7 +49,7 @@ export class QuestionAdminRepository {
     );
     return rows ? (rows[0] as IQuestion) : null;
   }
-  async createQuestion(dto: CreateQuestionDto): Promise<number> {
+  async create(dto: CreateQuestionDto): Promise<number> {
     const sqlLast = ` SELECT questionCode FROM ${this.table} ORDER BY questionCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let questionCode = 'QUS000001';
@@ -73,57 +60,51 @@ export class QuestionAdminRepository {
       INSERT INTO ${this.table}  (questionCode, answerCode, questionObject, questionContent, questionCategory, createdId) 
       VALUES(?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      questionCode,
-      dto.answerCode,
-      dto.questionObject,
-      dto.questionContent,
-      dto.questionCategory,
-      dto.createdId
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [questionCode, dto.answerCode, dto.questionObject, dto.questionContent, dto.questionCategory, dto.createdId]);
 
     return result.insertId;
   }
-
-  async updateAnswerQuestionNull(questionCode: string): Promise<number> {
-    const sql = `
-      UPDATE ${this.table} SET answerCode = ?
-      WHERE questionCode = ?
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      null,
-      questionCode,
-    ]);
-
-    return result.affectedRows;
-  }
-  async updateQuestion(dto: UpdateQuestionDto, questionCode: string): Promise<number> {
+  async update(dto: UpdateQuestionDto, questionCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET answerCode = ?, questionObject = ?, questionContent = ?, questionCategory = ?,
       updatedId = ?, updatedAt = ?
       WHERE questionCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.answerCode,
-      dto.questionObject,
-      dto.questionContent,
-      dto.questionCategory,
-      dto.updatedId,
-      new Date(),
-      questionCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.answerCode, dto.questionObject, dto.questionContent, dto.questionCategory, dto.updatedId, new Date(), questionCode]);
 
     return result.affectedRows;
   }
 
-  async deleteQuestion(questionCode: string): Promise<number> {
+  async delete(questionCode: string): Promise<number> {
     const sql = `
       DELETE FROM ${this.table}
       WHERE questionCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      questionCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [questionCode]);
+
+    return result.affectedRows;
+  }
+
+  async getAllByAnswer(answerCode: string): Promise<IQuestion[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
+        B.categoryName, C.objectName
+        FROM ${this.table} A 
+        LEFT JOIN tbl_category B
+        ON A.questionCategory = B.categoryCode
+        LEFT JOIN tbl_object C
+        ON A.questionObject = C.objectCharacter
+        WHERE A.answerCode IS NOT NULL AND A.answerCode = ?`,
+      [answerCode],
+    );
+    return rows as IQuestion[];
+  }
+  async updateAnswerQuestionNull(questionCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET answerCode = ?
+      WHERE questionCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [null, questionCode]);
 
     return result.affectedRows;
   }

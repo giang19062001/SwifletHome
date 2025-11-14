@@ -8,12 +8,15 @@ import {
 } from './blog.dto';
 import { BlogAdminRepository } from './blog.repository';
 import { IBlog } from '../blog.interface';
+import { AbAdminService } from 'src/abstract/common';
 
 @Injectable()
-export class BlogAdminService {
+export class BlogAdminService extends AbAdminService{
   constructor(
     private readonly blogAdminRepository: BlogAdminRepository,
-  ) {}
+  ) {
+    super();
+  }
   async getAll(dto: GetAllBlogDto): Promise<IList<IBlog>> {
     const total = await this.blogAdminRepository.getTotal(dto);
     const list = await this.blogAdminRepository.getAll(dto);
@@ -23,16 +26,16 @@ export class BlogAdminService {
     const result = await this.blogAdminRepository.getDetail(blogCode);
     return result;
   }
-  async createBlog(dto: CreateBlogDto): Promise<number> {
-    const result = await this.blogAdminRepository.createBlog(dto);
+  async create(dto: CreateBlogDto): Promise<number> {
+    const result = await this.blogAdminRepository.create(dto);
     return result;
   }
-  async updateBlog(dto: UpdateBlogDto, blogCode: string): Promise<number> {
-    const result = await this.blogAdminRepository.updateBlog(dto, blogCode);
+  async update(dto: UpdateBlogDto, blogCode: string): Promise<number> {
+    const result = await this.blogAdminRepository.update(dto, blogCode);
     return result;
   }
-  async deleteBlog(blogCode: string): Promise<number> {
-    const result = await this.blogAdminRepository.deleteBlog(blogCode);
+  async delete(blogCode: string): Promise<number> {
+    const result = await this.blogAdminRepository.delete(blogCode);
     return result;
   }
 }

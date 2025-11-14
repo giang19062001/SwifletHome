@@ -131,6 +131,7 @@ CREATE TABLE `tbl_uploads_video` (
   UNIQUE KEY `videoUrl_UNIQUE` (`urlLink`)
 ) 
 
+-- nhà yến SCT
 CREATE TABLE `tbl_home` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeCode` varchar(45) NOT NULL,
@@ -166,6 +167,7 @@ CREATE TABLE `tbl_home_img` (
   UNIQUE KEY `filename_UNIQUE` (`filename`)
 )
 
+-- đơn đăng ký nhà yến
 CREATE TABLE `tbl_home_submit` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeCode` varchar(45) NOT NULL,

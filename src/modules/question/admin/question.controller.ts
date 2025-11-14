@@ -56,10 +56,10 @@ export class QuestionAdminController {
   }
 
   @ApiBody({ type: CreateQuestionDto })
-  @Post('createQuestion')
+  @Post('create')
   @HttpCode(HttpStatus.OK)
-  async createQuestion(@Body() dto: CreateQuestionDto): Promise<number> {
-    const result = await this.questionAdminService.createQuestion(dto);
+  async create(@Body() dto: CreateQuestionDto): Promise<number> {
+    const result = await this.questionAdminService.create(dto);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -68,23 +68,23 @@ export class QuestionAdminController {
 
   @ApiBody({ type: UpdateQuestionDto })
   @ApiParam({ name: 'questionCode', type: String })
-  @Put('updateQuestion/:questionCode')
+  @Put('update/:questionCode')
   @HttpCode(HttpStatus.OK)
-  async updateQuestion(@Body() dto: UpdateQuestionDto,  @Param('questionCode') questionCode: string): Promise<number> {
-    const result = await this.questionAdminService.updateQuestion(dto, questionCode);
+  async update(@Body() dto: UpdateQuestionDto,  @Param('questionCode') questionCode: string): Promise<number> {
+    const result = await this.questionAdminService.update(dto, questionCode);
     if (result === 0) {
       throw new BadRequestException();
     }
     return result;
   }
 
-  @Delete('deleteQuestion/:questionCode')
+  @Delete('delete/:questionCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'questionCode', type: String })
-  async updateAnswer(
+  async delete(
     @Param('questionCode') questionCode: string,
   ): Promise<number> {
-    const result = await this.questionAdminService.deleteQuestion(questionCode);
+    const result = await this.questionAdminService.delete(questionCode);
     if (result === 0) {
       throw new BadRequestException();
     }

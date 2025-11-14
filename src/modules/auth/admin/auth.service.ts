@@ -1,21 +1,20 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { IUserAuthAdmin } from './auth.interface';
 import { LoginAdminDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
+import { AbAuthService } from '../auth.abstract';
 
 @Injectable()
-export class AuthAdminService {
+export class AuthAdminService extends AbAuthService {
   constructor(
     private readonly userAdminService: UserAdminService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) {
+    super();
+  }
   async login(dto: LoginAdminDto): Promise<Omit<IUserAuthAdmin, 'userPassword'>> {
     const user = await this.userAdminService.findByUserId(dto.userId);
 
@@ -23,10 +22,7 @@ export class AuthAdminService {
       throw new UnauthorizedException(Msg.AccountLoginWrong);
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      dto.userPassword,
-      user.userPassword,
-    );
+    const isPasswordValid = await bcrypt.compare(dto.userPassword, user.userPassword);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException(Msg.AccountLoginWrong);
@@ -42,6 +38,9 @@ export class AuthAdminService {
     const payload = { userId: user.userId, userName: user.userName };
     const accessToken = this.jwtService.sign(payload);
     return { ...userWithoutPassword, accessToken };
+  }
+  register(dto: any): Promise<any> {
+    throw new Error('Method not implemented.');
   }
 
   verifyToken(token: string) {
