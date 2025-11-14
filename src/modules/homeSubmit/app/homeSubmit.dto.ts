@@ -10,13 +10,6 @@ export class CreateHomeSubmitDto {
   homeCode: string;
 
   @ApiProperty({
-    example: 'USR000001',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userCode: string;
-
-  @ApiProperty({
     example: 'Giang',
   })
   @IsString()
@@ -31,7 +24,7 @@ export class CreateHomeSubmitDto {
   userPhone: string;
 
   @ApiProperty({
-    example: 'COD000001',
+    example: 'COD000003',
   })
   @IsString()
   @IsNotEmpty()

@@ -26,14 +26,15 @@ CREATE TABLE `tbl_category` (
 
 CREATE TABLE `tbl_object` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `objectCharacter` enum('SWIFTLET','TEA','COFFEE') NOT NULL DEFAULT 'SWIFTLET',
+  `objectKeyword` enum('SWIFTLET','TEA','COFFEE') NOT NULL DEFAULT 'SWIFTLET',
   `objectName` varchar(45) NOT NULL,
+  `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
-  UNIQUE KEY `objectCharacter_UNIQUE` (`objectCharacter`)
+  UNIQUE KEY `objectCharacter_UNIQUE` (`objectKeyword`)
 )
 
 CREATE TABLE `tbl_question` (
@@ -188,6 +189,7 @@ CREATE TABLE `tbl_home_submit` (
 CREATE TABLE `tbl_doctor_file` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `doctorSeq` int DEFAULT NULL,
+  `userCode` varchar(45) NOT NULL,
   `uniqueId` char(255) NOT NULL,
   `filename` varchar(255) NOT NULL,
   `originalname` text NOT NULL,
@@ -196,7 +198,7 @@ CREATE TABLE `tbl_doctor_file` (
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `createdId` varchar(45) DEFAULT NULL,
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
@@ -318,12 +320,12 @@ CREATE TABLE `tbl_info_system` (
 
 -- noi dung giao diện dynamic cho app từ db
 -- SIGNUP_SERVICE: đăng kí dịch vụ
-CREATE TABLE `tbl_content_system` (
+CREATE TABLE `tbl_screen_system` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `contentCharacter` enum('SIGNUP_SERVICE') NOT NULL DEFAULT 'SIGNUP_SERVICE', 
-  `contentName` varchar(45) NOT NULL,
-  `contentContent` JSON NOT NULL,
-  `contentDescription` varchar(255) NOT NULL,
+  `screenKeyword` enum('SIGNUP_SERVICE') NOT NULL DEFAULT 'SIGNUP_SERVICE', 
+  `screenName` varchar(45) NOT NULL,
+  `screenContent` JSON NOT NULL,
+  `screenDescription` varchar(255) NOT NULL,
   `isActive` char(1) NOT NULL DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,

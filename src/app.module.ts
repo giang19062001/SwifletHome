@@ -24,9 +24,10 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UserAppModule } from './modules/user/app/user.module';
 import { UserPaymentModule } from './modules/userPayment/user.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
-import { ContentAppModule } from './modules/content/app/content.module';
 import { InfoAppModule } from './modules/info/app/info.module';
 import { CategoryAdminModule } from './modules/category/admin/category.module';
+import { ScreenAppModule } from './modules/screen/app/screen.module';
+import { ObjectAdminModule } from './modules/object/admin/object.module';
 
 @Module({
   imports: [
@@ -49,13 +50,14 @@ import { CategoryAdminModule } from './modules/category/admin/category.module';
     DoctorAppModule,
     HomeAppModule,
     HomeSubmitAppModule,
-    ContentAppModule,
+    ScreenAppModule,
     InfoAppModule,
 
     //admin
     AuthAdminModule,
     UserAdminModule,
     CategoryAdminModule,
+    ObjectAdminModule,
     QuestionAdminModule,
     AnswerAdminModule,
     UploadAdminModule,

@@ -8,8 +8,8 @@ export interface IDoctor {
   statusCode: string;
   uniqueId: string;
   isActive: 'Y' | 'N';
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdId: string;
   updatedId: string;
   doctorFiles: IDoctorFile[]
@@ -22,6 +22,7 @@ export interface IDoctorFileStr {
 export interface IDoctorFile {
   seq: number;
   doctorSeq: number;
+  userCode: string;
   homeName: string;
   filename: string;
   originalname: string;

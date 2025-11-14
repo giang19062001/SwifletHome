@@ -8,15 +8,16 @@ import { CreateDoctorDto } from './doctor.dto';
 @Injectable()
 export class DoctorAppRepository {
   private readonly table = 'tbl_doctor';
+  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async uploadFile(seq: number, uniqueId: string, createdId: string, file: Express.Multer.File | IDoctorFile): Promise<number> {
+  async uploadFile(seq: number, uniqueId: string, userCode: string, file: Express.Multer.File | IDoctorFile): Promise<number> {
     const sql = `
-      INSERT INTO tbl_doctor_file (filename, originalname, size, mimetype, uniqueId, doctorSeq, createdId)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tbl_doctor_file (filename, originalname, size, mimetype, uniqueId, doctorSeq, userCode, createdId)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, uniqueId, seq, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, uniqueId, seq, userCode, userCode]);
 
     return result.insertId;
   }
@@ -30,12 +31,12 @@ export class DoctorAppRepository {
     );
     return rows ? (rows[0] as IDoctor) : null;
   }
-  async create(dto: CreateDoctorDto): Promise<number> {
+  async create(userCode: string, dto: CreateDoctorDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.table}  (userCode, userName, userPhone, note, statusCode, uniqueId, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.userName, dto.userPhone, dto.note, 'COD000008', dto.uniqueId, dto.createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.note, 'COD000008', dto.uniqueId, userCode]);
 
     return result.insertId;
   }

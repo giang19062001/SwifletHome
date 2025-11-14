@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class GetAllCodeDto {
+export class GetCodeDto {
   @ApiProperty({
     example: 'SUBMIT',
   })
@@ -15,4 +15,11 @@ export class GetAllCodeDto {
   @IsString()
   @IsNotEmpty()
   subCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsOptional()
+  keyCode?: string;
 }

@@ -5,8 +5,8 @@ export interface IPackage {
   packagePrice: string;
   packageExpireDay: number;
   isActive: 'Y' | 'N';
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdId: string;
   updatedId: string;
 }

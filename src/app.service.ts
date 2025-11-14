@@ -4,6 +4,7 @@ import { IAnswer } from './modules/answer/answer.interface';
 import { HomeAdminService } from './modules/home/admin/home.service';
 import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
+import { ObjectAdminService } from './modules/object/admin/object.service';
 
 @Injectable()
 export class AppService {
@@ -12,6 +13,7 @@ export class AppService {
     private readonly catetegoryAdminService: CategoryAdminService,
     private readonly homeAdminService: HomeAdminService,
     private readonly blogAdminService: BlogAdminService,
+    private readonly objectAdminService: ObjectAdminService,
   ) {}
   // answer
   async getDetailAnswer(answerCode: string): Promise<IAnswer | null> {
@@ -19,7 +21,11 @@ export class AppService {
     return result;
   }
   async renderCreateAnswer(): Promise<any> {
-    const { list } = await this.catetegoryAdminService.getAll({
+    const { list: categories } = await this.catetegoryAdminService.getAll({
+      limit: 0,
+      page: 0,
+    });
+    const { list: objects } = await this.objectAdminService.getAll({
       limit: 0,
       page: 0,
     });
@@ -27,12 +33,17 @@ export class AppService {
       answerContent: '',
       answerObject: '',
       answerCategory: '',
-      categories: list,
+      categories: categories,
+      objects: objects,
     };
   }
   async renderAnswerUpdate(answerCode: string): Promise<any> {
     const answer = await this.answerAdminService.getDetail(answerCode);
-    const { list } = await this.catetegoryAdminService.getAll({
+    const { list: categories } = await this.catetegoryAdminService.getAll({
+      limit: 0,
+      page: 0,
+    });
+    const { list: objects } = await this.objectAdminService.getAll({
       limit: 0,
       page: 0,
     });
@@ -41,12 +52,17 @@ export class AppService {
       answerContent: answer?.answerContent,
       answerObject: answer?.answerObject,
       answerCategory: answer?.answerCategory,
-      categories: list,
+      categories: categories,
+      objects: objects,
     };
   }
   //blog
   async renderCreateBlog(): Promise<any> {
-    const { list } = await this.catetegoryAdminService.getAll({
+    const { list: categories } = await this.catetegoryAdminService.getAll({
+      limit: 0,
+      page: 0,
+    });
+    const { list: objects } = await this.objectAdminService.getAll({
       limit: 0,
       page: 0,
     });
@@ -54,12 +70,17 @@ export class AppService {
       blogContent: '',
       blogObject: '',
       blogCategory: '',
-      categories: list,
+      categories: categories,
+      objects: objects,
     };
   }
   async renderBlogUpdate(blogCode: string): Promise<any> {
     const blog = await this.blogAdminService.getDetail(blogCode);
-    const { list } = await this.catetegoryAdminService.getAll({
+    const { list: categories } = await this.catetegoryAdminService.getAll({
+      limit: 0,
+      page: 0,
+    });
+    const { list: objects } = await this.objectAdminService.getAll({
       limit: 0,
       page: 0,
     });
@@ -68,7 +89,8 @@ export class AppService {
       blogContent: blog?.blogContent,
       blogObject: blog?.blogObject,
       blogCategory: blog?.blogCategory,
-      categories: list,
+      categories: categories,
+      objects: objects,
     };
   }
   // home

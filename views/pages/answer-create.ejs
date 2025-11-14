@@ -9,9 +9,7 @@
               <label for="answerCategory" class="form-label">Thể loại</label>
               <select class="form-select form-select-sm" id="answerCategory" name="answerCategory">
                 <% values.categories.forEach(function(cate) { %>
-                  <option value="<%= cate.categoryCode %>" <%=(values.answerCategory &&
-                    values.answerCategory===cate.categoryCode) ? 'selected' : '' %>
-                    >
+                  <option value="<%= cate.categoryCode %>" <%=(values.answerCategory && values.answerCategory===cate.categoryCode) ? 'selected' : '' %>>
                     <%= cate.categoryName %>
                   </option>
                   <% }); %>
@@ -21,7 +19,11 @@
             <div class="col-md-3">
               <label for="answerObject" class="form-label">Đối tượng</label>
               <select class="form-select form-select-sm" id="answerObject">
-                <option value="SWIFTLET" <%=values.answerObject==='SWIFTLET' ? 'selected' : '' %>>Yến</option>
+                 <% values.objects.forEach(function(obj) { %>
+                  <option value="<%= obj.objectKeyword %>" <%=(values.answerObject && values.answerObject===obj.objectKeyword) ? 'selected' : '' %>>
+                    <%= obj.objectName %>
+                  </option>
+                  <% }); %>
               </select>
             </div>
             <div class="col-md-3">

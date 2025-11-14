@@ -5,6 +5,7 @@ import { DoctorAppRepository } from './doctor.repository';
 import { IDoctorFileStr } from '../doctor.interface';
 import { getFileLocation } from 'src/config/multer';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { UserAppService } from 'src/modules/user/app/user.service';
 
 @Injectable()
 export class DoctorAppService {
@@ -12,15 +13,16 @@ export class DoctorAppService {
 
   constructor(
     private readonly doctorAppRepository: DoctorAppRepository,
+    private readonly userAppService: UserAppService,
     private readonly logger: LoggingService,
   ) {}
 
-  async create(dto: CreateDoctorDto): Promise<number> {
+  async create(userCode: string, dto: CreateDoctorDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/createDoctor:`;
 
     try {
       let result = 1;
-      const seq = await this.doctorAppRepository.create(dto);
+      const seq = await this.doctorAppRepository.create(userCode, dto);
       if (seq) {
         const doctor = await this.doctorAppRepository.getDetail(seq);
         if (doctor) {
@@ -44,13 +46,13 @@ export class DoctorAppService {
       return 0;
     }
   }
-  async uploadFile(dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<IDoctorFileStr[]> {
+  async uploadFile(userCode: string, dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<IDoctorFileStr[]> {
     const logbase = `${this.SERVICE_NAME}/uploadFile:`;
     try {
       let filesResponse: IDoctorFileStr[] = [];
       if (doctorFiles.length > 0) {
         for (const file of doctorFiles) {
-          const result = await this.doctorAppRepository.uploadFile(0, dto.uniqueId, dto.createdId, file);
+          const result = await this.doctorAppRepository.uploadFile(0, dto.uniqueId, userCode, file);
           if (result > 0) {
             const location = getFileLocation(file.mimetype, file.fieldname);
             filesResponse.push({ filename: `/${location}/${file.filename}` });

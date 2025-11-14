@@ -17,7 +17,6 @@ export class AppController {
     return { title: 'Đăng nhập', isLayout: false };
   }
 
-  
   // dashboard
   @Get('/dashboard/main')
   @UseGuards(PageAuthAdminGuard)
@@ -30,16 +29,6 @@ export class AppController {
     };
   }
   // question
-  @Get('/dashboard/category/list')
-  @UseGuards(PageAuthAdminGuard)
-  @Render('pages/category-question')
-  renderCateQuestion(@Req() req: Request) {
-    return {
-      title: 'Danh sách thể loại',
-      isLayout: true,
-      user: req.session.user,
-    };
-  }
   @Get('/dashboard/question/list')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/question')
@@ -87,7 +76,40 @@ export class AppController {
       values: values,
     };
   }
+  // category
+  @Get('/dashboard/category/list')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/category')
+  renderCategory(@Req() req: Request) {
+    return {
+      title: 'Danh sách thể loại',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
 
+  // object
+  @Get('/dashboard/object/list')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/object')
+  renderObject(@Req() req: Request) {
+    return {
+      title: 'Danh sách thể loại',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+  //user
+  @Get('/dashboard/user/list')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/user')
+  renderUser(@Req() req: Request) {
+    return {
+      title: 'Danh sách khách hàng',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   //blog
   @Get('/dashboard/blog/list')
   @UseGuards(PageAuthAdminGuard)

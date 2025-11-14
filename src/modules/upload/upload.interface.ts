@@ -6,8 +6,8 @@ export interface IFileUpload {
   size: number;
   mimetype: string;
   urlLink: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdId: string;
   updatedId: string;
 }

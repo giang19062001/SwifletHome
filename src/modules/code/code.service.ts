@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CodeRepository } from './code.repository';
-import { GetAllCodeDto } from './code.dto';
+import { GetCodeDto } from './code.dto';
 import { ICode } from './code.interface';
 import { AbAdminService } from 'src/abstract/common';
 
@@ -9,7 +9,7 @@ export class CodeService extends AbAdminService {
   constructor(private readonly codeRepository: CodeRepository) {
     super();
   }
-  async getAll(dto: GetAllCodeDto): Promise<ICode[]> {
+  async getAll(dto: GetCodeDto): Promise<ICode[]> {
     const list = await this.codeRepository.getAll(dto);
     return list;
   }

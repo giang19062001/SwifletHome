@@ -1,12 +1,12 @@
 import { IInfoBank } from '../info/info.interface';
 import { IPackage } from '../package/package.interface';
 
-export interface IContent {
+export interface IScreen {
   seq: number;
-  contentCharacter: 'SIGNUP_SERVICE'; // enum('SIGNUP_SERVICE')
-  contentName: string;
-  contentContent: any;
-  contentDescription: string;
+  screenKeyword: 'SIGNUP_SERVICE'; // enum('SIGNUP_SERVICE')
+  screenName: string;
+  screenContent: any;
+  screenDescription: string;
   isActive: 'Y' | 'N';
   createdAt: Date;
   updatedAt: Date;
@@ -14,7 +14,7 @@ export interface IContent {
   updatedId?: string;
 }
 
-export interface IContentSignupService {
+export interface IScreenSignupService {
   contentEnd: string;
   contentStart: string;
   contentCenter: { packages: IPackage[]; bankInfo: IInfoBank | null };

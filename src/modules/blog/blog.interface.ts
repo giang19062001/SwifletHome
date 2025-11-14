@@ -7,8 +7,8 @@ export interface IBlog {
   blogScreenCode: string;
   isActive: 'Y' | 'N';
   isFree: 'Y' | 'N';
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdId: string;
   updatedId: string;
 }

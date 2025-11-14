@@ -9,14 +9,12 @@ export class HomeSubmitAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async create(dto: CreateHomeSubmitDto): Promise<number> {
+  async create(dto: CreateHomeSubmitDto, userCode: string, statusCode: string): Promise<number> {
     const sql = `
       INSERT INTO ${this.table}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, statusCode, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-
-    // COD000005: WAITING
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.homeCode, dto.userCode, dto.userName, dto.userPhone, dto.numberAttendCode, dto.note, 'COD000005', dto.userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.homeCode, userCode, dto.userName, dto.userPhone, dto.numberAttendCode, dto.note, statusCode, userCode]);
 
     return result.insertId;
   }

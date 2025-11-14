@@ -1,26 +1,26 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
-import { ContentAppService } from './content.service';
+import { ScreenAppService } from './screen.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 
-@ApiTags('app/content')
-@Controller('/api/app/content')
+@ApiTags('app/screen')
+@Controller('/api/app/screen')
 @ApiBearerAuth('app-auth')
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
-export class ContentAppController {
-  constructor(private readonly contentAppService: ContentAppService) {}
+export class ScreenAppController {
+  constructor(private readonly screenAppService: ScreenAppService) {}
 
   @ApiParam({
-    description: '**character:** `SIGNUP_SERVICE`',
-    name: 'character',
+    description: '**keyword:** `SIGNUP_SERVICE`',
+    name: 'keyword',
     type: String,
   })
-  @Get('getDetail/:character')
+  @Get('getDetail/:keyword')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('character') character: string) {
-    const result = await this.contentAppService.getDetail(character);
+  async getDetail(@Param('keyword') keyword: string) {
+    const result = await this.screenAppService.getDetail(keyword);
     if (!result) {
       throw new BadRequestException();
     }

@@ -2,11 +2,13 @@ let page = 1;
 let limit = 10;
 let pageElement = 'page-question';
 let categories = [];
+let objects = [];
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllQuestion(page, limit);
-  getAllCategory(page, limit);
+  getAllCategory(0, 0);
+  getAllObject(0, 0);
 });
 
 // TODO: FUNC
@@ -35,6 +37,20 @@ function closeQuestionModal(type) {
   }
 }
 
+// tắt/ hiện link chi tiết câu trả lời
+function toggleAnswerDetailLink(modalBody) {
+  const answerSelect = modalBody.querySelector('#answerCode');
+  const answerDetailLink = modalBody.querySelector('#answerDetailLink');
+  const selected = answerSelect.options[answerSelect.selectedIndex];
+  const code = selected.getAttribute('data-answer-code');
+  if (code) {
+    answerDetailLink.href = `/dashboard/answer/update/${code}`;
+    answerDetailLink.style.display = 'inline-block';
+  } else {
+    answerDetailLink.style.display = 'none';
+  }
+}
+
 // TODO: RENDER
 async function showQuestionModal(type, questionData) {
   // init modal
@@ -42,7 +58,7 @@ async function showQuestionModal(type, questionData) {
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body');
 
-  // render <option> category
+  // hiển thị danh sách thể loại
   const categoryOptions = categories
     .map(
       (cate) => `
@@ -54,37 +70,42 @@ async function showQuestionModal(type, questionData) {
     )
     .join('');
 
+  // hiển thị danh sách thể loại
+  const objectOptions = objects
+    .map(
+      (obj) => `
+      <option value="${obj.objectKeyword}" 
+        ${questionData.questionObject === obj.objectKeyword ? 'selected' : ''}>
+        ${obj.objectName}
+      </option>
+    `,
+    )
+    .join('');
+
   // form
   modalBody.querySelector('#questionCode').value = questionData.questionCode || '';
   modalBody.querySelector('#questionContent').value = questionData.questionContent || '';
   modalBody.querySelector('#questionCategory').innerHTML = categoryOptions;
+  modalBody.querySelector('#questionObject').innerHTML = objectOptions;
 
-  // render answer list
-  await renderAllAnswer(modalBody, questionData ? questionData.answerCode : '', modalBody.querySelector('#questionCategory').value);
-  // validate
+  // hiển thị danh sách câu trả lời
+  await renderAllAnswer(modalBody, questionData ? questionData.answerCode : '');
+
+  // thêm validate cho nội dung câu hỏi -> ko thể để trống
   modalBody.querySelector('#questionContent')?.addEventListener('input', (e) => {
     modalBody.querySelector('.err-questionContent').style.display = String(e.target.value).trim() == '' ? 'block' : 'none';
   });
 
-  // assign event show link "Xem chi tiết"
+  // gắn sự kiện open link detail cho câu trả lời đang được chọn
   const answerSelect = modalBody.querySelector('#answerCode');
-  const answerDetailLink = modalBody.querySelector('#answerDetailLink');
-
   answerSelect.addEventListener('change', function () {
-    const selected = this.options[this.selectedIndex];
-    const code = selected.getAttribute('data-answer-code');
-    if (code) {
-      answerDetailLink.href = `/dashboard/answer/update/${code}`;
-      answerDetailLink.style.display = 'inline-block';
-    } else {
-      answerDetailLink.style.display = 'none';
-    }
+    toggleAnswerDetailLink(modalBody);
   });
 
-  // trigger event immediately
+  // trigger event cho câu trả lời được chọn
   setTimeout(() => answerSelect.dispatchEvent(new Event('change')), 0);
 
-  // assign <event> update
+  // gắn sự kiện cho nút submit form
   modalEl.querySelector('.modal-footer button').onclick = type === 'create' ? createQuestion : updateQuestion;
 
   // show modal
@@ -92,32 +113,43 @@ async function showQuestionModal(type, questionData) {
   modal.show();
 }
 
-async function renderAllAnswer(modalBody, answerCode, questionCategory) {
-  // sub function
-  async function renderAnswer(currentCategoryCode) {
-    const answers = await getAllAnswer(0, 0, currentCategoryCode, 'SWIFTLET');
-    const answerOptions = answers
-      ?.map(
-        (ans) => `
+async function renderAnswer(modalBody, answerCode) {
+  const questionCategory = modalBody.querySelector('#questionCategory').value;
+  const questionObject = modalBody.querySelector('#questionObject').value;
+
+  const answers = await getAllAnswer(0, 0, questionCategory, questionObject);
+  const answerOptions = answers
+    ?.map(
+      (ans) => `
           <option value="${ans.answerCode}" data-answer-code="${ans.answerCode}"
             ${answerCode === ans.answerCode ? 'selected' : ''}>
             ${getShortTextFromHtml(ans.answerContent)}
           </option>
         `,
-      )
-      .join('');
-    modalBody.querySelector('#answerCode').innerHTML = `
-      <option value="">Chọn câu trả lời</option>
-      ${answerOptions}
-    `;
-  }
+    )
+    .join('');
 
-  // render frist
-  await renderAnswer(questionCategory);
+  modalBody.querySelector('#answerCode').innerHTML = ` <option value="">Chọn câu trả lời</option> ${answerOptions}`;
+}
 
-  // render when category change
+async function renderAllAnswer(modalBody, answerCode) {
+  // render câu trả lời
+  await renderAnswer(modalBody, answerCode);
+
+  // render lại câu trả lời khi category bị thay đổi
   modalBody.querySelector('#questionCategory').addEventListener('change', async (e) => {
-    await renderAnswer(e.target.value);
+    await renderAnswer(modalBody, answerCode);
+
+    // tắt/hiển link chi tiết câu trả lời
+    toggleAnswerDetailLink(modalBody);
+  });
+
+  // render lại câu trả lời khi object bị thay đổi
+  modalBody.querySelector('#questionObject').addEventListener('change', async (e) => {
+    await renderAnswer(modalBody, answerCode);
+
+    // tắt/hiển link chi tiết câu trả lời
+    toggleAnswerDetailLink(modalBody);
   });
 }
 
@@ -195,6 +227,27 @@ async function getAllCategory(currentPage, limit) {
       console.log('err', err);
     });
 }
+async function getAllObject(currentPage, limit) {
+  await axios
+    .post(
+      currentUrl + '/api/admin/object/getAll',
+      {
+        page: currentPage,
+        limit: limit,
+      },
+      axiosAuth(),
+    )
+    .then(function (response) {
+      console.log('response', response);
+      if (response.status === 200 && response.data) {
+        objects = response.data.list;
+      }
+    })
+    .catch(function (err) {
+      console.log('err', err);
+    });
+}
+
 async function getDetailQuestion(questionCode) {
   await axios
     .get(currentUrl + '/api/admin/question/getDetail/' + questionCode, axiosAuth())

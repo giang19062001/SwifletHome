@@ -5,6 +5,9 @@ import { ResponseAppInterceptor } from 'src/interceptors/response';
 import { HomeSubmitAppService } from './homeSubmit.service';
 import { CreateHomeSubmitDto } from './homeSubmit.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { Msg } from 'src/helpers/message';
+import { GetUserApp } from 'src/decorator/auth';
+import * as userInterface from 'src/modules/user/app/user.interface';
 
 @ApiTags('app/homeSubmit')
 @Controller('/api/app/homeSubmit')
@@ -16,11 +19,15 @@ export class HomeSubmitAppController {
 
   @ApiBody({
     type: CreateHomeSubmitDto,
+    description: "numberAttendCode: mã code từ API getAll (mainCode: 'SUBMIT', subCode: 'NUMBER_ATTEND')",
   })
   @Post('create')
-  @HttpCode(HttpStatus.CREATED)
-  async create(@Body() dto: CreateHomeSubmitDto): Promise<number> {
-    const result = await this.homeSubmitAppService.create(dto);
-    return result;
+  @HttpCode(HttpStatus.OK)
+  async create(@Body() dto: CreateHomeSubmitDto, @GetUserApp() user: userInterface.IUserApp) {
+    const result = await this.homeSubmitAppService.create(dto, user.userCode);
+    return {
+      message: Msg.HomeSummitCreateOk,
+      data: result,
+    };
   }
 }

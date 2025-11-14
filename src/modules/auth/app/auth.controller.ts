@@ -63,6 +63,9 @@ export class AuthAppController {
   }
 
   @ApiParam({ name: 'userPhone', type: String })
+   @ApiOperation({
+    summary: 'Nên kiểm tra SĐT đã tồn tại hay chưa trước khi đăng ký',
+  })
   @Get('checkDuplicatePhone/:userPhone')
   @HttpCode(HttpStatus.OK)
   async checkDuplicatePhone(@Param('userPhone') userPhone: string) {

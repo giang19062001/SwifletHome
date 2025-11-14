@@ -7,8 +7,8 @@ export interface IHome {
   latitude: number;
   longitude: number;
   isActive: 'Y' | 'N';
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdId: string;
   updatedId: string;
   homeImage: string | IHomeImg;

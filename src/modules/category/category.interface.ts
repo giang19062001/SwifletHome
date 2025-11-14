@@ -3,8 +3,8 @@ export interface ICategory {
   categoryCode: string;
   categoryName: string;
   isActive: 'Y' | 'N';
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdId: string;
   updatedId: string;
 }

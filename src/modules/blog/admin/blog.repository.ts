@@ -59,7 +59,7 @@ export class BlogAdminRepository extends AbAdminRepo {
       B.categoryName, C.objectName
       FROM ${this.table} A 
       LEFT JOIN tbl_category B ON A.blogCategory = B.categoryCode
-      LEFT JOIN tbl_object C ON A.blogObject = C.objectCharacter
+      LEFT JOIN tbl_object C ON A.blogObject = C.objectKeyword
       ${whereClause}
       ${limitClause}`,
       params,
@@ -74,7 +74,7 @@ export class BlogAdminRepository extends AbAdminRepo {
         LEFT JOIN tbl_category B
         ON A.blogCategory = B.categoryCode
         LEFT JOIN tbl_object C
-        ON A.blogObject = C.objectCharacter
+        ON A.blogObject = C.objectKeyword
         WHERE A.blogCode = ? 
         LIMIT 1 `,
       [blogCode],

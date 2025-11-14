@@ -66,7 +66,7 @@ export class AnswerAdminRepository extends AbAdminRepo {
       B.categoryName, C.objectName
       FROM ${this.table} A 
       LEFT JOIN tbl_category B ON A.answerCategory = B.categoryCode
-      LEFT JOIN tbl_object C ON A.answerObject = C.objectCharacter
+      LEFT JOIN tbl_object C ON A.answerObject = C.objectKeyword
       ${whereClause}
       ${limitClause}`,
       params,
@@ -81,7 +81,7 @@ export class AnswerAdminRepository extends AbAdminRepo {
         LEFT JOIN tbl_category B
         ON A.answerCategory = B.categoryCode
         LEFT JOIN tbl_object C
-        ON A.answerObject = C.objectCharacter
+        ON A.answerObject = C.objectKeyword
         WHERE A.answerCode = ? 
         LIMIT 1 `,
       [answerCode],

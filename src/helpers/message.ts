@@ -14,6 +14,8 @@ export const Msg = {
   AccountLoginBlock: 'Tài khoản đã bị vô hiệu hóa',
   UserNotFound: 'Người dùng không tồn tại',
   HomeNotFound: 'Thông tin nhà yến không tồn tại',
+  HomeSummitCreateOk: 'Đăng ký tham quan thành công',
+  DoctorCreateOk: 'Gửi thông tin khám bệnh nhà yến thành công',
   CannotReply: 'Hệ thống chưa có thông tin về câu trả lời của câu hỏi này',
   FileEmpty: 'Không có file nào được upload',
   FileAudioRequire: 'Bắt buộc nhập 2 file audio',

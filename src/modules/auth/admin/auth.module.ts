@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthAdminController } from './auth.controller';
 import { AuthAdminService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
@@ -15,7 +15,7 @@ import { UserAdminModule } from 'src/modules/user/admin/user.module';
         signOptions: { expiresIn: '1h' },
       }),
     }),
-    UserAdminModule
+    forwardRef(() => UserAdminModule), // ← phá phụ thuộc vòng tròn
   ],
   controllers: [AuthAdminController],
   providers: [AuthAdminService],

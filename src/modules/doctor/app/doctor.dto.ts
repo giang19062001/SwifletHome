@@ -11,14 +11,7 @@ export class DoctorFileDto {
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
-
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
-
+  
   @ApiProperty({
     type: 'array',
     items: {
@@ -36,13 +29,6 @@ class DoctorFileStrDto {
 }
 
 export class CreateDoctorDto {
-  @ApiProperty({
-    example: 'USR000001',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userCode: string;
-
   @ApiProperty({
     example: '',
   })
@@ -71,13 +57,6 @@ export class CreateDoctorDto {
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
-
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
 
   @ApiProperty({
     type: [DoctorFileStrDto],

@@ -11,27 +11,36 @@ export class HomeSubmitAppService {
   constructor(
     private readonly homeSubmitAppRepository: HomeSubmitAppRepository,
     private readonly homeAppService: HomeAppService,
-    private readonly userAppService: UserAppService,
     private readonly codeService: CodeService,
   ) {}
-  async create(dto: CreateHomeSubmitDto): Promise<number> {
-    const user = await this.userAppService.findByCode(dto.userCode);
-    if (!user) {
-      throw new BadRequestException(Msg.UserNotFound);
-    }
+  async create(dto: CreateHomeSubmitDto, userCode: string): Promise<number> {
+    // kiểm tra homeCode
     const home = await this.homeAppService.getDetail(dto.homeCode);
     if (!home) {
       throw new BadRequestException(Msg.HomeNotFound);
     }
-    const codes = await this.codeService.getAll({ mainCode: 'SUBMIT', subCode: 'NUMBER_ATTEND' });
-    if (!codes.length) {
+    // kiểm tra attendCode
+    const attendCodes = await this.codeService.getAll({
+      mainCode: 'SUBMIT',
+      subCode: 'NUMBER_ATTEND',
+    });
+    if (!attendCodes.length) {
       throw new BadRequestException();
     }
-    if (!codes.map((c) => c.code).includes(dto.numberAttendCode)) {
+    if (!attendCodes.map((c) => c.code).includes(dto.numberAttendCode)) {
       throw new BadRequestException(Msg.CodeInvalid);
     }
+    // lấy statusCode -> Đang chờ duyệt
+    const statusCodes = await this.codeService.getAll({
+      mainCode: 'SUBMIT',
+      subCode: 'STATUS',
+      keyCode: 'WAITING',
+    });
+    if (!statusCodes.length) {
+      throw new BadRequestException();
+    }
 
-    const result = await this.homeSubmitAppRepository.create(dto);
-    return 1;
+    const result = await this.homeSubmitAppRepository.create(dto, userCode, statusCodes[0].code);
+    return result;
   }
 }

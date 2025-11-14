@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { GetAllCodeDto } from './code.dto';
+import { GetCodeDto } from './code.dto';
 import { ICode } from './code.interface';
 import { AbAdminRepo } from 'src/abstract/common';
 
@@ -12,14 +12,14 @@ export class CodeRepository extends AbAdminRepo {
     super();
   }
 
-  async getAll(dto: GetAllCodeDto): Promise<ICode[]> {
+  async getAll(dto: GetCodeDto): Promise<ICode[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.code, A.mainCode, A.subCode, A.keyCode, A.valueCode, A.sortOrder, A.isActive
         FROM ${this.table} A
-        WHERE A.mainCode = ? AND A.subCode = ?
+        WHERE A.mainCode = ? AND A.subCode = ? ${'keyCode' in dto && dto.keyCode ? 'AND A.keyCode = ?' : ''}
         AND A.isActive = 'Y' 
         ORDER BY A.sortOrder ASC`,
-      [dto.mainCode, dto.subCode],
+        'keyCode' in dto && dto.keyCode ? [dto.mainCode, dto.subCode, dto.keyCode] : [dto.mainCode, dto.subCode],
     );
     return rows as ICode[];
   }

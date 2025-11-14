@@ -6,8 +6,8 @@ export interface IAnswer {
   answerCategory: string;
   isActive: 'Y' | 'N';
   isFree: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdId: string;
   updatedId: string;
 }

@@ -12248,48 +12248,6 @@ textarea.form-control-lg {
     display: block;
   }
 }
-@media (max-width: 992px) {
-  .sidebar-vertical-tab {
-    display: block;
-  }
-}
-@media (min-width: 993px) {
-  .sidebar-vertical-tab {
-    display: none;
-  }
-}
-@media (max-width: 992px) {
-  .sidebar-vertical-tab {
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
-  }
-}
-.sidebar-vertical-tab {
-  padding: 0px 0 0px 0 !important;
-}
-.sidebar-vertical-tab ul {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-left: 0px !important;
-}
-.sidebar-vertical-tab ul li {
-  list-style-type: none;
-  width: 50%;
-}
-.sidebar-vertical-tab ul li.mm-active > a.sb-vertical {
-  border-bottom: 3px solid #0175ff;
-  padding: 4px 8px;
-  border-radius: 3px;
-}
-.sidebar-vertical-tab ul li > a {
-  justify-content: center;
-}
-.sidebar-vertical-tab ul li > a.en {
-  font-size: 0.95em !important;
-}
-
 @font-face {
   font-family: "Pretendard";
   src: local("Pretendard-Regular"), url("/fonts/Pretendard-Regular.otf") format("truetype");

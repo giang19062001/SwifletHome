@@ -25,7 +25,7 @@ export class QuestionAdminRepository extends AbAdminRepo {
         LEFT JOIN tbl_category B
         ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
-        ON A.questionObject = C.objectCharacter `;
+        ON A.questionObject = C.objectKeyword `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -44,7 +44,7 @@ export class QuestionAdminRepository extends AbAdminRepo {
         LEFT JOIN tbl_category B
         ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
-        ON A.questionObject = C.objectCharacter
+        ON A.questionObject = C.objectKeyword
         LEFT JOIN tbl_answer D
         ON A.answerCode = D.answerCode
         WHERE A.questionCode = ? 
@@ -97,7 +97,7 @@ export class QuestionAdminRepository extends AbAdminRepo {
         LEFT JOIN tbl_category B
         ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
-        ON A.questionObject = C.objectCharacter
+        ON A.questionObject = C.objectKeyword
         WHERE A.answerCode IS NOT NULL AND A.answerCode = ?`,
       [answerCode],
     );

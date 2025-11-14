@@ -58,7 +58,7 @@ export class HomeAdminController {
   }
 
   @Post('create')
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateHomeDto })
   // @UseInterceptors(AnyFilesInterceptor(multerImgConfig))

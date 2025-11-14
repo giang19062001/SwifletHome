@@ -59,7 +59,7 @@ export class AnswerAdminController {
 
   @ApiBody({ type: CreateAnswerDto })
   @Post('create')
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   async create(@Body() dto: CreateAnswerDto): Promise<number> {
     const result = await this.answerAdminService.create(dto);
     if (result === 0) {

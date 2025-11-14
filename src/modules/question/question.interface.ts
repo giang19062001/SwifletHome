@@ -5,8 +5,8 @@ export interface IQuestion {
   questionObject: string;
   questionCategory: string;
   isActive: 'Y' | 'N';
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdId: string;
   updatedId: string;
   answerCode: string;
