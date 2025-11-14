@@ -27,22 +27,22 @@ export class UploadService {
     }
   }
 
-  public async deletePhysicalFile(filepath: string): Promise<void> {
-    const logbase = `${this.SERVICE_NAME}/deletePhysicalFile`;
+  public async deleteLocalFile(filepath: string): Promise<void> {
+    const logbase = `${this.SERVICE_NAME}/deleteLocalFile`;
     try {
       const filePath = path.join(process.cwd(), this.UPLOAD_PATH, filepath);
 
       try {
         await fs.access(filePath);
       } catch {
-        this.logger.error(logbase, `File ${filepath} not found in directory`);
+        this.logger.error(logbase, `Không tìm thấy tệp ${filepath} trong thư mục`);
         return;
       }
 
       await fs.unlink(filePath);
-      this.logger.log(logbase, `File ${filepath} deleted successfully from directory`);
+      this.logger.log(logbase, `Đã xóa thành công tệp ${filepath} khỏi thư mục`);
     } catch (error) {
-      this.logger.error(logbase, `File ${filepath} deleted failed  from directory -> ${error}`);
+      this.logger.error(logbase, `Không xóa được tệp ${filepath} khỏi thư mục -> ${error}`);
     }
   }
 
@@ -111,7 +111,7 @@ export class UploadService {
       //   throw new NotFoundException();
       // }
       // const filepath = `${file?.filename.startsWith('editorImg-') ? 'images/editors' : 'images/homes'}/${filename}`;
-      // await this.deletePhysicalFile(filepath);
+      // await this.deleteLocalFile(filepath);
 
       const result = await this.uploadRepository.deleteImg(filename);
 
@@ -133,8 +133,8 @@ export class UploadService {
       // await this.uploadRepository.terminalAudio(file?.filenamePay ?? '');
       // await this.uploadRepository.terminalAudio(file?.filenameFree ?? '');
 
-      // await this.deletePhysicalFile(`/audios/editors/${file?.filenamePay}`);
-      // await this.deletePhysicalFile(`/audios/editors/${file?.filenameFree}`);
+      // await this.deleteLocalFile(`/audios/editors/${file?.filenamePay}`);
+      // await this.deleteLocalFile(`/audios/editors/${file?.filenameFree}`);
 
       await this.uploadRepository.deleteAudio(file?.filenamePay ?? '');
       await this.uploadRepository.deleteAudio(file?.filenameFree ?? '');

@@ -15,8 +15,7 @@ export class HomeSubmitAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IHomeSubmit[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
+    let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
         B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
         FROM ${this.table} A 
         LEFT JOIN tbl_home B
@@ -24,10 +23,15 @@ export class HomeSubmitAdminRepository {
         LEFT JOIN tbl_code_common C
         ON A.numberAttendCode = C.code
         LEFT JOIN tbl_code_common D
-        ON A.statusCode = D.code
-        LIMIT ? OFFSET ? `,
-      [dto.limit, (dto.page - 1) * dto.limit],
-    );
+        ON A.statusCode = D.code `;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IHomeSubmit[];
   }
 

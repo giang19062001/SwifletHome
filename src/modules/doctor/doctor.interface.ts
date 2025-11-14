@@ -7,7 +7,7 @@ export interface IDoctor {
   noteAnswered: string;
   statusCode: string;
   uniqueId: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
   createdAt: string;
   updatedAt: string;
   createdId: string;
@@ -28,5 +28,5 @@ export interface IDoctorFile {
   size: number;
   mimetype: string;
   uniqueId: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
 }

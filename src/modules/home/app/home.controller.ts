@@ -25,9 +25,12 @@ import { IListApp } from 'src/interfaces/common';
 import { IHome } from '../home.interface';
 import { HomeAppService } from './home.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 
 @ApiTags('app/home')
 @Controller('/api/app/home')
+@ApiBearerAuth('app-auth')
+@UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class HomeAppController {
   constructor(private readonly homeAppService: HomeAppService) {}
@@ -47,6 +50,9 @@ export class HomeAppController {
   @HttpCode(HttpStatus.OK)
   async getDetail(@Param('homeCode') homeCode: string): Promise<IHome | null> {
     const result = await this.homeAppService.getDetail(homeCode);
+      if (!result) {
+      throw new BadRequestException();
+    }
     return result;
   }
 }

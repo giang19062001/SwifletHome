@@ -4,7 +4,7 @@ export interface IAnswer {
   answerObject: string;
   answerContent: string;
   answerCategory: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
   isFree: string;
   createdAt: string;
   updatedAt: string;

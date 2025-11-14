@@ -20,6 +20,14 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as IUserApp) : null;
   }
+   async findByCode(userCode: string): Promise<IUserApp | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT seq, userCode, userName, userPhone, userDevice, userPassword
+     FROM ${this.table} WHERE userCode = ? AND isActive = 'Y' LIMIT 1`,
+      [userCode],
+    );
+    return rows.length ? (rows[0] as IUserApp) : null;
+  }
   async findBySeq(seq: number): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, userCode, userName, userPhone, userDevice, userPassword

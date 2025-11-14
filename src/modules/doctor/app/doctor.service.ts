@@ -15,12 +15,12 @@ export class DoctorAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async createDoctor(dto: CreateDoctorDto): Promise<number> {
+  async create(dto: CreateDoctorDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/createDoctor:`;
 
     try {
       let result = 1;
-      const seq = await this.doctorAppRepository.createDoctor(dto);
+      const seq = await this.doctorAppRepository.create(dto);
       if (seq) {
         const doctor = await this.doctorAppRepository.getDetail(seq);
         if (doctor) {
@@ -33,7 +33,7 @@ export class DoctorAppService {
             }
           } else {
             // những files có uniqueId của doctor hiện tại không tồn tại -> xóa doctor để đông nhất dữ liệu
-            await this.doctorAppRepository.deleteDoctor(seq);
+            await this.doctorAppRepository.delete(seq);
             result = 0;
           }
         }
@@ -44,13 +44,13 @@ export class DoctorAppService {
       return 0;
     }
   }
-  async insertDoctorFile(dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<IDoctorFileStr[]> {
-    const logbase = `${this.SERVICE_NAME}/insertDoctorFile:`;
+  async uploadFile(dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<IDoctorFileStr[]> {
+    const logbase = `${this.SERVICE_NAME}/uploadFile:`;
     try {
       let filesResponse: IDoctorFileStr[] = [];
       if (doctorFiles.length > 0) {
         for (const file of doctorFiles) {
-          const result = await this.doctorAppRepository.insertDoctorFile(0, dto.uniqueId, dto.createdId, file);
+          const result = await this.doctorAppRepository.uploadFile(0, dto.uniqueId, dto.createdId, file);
           if (result > 0) {
             const location = getFileLocation(file.mimetype, file.fieldname);
             filesResponse.push({ filename: `/${location}/${file.filename}` });

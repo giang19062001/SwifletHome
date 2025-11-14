@@ -6,7 +6,7 @@ export interface IHome {
   homeDescription: string;
   latitude: number;
   longitude: number;
-  isActive: string;
+  isActive: 'Y' | 'N';
   createdAt: string;
   updatedAt: string;
   createdId: string;
@@ -22,5 +22,5 @@ export interface IHomeImg {
   originalname: string;
   size: number;
   mimetype: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
 }

@@ -19,17 +19,21 @@ export class QuestionAdminRepository extends AbAdminRepo {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IQuestion[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
+    let query = ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
         ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
-        ON A.questionObject = C.objectCharacter
-        LIMIT ? OFFSET ? `,
-      [dto.limit, (dto.page - 1) * dto.limit],
-    );
+        ON A.questionObject = C.objectCharacter `;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IQuestion[];
   }
   async getDetail(questionCode: string): Promise<IQuestion | null> {

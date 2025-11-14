@@ -7,7 +7,6 @@ import { QuestionAdminModule } from './modules/question/admin/question.module';
 import { AnswerAdminModule } from './modules/answer/admin/answer.module';
 import { UploadAdminModule } from './modules/upload/upload.module';
 import { AuthAdminModule } from './modules/auth/admin/auth.module';
-import { CategoryModule } from './modules/category/category.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { QuestionAppModule } from './modules/question/app/question.module';
 import { HomeAdminModule } from './modules/home/admin/home.module';
@@ -25,6 +24,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UserAppModule } from './modules/user/app/user.module';
 import { UserPaymentModule } from './modules/userPayment/user.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
+import { ContentAppModule } from './modules/content/app/content.module';
+import { InfoAppModule } from './modules/info/app/info.module';
+import { CategoryAdminModule } from './modules/category/admin/category.module';
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { UserAdminModule } from './modules/user/admin/user.module';
     ScheduleModule.forRoot(),
     DatabaseModule,
     LoggerModule,
+    CodeModule,
 
     //app
     AuthAppModule,
@@ -46,14 +49,13 @@ import { UserAdminModule } from './modules/user/admin/user.module';
     DoctorAppModule,
     HomeAppModule,
     HomeSubmitAppModule,
-
-    //common
-    CodeModule,
-    CategoryModule,
+    ContentAppModule,
+    InfoAppModule,
 
     //admin
     AuthAdminModule,
     UserAdminModule,
+    CategoryAdminModule,
     QuestionAdminModule,
     AnswerAdminModule,
     UploadAdminModule,

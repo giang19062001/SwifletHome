@@ -10,12 +10,17 @@ export class PackageAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAll(dto: PagingDto): Promise<IPackage[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageExpireDay, A.packageDescription
-        FROM ${this.table} A WHERE A.isActive = 'Y'
-        LIMIT ? OFFSET ? `,
-      [dto.limit, (dto.page - 1) * dto.limit],
-    );
+    let query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageExpireDay, A.packageDescription
+               FROM ${this.table} A
+               WHERE A.isActive = 'Y'`;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IPackage[];
   }
 }

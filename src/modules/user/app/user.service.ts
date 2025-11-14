@@ -20,6 +20,10 @@ export class UserAppService {
     return await this.userAppRepository.findByPhone(userPhone);
   }
 
+  async findByCode(userCode: string): Promise<IUserApp | null> {
+    return await this.userAppRepository.findByCode(userCode);
+  }
+
   async create(dto: RegisterAppDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/create`;
 

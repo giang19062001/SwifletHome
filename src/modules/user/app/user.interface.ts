@@ -5,6 +5,6 @@ export interface IUserApp {
   userPassword: string;
   userPhone: string;
   userDevice: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
   accessToken: string;
 }

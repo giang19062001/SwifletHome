@@ -4,8 +4,9 @@ import { AnswerAppController } from './answer.controller';
 import { AnswerAppRepository } from './answer.repository';
 import { QuestionAppModule } from 'src/modules/question/app/question.module';
 import { SearchModule } from 'src/modules/search/search.module';
+import { AuthAppModule } from 'src/modules/auth/app/auth.module';
 @Module({
-  imports: [QuestionAppModule, SearchModule],
+  imports: [AuthAppModule, QuestionAppModule, SearchModule],
   controllers: [AnswerAppController],
   providers: [AnswerAppService, AnswerAppRepository],
 })

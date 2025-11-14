@@ -6,5 +6,5 @@ export interface ICode {
   keyCode: string;
   valueCode: string;
   sortOrder: number;
-  isActive: string;
+  isActive: 'Y' | 'N';
 }

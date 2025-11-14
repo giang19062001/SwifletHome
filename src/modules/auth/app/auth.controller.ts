@@ -63,10 +63,10 @@ export class AuthAppController {
   }
 
   @ApiParam({ name: 'userPhone', type: String })
-  @Get('checkPhoneDuplicate/:userPhone')
+  @Get('checkDuplicatePhone/:userPhone')
   @HttpCode(HttpStatus.OK)
-  async checkPhoneDuplicate(@Param('userPhone') userPhone: string) {
-    const user = await this.authAppService.checkPhoneDuplicate(userPhone);
+  async checkDuplicatePhone(@Param('userPhone') userPhone: string) {
+    const user = await this.authAppService.checkDuplicatePhone(userPhone);
     return user;
   }
 

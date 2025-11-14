@@ -30,31 +30,34 @@ import { DoctorAppService } from './doctor.service';
 import { getDoctorMulterConfig } from 'src/config/multer';
 import { MulterBadRequestFilter } from 'src/filter/uploadError';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 
-@ApiBearerAuth('admin-auth')
 @ApiTags('app/doctor')
-@UseInterceptors(ResponseAppInterceptor)
 @Controller('/api/app/doctor')
-export class DoctorAdminController {
+@ApiBearerAuth('app-auth')
+@UseGuards(ApiAuthAppGuard)
+@UseInterceptors(ResponseAppInterceptor)
+export class DoctorAppController {
   constructor(private readonly doctorAppService: DoctorAppService) {}
 
-  @Post('createDoctor')
+  @Post('create')
+  @HttpCode(HttpStatus.CREATED)
   @ApiBody({ type: CreateDoctorDto })
-  async createDoctor(@Body() dto: CreateDoctorDto) {
-    const result = await this.doctorAppService.createDoctor(dto);
+  async create(@Body() dto: CreateDoctorDto) {
+    const result = await this.doctorAppService.create(dto);
     if (result === 0) {
       throw new BadRequestException();
     }
     return result;
   }
 
-  @Post('uploadFileDoctor')
+  @Post('uploadFile')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: DoctorFileDto })
   @UseFilters(MulterBadRequestFilter)
   @UseInterceptors(FilesInterceptor('doctorFiles', 5, getDoctorMulterConfig(5)))
-  async uploadFileDoctor(@Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {
-    const result = await this.doctorAppService.insertDoctorFile(dto, doctorFiles);
+  async uploadFile(@Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {
+    const result = await this.doctorAppService.uploadFile(dto, doctorFiles);
     return result;
   }
 }

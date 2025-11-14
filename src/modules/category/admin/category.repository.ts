@@ -1,11 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { ICategory } from './category.interface';
 import { PagingDto } from 'src/dto/common';
 import { AbAdminRepo } from 'src/abstract/common';
+import { ICategory } from '../category.interface';
 
 @Injectable()
-export class CategoryRepository extends AbAdminRepo {
+export class CategoryAdminRepository extends AbAdminRepo {
   private readonly table = 'tbl_category';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
@@ -17,11 +17,16 @@ export class CategoryRepository extends AbAdminRepo {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<ICategory[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table}  ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
-      dto.limit == 0 && dto.page == 0 ? [] : [dto.limit, (dto.page - 1) * dto.limit],
-    );
+    let query = `  SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
+        FROM ${this.table} `;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as ICategory[];
   }
   getDetail(dto: string | number): Promise<any | null> {

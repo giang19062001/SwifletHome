@@ -3,6 +3,6 @@ export interface IUserAuthAdmin {
   userId: string;
   userPassword: string;
   userName: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
   accessToken: string;
 }

@@ -4,9 +4,12 @@ import type { Request, Response } from 'express';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
 import { HomeSubmitAppService } from './homeSubmit.service';
 import { CreateHomeSubmitDto } from './homeSubmit.dto';
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 
 @ApiTags('app/homeSubmit')
 @Controller('/api/app/homeSubmit')
+@ApiBearerAuth('app-auth')
+@UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class HomeSubmitAppController {
   constructor(private readonly homeSubmitAppService: HomeSubmitAppService) {}
@@ -15,7 +18,7 @@ export class HomeSubmitAppController {
     type: CreateHomeSubmitDto,
   })
   @Post('create')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateHomeSubmitDto): Promise<number> {
     const result = await this.homeSubmitAppService.create(dto);
     return result;

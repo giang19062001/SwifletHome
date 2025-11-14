@@ -4,7 +4,7 @@ export interface IPackage {
   packageName: string;
   packagePrice: string;
   packageExpireDay: number;
-  isActive: string;
+  isActive: 'Y' | 'N';
   createdAt: string;
   updatedAt: string;
   createdId: string;

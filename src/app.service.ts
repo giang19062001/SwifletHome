@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
 import { IAnswer } from './modules/answer/answer.interface';
-import { CategoryService } from './modules/category/category.service';
 import { HomeAdminService } from './modules/home/admin/home.service';
 import { BlogAdminService } from './modules/blog/admin/blog.service';
+import { CategoryAdminService } from './modules/category/admin/category.service';
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly answerAdminService: AnswerAdminService,
-    private readonly catetegoryService: CategoryService,
+    private readonly catetegoryAdminService: CategoryAdminService,
     private readonly homeAdminService: HomeAdminService,
     private readonly blogAdminService: BlogAdminService,
   ) {}
@@ -19,7 +19,7 @@ export class AppService {
     return result;
   }
   async renderCreateAnswer(): Promise<any> {
-    const { list } = await this.catetegoryService.getAll({
+    const { list } = await this.catetegoryAdminService.getAll({
       limit: 0,
       page: 0,
     });
@@ -32,7 +32,7 @@ export class AppService {
   }
   async renderAnswerUpdate(answerCode: string): Promise<any> {
     const answer = await this.answerAdminService.getDetail(answerCode);
-    const { list } = await this.catetegoryService.getAll({
+    const { list } = await this.catetegoryAdminService.getAll({
       limit: 0,
       page: 0,
     });
@@ -46,7 +46,7 @@ export class AppService {
   }
   //blog
   async renderCreateBlog(): Promise<any> {
-    const { list } = await this.catetegoryService.getAll({
+    const { list } = await this.catetegoryAdminService.getAll({
       limit: 0,
       page: 0,
     });
@@ -59,7 +59,7 @@ export class AppService {
   }
   async renderBlogUpdate(blogCode: string): Promise<any> {
     const blog = await this.blogAdminService.getDetail(blogCode);
-    const { list } = await this.catetegoryService.getAll({
+    const { list } = await this.catetegoryAdminService.getAll({
       limit: 0,
       page: 0,
     });

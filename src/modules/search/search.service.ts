@@ -19,7 +19,7 @@ export class SearchService {
 
   findAnswer(query: string, data: ISearchItem[]): string {
     if (!data?.length) {
-      return Msg.DataEmpty;
+      return Msg.CannotReply;
     }
 
     // dữ liệu đã chuẩn hóa

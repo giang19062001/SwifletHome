@@ -4,7 +4,7 @@ export interface IQuestion {
   questionContent: string;
   questionObject: string;
   questionCategory: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
   createdAt: string;
   updatedAt: string;
   createdId: string;

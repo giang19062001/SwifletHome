@@ -3,5 +3,5 @@ export interface IUserAdmin {
   userId: string;
   userPassword: string;
   userName: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
 }

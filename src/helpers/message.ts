@@ -1,4 +1,5 @@
 export const Msg = {
+  CodeInvalid:"Mã code không hợp lệ",
   TokenMissing: 'Vui lòng xác thực token',
   TokenInvalid: 'Token không hợp lệ',
   PhoneExist: 'Số điện thoại đã tồn tại',
@@ -11,8 +12,9 @@ export const Msg = {
   PasswordChangeErr: 'Đổi mật khẩu thất bại',
   AccountLoginWrong: 'Tài khoản hoặc mật khẩu không hợp lệ',
   AccountLoginBlock: 'Tài khoản đã bị vô hiệu hóa',
-  DataEmpty: 'Hiện tại hệ thống chưa cung cấp dữ liệu về câu hỏi/trả lời',
-  CannotReply: 'Xin lỗi, tôi chưa có thông tin về câu hỏi này',
+  UserNotFound: 'Người dùng không tồn tại',
+  HomeNotFound: 'Thông tin nhà yến không tồn tại',
+  CannotReply: 'Hệ thống chưa có thông tin về câu trả lời của câu hỏi này',
   FileEmpty: 'Không có file nào được upload',
   FileAudioRequire: 'Bắt buộc nhập 2 file audio',
   FileOvertake: 'Số file upload đã vượt quá số lượng tối đa',

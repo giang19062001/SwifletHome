@@ -69,7 +69,7 @@ export class HomeAdminService extends AbAdminService{
       if (dto.homeImage.filename !== (home.homeImage as IHomeImg).filename) {
         // delete old physical file
         const homeImagePath = `/images/homes/${(home.homeImage as IHomeImg).filename}`;
-        await this.uploadService.deletePhysicalFile(homeImagePath);
+        await this.uploadService.deleteLocalFile(homeImagePath);
 
         // delete old db file
         await this.homeAdminRepository.deleteHomeImagesOne((home.homeImage as IHomeImg).seq);
@@ -91,7 +91,7 @@ export class HomeAdminService extends AbAdminService{
         // delete physical
         for (const file of fileNeedDeletes) {
           const filepath = `/images/homes/${file.filename}`;
-          await this.uploadService.deletePhysicalFile(filepath);
+          await this.uploadService.deleteLocalFile(filepath);
         }
       }
       if (fileNeedCreates.length) {
@@ -117,12 +117,12 @@ export class HomeAdminService extends AbAdminService{
       //   await this.homeAdminRepository.deleteHomeImages(home?.seq ?? 0);
       // }
       // const homeImagePath = `/image/homes/${home.homeImage}`;
-      // await this.uploadService.deletePhysicalFile(homeImagePath);
+      // await this.uploadService.deleteLocalFile(homeImagePath);
       // if (images.length) {
       // xóa các file ảnh của nhà yến trong thư mục uploads
       //   for (const file of images) {
       //     const filepath = `/images/homes/${file.filename}`;
-      //     await this.uploadService.deletePhysicalFile(filepath);
+      //     await this.uploadService.deleteLocalFile(filepath);
       //   }
       // }
 

@@ -4,6 +4,6 @@ export interface IUserAuthApp {
   userName: string;
   userPhone: string;
   userDevice: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
   accessToken: string;
 }

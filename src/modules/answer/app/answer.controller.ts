@@ -12,13 +12,16 @@ import {
   Param,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AnswerAppService } from './answer.service';
 import { SearchService } from 'src/modules/search/search.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 
 @ApiTags('app/answer')
 @Controller('/api/app/answer')
+@ApiBearerAuth('app-auth')
+@UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class AnswerAppController {
   constructor(

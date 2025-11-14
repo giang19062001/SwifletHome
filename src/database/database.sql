@@ -302,12 +302,12 @@ CREATE TABLE `tbl_package` (
 )
 
 -- thông tin chuyển khoản, fcm key, s3 key
-CREATE TABLE `tbl_config_system` (
+CREATE TABLE `tbl_info_system` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `configCharacter` enum('BANK') NOT NULL DEFAULT 'BANK',
-  `configName` varchar(45) NOT NULL,
-  `configContent` json NOT NULL,
-  `configDescription` varchar(255) NOT NULL,
+  `infoCharacter` enum('BANK') NOT NULL DEFAULT 'BANK',
+  `infoName` varchar(45) NOT NULL,
+  `infoContent` json NOT NULL,
+  `infoDescription` varchar(255) NOT NULL,
   `isActive` char(1) NOT NULL DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
@@ -316,14 +316,14 @@ CREATE TABLE `tbl_config_system` (
   PRIMARY KEY (`seq`)
 )
 
--- giao diện dynamic cho app từ db
+-- noi dung giao diện dynamic cho app từ db
 -- SIGNUP_SERVICE: đăng kí dịch vụ
-CREATE TABLE `tbl_design_system` (
+CREATE TABLE `tbl_content_system` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `designCharacter` enum('SIGNUP_SERVICE') NOT NULL DEFAULT 'SIGNUP_SERVICE', 
-  `designName` varchar(45) NOT NULL,
-  `designContent` JSON NOT NULL,
-  `designDescription` varchar(255) NOT NULL,
+  `contentCharacter` enum('SIGNUP_SERVICE') NOT NULL DEFAULT 'SIGNUP_SERVICE', 
+  `contentName` varchar(45) NOT NULL,
+  `contentContent` JSON NOT NULL,
+  `contentDescription` varchar(255) NOT NULL,
   `isActive` char(1) NOT NULL DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,

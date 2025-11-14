@@ -19,13 +19,17 @@ export class HomeAdminRepository extends AbAdminRepo {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IHome[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
+    let query = `   SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A  
-        WHERE A.isActive = 'Y'
-        ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
-      dto.limit == 0 && dto.page == 0 ? [] : [dto.limit, (dto.page - 1) * dto.limit],
-    );
+        WHERE A.isActive = 'Y' `;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IHome[];
   }
   async getDetail(homeCode: string): Promise<IHome | null> {

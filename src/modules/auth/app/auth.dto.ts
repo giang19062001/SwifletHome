@@ -23,7 +23,7 @@ export class UpdateDeviceTokenDto {
 
 export class LoginAppDto {
   @ApiProperty({
-    example: '',
+    example: '0334644324',
   })
   @IsString()
   @IsNotEmpty()
@@ -31,7 +31,7 @@ export class LoginAppDto {
   userPhone: string;
 
   @ApiProperty({
-    example: '',
+    example: '123',
   })
   @IsString()
   @IsNotEmpty()
@@ -54,7 +54,7 @@ export class RegisterAppDto {
   userName: string;
 
   @ApiProperty({
-    example: '',
+    example: '0334644324',
   })
   @IsString()
   @IsNotEmpty()
@@ -62,7 +62,7 @@ export class RegisterAppDto {
   userPhone: string;
 
   @ApiProperty({
-    example: '',
+    example: '123',
   })
   @IsString()
   @IsNotEmpty()

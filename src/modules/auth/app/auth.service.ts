@@ -159,8 +159,8 @@ export class AuthAppService extends AbAuthService{
     return result;
   }
 
-  async checkPhoneDuplicate(userPhone: string): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/checkPhoneDuplicate`;
+  async checkDuplicatePhone(userPhone: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/checkDuplicatePhone`;
     const phone = await this.userAppService.findByPhone(userPhone);
 
     // lỗi -> số điện thoại đã tồn tại

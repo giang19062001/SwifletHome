@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { CategoryRepository } from './category.repository';
-import { ICategory } from './category.interface';
+import { CategoryAdminRepository } from './category.repository';
 import { PagingDto } from 'src/dto/common';
 import { IList } from 'src/interfaces/common';
 import { AbAdminService } from 'src/abstract/common';
+import { ICategory } from '../category.interface';
 
 @Injectable()
-export class CategoryService extends AbAdminService {
-  constructor(private readonly categoryRepository: CategoryRepository) {
+export class CategoryAdminService extends AbAdminService {
+  constructor(private readonly categoryAdminRepository: CategoryAdminRepository) {
     super();
   }
   async getAll(dto: PagingDto): Promise<IList<ICategory>> {
-    const total = await this.categoryRepository.getTotal();
-    const list = await this.categoryRepository.getAll(dto);
+    const total = await this.categoryAdminRepository.getTotal();
+    const list = await this.categoryAdminRepository.getAll(dto);
     return { total, list };
   }
   getDetail(dto: string | number): Promise<any | null> {

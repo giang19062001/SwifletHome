@@ -57,7 +57,7 @@ export class BlogAdminController {
 
   @ApiBody({ type: CreateBlogDto })
   @Post('create')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateBlogDto): Promise<number> {
     const result = await this.blogAdminService.create(dto);
     if (result === 0) {

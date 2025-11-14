@@ -11,17 +11,25 @@ import { CodeService } from './code.service';
 @ApiTags('app/code')
 @Controller('/api/app/code')
 @UseInterceptors(ResponseAppInterceptor)
-export class CodeController {
+export default class CodeController {
   constructor(private readonly codeService: CodeService) {}
 
   @ApiBody({
-    description: '**subCode:** `STATUS`, `NUMBER_ATTEND`',
+    description: `
+  **\`mainCode\`**: - **\`SUBMIT\`** - đăng ký tham quan nhà yến  
+  **\`subCode\`**:
+  - **\`STATUS\`** - trạng thái đăng ký tham quan nhà yến  \n
+  - **\`NUMBER_ATTEND\`** - số lượng người đăng ký tham quan nhà yến
+  `,
     type: GetAllCodeDto,
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
   async getAll(@Body() dto: GetAllCodeDto): Promise<ICode[]> {
     const result = await this.codeService.getAll(dto);
+    if (result.length == 0) {
+      throw new BadRequestException();
+    }
     return result;
   }
 }

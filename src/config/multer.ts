@@ -18,17 +18,27 @@ interface MulterLimits {
 
 export const getFileLocation = (mimetype: string, fieldname: string) => {
   if (mimetype.startsWith('image/')) {
-    if (fieldname === 'editorImg') return 'images/editors';
-    if (fieldname === 'homeImage' || fieldname === 'homeImages') return 'images/homes';
-    if (fieldname === 'doctorFiles') return 'images/doctors';
+    if (fieldname === 'editorImg' || fieldname.includes('editorImg')) {
+      return 'images/editors';
+    }
+    if (fieldname === 'homeImage' || fieldname.includes('homeImage') || fieldname === 'homeImages' || fieldname.includes('homeImages')) {
+      return 'images/homes';
+    }
+    if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
+      return 'images/doctors';
+    }
     return 'images/others';
   }
   if (mimetype.startsWith('video/')) {
-    if (fieldname === 'doctorFiles') return 'videos/doctors';
+    if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
+      return 'videos/doctors';
+    }
     return 'videos/others';
   }
   if (mimetype.startsWith('audio/')) {
-    if (fieldname.includes('editorAudio')) return 'audios/editors';
+    if (fieldname === 'editorAudio' || fieldname.includes('editorAudio')) {
+      return 'audios/editors';
+    }
     return 'audios/others';
   }
   return 'others';

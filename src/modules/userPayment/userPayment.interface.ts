@@ -4,7 +4,7 @@ export interface IUserPayment {
   packageCode: string;
   startDate: string;
   endDate: string;
-  isActive: string;
+  isActive: 'Y' | 'N';
   createdAt: string;
   updatedAt: string;
   createdId: string;

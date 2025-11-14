@@ -15,15 +15,19 @@ export class DoctorAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IDoctor[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.statusCode, A.createdAt,
+    let query = `  SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.statusCode, A.createdAt,
         B.valueCode AS statusValue, B.keyCode as statusKey
         FROM ${this.table} A 
          LEFT JOIN tbl_code_common B
-        ON A.statusCode = B.code
-        LIMIT ? OFFSET ? `,
-      [dto.limit, (dto.page - 1) * dto.limit],
-    );
+        ON A.statusCode = B.code `;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IDoctor[];
   }
 
@@ -49,6 +53,27 @@ export class DoctorAdminRepository {
 
     return result.affectedRows;
   }
+
+  async getFilesNotUse(): Promise<IDoctorFile[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.doctorSeq, A.uniqueId, A.filename, A.mimetype FROM tbl_doctor_file A
+      WHERE A.doctorSeq = 0 AND A.uniqueId NOT IN (SELECT uniqueId FROM tbl_doctor)
+      `,
+    );
+    return rows as IDoctorFile[];
+  }
+
+  
+  async deleteFile(seq: number): Promise<number> {
+    const sql = `
+      DELETE FROM tbl_doctor_file
+      WHERE seq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
+
+    return result.affectedRows;
+  }
+
   async getFilesBySeq(seq: number): Promise<IDoctorFile[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT B.seq, B.filename,  B.mimetype

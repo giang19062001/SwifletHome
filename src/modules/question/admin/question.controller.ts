@@ -57,7 +57,7 @@ export class QuestionAdminController {
 
   @ApiBody({ type: CreateQuestionDto })
   @Post('create')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateQuestionDto): Promise<number> {
     const result = await this.questionAdminService.create(dto);
     if (result === 0) {

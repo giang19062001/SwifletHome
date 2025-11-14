@@ -5,8 +5,8 @@ export interface IBlog {
   blogContent: string;
   blogCategory: string;
   blogScreenCode: string;
-  isActive: string;
-  isFree: string;
+  isActive: 'Y' | 'N';
+  isFree: 'Y' | 'N';
   createdAt: string;
   updatedAt: string;
   createdId: string;
