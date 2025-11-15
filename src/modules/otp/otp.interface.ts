@@ -8,3 +8,5 @@ export interface IOtp {
   createdAt: string;
   isUsed: number;
 }
+
+

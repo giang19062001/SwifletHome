@@ -74,14 +74,14 @@ export class AuthAppService extends AbAuthService{
     }
 
     // cập nhập lại device mỗi lần đăng nhập
-    await this.userAppService.updateDeviceToken(dto.userDevice, dto.userPhone);
+    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
 
     // generate token
-    const payload = { userCode: user.userCode, userName: user.userName, userPhone: user.userPhone, userDevice: dto.userDevice };
+    const payload = { userCode: user.userCode, userName: user.userName, userPhone: user.userPhone, deviceToken: dto.deviceToken };
     const accessToken = this.jwtService.sign(payload);
-    return { ...userWithoutPassword, userDevice: dto.userDevice, accessToken };
+    return { ...userWithoutPassword, deviceToken: dto.deviceToken, accessToken };
   }
 
   async register(dto: RegisterAppDto): Promise<number> {
@@ -155,7 +155,7 @@ export class AuthAppService extends AbAuthService{
       throw new BadRequestException(Msg.PhoneNotExist);
     }
 
-    const result = await this.userAppService.updateDeviceToken(dto.userDevice, userPhone);
+    const result = await this.userAppService.updateDeviceToken(dto.deviceToken, userPhone);
     return result;
   }
 
@@ -166,7 +166,7 @@ export class AuthAppService extends AbAuthService{
     // lỗi -> số điện thoại đã tồn tại
     if (phone) {
       this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneExist}`);
-      throw new BadRequestException(Msg.PhoneExist);
+      return 0
     }
     return 1;
   }

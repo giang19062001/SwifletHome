@@ -14,7 +14,7 @@ export class UserAppRepository {
 
   async findByPhone(userPhone: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, userDevice, userPassword
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
      FROM ${this.table} WHERE userPhone = ? AND isActive = 'Y' LIMIT 1`,
       [userPhone],
     );
@@ -22,7 +22,7 @@ export class UserAppRepository {
   }
    async findByCode(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, userDevice, userPassword
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
      FROM ${this.table} WHERE userCode = ? AND isActive = 'Y' LIMIT 1`,
       [userCode],
     );
@@ -30,7 +30,7 @@ export class UserAppRepository {
   }
   async findBySeq(seq: number): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, userDevice, userPassword
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
      FROM ${this.table} WHERE seq = ? LIMIT 1`,
       [seq],
     );
@@ -44,10 +44,10 @@ export class UserAppRepository {
       userCode = generateCode(rows[0].userCode, 'USR', 6);
     }
     const sql = `
-      INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, userDevice, isActive, createdId) 
+      INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, deviceToken, isActive, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.userDevice, 'Y', this.updator]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.deviceToken, 'Y', this.updator]);
 
     return result.insertId;
   }
@@ -61,12 +61,12 @@ export class UserAppRepository {
 
     return result.affectedRows;
   }
-  async updateDeviceToken(userDevice: string, userPhone: string): Promise<number> {
+  async updateDeviceToken(deviceToken: string, userPhone: string): Promise<number> {
     const sql = `
-        UPDATE ${this.table} SET userDevice = ?, updatedAt = NOW(), updatedId = ?
+        UPDATE ${this.table} SET deviceToken = ?, updatedAt = NOW(), updatedId = ?
         WHERE userPhone = ?
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userDevice, this.updator, userPhone]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [deviceToken, this.updator, userPhone]);
 
     return result.affectedRows;
   }

@@ -49,7 +49,7 @@ export class UserAppService {
     return await this.userAppRepository.updatePassword(newPassword, userPhone);
   }
 
-  async updateDeviceToken(userDevice: string, userPhone: string): Promise<number> {
-    return await this.userAppRepository.updateDeviceToken(userDevice, userPhone);
+  async updateDeviceToken(deviceToken: string, userPhone: string): Promise<number> {
+    return await this.userAppRepository.updateDeviceToken(deviceToken, userPhone);
   }
 }

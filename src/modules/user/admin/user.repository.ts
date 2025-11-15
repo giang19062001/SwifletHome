@@ -30,7 +30,7 @@ export class UserAdminRepository {
   }
   
   async getAll(dto: PagingDto): Promise<IUserApp[]> {
-    let query = ` SELECT A.seq, A.userCode, A.userName, A.userPassword, A.userPhone, A.userDevice, A.isActive, A.createdAt, A.createdId, A.updatedAt, A.updatedId
+    let query = ` SELECT A.seq, A.userCode, A.userName, A.userPassword, A.userPhone, A.deviceToken, A.isActive, A.createdAt, A.createdId, A.updatedAt, A.updatedId
                 FROM ${this.tableApp} A  `;
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

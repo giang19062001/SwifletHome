@@ -7,6 +7,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response';
 import { RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { Msg } from 'src/helpers/message';
 import { ApiAuthAppGuard } from './auth.guard';
+import { IUserAuthApp } from './auth.interface';
 
 @ApiBearerAuth('app-auth')
 @ApiTags('app/auth')
@@ -20,7 +21,7 @@ export class AuthAppController {
   })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: LoginAppDto) {
+  async login(@Body() dto: LoginAppDto){
     const user = await this.authAppService.login(dto);
     return user;
   }
@@ -43,7 +44,7 @@ export class AuthAppController {
   @HttpCode(HttpStatus.OK)
   async updateDeviceToken(@Body() dto: UpdateDeviceTokenDto, @Param('userPhone') userPhone: string) {
     const result = await this.authAppService.updateDeviceToken(dto, userPhone);
-    return result;
+    return {data: result};
   }
 
   @UseGuards(ApiAuthAppGuard)
@@ -69,8 +70,11 @@ export class AuthAppController {
   @Get('checkDuplicatePhone/:userPhone')
   @HttpCode(HttpStatus.OK)
   async checkDuplicatePhone(@Param('userPhone') userPhone: string) {
-    const user = await this.authAppService.checkDuplicatePhone(userPhone);
-    return user;
+    const result = await this.authAppService.checkDuplicatePhone(userPhone);
+    return {
+      message: !result ? Msg.PhoneExist : Msg.PhoneOk,
+      data: result
+    };
   }
 
   @ApiBody({
@@ -100,6 +104,7 @@ export class AuthAppController {
     return {
       success: isValid,
       message: isValid ? Msg.OtpValid : Msg.OtpInvalid,
+      data: isValid ? 1 : 0
     };
   }
 }

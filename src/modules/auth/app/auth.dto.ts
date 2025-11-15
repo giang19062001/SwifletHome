@@ -18,7 +18,7 @@ export class UpdateDeviceTokenDto {
   })
   @IsString()
   @IsNotEmpty()
-  userDevice: string;
+  deviceToken: string;
 }
 
 export class LoginAppDto {
@@ -42,7 +42,7 @@ export class LoginAppDto {
   })
   @IsString()
   @IsNotEmpty()
-  userDevice: string;
+  deviceToken: string;
 }
 
 export class RegisterAppDto {
@@ -73,5 +73,5 @@ export class RegisterAppDto {
   })
   @IsString()
   @IsNotEmpty()
-  userDevice: string;
+  deviceToken: string;
 }

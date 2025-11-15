@@ -8,7 +8,7 @@ CREATE TABLE `tbl_user_admin` (
   `updatedAt` datetime DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `userId_UNIQUE` (`userId`)
-)
+);
 
 
 CREATE TABLE `tbl_category` (
@@ -22,7 +22,7 @@ CREATE TABLE `tbl_category` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `categoryCode_UNIQUE` (`categoryCode`)
-)
+);
 
 CREATE TABLE `tbl_object` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -35,7 +35,7 @@ CREATE TABLE `tbl_object` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `objectCharacter_UNIQUE` (`objectKeyword`)
-)
+);
 
 CREATE TABLE `tbl_question` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -50,8 +50,8 @@ CREATE TABLE `tbl_question` (
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
-  UNIQUE KEY `questionCode_UNIQUE` (`questionCode`),
-)
+  UNIQUE KEY `questionCode_UNIQUE` (`questionCode`)
+);
 
 CREATE TABLE `tbl_answer` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -67,7 +67,7 @@ CREATE TABLE `tbl_answer` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `answerCode_UNIQUE` (`answerCode`)
-)
+);
 
 CREATE TABLE `tbl_blog` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -75,7 +75,7 @@ CREATE TABLE `tbl_blog` (
   `blogObject` char(10) NOT NULL,
   `blogCategory` varchar(45) NOT NULL,
   `blogContent` text NOT NULL,
-  `blogScreenCode` char(15) DEFAULT ''
+  `blogScreenCode` char(15) DEFAULT '', -- màn hình code trên app
   `isActive` char(1) DEFAULT 'Y',
   `isFree` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -84,7 +84,7 @@ CREATE TABLE `tbl_blog` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `blogCode_UNIQUE` (`blogCode`)
-)
+);
 
 CREATE TABLE `tbl_uploads_image` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -100,7 +100,7 @@ CREATE TABLE `tbl_uploads_image` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
-)
+);
 
 CREATE TABLE `tbl_uploads_audio` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -117,7 +117,7 @@ CREATE TABLE `tbl_uploads_audio` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
-)
+);
 
 
 CREATE TABLE `tbl_uploads_video` (
@@ -130,7 +130,7 @@ CREATE TABLE `tbl_uploads_video` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `videoUrl_UNIQUE` (`urlLink`)
-) 
+);
 
 -- nhà yến SCT
 CREATE TABLE `tbl_home` (
@@ -150,7 +150,7 @@ CREATE TABLE `tbl_home` (
   PRIMARY KEY (`seq`),
   UNIQUE KEY `homeCode_UNIQUE` (`homeCode`),
   UNIQUE KEY `homeImage_UNIQUE` (`homeImage`)
-)
+);
 
 CREATE TABLE `tbl_home_img` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -166,7 +166,7 @@ CREATE TABLE `tbl_home_img` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
-)
+);
 
 -- đơn đăng ký nhà yến
 CREATE TABLE `tbl_home_submit` (
@@ -184,7 +184,7 @@ CREATE TABLE `tbl_home_submit` (
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`)
-)
+);
 
 CREATE TABLE `tbl_doctor_file` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -202,7 +202,7 @@ CREATE TABLE `tbl_doctor_file` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `filename_UNIQUE` (`filename`)
-)
+);
 
 CREATE TABLE `tbl_doctor` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -220,7 +220,7 @@ CREATE TABLE `tbl_doctor` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
-) 
+);
 
 CREATE TABLE `tbl_code_common` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -238,7 +238,7 @@ CREATE TABLE `tbl_code_common` (
   PRIMARY KEY (`seq`),
   UNIQUE KEY `mainCode` (`mainCode`,`subCode`,`keyCode`),
   UNIQUE KEY `code_UNIQUE` (`code`)
-) 
+); 
 
 CREATE TABLE `tbl_otp` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -253,7 +253,7 @@ CREATE TABLE `tbl_otp` (
   PRIMARY KEY (`seq`),
   KEY `idx_phone_number` (`userPhone`),
   KEY `idx_expires_at` (`expiresAt`)
-) 
+); 
 
 CREATE TABLE `tbl_user_app` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -261,7 +261,7 @@ CREATE TABLE `tbl_user_app` (
   `userName` varchar(45) NOT NULL,
   `userPassword` varchar(255) NOT NULL,
   `userPhone` varchar(15) NOT NULL,
-  `userDevice` text NOT NULL,
+  `deviceToken` text NOT NULL,
   `isActive` char(1) NOT NULL DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT NULL,
@@ -270,7 +270,8 @@ CREATE TABLE `tbl_user_app` (
   PRIMARY KEY (`seq`),
   UNIQUE KEY `userPhone_UNIQUE` (`userPhone`),
   UNIQUE KEY `userCode_UNIQUE` (`userCode`)
-)
+);
+
 CREATE TABLE `tbl_user_payment` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `userCode` varchar(45) NOT NULL,
@@ -283,9 +284,8 @@ CREATE TABLE `tbl_user_payment` (
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
-  UNIQUE KEY `userPhone_UNIQUE` (`userPhone`),
   UNIQUE KEY `userCode_UNIQUE` (`userCode`)
-)
+);
 
 CREATE TABLE `tbl_package` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -301,7 +301,7 @@ CREATE TABLE `tbl_package` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `packageCode_UNIQUE` (`packageCode`)
-)
+);
 
 -- thông tin chuyển khoản, fcm key, s3 key
 CREATE TABLE `tbl_info_system` (
@@ -316,7 +316,7 @@ CREATE TABLE `tbl_info_system` (
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`)
-)
+);
 
 -- noi dung giao diện dynamic cho app từ db
 -- SIGNUP_SERVICE: đăng kí dịch vụ
@@ -332,7 +332,7 @@ CREATE TABLE `tbl_screen_system` (
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`)
-)
+);
 
 
 
@@ -373,3 +373,8 @@ CREATE TABLE tbl_notifications (
   createdId varchar(45) DEFAULT 'SYSTEM',
   updatedId varchar(45) DEFAULT NULL
 );
+
+
+-- INSERT
+INSERT INTO `tbl_user_admin` (`userId`, `userName`, `userPassword`, `isActive`, `createdAt`, `updatedAt`) 
+VALUES ('admin', 'Boss', '$2b$10$f6Kw1Pc6YmdahVRjq8CVvO2HREVU/Cavc1mdwvopBovzptak3bvkm', 'Y', '2025-10-20 10:39:20', NULL),

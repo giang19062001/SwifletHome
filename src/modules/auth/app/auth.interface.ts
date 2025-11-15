@@ -3,7 +3,7 @@ export interface IUserAuthApp {
   userCode: string;
   userName: string;
   userPhone: string;
-  userDevice: string;
+  deviceToken: string;
   isActive: 'Y' | 'N';
   accessToken: string;
 }
