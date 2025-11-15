@@ -60,13 +60,19 @@ export class OtpService {
     // không tồn tại otp hợp lệ nào hiện có của số điện thoại này trong db
     if (!otp) {
       this.logger.error(logbase, `OTP for ${dto.userPhone}: ${Msg.OtpExpire}`);
-      throw new BadRequestException(Msg.OtpExpire);
+      throw new BadRequestException({
+        message: Msg.OtpExpire,
+        data: 0,
+      });
     }
 
     // Kiểm tra số lần nhập
     if (otp.attemptCount >= this.MAX_ATTEMPTS) {
       this.logger.error(logbase, `OTP for ${dto.userPhone}: ${Msg.OtpOvertake}`);
-      throw new ForbiddenException(Msg.OtpOvertake);
+       throw new ForbiddenException({
+        message: Msg.OtpOvertake,
+        data: 0,
+      });
     }
 
     // Tăng số lần thử
@@ -76,7 +82,10 @@ export class OtpService {
     if (otp.otpCode !== dto.otpCode) {
       const remainingAttempts = this.MAX_ATTEMPTS - (otp.attemptCount + 1);
       this.logger.error(logbase, `OTP for ${dto.userPhone}: ${Msg.OtpRemainAttempt(remainingAttempts)}`);
-      throw new BadRequestException(Msg.OtpRemainAttempt(remainingAttempts));
+       throw new BadRequestException({
+        message: Msg.OtpRemainAttempt(remainingAttempts),
+        data: 0,
+      });
     }
 
     // Khớp -> Đánh dấu OTP đã sử dụng

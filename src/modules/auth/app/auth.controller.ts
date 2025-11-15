@@ -86,7 +86,6 @@ export class AuthAppController {
   async requestOtp(@Body() dto: RequestOtpDto) {
     const otpCode = await this.authAppService.requestOtp(dto);
     return {
-      success: true,
       message: Msg.OtpSent,
       data: { otpCode },
     };
