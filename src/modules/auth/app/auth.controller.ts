@@ -47,10 +47,7 @@ export class AuthAppController {
     return {data: result};
   }
 
-  @UseGuards(ApiAuthAppGuard)
-  @ApiOperation({
-    summary: 'Cần đăng nhập và xác thực token',
-  })
+
   @ApiParam({ name: 'userPhone', type: String })
   @ApiBody({ type: UpdatePasswordDto })
   @Put('updatePassword/:userPhone')
