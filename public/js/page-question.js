@@ -53,12 +53,12 @@ function toggleAnswerDetailLink(modalBody) {
 
 // TODO: RENDER
 async function showQuestionModal(type, questionData) {
-  // init modal
   const modalSelector = type === 'create' ? '.question-create-modal' : '.question-update-modal';
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body');
+  const submitBtn = modalEl.querySelector('.modal-footer button');
 
-  // hiển thị danh sách thể loại
+  // category
   const categoryOptions = categories
     .map(
       (cate) => `
@@ -70,7 +70,7 @@ async function showQuestionModal(type, questionData) {
     )
     .join('');
 
-  // hiển thị danh sách thể loại
+  //  object
   const objectOptions = objects
     .map(
       (obj) => `
@@ -82,37 +82,53 @@ async function showQuestionModal(type, questionData) {
     )
     .join('');
 
-  // form
+  // Fill form
   modalBody.querySelector('#questionCode').value = questionData.questionCode || '';
   modalBody.querySelector('#questionContent').value = questionData.questionContent || '';
   modalBody.querySelector('#questionCategory').innerHTML = categoryOptions;
   modalBody.querySelector('#questionObject').innerHTML = objectOptions;
 
-  // hiển thị danh sách câu trả lời
-  await renderAllAnswer(modalBody, questionData ? questionData.answerCode : '');
-
-  // thêm validate cho nội dung câu hỏi -> ko thể để trống
-  modalBody.querySelector('#questionContent')?.addEventListener('input', (e) => {
-    modalBody.querySelector('.err-questionContent').style.display = String(e.target.value).trim() == '' ? 'block' : 'none';
-  });
-
-  // gắn sự kiện open link detail cho câu trả lời đang được chọn
+  // Thay thế tạm nội dung answer select, nút submit
   const answerSelect = modalBody.querySelector('#answerCode');
-  answerSelect.addEventListener('change', function () {
-    toggleAnswerDetailLink(modalBody);
-  });
+  answerSelect.innerHTML = '<option value="">-- Đang tải --</option>';
+  answerSelect.disabled = true;
 
-  // trigger event cho câu trả lời được chọn
-  setTimeout(() => answerSelect.dispatchEvent(new Event('change')), 0);
+  //  Disable nút submit
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang tải...';
 
-  // gắn sự kiện cho nút submit form
-  modalEl.querySelector('.modal-footer button').onclick = type === 'create' ? createQuestion : updateQuestion;
-
-  // show modal
+  // MỞ MODAL
   const modal = new bootstrap.Modal(modalEl);
   modal.show();
-}
 
+  //   render answer
+  await renderAllAnswer(modalBody, questionData ? questionData.answerCode : '');
+
+  //  enable lại 'asnwer' và nút submit
+  answerSelect.disabled = false;
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = type === 'create' ? 'Tạo mới' : 'Cập nhật';
+
+  // Trigger change để hiển thị link detail (nếu có)
+  setTimeout(() => answerSelect.dispatchEvent(new Event('change')), 0);
+
+  // thêm validate 'questionContent'
+  modalBody.querySelector('#questionContent')?.addEventListener('input', (e) => {
+    modalBody.querySelector('.err-questionContent').style.display = String(e.target.value).trim() === '' ? 'block' : 'none';
+  });
+
+  const answerSelectLive = modalBody.querySelector('#answerCode');
+  answerSelectLive.addEventListener('change', () => toggleAnswerDetailLink(modalBody));
+
+  // Gắn sự kiện submit
+  submitBtn.onclick = () => {
+    if (type === 'create') {
+      createQuestion(submitBtn);
+    } else {
+      updateQuestion(submitBtn);
+    }
+  };
+}
 async function renderAnswer(modalBody, answerCode) {
   const questionCategory = modalBody.querySelector('#questionCategory').value;
   const questionObject = modalBody.querySelector('#questionObject').value;
@@ -176,18 +192,22 @@ function renderAllQuestion(data, objElement) {
     });
     objElement.innerHTML = HTML;
 
-    // render paging
-    let pagerHTML = createPagerHTML(data.total, limit, page, 5, 'changePage');
+    // phân trang
+    let pagerHTML = renderPager(data.total, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
-    //clear
-    objElement.innerHTML = ``;
-    document.getElementById('privacy-main-pager').innerHTML = ``;
+    // dữ liệu trống
+    renderEmptyRowTable(objElement, 7);
   }
+  // xóa skeleton
+  hideSkeleton(objElement);
 }
 // TODO: API
 async function getAllQuestion(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
+  // Hiển thị skeleton
+  showSkeleton(objElement, limit, 7);
+
   await axios
     .post(
       currentUrl + '/api/admin/question/getAll',
@@ -198,7 +218,6 @@ async function getAllQuestion(currentPage, limit) {
       axiosAuth(),
     )
     .then(function (response) {
-      console.log('response', response);
       if (response.status === 200 && response.data) {
         renderAllQuestion(response.data, objElement);
       }
@@ -308,61 +327,67 @@ async function deleteQuestion(questionCode) {
       toastOk('Xóa thất bại');
     });
 }
-async function createQuestion() {
+async function createQuestion(btn) {
+  const modalBody = document.querySelector('.question-create-modal .modal-body form');
   try {
-    const modalBody = document.querySelector('.question-create-modal .modal-body form');
-    const questionContent = modalBody.querySelector('#questionContent').value;
+    const questionContent = modalBody.querySelector('#questionContent').value.trim();
     const questionCategory = modalBody.querySelector('#questionCategory').value;
     const questionObject = modalBody.querySelector('#questionObject').value;
     const answerCode = modalBody.querySelector('#answerCode').value;
+
     if (String(questionContent).trim() == '') {
       modalBody.querySelector('.err-questionContent').style.display = 'block';
       return;
     }
-    await axios
-      .post(
-        currentUrl + '/api/admin/question/create',
-        {
-          questionContent: questionContent,
-          questionCategory: questionCategory,
-          questionObject: questionObject,
-          answerCode: answerCode,
-          createdId: user.userId,
-        },
-        axiosAuth(),
-      )
-      .then(function (response) {
-        console.log('response', response);
-        if (response.status === 200 && response.data) {
-          toastOk('Thêm thành công');
-          // đóng modal
-          closeQuestionModal('create');
-          // refresh list
-          page = 1;
-          getAllQuestion(page, limit);
-        } else {
-          toastErr('Thêm thất bại');
-        }
-      })
-      .catch(function (err) {
-        console.log('err', err);
-      });
+
+    // disable nút summit
+    btn.disabled = true;
+
+    const response = await axios.post(
+      currentUrl + '/api/admin/question/create',
+      {
+        questionContent,
+        questionCategory,
+        questionObject,
+        answerCode,
+        createdId: user.userId,
+      },
+      axiosAuth(),
+    );
+
+    if (response.status === 200 && response.data) {
+      toastOk('Thêm thành công');
+      closeQuestionModal('create');
+      page = 1;
+      getAllQuestion(page, limit);
+    } else {
+      toastErr('Thêm thất bại');
+    }
   } catch (err) {
     console.log(err);
+  } finally {
+    // bật lại nút
+    btn.disabled = false;
   }
 }
+async function updateQuestion(btn) {
+  const modalBody = document.querySelector('.question-update-modal .modal-body form');
 
-async function updateQuestion() {
   try {
-    const modalBody = document.querySelector('.question-update-modal .modal-body form');
     const questionContent = modalBody.querySelector('#questionContent').value;
     const questionCategory = modalBody.querySelector('#questionCategory').value;
     const questionObject = modalBody.querySelector('#questionObject').value;
     const answerCode = modalBody.querySelector('#answerCode').value;
     const questionCode = modalBody.querySelector('#questionCode').value;
+
     if (String(questionContent).trim() == '') {
+      modalBody.querySelector('.err-questionContent').style.display = 'block';
       return;
     }
+
+    // disable nút summit
+    btn.disabled = true;
+
     await axios
       .put(
         currentUrl + '/api/admin/question/update/' + questionCode,
@@ -393,5 +418,8 @@ async function updateQuestion() {
       });
   } catch (err) {
     console.log(err);
+  } finally {
+    // bật lại nút
+    btn.disabled = false;
   }
 }

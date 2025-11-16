@@ -12,11 +12,11 @@ function axiosAuth(config) {
   };
 }
 function getShortTextFromHtml(html) {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
 
-    const text = tempDiv.textContent || tempDiv.innerText || "";
-    return text.slice(0, 50);
+  const text = tempDiv.textContent || tempDiv.innerText || '';
+  return text.slice(0, 50);
 }
 
 async function ChangeUrlToFile(filename, location) {
@@ -29,20 +29,39 @@ async function ChangeUrlToFile(filename, location) {
   }
 }
 
-function createPagerHTML(
-  totalCount,
-  offset,
-  currentPage,
-  pageBlockCount,
-  callBack,
-) {
+// table
+function renderEmptyRowTable(objElement, colspan) {
+  return (objElement.innerHTML = `<tr><td colspan="${colspan + 1}" class="text-center">Không có dữ liệu</td></tr>`);
+}
+function showSkeleton(objElement, rows = 5, cols = 5) {
+  // Xóa pager cũ
+  document.getElementById('privacy-main-pager').innerHTML = '';
+  // render skeleton
+  let skeletonRow = '';
+  let skeletonCol = '<td><p class="skeleton skeleton-stt"></p></td>';
+  for (let i = 0; i < cols; i++) {
+    skeletonCol += '<td><p class="skeleton skeleton-text"></p></td>';
+  }
+  for (let i = 0; i < rows; i++) {
+    skeletonRow += `
+            <tr class="text-center">
+                ${skeletonCol}
+            </tr>`;
+  }
+  objElement.innerHTML = skeletonRow;
+  objElement.closest('table').classList.add('skeleton-loading');
+}
+
+function hideSkeleton(objElement) {
+  objElement.closest('table').classList.remove('skeleton-loading');
+}
+function renderPager(totalCount, offset, currentPage, pageBlockCount, callBack) {
   if (totalCount > 0) {
     let totalPage = Math.floor(totalCount / offset);
     if (totalPage < 1) totalPage = 1;
     if (totalCount % offset > 0) totalPage++;
     if (totalCount < offset) totalPage--; //
-    let startPage =
-      pageBlockCount * Math.floor((currentPage - 1) / pageBlockCount) + 1;
+    let startPage = pageBlockCount * Math.floor((currentPage - 1) / pageBlockCount) + 1;
 
     let callBacks = callBack.split(':');
     let callBacksArg = '';
@@ -82,6 +101,7 @@ function createPagerHTML(
   }
 }
 
+// toast
 function toastOk(text) {
   Toastify({
     text: text,
@@ -125,6 +145,6 @@ function reloadPage(url) {
   }, 1500);
 }
 
-function gotoPage(url){
-  window.location.href = url
+function gotoPage(url) {
+  window.location.href = url;
 }

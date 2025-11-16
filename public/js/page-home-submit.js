@@ -19,7 +19,7 @@ function changePage(p) {
 
 function closeHomeSubmitModal() {
   // Xác định modal theo loại
-  const modalSelector = '.home-submit-update-modal'
+  const modalSelector = '.home-submit-update-modal';
   const modalEl = document.querySelector(modalSelector);
 
   if (!modalEl) return;
@@ -102,19 +102,24 @@ function renderAllHomeSubmit(data, objElement) {
     });
     objElement.innerHTML = HTML;
 
-    // render paging
-    let pagerHTML = createPagerHTML(data.total, limit, page, 5, 'changePage');
+    // phân trang
+    let pagerHTML = renderPager(data.total, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
-    //clear
-    objElement.innerHTML = ``;
-    document.getElementById('privacy-main-pager').innerHTML = ``;
+    // dữ liệu trống
+    renderEmptyRowTable(objElement, 7);
   }
+
+  // xóa skeleton
+  hideSkeleton(objElement);
 }
 // TODO: API
 
 async function getAllHomeSubmit(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
+  // Hiển thị skeleton
+  showSkeleton(objElement, limit, 7);
+
   await axios
     .post(
       currentUrl + '/api/admin/homeSubmit/getAll',

@@ -1,94 +1,113 @@
 const currentPath = window.location.pathname;
 const currentUrl = window.location.origin;
+let pathParts = currentPath.split('/').filter(Boolean);
+let partType = pathParts[1] || ''; // fix bug partCut[2] cũ (thường là index 1)
 
-document.addEventListener('DOMContentLoaded', () => {
-  initMenu();
-});
+document.addEventListener('DOMContentLoaded', initMenu);
 
-// === MAIN INIT ===
 function initMenu() {
-  const allLinks = document.querySelectorAll('#side-menu a');
-  const topLinks = document.querySelectorAll('#side-menu > li > a');
-  const partCut = currentPath.split('/');
-  const partType = partCut[2]; // "question" or "answer"
+  const menu = document.getElementById('side-menu');
+  if (!menu) return;
 
-  // ========  load => set active by URL ========
-  allLinks.forEach((link) => {
+  const allLinks = menu.querySelectorAll('a');
+  const topLinks = menu.querySelectorAll(':scope > li > a');
+
+  // 1. Set active dựa vào URL (chỉ chạy 1 lần khi load trang)
+  setActiveMenuByUrl(allLinks);
+
+  // 2. Handle click
+  topLinks.forEach(link => link.addEventListener('click', handleTopLinkClick));
+}
+
+function setActiveMenuByUrl(allLinks) {
+  let bestMatch = null;
+  let maxLength = 0;
+
+  allLinks.forEach(link => {
     const href = link.getAttribute('href');
-    console.log(href, partType);
+    if (!href || href === '#' || href === '') return;
 
-    if (href.includes(`/${partType}/`)) {
-      // find parent element has this class
-      const subMenu = link.closest('.sub-menu');
-      if (subMenu) {
-        if (href === currentPath) {
-          link.classList.add('active'); // parent,sub menu => add active
-        }
-        // open sub menu
-        subMenu.classList.add('open');
-        subMenu.style.maxHeight = subMenu.scrollHeight + 'px';
-        const parentLink = subMenu.previousElementSibling; // reviousElementSibling of '.sub-menu' => a 'waves-effect sidebar-title sb-horizontal'
-        if (parentLink) {
-          parentLink.classList.add('child-active'); // a 'waves-effect sidebar-title sb-horizontal' => a 'waves-effect sidebar-title sb-horizontal child-active'
-        }
-      } else {
-        link.classList.add('active'); // parent menu => add active
-      }
+    // Ưu tiên href dài nhất khớp currentPath (tránh trùng lặp kiểu /question/ và /question-detail/)
+    if (currentPath.startsWith(href) && href.length > maxLength) {
+      maxLength = href.length;
+      bestMatch = link;
     }
   });
 
-  // ======== Click => set active by href ========
-  topLinks.forEach((link) => {
-    link.addEventListener('click', (e) => {
-      const li = link.parentElement;
-      const subMenu = li.querySelector('.sub-menu');
+  if (!bestMatch) return;
 
-      // if there is .sub-menu
-      if (subMenu) {
-        e.preventDefault();
+  bestMatch.classList.add('active');
 
-        const isOpen = subMenu.classList.contains('open');
-
-        // close all another menu
-        document.querySelectorAll('#side-menu .sub-menu.open').forEach((ul) => {
-          if (ul !== subMenu) {
-            ul.classList.remove('open');
-            ul.style.maxHeight = null;
-            ul.previousElementSibling?.classList.remove(
-              'active',
-              'child-active',
-            );
-          }
-        });
-
-        // Toggle
-        if (!isOpen) {
-          subMenu.classList.add('open');
-          subMenu.style.maxHeight = subMenu.scrollHeight + 'px';
-          link.classList.add('active');
-
-          // click frist child of this sub menu
-          const firstChild = subMenu.querySelector('a');
-          if (
-            firstChild &&
-            !firstChild.getAttribute('href').includes(`/${partType}/`)
-          ) {
-            window.location.href = firstChild.getAttribute('href');
-          }
-        } else {
-          subMenu.classList.remove('open');
-          subMenu.style.maxHeight = null;
-          link.classList.remove('active');
-        }
-      } else {
-        // dont has sub menu → redirect
-        allLinks.forEach((a) => a.classList.remove('active', 'child-active'));
-        link.classList.add('active');
-        window.location.href = link.getAttribute('href');
-      }
+  const subMenu = bestMatch.closest('.sub-menu');
+  if (subMenu) {
+    subMenu.classList.add('open');
+    requestAnimationFrame(() => {
+      subMenu.style.maxHeight = subMenu.scrollHeight + 'px';
     });
-  });
+
+    const parentLink = subMenu.previousElementSibling;
+    if (parentLink?.matches('a')) {
+      parentLink.classList.add('child-active');
+    }
+  }
 }
 
+function handleTopLinkClick(e) {
+  const link = e.currentTarget;
+  const li = link.parentElement;
+  const subMenu = li.querySelector(':scope > .sub-menu');
 
+  // Không có submenu → navigate bình thường (leaf item)
+  if (!subMenu) {
+    closeAllSubMenus(); // đóng hết submenu + xóa child-active cũ
+    document.querySelectorAll('#side-menu a').forEach(a => {
+      a.classList.remove('active', 'child-active');
+    });
+    link.classList.add('active');
+    return; // cho phép navigate
+  }
 
+  // Có submenu → accordion behaviour
+  e.preventDefault();
+
+  const isOpen = subMenu.classList.contains('open');
+
+  // Đóng tất cả submenu khác
+  closeAllSubMenus(subMenu);
+
+  if (!isOpen) {
+    // MỞ submenu hiện tại
+    subMenu.classList.add('open');
+    link.classList.add('child-active'); // chỉ dùng child-active, KHÔNG dùng active
+    requestAnimationFrame(() => {
+      subMenu.style.maxHeight = subMenu.scrollHeight + 'px';
+    });
+
+    // Nếu first child hợp lệ với partType hiện tại → không redirect (chỉ mở để xem)
+    // Nếu không hợp lệ → redirect vào child đầu tiên (giữ logic cũ của bạn)
+    const firstChild = subMenu.querySelector('a[href]');
+    if (firstChild) {
+      const childHref = firstChild.getAttribute('href');
+      if (childHref && !childHref.includes(`/${partType}/`)) {
+        window.location.href = childHref;
+      }
+    }
+  } else {
+    // ĐÓNG submenu hiện tại
+    subMenu.classList.remove('open');
+    subMenu.style.maxHeight = null;
+    link.classList.remove('child-active');
+  }
+}
+
+function closeAllSubMenus(exclude = null) {
+  document.querySelectorAll('#side-menu .sub-menu.open').forEach(ul => {
+    if (ul === exclude) return;
+    ul.classList.remove('open');
+    ul.style.maxHeight = null;
+    const parentLink = ul.previousElementSibling;
+    if (parentLink?.matches('a')) {
+      parentLink.classList.remove('child-active'); // chỉ xóa child-active, giữ active nếu là trang hiện tại
+    }
+  });
+}

@@ -46,19 +46,24 @@ function renderAllHome(data, objElement) {
     });
     objElement.innerHTML = HTML;
 
-    // render paging
-    let pagerHTML = createPagerHTML(data.total, limit, page, 5, 'changePage');
+   // phân trang
+    let pagerHTML = renderPager(data.total, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
-    //clear
-    objElement.innerHTML = ``;
-    document.getElementById('privacy-main-pager').innerHTML = ``;
+    // dữ liệu trống
+    renderEmptyRowTable(objElement, 8);
   }
+
+  // xóa skeleton
+  hideSkeleton(objElement);
 }
 // TODO: API
 
 async function getAllHome(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
+    // Hiển thị skeleton
+  showSkeleton(objElement, limit, 8);
+
   await axios
     .post(
       currentUrl + '/api/admin/home/getAll',

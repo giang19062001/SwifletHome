@@ -29,7 +29,7 @@ export class PageAuthAdminGuard implements CanActivate {
 
         if (req.originalUrl === '/') {
           // in login page
-          res.redirect('/dashboard/question/list');
+          res.redirect('/dashboard/main');
           return false;
         } else {
           // in another page => next()

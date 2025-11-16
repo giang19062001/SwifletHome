@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (response.status === 200 && response.data) {
-          gotoPage('/dashboard/question/list');
+          gotoPage('/dashboard/main');
       }
     } catch (error) {
       const resultErr = error.response?.data ?? error;

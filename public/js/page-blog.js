@@ -29,7 +29,7 @@ const renderAllBlog = (data, objElement) => {
             <td><p>${ele.categoryName}</p></td>
             <td><p>${ele.objectName}</p></td>
             <td><p>${getShortTextFromHtml(ele.blogContent)}</p></td>
-            <td><b class="${ele.isFree == "Y" ? "txt-free" : "txt-pay"}">${ele.isFree == "Y" ? "Miễn phí" : "Tính phí"}</b></td>
+            <td><b class="${ele.isFree == 'Y' ? 'txt-free' : 'txt-pay'}">${ele.isFree == 'Y' ? 'Miễn phí' : 'Tính phí'}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
@@ -41,19 +41,23 @@ const renderAllBlog = (data, objElement) => {
     });
     objElement.innerHTML = HTML;
 
-    // render paging
-    let pagerHTML = createPagerHTML(data.total, limit, page, 5, 'changePage');
+    // phân trang
+    let pagerHTML = renderPager(data.total, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
-    //clear
-    objElement.innerHTML = ``;
-    document.getElementById('privacy-main-pager').innerHTML = ``;
+    // dữ liệu trống
+    renderEmptyRowTable(objElement, 7);
   }
+
+  // xóa skeleton
+  hideSkeleton(objElement);
 };
 // API
 async function getAllBlog(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
-
+  // Hiển thị skeleton
+  showSkeleton(objElement, limit, 7);
+  
   await axios
     .post(
       currentUrl + '/api/admin/blog/getAll',
@@ -77,17 +81,12 @@ async function getAllBlog(currentPage, limit) {
 }
 
 async function deleteBlog(blogCode) {
-  const confirmed = window.confirm(
-    `Bạn có chắc chắn muốn xóa bài viết này không?`,
-  );
+  const confirmed = window.confirm(`Bạn có chắc chắn muốn xóa bài viết này không?`);
   if (!confirmed) {
     return;
   }
   await axios
-    .delete(
-      currentUrl + `/api/admin/blog/delete/${blogCode}`,
-      axiosAuth(),
-    )
+    .delete(currentUrl + `/api/admin/blog/delete/${blogCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

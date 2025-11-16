@@ -1,0 +1,50 @@
+.page-main {
+  .content-area {
+    margin: 0 auto;
+  }
+
+  .box {
+    background-color: #ffffff;
+    padding: 25px 20px;
+    border-radius: 15px;
+  }
+
+  .sparkboxes .box {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    position: relative;
+    border-radius: 5px;
+  }
+  .pretty-shadow {
+    box-shadow:
+      rgba(17, 17, 26, 0.05) 0px 1px 0px,
+      rgba(17, 17, 26, 0.1) 0px 0px 8px;
+  }
+
+  .sparkboxes .box .details {
+    position: absolute;
+    color: #fff;
+    transform: scale(0.7) translate(-22px, 20px);
+  }
+  .sparkboxes strong {
+    position: relative;
+    z-index: 3;
+    top: -8px;
+    color: #fff;
+  }
+  .sparkboxes .box1 {
+    background: linear-gradient(135deg, #0396ff 10%, #abdcff 100%);
+  }
+
+  .sparkboxes .box2 {
+    background: linear-gradient(135deg, #4c83ff 10%, #2afadf 100%);
+  }
+
+  .sparkboxes .box3 {
+    background: linear-gradient(135deg, #5961f9 10%, #ee9ae5 100%);
+  }
+
+  .sparkboxes .box4 {
+    background: linear-gradient(135deg, #da6ccf 10%, #f1a3a7 100%);
+  }
+}

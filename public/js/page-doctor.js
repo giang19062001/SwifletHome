@@ -136,14 +136,16 @@ function renderAllDoctor(data, objElement) {
     });
     objElement.innerHTML = HTML;
 
-    // render paging
-    let pagerHTML = createPagerHTML(data.total, limit, page, 5, 'changePage');
+    // phân trang
+    let pagerHTML = renderPager(data.total, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
-    //clear
-    objElement.innerHTML = ``;
-    document.getElementById('privacy-main-pager').innerHTML = ``;
+    // dữ liệu trống
+    renderEmptyRowTable(objElement, 6);
   }
+
+  // xóa skeleton
+  hideSkeleton(objElement);
 }
 // TODO: API
 async function getStatusCode() {
@@ -168,6 +170,8 @@ async function getStatusCode() {
 }
 async function getAllDoctor(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
+  // Hiển thị skeleton
+  showSkeleton(objElement, limit, 6);
   await axios
     .post(
       currentUrl + '/api/admin/doctor/getAll',
@@ -178,7 +182,6 @@ async function getAllDoctor(currentPage, limit) {
       axiosAuth(),
     )
     .then(function (response) {
-      console.log('response', response);
       if (response.status === 200 && response.data) {
         renderAllDoctor(response.data, objElement);
       }
