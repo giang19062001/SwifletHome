@@ -4,6 +4,7 @@ import { IScreen } from '../screen.interface';
 import { IPaging, IList } from 'src/interfaces/admin';
 import { AbAdminRepo } from 'src/abstract/admin.repository';
 import { PagingDto } from 'src/dto/admin';
+import { UpdateScreenDto } from './screen.dto';
 
 @Injectable()
 export class ScreenAdminRepository extends AbAdminRepo {
@@ -45,8 +46,14 @@ export class ScreenAdminRepository extends AbAdminRepo {
   create(dto: any): Promise<number> {
     throw new Error('Method not implemented.');
   }
-  update(dto: any, id: string | number): Promise<number> {
-    throw new Error('Method not implemented.');
+  async update(dto: UpdateScreenDto, screenKeyword: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET screenName = ?, screenDescription = ?, screenContent = ?, updatedId = ?, updatedAt = ?
+      WHERE screenKeyword = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.screenName, dto.screenDescription, dto.screenContent, dto.updatedId, new Date(), screenKeyword]);
+
+    return result.affectedRows;
   }
   delete(dto: string | number): Promise<number> {
     throw new Error('Method not implemented.');

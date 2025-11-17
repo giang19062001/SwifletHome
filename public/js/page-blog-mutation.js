@@ -4,7 +4,7 @@ const pageElement = 'page-blog-mutation';
 
 // Theo dõi nút chế độ xem
 document.getElementById('isPaidPreview').addEventListener('change', (event) => {
-  getEditorContent(); // getEditorContent() -> renderContentHtml()
+  getThenRenderEditorContent(); // getThenRenderEditorContent() -> renderContentHtml()
 });
 
 // Theo dõi radio isFree thay đổi
@@ -13,7 +13,7 @@ document.querySelectorAll('input[name="isFree"]').forEach((radio) => {
     // set chế độ xem là NOT_PAID_YET
     document.getElementById('isPaidPreview').checked = false;
     //re-render
-    getEditorContent(); // getEditorContent() -> renderContentHtml()
+    getThenRenderEditorContent(); // getThenRenderEditorContent() -> renderContentHtml()
     // ẩn/ hiện nút thanh toán
     togglePaymentButton();
 
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (Array.isArray(fileList) && fileList.length > 0) {
       clearInterval(waitForFileList);
       // re-render editor content
-      getEditorContent();
+      getThenRenderEditorContent();
       // ẩn/ hiện nút thanh toán
       togglePaymentButton();
       // ẩn/ hiện chế độ xem
@@ -62,7 +62,7 @@ function renderContentHtml() {
 
   // xóa nút thanh toán ra khỏi editor
   if (isFree == 'Y') {
-    contentHtml = removeText('[[payment]]');
+    contentHtml = removeEditorText('[[payment]]');
   }
   console.log(isPaidPreview);
 
@@ -117,10 +117,10 @@ function renderContentHtml() {
 
 // TODO:API
 async function createBlog() {
-  getEditorContent(); // assisgn value
+  getThenRenderEditorContent(); // assisgn value
 
   // validate
-  if (validateContent() == false) {
+  if (validateEditorContent() == false) {
     toastErr('Vui lòng nhập nội dung.');
     return;
   }
@@ -154,10 +154,10 @@ async function createBlog() {
 }
 
 async function updateBlog() {
-  getEditorContent(); // assisgn value
+  getThenRenderEditorContent(); // assisgn value
 
   // validate
-  if (validateContent() == false) {
+  if (validateEditorContent() == false) {
     toastErr('Vui lòng nhập nội dung.');
     return;
   }

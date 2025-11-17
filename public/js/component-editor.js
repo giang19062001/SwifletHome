@@ -13,17 +13,23 @@ const quillGlobal = new Quill('#editor', {
 quillGlobal.root.addEventListener('paste', (e) => {
   e.preventDefault();
   // >> santizer string >> html
-  getEditorContent();
+  getThenRenderEditorContent();
 });
 
-function removeText(text) {
+function removeEditorText(text) {
   let html = quillGlobal.root.innerHTML;
   html = html.replaceAll(text, '');
   quillGlobal.root.innerHTML = html;
   return quillGlobal.root.innerHTML;
 }
 
-function validateContent() {
+function setEditorContent(html) {
+  quillGlobal.root.innerHTML = html;
+}
+function getEditorContent() {
+  return quillGlobal.root.innerHTML;
+}
+function validateEditorContent() {
   const text = quillGlobal.root.textContent.trim();
   if (!text || text === '' || text === '\n') {
     return false;
@@ -31,7 +37,7 @@ function validateContent() {
   return true;
 }
 
-function getEditorContent() {
+function getThenRenderEditorContent() {
   document.getElementById('content-message').innerHTML = quillGlobal.root.innerHTML;
 
   // >> santizer string >> html

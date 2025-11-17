@@ -1,7 +1,7 @@
 const pageType = window.location.pathname.includes('/update') ? 'update' : 'create';
 let homeImagesFiles = []; // Track newly added files for homeImages
 
-const homeFormConstraints = {
+const homeMutationConstraints = {
   homeName: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên nhà yến.' },
   },
@@ -60,7 +60,7 @@ function initializeForm() {
       homeCode: pageType === 'update' ? homeData.homeCode : undefined,
     };
 
-    const errors = validate(formData, homeFormConstraints);
+    const errors = validate(formData, homeMutationConstraints);
     if (!descriptionText) {
       if (!errors) errors = {};
       errors.homeDescription = ['Vui lòng nhập mô tả.']; // set error
@@ -70,6 +70,7 @@ function initializeForm() {
       return;
     }
 
+    // xóa lỗi
     clearErrors();
     if (pageType === 'update') {
       await updateHome(formData);
@@ -78,9 +79,9 @@ function initializeForm() {
     }
   });
 
-  // Real-time validation for inputs
+  //  kiểm tra validation của các input real-time
   form.querySelectorAll('input, textarea').forEach((input) => {
-    input.addEventListener('input', () => validateField(homeFormConstraints, input));
+    input.addEventListener('input', () => validateField(homeMutationConstraints, input));
   });
 
   // validate for homeDescription
@@ -112,7 +113,7 @@ function initializeForm() {
     homeImagesPreview.innerHTML = '';
     homeImagesFiles.forEach((file, index) => renderImagePreview(file, index, homeImagesInput, homeImagesPreview, 'homeImages'));
 
-    validateField(homeFormConstraints, homeImagesInput);
+    validateField(homeMutationConstraints, homeImagesInput);
   });
 
   // Preview home image 'CHANGE EVENT'
@@ -121,7 +122,7 @@ function initializeForm() {
     if (homeImageInput.files.length > 0) {
       renderImagePreview(homeImageInput.files[0], 0, homeImageInput, homeImagePreview, 'homeImage');
     }
-    validateField(homeFormConstraints, homeImageInput);
+    validateField(homeMutationConstraints, homeImageInput);
   });
 }
 // TODO: FUNC
@@ -163,7 +164,7 @@ async function assignForm(homeData) {
       dataTransfer.items.add(file);
       homeImageInput.files = dataTransfer.files;
       renderImagePreview(file, 0, homeImageInput, homeImagePreview, 'homeImage');
-      validateField(homeFormConstraints, homeImageInput);
+      validateField(homeMutationConstraints, homeImageInput);
     }
   }
 
@@ -179,7 +180,7 @@ async function assignForm(homeData) {
       homeImagesInput.files = dataTransfer.files;
       homeImagesPreview.innerHTML = '';
       homeImagesFiles.forEach((file, index) => renderImagePreview(file, index, homeImagesInput, homeImagesPreview, 'homeImages'));
-      validateField(homeFormConstraints, homeImagesInput);
+      validateField(homeMutationConstraints, homeImagesInput);
     }
   }
 }
@@ -225,7 +226,7 @@ function renderImagePreview(file, index, input, preview, field) {
     }
 
     // Validate field
-    const errors = validate.single(input.files, homeFormConstraints[field]);
+    const errors = validate.single(input.files, homeMutationConstraints[field]);
     const errorElement = document.querySelector(`[data-error="${field}"]`);
     if (errorElement) {
       errorElement.textContent = errors ? errors[0] : '';
