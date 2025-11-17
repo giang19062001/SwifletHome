@@ -1,6 +1,6 @@
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
 import { AppService } from './app.service';
-import { Controller, Get, Render, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Render, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
 import { PageAuthAdminGuard } from './modules/auth/admin/auth.page.guard';
@@ -28,6 +28,36 @@ export class AppController {
       user: req.session.user,
     };
   }
+
+  // config
+  @Get('/dashboard/screen/list')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/screen')
+  renderScreen(@Req() req: Request) {
+    return {
+      title: 'Danh sách cấu hình màn hình',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+  @Get('/dashboard/screen/update')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/screen-update')
+  async renderScreenUpdate(@Req() req: Request) {
+    const screenKeyword = req.query['screen-keyword'] as string;
+    const values = await this.appService.renderScreenUpdate(screenKeyword);
+    if (values?.screenData) {
+      return {
+        title: 'Chỉnh sửa màn hình',
+        isLayout: true,
+        user: req.session.user,
+        values: values,
+      };
+    }else{
+       throw new NotFoundException()
+    }
+  }
+
   // question
   @Get('/dashboard/question/list')
   @UseGuards(PageAuthAdminGuard)
@@ -54,8 +84,8 @@ export class AppController {
   @Get('/dashboard/answer/create')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer-create')
-  async renderCreateAnswer(@Req() req: Request) {
-    const values = await this.appService.renderCreateAnswer();
+  async renderAnswerCreate(@Req() req: Request) {
+    const values = await this.appService.renderAnswerCreate();
     return {
       title: 'Thêm câu trả lời',
       isLayout: true,
@@ -125,8 +155,8 @@ export class AppController {
   @Get('/dashboard/blog/create')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/blog-create')
-  async renderCreateBlog(@Req() req: Request) {
-    const values = await this.appService.renderCreateBlog();
+  async renderBlogCreate(@Req() req: Request) {
+    const values = await this.appService.renderBlogCreate();
     return {
       title: 'Thêm bài viết',
       isLayout: true,

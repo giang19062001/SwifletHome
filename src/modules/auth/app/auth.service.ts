@@ -73,7 +73,7 @@ export class AuthAppService extends AbAuthService{
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
 
-    // cập nhập lại device mỗi lần đăng nhập
+    // Chỉnh sửa lại device mỗi lần đăng nhập
     await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;

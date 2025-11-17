@@ -240,7 +240,7 @@ async function createHome(formData) {
 }
 
 async function updateHome(formData) {
-  await submitHome(formData, `/api/admin/home/update/${formData.homeCode}`, 'put', 'Cập nhật thành công');
+  await submitHome(formData, `/api/admin/home/update/${formData.homeCode}`, 'put', 'Chỉnh sửa thành công');
 }
 
 async function submitHome(formData, url, method, successMessage) {
@@ -261,7 +261,7 @@ async function submitHome(formData, url, method, successMessage) {
       toastOk(successMessage);
       reloadPage('/dashboard/home/list');
     } else {
-      toastErr(`Lỗi khi ${method === 'post' ? 'tạo' : 'cập nhật'} nhà yến`);
+      toastErr(`Lỗi khi ${method === 'post' ? 'tạo' : 'Chỉnh sửa'} nhà yến`);
     }
   } catch (error) {
     console.error(`error:`, error);

@@ -107,7 +107,7 @@ async function showQuestionModal(type, questionData) {
   //  enable lại 'asnwer' và nút submit
   answerSelect.disabled = false;
   submitBtn.disabled = false;
-  submitBtn.innerHTML = type === 'create' ? 'Tạo mới' : 'Cập nhật';
+  submitBtn.innerHTML = type === 'create' ? 'Tạo mới' : 'Chỉnh sửa';
 
   // Trigger change để hiển thị link detail (nếu có)
   setTimeout(() => answerSelect.dispatchEvent(new Event('change')), 0);
@@ -184,7 +184,7 @@ function renderAllQuestion(data, objElement) {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-main-out"  onclick="getDetailQuestion('${ele.questionCode}')">Cập nhập</button>
+                <button class="btn-main-out"  onclick="getDetailQuestion('${ele.questionCode}')">Chỉnh sửa</button>
                 <button class="btn-err-out"  onclick="deleteQuestion('${ele.questionCode}')">Xóa</button>
             </td>
          </tr>`;
@@ -403,14 +403,14 @@ async function updateQuestion(btn) {
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
-          toastOk('Cập nhập thành công');
+          toastOk('Chỉnh sửa thành công');
           // đóng modal
           closeQuestionModal('update');
           // refresh list
           page = 1;
           getAllQuestion(page, limit);
         } else {
-          toastErr('Cập nhập thất bại');
+          toastErr('Chỉnh sửa thất bại');
         }
       })
       .catch(function (err) {

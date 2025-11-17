@@ -2,15 +2,44 @@
   <div data-simplebar class="h-100">
     <div id="sidebar-menu">
       <ul class="metismenu list-unstyled" id="side-menu">
-        
         <li>
           <a href="/dashboard/main" class="sidebar-title sb-horizontal">
-            <span><i class="far fa-caret-square-right"></i>Thống kê</span>
+            <svg class="my-icon" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="12" width="4" height="8" fill="currentColor" />
+              <rect x="10" y="8" width="4" height="12" fill="currentColor" />
+              <rect x="17" y="4" width="4" height="16" fill="currentColor" />
+            </svg>
+
+            <span>Thống kê</span>
           </a>
         </li>
         <li>
+          <a href="javascript: void(0);" class="sidebar-title sb-horizontal">
+            <svg class="my-icon" viewBox="0 0 32 32">
+              <path
+                d="M17.599 3.738v2.598l0.8 0.207c0.905 0.234 1.768 0.597 2.566 1.081l0.715 0.434 1.86-1.86 2.262 2.262-1.888 1.888 0.407 0.708c0.451 0.785 0.788 1.635 1.002 2.527l0.196 0.817h2.744v3.199h-2.806l-0.216 0.782c-0.233 0.844-0.583 1.654-1.040 2.406l-0.434 0.716 2.036 2.035-2.262 2.262-2.064-2.064-0.707 0.407c-0.734 0.422-1.531 0.745-2.368 0.961l-0.8 0.206v2.951h-3.199v-2.951l-0.8-0.206c-0.837-0.216-1.634-0.539-2.368-0.961l-0.708-0.407-2.064 2.064-2.262-2.262 2.036-2.035-0.434-0.716c-0.457-0.753-0.807-1.562-1.040-2.406l-0.216-0.782h-2.806v-3.199h2.744l0.196-0.817c0.213-0.891 0.551-1.742 1.002-2.527l0.407-0.708-1.888-1.888 2.262-2.262 1.86 1.86 0.715-0.434c0.798-0.484 1.661-0.848 2.566-1.081l0.8-0.207v-2.598h3.199zM16 20.799c2.646 0 4.798-2.153 4.798-4.799s-2.152-4.799-4.798-4.799-4.798 2.153-4.798 4.799c0 2.646 2.152 4.799 4.798 4.799zM18.666 2.672h-5.331v2.839c-1.018 0.263-1.975 0.67-2.852 1.202l-2.022-2.022-3.769 3.77 2.065 2.065c-0.498 0.867-0.875 1.81-1.114 2.809h-2.97v5.331h3.060c0.263 0.953 0.655 1.85 1.156 2.676l-2.198 2.198 3.769 3.77 2.241-2.241c0.816 0.469 1.7 0.828 2.633 1.069v3.191h5.331v-3.191c0.933-0.241 1.817-0.6 2.633-1.069l2.241 2.241 3.769-3.77-2.198-2.198c0.501-0.826 0.893-1.723 1.156-2.676h3.060v-5.331h-2.97c-0.239-0.999-0.616-1.941-1.114-2.809l2.065-2.065-3.769-3.77-2.022 2.022c-0.877-0.532-1.834-0.939-2.852-1.202v-2.839h-0zM16 19.733c-2.062 0-3.732-1.671-3.732-3.733s1.67-3.732 3.732-3.732 3.732 1.671 3.732 3.732c0 2.062-1.67 3.733-3.732 3.733v0z"
+                fill="currentColor" stroke="currentColor">
+
+              </path>
+            </svg>
+
+            <span>Cấu hình chung</span>
+          </a>
+           <ul class="sub-menu" aria-expanded="true">
+            <li><a href="/dashboard/screen/list">Màn hình</a></li>
+            <li>
+              <a href="/dashboard/info/list">Thông tin</a>
+            </li>
+          </ul>
+        </li>
+        <li>
           <a href="javascript: void(0);" class="waves-effect sidebar-title sb-horizontal">
-            <span><i class="far fa-caret-square-right"></i>Q&A</span>
+            <svg class="my-icon" viewBox="0 0 640 640">
+              <path
+                d="M224 224C224 171 267 128 320 128C373 128 416 171 416 224C416 266.7 388.1 302.9 349.5 315.4C321.1 324.6 288 350.7 288 392L288 416C288 433.7 302.3 448 320 448C337.7 448 352 433.7 352 416L352 392C352 390.3 352.6 387.9 355.5 384.7C358.5 381.4 363.4 378.2 369.2 376.3C433.5 355.6 480 295.3 480 224C480 135.6 408.4 64 320 64C231.6 64 160 135.6 160 224C160 241.7 174.3 256 192 256C209.7 256 224 241.7 224 224zM320 576C342.1 576 360 558.1 360 536C360 513.9 342.1 496 320 496C297.9 496 280 513.9 280 536C280 558.1 297.9 576 320 576z"
+                stroke="currentColor" fill="currentColor"></path>
+            </svg>
+            <span> Q&A</span>
           </a>
           <ul class="sub-menu" aria-expanded="true">
             <li><a href="/dashboard/question/list">Câu hỏi</a></li>
@@ -20,10 +49,20 @@
           </ul>
         </li>
 
-
         <li>
           <a href="javascript: void(0);" class="waves-effect sidebar-title sb-horizontal">
-            <span><i class="far fa-caret-square-right"></i>Danh mục</span>
+            <svg class="my-icon" viewBox="0 0 20 20" fill="none">
+              <path d="M6.1665 6.0332C7.35317 6.46654 8.6465 6.46654 9.83317 6.0332Z" fill="currentColor"></path>
+              <path d="M6.1665 6.0332C7.35317 6.46654 8.6465 6.46654 9.83317 6.0332" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path
+                d="M11.2134 1.3335H4.78671C3.36671 1.3335 2.21338 2.4935 2.21338 3.90683V13.3002C2.21338 14.5002 3.07338 15.0068 4.12671 14.4268L7.38005 12.6202C7.72671 12.4268 8.28671 12.4268 8.62671 12.6202L11.88 14.4268C12.9334 15.0135 13.7934 14.5068 13.7934 13.3002V3.90683C13.7867 2.4935 12.6334 1.3335 11.2134 1.3335Z"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path
+                d="M11.2134 1.3335H4.78671C3.36671 1.3335 2.21338 2.4935 2.21338 3.90683V13.3002C2.21338 14.5002 3.07338 15.0068 4.12671 14.4268L7.38005 12.6202C7.72671 12.4268 8.28671 12.4268 8.62671 12.6202L11.88 14.4268C12.9334 15.0135 13.7934 14.5068 13.7934 13.3002V3.90683C13.7867 2.4935 12.6334 1.3335 11.2134 1.3335Z"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span> Danh mục</span>
           </a>
           <ul class="sub-menu" aria-expanded="true">
             <li><a href="/dashboard/category/list">Thể loại</a></li>
@@ -33,21 +72,49 @@
           </ul>
         </li>
 
-
         <li>
           <a href="/dashboard/user/list" class="sidebar-title sb-horizontal">
-            <span><i class="far fa-caret-square-right"></i>Khách hàng</span>
+            <svg class="my-icon" viewBox="0 0 24 24" fill="none">
+              <g opacity="1">
+                <path
+                  d="M12.1601 10.87C12.0601 10.86 11.9401 10.86 11.8301 10.87C9.45006 10.79 7.56006 8.84 7.56006 6.44C7.56006 3.99 9.54006 2 12.0001 2C14.4501 2 16.4401 3.99 16.4401 6.44C16.4301 8.84 14.5401 10.79 12.1601 10.87Z"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path
+                  d="M7.16021 14.56C4.74021 16.18 4.74021 18.82 7.16021 20.43C9.91021 22.27 14.4202 22.27 17.1702 20.43C19.5902 18.81 19.5902 16.17 17.1702 14.56C14.4302 12.73 9.92021 12.73 7.16021 14.56Z"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </g>
+            </svg>
+            <span> Khách hàng</span>
           </a>
         </li>
         <li>
           <a href="/dashboard/blog/list" class="sidebar-title sb-horizontal">
-            <span><i class="far fa-caret-square-right"></i>Bài viết - Blog</span>
+            <svg class="my-icon" viewBox="0 0 24 24" fill="none">
+              <g opacity="1">
+                <path d="M8 12.2002H15" stroke="currentColor" stroke-width="2" stroke-miterlimit="10"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M8 16.2002H12.38" stroke="currentColor" stroke-width="2" stroke-miterlimit="10"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M10 6H14C16 6 16 5 16 4C16 2 15 2 14 2H10C9 2 8 2 8 4C8 6 9 6 10 6Z" stroke="currentColor"
+                  stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path
+                  d="M16 4.02002C19.33 4.20002 21 5.43002 21 10V16C21 20 20 22 15 22H9C4 22 3 20 3 16V10C3 5.44002 4.67 4.20002 8 4.02002"
+                  stroke="currentColor" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </g>
+            </svg>
+            <span> Bài viết - Blog</span>
           </a>
         </li>
 
         <li>
           <a href="javascript: void(0);" class="waves-effect sidebar-title sb-horizontal">
-            <span><i class="far fa-caret-square-right"></i>Nhà yến (SCT)</span>
+            <svg class="my-icon" viewBox="0 0 640 640">
+              <path
+                d="M192 112C183.2 112 176 119.2 176 128L176 512C176 520.8 183.2 528 192 528L272 528L272 448C272 430.3 286.3 416 304 416L336 416C353.7 416 368 430.3 368 448L368 528L448 528C456.8 528 464 520.8 464 512L464 128C464 119.2 456.8 112 448 112L192 112zM128 128C128 92.7 156.7 64 192 64L448 64C483.3 64 512 92.7 512 128L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 128zM224 176C224 167.2 231.2 160 240 160L272 160C280.8 160 288 167.2 288 176L288 208C288 216.8 280.8 224 272 224L240 224C231.2 224 224 216.8 224 208L224 176zM368 160L400 160C408.8 160 416 167.2 416 176L416 208C416 216.8 408.8 224 400 224L368 224C359.2 224 352 216.8 352 208L352 176C352 167.2 359.2 160 368 160zM224 304C224 295.2 231.2 288 240 288L272 288C280.8 288 288 295.2 288 304L288 336C288 344.8 280.8 352 272 352L240 352C231.2 352 224 344.8 224 336L224 304zM368 288L400 288C408.8 288 416 295.2 416 304L416 336C416 344.8 408.8 352 400 352L368 352C359.2 352 352 344.8 352 336L352 304C352 295.2 359.2 288 368 288z"
+                stroke="currentColor" fill="currentColor"></path>
+            </svg>
+            <span> Nhà yến (SCT)</span>
           </a>
           <ul class="sub-menu" aria-expanded="true">
             <li><a href="/dashboard/home/list">DS nhà yến</a></li>
@@ -58,10 +125,14 @@
         </li>
         <li>
           <a href="/dashboard/doctor/list" class="sidebar-title sb-horizontal">
-            <span><i class="far fa-caret-square-right"></i>Khám bệnh nhà yến</span>
+            <svg class="my-icon" viewBox="0 0 640 640">
+              <path
+                d="M64 112C64 85.5 85.5 64 112 64L160 64C177.7 64 192 78.3 192 96C192 113.7 177.7 128 160 128L128 128L128 256C128 309 171 352 224 352C277 352 320 309 320 256L320 128L288 128C270.3 128 256 113.7 256 96C256 78.3 270.3 64 288 64L336 64C362.5 64 384 85.5 384 112L384 256C384 333.4 329 398 256 412.8L256 432C256 493.9 306.1 544 368 544C429.9 544 480 493.9 480 432L480 346.5C442.7 333.3 416 297.8 416 256C416 203 459 160 512 160C565 160 608 203 608 256C608 297.8 581.3 333.4 544 346.5L544 432C544 529.2 465.2 608 368 608C270.8 608 192 529.2 192 432L192 412.8C119 398 64 333.4 64 256L64 112zM512 288C529.7 288 544 273.7 544 256C544 238.3 529.7 224 512 224C494.3 224 480 238.3 480 256C480 273.7 494.3 288 512 288z"
+                stroke="currentColor" fill="currentColor"></path>
+            </svg>
+            <span> Khám bệnh nhà yến </span>
           </a>
         </li>
-
       </ul>
     </div>
   </div>

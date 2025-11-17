@@ -5,6 +5,7 @@ import { HomeAdminService } from './modules/home/admin/home.service';
 import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
 import { ObjectAdminService } from './modules/object/admin/object.service';
+import { ScreenAdminService } from './modules/screen/admin/screen.service';
 
 @Injectable()
 export class AppService {
@@ -14,13 +15,10 @@ export class AppService {
     private readonly homeAdminService: HomeAdminService,
     private readonly blogAdminService: BlogAdminService,
     private readonly objectAdminService: ObjectAdminService,
+    private readonly screenAdminService: ScreenAdminService,
   ) {}
-  // answer
-  async getDetailAnswer(answerCode: string): Promise<IAnswer | null> {
-    const result = await this.answerAdminService.getDetail(answerCode);
-    return result;
-  }
-  async renderCreateAnswer(): Promise<any> {
+
+  async renderAnswerCreate(): Promise<any> {
     const { list: categories } = await this.catetegoryAdminService.getAll({
       limit: 0,
       page: 0,
@@ -57,7 +55,7 @@ export class AppService {
     };
   }
   //blog
-  async renderCreateBlog(): Promise<any> {
+  async renderBlogCreate(): Promise<any> {
     const { list: categories } = await this.catetegoryAdminService.getAll({
       limit: 0,
       page: 0,
@@ -98,6 +96,14 @@ export class AppService {
     const homeData = await this.homeAdminService.getDetail(answerCode);
     return {
       homeData: homeData,
+    };
+  }
+
+  // config
+  async renderScreenUpdate(screenKeyword: string): Promise<any> {
+    const screenData = await this.screenAdminService.getDetail(screenKeyword);
+    return {
+      screenData: screenData,
     };
   }
 }

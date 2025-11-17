@@ -180,7 +180,7 @@ async function updateBlog() {
       )
       .then(function (response) {
         console.log('response', response);
-        toastOk('Cập nhập thành công');
+        toastOk('Chỉnh sửa thành công');
         reloadPage('/dashboard/blog/list');
       })
       .catch(function (error) {

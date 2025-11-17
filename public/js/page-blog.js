@@ -11,10 +11,10 @@ function changePage(p) {
   document.getElementById('privacy-main-pager').innerHTML = '';
   getAllBlog(page, limit);
 }
-function gotoCreateBlog() {
+function gotoBlogCreate() {
   gotoPage('/dashboard/blog/create');
 }
-function gotoDetailBlog(blogCode) {
+function gotoBlogUpdate(blogCode) {
   gotoPage('/dashboard/blog/update/' + blogCode);
 }
 // RENDER
@@ -33,7 +33,7 @@ const renderAllBlog = (data, objElement) => {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-main-out" onClick="gotoDetailBlog('${ele.blogCode}')">Cập nhập</button>
+                <button class="btn-main-out" onClick="gotoBlogUpdate('${ele.blogCode}')">Chỉnh sửa</button>
                 <button class="btn-err-out"  onclick="deleteBlog('${ele.blogCode}')">Xóa</button>
             </td>
          </tr>`;

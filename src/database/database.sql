@@ -304,7 +304,7 @@ CREATE TABLE `tbl_package` (
 );
 
 -- thông tin chuyển khoản, fcm key, s3 key
-CREATE TABLE `tbl_info_system` (
+CREATE TABLE `tbl_info_config` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `infoCharacter` enum('BANK') NOT NULL DEFAULT 'BANK',
   `infoName` varchar(45) NOT NULL,
@@ -320,7 +320,7 @@ CREATE TABLE `tbl_info_system` (
 
 -- noi dung giao diện dynamic cho app từ db
 -- SIGNUP_SERVICE: đăng kí dịch vụ
-CREATE TABLE `tbl_screen_system` (
+CREATE TABLE `tbl_screen_config` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `screenKeyword` enum('SIGNUP_SERVICE') NOT NULL DEFAULT 'SIGNUP_SERVICE', 
   `screenName` varchar(45) NOT NULL,

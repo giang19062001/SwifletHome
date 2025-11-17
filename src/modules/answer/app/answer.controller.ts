@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AnswerAppService } from './answer.service';
-import { SearchService } from 'src/modules/search/search.service';
+import { SearchService } from 'src/common/search/search.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 

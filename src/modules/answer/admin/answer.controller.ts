@@ -15,8 +15,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/common';
-import { IList } from 'src/interfaces/common';
+import { PagingDto } from 'src/dto/admin';
+import { IList } from 'src/interfaces/admin';
 
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { AnswerAdminService } from './answer.service';

@@ -38,7 +38,7 @@ function renderAllHome(data, objElement) {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-main-out" onclick="gotoHomeUpdate('${ele.homeCode}')">Cập nhập</button>
+                <button class="btn-main-out" onclick="gotoHomeUpdate('${ele.homeCode}')">Chỉnh sửa</button>
                 <button class="btn-err-out" onclick="deleteHome('${ele.homeCode}')">Xóa</button>
             </td>
          </tr>`;

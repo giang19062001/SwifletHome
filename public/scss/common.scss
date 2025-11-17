@@ -1,3 +1,4 @@
+// error
 .error-message {
   color: #e72c2c;
   font-family: Pretendard;
@@ -15,6 +16,7 @@
   font-size: 1.3rem;
   color: #565c66;
 }
+//button
 #btn-main {
   padding: 7px 15px;
   border-radius: 15px;
@@ -27,7 +29,7 @@
   cursor: pointer;
 
   &:disabled {
-    opacity: 0.5; 
+    opacity: 0.5;
     cursor: not-allowed;
     background-color: #f0f0f0;
     color: #aaa;

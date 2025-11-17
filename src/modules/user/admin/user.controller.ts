@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { UserAdminService } from './user.service';
-import { PagingDto } from 'src/dto/common';
+import { PagingDto } from 'src/dto/admin';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 
 @ApiBearerAuth('admin-auth')

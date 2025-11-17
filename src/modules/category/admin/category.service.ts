@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CategoryAdminRepository } from './category.repository';
-import { PagingDto } from 'src/dto/common';
-import { IList } from 'src/interfaces/common';
-import { AbAdminService } from 'src/abstract/common';
+import { PagingDto } from 'src/dto/admin';
+import { IList } from 'src/interfaces/admin';
+import { AbAdminService } from 'src/abstract/admin.service';
 import { ICategory } from '../category.interface';
 
 @Injectable()

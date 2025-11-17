@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/common';
+import { PagingDto } from 'src/dto/admin';
 import { IHome, IHomeImg } from '../home.interface';
 
 @Injectable()

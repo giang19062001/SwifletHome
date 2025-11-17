@@ -1,0 +1,93 @@
+<!-- html -->
+<div id="page-screen-mutation">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="blogCategory" class="form-label">Tên màn hình</label>
+                            <input type="text" class="form-control" id="screenName" name="screenName"
+                                value="<%= values.screenData.screenName %>" />
+                        </div>
+                        <div class="col-md-9">
+                            <label for="blogCategory" class="form-label">Mô tả</label>
+                            <input type="text" class="form-control" id="screenDescription" name="screenDescription"
+                                value="<%= values.screenData.screenDescription %>" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <div class="preview">
+                <div class="chat-box">
+                    <div class="message bot">
+                        <div class="bubble" id="content-message">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-button bottom-swtich">
+
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="component-editor">
+                <%- include('./editor', { content: "" }) %>
+
+                    <div class="bottom-button">
+                        <button class="btn-main-audio" onclick="getEditorContent()">
+                            Xem trước
+                        </button>
+                        <button class="btn-main" onclick="updateBlog()">Lưu</button>
+                    </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="component-upload">
+                <p class="title">Danh sách nội dung</p>
+                <div class="space-box">
+                    <div class="file-box">
+                        <div class="file-card">
+                            <div class="file-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="24" height="24" fill="none" />
+                                    <g transform="matrix(0.5 0 0 0.5 12 12)">
+                                        <path transform="translate(-25, -25)" d="M 8 5 C 6.3550302 5 5 6.3550302 5 8 L 5 42 C 5 43.64497 6.3550302 45 8 45 L 42 45 C 43.64497 45 45 43.64497 45 42 L 45 8 C 45 6.3550302 43.64497 5 42 5 L 8 5 z 
+         M 8 7 L 42 7 C 42.56503 7 43 7.4349698 43 8 L 43 42 C 43 42.56503 42.56503 43 42 43 L 8 43 C 7.4349698 43 7 42.56503 7 42 L 7 8 C 7 7.4349698 7.4349698 7 8 7 z 
+         M 11 12 L 11 14 L 37 14 L 37 12 L 11 12 z 
+         M 11 18 L 11 20 L 28 20 L 28 18 L 11 18 z 
+         M 11 24 L 11 26 L 37 26 L 37 24 L 11 24 z 
+         M 11 30 L 11 32 L 28 32 L 28 30 L 11 30 z 
+         M 11 36 L 11 38 L 37 38 L 37 36 L 11 36 z" fill="#7f8387" stroke="#7f8387" stroke-width="0.75"
+                                            stroke-linecap="round" stroke-linejoin="round" opacity="0.6" />
+                                    </g>
+                                </svg>
+
+
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">Trả phí</div>
+
+                            </div>
+                            <div class="file-button">
+                                <button class="copy-btn btn-main-out">Chỉnh sửa </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const screenData = <% - JSON.stringify(values.screenData) %>;
+</script>
+<script src="/js/page-screen-mutation.js"></script>

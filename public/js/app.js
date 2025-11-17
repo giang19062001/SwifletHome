@@ -1,5 +1,7 @@
 const currentPath = window.location.pathname;
 const currentUrl = window.location.origin;
+const currentSearch = window.location.search;
+
 let pathParts = currentPath.split('/').filter(Boolean);
 let partType = pathParts[1] || ''; // fix bug partCut[2] cũ (thường là index 1)
 

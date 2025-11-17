@@ -2,8 +2,8 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAdminRepository } from './user.repository';
 import { IUserAdmin } from './user.interface';
-import { PagingDto } from 'src/dto/common';
-import { IList } from 'src/interfaces/common';
+import { PagingDto } from 'src/dto/admin';
+import { IList } from 'src/interfaces/admin';
 import { IUserApp } from '../app/user.interface';
 
 @Injectable()

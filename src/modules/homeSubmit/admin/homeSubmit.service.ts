@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/common';
-import { IList } from 'src/interfaces/common';
+import { PagingDto } from 'src/dto/admin';
+import { IList } from 'src/interfaces/admin';
 import { HomeSubmitAdminRepository } from './homeSubmit.repository';
 import { IHomeSubmit } from '../homeSubmit.interface';
 import { UpdateStatusDto } from './homeSubmit.dto';

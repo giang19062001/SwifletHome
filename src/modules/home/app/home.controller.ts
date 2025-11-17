@@ -20,12 +20,12 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/common';
-import { IListApp } from 'src/interfaces/common';
+import { PagingDto } from 'src/dto/admin';
 import { IHome } from '../home.interface';
 import { HomeAppService } from './home.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { IListApp } from 'src/interfaces/app';
 
 @ApiTags('app/home')
 @Controller('/api/app/home')

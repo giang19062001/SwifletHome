@@ -20,8 +20,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/common';
-import { IList } from 'src/interfaces/common';
+import { PagingDto } from 'src/dto/admin';
+import { IList } from 'src/interfaces/admin';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeAdminService } from './home.service';
 import { IHome } from '../home.interface';

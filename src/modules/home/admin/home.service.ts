@@ -1,13 +1,13 @@
 import { UploadService } from './../../upload/upload.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PagingDto } from 'src/dto/common';
-import { IList } from 'src/interfaces/common';
+import { PagingDto } from 'src/dto/admin';
+import { IList } from 'src/interfaces/admin';
 import { IHome, IHomeImg } from '../home.interface';
 import { HomeAdminRepository } from './home.repository';
 import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import { diffByTwoArr } from 'src/helpers/func';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { AbAdminService } from 'src/abstract/common';
+import { AbAdminService } from 'src/abstract/admin.service';
 
 @Injectable()
 export class HomeAdminService extends AbAdminService{

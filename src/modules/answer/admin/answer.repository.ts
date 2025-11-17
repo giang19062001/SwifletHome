@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/common';
+import { PagingDto } from 'src/dto/admin';
 import { IAnswer } from '../answer.interface';
 import {
   CreateAnswerDto,
@@ -8,7 +8,7 @@ import {
   UpdateAnswerDto,
 } from './answer.dto';
 import { generateCode } from 'src/helpers/func';
-import { AbAdminRepo } from 'src/abstract/common';
+import { AbAdminRepo } from 'src/abstract/admin.repository';
 
 @Injectable()
 export class AnswerAdminRepository extends AbAdminRepo {

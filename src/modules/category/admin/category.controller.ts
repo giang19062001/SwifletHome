@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { PagingDto } from 'src/dto/common';
+import { PagingDto } from 'src/dto/admin';
 import { CategoryAdminService } from './category.service';
-import { IList } from 'src/interfaces/common';
+import { IList } from 'src/interfaces/admin';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { ICategory } from '../category.interface';
 

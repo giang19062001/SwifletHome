@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { IDoctor } from '../doctor.interface';
 import { DoctorAdminRepository } from './doctor.repository';
-import { IList } from 'src/interfaces/common';
-import { PagingDto } from 'src/dto/common';
+import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin';
 import { UpdateDoctorDto } from './doctor.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { LoggingService } from 'src/common/logger/logger.service';

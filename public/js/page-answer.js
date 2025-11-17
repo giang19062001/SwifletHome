@@ -11,10 +11,10 @@ function changePage(p) {
   document.getElementById('privacy-main-pager').innerHTML = '';
   getAllAnswer(page, limit);
 }
-function gotoCreateAnswer() {
+function gotoAnswerCreate() {
   gotoPage('/dashboard/answer/create');
 }
-function gotoDetailAnswer(answerCode) {
+function gotoAnswerUpdate(answerCode) {
   gotoPage('/dashboard/answer/update/' + answerCode);
 }
 // RENDER
@@ -33,7 +33,7 @@ const renderAllAnswer = (data, objElement) => {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-main-out" onClick="gotoDetailAnswer('${ele.answerCode}')">Cập nhập</button>
+                <button class="btn-main-out" onClick="gotoAnswerUpdate('${ele.answerCode}')">Chỉnh sửa</button>
                 <button class="btn-err-out"  onclick="deleteAnswer('${ele.answerCode}')">Xóa</button>
             </td>
          </tr>`;

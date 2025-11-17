@@ -12095,15 +12095,86 @@ textarea.form-control-lg {
 }
 .vertical-menu {
   width: 280px;
-  z-index: 1001;
-  background: #ffffff;
   position: fixed;
   top: var(--header-height);
   bottom: 0;
-  margin-top: 0;
   padding-top: 20px;
   padding-left: 55px;
+  background: #ffffff;
+  z-index: 1001;
   box-shadow: 0px 2px 16px 0px rgba(0, 0, 0, 0.0588235294);
+}
+.vertical-menu [data-simplebar] {
+  height: 100%;
+}
+.vertical-menu #sidebar-menu {
+  padding: 10px 0 30px 0;
+}
+.vertical-menu #sidebar-menu .menu-title {
+  padding: 12px 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7f8387;
+  pointer-events: none;
+}
+.vertical-menu #sidebar-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.vertical-menu #sidebar-menu ul li {
+  margin-bottom: 10px;
+}
+.vertical-menu #sidebar-menu ul li:last-child {
+  margin-bottom: 0;
+}
+.vertical-menu #sidebar-menu ul li a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #505050;
+  font-size: 17px;
+  font-family: "Pretendard";
+  transition: all 0.4s;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.vertical-menu #sidebar-menu ul li a svg.my-icon,
+.vertical-menu #sidebar-menu ul li a i {
+  width: 24px;
+  height: 24px;
+  min-width: 1.75rem;
+  margin-right: 10px;
+  color: #7f8387;
+  transition: all 0.4s;
+  stroke: #7f8387;
+}
+.vertical-menu #sidebar-menu ul li a.active, .vertical-menu #sidebar-menu ul li a.child-active {
+  color: #0175ff;
+  font-weight: 600;
+}
+.vertical-menu #sidebar-menu ul li a.active svg.my-icon,
+.vertical-menu #sidebar-menu ul li a.active i, .vertical-menu #sidebar-menu ul li a.child-active svg.my-icon,
+.vertical-menu #sidebar-menu ul li a.child-active i {
+  color: #0175ff;
+}
+.vertical-menu #sidebar-menu ul li .sub-menu {
+  overflow: hidden;
+  max-height: 0;
+  margin-left: 20px;
+  transition: max-height 0.3s ease;
+}
+.vertical-menu #sidebar-menu ul li .sub-menu.open {
+  max-height: 500px;
+}
+.vertical-menu #sidebar-menu ul li .sub-menu li a {
+  padding: 0.4rem 1.5rem 0.4rem 2rem;
+  font-size: 16px;
+}
+.vertical-menu #sidebar-menu ul li .sub-menu li a ul.sub-menu li a {
+  padding-left: 4.5rem;
 }
 
 .main-content {
@@ -12111,113 +12182,8 @@ textarea.form-control-lg {
   overflow: hidden;
 }
 .main-content .content {
-  padding: 0 15px 10px 15px;
   margin-top: var(--header-height);
-}
-
-#side-menu .sub-menu {
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.3s ease;
-  margin-left: 20px;
-}
-#side-menu .sub-menu.open {
-  max-height: 500px;
-}
-#side-menu a {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  text-decoration: none;
-  color: #444;
-  border-radius: 6px;
-  transition: all 0.2s;
-}
-#side-menu a.active, #side-menu a.child-active {
-  color: #0175ff;
-  font-weight: 600;
-}
-#side-menu a.active i, #side-menu a.child-active i {
-  color: #0175ff;
-}
-
-#sidebar-menu {
-  padding: 10px 0 30px 0;
-}
-#sidebar-menu .mm-active {
-  color: #ff6b21;
-}
-#sidebar-menu .mm-active > a {
-  color: #ff6b21;
-}
-#sidebar-menu .mm-active > a.sb-horizontal {
-  border-left: 3px solid #0175ff;
-  padding: 4px 8px;
-  border-radius: 3px;
-}
-#sidebar-menu .mm-active > a i {
-  color: #ff6b21;
-}
-#sidebar-menu .mm-active .active {
-  font-weight: 600;
-  font-size: 17px;
-  color: #ff6b21;
-}
-#sidebar-menu .mm-active .active i {
-  color: #ff6b21;
-}
-#sidebar-menu .mm-active > i {
-  color: #ff6b21;
-}
-#sidebar-menu ul li a {
-  display: flex;
-  align-items: center;
-  color: #505050;
-  font-size: 17px;
-  font-family: "Pretendard";
-  transition: all 0.4s;
-  margin-bottom: 15px;
-  text-decoration: none;
-}
-#sidebar-menu ul li a img {
-  height: 20px;
-  width: 20px;
-  margin-right: 10px;
-}
-#sidebar-menu ul li a i {
-  display: inline-block;
-  min-width: 1.75rem;
-  padding-bottom: 0.125em;
-  font-size: 1.25rem;
-  line-height: 1.40625rem;
-  vertical-align: middle;
-  color: #7f8387;
-  transition: all 0.4s;
-}
-#sidebar-menu ul li .badge {
-  margin-top: 4px;
-}
-#sidebar-menu ul li ul.sub-menu {
-  padding: 0;
-  font-family: "Pretendard";
-}
-#sidebar-menu ul li ul.sub-menu li a {
-  padding: 0rem 1.5rem 0rem 2rem;
-  font-size: 16px;
-}
-#sidebar-menu ul li ul.sub-menu li ul.sub-menu li a {
-  padding: 0.4rem 1.5rem 0.4rem 4.5rem;
-}
-
-.menu-title {
-  padding: 12px 20px;
-  font-size: 11px;
-  text-transform: uppercase;
-  color: #7f8387;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  pointer-events: none;
-  cursor: default;
+  padding: 0 15px 10px;
 }
 
 @media (max-width: 992px) {
@@ -19039,6 +19005,70 @@ select {
 }
 .page-main .sparkboxes .box4 {
   background: linear-gradient(135deg, #da6ccf 10%, #f1a3a7 100%);
+}
+
+#page-screen-mutation .bottom-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#page-screen-mutation .bottom-swtich {
+  padding: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+#page-screen-mutation .preview {
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 15px;
+  background-color: white;
+  padding: 15px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+#page-screen-mutation .preview .if-video {
+  width: 30em !important;
+  min-height: 230px;
+}
+#page-screen-mutation .preview .chat-box {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+#page-screen-mutation .preview .message {
+  display: flex;
+  margin-bottom: 16px;
+}
+#page-screen-mutation .preview .bot {
+  justify-content: flex-start;
+}
+#page-screen-mutation .preview .bubble {
+  max-width: 100%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+}
+#page-screen-mutation .preview .bubble img {
+  display: block;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+#page-screen-mutation .preview .bot .bubble {
+  background-color: #ffffff;
+  color: #333;
+  border-bottom-left-radius: 4px;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+#page-screen-mutation .preview .input-container {
+  margin-top: 16px;
+  flex-shrink: 0;
 }
 
 .component-upload {

@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/com
 import { Msg } from 'src/helpers/message';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { PackageAppRepository } from './package.repository';
-import { PagingDto } from 'src/dto/common';
+import { PagingDto } from 'src/dto/admin';
 import { IPackage } from '../package.interface';
 
 @Injectable()

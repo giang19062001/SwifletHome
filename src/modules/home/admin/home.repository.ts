@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/common';
+import { PagingDto } from 'src/dto/admin';
 import { IHome, IHomeImg } from '../home.interface';
 import { CreateHomeDto, UpdateHomeDto } from './home.dto';
 import { generateCode } from 'src/helpers/func';
-import { AbAdminRepo } from 'src/abstract/common';
+import { AbAdminRepo } from 'src/abstract/admin.repository';
 
 @Injectable()
 export class HomeAdminRepository extends AbAdminRepo {

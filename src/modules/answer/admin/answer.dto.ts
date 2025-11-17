@@ -1,7 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { PagingDto } from 'src/dto/common';
-import { IsFreeEnum } from 'src/interfaces/common';
+import { PagingDto } from 'src/dto/admin';
+import { IsFreeEnum } from 'src/interfaces/admin';
 
 export class GetAllAnswerDto extends PagingDto {
   @ApiProperty({

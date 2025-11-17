@@ -129,7 +129,7 @@ function renderAllDoctor(data, objElement) {
             <td><b class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.statusValue}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
-                <button class="btn-main-out"  onclick="getDetailDoctor('${ele.seq}')">Cập nhập</button>
+                <button class="btn-main-out"  onclick="getDetailDoctor('${ele.seq}')">Chỉnh sửa</button>
             </td>
          </tr>`;
       HTML += rowHtml;
@@ -228,14 +228,14 @@ async function updateDoctor() {
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
-          toastOk('Cập nhập thành công');
+          toastOk('Chỉnh sửa thành công');
           // đóng modal
           closeDoctorModal();
           // refresh list
           page = 1;
           getAllDoctor(page, limit);
         } else {
-          toastErr('Cập nhập thất bại');
+          toastErr('Chỉnh sửa thất bại');
         }
       })
       .catch(function (error) {
