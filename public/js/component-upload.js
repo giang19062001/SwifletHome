@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /// Hàm hiển thị/ẩn nút PAYMENT theo radio isFree
 function togglePaymentButton() {
   const isFree = document.querySelector('input[name="isFree"]:checked')?.value;
-  document.querySelector('button.PAYMENT').style.display = (isFree === 'Y') ? 'none' : 'block';
+  document.querySelector('button.PAYMENT').style.display = isFree === 'Y' ? 'none' : 'block';
 }
 // convert embed sang watch của youtube
 function convertToEmbedUrl(youtubeUrl) {
@@ -134,11 +134,33 @@ function copyData(filename, mimetype) {
   } else if (mimetype.startsWith('payment/')) {
     copiedName = `[[payment]]`;
   }
-  try {
-    navigator.clipboard.writeText(copiedName);
-    console.log(copiedName);
-  } catch {
-    console.log(copiedName);
+
+  if (!copiedName) {
+    console.warn('Không có dữ liệu để copy');
+    return;
+  }
+
+  // localhost, https
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard
+      .writeText(copiedName)
+      .then(() => console.log('Copied:', copiedName))
+      .catch((err) => console.error('Clipboard error:', err));
+  } else {
+    // http
+    const textArea = document.createElement('textarea');
+    textArea.value = copiedName;
+    textArea.style.position = 'fixed'; // tránh scroll
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      console.log('Copied (fallback):', copiedName);
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+    }
+    document.body.removeChild(textArea);
   }
 }
 
@@ -184,22 +206,24 @@ const renderAllFile = (data, objElement) => {
       ${fileData.date ? `<div class="file-meta"><span class="file-date">${fileData.date}</span></div>` : ``}
     </div>
     <div class="file-button">
-         ${fileData.filename == 'PAYMENT'
-        ? `<button style="display:none" class="copy-btn btn-main-out PAYMENT" 
+         ${
+           fileData.filename == 'PAYMENT'
+             ? `<button style="display:none" class="copy-btn btn-main-out PAYMENT" 
         onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
         Sao chép
       </button>`
-        : `<button class="copy-btn btn-main-out" 
+             : `<button class="copy-btn btn-main-out" 
         onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
         Sao chép
       </button>`
-      }
-      ${fileData.filename !== 'PAYMENT'
-        ? ` <button class="btn-err-out" 
+         }
+      ${
+        fileData.filename !== 'PAYMENT'
+          ? ` <button class="btn-err-out" 
         onclick="deleteFile('${fileData.filename}','${fileData.seq}','${fileData.mimetype}')">
         Xóa
       </button>`
-        : ''
+          : ''
       }
      
     </div>
