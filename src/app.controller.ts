@@ -30,7 +30,7 @@ export class AppController {
   }
 
   // config
-  @Get('/dashboard/screen/list')
+  @Get('/dashboard/config/screen')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/screen')
   renderScreen(@Req() req: Request) {
@@ -40,7 +40,7 @@ export class AppController {
       user: req.session.user,
     };
   }
-  @Get('/dashboard/screen/update')
+  @Get('/dashboard/config/screen/update')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/screen-update')
   async renderScreenUpdate(@Req() req: Request) {
@@ -53,13 +53,24 @@ export class AppController {
         user: req.session.user,
         values: values,
       };
-    }else{
-       throw new NotFoundException()
+    } else {
+      throw new NotFoundException();
     }
   }
 
+  // info
+  @Get('/dashboard/config/info')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/info')
+  renderInfo(@Req() req: Request) {
+    return {
+      title: 'Danh sách thông tin chung',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   // question
-  @Get('/dashboard/question/list')
+  @Get('/dashboard/qa/question')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/question')
   renderQuestion(@Req() req: Request) {
@@ -71,7 +82,7 @@ export class AppController {
   }
 
   // answer
-  @Get('/dashboard/answer/list')
+  @Get('/dashboard/qa/answer')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer')
   renderAnswer(@Req() req: Request) {
@@ -81,7 +92,7 @@ export class AppController {
       user: req.session.user,
     };
   }
-  @Get('/dashboard/answer/create')
+  @Get('/dashboard/qa/answer/create')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer-create')
   async renderAnswerCreate(@Req() req: Request) {
@@ -94,7 +105,7 @@ export class AppController {
     };
   }
 
-  @Get('/dashboard/answer/update/:id')
+  @Get('/dashboard/qa/answer/update/:id')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer-update')
   async renderAnswerUpdate(@Req() req: Request) {
@@ -107,7 +118,7 @@ export class AppController {
     };
   }
   // category
-  @Get('/dashboard/category/list')
+  @Get('/dashboard/catalog/category')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/category')
   renderCategory(@Req() req: Request) {
@@ -119,7 +130,7 @@ export class AppController {
   }
 
   // object
-  @Get('/dashboard/object/list')
+  @Get('/dashboard/catalog/object')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/object')
   renderObject(@Req() req: Request) {
@@ -179,7 +190,7 @@ export class AppController {
   }
 
   //home
-  @Get('/dashboard/home/list')
+  @Get('/dashboard/home/sale')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home')
   renderHome(@Req() req: Request) {
@@ -190,14 +201,14 @@ export class AppController {
     };
   }
 
-  @Get('/dashboard/home/create')
+  @Get('/dashboard/home/sale/create')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-create')
   renderHomeCreate(@Req() req: Request) {
     return { title: 'Thêm nhà yến', isLayout: true, user: req.session.user };
   }
 
-  @Get('/dashboard/home/update/:id')
+  @Get('/dashboard/home/sale/update/:id')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-update')
   async renderHomeUpdate(@Req() req: Request) {
@@ -210,7 +221,7 @@ export class AppController {
     };
   }
 
-  @Get('/dashboard/home-submit/list')
+  @Get('/dashboard/home/submit')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-submit')
   renderHomeSubmit(@Req() req: Request) {

@@ -24,16 +24,8 @@ function closeDoctorModal(type) {
 
   if (!modalEl) return;
 
-  // Lấy instance modal hiện tại
-  const modalInstance = bootstrap.Modal.getInstance(modalEl);
-
-  if (modalInstance) {
-    modalInstance.hide(); // Đóng modal
-  } else {
-    // Nếu chưa có instance (trường hợp modal chưa được show trước đó)
-    const modal = new bootstrap.Modal(modalEl);
-    modal.hide();
-  }
+  // đóng modal boostrap
+  closeModal(modalEl);
 }
 async function showDoctorModal(doctorData) {
   // init modal
@@ -192,17 +184,19 @@ async function getAllDoctor(currentPage, limit) {
 }
 
 async function getDetailDoctor(seq) {
-  await axios
-    .get(currentUrl + '/api/admin/doctor/getDetail/' + seq, axiosAuth())
-    .then(function (response) {
-      console.log('response', response);
-      if (response.status === 200 && response.data) {
-        showDoctorModal(response.data);
-      }
-    })
-    .catch(function (err) {
-      console.log('err', err);
-    });
+  await loaderApiCall(
+    axios
+      .get(currentUrl + '/api/admin/doctor/getDetail/' + seq, axiosAuth())
+      .then(function (response) {
+        console.log('response', response);
+        if (response.status === 200 && response.data) {
+          showDoctorModal(response.data);
+        }
+      })
+      .catch(function (err) {
+        console.log('err', err);
+      }),
+  );
 }
 
 async function updateDoctor() {

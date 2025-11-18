@@ -306,7 +306,7 @@ CREATE TABLE `tbl_package` (
 -- thông tin chuyển khoản, fcm key, s3 key
 CREATE TABLE `tbl_info_config` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `infoCharacter` enum('BANK') NOT NULL DEFAULT 'BANK',
+  `infoKeyword` enum('BANK') NOT NULL DEFAULT 'BANK',
   `infoName` varchar(45) NOT NULL,
   `infoContent` json NOT NULL,
   `infoDescription` varchar(255) NOT NULL,

@@ -29,6 +29,7 @@ import { CategoryAdminModule } from './modules/category/admin/category.module';
 import { ScreenAppModule } from './modules/screen/app/screen.module';
 import { ObjectAdminModule } from './modules/object/admin/object.module';
 import { ScreenAdminModule } from './modules/screen/admin/screen.module';
+import { InfoAdminModule } from './modules/info/admin/info.module';
 
 @Module({
   imports: [
@@ -66,7 +67,8 @@ import { ScreenAdminModule } from './modules/screen/admin/screen.module';
     HomeSubmitAdminModule,
     BlogAdminModule,
     DoctorAdminModule,
-    ScreenAdminModule
+    ScreenAdminModule,
+    InfoAdminModule
   ],
   controllers: [AppController],
   providers: [AppService],

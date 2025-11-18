@@ -25,16 +25,8 @@ function closeQuestionModal(type) {
 
   if (!modalEl) return;
 
-  // Lấy instance modal hiện tại
-  const modalInstance = bootstrap.Modal.getInstance(modalEl);
-
-  if (modalInstance) {
-    modalInstance.hide(); // Đóng modal
-  } else {
-    // Nếu chưa có instance (trường hợp modal chưa được show trước đó)
-    const modal = new bootstrap.Modal(modalEl);
-    modal.hide();
-  }
+  // đóng modal boostrap
+  closeModal(modalEl);
 }
 
 // tắt/ hiện link chi tiết câu trả lời
@@ -44,7 +36,7 @@ function toggleAnswerDetailLink(modalBody) {
   const selected = answerSelect.options[answerSelect.selectedIndex];
   const code = selected.getAttribute('data-answer-code');
   if (code) {
-    answerDetailLink.href = `/dashboard/answer/update/${code}`;
+    answerDetailLink.href = `/dashboard/qa/answer/update/${code}`;
     answerDetailLink.style.display = 'inline-block';
   } else {
     answerDetailLink.style.display = 'none';
@@ -268,17 +260,19 @@ async function getAllObject(currentPage, limit) {
 }
 
 async function getDetailQuestion(questionCode) {
-  await axios
-    .get(currentUrl + '/api/admin/question/getDetail/' + questionCode, axiosAuth())
-    .then(function (response) {
-      console.log('response', response);
-      if (response.status === 200 && response.data) {
-        showQuestionModal('update', response.data);
-      }
-    })
-    .catch(function (err) {
-      console.log('err', err);
-    });
+  await loaderApiCall(
+    axios
+      .get(currentUrl + '/api/admin/question/getDetail/' + questionCode, axiosAuth())
+      .then(function (response) {
+        console.log('response', response);
+        if (response.status === 200 && response.data) {
+          showQuestionModal('update', response.data);
+        }
+      })
+      .catch(function (err) {
+        console.log('err', err);
+      }),
+  );
 }
 
 async function getAllAnswer(currentPage, limit, answerCategory, answerObject) {

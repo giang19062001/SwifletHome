@@ -51,14 +51,13 @@ function togglePreview() {
 
 // TODO:RENDER
 function renderContentHtml() {
-
   const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
   const isPaidPreview = document.getElementById('isPaidPreview').checked ? 'PAID' : 'NOT_PAID_YET';
 
   // lấy content từ bong bóng message html
   const bot = document.getElementById('content-message');
   let contentHtml = bot.innerHTML;
-  answerContent = contentHtml;   // ! DATA để gửi đến API
+  answerContent = contentHtml; // ! DATA để gửi đến API
 
   // xóa nút thanh toán ra khỏi editor
   if (isFree == 'Y') {
@@ -124,6 +123,11 @@ async function createAnswer() {
     toastErr('Vui lòng nhập nội dung.');
     return;
   }
+
+  // disable button
+  const submitBtn = document.querySelector('.btn-submit');
+  submitBtn.disabled = true;
+  
   try {
     const answerCategory = document.getElementById('answerCategory').value;
     const answerObject = document.getElementById('answerObject').value;
@@ -143,13 +147,15 @@ async function createAnswer() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Thêm thành công');
-        reloadPage('/dashboard/answer/list');
+        reloadPage('/dashboard/qa/answer');
       })
       .catch(function (error) {
         console.log('error', error);
       });
   } catch (error) {
     console.log('err', error);
+  } finally {
+    // submitBtn.disabled = false; // bật lại button
   }
 }
 
@@ -161,6 +167,11 @@ async function updateAnswer() {
     toastErr('Vui lòng nhập nội dung.');
     return;
   }
+
+  // disable button
+  const submitBtn = document.querySelector('.btn-submit');
+  submitBtn.disabled = true;
+
   try {
     const answerCategory = document.getElementById('answerCategory').value;
     const answerObject = document.getElementById('answerObject').value;
@@ -181,12 +192,14 @@ async function updateAnswer() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Chỉnh sửa thành công');
-        reloadPage('/dashboard/answer/list');
+        reloadPage('/dashboard/qa/answer');
       })
       .catch(function (error) {
         console.log('error', error);
       });
   } catch (error) {
     console.log('err', error);
+  } finally {
+    // submitBtn.disabled = false; // bật lại button
   }
 }

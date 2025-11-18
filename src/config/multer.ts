@@ -1,5 +1,5 @@
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { BadRequestException, Logger } from '@nestjs/common';
@@ -16,6 +16,15 @@ interface MulterLimits {
   headerPairs?: number;
 }
 
+export const validateImgExt = (originalname) => {
+  const ext = extname(originalname).toLowerCase();
+  if (IMG_TYPES.includes(ext)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 export const getFileLocation = (mimetype: string, fieldname: string) => {
   if (mimetype.startsWith('image/')) {
     if (fieldname === 'editorImg' || fieldname.includes('editorImg')) {
@@ -26,6 +35,9 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     }
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
       return 'images/doctors';
+    }
+    if (fieldname === 'configfiles' || fieldname.includes('configfiles')) {
+      return 'images/configs';
     }
     return 'images/others';
   }
@@ -56,7 +68,7 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
     storage: diskStorage({
       destination: (req, file, cb) => {
         const location = getFileLocation(file.mimetype, file.fieldname);
-        const folderPath = `./public/uploads/${location}`;
+        const folderPath = join(process.cwd(), 'public', 'uploads', location);
         if (!existsSync(folderPath)) {
           mkdirSync(folderPath, { recursive: true });
         }

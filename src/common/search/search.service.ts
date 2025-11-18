@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
-import { fuseConfig, ISearchItem } from 'src/config/fuse';
+import { fuseConfig, ISearchItem } from 'src/config/search';
 import { Msg } from 'src/helpers/message';
 
 @Injectable()

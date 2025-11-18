@@ -1,6 +1,5 @@
 const pageType = window.location.pathname.includes('/update') ? 'update' : 'create';
-let homeImagesFiles = []; // Track newly added files for homeImages
-
+let homeImagesFiles = []; // Theo dõi các file mới được thêm vào cho homeImages
 const homeMutationConstraints = {
   homeName: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên nhà yến.' },
@@ -30,8 +29,10 @@ const homeMutationConstraints = {
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', () => {
+  // cho trạng thái thêm
   initializeForm();
   if (pageType === 'update') {
+    // cho trạng thái chỉnh sửa
     assignForm(homeData);
   }
 });
@@ -43,9 +44,10 @@ function initializeForm() {
   const homeImageInput = form.querySelector('#homeImage');
   const homeImagesInput = form.querySelector('#homeImages');
 
-  // Handle form submission
+  // gắn event khi form submit
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    // lấy từ quill editor
     const descriptionHTML = quillGlobal.root.innerHTML;
     const descriptionText = quillGlobal.getText().trim();
     const formData = {
@@ -60,18 +62,21 @@ function initializeForm() {
       homeCode: pageType === 'update' ? homeData.homeCode : undefined,
     };
 
+    // kiểm tra validate input
     const errors = validate(formData, homeMutationConstraints);
     if (!descriptionText) {
       if (!errors) errors = {};
-      errors.homeDescription = ['Vui lòng nhập mô tả.']; // set error
+      errors.homeDescription = ['Vui lòng nhập mô tả.'];
     }
+    // nếu có lỗi -> hiện lỗi
     if (errors) {
       displayErrors(errors);
       return;
     }
 
-    // xóa lỗi
+    // ko lỗi - clear lỗi
     clearErrors();
+    // submit
     if (pageType === 'update') {
       await updateHome(formData);
     } else {
@@ -79,12 +84,12 @@ function initializeForm() {
     }
   });
 
-  //  kiểm tra validation của các input real-time
+  //  gắn sự kiện tự động validate của các input real-time
   form.querySelectorAll('input, textarea').forEach((input) => {
     input.addEventListener('input', () => validateField(homeMutationConstraints, input));
   });
 
-  // validate for homeDescription
+  //  gắn sự kiện tự động validate của quill editor
   if (quillGlobal) {
     quillGlobal.on('text-change', () => {
       const errEl = form.querySelector('[data-error="homeDescription"]');
@@ -98,30 +103,33 @@ function initializeForm() {
       }
     });
   }
-  // Preview home images 'CHANGE EVENT'
+  // lắng nghe sự kiện thay đổi của homeImagesFiles
   homeImagesInput.addEventListener('change', () => {
-    // Append new files to homeImagesFiles
+    // thêm các file mới vào homeImagesFiles
     const addedFiles = Array.from(homeImagesInput.files);
     homeImagesFiles = homeImagesFiles.concat(addedFiles);
 
-    // Update FileList
+    // cập nhập lại FileList của homeImagesFiles
     const dataTransfer = new DataTransfer();
     homeImagesFiles.forEach((file) => dataTransfer.items.add(file));
     homeImagesInput.files = dataTransfer.files;
 
-    // Re-render all previews
+    // Re-render các ảnh preview của homeImagesFiles
     homeImagesPreview.innerHTML = '';
     homeImagesFiles.forEach((file, index) => renderImagePreview(file, index, homeImagesInput, homeImagesPreview, 'homeImages'));
 
+    // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
     validateField(homeMutationConstraints, homeImagesInput);
   });
 
-  // Preview home image 'CHANGE EVENT'
+  // lắng nghe sự kiện thay đổi của homeImageInput
   homeImageInput.addEventListener('change', () => {
     homeImagePreview.innerHTML = '';
     if (homeImageInput.files.length > 0) {
+      // Re-render  ảnh preview của homeImageInput
       renderImagePreview(homeImageInput.files[0], 0, homeImageInput, homeImagePreview, 'homeImage');
     }
+    // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
     validateField(homeMutationConstraints, homeImageInput);
   });
 }
@@ -133,53 +141,62 @@ async function assignForm(homeData) {
   const homeImageInput = form.querySelector('#homeImage');
   const homeImagesInput = form.querySelector('#homeImages');
 
-  // Populate text fields
+  // điền giá trị các input bằng dữ liệu từ API
   form.querySelector('#homeName').value = homeData.homeName || '';
   form.querySelector('#homeAddress').value = homeData.homeAddress || '';
   form.querySelector('#latitude').value = homeData.latitude || '';
   form.querySelector('#longitude').value = homeData.longitude || '';
   // form.querySelector('#homeDescription').value = homeData.homeDescription || '';
 
-  // set homeDescription value
+  // cập nhập editor bằng dữ liệu từ API
   if (quillGlobal && homeData.homeDescription) {
     quillGlobal.root.innerHTML = homeData.homeDescription;
   }
-  // Clear existing error messages
+  // xóa các lỗi
   document.querySelectorAll('.error-message').forEach((el) => {
     el.textContent = '';
     el.style.display = 'none';
   });
 
-  // Reset image-related state
+  // reset các biến liên quan về ảnh, file
   homeImagesFiles = [];
   homeImageInput.value = '';
   homeImagesInput.value = '';
 
-  // Handle homeImage
+  // gán giá trị homeImage với dữ liệu từ API
   if (pageType === 'update' && homeData.homeImage) {
+    // lấy đường dẫn từ filename -> trả ra file
     const file = await ChangeUrlToFile(homeData.homeImage.filename, 'images/homes');
     if (file) {
-      // Update FileList for homeImage
+      // cập nhập FileList cho homeImage
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
       homeImageInput.files = dataTransfer.files;
+
+      // Re-render ảnh preview của homeImageInput
       renderImagePreview(file, 0, homeImageInput, homeImagePreview, 'homeImage');
+
+      // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
       validateField(homeMutationConstraints, homeImageInput);
     }
   }
 
-  // Handle homeImages
+  // gán giá trị homeImageS với dữ liệu từ API
   if (pageType === 'update' && homeData.homeImages && Array.isArray(homeData.homeImages)) {
-    // assign homeImagesFiles from 'homeData'
+    // lấy đường dẫn từ filename -> trả ra file list
     const files = await Promise.all(homeData.homeImages.map((img) => ChangeUrlToFile(img.filename, 'images/homes')));
     homeImagesFiles = files.filter((file) => file !== null);
     if (homeImagesFiles.length > 0) {
-      // Update FileList for  homeImages
+      // cập nhập FileList cho homeImages
       const dataTransfer = new DataTransfer();
       homeImagesFiles.forEach((file) => dataTransfer.items.add(file));
       homeImagesInput.files = dataTransfer.files;
       homeImagesPreview.innerHTML = '';
+
+      // Re-render TỪNG ảnh preview của homeImagesFiles
       homeImagesFiles.forEach((file, index) => renderImagePreview(file, index, homeImagesInput, homeImagesPreview, 'homeImages'));
+
+      // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
       validateField(homeMutationConstraints, homeImagesInput);
     }
   }
@@ -187,6 +204,7 @@ async function assignForm(homeData) {
 
 // TODO: RENDER
 function renderImagePreview(file, index, input, preview, field) {
+  // tạo preview element
   const previewHtml = `
     <div class="image-preview" data-index="${index}">
       <img src="" alt="Preview ${index + 1}">
@@ -198,26 +216,29 @@ function renderImagePreview(file, index, input, preview, field) {
   const previewElement = preview.querySelector(`[data-index="${index}"]`);
   const imgElement = previewElement.querySelector('img');
 
-  // show file preview
+  // hiện ảnh preview
   const reader = new FileReader();
   reader.onload = (e) => {
     imgElement.src = e.target.result;
   };
   reader.readAsDataURL(file);
 
+  // tạo nút delete và gán trên ảnh preview
   const deleteBtn = previewElement.querySelector('.delete-btn');
   deleteBtn.addEventListener('click', () => {
     const idx = parseInt(previewElement.dataset.index);
+    // nếu sự kiện xóa được nhấn  cho homeImages
     if (field === 'homeImages') {
-      homeImagesFiles.splice(idx, 1); // remove file from homeImagesFiles
+      homeImagesFiles.splice(idx, 1); // nếu sự kiện xóa được nhấn -> xóa file ra khỏi homeImagesFiles dựa vào index
       const dataTransfer = new DataTransfer();
-      homeImagesFiles.forEach((file) => dataTransfer.items.add(file)); // update FileList for 'homeImages' again
-      input.files = dataTransfer.files;
+      homeImagesFiles.forEach((file) => dataTransfer.items.add(file)); // cập nhập lại FileList cho 'homeImages'
+      input.files = dataTransfer.files; // gán lại vào input của homeImages
     } else {
-      input.value = ''; // Clear "homeImage" input
+      // nếu sự kiện xóa được nhấn  cho homeImage
+      input.value = ''; // chỉ cần reset input
     }
 
-    // Re-render previews
+    // Re-render ảnh của  homeImages và homeImage
     preview.innerHTML = '';
     if (field === 'homeImages') {
       homeImagesFiles.forEach((file, i) => renderImagePreview(file, i, input, preview, field));
@@ -225,7 +246,7 @@ function renderImagePreview(file, index, input, preview, field) {
       renderImagePreview(input.files[0], 0, input, preview, field);
     }
 
-    // Validate field
+    // kiểm tra lỗi nếu có thì hiện , ko có thì xóa lỗi
     const errors = validate.single(input.files, homeMutationConstraints[field]);
     const errorElement = document.querySelector(`[data-error="${field}"]`);
     if (errorElement) {
@@ -245,30 +266,39 @@ async function updateHome(formData) {
 }
 
 async function submitHome(formData, url, method, successMessage) {
-  console.log('formData', formData);
+  // thêm dự liệu input vào formData
   const postData = new FormData();
   const fields = ['homeName', 'homeAddress', 'homeDescription', 'latitude', 'longitude'];
   fields.forEach((field) => postData.append(field, formData[field]));
   postData.append(method == 'post' ? 'createdId' : 'updatedId', user.userId);
+
+  // nếu có cập nhập file của homeImage hoặc homeImages -> đẩy vào formData
   if (formData.homeImage?.length) {
     postData.append('homeImage', formData.homeImage[0]);
     Array.from(formData.homeImages).forEach((file) => {
       postData.append('homeImages', file);
     });
   }
+
+  // disable button
+  const submitBtn = document.querySelector('.btn-main-lg');
+  submitBtn.disabled = true;
+
   try {
     const response = await axios[method](url, postData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
     if (response.data) {
       toastOk(successMessage);
-      reloadPage('/dashboard/home/list');
+      // về trang danh sache
+      reloadPage('/dashboard/home/sale');
     } else {
       toastErr(`Lỗi khi ${method === 'post' ? 'tạo' : 'Chỉnh sửa'} nhà yến`);
     }
   } catch (error) {
     console.error(`error:`, error);
-     if (error.response.data) {
+    if (error.response.data) {
       toastErr(error.response.data.message);
     }
+  } finally {
+    // submitBtn.disabled = false; // bật lại button
   }
-  
 }

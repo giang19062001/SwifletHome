@@ -8,6 +8,7 @@ import { UploadAudioFilesDto, UploadVideoLinkDto } from './upload.dto';
 import { sortByDate } from 'src/helpers/func';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message';
+import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()
 export class UploadService {
@@ -17,35 +18,8 @@ export class UploadService {
   constructor(
     private readonly uploadRepository: UploadRepository,
     private readonly logger: LoggingService,
-  ) {
-    this.ensureUploadDirectoryExists();
-  }
-
-  private ensureUploadDirectoryExists(): void {
-    if (!existsSync(this.UPLOAD_PATH)) {
-      mkdirSync(this.UPLOAD_PATH, { recursive: true });
-    }
-  }
-
-  public async deleteLocalFile(filepath: string): Promise<void> {
-    const logbase = `${this.SERVICE_NAME}/deleteLocalFile`;
-    try {
-      const filePath = path.join(process.cwd(), this.UPLOAD_PATH, filepath);
-
-      try {
-        await fs.access(filePath);
-      } catch {
-        this.logger.error(logbase, `Không tìm thấy tệp ${filepath} trong thư mục`);
-        return;
-      }
-
-      await fs.unlink(filePath);
-      this.logger.log(logbase, `Đã xóa thành công tệp ${filepath} khỏi thư mục`);
-    } catch (error) {
-      this.logger.error(logbase, `Không xóa được tệp ${filepath} khỏi thư mục -> ${error}`);
-    }
-  }
-
+    private readonly fileLocalService : FileLocalService
+  ) {}
   async uploadImg(file: Express.Multer.File, createdId: string): Promise<number> {
     try {
       const result = await this.uploadRepository.uploadImg(file, createdId);
@@ -104,14 +78,12 @@ export class UploadService {
   async deleteImg(filename: string): Promise<number> {
     try {
       // const file = await this.uploadRepository.getFileImg(filename);
-
       // const result = await this.uploadRepository.terminalImg(filename);
-
       // if (result === 0) {
       //   throw new NotFoundException();
       // }
       // const filepath = `${file?.filename.startsWith('editorImg-') ? 'images/editors' : 'images/homes'}/${filename}`;
-      // await this.deleteLocalFile(filepath);
+      // await this.fileLocalService.deleteLocalFile(filepath);
 
       const result = await this.uploadRepository.deleteImg(filename);
 
@@ -132,9 +104,8 @@ export class UploadService {
 
       // await this.uploadRepository.terminalAudio(file?.filenamePay ?? '');
       // await this.uploadRepository.terminalAudio(file?.filenameFree ?? '');
-
-      // await this.deleteLocalFile(`/audios/editors/${file?.filenamePay}`);
-      // await this.deleteLocalFile(`/audios/editors/${file?.filenameFree}`);
+      // await this.fileLocalService.deleteLocalFile(`/audios/editors/${file?.filenamePay}`);
+      // await this.fileLocalService.deleteLocalFile(`/audios/editors/${file?.filenameFree}`);
 
       await this.uploadRepository.deleteAudio(file?.filenamePay ?? '');
       await this.uploadRepository.deleteAudio(file?.filenameFree ?? '');

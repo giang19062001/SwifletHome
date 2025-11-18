@@ -14,7 +14,7 @@ export class UpdatePasswordDto {
 
 export class UpdateDeviceTokenDto {
   @ApiProperty({
-    example: 'token_efg123',
+    example: 'fIMHPAUfTYKpTPVcTvtux8:APA91bFQ52ugkIGF5wq04L3ALYNamDTcHvFQWAvP7mWLSi5d6DXXqKhDEadgOIorK7Zk-loIstEvo-HwydCzFaJannJfCkWrgc1zb86lu8Z6rf3qtZoTahk',
   })
   @IsString()
   @IsNotEmpty()
@@ -31,14 +31,14 @@ export class LoginAppDto {
   userPhone: string;
 
   @ApiProperty({
-    example: '123',
+    example: 'Giang19062001!',
   })
   @IsString()
   @IsNotEmpty()
   userPassword: string;
 
   @ApiProperty({
-    example: 'token_efg123',
+    example: 'fIMHPAUfTYKpTPVcTvtux8:APA91bFQ52ugkIGF5wq04L3ALYNamDTcHvFQWAvP7mWLSi5d6DXXqKhDEadgOIorK7Zk-loIstEvo-HwydCzFaJannJfCkWrgc1zb86lu8Z6rf3qtZoTahk',
   })
   @IsString()
   @IsNotEmpty()
@@ -62,14 +62,14 @@ export class RegisterAppDto {
   userPhone: string;
 
   @ApiProperty({
-    example: '123',
+    example: 'Giang19062001!',
   })
   @IsString()
   @IsNotEmpty()
   userPassword: string;
 
   @ApiProperty({
-    example: 'token_abc123',
+    example: 'fIMHPAUfTYKpTPVcTvtux8:APA91bFQ52ugkIGF5wq04L3ALYNamDTcHvFQWAvP7mWLSi5d6DXXqKhDEadgOIorK7Zk-loIstEvo-HwydCzFaJannJfCkWrgc1zb86lu8Z6rf3qtZoTahk',
   })
   @IsString()
   @IsNotEmpty()

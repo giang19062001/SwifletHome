@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // TODO: FUNC
 function gotoHomeCreate(){
-  gotoPage('/dashboard/home/create');
+  gotoPage('/dashboard/home/sale/create');
 }
 function gotoHomeUpdate(homeCode){
-  gotoPage('/dashboard/home/update/'+homeCode);
+  gotoPage('/dashboard/home/sale/update/'+homeCode);
 }
 function changePage(p) {
   page = p;

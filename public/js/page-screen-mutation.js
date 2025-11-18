@@ -1,5 +1,3 @@
-let screenContent = {};
-let keyActive = '';
 const pageElement = '#page-screen-mutation';
 const params = new URLSearchParams(currentSearch);
 const screenKeyword = params.get('screen-keyword');
@@ -11,13 +9,15 @@ const screenMutationConstraints = {
     presence: { allowEmpty: false, message: '^Vui lòng nhập mô tả.' },
   },
 };
+let screenContent = {};
+let keyActive = '';
 
 document.addEventListener('DOMContentLoaded', function () {
   console.log('screenData', screenData);
 
   // kiểm tra danh sách fileds
   if ('screenContent' in screenData) {
-    setContentFileds(screenData.screenContent);
+    mapContentFileds(screenData.screenContent);
   }
 
   // mark active key đầu tiên
@@ -49,12 +49,12 @@ function showNameOfKey(key) {
   return name;
 }
 
-function setContentFileds(data) {
+function mapContentFileds(data) {
   switch (screenKeyword) {
     case 'SIGNUP_SERVICE':
       screenContent = {
-        contentEnd: data.contentEnd ?? '',
         contentStart: data.contentStart ?? '',
+        contentEnd: data.contentEnd ?? '',
       };
       break;
     default:
@@ -97,7 +97,7 @@ function renderContentHtml() {
   // lấy content từ editor
   screenContent[keyActive] = getEditorContent();
   // set content cho bong bóng preview với tất cả fields hiện có
-   document.getElementById('content-message').innerHTML = ""
+  document.getElementById('content-message').innerHTML = '';
   let HTML = ``;
   Object.entries(screenContent).forEach(([key, value]) => {
     HTML += value;

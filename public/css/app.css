@@ -18306,7 +18306,7 @@ select {
   color: #565c66;
 }
 
-#btn-main, .btn-err-out, .btn-err, .btn-main-out, .btn-main-video, .btn-main-audio, .btn-main-image, .btn-main, .btn-main-lg {
+#btn-main, .btn-err-out, .btn-err, .btn-main-out, .btn-main-video, .btn-main-audio, .btn-main-image, .btn-main, .btn-submit, .btn-main-lg {
   padding: 7px 15px;
   border-radius: 15px;
   font-family: Pretendard;
@@ -18317,7 +18317,7 @@ select {
   outline: auto;
   cursor: pointer;
 }
-#btn-main:disabled, .btn-err-out:disabled, .btn-err:disabled, .btn-main-out:disabled, .btn-main-video:disabled, .btn-main-audio:disabled, .btn-main-image:disabled, .btn-main:disabled, .btn-main-lg:disabled {
+#btn-main:disabled, .btn-err-out:disabled, .btn-err:disabled, .btn-main-out:disabled, .btn-main-video:disabled, .btn-main-audio:disabled, .btn-main-image:disabled, .btn-main:disabled, .btn-submit:disabled, .btn-main-lg:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background-color: #f0f0f0;
@@ -18336,12 +18336,12 @@ select {
   background-color: #0760ce;
 }
 
-.btn-main {
+.btn-main, .btn-submit {
   background-color: #0175ff;
   border-color: #0175ff;
   color: #ffffff;
 }
-.btn-main:hover {
+.btn-main:hover, .btn-submit:hover {
   background-color: #0760ce;
 }
 
@@ -18566,6 +18566,39 @@ select {
   margin: 0 auto;
 }
 
+/* Overlay che phủ toàn trang */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35); /* nền mờ */
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* nằm trên mọi thứ */
+}
+
+/* Ẩn hiện bằng class */
+.page-loader.hidden {
+  display: none;
+}
+
+/* Spinner tròn */
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 6px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+/* Animation quay */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .page-login {
   display: flex;
   justify-content: center;

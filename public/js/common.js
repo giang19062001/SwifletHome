@@ -100,6 +100,19 @@ function renderPager(totalCount, offset, currentPage, pageBlockCount, callBack) 
     return '';
   }
 }
+// modal
+function closeModal(modalEl) {
+  // Lấy instance modal hiện tại
+  const modalInstance = bootstrap.Modal.getInstance(modalEl);
+
+  if (modalInstance) {
+    modalInstance.hide(); // Đóng modal
+  } else {
+    // Nếu chưa có instance (trường hợp modal chưa được show trước đó)
+    const modal = new bootstrap.Modal(modalEl);
+    modal.hide();
+  }
+}
 
 // toast
 function toastOk(text) {
@@ -135,6 +148,25 @@ function toastErr(text) {
   }).showToast();
 }
 
+//loader
+function showPageLoader() {
+  document.getElementById('page-loader')?.classList.remove('hidden');
+}
+
+function hidePageLoader() {
+  document.getElementById('page-loader')?.classList.add('hidden');
+}
+
+async function loaderApiCall(promise) {
+  try {
+    showPageLoader();
+    const res = await promise;
+    return res;
+  } finally {
+    hidePageLoader();
+  }
+}
+// redirect
 function reloadPage(url) {
   setTimeout(() => {
     if (url) {

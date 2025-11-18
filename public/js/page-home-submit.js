@@ -24,16 +24,8 @@ function closeHomeSubmitModal() {
 
   if (!modalEl) return;
 
-  // Lấy instance modal hiện tại
-  const modalInstance = bootstrap.Modal.getInstance(modalEl);
-
-  if (modalInstance) {
-    modalInstance.hide(); // Đóng modal
-  } else {
-    // Nếu chưa có instance (trường hợp modal chưa được show trước đó)
-    const modal = new bootstrap.Modal(modalEl);
-    modal.hide();
-  }
+  // đóng modal boostrap
+  closeModal(modalEl);
 }
 
 // TODO: RENDER
@@ -85,7 +77,7 @@ function renderAllHomeSubmit(data, objElement) {
          <tr class="text-center">
             <td><p>${page * i++}</p></td>
             <td style="max-width: 150px;">
-              <a target="_blank" href="/dashboard/home/update/${ele.homeCode}">
+              <a target="_blank" href="/dashboard/home/sale/update/${ele.homeCode}">
                 ${ele.homeName}
               </a>
             </td>
@@ -113,8 +105,8 @@ function renderAllHomeSubmit(data, objElement) {
   // xóa skeleton
   hideSkeleton(objElement);
 }
-// TODO: API
 
+// TODO: API
 async function getAllHomeSubmit(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
@@ -160,17 +152,19 @@ async function getStatusCode() {
     });
 }
 async function getDetailHomeSubmit(seq) {
-  await axios
-    .get(currentUrl + '/api/admin/homeSubmit/getDetail/' + seq, axiosAuth())
-    .then(function (response) {
-      console.log('response', response);
-      if (response.status === 200 && response.data) {
-        showHomeSubmitModal(response.data);
-      }
-    })
-    .catch(function (err) {
-      console.log('err', err);
-    });
+  await loaderApiCall(
+    axios
+      .get(currentUrl + '/api/admin/homeSubmit/getDetail/' + seq, axiosAuth())
+      .then(function (response) {
+        console.log('response', response);
+        if (response.status === 200 && response.data) {
+          showHomeSubmitModal(response.data);
+        }
+      })
+      .catch(function (err) {
+        console.log('err', err);
+      }),
+  );
 }
 
 async function updateHomeSubmit() {

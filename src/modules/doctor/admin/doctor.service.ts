@@ -6,9 +6,9 @@ import { PagingDto } from 'src/dto/admin';
 import { UpdateDoctorDto } from './doctor.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { UploadService } from 'src/modules/upload/upload.service';
 import { getFileLocation } from 'src/config/multer';
 import path from 'path';
+import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()
 export class DoctorAdminService {
@@ -16,7 +16,7 @@ export class DoctorAdminService {
 
   constructor(
     private readonly doctorAdminRepository: DoctorAdminRepository,
-    private readonly uploadService: UploadService,
+    private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
   // 2 giờ sáng mỗi ngày
@@ -32,7 +32,7 @@ export class DoctorAdminService {
           await this.doctorAdminRepository.deleteFile(file.seq);
           // xóa file trong uploads
           const location = getFileLocation(file.mimetype, file.filename);
-          await this.uploadService.deleteLocalFile(`${path.join(location, file.filename)}`);
+          await this.fileLocalService.deleteLocalFile(`${path.join(location, file.filename)}`);
         }
         this.logger.log(logbase, `Các file khám bệnh  không dùng dã được xóa theo lịch trình thành công`);
       } else {

@@ -14,8 +14,8 @@ export class InfoAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async getDetail(infoCharacter: string): Promise<IInfo | null> {
-    const result = await this.infoAppRepository.getDetail(infoCharacter);
+  async getDetail(infoKeyword: string): Promise<IInfo | null> {
+    const result = await this.infoAppRepository.getDetail(infoKeyword);
     return result;
   }
 }

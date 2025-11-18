@@ -18,7 +18,7 @@ export class ScreenAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async getDetail(keyword: string): Promise<any> {
+  async getContent(keyword: string): Promise<any> {
     const screen = await this.screenAppRepository.getDetail(keyword);
     let result: any | null = null;
 

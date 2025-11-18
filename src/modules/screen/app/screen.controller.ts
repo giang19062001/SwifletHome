@@ -17,10 +17,10 @@ export class ScreenAppController {
     name: 'keyword',
     type: String,
   })
-  @Get('getDetail/:keyword')
+  @Get('getContent/:keyword')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('keyword') keyword: string) {
-    const result = await this.screenAppService.getDetail(keyword);
+  async getContent(@Param('keyword') keyword: string) {
+    const result = await this.screenAppService.getContent(keyword);
     if (!result) {
       throw new BadRequestException();
     }

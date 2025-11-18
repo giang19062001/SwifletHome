@@ -10,12 +10,12 @@ export class InfoAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getDetail(infoCharacter: string): Promise<IInfo | null> {
+  async getDetail(infoKeyword: string): Promise<IInfo | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.infoCharacter, A.infoName, A.infoContent, A.infoDescription, A.isActive
-        FROM ${this.table} A WHERE A.infoCharacter = ? AND A.isActive = 'Y'
+      ` SELECT A.seq, A.infoKeyword, A.infoName, A.infoContent, A.infoDescription, A.isActive
+        FROM ${this.table} A WHERE A.infoKeyword = ? AND A.isActive = 'Y'
         LIMIT 1`,
-      [infoCharacter],
+      [infoKeyword],
     );
     return rows ? (rows[0] as IInfo) : null;
   }

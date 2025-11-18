@@ -1,0 +1,80 @@
+<div class="common-table-container row" id="page-screen">
+    <div class="col-xl-12">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <p class="title-page">
+                                <%= title %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="container-table">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr class="text-center">
+                                    <th>
+                                        <p>STT</p>
+                                    </th>
+                                    <th>
+                                        <p>Tên màn hình</p>
+                                    </th>
+                                    <th>
+                                        <p>Mô tả</p>
+                                    </th>
+                                    <th>
+                                        <p>Ngày tạo</p>
+                                    </th>
+                                    <th>
+                                        <p>Người tạo</p>
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table"></tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination" id="privacy-main-pager"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- modal update-->
+<div class="modal common-modal info-update-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-header-title">Chỉnh sửa thông tin</p>
+                <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                        <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="infoKeyword" value="">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-main">Chỉnh sửa</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/page-info.js"></script>
+<script src="/lib/validate.min.js"></script>
+<script src="/js/common-validate.js"></script>

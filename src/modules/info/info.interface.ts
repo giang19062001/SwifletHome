@@ -1,6 +1,6 @@
 export interface IInfo {
   seq: number;
-  infoCharacter: 'BANK';
+  infoKeyword: 'BANK';
   infoName: string;
   infoContent: any;
   infoDescription: string;

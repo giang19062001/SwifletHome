@@ -3,10 +3,10 @@ import { AuthAdminModule } from "src/modules/auth/admin/auth.module";
 import { DoctorAdminController } from "./doctor.controller";
 import { DoctorAdminRepository } from "./doctor.repository";
 import { DoctorAdminService } from "./doctor.service";
-import { UploadAdminModule } from "src/modules/upload/upload.module";
+import { FileLocalModule } from "src/common/fileLocal/fileLocal.module";
 
 @Module({
-  imports: [AuthAdminModule, UploadAdminModule],
+  imports: [AuthAdminModule, FileLocalModule],
   controllers: [DoctorAdminController],
   providers: [DoctorAdminService, DoctorAdminRepository],
 })

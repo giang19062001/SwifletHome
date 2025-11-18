@@ -124,6 +124,10 @@ async function createBlog() {
     toastErr('Vui lòng nhập nội dung.');
     return;
   }
+    // disable button
+  const submitBtn = document.querySelector('.btn-submit');
+  submitBtn.disabled = true;
+
   try {
     const blogCategory = document.getElementById('blogCategory').value;
     const blogObject = document.getElementById('blogObject').value;
@@ -150,6 +154,8 @@ async function createBlog() {
       });
   } catch (error) {
     console.log('err', error);
+  }finally {
+    // submitBtn.disabled = false; // bật lại button
   }
 }
 
@@ -161,6 +167,10 @@ async function updateBlog() {
     toastErr('Vui lòng nhập nội dung.');
     return;
   }
+    // disable button
+  const submitBtn = document.querySelector('.btn-submit');
+  submitBtn.disabled = true;
+
   try {
     const blogCategory = document.getElementById('blogCategory').value;
     const blogObject = document.getElementById('blogObject').value;
@@ -188,5 +198,7 @@ async function updateBlog() {
       });
   } catch (error) {
     console.log('err', error);
+  } finally {
+    // submitBtn.disabled = false; // bật lại button
   }
 }

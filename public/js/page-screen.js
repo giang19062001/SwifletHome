@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // TODO: FUNC
 function gotoScreenUpdate(screenKeyword) {
-  gotoPage('/dashboard/screen/update?screen-keyword=' + screenKeyword);
+  gotoPage('/dashboard/config/screen/update?screen-keyword=' + screenKeyword);
 }
 function changePage(p) {
   page = p;
