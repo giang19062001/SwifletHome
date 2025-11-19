@@ -16,5 +16,6 @@ export interface IInfoBank {
   bankName: string;
   bankBranch: string;
   accountName: string;
+  accountNumber: string;
   paymentContent: string;
 }

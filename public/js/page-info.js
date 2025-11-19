@@ -19,6 +19,9 @@ const InfoBankConstraints = {
   accountName: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên chủ tài khoản.' },
   },
+  accountNumber: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập mã tài khoản.' },
+  },
   bankBranch: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên chi nhánh ngân hàng.' },
   },
@@ -49,6 +52,9 @@ function showNameOfKey(key) {
       break;
     case 'accountName':
       name = 'Tên chủ tài khoản';
+      break;
+    case 'accountNumber':
+      name = 'Mã tài khoản';
       break;
     case 'bankBranch':
       name = 'Tên chi nhánh ngân hàng';
@@ -93,6 +99,7 @@ function mapContentFileds(infoKeyword, infoName, infoDescription, data) {
         bankName: data.bankName ?? '',
         bankBranch: data.bankBranch ?? '',
         accountName: data.accountName ?? '',
+        accountNumber: data.accountNumber?? '',
         paymentContent: data.paymentContent ?? '',
         qrcode: data.qrcode ?? '',
       };
