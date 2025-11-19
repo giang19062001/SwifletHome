@@ -23,7 +23,7 @@ export class UserAppRepository {
   async getDetail(userCode: string): Promise<IUserAppInfo | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, 
-     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'Gói dùng thử') AS packageDescription
+     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
      FROM ${this.table} A 
      LEFT JOIN tbl_user_payment B
      ON A.userCode = B.userCode

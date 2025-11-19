@@ -3,7 +3,7 @@ import type { Pool } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { IUserAdmin } from './user.interface';
 import { PagingDto } from 'src/dto/admin';
-import { IUserApp } from '../app/user.interface';
+import { IUserAppInfo } from '../app/user.interface';
 
 @Injectable()
 export class UserAdminRepository {
@@ -29,9 +29,15 @@ export class UserAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   
-  async getAll(dto: PagingDto): Promise<IUserApp[]> {
-    let query = ` SELECT A.seq, A.userCode, A.userName, A.userPassword, A.userPhone, A.deviceToken, A.isActive, A.createdAt, A.createdId, A.updatedAt, A.updatedId
-                FROM ${this.tableApp} A  `;
+  async getAll(dto: PagingDto): Promise<IUserAppInfo[]> {
+    let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
+     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
+     FROM ${this.tableApp} A 
+     LEFT JOIN tbl_user_payment B
+     ON A.userCode = B.userCode
+     LEFT JOIN tbl_package C
+     ON B.packageCode = C.packageCode
+     WHERE A.isActive = 'Y' `;
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
@@ -39,6 +45,6 @@ export class UserAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IUserApp[];
+    return rows as IUserAppInfo[];
   }
 }

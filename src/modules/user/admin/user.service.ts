@@ -4,7 +4,7 @@ import { UserAdminRepository } from './user.repository';
 import { IUserAdmin } from './user.interface';
 import { PagingDto } from 'src/dto/admin';
 import { IList } from 'src/interfaces/admin';
-import { IUserApp } from '../app/user.interface';
+import { IUserAppInfo } from '../app/user.interface';
 
 @Injectable()
 export class UserAdminService {
@@ -19,7 +19,7 @@ export class UserAdminService {
     return await this.userAdminRepository.findByUserId(userId);
   }
 
-  async getAll(dto: PagingDto): Promise<IList<IUserApp>> {
+  async getAll(dto: PagingDto): Promise<IList<IUserAppInfo>> {
     const total = await this.userAdminRepository.getTotal(dto);
     const list = await this.userAdminRepository.getAll(dto);
     return { total, list };

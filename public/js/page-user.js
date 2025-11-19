@@ -26,10 +26,12 @@ function renderAllUser(data, objElement) {
             <td><p>${page * i++}</p></td>
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
-            <td><b class="txt-${ele.isActive == 'Y' ? 'ok' : 'not-ok'}">${ele.isActive == 'Y' ? 'Đang hoạt động' : 'Ngưng hoạt động'}</b></td>
+            <td><p>${ele.packageName} ${ele.packageDescription ? `(${ele.packageDescription})` : ''}</p></td>
+            <td><p>${ele.startDate ? moment(ele.startDate).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
+            <td><p>${ele.endDate ? moment(ele.endDate).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
            <td>
-               <!--   <button class="btn-main-out">Chi tiết</button>  -->
+                  <button class="btn-main-out">Chỉnh sửa</button> 
             </td> 
          </tr>`;
       HTML += rowHtml;
@@ -41,7 +43,7 @@ function renderAllUser(data, objElement) {
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     // dữ liệu trống
-    renderEmptyRowTable(objElement, 5);
+    renderEmptyRowTable(objElement, 7);
   }
 
   // xóa skeleton
@@ -52,7 +54,7 @@ function renderAllUser(data, objElement) {
 async function getAllUser(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
-  showSkeleton(objElement, limit, 5);
+  showSkeleton(objElement, limit, 7);
 
   await axios
     .post(

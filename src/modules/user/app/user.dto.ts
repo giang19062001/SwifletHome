@@ -26,14 +26,13 @@ export class ResUserAuthAppDto extends ResUserAppDto {
 }
 
 export class ResUserAppInfoDto extends ResUserAppDto {
-
   @ApiProperty({ example: '' })
   startDate: Date | null;
 
   @ApiProperty({ example: '' })
   endDate: Date | null;
 
-    @ApiProperty({ example: '' })
+  @ApiProperty({ example: '' })
   packageCode: Date | null;
 
   @ApiProperty({ example: '' })
