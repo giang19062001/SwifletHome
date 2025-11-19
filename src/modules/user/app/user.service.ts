@@ -4,7 +4,7 @@ import { UserAppRepository } from './user.repository';
 import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
 import { UserPaymentService } from 'src/modules/userPayment/userPayment.service';
 import { CreateUserPaymentDto } from 'src/modules/userPayment/userPayment.dto';
-import { IUserApp } from './user.interface';
+import { IUserApp, IUserAppInfo } from './user.interface';
 
 @Injectable()
 export class UserAppService {
@@ -20,8 +20,8 @@ export class UserAppService {
     return await this.userAppRepository.findByPhone(userPhone);
   }
 
-  async findByCode(userCode: string): Promise<IUserApp | null> {
-    return await this.userAppRepository.findByCode(userCode);
+  async getDetail(userCode: string): Promise<IUserAppInfo | null> {
+    return await this.userAppRepository.getDetail(userCode);
   }
 
   async create(dto: RegisterAppDto): Promise<number> {
@@ -45,6 +45,10 @@ export class UserAppService {
     return 1;
   }
 
+  
+  async update(userName: string, userPhone: string, userCode: string): Promise<number> {
+    return await this.userAppRepository.update(userName, userPhone, userCode);
+  }
   async updatePassword(newPassword: string, userPhone: string): Promise<number> {
     return await this.userAppRepository.updatePassword(newPassword, userPhone);
   }

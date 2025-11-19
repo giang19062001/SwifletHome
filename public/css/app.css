@@ -18991,12 +18991,12 @@ select {
   display: inline-block;
 }
 .doctor-update-modal .file-item img {
-  width: 250px;
-  min-height: 200px;
+  width: 200px;
+  min-height: 150px;
 }
 .doctor-update-modal .file-item video {
   width: 250px;
-  height: "auto";
+  height: 200px;
 }
 
 .page-main .content-area {

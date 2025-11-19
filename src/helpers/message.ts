@@ -1,5 +1,7 @@
 export const Msg = {
-  CodeInvalid:"Mã code không hợp lệ",
+  UpdateOk: 'Cập nhập thông tin thành công',
+  UpdateErr: 'Cập nhập thông tin thất bại',
+  CodeInvalid: 'Mã code không hợp lệ',
   TokenMissing: 'Vui lòng xác thực token',
   TokenInvalid: 'Token không hợp lệ',
   PhoneExist: 'Số điện thoại đã tồn tại',

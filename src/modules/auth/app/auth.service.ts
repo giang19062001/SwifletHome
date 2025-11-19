@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message';
-import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto } from './auth.dto';
+import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { hashPassword } from 'src/helpers/auth';
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
@@ -10,9 +10,10 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { IUserAuthApp } from './auth.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { AbAuthService } from '../auth.abstract';
+import { IUserApp, IUserAppInfo } from 'src/modules/user/app/user.interface';
 
 @Injectable()
-export class AuthAppService extends AbAuthService{
+export class AuthAppService extends AbAuthService {
   private readonly SERVICE_NAME = 'AuthAppService';
 
   constructor(
@@ -114,6 +115,23 @@ export class AuthAppService extends AbAuthService{
     return result;
   }
 
+  async update(dto: UpdateUserDto, userPhone: string, userCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/update`;
+
+    const user = await this.userAppService.findByPhone(userPhone);
+
+    // tài khoản của sđt không tồn tại -> không thể update
+    if (!user) {
+      this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneNotExist}`);
+      throw new BadRequestException(Msg.PhoneNotExist);
+    }
+
+    const result = await this.userAppService.update(dto.userName, userPhone, userCode);
+    this.logger.log(logbase, `${userPhone} -> ${result ? Msg.UpdateOk : Msg.UpdateErr}`);
+
+    return result;
+  }
+
   async updatePassword(dto: UpdatePasswordDto, userPhone: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/updatePassword`;
     const user = await this.userAppService.findByPhone(userPhone);
@@ -166,9 +184,13 @@ export class AuthAppService extends AbAuthService{
     // lỗi -> số điện thoại đã tồn tại
     if (phone) {
       this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneExist}`);
-      return 0
+      return 0;
     }
     return 1;
+  }
+
+  async getInfo(userCode: string): Promise<IUserAppInfo | null> {
+    return await this.userAppService.getDetail(userCode);
   }
 
   async requestOtp(dto: RequestOtpDto): Promise<string> {

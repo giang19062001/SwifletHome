@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -20,7 +20,6 @@ import { DoctorAdminModule } from './modules/doctor/admin/doctor.module';
 import { LoggerModule } from './common/logger/logger.module';
 import { AuthAppModule } from './modules/auth/app/auth.module';
 import { OtpAppModule } from './modules/otp/otp.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { UserAppModule } from './modules/user/app/user.module';
 import { UserPaymentModule } from './modules/userPayment/user.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
@@ -31,6 +30,8 @@ import { ObjectAdminModule } from './modules/object/admin/object.module';
 import { ScreenAdminModule } from './modules/screen/admin/screen.module';
 import { InfoAdminModule } from './modules/info/admin/info.module';
 import { PackageAdminModule } from './modules/package/admin/package.module';
+import { IpMiddleware } from './middleware/ip';
+import { CormModule } from './common/corn/corn.module';
 
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { PackageAdminModule } from './modules/package/admin/package.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ScheduleModule.forRoot(),
+    CormModule,
     DatabaseModule,
     LoggerModule,
     CodeModule,
@@ -75,4 +76,10 @@ import { PackageAdminModule } from './modules/package/admin/package.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(IpMiddleware)
+      .forRoutes('*'); // Áp dụng cho tất cả routes
+  }
+}

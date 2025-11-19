@@ -1,4 +1,6 @@
-export interface IUserPayment {
+import { IPackage } from "../package/package.interface";
+
+export interface IUserAppPayment extends IPackage {
   seq: number;
   userCode: string;
   packageCode: string;

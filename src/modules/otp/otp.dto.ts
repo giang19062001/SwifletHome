@@ -5,6 +5,12 @@ export enum PurposeEnum {
   REGISTER = 'REGISTER',
   FORGOT_PASSWORD = 'FORGOT_PASSWORD',
 }
+
+export class ResRequestOtpDto {
+  @ApiProperty({ example: '4321' })
+  otpCode: string;
+}
+
 export class RequestOtpDto {
   @ApiProperty({
     example: '0334644324',

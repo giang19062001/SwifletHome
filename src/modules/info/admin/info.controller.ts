@@ -8,13 +8,13 @@ import { IInfo } from '../info.interface';
 import { UpdateInfoDto } from './info.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
-@ApiBearerAuth('admin-auth')
+@ApiBearerAuth('admin-auth')  
+@ApiTags('admin/info')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/info')
 export class InfoAdminController {
   constructor(private readonly infoAdminService: InfoAdminService) {}
 
-  @ApiTags('admin/info')
   @ApiBody({
     type: PagingDto,
   })
@@ -25,7 +25,6 @@ export class InfoAdminController {
     return result;
   }
 
-  @ApiTags('admin/info')
   @ApiParam({ name: 'infoKeyword', type: String })
   @Get('getDetail/:infoKeyword')
   @HttpCode(HttpStatus.OK)
@@ -37,7 +36,8 @@ export class InfoAdminController {
     return result;
   }
 
-  // API với body động -> ko thể generate swagger
+  @ApiBody({ type: UpdateInfoDto })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(AnyFilesInterceptor())
   @Put('update/:keyword')
   async update(

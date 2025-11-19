@@ -3,13 +3,17 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 
 
 // log ghi trong file
-const customFormat = format.printf(({ timestamp, level, message, context, stack }) => {
+const customFormat = format.printf(({ timestamp, level, message, context, stack, ip }) => {
   const logEntry: any = {
     level,
     timestamp,
     caller: message,
     context
   };
+
+  if (ip) {
+    logEntry.ip = ip;
+  }
 
   if (stack) {
     logEntry.stack = stack;
@@ -32,7 +36,7 @@ export const winstonConfig = {
       format: format.combine(
         format.colorize(),
         format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        format.printf(({ timestamp, level, message, context, stack }) => {
+        format.printf(({ timestamp, level, message, context, stack, ip }) => {
           let contextStr = '';
 
           if (context) {
@@ -43,7 +47,8 @@ export const winstonConfig = {
             }
           }
 
-          return `${level}: [${timestamp}]-[${message}]:\t${stack ? `${stack}` : `${contextStr}`}`;
+          const ipStr = ip ? `[IP: ${ip}]` : '';
+          return `${level}: [${timestamp}]${ipStr}-[${message}]:\t${stack ? `${stack}` : `${contextStr}`}`;
         }),
       ),
     }),
@@ -66,5 +71,4 @@ export const winstonConfig = {
   
   // Thêm exitOnError false để tránh crash app khi có lỗi ghi log
   exitOnError: false,
-  
 };

@@ -1,13 +1,17 @@
+import { ApiAppResponse } from './../../../interfaces/app';
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto } from './auth.dto';
+import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { AuthAppService } from './auth.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
-import { RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
+import { RequestOtpDto, ResRequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { Msg } from 'src/helpers/message';
 import { ApiAuthAppGuard } from './auth.guard';
-import { IUserAuthApp } from './auth.interface';
+import { GetUserApp } from 'src/decorator/auth';
+import * as userInterface from 'src/modules/user/app/user.interface';
+import { ApiAppResponseDto } from 'src/dto/app';
+import { ResUserAppInfoDto, ResUserAuthAppDto } from 'src/modules/user/app/user.dto';
 
 @ApiBearerAuth('app-auth')
 @ApiTags('app/auth')
@@ -21,7 +25,8 @@ export class AuthAppController {
   })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: LoginAppDto){
+  @ApiOkResponse({ type: ApiAppResponseDto(ResUserAuthAppDto) })
+  async login(@Body() dto: LoginAppDto) {
     const user = await this.authAppService.login(dto);
     return user;
   }
@@ -30,6 +35,7 @@ export class AuthAppController {
   })
   @Post('register')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async register(@Body() dto: RegisterAppDto) {
     const result = await this.authAppService.register(dto);
     return {
@@ -38,20 +44,50 @@ export class AuthAppController {
     };
   }
 
+  @Get('getInfo')
+  @UseGuards(ApiAuthAppGuard)
+  @ApiOperation({
+    summary: 'Cần xác thực',
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ResUserAppInfoDto) })
+  async getInfo(@GetUserApp() user: userInterface.IUserAppInfo): Promise<userInterface.IUserAppInfo | null> {
+    const result = await this.authAppService.getInfo(user.userCode);
+    return result;
+  }
+
+  @ApiParam({ name: 'userPhone', type: String })
+  @ApiBody({ type: UpdateUserDto })
+  @Put('update/:userPhone')
+  @UseGuards(ApiAuthAppGuard)
+  @ApiOperation({
+    summary: 'Cần xác thực',
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  async update(@GetUserApp() user: userInterface.IUserApp, @Body() dto: UpdateUserDto, @Param('userPhone') userPhone: string, @Req() req: Request) {
+    const result = await this.authAppService.update(dto, userPhone, user.userCode);
+    return {
+      message: result ? Msg.UpdateOk : Msg.UpdateErr,
+      data: result,
+    };
+  }
+
   @ApiParam({ name: 'userPhone', type: String })
   @ApiBody({ type: UpdateDeviceTokenDto })
   @Put('updateDeviceToken/:userPhone')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async updateDeviceToken(@Body() dto: UpdateDeviceTokenDto, @Param('userPhone') userPhone: string) {
     const result = await this.authAppService.updateDeviceToken(dto, userPhone);
-    return {data: result};
+    return { data: result };
   }
-
 
   @ApiParam({ name: 'userPhone', type: String })
   @ApiBody({ type: UpdatePasswordDto })
   @Put('updatePassword/:userPhone')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async updatePassword(@Body() dto: UpdatePasswordDto, @Param('userPhone') userPhone: string) {
     const result = await this.authAppService.updatePassword(dto, userPhone);
     return {
@@ -61,16 +97,17 @@ export class AuthAppController {
   }
 
   @ApiParam({ name: 'userPhone', type: String })
-   @ApiOperation({
+  @ApiOperation({
     summary: 'Nên kiểm tra SĐT đã tồn tại hay chưa trước khi đăng ký',
   })
   @Get('checkDuplicatePhone/:userPhone')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async checkDuplicatePhone(@Param('userPhone') userPhone: string) {
     const result = await this.authAppService.checkDuplicatePhone(userPhone);
     return {
       message: !result ? Msg.PhoneExist : Msg.PhoneOk,
-      data: result
+      data: result,
     };
   }
 
@@ -80,6 +117,7 @@ export class AuthAppController {
   })
   @Post('requestOtp')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ResRequestOtpDto) })
   async requestOtp(@Body() dto: RequestOtpDto) {
     const otpCode = await this.authAppService.requestOtp(dto);
     return {
@@ -94,13 +132,14 @@ export class AuthAppController {
   })
   @Post('verifyOtp')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async verifyOtp(@Body() dto: VerifyOtpDto) {
     const isValid = await this.authAppService.verifyOtp(dto);
 
     return {
       success: isValid,
       message: isValid ? Msg.OtpValid : Msg.OtpInvalid,
-      data: isValid ? 1 : 0
+      data: isValid ? 1 : 0,
     };
   }
 }
