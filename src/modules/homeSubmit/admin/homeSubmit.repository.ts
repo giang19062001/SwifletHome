@@ -18,7 +18,7 @@ export class HomeSubmitAdminRepository {
     let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
         B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
         FROM ${this.table} A 
-        LEFT JOIN tbl_home B
+        LEFT JOIN tbl_home_sale B
         ON A.homeCode = B.homeCode
         LEFT JOIN tbl_code_common C
         ON A.numberAttendCode = C.code
@@ -40,7 +40,7 @@ export class HomeSubmitAdminRepository {
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
         B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
         FROM ${this.table} A 
-        LEFT JOIN tbl_home B
+        LEFT JOIN tbl_home_sale B
         ON A.homeCode = B.homeCode
         LEFT JOIN tbl_code_common C
         ON A.numberAttendCode = C.code

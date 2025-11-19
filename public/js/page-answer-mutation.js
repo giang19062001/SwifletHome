@@ -147,7 +147,7 @@ async function createAnswer() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Thêm thành công');
-        reloadPage('/dashboard/qa/answer');
+        reloadPage('/dashboard/q-and-a/answer');
       })
       .catch(function (error) {
         console.log('error', error);
@@ -192,7 +192,7 @@ async function updateAnswer() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Chỉnh sửa thành công');
-        reloadPage('/dashboard/qa/answer');
+        reloadPage('/dashboard/q-and-a/answer');
       })
       .catch(function (error) {
         console.log('error', error);

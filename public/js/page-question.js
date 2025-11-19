@@ -36,7 +36,7 @@ function toggleAnswerDetailLink(modalBody) {
   const selected = answerSelect.options[answerSelect.selectedIndex];
   const code = selected.getAttribute('data-answer-code');
   if (code) {
-    answerDetailLink.href = `/dashboard/qa/answer/update/${code}`;
+    answerDetailLink.href = `/dashboard/q-and-a/answer/update/${code}`;
     answerDetailLink.style.display = 'inline-block';
   } else {
     answerDetailLink.style.display = 'none';

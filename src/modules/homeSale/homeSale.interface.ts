@@ -1,4 +1,4 @@
-export interface IHome {
+export interface IHomeSale {
   seq: number;
   homeCode: string;
   homeName: string;
@@ -11,11 +11,11 @@ export interface IHome {
   updatedAt: Date;
   createdId: string;
   updatedId: string;
-  homeImage: string | IHomeImg;
-  homeImages: IHomeImg[]
+  homeImage: string | IHomeSaleImg;
+  homeImages: IHomeSaleImg[]
 }
 
-export interface IHomeImg {
+export interface IHomeSaleImg {
   seq: number;
   homeSeq: number;
   filename: string;

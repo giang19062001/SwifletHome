@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
 import { IAnswer } from './modules/answer/answer.interface';
-import { HomeAdminService } from './modules/home/admin/home.service';
+import { HomeSaleAdminService } from './modules/homeSale/admin/homeSale.service';
 import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
 import { ObjectAdminService } from './modules/object/admin/object.service';
@@ -12,7 +12,7 @@ export class AppService {
   constructor(
     private readonly answerAdminService: AnswerAdminService,
     private readonly catetegoryAdminService: CategoryAdminService,
-    private readonly homeAdminService: HomeAdminService,
+    private readonly homeAdminService: HomeSaleAdminService,
     private readonly blogAdminService: BlogAdminService,
     private readonly objectAdminService: ObjectAdminService,
     private readonly screenAdminService: ScreenAdminService,

@@ -1,14 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin';
-import { IHome, IHomeImg } from '../home.interface';
-import { CreateHomeDto, UpdateHomeDto } from './home.dto';
+import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
+import { CreateHomeDto, UpdateHomeDto } from './homeSale.dto';
 import { generateCode } from 'src/helpers/func';
 import { AbAdminRepo } from 'src/abstract/admin.repository';
 
 @Injectable()
-export class HomeAdminRepository extends AbAdminRepo {
-  private readonly table = 'tbl_home';
+export class HomeSaleAdminRepository extends AbAdminRepo {
+  private readonly table = 'tbl_home_sale';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
     super();
@@ -18,7 +18,7 @@ export class HomeAdminRepository extends AbAdminRepo {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<IHome[]> {
+  async getAll(dto: PagingDto): Promise<IHomeSale[]> {
     let query = `   SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A  
         WHERE A.isActive = 'Y' `;
@@ -30,9 +30,9 @@ export class HomeAdminRepository extends AbAdminRepo {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IHome[];
+    return rows as IHomeSale[];
   }
-  async getDetail(homeCode: string): Promise<IHome | null> {
+  async getDetail(homeCode: string): Promise<IHomeSale | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive
           FROM ${this.table} A 
@@ -40,7 +40,7 @@ export class HomeAdminRepository extends AbAdminRepo {
           LIMIT 1 `,
       [homeCode],
     );
-    return rows ? (rows[0] as IHome) : null;
+    return rows ? (rows[0] as IHomeSale) : null;
   }
   async create(dto: CreateHomeDto): Promise<number> {
     const sqlLast = ` SELECT homeCode FROM ${this.table} ORDER BY homeCode DESC LIMIT 1`;
@@ -92,18 +92,18 @@ export class HomeAdminRepository extends AbAdminRepo {
     return result.affectedRows;
   }
   // images
-  async getImages(seq: number): Promise<IHomeImg[]> {
+  async getImages(seq: number): Promise<IHomeSaleImg[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive
-          FROM tbl_home_img A 
+          FROM tbl_home_sale_img A 
           WHERE A.homeSeq = ? `,
       [seq],
     );
-    return rows as IHomeImg[];
+    return rows as IHomeSaleImg[];
   }
-  async createImages(seq: number, createdId: string, file: Express.Multer.File | IHomeImg): Promise<number> {
+  async createImages(seq: number, createdId: string, file: Express.Multer.File | IHomeSaleImg): Promise<number> {
     const sql = `
-      INSERT INTO tbl_home_img (filename, originalname, size, mimetype, homeSeq, createdId)
+      INSERT INTO tbl_home_sale_img (filename, originalname, size, mimetype, homeSeq, createdId)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
@@ -114,7 +114,7 @@ export class HomeAdminRepository extends AbAdminRepo {
 
   async deleteHomeImages(seq: number): Promise<number> {
     const sql = `
-      DELETE FROM  tbl_home_img
+      DELETE FROM  tbl_home_sale_img
       WHERE homeSeq = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
@@ -123,7 +123,7 @@ export class HomeAdminRepository extends AbAdminRepo {
   }
   async deleteHomeImagesOne(seq: number): Promise<number> {
     const sql = `
-      DELETE FROM  tbl_home_img
+      DELETE FROM  tbl_home_sale_img
       WHERE seq = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
@@ -133,7 +133,7 @@ export class HomeAdminRepository extends AbAdminRepo {
   async deleteHomeImagesMulti(seqList: number[]): Promise<number> {
     const placeholders = seqList.map(() => '?').join(', ');
     const sql = `
-    DELETE FROM tbl_home_img
+    DELETE FROM tbl_home_sale_img
     WHERE seq IN (${placeholders})
   `;
 

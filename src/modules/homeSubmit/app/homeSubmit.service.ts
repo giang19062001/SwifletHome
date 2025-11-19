@@ -3,14 +3,14 @@ import { HomeSubmitAppRepository } from './homeSubmit.repository';
 import { CreateHomeSubmitDto } from './homeSubmit.dto';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { Msg } from 'src/helpers/message';
-import { HomeAppService } from 'src/modules/home/app/home.service';
+import { HomeSaleAppService } from 'src/modules/homeSale/app/homeSale.service';
 import { CodeService } from 'src/modules/code/code.service';
 
 @Injectable()
 export class HomeSubmitAppService {
   constructor(
     private readonly homeSubmitAppRepository: HomeSubmitAppRepository,
-    private readonly homeAppService: HomeAppService,
+    private readonly homeAppService: HomeSaleAppService,
     private readonly codeService: CodeService,
   ) {}
   async create(dto: CreateHomeSubmitDto, userCode: string): Promise<number> {

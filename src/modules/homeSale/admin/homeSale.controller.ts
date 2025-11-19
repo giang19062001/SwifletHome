@@ -23,9 +23,9 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/
 import { PagingDto } from 'src/dto/admin';
 import { IList } from 'src/interfaces/admin';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { HomeAdminService } from './home.service';
-import { IHome } from '../home.interface';
-import { CreateHomeDto, UpdateHomeDto } from './home.dto';
+import { HomeSaleAdminService } from './homeSale.service';
+import { IHomeSale } from '../homeSale.interface';
+import { CreateHomeDto, UpdateHomeDto } from './homeSale.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer';
 
@@ -33,15 +33,15 @@ import { multerImgConfig } from 'src/config/multer';
 @ApiTags('admin/home')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/home')
-export class HomeAdminController {
-  constructor(private readonly homeAdminService: HomeAdminService) {}
+export class HomeSaleAdminController {
+  constructor(private readonly homeAdminService: HomeSaleAdminService) {}
 
   @ApiBody({
     type: PagingDto,
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<IList<IHome>> {
+  async getAll(@Body() dto: PagingDto): Promise<IList<IHomeSale>> {
     const result = await this.homeAdminService.getAll(dto);
     return result;
   }
@@ -49,7 +49,7 @@ export class HomeAdminController {
   @ApiParam({ name: 'homeCode', type: String })
   @Get('getDetail/:homeCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('homeCode') homeCode: string): Promise<IHome | null> {
+  async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
     const result = await this.homeAdminService.getDetail(homeCode);
     if (!result) {
       throw new BadRequestException();

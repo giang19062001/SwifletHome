@@ -3,10 +3,10 @@ import { HomeSubmitAppRepository } from './homeSubmit.repository';
 import { HomeSubmitAppService } from './homeSubmit.service';
 import { HomeSubmitAppController } from './homeSubmit.controller';
 import { AuthAppModule } from 'src/modules/auth/app/auth.module';
-import { HomeAppModule } from 'src/modules/home/app/home.module';
+import { HomeSaleAppModule } from 'src/modules/homeSale/app/homeSale.module';
 
 @Module({
-  imports: [AuthAppModule, HomeAppModule],
+  imports: [AuthAppModule, HomeSaleAppModule],
   controllers: [HomeSubmitAppController],
   providers: [HomeSubmitAppService, HomeSubmitAppRepository],
 })

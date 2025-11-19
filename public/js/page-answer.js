@@ -12,10 +12,10 @@ function changePage(p) {
   getAllAnswer(page, limit);
 }
 function gotoAnswerCreate() {
-  gotoPage('/dashboard/qa/answer/create');
+  gotoPage('/dashboard/q-and-a/answer/create');
 }
 function gotoAnswerUpdate(answerCode) {
-  gotoPage('/dashboard/qa/answer/update/' + answerCode);
+  gotoPage('/dashboard/q-and-a/answer/update/' + answerCode);
 }
 // RENDER
 const renderAllAnswer = (data, objElement) => {

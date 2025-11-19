@@ -133,7 +133,7 @@ CREATE TABLE `tbl_uploads_video` (
 );
 
 -- nhà yến SCT
-CREATE TABLE `tbl_home` (
+CREATE TABLE `tbl_home_sale` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeCode` varchar(45) NOT NULL,
   `homeName` varchar(255) NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE `tbl_home` (
   UNIQUE KEY `homeImage_UNIQUE` (`homeImage`)
 );
 
-CREATE TABLE `tbl_home_img` (
+CREATE TABLE `tbl_home_sale_img` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeSeq` int NOT NULL,
   `filename` varchar(255) NOT NULL,

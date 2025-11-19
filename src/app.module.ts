@@ -9,8 +9,8 @@ import { UploadAdminModule } from './modules/upload/upload.module';
 import { AuthAdminModule } from './modules/auth/admin/auth.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { QuestionAppModule } from './modules/question/app/question.module';
-import { HomeAdminModule } from './modules/home/admin/home.module';
-import { HomeAppModule } from './modules/home/app/home.module';
+import { HomeSaleAdminModule } from './modules/homeSale/admin/homeSale.module';
+import { HomeSaleAppModule } from './modules/homeSale/app/homeSale.module';
 import { HomeSubmitAppModule } from './modules/homeSubmit/app/homeSubmit.module';
 import { HomeSubmitAdminModule } from './modules/homeSubmit/admin/homeSubmit.module';
 import { BlogAdminModule } from './modules/blog/admin/blog.module';
@@ -30,6 +30,7 @@ import { ScreenAppModule } from './modules/screen/app/screen.module';
 import { ObjectAdminModule } from './modules/object/admin/object.module';
 import { ScreenAdminModule } from './modules/screen/admin/screen.module';
 import { InfoAdminModule } from './modules/info/admin/info.module';
+import { PackageAdminModule } from './modules/package/admin/package.module';
 
 @Module({
   imports: [
@@ -50,7 +51,7 @@ import { InfoAdminModule } from './modules/info/admin/info.module';
     QuestionAppModule,
     AnswerAppModule,
     DoctorAppModule,
-    HomeAppModule,
+    HomeSaleAppModule,
     HomeSubmitAppModule,
     ScreenAppModule,
     InfoAppModule,
@@ -63,12 +64,13 @@ import { InfoAdminModule } from './modules/info/admin/info.module';
     QuestionAdminModule,
     AnswerAdminModule,
     UploadAdminModule,
-    HomeAdminModule,
+    HomeSaleAdminModule,
     HomeSubmitAdminModule,
     BlogAdminModule,
     DoctorAdminModule,
     ScreenAdminModule,
-    InfoAdminModule
+    InfoAdminModule,
+    PackageAdminModule
   ],
   controllers: [AppController],
   providers: [AppService],

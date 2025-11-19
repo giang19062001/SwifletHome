@@ -1,35 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin';
 import { IList } from 'src/interfaces/admin';
-import { IHome, IHomeImg } from '../home.interface';
-import { HomeAdminRepository } from './home.repository';
-import { CreateHomeDto, UpdateHomeDto } from './home.dto';
+import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
+import { HomeSaleAdminRepository } from './homeSale.repository';
+import { CreateHomeDto, UpdateHomeDto } from './homeSale.dto';
 import { diffByTwoArr } from 'src/helpers/func';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { AbAdminService } from 'src/abstract/admin.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()
-export class HomeAdminService extends AbAdminService{
-  private readonly SERVICE_NAME = "HomeAdminService"
+export class HomeSaleAdminService extends AbAdminService{
+  private readonly SERVICE_NAME = "HomeSaleAdminService"
   constructor(
-    private readonly homeAdminRepository: HomeAdminRepository,
+    private readonly homeAdminRepository: HomeSaleAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {
     super();
   }
-  async getAll(dto: PagingDto): Promise<IList<IHome>> {
+  async getAll(dto: PagingDto): Promise<IList<IHomeSale>> {
     const total = await this.homeAdminRepository.getTotal();
     const list = await this.homeAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(homeCode: string): Promise<IHome | null> {
+  async getDetail(homeCode: string): Promise<IHomeSale | null> {
     let result = await this.homeAdminRepository.getDetail(homeCode);
     if (result) {
       let homeImages = await this.homeAdminRepository.getImages(result ? result?.seq : 0);
       // remove main img
-      let homeImagesExceptMain: IHomeImg[] = [];
+      let homeImagesExceptMain: IHomeSaleImg[] = [];
       for (const img of homeImages) {
         if (img.filename == result.homeImage) {
           result.homeImage = img;
@@ -66,22 +66,22 @@ export class HomeAdminService extends AbAdminService{
     const home = await this.getDetail(homeCode);
     if (home) {
       // homeImage is changed -> delete old file
-      if (dto.homeImage.filename !== (home.homeImage as IHomeImg).filename) {
+      if (dto.homeImage.filename !== (home.homeImage as IHomeSaleImg).filename) {
         // delete old physical file
-        const homeImagePath = `/images/homes/${(home.homeImage as IHomeImg).filename}`;
+        const homeImagePath = `/images/homes/${(home.homeImage as IHomeSaleImg).filename}`;
         await this.fileLocalService.deleteLocalFile(homeImagePath);
 
         // delete old db file
-        await this.homeAdminRepository.deleteHomeImagesOne((home.homeImage as IHomeImg).seq);
+        await this.homeAdminRepository.deleteHomeImagesOne((home.homeImage as IHomeSaleImg).seq);
 
         //insert new homeImage
         await this.homeAdminRepository.createImages(home.seq, 'admin', dto.homeImage);
       }
 
-      const fileNeedDeletes: IHomeImg[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
+      const fileNeedDeletes: IHomeSaleImg[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
       this.logger.log(logbase, `fileNeedDeletes --> ${JSON.stringify(fileNeedDeletes)}`);
 
-      const fileNeedCreates: IHomeImg[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
+      const fileNeedCreates: IHomeSaleImg[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
       this.logger.log(logbase, `fileNeedCreates --> ${JSON.stringify(fileNeedCreates)}`);
 
       // homeImages is changed -> delete old file

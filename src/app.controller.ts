@@ -29,7 +29,7 @@ export class AppController {
     };
   }
 
-  // config
+  // config/screen
   @Get('/dashboard/config/screen')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/screen')
@@ -58,7 +58,7 @@ export class AppController {
     }
   }
 
-  // info
+  // config/info
   @Get('/dashboard/config/info')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/info')
@@ -69,8 +69,8 @@ export class AppController {
       user: req.session.user,
     };
   }
-  // question
-  @Get('/dashboard/qa/question')
+  // q-and-a/question
+  @Get('/dashboard/q-and-a/question')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/question')
   renderQuestion(@Req() req: Request) {
@@ -81,8 +81,8 @@ export class AppController {
     };
   }
 
-  // answer
-  @Get('/dashboard/qa/answer')
+  // q-and-a/answer
+  @Get('/dashboard/q-and-a/answer')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer')
   renderAnswer(@Req() req: Request) {
@@ -92,7 +92,7 @@ export class AppController {
       user: req.session.user,
     };
   }
-  @Get('/dashboard/qa/answer/create')
+  @Get('/dashboard/q-and-a/answer/create')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer-create')
   async renderAnswerCreate(@Req() req: Request) {
@@ -105,7 +105,7 @@ export class AppController {
     };
   }
 
-  @Get('/dashboard/qa/answer/update/:id')
+  @Get('/dashboard/q-and-a/answer/update/:id')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/answer-update')
   async renderAnswerUpdate(@Req() req: Request) {
@@ -117,7 +117,19 @@ export class AppController {
       values: values,
     };
   }
-  // category
+
+    // catalog/package
+  @Get('/dashboard/catalog/package')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/package')
+  renderPackage(@Req() req: Request) {
+    return {
+      title: 'Danh sách gói trả phí',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+  // catalog/category
   @Get('/dashboard/catalog/category')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/category')
@@ -129,7 +141,7 @@ export class AppController {
     };
   }
 
-  // object
+  // catalog/object
   @Get('/dashboard/catalog/object')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/object')
@@ -189,7 +201,7 @@ export class AppController {
     };
   }
 
-  //home
+  //home/sale
   @Get('/dashboard/home/sale')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home')
@@ -221,6 +233,7 @@ export class AppController {
     };
   }
 
+  // home/submit
   @Get('/dashboard/home/submit')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-submit')

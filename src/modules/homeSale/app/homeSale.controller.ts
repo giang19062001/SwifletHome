@@ -21,8 +21,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin';
-import { IHome } from '../home.interface';
-import { HomeAppService } from './home.service';
+import { IHomeSale } from '../homeSale.interface';
+import { HomeSaleAppService } from './homeSale.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { IListApp } from 'src/interfaces/app';
@@ -32,15 +32,15 @@ import { IListApp } from 'src/interfaces/app';
 @ApiBearerAuth('app-auth')
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
-export class HomeAppController {
-  constructor(private readonly homeAppService: HomeAppService) {}
+export class HomeSaleAppController {
+  constructor(private readonly homeAppService: HomeSaleAppService) {}
 
   @ApiBody({
     type: PagingDto,
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<IListApp<IHome>> {
+  async getAll(@Body() dto: PagingDto): Promise<IListApp<IHomeSale>> {
     const result = await this.homeAppService.getAll(dto);
     return result;
   }
@@ -48,7 +48,7 @@ export class HomeAppController {
   @ApiParam({ name: 'homeCode', type: String })
   @Get('getDetail/:homeCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('homeCode') homeCode: string): Promise<IHome | null> {
+  async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
     const result = await this.homeAppService.getDetail(homeCode);
       if (!result) {
       throw new BadRequestException();
