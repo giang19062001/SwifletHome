@@ -65,6 +65,9 @@ async function showHomeSubmitModal(homeData) {
 
   // show modal
   const modal = new bootstrap.Modal(modalEl);
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    closeHomeSubmitModal();
+  });
   modal.show();
 }
 

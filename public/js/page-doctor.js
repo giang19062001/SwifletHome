@@ -16,7 +16,6 @@ function changePage(p) {
   getAllDoctor(page, limit);
 }
 
-// TODO: RENDER
 function closeDoctorModal(type) {
   // Xác định modal theo loại
   const modalSelector = type === 'create' ? '.doctor-create-modal' : '.doctor-update-modal';
@@ -24,9 +23,14 @@ function closeDoctorModal(type) {
 
   if (!modalEl) return;
 
+  // xóa lỗi input
+  const modalBody = modalEl.querySelector('.modal-body');
+  modalBody.querySelector('.err-noteAnswered').style.display = 'none';
+
   // đóng modal boostrap
   closeModal(modalEl);
 }
+// TODO: RENDER
 async function showDoctorModal(doctorData) {
   // init modal
   const modalSelector = '.doctor-update-modal';
@@ -105,6 +109,9 @@ async function showDoctorModal(doctorData) {
 
   // show modal
   const modal = new bootstrap.Modal(modalEl);
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    closeDoctorModal()
+  });
   modal.show();
 }
 function renderAllDoctor(data, objElement) {

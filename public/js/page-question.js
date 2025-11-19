@@ -91,6 +91,9 @@ async function showQuestionModal(type, questionData) {
 
   // MỞ MODAL
   const modal = new bootstrap.Modal(modalEl);
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    closeQuestionModal();
+  });
   modal.show();
 
   //   render answer

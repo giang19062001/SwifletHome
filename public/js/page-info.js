@@ -99,7 +99,7 @@ function mapContentFileds(infoKeyword, infoName, infoDescription, data) {
         bankName: data.bankName ?? '',
         bankBranch: data.bankBranch ?? '',
         accountName: data.accountName ?? '',
-        accountNumber: data.accountNumber?? '',
+        accountNumber: data.accountNumber ?? '',
         paymentContent: data.paymentContent ?? '',
         qrcode: data.qrcode ?? '',
       };
@@ -149,7 +149,6 @@ function getDataForm(modalBody) {
   return formData;
 }
 
-// TODO: RENDER
 function closeInfoModal(type) {
   // Xác định modal theo loại
   const modalSelector = type === 'create' ? '.info-create-modal' : '.info-update-modal';
@@ -160,6 +159,8 @@ function closeInfoModal(type) {
   // đóng modal boostrap
   closeModal(modalEl);
 }
+
+// TODO: RENDER
 async function showInfoModal(type, infoData) {
   const modalSelector = type === 'create' ? '.info-create-modal' : '.info-update-modal';
   const modalEl = document.querySelector(modalSelector);
@@ -243,6 +244,9 @@ async function showInfoModal(type, infoData) {
 
   // MỞ MODAL
   const modal = new bootstrap.Modal(modalEl);
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    closeInfoModal();
+  });
   modal.show();
 
   // Gắn sự kiện submit
