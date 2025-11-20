@@ -2,18 +2,15 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IScreen } from '../screen.interface';
 import { IPaging, IList } from 'src/interfaces/admin';
-import { AbAdminRepo } from 'src/abstract/admin.repository';
 import { PagingDto } from 'src/dto/admin';
 import { UpdateScreenDto } from './screen.dto';
 
 @Injectable()
-export class ScreenAdminRepository extends AbAdminRepo {
+export class ScreenAdminRepository {
   private readonly table = 'tbl_screen_config';
   private readonly updator = 'SYSTEM';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-    super();
-  }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
@@ -43,9 +40,7 @@ export class ScreenAdminRepository extends AbAdminRepo {
     );
     return rows ? (rows[0] as IScreen) : null;
   }
-  create(dto: any): Promise<number> {
-    throw new Error('Method not implemented.');
-  }
+
   async update(dto: UpdateScreenDto, screenKeyword: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET screenName = ?, screenDescription = ?, screenContent = ?, updatedId = ?, updatedAt = ?
@@ -54,8 +49,5 @@ export class ScreenAdminRepository extends AbAdminRepo {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.screenName, dto.screenDescription, dto.screenContent, dto.updatedId, new Date(), screenKeyword]);
 
     return result.affectedRows;
-  }
-  delete(dto: string | number): Promise<number> {
-    throw new Error('Method not implemented.');
   }
 }

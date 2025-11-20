@@ -199,7 +199,7 @@ ALTER TABLE tbl_home_sale ENGINE=InnoDB;
 ALTER TABLE tbl_home_sale_img ENGINE=InnoDB;
 ALTER TABLE tbl_home_sale_submit ENGINE=InnoDB;
 
-
+-- khám bệnh nhà yến
 CREATE TABLE `tbl_doctor_file` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `doctorSeq` int DEFAULT NULL,
@@ -236,6 +236,7 @@ CREATE TABLE `tbl_doctor` (
   UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
 );
 
+-- mã code dùng chung
 CREATE TABLE `tbl_code_common` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `code` varchar(15) NOT NULL,
@@ -254,6 +255,7 @@ CREATE TABLE `tbl_code_common` (
   UNIQUE KEY `code_UNIQUE` (`code`)
 ); 
 
+-- khách hàng
 CREATE TABLE `tbl_otp` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `userPhone` varchar(15) NOT NULL,
@@ -310,11 +312,8 @@ CREATE TABLE `tbl_user_payment_history` (
   `packageCode` varchar(45) DEFAULT NULL,
   `startDate` datetime DEFAULT NULL,
   `endDate` datetime DEFAULT NULL,
-  `isActive` char(1) NOT NULL DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` datetime DEFAULT NULL,
   `createdId` varchar(45) DEFAULT 'SYSTEM',
-  `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
   CONSTRAINT `fk_user_payment_history_user`
     FOREIGN KEY (`userCode`) REFERENCES `tbl_user_app` (`userCode`)

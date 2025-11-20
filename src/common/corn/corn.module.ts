@@ -10,4 +10,4 @@ import { DoctorAdminModule } from 'src/modules/doctor/admin/doctor.module';
   providers: [CornService],
   exports: [],
 })
-export class CormModule {}
+export class CornModule {}

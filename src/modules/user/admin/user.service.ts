@@ -5,6 +5,8 @@ import { IUserAdmin } from './user.interface';
 import { IList } from 'src/interfaces/admin';
 import { IUserAppInfo } from '../app/user.interface';
 import { GetAllUserDto } from './user.dto';
+import { UserPaymentAdminService } from 'src/modules/userPayment/admin/userPayment.service';
+import { UpdateUserPaymentAdminDto } from 'src/modules/userPayment/admin/userPayment.dto';
 
 @Injectable()
 export class UserAdminService {
@@ -12,6 +14,7 @@ export class UserAdminService {
 
   constructor(
     private readonly userAdminRepository: UserAdminRepository,
+    private readonly userPaymentAdminService: UserPaymentAdminService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -39,5 +42,9 @@ export class UserAdminService {
       // admin
       return null;
     }
+  }
+
+  async updatePackage(dto: UpdateUserPaymentAdminDto, userCode: string): Promise<number> {
+    return await this.userPaymentAdminService.update(dto, userCode);
   }
 }

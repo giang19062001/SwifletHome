@@ -1,21 +1,22 @@
 import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Msg } from 'src/helpers/message';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { UserPaymentRepository } from './userPayment.repository';
-import { CreateUserPaymentDto } from './userPayment.dto';
+import { UserPaymentAppRepository } from './userPayment.repository';
+import { CreateUserPaymentAppDto } from './userPayment.dto';
+import moment from 'moment';
 
 @Injectable()
-export class UserPaymentService {
-  private readonly SERVICE_NAME = 'UserPaymentService';
+export class UserPaymentAppService {
+  private readonly SERVICE_NAME = 'UserPaymentAppService';
 
   constructor(
-    private readonly userPaymentRepository: UserPaymentRepository,
+    private readonly userPaymentAppRepository: UserPaymentAppRepository,
     private readonly logger: LoggingService,
   ) {}
 
-  async create(dto: CreateUserPaymentDto): Promise<number> {
-    const createdAt = new Date()
-    await this.userPaymentRepository.createHistory(dto, createdAt);
-    return await this.userPaymentRepository.create(dto, createdAt);
+  async create(dto: CreateUserPaymentAppDto): Promise<number> {
+    const createdAt = new Date();
+    await this.userPaymentAppRepository.createHistory(dto, createdAt);
+    return await this.userPaymentAppRepository.create(dto, createdAt);
   }
 }

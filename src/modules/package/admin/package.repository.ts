@@ -29,8 +29,14 @@ export class PackageAdminRepository extends AbAdminRepo {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IPackage[];
   }
-  getDetail(dto: string | number): Promise<any | null> {
-    throw new Error('Method not implemented.');
+  async getDetail(packageCode: string): Promise<IPackage | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT seq, packageCode, packageName, packagePrice, packageExpireDay, packageDescription, isActive, createdAt, updatedAt, createdId, updatedId 
+        FROM ${this.table} 
+        WHERE packageCode = ?`,
+      [packageCode],
+    );
+    return rows ? (rows[0] as IPackage) : null;
   }
   create(dto: any): Promise<number> {
     throw new Error('Method not implemented.');

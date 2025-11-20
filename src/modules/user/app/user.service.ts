@@ -2,8 +2,8 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppRepository } from './user.repository';
 import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
-import { UserPaymentService } from 'src/modules/userPayment/app/userPayment.service';
-import { CreateUserPaymentDto } from 'src/modules/userPayment/app/userPayment.dto';
+import { UserPaymentAppService } from 'src/modules/userPayment/app/userPayment.service';
+import { CreateUserPaymentAppDto } from 'src/modules/userPayment/app/userPayment.dto';
 import { IUserApp, IUserAppInfo } from './user.interface';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class UserAppService {
 
   constructor(
     private readonly userAppRepository: UserAppRepository,
-    private readonly userPaymentService: UserPaymentService,
+    private readonly userPaymentService: UserPaymentAppService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -33,7 +33,7 @@ export class UserAppService {
       if (user) {
         this.logger.log(logbase, 'Thiết lập gói miễn phí cho người dùng đăng kí mới');
         // mặc định user mới sẽ sử dụng gói miễn phí
-        const dto: CreateUserPaymentDto = {
+        const dto: CreateUserPaymentAppDto = {
           userCode: user.userCode,
           packageCode: null,
           endDate: null,

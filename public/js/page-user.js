@@ -72,7 +72,7 @@ async function showUserModal(type, userInfo) {
     if (type === 'create') {
       //
     } else {
-      // updateUser(submitBtn);
+      updateUser(submitBtn);
     }
   };
 }
@@ -90,11 +90,11 @@ function renderAllUser(data, objElement) {
             <td><p>${ele.startDate ? formatDateTime(ele.startDate) : ''}</p></td>
             <td><p>${ele.endDate ? formatDateTime(ele.endDate) : ''}</p></td>
             <td>
-              <p class="txt-not-ok">${ele.startDate && ele.endDate ? moment.utc(ele.endDate).startOf('day').diff(moment.utc(ele.startDate).startOf('day'), 'days') + ' ngày' : ''}</p>
+              <p class="txt-not-ok">${ele.endDate ? moment.utc(ele.endDate).startOf('day').diff(moment.utc().startOf('day'), 'days') + ' ngày' : ''}</p>
             </td>
             <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
-                <button class="btn-main-out" onclick="getDetailUser('${ele.userCode}')">Chỉnh sửa</button> 
+                <button class="btn-main-out" onclick="getDetailUser('${ele.userCode}')">Chi tiết</button> 
             </td> 
          </tr>`;
       HTML += rowHtml;
@@ -179,31 +179,20 @@ async function getDetailUser(userCode) {
 }
 
 async function updateUser(btn) {
-  const modalBody = document.querySelector('.question-update-modal .modal-body form');
+  const modalBody = document.querySelector('.user-update-modal .modal-body form');
 
   try {
-    const questionContent = modalBody.querySelector('#questionContent').value;
-    const questionCategory = modalBody.querySelector('#questionCategory').value;
-    const questionObject = modalBody.querySelector('#questionObject').value;
-    const answerCode = modalBody.querySelector('#answerCode').value;
-    const questionCode = modalBody.querySelector('#questionCode').value;
-
-    if (String(questionContent).trim() == '') {
-      modalBody.querySelector('.err-questionContent').style.display = 'block';
-      return;
-    }
+    const packageCode = modalBody.querySelector('#packageCode').value;
+    const userCode = modalBody.querySelector('#userCode').value;
 
     // disable nút summit
     btn.disabled = true;
 
     await axios
       .put(
-        currentUrl + '/api/admin/question/update/' + questionCode,
+        currentUrl + '/api/admin/user/updatePackage/' + userCode,
         {
-          questionContent: questionContent,
-          questionCategory: questionCategory,
-          questionObject: questionObject,
-          answerCode: answerCode,
+          packageCode: packageCode,
           updatedId: user.userId,
         },
         axiosAuth(),
@@ -213,10 +202,10 @@ async function updateUser(btn) {
         if (response.status === 200 && response.data) {
           toastOk('Chỉnh sửa thành công');
           // đóng modal
-          closeQuestionModal('update');
+          closeUserModal('update');
           // refresh list
           page = 1;
-          getAllQuestion(page, limit);
+          getAllUser(page, limit);
         } else {
           toastErr('Chỉnh sửa thất bại');
         }

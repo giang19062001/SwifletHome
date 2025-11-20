@@ -21,7 +21,7 @@ import { LoggerModule } from './common/logger/logger.module';
 import { AuthAppModule } from './modules/auth/app/auth.module';
 import { OtpAppModule } from './modules/otp/otp.module';
 import { UserAppModule } from './modules/user/app/user.module';
-import { UserPaymentModule } from './modules/userPayment/app/user.module';
+import { UserPaymentAppModule } from './modules/userPayment/app/userPayment.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
 import { InfoAppModule } from './modules/info/app/info.module';
 import { CategoryAdminModule } from './modules/category/admin/category.module';
@@ -31,7 +31,8 @@ import { ScreenAdminModule } from './modules/screen/admin/screen.module';
 import { InfoAdminModule } from './modules/info/admin/info.module';
 import { PackageAdminModule } from './modules/package/admin/package.module';
 import { IpMiddleware } from './middleware/ip';
-import { CormModule } from './common/corn/corn.module';
+import { CornModule } from './common/corn/corn.module';
+import { UserPaymentAdminModule } from './modules/userPayment/admin/userPayment.module';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { CormModule } from './common/corn/corn.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    CormModule,
+    CornModule,
     DatabaseModule,
     LoggerModule,
     CodeModule,
@@ -48,7 +49,7 @@ import { CormModule } from './common/corn/corn.module';
     AuthAppModule,
     OtpAppModule,
     UserAppModule,
-    UserPaymentModule,
+    UserPaymentAppModule,
     QuestionAppModule,
     AnswerAppModule,
     DoctorAppModule,
@@ -71,7 +72,8 @@ import { CormModule } from './common/corn/corn.module';
     DoctorAdminModule,
     ScreenAdminModule,
     InfoAdminModule,
-    PackageAdminModule
+    PackageAdminModule,
+    UserPaymentAdminModule
   ],
   controllers: [AppController],
   providers: [AppService],

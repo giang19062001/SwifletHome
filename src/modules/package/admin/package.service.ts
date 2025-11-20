@@ -15,8 +15,9 @@ export class PackageAdminService extends AbAdminService {
     const list = await this.packageAdminRepository.getAll(dto);
     return { total, list };
   }
-  getDetail(dto: string | number): Promise<any | null> {
-    throw new Error('Method not implemented.');
+  async getDetail(packageCode: string): Promise<IPackage | null> {
+    const result = await this.packageAdminRepository.getDetail(packageCode);
+    return result;
   }
   create(dto: any): Promise<number> {
     throw new Error('Method not implemented.');

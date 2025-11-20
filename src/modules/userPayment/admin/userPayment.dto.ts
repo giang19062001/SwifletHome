@@ -1,14 +1,8 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, Matches, IsOptional, ValidateIf, IsDate } from 'class-validator';
 
-export class CreateUserPaymentAppDto {
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userCode: string;
-
+export class UpdateUserPaymentAdminDto {
   @ApiProperty({
     example: null,
     required: false,
@@ -19,16 +13,9 @@ export class CreateUserPaymentAppDto {
   packageCode: string | null;
 
   @ApiProperty({
-    example: '',
+    example: 'admin',
   })
   @IsString()
   @IsNotEmpty()
-  startDate: string | null;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  endDate: string | null;
+  updatedId: string;
 }
