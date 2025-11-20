@@ -6,6 +6,19 @@
     "deleteOutDir": true,
     "plugins": [
       "@nestjs/swagger/plugin"
-    ]
+    ],
+    "assets": [
+      {
+        "include": "../public",
+        "outDir": "dist/public",
+        "watchAssets": true
+      },
+      {
+        "include": "../views",
+        "outDir": "dist/views",
+        "watchAssets": true
+      }
+    ],
+    "watchAssets": true
   }
 }
