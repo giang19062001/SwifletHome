@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import admin from 'firebase-admin';
-import serviceAccountJson from './firebase-adminsdk.json'; // JSON từ Firebase
+import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { MulticastMessage } from 'firebase-admin/messaging';
 const serviceAccount = serviceAccountJson as any;
 

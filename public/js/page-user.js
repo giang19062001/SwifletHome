@@ -5,8 +5,8 @@ let packages = [];
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
-  getAllUser(page, limit);
   getAllPackage(0, 0);
+  getAllUser(page, limit);
 });
 
 // TODO: FUNC

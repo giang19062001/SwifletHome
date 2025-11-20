@@ -5,6 +5,8 @@
 /public/css/*
 #/public/uploads/*
 
+# firebase
+firebase-adminsdk.json
 # Logs
 logs
 *.log
