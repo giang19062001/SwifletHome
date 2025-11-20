@@ -14,6 +14,8 @@ export class UserPaymentService {
   ) {}
 
   async create(dto: CreateUserPaymentDto): Promise<number> {
-    return await this.userPaymentRepository.create(dto);
+    const createdAt = new Date()
+    await this.userPaymentRepository.createHistory(dto, createdAt);
+    return await this.userPaymentRepository.create(dto, createdAt);
   }
 }

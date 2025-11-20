@@ -153,7 +153,7 @@ export class AppController {
     };
   }
   //user
-  @Get('/dashboard/user/list')
+  @Get('/dashboard/user')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/user')
   renderUser(@Req() req: Request) {
@@ -164,7 +164,7 @@ export class AppController {
     };
   }
   //blog
-  @Get('/dashboard/blog/list')
+  @Get('/dashboard/blog')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/blog')
   renderBlog(@Req() req: Request) {
@@ -246,7 +246,7 @@ export class AppController {
   }
 
   // doctor
-  @Get('/dashboard/doctor/list')
+  @Get('/dashboard/doctor')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/doctor')
   renderDoctor(@Req() req: Request) {

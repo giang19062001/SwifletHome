@@ -1,122 +1,126 @@
- <div class="common-table-container row" id="page-doctor">
-        <div class="col-xl-12">
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                            <p class="title-page"><%= title %></p>
-                            </div>
+<div class="common-table-container row" id="page-doctor">
+    <div class="col-xl-12">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <p class="title-page">
+                                <%= title %>
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="container-table">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead class="table-dark">
-                                    <tr class="text-center">
-                                        <th>
-                                            <p>STT</p>
-                                        </th>
-                                        <th>
-                                            <p>Tên khách hàng</p>
-                                        </th>
-                                        <th>
-                                            <p>SĐT</p>
-                                        </th>
-                                        <th>
-                                            <p>Triệu chứng nhà yến</p>
-                                        </th>
-                                        <th>
-                                            <p>Trạng thái</p>
-                                        </th>
-                                        <th>
-                                            <p>Ngày tạo</p>
-                                        </th>
-                                        <th>
-                                            <p></p>
-                                        </th>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="container-table">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr class="text-center">
+                                    <th>
+                                        <p>STT</p>
+                                    </th>
+                                    <th>
+                                        <p>Tên khách hàng</p>
+                                    </th>
+                                    <th>
+                                        <p>SĐT</p>
+                                    </th>
+                                    <th>
+                                        <p>Triệu chứng nhà yến</p>
+                                    </th>
+                                    <th>
+                                        <p>Trạng thái</p>
+                                    </th>
+                                    <th>
+                                        <p>Ngày tạo</p>
+                                    </th>
+                                    <th>
+                                        <p></p>
+                                    </th>
 
-                                    </tr>
-                                </thead>
-                                <tbody class="body-table"></tbody>
-                            </table>
-                        </div>
-                        <nav>
-                            <ul class="pagination" id="privacy-main-pager"></ul>
-                        </nav>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table"></tbody>
+                        </table>
                     </div>
+                    <nav>
+                        <ul class="pagination" id="privacy-main-pager"></ul>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
-    </div>
-    <!-- modal update-->
-    <div class="modal common-modal doctor-update-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
-        aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <p class="modal-header-title">Chỉnh sửa trạng thái</p>
-                    <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
-                            <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <input type="hidden" id="seq" value="">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="row mb-2">
-                                    <label class="col-5">Tên khách hàng:</label>
-                                    <p class="col-7" id="userName"></p>
-                                </div>
-                                <div class="row mb-2">
-                                    <label class="col-5">Số điện thoại:</label>
-                                    <p class="col-7" id="userPhone"></p>
-                                </div>
-                                <div class="row mb-2">
-                                    <label class="col-5">Triệu chứng nhà yến:</label>
-                                    <p class="col-7" id="note"></p>
-                                </div>
-
-                                <div class="row mb-2">
-                                    <label class="col-5">Trạng thái:</label>
-                                    <div class="col-7">
-
-                                        <select class="form-select" id="statusCode"></select>
-                                    </div>
-                                </div>
+</div>
+</div>
+<!-- modal update-->
+<div class="modal common-modal doctor-update-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-header-title">Chỉnh sửa trạng thái</p>
+                <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                        <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="seq" value="">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row mb-2">
+                                <label class="col-5">Tên khách hàng:</label>
+                                <p class="col-7" id="userName"></p>
                             </div>
-                            <div class="col-md-6">
-                                <label class="mb-2">Phản hồi:</label>
-                                <textarea class="form-control" id="noteAnswered" rows="5"></textarea>
-                                <div class="err-noteAnswered">Vui lòng nhập nội dung phản hồi.</div>
+                            <div class="row mb-2">
+                                <label class="col-5">Số điện thoại:</label>
+                                <p class="col-7" id="userPhone"></p>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="col-5">Triệu chứng nhà yến:</label>
+                                <p class="col-7" id="note"></p>
+                            </div>
+
+                            <div class="row mb-2">
+                                <label class="col-5">Trạng thái:</label>
+                                <div class="col-7">
+
+                                    <select class="form-select w-50" id="statusCode"></select>
+                                </div>
                             </div>
                         </div>
-                        <hr />
-                        <div class="row mb-2">
-                            <h5>Danh sách hình ảnh mô tả triệu chứng</h5>
-                            <div id="doctorFiles-images" class="mb-3">
 
-                            </div>
-                              <h5>Danh sách video mô tả triệu chứng</h5>
-                            <div id="doctorFiles-videos">
-
-                            </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="mb-2">Phản hồi:</label>
+                            <textarea class="form-control" id="noteAnswered" rows="3"></textarea>
+                            <div class="err-noteAnswered">Vui lòng nhập nội dung phản hồi.</div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-main">Chỉnh sửa</button>
-                </div>
+                    </div>
+                    <div class="row mb-2">
+                        <h5>Danh sách hình ảnh mô tả triệu chứng</h5>
+                        <div id="doctorFiles-images" class="mb-3">
+
+                        </div>
+                        <h5>Danh sách video mô tả triệu chứng</h5>
+                        <div id="doctorFiles-videos">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-submit">Chỉnh sửa</button>
             </div>
         </div>
     </div>
-    <script src="/js/page-doctor.js"></script>
+</div>
+<script src="/js/page-doctor.js"></script>

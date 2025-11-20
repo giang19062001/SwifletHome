@@ -17,7 +17,7 @@ export class UserAdminRepository {
     return rows.length ? (rows[0] as IUserAdmin) : null;
   }
 
-  async getTotal(dto: PagingDto): Promise<number> {
+  async getTotalUserApp(dto: PagingDto): Promise<number> {
     let query = ` SELECT COUNT(seq) AS TOTAL  FROM ${this.tableApp}  `;
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -28,8 +28,8 @@ export class UserAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  
-  async getAll(dto: PagingDto): Promise<IUserAppInfo[]> {
+
+  async getAllUserApp(dto: PagingDto): Promise<IUserAppInfo[]> {
     let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
      FROM ${this.tableApp} A 
@@ -46,5 +46,20 @@ export class UserAdminRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IUserAppInfo[];
+  }
+  async getDetailUserApp(userCode: string): Promise<IUserAppInfo | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
+     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
+     FROM ${this.tableApp} A 
+     LEFT JOIN tbl_user_payment B
+     ON A.userCode = B.userCode
+     LEFT JOIN tbl_package C
+     ON B.packageCode = C.packageCode
+     WHERE A.userCode = ? AND A.isActive = 'Y'
+     LIMIT 1`,
+      [userCode],
+    );
+    return rows.length ? (rows[0] as IUserAppInfo) : null;
   }
 }

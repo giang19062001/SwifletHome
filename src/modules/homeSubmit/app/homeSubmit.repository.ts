@@ -5,7 +5,7 @@ import { IHomeSubmit } from '../homeSubmit.interface';
 
 @Injectable()
 export class HomeSubmitAppRepository {
-  private readonly table = 'tbl_home_submit';
+  private readonly table = 'tbl_home_sale_submit';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 

@@ -1,10 +1,12 @@
 let page = 1;
 let limit = 10;
 const pageElement = 'page-user';
+let packages = [];
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllUser(page, limit);
+  getAllPackage(0, 0);
 });
 
 // TODO: FUNC
@@ -15,7 +17,65 @@ function changePage(p) {
   getAllUser(page, limit);
 }
 
+function closeUserModal(type) {
+  // Xác định modal theo loại
+  const modalSelector = type === 'create' ? '.user-create-modal' : '.user-update-modal';
+  const modalEl = document.querySelector(modalSelector);
+
+  if (!modalEl) return;
+
+  // đóng modal boostrap
+  closeModal(modalEl);
+}
+
 // TODO: RENDER
+async function showUserModal(type, userInfo) {
+  const modalSelector = type === 'create' ? '.user-create-modal' : '.user-update-modal';
+  const modalEl = document.querySelector(modalSelector);
+  const modalBody = modalEl.querySelector('.modal-body');
+  const submitBtn = modalEl.querySelector('.modal-footer button');
+
+  console.log(userInfo.packageCode, packages);
+  // gói
+
+  const packageOptions = [
+    `
+    <option value="" ${!userInfo.packageCode ? 'selected' : ''}>
+      Gói dùng thử
+    </option>
+  `,
+    ...packages.map(
+      (pak) => `
+      <option value="${pak.packageCode}" 
+        ${userInfo.packageCode === pak.packageCode ? 'selected' : ''}>
+        ${pak.packageName} (${pak.packageDescription})
+      </option>
+    `,
+    ),
+  ].join('');
+
+  // Fill form
+  modalBody.querySelector('#userCode').value = userInfo.userCode || '';
+  modalBody.querySelector('#userName').value = userInfo.userName || '';
+  modalBody.querySelector('#userPhone').value = userInfo.userPhone || '';
+  modalBody.querySelector('#packageCode').innerHTML = packageOptions;
+
+  // MỞ MODAL
+  const modal = new bootstrap.Modal(modalEl);
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    closeUserModal();
+  });
+  modal.show();
+
+  // Gắn sự kiện submit
+  submitBtn.onclick = () => {
+    if (type === 'create') {
+      //
+    } else {
+      // updateUser(submitBtn);
+    }
+  };
+}
 function renderAllUser(data, objElement) {
   let HTML = '';
   if (data?.list?.length) {
@@ -27,11 +87,14 @@ function renderAllUser(data, objElement) {
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td><p>${ele.packageName} ${ele.packageDescription ? `(${ele.packageDescription})` : ''}</p></td>
-            <td><p>${ele.startDate ? moment(ele.startDate).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
-            <td><p>${ele.endDate ? moment(ele.endDate).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
-            <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
+            <td><p>${ele.startDate ? formatDateTime(ele.startDate) : ''}</p></td>
+            <td><p>${ele.endDate ? formatDateTime(ele.endDate) : ''}</p></td>
+            <td>
+              <p class="txt-not-ok">${ele.startDate && ele.endDate ? moment.utc(ele.endDate).startOf('day').diff(moment.utc(ele.startDate).startOf('day'), 'days') + ' ngày' : ''}</p>
+            </td>
+            <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
-                  <button class="btn-main-out">Chỉnh sửa</button> 
+                <button class="btn-main-out" onclick="getDetailUser('${ele.userCode}')">Chỉnh sửa</button> 
             </td> 
          </tr>`;
       HTML += rowHtml;
@@ -51,6 +114,27 @@ function renderAllUser(data, objElement) {
 }
 // TODO: API
 
+async function getAllPackage(currentPage, limit) {
+  await axios
+    .post(
+      currentUrl + '/api/admin/package/getAll',
+      {
+        page: currentPage,
+        limit: limit,
+      },
+      axiosAuth(),
+    )
+    .then(function (response) {
+      console.log('response', response);
+      if (response.status === 200 && response.data) {
+        packages = response.data.list ?? [];
+      }
+    })
+    .catch(function (error) {
+      console.log('error', error);
+    });
+}
+
 async function getAllUser(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
@@ -62,6 +146,7 @@ async function getAllUser(currentPage, limit) {
       {
         page: currentPage,
         limit: limit,
+        type: 'APP',
       },
       axiosAuth(),
     )
@@ -74,4 +159,75 @@ async function getAllUser(currentPage, limit) {
     .catch(function (error) {
       console.log('error', error);
     });
+}
+
+async function getDetailUser(userCode) {
+  await loaderApiCall(
+    // lấy thông tin user
+    axios
+      .post(currentUrl + '/api/admin/user/getDetail/' + userCode, { type: 'APP' }, axiosAuth())
+      .then(function (response) {
+        console.log('response', response);
+        if (response.status === 200 && response.data) {
+          showUserModal('update', response.data);
+        }
+      })
+      .catch(function (err) {
+        console.log('err', err);
+      }),
+  );
+}
+
+async function updateUser(btn) {
+  const modalBody = document.querySelector('.question-update-modal .modal-body form');
+
+  try {
+    const questionContent = modalBody.querySelector('#questionContent').value;
+    const questionCategory = modalBody.querySelector('#questionCategory').value;
+    const questionObject = modalBody.querySelector('#questionObject').value;
+    const answerCode = modalBody.querySelector('#answerCode').value;
+    const questionCode = modalBody.querySelector('#questionCode').value;
+
+    if (String(questionContent).trim() == '') {
+      modalBody.querySelector('.err-questionContent').style.display = 'block';
+      return;
+    }
+
+    // disable nút summit
+    btn.disabled = true;
+
+    await axios
+      .put(
+        currentUrl + '/api/admin/question/update/' + questionCode,
+        {
+          questionContent: questionContent,
+          questionCategory: questionCategory,
+          questionObject: questionObject,
+          answerCode: answerCode,
+          updatedId: user.userId,
+        },
+        axiosAuth(),
+      )
+      .then(function (response) {
+        console.log('response', response);
+        if (response.status === 200 && response.data) {
+          toastOk('Chỉnh sửa thành công');
+          // đóng modal
+          closeQuestionModal('update');
+          // refresh list
+          page = 1;
+          getAllQuestion(page, limit);
+        } else {
+          toastErr('Chỉnh sửa thất bại');
+        }
+      })
+      .catch(function (err) {
+        console.log('err', err);
+      });
+  } catch (err) {
+    console.log(err);
+  } finally {
+    // bật lại nút
+    btn.disabled = false;
+  }
 }

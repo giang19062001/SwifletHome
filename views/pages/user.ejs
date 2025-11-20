@@ -39,6 +39,9 @@
                               <p>Ngày kết thúc gói</p>
                            </th>
                            <th>
+                              <p>Số ngày còn lại</p>
+                           </th>
+                           <th>
                               <p>Ngày đăng ký</p>
                            </th>
                            <th>
@@ -59,12 +62,12 @@
 </div>
 </div>
 <!-- modal update-->
-<div class="modal common-modal home-submit-update-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
+<div class="modal common-modal user-update-modal" tabindex="-1" role="dialog" aria-labelledby="chart-modal"
    aria-hidden="true">
-   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+   <div class="modal-dialog modal-md modal-dialog-centered" role="document">
       <div class="modal-content">
          <div class="modal-header">
-            <p class="modal-header-title">Chỉnh sửa trạng thái</p>
+            <p class="modal-header-title">Chỉnh sửa</p>
             <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
@@ -74,45 +77,30 @@
          </div>
          <div class="modal-body">
             <form>
-               <input type="hidden" id="seq" value="">
-               <div class="row mb-3">
-                  <div class="col-md-5">
-                     <img src="" class="homeImage" />
-                  </div>
-                  <div class="col-md-7">
-                     <div class="row mb-2">
-                        <p class="homeName col-12"></p>
-                     </div>
-                     <div class="row mb-2">
-                        <label class="col-5">Tên khách đăng ký:</label>
-                        <p class="col-7 userName"></p>
-                     </div>
-                     <div class="row mb-2">
-                        <label class="col-5">Số điện thoại đăng ký:</label>
-                        <p class="col-7 userPhone"></p>
-                     </div>
-                     <div class="row mb-2">
-                        <label class="col-5">Số lượng đăng ký:</label>
-                        <p class="col-7 numberAttend"></p>
-                     </div>
+               <input type="hidden" id="userCode" value="">
 
-                     <div class="row mb-2">
-                        <label class="col-5">Trạng thái:</label>
-                        <div class="col-7">
-                           <select class="form-select" id="statusCode"></select>
-                        </div>
-                     </div>
-                     <div class="row mb-1">
-                        <label class="col-5">Ghi chú:</label>
-                        <p class="col-7 note"></p>
-                     </div>
+               <div class="row mb-3">
+                  <div class="col-md-6">
+                     <label for="userName" class="form-label">Tên khách hàng</label>
+                     <input class="form-control" id="userName"></input>
                   </div>
+                  <div class="col-md-6">
+                     <label for="userPhone" class="form-label">Số điện thoại</label>
+                     <input class="form-control" id="userPhone"></input>
+                  </div>
+               </div>
+               <div class="row mb-3">
+                  <div class="col-md-12">
+                     <label for="packageCode" class="form-label">Gói đang dùng</label>
+                     <select class="form-select" id="packageCode"></select>
+                  </div>
+
                </div>
 
             </form>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn-main">Chỉnh sửa</button>
+            <button type="button" class="btn-submit">Chỉnh sửa</button>
          </div>
       </div>
    </div>

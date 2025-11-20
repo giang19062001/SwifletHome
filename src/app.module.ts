@@ -21,7 +21,7 @@ import { LoggerModule } from './common/logger/logger.module';
 import { AuthAppModule } from './modules/auth/app/auth.module';
 import { OtpAppModule } from './modules/otp/otp.module';
 import { UserAppModule } from './modules/user/app/user.module';
-import { UserPaymentModule } from './modules/userPayment/user.module';
+import { UserPaymentModule } from './modules/userPayment/app/user.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
 import { InfoAppModule } from './modules/info/app/info.module';
 import { CategoryAdminModule } from './modules/category/admin/category.module';

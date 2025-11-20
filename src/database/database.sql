@@ -169,7 +169,7 @@ CREATE TABLE `tbl_home_sale_img` (
 );
 
 -- đơn đăng ký nhà yến
-CREATE TABLE `tbl_home_submit` (
+CREATE TABLE `tbl_home_sale_submit` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeCode` varchar(45) NOT NULL,
   `userCode` varchar(45) NOT NULL,
@@ -185,6 +185,20 @@ CREATE TABLE `tbl_home_submit` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`)
 );
+
+-- thêm constraint cho home sale
+ALTER TABLE tbl_home_sale_img
+  ADD CONSTRAINT fk_home_img_home
+  FOREIGN KEY (homeSeq) REFERENCES tbl_home_sale(seq)
+  ON DELETE CASCADE;
+ALTER TABLE tbl_home_sale_submit
+  ADD CONSTRAINT fk_home_submit_home
+  FOREIGN KEY (homeCode) REFERENCES tbl_home_sale(homeCode)
+  ON DELETE CASCADE;
+ALTER TABLE tbl_home_sale ENGINE=InnoDB;
+ALTER TABLE tbl_home_sale_img ENGINE=InnoDB;
+ALTER TABLE tbl_home_sale_submit ENGINE=InnoDB;
+
 
 CREATE TABLE `tbl_doctor_file` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -270,7 +284,7 @@ CREATE TABLE `tbl_user_app` (
   PRIMARY KEY (`seq`),
   UNIQUE KEY `userPhone_UNIQUE` (`userPhone`),
   UNIQUE KEY `userCode_UNIQUE` (`userCode`)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE `tbl_user_payment` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -284,8 +298,29 @@ CREATE TABLE `tbl_user_payment` (
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
-  UNIQUE KEY `userCode_UNIQUE` (`userCode`)
-);
+  UNIQUE KEY `userCode_UNIQUE` (`userCode`),
+  CONSTRAINT `fk_user_payment_user`
+    FOREIGN KEY (`userCode`) REFERENCES `tbl_user_app` (`userCode`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE `tbl_user_payment_history` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `userCode` varchar(45) NOT NULL,
+  `packageCode` varchar(45) DEFAULT NULL,
+  `startDate` datetime DEFAULT NULL,
+  `endDate` datetime DEFAULT NULL,
+  `isActive` char(1) NOT NULL DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  CONSTRAINT `fk_user_payment_history_user`
+    FOREIGN KEY (`userCode`) REFERENCES `tbl_user_app` (`userCode`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 
 CREATE TABLE `tbl_package` (
   `seq` int NOT NULL AUTO_INCREMENT,

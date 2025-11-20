@@ -2,8 +2,8 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppRepository } from './user.repository';
 import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
-import { UserPaymentService } from 'src/modules/userPayment/userPayment.service';
-import { CreateUserPaymentDto } from 'src/modules/userPayment/userPayment.dto';
+import { UserPaymentService } from 'src/modules/userPayment/app/userPayment.service';
+import { CreateUserPaymentDto } from 'src/modules/userPayment/app/userPayment.dto';
 import { IUserApp, IUserAppInfo } from './user.interface';
 
 @Injectable()

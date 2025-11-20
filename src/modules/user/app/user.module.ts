@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { UserAppService } from "./user.service";
 import { UserAppRepository } from "./user.repository";
-import { UserPaymentModule } from "src/modules/userPayment/user.module";
+import { UserPaymentModule } from "src/modules/userPayment/app/user.module";
 
 @Module({
   imports:[UserPaymentModule],

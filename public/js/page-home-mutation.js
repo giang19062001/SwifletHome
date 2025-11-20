@@ -281,7 +281,7 @@ async function submitHome(formData, url, method, successMessage) {
   }
 
   // disable button
-  const submitBtn = document.querySelector('.btn-main-lg');
+  const submitBtn = document.querySelector('.btn-submit-lg');
   submitBtn.disabled = true;
 
   try {

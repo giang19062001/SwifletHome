@@ -3,7 +3,7 @@ const currentUrl = window.location.origin;
 const currentSearch = window.location.search;
 
 let pathParts = currentPath.split('/').filter(Boolean);
-let partType = pathParts[1] || ''; // fix bug partCut[2] cũ (thường là index 1)
+let partType = pathParts[1] || '';
 
 document.addEventListener('DOMContentLoaded', initMenu);
 
@@ -14,10 +14,10 @@ function initMenu() {
   const allLinks = menu.querySelectorAll('a');
   const topLinks = menu.querySelectorAll(':scope > li > a');
 
-  // 1. Set active dựa vào URL (chỉ chạy 1 lần khi load trang)
+  // Set active dựa vào URL (chạy 1 lần khi load trang)
   setActiveMenuByUrl(allLinks);
 
-  // 2. Handle click
+  // Handle click
   topLinks.forEach(link => link.addEventListener('click', handleTopLinkClick));
 }
 
@@ -29,6 +29,7 @@ function setActiveMenuByUrl(allLinks) {
     const href = link.getAttribute('href');
     if (!href || href === '#' || href === '') return;
 
+    console.log(currentPath, href);
     // Ưu tiên href dài nhất khớp currentPath (tránh trùng lặp kiểu /question/ và /question-detail/)
     if (currentPath.startsWith(href) && href.length > maxLength) {
       maxLength = href.length;

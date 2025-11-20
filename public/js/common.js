@@ -157,6 +157,11 @@ function hidePageLoader() {
   document.getElementById('page-loader')?.classList.add('hidden');
 }
 
+// time
+function formatDateTime(dateTime){
+   return moment.utc(dateTime).format('YYYY-MM-DD HH:mm:ss')
+}
+
 async function loaderApiCall(promise) {
   try {
     showPageLoader();

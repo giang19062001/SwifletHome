@@ -1,4 +1,4 @@
-import { IUserAppPayment } from "src/modules/userPayment/userPayment.interface";
+import { IUserAppPayment } from "src/modules/userPayment/app/userPayment.interface";
 
 export interface IUserApp {
   seq: number;

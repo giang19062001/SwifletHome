@@ -1,4 +1,4 @@
-import { IPackage } from "../package/package.interface";
+import { IPackage } from "../../package/package.interface";
 
 export interface IUserAppPayment extends IPackage {
   seq: number;

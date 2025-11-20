@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { UserPaymentRepository } from "./userPayment.repository";
 import { UserPaymentService } from "./userPayment.service";
+import { UserPaymentRepository } from "./userPayment.repository";
 
 @Module({
   providers: [UserPaymentService, UserPaymentRepository],

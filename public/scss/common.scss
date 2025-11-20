@@ -36,10 +36,21 @@
   }
 }
 
-.btn-main-lg {
+
+.btn-submit {
+  @extend #btn-main;
+  min-width: 125px;
+  background-color: $main-color;
+  border-color: $main-color;
+  color: #ffffff;
+  &:hover {
+    background-color: $main-color-hover;
+  }
+}
+.btn-submit-lg {
   @extend #btn-main;
   font-size: medium;
-  min-width: 200px;
+  min-width: 175px;
   min-height: 40px;
   background-color: $main-color;
   border-color: $main-color;
@@ -50,7 +61,7 @@
 }
 
 
-.btn-main, .btn-submit {
+.btn-main {
   @extend #btn-main;
   background-color: $main-color;
   border-color: $main-color;

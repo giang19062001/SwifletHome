@@ -6,7 +6,7 @@ import { UpdateStatusDto } from './homeSubmit.dto';
 
 @Injectable()
 export class HomeSubmitAdminRepository {
-  private readonly table = 'tbl_home_submit';
+  private readonly table = 'tbl_home_sale_submit';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 

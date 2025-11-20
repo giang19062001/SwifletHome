@@ -2,9 +2,9 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAdminRepository } from './user.repository';
 import { IUserAdmin } from './user.interface';
-import { PagingDto } from 'src/dto/admin';
 import { IList } from 'src/interfaces/admin';
 import { IUserAppInfo } from '../app/user.interface';
+import { GetAllUserDto } from './user.dto';
 
 @Injectable()
 export class UserAdminService {
@@ -19,9 +19,25 @@ export class UserAdminService {
     return await this.userAdminRepository.findByUserId(userId);
   }
 
-  async getAll(dto: PagingDto): Promise<IList<IUserAppInfo>> {
-    const total = await this.userAdminRepository.getTotal(dto);
-    const list = await this.userAdminRepository.getAll(dto);
-    return { total, list };
+  async getAll(dto: GetAllUserDto): Promise<IList<IUserAppInfo> | IList<IUserAdmin>> {
+    if (dto.type == 'APP') {
+      // app
+      const total = await this.userAdminRepository.getTotalUserApp(dto);
+      const list = await this.userAdminRepository.getAllUserApp(dto);
+      return { total, list };
+    } else {
+      // admin
+      return { total: 0, list: [] };
+    }
+  }
+
+  async getDetail(userCode: string, type: string): Promise<IUserAppInfo | IUserAdmin | null> {
+    if (type == 'APP') {
+      // app
+      return await this.userAdminRepository.getDetailUserApp(userCode);
+    } else {
+      // admin
+      return null;
+    }
   }
 }

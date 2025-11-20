@@ -147,7 +147,7 @@ async function createBlog() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Thêm thành công');
-        reloadPage('/dashboard/blog/list');
+        reloadPage('/dashboard/blog');
       })
       .catch(function (error) {
         console.log('error', error);
@@ -191,7 +191,7 @@ async function updateBlog() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Chỉnh sửa thành công');
-        reloadPage('/dashboard/blog/list');
+        reloadPage('/dashboard/blog');
       })
       .catch(function (error) {
         console.log('error', error);
