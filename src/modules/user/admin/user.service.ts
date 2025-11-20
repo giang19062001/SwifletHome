@@ -45,6 +45,7 @@ export class UserAdminService {
   }
 
   async updatePackage(dto: UpdateUserPaymentAdminDto, userCode: string): Promise<number> {
-    return await this.userPaymentAdminService.update(dto, userCode);
+    const result = await this.userPaymentAdminService.update(dto, userCode);
+    return result;
   }
 }

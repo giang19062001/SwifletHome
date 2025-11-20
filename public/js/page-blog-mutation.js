@@ -51,14 +51,13 @@ function togglePreview() {
 
 // TODO:RENDER
 function renderContentHtml() {
-
   const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
   const isPaidPreview = document.getElementById('isPaidPreview').checked ? 'PAID' : 'NOT_PAID_YET';
 
   // lấy content từ bong bóng message html
   const bot = document.getElementById('content-message');
   let contentHtml = bot.innerHTML;
-  blogContent = contentHtml;   // ! DATA để gửi đến API
+  blogContent = contentHtml; // ! DATA để gửi đến API
 
   // xóa nút thanh toán ra khỏi editor
   if (isFree == 'Y') {
@@ -124,7 +123,7 @@ async function createBlog() {
     toastErr('Vui lòng nhập nội dung.');
     return;
   }
-    // disable button
+  // disable button
   const submitBtn = document.querySelector('.btn-submit');
   submitBtn.disabled = true;
 
@@ -151,10 +150,12 @@ async function createBlog() {
       })
       .catch(function (error) {
         console.log('error', error);
+        submitBtn.disabled = false; // bật lại button
       });
   } catch (error) {
     console.log('err', error);
-  }finally {
+    submitBtn.disabled = false; // bật lại button
+  } finally {
     // submitBtn.disabled = false; // bật lại button
   }
 }
@@ -167,7 +168,7 @@ async function updateBlog() {
     toastErr('Vui lòng nhập nội dung.');
     return;
   }
-    // disable button
+  // disable button
   const submitBtn = document.querySelector('.btn-submit');
   submitBtn.disabled = true;
 
@@ -195,9 +196,11 @@ async function updateBlog() {
       })
       .catch(function (error) {
         console.log('error', error);
+        submitBtn.disabled = false; // bật lại button
       });
   } catch (error) {
     console.log('err', error);
+    submitBtn.disabled = false; // bật lại button
   } finally {
     // submitBtn.disabled = false; // bật lại button
   }

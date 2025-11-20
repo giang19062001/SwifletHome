@@ -150,7 +150,7 @@ CREATE TABLE `tbl_home_sale` (
   PRIMARY KEY (`seq`),
   UNIQUE KEY `homeCode_UNIQUE` (`homeCode`),
   UNIQUE KEY `homeImage_UNIQUE` (`homeImage`)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE `tbl_home_sale_img` (
   `seq` int NOT NULL AUTO_INCREMENT,
@@ -165,10 +165,15 @@ CREATE TABLE `tbl_home_sale_img` (
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
-  UNIQUE KEY `filename_UNIQUE` (`filename`)
-);
+  UNIQUE KEY `filename_UNIQUE` (`filename`),
 
--- đơn đăng ký nhà yến
+  CONSTRAINT `fk_home_img_home`
+    FOREIGN KEY (`homeSeq`)
+    REFERENCES `tbl_home_sale` (`seq`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- đăng ký tham quan nha yến
 CREATE TABLE `tbl_home_sale_submit` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `homeCode` varchar(45) NOT NULL,
@@ -183,21 +188,12 @@ CREATE TABLE `tbl_home_sale_submit` (
   `updatedAt` datetime DEFAULT NULL,
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`seq`)
-);
-
--- thêm constraint cho home sale
-ALTER TABLE tbl_home_sale_img
-  ADD CONSTRAINT fk_home_img_home
-  FOREIGN KEY (homeSeq) REFERENCES tbl_home_sale(seq)
-  ON DELETE CASCADE;
-ALTER TABLE tbl_home_sale_submit
-  ADD CONSTRAINT fk_home_submit_home
-  FOREIGN KEY (homeCode) REFERENCES tbl_home_sale(homeCode)
-  ON DELETE CASCADE;
-ALTER TABLE tbl_home_sale ENGINE=InnoDB;
-ALTER TABLE tbl_home_sale_img ENGINE=InnoDB;
-ALTER TABLE tbl_home_sale_submit ENGINE=InnoDB;
+  PRIMARY KEY (`seq`),
+  CONSTRAINT `fk_home_submit_home`
+    FOREIGN KEY (`homeCode`)
+    REFERENCES `tbl_home_sale` (`homeCode`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- khám bệnh nhà yến
 CREATE TABLE `tbl_doctor_file` (

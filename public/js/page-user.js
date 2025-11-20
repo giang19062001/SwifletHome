@@ -106,7 +106,7 @@ function renderAllUser(data, objElement) {
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     // dữ liệu trống
-    renderEmptyRowTable(objElement, 7);
+    renderEmptyRowTable(objElement, 8);
   }
 
   // xóa skeleton
@@ -138,7 +138,7 @@ async function getAllPackage(currentPage, limit) {
 async function getAllUser(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
-  showSkeleton(objElement, limit, 7);
+  showSkeleton(objElement, limit, 8);
 
   await axios
     .post(

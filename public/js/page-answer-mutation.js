@@ -127,7 +127,7 @@ async function createAnswer() {
   // disable button
   const submitBtn = document.querySelector('.btn-submit');
   submitBtn.disabled = true;
-  
+
   try {
     const answerCategory = document.getElementById('answerCategory').value;
     const answerObject = document.getElementById('answerObject').value;
@@ -151,9 +151,11 @@ async function createAnswer() {
       })
       .catch(function (error) {
         console.log('error', error);
+        submitBtn.disabled = false; // bật lại button
       });
   } catch (error) {
     console.log('err', error);
+    submitBtn.disabled = false; // bật lại button
   } finally {
     // submitBtn.disabled = false; // bật lại button
   }
@@ -196,9 +198,11 @@ async function updateAnswer() {
       })
       .catch(function (error) {
         console.log('error', error);
+        submitBtn.disabled = false; // bật lại button
       });
   } catch (error) {
     console.log('err', error);
+    submitBtn.disabled = false; // bật lại button
   } finally {
     // submitBtn.disabled = false; // bật lại button
   }

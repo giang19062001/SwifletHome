@@ -290,14 +290,13 @@ async function submitHome(formData, url, method, successMessage) {
       toastOk(successMessage);
       // về trang danh sache
       reloadPage('/dashboard/home/sale');
-    } else {
-      toastErr(`Lỗi khi ${method === 'post' ? 'tạo' : 'Chỉnh sửa'} nhà yến`);
-    }
+    } 
   } catch (error) {
     console.error(`error:`, error);
     if (error.response.data) {
       toastErr(error.response.data.message);
     }
+    submitBtn.disabled = false; // bật lại button
   } finally {
     // submitBtn.disabled = false; // bật lại button
   }
