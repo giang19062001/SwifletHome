@@ -3,6 +3,7 @@
 /node_modules
 /build
 /public/css/*
+#/public/uploads/*
 
 # Logs
 logs
