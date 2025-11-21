@@ -23,15 +23,10 @@
   
   // Validate field
   const validateField = (constraints, input) => {
-    console.log("Adsad");
     const fieldName = input.name;
-     console.log(fieldName);
     const fieldValue = input.type === 'file' ? input.files : input.value;
-    console.log(fieldValue);
     const errors = validate.single(fieldValue, constraints[fieldName]);
-    console.log(errors);
     const errorElement = document.querySelector(`[data-error="${fieldName}"]`);
-    console.log(errorElement);
     if (errorElement) {
       errorElement.textContent = errors ? errors[0] : '';
       errorElement.style.display = errors ? 'block' : 'none';

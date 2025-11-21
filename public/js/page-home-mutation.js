@@ -63,7 +63,7 @@ function initializeForm() {
     };
 
     // kiểm tra validate input
-    const errors = validate(formData, homeMutationConstraints);
+    let errors = validate(formData, homeMutationConstraints);
     if (!descriptionText) {
       if (!errors) errors = {};
       errors.homeDescription = ['Vui lòng nhập mô tả.'];

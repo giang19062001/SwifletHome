@@ -19,6 +19,10 @@ async function bootstrap() {
 
   // (CSS, JS, IMG), views , engine
   app.useStaticAssets(join(__dirname, '..', 'public'));
+
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads',
+  });
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('ejs');
   app.use(expressLayouts);
@@ -36,7 +40,7 @@ async function bootstrap() {
   //session
   app.use(
     session({
-      secret: configService.get<string>('SESSION_KEY') ?? "",
+      secret: configService.get<string>('SESSION_KEY') ?? '',
       resave: false,
       saveUninitialized: false,
       cookie: { maxAge: 60 * 60 * 1000 }, // 1 hrs
