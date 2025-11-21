@@ -369,7 +369,7 @@ CREATE TABLE tbl_notification_topics (
   seq INT AUTO_INCREMENT PRIMARY KEY,
   topicCode VARCHAR(45) NOT NULL UNIQUE,
   topicName VARCHAR(45) NOT NULL UNIQUE,
-  description TEXT,
+  topicDescription TEXT,
   isActive CHAR(1) NOT NULL DEFAULT 'Y',
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt DATETIME DEFAULT NULL,

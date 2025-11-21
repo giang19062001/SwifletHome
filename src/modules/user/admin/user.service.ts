@@ -4,9 +4,11 @@ import { UserAdminRepository } from './user.repository';
 import { IUserAdmin } from './user.interface';
 import { IList } from 'src/interfaces/admin.interface';
 import { IUserAppInfo } from '../app/user.interface';
-import { GetAllUserDto } from './user.dto';
-import { UserPaymentAdminService } from 'src/modules/userPayment/admin/userPayment.service';
-import { UpdateUserPaymentAdminDto } from 'src/modules/userPayment/admin/userPayment.dto';
+import { GetAllUserDto, UpdateUserPaymentAdminDto } from './user.dto';
+import { IPackage } from 'src/modules/package/package.interface';
+import { FirebaseService } from 'src/common/firebase/firebase.service';
+import { PackageAdminService } from 'src/modules/package/admin/package.service';
+import moment from 'moment';
 
 @Injectable()
 export class UserAdminService {
@@ -14,7 +16,8 @@ export class UserAdminService {
 
   constructor(
     private readonly userAdminRepository: UserAdminRepository,
-    private readonly userPaymentAdminService: UserPaymentAdminService,
+    private readonly packageAdminService: PackageAdminService,
+    private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -45,7 +48,49 @@ export class UserAdminService {
   }
 
   async updatePackage(dto: UpdateUserPaymentAdminDto, userCode: string): Promise<number> {
-    const result = await this.userPaymentAdminService.update(dto, userCode);
+    const result = await this.updatePayment(dto, userCode);
+    return result;
+  }
+
+  //TODO: PAYMENT
+
+  async updatePayment(dto: UpdateUserPaymentAdminDto, userCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/update`;
+
+    const updatedAt = new Date();
+    let startDate: string | null = null;
+    let endDate: string | null = null;
+    let packageData: IPackage | null = null;
+    // chọn gói miễn phí
+    if (!dto.packageCode) {
+      startDate = null;
+      endDate = null;
+      this.logger.log(logbase, `${userCode} -> cập nhập gói miễn phí`);
+    } else {
+      // chọn các gói tính phí
+      packageData = await this.packageAdminService.getDetail(dto.packageCode);
+      if (!packageData) {
+        throw new BadRequestException();
+      }
+      // ngày giờ hiện tại
+      const datetime = moment();
+      // ngày giờ kết thúc
+      startDate = datetime.format('YYYY-MM-DD HH:mm:ss');
+      // endOf -> 23:59:59
+      endDate = datetime.clone().add(packageData.packageExpireDay, 'days').endOf('day').format('YYYY-MM-DD HH:mm:ss');
+      this.logger.log(logbase, `${userCode} -> cập nhập gói ${packageData?.packageName}(${packageData?.packageDescription})`);
+    }
+
+    await this.userAdminRepository.createPaymentHistory(dto, userCode, startDate, endDate, updatedAt);
+    const result = await this.userAdminRepository.updatePayment(dto, userCode, startDate, endDate, updatedAt);
+    if (result) {
+      //gửi nofity
+      this.firebaseService.sendNotification(
+        'c5IcFc-dS9apRp4PbSgqoU:APA91bFyHwpnHANDbQUUzywUOTOIsT2xamQzjwI3J9SjpAh4H1HBaPad3e0kk2VFQ4hx1PegPmzizHOYl4FNnIOnGRLU2MxZBeSTIJOv_Vgk2C0oCEqd174',
+        'Thông báo YenHome',
+        `Gói ${!packageData ? 'Miễn phí' : (packageData as unknown as IPackage).packageName} đã được cập nhập thành công`,
+      );
+    }
     return result;
   }
 }

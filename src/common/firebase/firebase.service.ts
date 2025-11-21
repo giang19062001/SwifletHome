@@ -72,56 +72,94 @@ export class FirebaseService implements OnModuleInit {
       throw error;
     }
   }
-
-  // Đăng ký một hoặc nhiều FCM token vào một topic
+  
+  // Subscribe 1 hoặc nhiều token vào topic
   async subscribeToTopic(tokens: string | string[], topic: string): Promise<number> {
-    if (!tokens || (Array.isArray(tokens) && tokens.length === 0)) {
-      throw new Error('Tokens không được để trống');
+    // 1. Gọi FCM để đăng ký thật
+    const fcmResponse = await admin.messaging().subscribeToTopic(tokens, topic);
+
+    // 2. Lưu vào MySQL (dùng upsert để tránh duplicate)
+    // const entities = tokens.map(token => {
+    //   const entity = new TopicSubscription();
+    //   entity.topic = topic;
+    //   entity.fcm_token = token;
+    //   return entity;
+    // });
+
+    // Dùng INSERT IGNORE hoặc upsert (tùy driver MySQL)
+    // await this.topicRepo
+    //   .createQueryBuilder()
+    //   .insert()
+    //   .into(TopicSubscription)
+    //   .values(entities)
+    //   .orIgnore() // MySQL: không lỗi nếu trùng unique key
+    //   .orUpdate(['fcm_token'], ['topic', 'fcm_token']) // nếu dùng PostgreSQL
+    //   .execute();
+
+    console.log(`Subscribed ${fcmResponse.successCount}/${tokens.length} tokens to topic "${topic}"`);
+    if (fcmResponse.failureCount > 0) {
+      console.warn('FCM errors:', fcmResponse.errors);
     }
 
-    const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
-
-    // Lọc bỏ token rỗng/invalid
-    const validTokens = tokenArray.filter(t => typeof t === 'string' && t.trim().length > 0);
-    if (validTokens.length === 0) return 0;
-
-    try {
-      const response = await admin.messaging().subscribeToTopic(validTokens, topic);
-      
-      console.log(`Đã subscribe ${response.successCount} token vào topic "${topic}"`);
-      if (response.failureCount > 0) {
-        console.warn(`Lỗi subscribe ${response.failureCount} token:`, response.errors);
-      }
-      
-      return response.successCount;
-    } catch (error) {
-      console.error('Subscribe topic thất bại:', error);
-      throw error;
-    }
+    return fcmResponse.successCount;
   }
 
-   // Gỡ một hoặc nhiều token khỏi topic
+  // Unsubscribe
   async unsubscribeFromTopic(tokens: string | string[], topic: string): Promise<number> {
-    if (!tokens || (Array.isArray(tokens) && tokens.length === 0)) {
-      throw new Error('Tokens không được để trống');
-    }
 
-    const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
-    const validTokens = tokenArray.filter(t => typeof t === 'string' && t.trim().length > 0);
-    if (validTokens.length === 0) return 0;
+    // 1. Gọi FCM
+    const fcmResponse = await admin.messaging().unsubscribeFromTopic(tokens, topic);
 
-    try {
-      const response = await admin.messaging().unsubscribeFromTopic(validTokens, topic);
-      
-      console.log(`Đã unsubscribe ${response.successCount} token khỏi topic "${topic}"`);
-      if (response.failureCount > 0) {
-        console.warn(`Lỗi unsubscribe ${response.failureCount} token:`, response.errors);
-      }
-      
-      return response.successCount;
-    } catch (error) {
-      console.error('Unsubscribe topic thất bại:', error);
-      throw error;
-    }
+    // 2. Xóa khỏi MySQL
+    // await this.topicRepo.delete({
+    //   topic,
+    //   fcm_token: In(tokens),
+    // });
+
+    console.log(`Unsubscribed ${fcmResponse.successCount} tokens from topic "${topic}"`);
+    return fcmResponse.successCount;
   }
+
+  // Lấy danh sách token của 1 topic
+  // async getTokensByTopic(topic: string): Promise<string[]> {
+  //   const results = await this.topicRepo.find({
+  //     where: { topic },
+  //     select: ['fcm_token'],
+  //   });
+  //   return results.map(r => r.fcm_token);
+  // }
+
+  // Lấy tất cả topic + số lượng subscriber
+  // async getAllTopicsWithCounts(): Promise<{ topic: string; count: number }[]> {
+  //   const result = await this.topicRepo
+  //     .createQueryBuilder()
+  //     .select('topic')
+  //     .addSelect('COUNT(*)', 'count')
+  //     .groupBy('topic')
+  //     .orderBy('count', 'DESC')
+  //     .getRawMany();
+
+  //   return result.map(r => ({
+  //     topic: r.topic,
+  //     count: Number(r.count),
+  //   }));
+  // }
+
+  // Bonus: Lấy danh sách topic mà 1 token đang subscribe
+  // async getTopicsByToken(fcmToken: string): Promise<string[]> {
+  // const results = await this.topicRepo.find({
+  //   where: { fcm_token: fcmToken },
+  //   select: ['topic'],
+  // });
+  // return results.map(r => r.topic);
+  // }
+
+  // Bonus: Xóa token khỏi tất cả topic (khi user logout hoặc refresh token)
+  // async removeTokenFromAllTopics(fcmToken: string): Promise<void> {
+  // const topics = await this.getTopicsByToken(fcmToken);
+  // if (topics.length > 0) {
+  //   await admin.messaging().unsubscribeFromTopic([fcmToken], topics);
+  // }
+  // await this.topicRepo.delete({ fcm_token: fcmToken });
+  // }
 }

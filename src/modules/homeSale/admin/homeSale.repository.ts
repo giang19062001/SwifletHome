@@ -1,14 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
-import { CreateHomeDto, UpdateHomeDto } from './homeSale.dto';
+import { IHomeSale, IHomeSaleImg, IHomeSubmit } from '../homeSale.interface';
+import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
 export class HomeSaleAdminRepository extends AbAdminRepo {
   private readonly table = 'tbl_home_sale';
+  private readonly tableImg = 'tbl_home_sale_img';
+  private readonly tableSubmit = 'tbl_home_sale_submit';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
     super();
@@ -91,11 +93,11 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
 
     return result.affectedRows;
   }
-  // images
+  // IMAGE
   async getImages(seq: number): Promise<IHomeSaleImg[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive
-          FROM tbl_home_sale_img A 
+          FROM ${this.tableImg} A 
           WHERE A.homeSeq = ? `,
       [seq],
     );
@@ -103,7 +105,7 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
   }
   async createImages(seq: number, createdId: string, file: Express.Multer.File | IHomeSaleImg): Promise<number> {
     const sql = `
-      INSERT INTO tbl_home_sale_img (filename, originalname, size, mimetype, homeSeq, createdId)
+      INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, homeSeq, createdId)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
@@ -114,7 +116,7 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
 
   async deleteHomeImages(seq: number): Promise<number> {
     const sql = `
-      DELETE FROM  tbl_home_sale_img
+      DELETE FROM  ${this.tableImg}
       WHERE homeSeq = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
@@ -123,7 +125,7 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
   }
   async deleteHomeImagesOne(seq: number): Promise<number> {
     const sql = `
-      DELETE FROM  tbl_home_sale_img
+      DELETE FROM  ${this.tableImg}
       WHERE seq = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
@@ -133,11 +135,64 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
   async deleteHomeImagesMulti(seqList: number[]): Promise<number> {
     const placeholders = seqList.map(() => '?').join(', ');
     const sql = `
-    DELETE FROM tbl_home_sale_img
+    DELETE FROM ${this.tableImg}
     WHERE seq IN (${placeholders})
   `;
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, seqList);
+    return result.affectedRows;
+  }
+  // TODO: SUBMIT 
+  async getTotalSubmit(): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableSubmit}`);
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+  async getAllSubmit(dto: PagingDto): Promise<IHomeSubmit[]> {
+    let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
+          B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
+          FROM ${this.tableSubmit} A 
+          LEFT JOIN tbl_home_sale B
+          ON A.homeCode = B.homeCode
+          LEFT JOIN tbl_code_common C
+          ON A.numberAttendCode = C.code
+          LEFT JOIN tbl_code_common D
+          ON A.statusCode = D.code `;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows as IHomeSubmit[];
+  }
+
+  async getDetailSubmit(seq: number): Promise<IHomeSubmit | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
+          B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
+          FROM ${this.tableSubmit} A 
+          LEFT JOIN tbl_home_sale B
+          ON A.homeCode = B.homeCode
+          LEFT JOIN tbl_code_common C
+          ON A.numberAttendCode = C.code
+          LEFT JOIN tbl_code_common D
+          ON A.statusCode = D.code
+          WHERE A.SEQ = ? 
+          LIMIT 1 `,
+      [seq],
+    );
+    return rows ? (rows[0] as IHomeSubmit) : null;
+  }
+
+  async updateSubmit(dto: UpdateStatusDto, seq: number): Promise<number> {
+    const sql = `
+        UPDATE ${this.tableSubmit} SET statusCode = ?, updatedId = ?, updatedAt = ?
+        WHERE seq = ?
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.statusCode, dto.updatedId, new Date(), seq]);
+
     return result.affectedRows;
   }
 }

@@ -4,10 +4,13 @@ import { RowDataPacket } from 'mysql2/promise';
 import { generateCode } from 'src/helpers/func.helper';
 import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserAppInfo } from './user.interface';
+import { CreateUserPaymentAppDto } from './user.dto';
 
 @Injectable()
 export class UserAppRepository {
   private readonly table = 'tbl_user_app';
+  private readonly tablePayment = 'tbl_user_payment';
+  private readonly tablePaymentHistory = 'tbl_user_payment_history';
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -86,4 +89,24 @@ export class UserAppRepository {
 
     return result.affectedRows;
   }
+
+  // TODO: PAYMENT 
+    async createPaymentHistory(dto: CreateUserPaymentAppDto, createdAt: Date): Promise<number> {
+      const sql = `
+          INSERT INTO ${this.tablePaymentHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
+          VALUES(?, ?, ?, ?, ?, ?)
+        `;
+      const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, this.updator, createdAt]);
+  
+      return result.insertId;
+    }
+    async createPayment(dto: CreateUserPaymentAppDto, createdAt: Date): Promise<number> {
+      const sql = `
+          INSERT INTO ${this.tablePayment} (userCode, packageCode, startDate, endDate, isActive, createdId, createdAt) 
+          VALUES(?, ?, ?, ?, ?, ?, ?)
+        `;
+      const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, 'Y', this.updator, createdAt]);
+  
+      return result.insertId;
+    }
 }

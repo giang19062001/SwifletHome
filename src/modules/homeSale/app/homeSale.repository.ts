@@ -2,10 +2,12 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
+import { CreateHomeSubmitDto } from './homeSubmit.dto';
 
 @Injectable()
 export class HomeSaleAppRepository {
   private readonly table = 'tbl_home_sale';
+  private readonly tableSubmit = 'tbl_home_sale_submit';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -62,5 +64,15 @@ export class HomeSaleAppRepository {
       result.homeImages = typeof result.homeImages === 'string' ? JSON.parse(result.homeImages) : result.homeImages;
     }
     return result;
+  }
+  // TODO: SUBMIT 
+  async createSubmit(dto: CreateHomeSubmitDto, userCode: string, statusCode: string): Promise<number> {
+    const sql = `
+        INSERT INTO ${this.tableSubmit}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, statusCode, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.homeCode, userCode, dto.userName, dto.userPhone, dto.numberAttendCode, dto.note, statusCode, userCode]);
+
+    return result.insertId;
   }
 }

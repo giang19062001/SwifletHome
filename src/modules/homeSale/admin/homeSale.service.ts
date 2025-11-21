@@ -1,33 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
-import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
+import { IHomeSale, IHomeSaleImg, IHomeSubmit } from '../homeSale.interface';
 import { HomeSaleAdminRepository } from './homeSale.repository';
-import { CreateHomeDto, UpdateHomeDto } from './homeSale.dto';
+import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { diffByTwoArr } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { AbAdminService } from 'src/abstract/admin.abstract';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()
-export class HomeSaleAdminService extends AbAdminService{
-  private readonly SERVICE_NAME = "HomeSaleAdminService"
+export class HomeSaleAdminService extends AbAdminService {
+  private readonly SERVICE_NAME = 'HomeSaleAdminService';
   constructor(
-    private readonly homeAdminRepository: HomeSaleAdminRepository,
+    private readonly homSaleAdminRepository: HomeSaleAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {
     super();
   }
   async getAll(dto: PagingDto): Promise<IList<IHomeSale>> {
-    const total = await this.homeAdminRepository.getTotal();
-    const list = await this.homeAdminRepository.getAll(dto);
+    const total = await this.homSaleAdminRepository.getTotal();
+    const list = await this.homSaleAdminRepository.getAll(dto);
     return { total, list };
   }
   async getDetail(homeCode: string): Promise<IHomeSale | null> {
-    let result = await this.homeAdminRepository.getDetail(homeCode);
+    let result = await this.homSaleAdminRepository.getDetail(homeCode);
     if (result) {
-      let homeImages = await this.homeAdminRepository.getImages(result ? result?.seq : 0);
+      let homeImages = await this.homSaleAdminRepository.getImages(result ? result?.seq : 0);
       // remove main img
       let homeImagesExceptMain: IHomeSaleImg[] = [];
       for (const img of homeImages) {
@@ -44,16 +44,16 @@ export class HomeSaleAdminService extends AbAdminService{
     }
   }
   async create(dto: CreateHomeDto): Promise<number> {
-    const seq = await this.homeAdminRepository.create(dto);
+    const seq = await this.homSaleAdminRepository.create(dto);
     if (seq) {
       //homeImage
       if (dto.homeImage) {
-        await this.homeAdminRepository.createImages(seq, dto.createdId, dto.homeImage);
+        await this.homSaleAdminRepository.createImages(seq, dto.createdId, dto.homeImage);
       }
       //homeImages
       if (dto.homeImages.length > 0) {
         for (const file of dto.homeImages) {
-          await this.homeAdminRepository.createImages(seq, dto.createdId, file);
+          await this.homSaleAdminRepository.createImages(seq, dto.createdId, file);
         }
       }
     }
@@ -72,10 +72,10 @@ export class HomeSaleAdminService extends AbAdminService{
         await this.fileLocalService.deleteLocalFile(homeImagePath);
 
         // delete old db file
-        await this.homeAdminRepository.deleteHomeImagesOne((home.homeImage as IHomeSaleImg).seq);
+        await this.homSaleAdminRepository.deleteHomeImagesOne((home.homeImage as IHomeSaleImg).seq);
 
         //insert new homeImage
-        await this.homeAdminRepository.createImages(home.seq, 'admin', dto.homeImage);
+        await this.homSaleAdminRepository.createImages(home.seq, 'admin', dto.homeImage);
       }
 
       const fileNeedDeletes: IHomeSaleImg[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
@@ -87,7 +87,7 @@ export class HomeSaleAdminService extends AbAdminService{
       // homeImages is changed -> delete old file
       if (fileNeedDeletes.length) {
         // delete db
-        await this.homeAdminRepository.deleteHomeImagesMulti(fileNeedDeletes.map((ele) => ele.seq));
+        await this.homSaleAdminRepository.deleteHomeImagesMulti(fileNeedDeletes.map((ele) => ele.seq));
         // delete physical
         for (const file of fileNeedDeletes) {
           const filepath = `/images/homes/${file.filename}`;
@@ -96,25 +96,25 @@ export class HomeSaleAdminService extends AbAdminService{
       }
       if (fileNeedCreates.length) {
         for (const file of fileNeedCreates) {
-          await this.homeAdminRepository.createImages(home.seq, 'admin', file);
+          await this.homSaleAdminRepository.createImages(home.seq, 'admin', file);
         }
       }
-      const result = await this.homeAdminRepository.update(dto, homeCode);
+      const result = await this.homSaleAdminRepository.update(dto, homeCode);
       return result;
     } else {
       return 0;
     }
   }
   async delete(homeCode: string): Promise<number> {
-    const home = await this.homeAdminRepository.getDetail(homeCode);
+    const home = await this.homSaleAdminRepository.getDetail(homeCode);
     if (home) {
-      // const images = await this.homeAdminRepository.getImages(home?.seq ?? 0);
+      // const images = await this.homSaleAdminRepository.getImages(home?.seq ?? 0);
 
-      const resultHome = await this.homeAdminRepository.delete(homeCode);
+      const resultHome = await this.homSaleAdminRepository.delete(homeCode);
 
       // xóa các file ảnh của nhà yến trong databse
       // if (resultHome) {
-      //   await this.homeAdminRepository.deleteHomeImages(home?.seq ?? 0);
+      //   await this.homSaleAdminRepository.deleteHomeImages(home?.seq ?? 0);
       // }
       // const homeImagePath = `/image/homes/${home.homeImage}`;
       // await this.fileLocalService.deleteLocalFile(homeImagePath);
@@ -130,5 +130,20 @@ export class HomeSaleAdminService extends AbAdminService{
     } else {
       return 0;
     }
+  }
+
+  // TODO: SUBMIT 
+  async getAllSubmit(dto: PagingDto): Promise<IList<IHomeSubmit>> {
+    const total = await this.homSaleAdminRepository.getTotalSubmit();
+    const list = await this.homSaleAdminRepository.getAllSubmit(dto);
+    return { total, list };
+  }
+  async getDetailSubmit(seq: number): Promise<IHomeSubmit | null> {
+    const result = await this.homSaleAdminRepository.getDetailSubmit(seq);
+    return result;
+  }
+  async updateSubmit(dto: UpdateStatusDto, seq: number): Promise<number> {
+    const result = await this.homSaleAdminRepository.updateSubmit(dto, seq);
+    return result;
   }
 }

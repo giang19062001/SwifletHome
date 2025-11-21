@@ -117,7 +117,7 @@ async function getAllHomeSubmit(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/homeSubmit/getAll',
+      currentUrl + '/api/admin/home/getAllSubmit',
       {
         page: currentPage,
         limit: limit,
@@ -157,7 +157,7 @@ async function getStatusCode() {
 async function getDetailHomeSubmit(seq) {
   await loaderApiCall(
     axios
-      .get(currentUrl + '/api/admin/homeSubmit/getDetail/' + seq, axiosAuth())
+      .get(currentUrl + '/api/admin/home/getDetailSubmit/' + seq, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -179,7 +179,7 @@ async function updateHomeSubmit() {
 
     await axios
       .put(
-        currentUrl + '/api/admin/homeSubmit/update/' + seq,
+        currentUrl + '/api/admin/home/updateSubmit/' + seq,
         {
           statusCode: statusCode,
           updatedId: user.userId,

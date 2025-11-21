@@ -2,9 +2,8 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppRepository } from './user.repository';
 import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
-import { UserPaymentAppService } from 'src/modules/userPayment/app/userPayment.service';
-import { CreateUserPaymentAppDto } from 'src/modules/userPayment/app/userPayment.dto';
 import { IUserApp, IUserAppInfo } from './user.interface';
+import { CreateUserPaymentAppDto } from './user.dto';
 
 @Injectable()
 export class UserAppService {
@@ -12,7 +11,6 @@ export class UserAppService {
 
   constructor(
     private readonly userAppRepository: UserAppRepository,
-    private readonly userPaymentService: UserPaymentAppService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -39,13 +37,12 @@ export class UserAppService {
           endDate: null,
           startDate: null,
         };
-        await this.userPaymentService.create(dto);
+        await this.createPayment(dto);
       }
     }
     return 1;
   }
 
-  
   async update(userName: string, userPhone: string, userCode: string): Promise<number> {
     return await this.userAppRepository.update(userName, userPhone, userCode);
   }
@@ -55,5 +52,12 @@ export class UserAppService {
 
   async updateDeviceToken(deviceToken: string, userPhone: string): Promise<number> {
     return await this.userAppRepository.updateDeviceToken(deviceToken, userPhone);
+  }
+
+  // TODO: PAYMENT
+  async createPayment(dto: CreateUserPaymentAppDto): Promise<number> {
+    const createdAt = new Date();
+    await this.userAppRepository.createPaymentHistory(dto, createdAt);
+    return await this.userAppRepository.createPayment(dto, createdAt);
   }
 }

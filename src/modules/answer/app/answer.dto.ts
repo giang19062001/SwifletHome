@@ -1,18 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class UpdateStatusDto {
-
+export class AnswerReplyDto {
   @ApiProperty({
-    example: '',
+    example: 'Âm thanh dẫn dụ chim yến ?',
   })
   @IsString()
   @IsNotEmpty()
-  statusCode: string;
-
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  updatedId: string;
+  question: string;
 }

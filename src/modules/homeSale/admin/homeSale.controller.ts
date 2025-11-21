@@ -24,8 +24,8 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeSaleAdminService } from './homeSale.service';
-import { IHomeSale } from '../homeSale.interface';
-import { CreateHomeDto, UpdateHomeDto } from './homeSale.dto';
+import { IHomeSale, IHomeSubmit } from '../homeSale.interface';
+import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
 
@@ -34,7 +34,7 @@ import { multerImgConfig } from 'src/config/multer.config';
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/home')
 export class HomeSaleAdminController {
-  constructor(private readonly homeAdminService: HomeSaleAdminService) {}
+  constructor(private readonly homeSaleAdminService: HomeSaleAdminService) {}
 
   @ApiBody({
     type: PagingDto,
@@ -42,7 +42,7 @@ export class HomeSaleAdminController {
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
   async getAll(@Body() dto: PagingDto): Promise<IList<IHomeSale>> {
-    const result = await this.homeAdminService.getAll(dto);
+    const result = await this.homeSaleAdminService.getAll(dto);
     return result;
   }
 
@@ -50,7 +50,7 @@ export class HomeSaleAdminController {
   @Get('getDetail/:homeCode')
   @HttpCode(HttpStatus.OK)
   async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
-    const result = await this.homeAdminService.getDetail(homeCode);
+    const result = await this.homeSaleAdminService.getDetail(homeCode);
     if (!result) {
       throw new BadRequestException();
     }
@@ -88,7 +88,7 @@ export class HomeSaleAdminController {
       homeImages,
     };
 
-    const result = await this.homeAdminService.create(body);
+    const result = await this.homeSaleAdminService.create(body);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -125,7 +125,7 @@ export class HomeSaleAdminController {
       homeImages,
     };
 
-    const result = await this.homeAdminService.update(dto, homeCode);
+    const result = await this.homeSaleAdminService.update(dto, homeCode);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -136,8 +136,42 @@ export class HomeSaleAdminController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'homeCode', type: String })
   async delete(@Param('homeCode') homeCode: string): Promise<number> {
-    const result = await this.homeAdminService.delete(homeCode);
+    const result = await this.homeSaleAdminService.delete(homeCode);
     if (result === 0) {
+      throw new BadRequestException();
+    }
+    return result;
+  }
+
+  // TODO: SUBMIT 
+  @ApiBody({
+    type: PagingDto,
+  })
+  @Post('getAllSubmit')
+  @HttpCode(HttpStatus.OK)
+  async getAllSubmit(@Body() dto: PagingDto): Promise<IList<IHomeSubmit>> {
+    const result = await this.homeSaleAdminService.getAllSubmit(dto);
+    return result;
+  }
+
+  @ApiBody({ type: UpdateStatusDto })
+  @ApiParam({ name: 'seq', type: Number })
+  @Put('updateSubmit/:seq')
+  @HttpCode(HttpStatus.OK)
+  async updateSubmit(@Body() dto: UpdateStatusDto, @Param('seq') seq: number): Promise<number> {
+    const result = await this.homeSaleAdminService.updateSubmit(dto, seq);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+    return result;
+  }
+
+  @ApiParam({ name: 'seq', type: Number })
+  @Get('getDetailSubmit/:seq')
+  @HttpCode(HttpStatus.OK)
+  async getDetailSubmit(@Param('seq') seq: number): Promise<IHomeSubmit | null> {
+    const result = await this.homeSaleAdminService.getDetailSubmit(seq);
+    if (!result) {
       throw new BadRequestException();
     }
     return result;

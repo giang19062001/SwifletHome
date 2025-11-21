@@ -1,5 +1,5 @@
 import { YnEnum } from "src/interfaces/admin.interface";
-import { IUserAppPayment } from "src/modules/userPayment/app/userPayment.interface";
+import { IPackage } from "src/modules/package/package.interface";
 
 export interface IUserApp {
   seq: number;
@@ -22,3 +22,15 @@ export interface IUserAppInfo extends IUserAppPayment {
 }
 
 
+export interface IUserAppPayment extends IPackage {
+  seq: number;
+  userCode: string;
+  packageCode: string;
+  startDate: string;
+  endDate: string;
+  isActive: YnEnum;
+  createdAt: Date;
+  updatedAt: Date;
+  createdId: string;
+  updatedId: string;
+}

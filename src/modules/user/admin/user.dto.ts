@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, ValidateIf } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 
 export enum UserTypeEnum {
@@ -19,4 +19,22 @@ export class GetDetailDto {
   @IsEnum(UserTypeEnum)
   @IsNotEmpty()
   type: string;
+}
+
+export class UpdateUserPaymentAdminDto {
+  @ApiProperty({
+    example: null,
+    required: false,
+    nullable: true,
+  })
+  @ValidateIf((_, value) => value !== null) // bỏ qua validate khi value string === null
+  @IsString()
+  packageCode: string | null;
+
+  @ApiProperty({
+    example: 'admin',
+  })
+  @IsString()
+  @IsNotEmpty()
+  updatedId: string;
 }

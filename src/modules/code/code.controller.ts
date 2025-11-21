@@ -15,7 +15,6 @@ export default class CodeController {
     description: `
   **\`mainCode\`**: - **\`SUBMIT\`** - đăng ký tham quan nhà yến  
   **\`subCode\`**:
-  - **\`STATUS\`** - trạng thái đăng ký tham quan nhà yến  \n
   - **\`NUMBER_ATTEND\`** - số lượng người đăng ký tham quan nhà yến
   `,
     type: GetCodeDto,

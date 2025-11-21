@@ -3,8 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserAdminService } from './user.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { GetAllUserDto, GetDetailDto } from './user.dto';
-import { UpdateUserPaymentAdminDto } from 'src/modules/userPayment/admin/userPayment.dto';
+import { GetAllUserDto, GetDetailDto, UpdateUserPaymentAdminDto } from './user.dto';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/user')

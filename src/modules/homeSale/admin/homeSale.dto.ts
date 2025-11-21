@@ -81,3 +81,18 @@ export class UpdateHomeDto extends OmitType(CreateHomeDto, ['createdId']) {
   @IsNotEmpty()
   updatedId: string;
 }
+
+export class UpdateStatusDto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  statusCode: string;
+
+  @ApiProperty({
+    example: 'admin',
+  })
+  @IsString()
+  updatedId: string;
+}

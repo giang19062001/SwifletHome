@@ -3,10 +3,11 @@ import { forwardRef, Module } from '@nestjs/common';
 import { UserAdminService } from './user.service';
 import { UserAdminRepository } from './user.repository';
 import { UserAdminController } from './user.controller';
-import { UserPaymentAdminModule } from 'src/modules/userPayment/admin/userPayment.module';
+import { PackageAdminModule } from 'src/modules/package/admin/package.module';
+import { FirebaseModule } from 'src/common/firebase/firebase.module';
 
 @Module({
-  imports:[UserPaymentAdminModule, forwardRef(() => AuthAdminModule)], // ← phá phụ thuộc vòng tròn
+  imports:[PackageAdminModule, FirebaseModule, forwardRef(() => AuthAdminModule)], // ← phá phụ thuộc vòng tròn
   controllers: [UserAdminController],
   providers: [UserAdminService, UserAdminRepository],
   exports: [UserAdminService],
