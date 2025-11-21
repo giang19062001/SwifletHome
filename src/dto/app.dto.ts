@@ -11,7 +11,7 @@ export const ApiAppResponseDto = <TModel>(model: any) => {
     @ApiProperty({ example: true })
     success: boolean;
 
-    @ApiProperty({ example: 'OK' })
+    @ApiProperty({ example: 'Success' })
     message: string;
 
     @ApiProperty({ example: 200 })

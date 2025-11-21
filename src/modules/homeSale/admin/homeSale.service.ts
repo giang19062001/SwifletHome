@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
-import { IHomeSale, IHomeSaleImg, IHomeSubmit } from '../homeSale.interface';
+import { IHomeSale, IHomeSaleImg, IHomeSaleSubmit } from '../homeSale.interface';
 import { HomeSaleAdminRepository } from './homeSale.repository';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { diffByTwoArr } from 'src/helpers/func.helper';
@@ -133,12 +133,12 @@ export class HomeSaleAdminService extends AbAdminService {
   }
 
   // TODO: SUBMIT 
-  async getAllSubmit(dto: PagingDto): Promise<IList<IHomeSubmit>> {
+  async getAllSubmit(dto: PagingDto): Promise<IList<IHomeSaleSubmit>> {
     const total = await this.homSaleAdminRepository.getTotalSubmit();
     const list = await this.homSaleAdminRepository.getAllSubmit(dto);
     return { total, list };
   }
-  async getDetailSubmit(seq: number): Promise<IHomeSubmit | null> {
+  async getDetailSubmit(seq: number): Promise<IHomeSaleSubmit | null> {
     const result = await this.homSaleAdminRepository.getDetailSubmit(seq);
     return result;
   }

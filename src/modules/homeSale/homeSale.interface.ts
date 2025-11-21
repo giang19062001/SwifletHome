@@ -28,7 +28,7 @@ export interface IHomeSaleImg {
 }
 
 
-export interface IHomeSubmit {
+export interface IHomeSaleSubmit {
   seq: number;
   homeCode: string;
   userCode: string;

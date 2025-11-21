@@ -1,7 +1,7 @@
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
+import { CreateDoctorDto, DoctorFileDto, ResDoctorFileStrDto } from './doctor.dto';
 import { DoctorAppService } from './doctor.service';
 import { getDoctorMulterConfig } from 'src/config/multer.config';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
@@ -10,6 +10,7 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as userInterface from 'src/modules/user/app/user.interface';
 import { Msg } from 'src/helpers/message.helper';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
 
 @ApiTags('app/doctor')
 @Controller('/api/app/doctor')
@@ -20,8 +21,9 @@ export class DoctorAppController {
   constructor(private readonly doctorAppService: DoctorAppService) {}
 
   @Post('create')
-  @HttpCode(HttpStatus.OK)
   @ApiBody({ type: CreateDoctorDto })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async create(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateDoctorDto) {
     const result = await this.doctorAppService.create(user.userCode, dto);
     if (result === 0) {
@@ -38,6 +40,8 @@ export class DoctorAppController {
   @ApiBody({ type: DoctorFileDto })
   @UseFilters(MulterBadRequestFilter)
   @UseInterceptors(FilesInterceptor('doctorFiles', 5, getDoctorMulterConfig(5)))
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto([ResDoctorFileStrDto]) })
   async uploadFile(@GetUserApp() user: userInterface.IUserApp, @Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {
     const result = await this.doctorAppService.uploadFile(user.userCode, dto, doctorFiles);
     return result;

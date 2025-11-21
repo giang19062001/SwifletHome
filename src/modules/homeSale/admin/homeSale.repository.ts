@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IHomeSale, IHomeSaleImg, IHomeSubmit } from '../homeSale.interface';
+import { IHomeSale, IHomeSaleImg, IHomeSaleSubmit } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { AbAdminRepo } from 'src/abstract/admin.abstract';
@@ -147,7 +147,7 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableSubmit}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllSubmit(dto: PagingDto): Promise<IHomeSubmit[]> {
+  async getAllSubmit(dto: PagingDto): Promise<IHomeSaleSubmit[]> {
     let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
           B.homeName, B.homeImage, C.valueOption AS numberAttend, D.valueOption AS statusValue, D.keyOption as statusKey
           FROM ${this.tableSubmit} A 
@@ -165,10 +165,10 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IHomeSubmit[];
+    return rows as IHomeSaleSubmit[];
   }
 
-  async getDetailSubmit(seq: number): Promise<IHomeSubmit | null> {
+  async getDetailSubmit(seq: number): Promise<IHomeSaleSubmit | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
           B.homeName, B.homeImage, C.valueOption AS numberAttend, D.valueOption AS statusValue, D.keyOption as statusKey
@@ -183,7 +183,7 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
           LIMIT 1 `,
       [seq],
     );
-    return rows ? (rows[0] as IHomeSubmit) : null;
+    return rows ? (rows[0] as IHomeSaleSubmit) : null;
   }
 
   async updateSubmit(dto: UpdateStatusDto, seq: number): Promise<number> {

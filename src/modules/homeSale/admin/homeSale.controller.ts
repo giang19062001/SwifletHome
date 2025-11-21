@@ -24,7 +24,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeSaleAdminService } from './homeSale.service';
-import { IHomeSale, IHomeSubmit } from '../homeSale.interface';
+import { IHomeSale, IHomeSaleSubmit } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
@@ -149,7 +149,7 @@ export class HomeSaleAdminController {
   })
   @Post('getAllSubmit')
   @HttpCode(HttpStatus.OK)
-  async getAllSubmit(@Body() dto: PagingDto): Promise<IList<IHomeSubmit>> {
+  async getAllSubmit(@Body() dto: PagingDto): Promise<IList<IHomeSaleSubmit>> {
     const result = await this.homeSaleAdminService.getAllSubmit(dto);
     return result;
   }
@@ -169,7 +169,7 @@ export class HomeSaleAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Get('getDetailSubmit/:seq')
   @HttpCode(HttpStatus.OK)
-  async getDetailSubmit(@Param('seq') seq: number): Promise<IHomeSubmit | null> {
+  async getDetailSubmit(@Param('seq') seq: number): Promise<IHomeSaleSubmit | null> {
     const result = await this.homeSaleAdminService.getDetailSubmit(seq);
     if (!result) {
       throw new BadRequestException();

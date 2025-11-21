@@ -11,7 +11,7 @@ export class DoctorFileDto {
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
-  
+
   @ApiProperty({
     type: 'array',
     items: {
@@ -27,7 +27,10 @@ class DoctorFileStrDto {
   @ApiProperty({ example: '' })
   filename: string;
 }
-
+export class ResDoctorFileStrDto {
+  @ApiProperty({ example: '' })
+  filename: string;
+}
 export class CreateDoctorDto {
   @ApiProperty({
     example: '',

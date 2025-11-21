@@ -27,7 +27,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { IListApp } from 'src/interfaces/app.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { CreateHomeSubmitDto } from './homeSubmit.dto';
+import { CreateHomeSubmitDto, ResHomeDto } from './homeSubmit.dto';
 import { Msg } from 'src/helpers/message.helper';
 import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
@@ -45,6 +45,7 @@ export class HomeSaleAppController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto([ResHomeDto]) })
   async getAll(@Body() dto: PagingDto): Promise<IListApp<IHomeSale>> {
     const result = await this.homeSaleAppService.getAll(dto);
     return result;
@@ -53,6 +54,7 @@ export class HomeSaleAppController {
   @ApiParam({ name: 'homeCode', type: String })
   @Get('getDetail/:homeCode')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ResHomeDto) })
   async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
     const result = await this.homeSaleAppService.getDetail(homeCode);
     if (!result) {
@@ -62,12 +64,12 @@ export class HomeSaleAppController {
   }
 
   // TODO: SUBMIT
-    @ApiBody({
-      description: `
+  @ApiBody({
+    description: `
   **\`numberAttendCode\`**: - **\` api/app/options/getAll (mainOption: 'SUBMIT', subOption: 'NUMBER_ATTEND')\`** - code (đăng ký tham quan nhà yến)  
     `,
-      type: CreateHomeSubmitDto,
-    })
+    type: CreateHomeSubmitDto,
+  })
   @Post('createSubmit')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
