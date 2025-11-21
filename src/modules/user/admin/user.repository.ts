@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { IUserAdmin } from './user.interface';
-import { PagingDto } from 'src/dto/admin';
+import { PagingDto } from 'src/dto/admin.dto';
 import { IUserAppInfo } from '../app/user.interface';
 
 @Injectable()

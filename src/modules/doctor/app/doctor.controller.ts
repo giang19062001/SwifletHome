@@ -3,13 +3,13 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppService } from './doctor.service';
-import { getDoctorMulterConfig } from 'src/config/multer';
-import { MulterBadRequestFilter } from 'src/filter/uploadError';
-import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { getDoctorMulterConfig } from 'src/config/multer.config';
+import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { GetUserApp } from 'src/decorator/auth';
+import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as userInterface from 'src/modules/user/app/user.interface';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 
 @ApiTags('app/doctor')
 @Controller('/api/app/doctor')

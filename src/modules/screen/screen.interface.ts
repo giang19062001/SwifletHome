@@ -1,3 +1,4 @@
+import { YnEnum } from 'src/interfaces/admin.interface';
 import { IInfoBank } from '../info/info.interface';
 import { IPackage } from '../package/package.interface';
 
@@ -7,7 +8,7 @@ export interface IScreen {
   screenName: string;
   screenContent: any;
   screenDescription: string;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId?: string;

@@ -1,3 +1,4 @@
+import { YnEnum } from "src/interfaces/admin.interface";
 import { IUserAppPayment } from "src/modules/userPayment/app/userPayment.interface";
 
 export interface IUserApp {
@@ -7,7 +8,7 @@ export interface IUserApp {
   userPassword: string;
   userPhone: string;
   deviceToken: string;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum
 }
 
 export interface IUserAppInfo extends IUserAppPayment {
@@ -17,7 +18,7 @@ export interface IUserAppInfo extends IUserAppPayment {
   userPassword: string;
   userPhone: string;
   deviceToken: string;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum
 }
 
 

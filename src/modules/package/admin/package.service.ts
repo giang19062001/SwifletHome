@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
-import { AbAdminService } from 'src/abstract/admin.service';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
+import { AbAdminService } from 'src/abstract/admin.abstract';
 import { PackageAdminRepository } from './package.repository';
 import { IPackage } from '../package.interface';
 

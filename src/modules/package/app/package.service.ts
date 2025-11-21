@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { PackageAppRepository } from './package.repository';
-import { PagingDto } from 'src/dto/admin';
+import { PagingDto } from 'src/dto/admin.dto';
 import { IPackage } from '../package.interface';
 
 @Injectable()

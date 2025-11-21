@@ -15,7 +15,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AnswerAppService } from './answer.service';
 import { SearchService } from 'src/common/search/search.service';
-import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 
 @ApiTags('app/answer')

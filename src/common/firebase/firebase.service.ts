@@ -60,7 +60,7 @@ export class FirebaseService implements OnModuleInit {
     const message: MulticastMessage = {
       tokens, // mảng tokens
       notification: { title, body },
-      data: data ? Object.fromEntries(Object.entries(data).map(([key, value]) => [key, String(value)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
+      data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
     };
 
     try {
@@ -69,6 +69,58 @@ export class FirebaseService implements OnModuleInit {
       return response;
     } catch (error) {
       console.error('Gửi multicast thất bại:', error);
+      throw error;
+    }
+  }
+
+  // Đăng ký một hoặc nhiều FCM token vào một topic
+  async subscribeToTopic(tokens: string | string[], topic: string): Promise<number> {
+    if (!tokens || (Array.isArray(tokens) && tokens.length === 0)) {
+      throw new Error('Tokens không được để trống');
+    }
+
+    const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
+
+    // Lọc bỏ token rỗng/invalid
+    const validTokens = tokenArray.filter(t => typeof t === 'string' && t.trim().length > 0);
+    if (validTokens.length === 0) return 0;
+
+    try {
+      const response = await admin.messaging().subscribeToTopic(validTokens, topic);
+      
+      console.log(`Đã subscribe ${response.successCount} token vào topic "${topic}"`);
+      if (response.failureCount > 0) {
+        console.warn(`Lỗi subscribe ${response.failureCount} token:`, response.errors);
+      }
+      
+      return response.successCount;
+    } catch (error) {
+      console.error('Subscribe topic thất bại:', error);
+      throw error;
+    }
+  }
+
+   // Gỡ một hoặc nhiều token khỏi topic
+  async unsubscribeFromTopic(tokens: string | string[], topic: string): Promise<number> {
+    if (!tokens || (Array.isArray(tokens) && tokens.length === 0)) {
+      throw new Error('Tokens không được để trống');
+    }
+
+    const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
+    const validTokens = tokenArray.filter(t => typeof t === 'string' && t.trim().length > 0);
+    if (validTokens.length === 0) return 0;
+
+    try {
+      const response = await admin.messaging().unsubscribeFromTopic(validTokens, topic);
+      
+      console.log(`Đã unsubscribe ${response.successCount} token khỏi topic "${topic}"`);
+      if (response.failureCount > 0) {
+        console.warn(`Lỗi unsubscribe ${response.failureCount} token:`, response.errors);
+      }
+      
+      return response.successCount;
+    } catch (error) {
+      console.error('Unsubscribe topic thất bại:', error);
       throw error;
     }
   }

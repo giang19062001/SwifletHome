@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
-import { generateCode } from 'src/helpers/func';
+import { generateCode } from 'src/helpers/func.helper';
 import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserAppInfo } from './user.interface';
 

@@ -5,8 +5,8 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/
 import { UploadAudioFilesDto, UploadImgFileDto, UploadVideoLinkDto } from './upload.dto';
 import { IAudioFreePay, IFileUpload } from './upload.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { multerAudioConfig, multerImgConfig } from 'src/config/multer';
-import { Msg } from 'src/helpers/message';
+import { multerAudioConfig, multerImgConfig } from 'src/config/multer.config';
+import { Msg } from 'src/helpers/message.helper';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/uploadFile')

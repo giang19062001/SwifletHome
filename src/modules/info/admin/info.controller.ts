@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Param, BadRequestException, Put, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { InfoAdminService } from './info.service';
 import { IInfo } from '../info.interface';

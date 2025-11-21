@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { GetCodeDto } from './code.dto';
 import { ICode } from './code.interface';
-import { AbAdminRepo } from 'src/abstract/admin.repository';
+import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
 export class CodeRepository extends AbAdminRepo {

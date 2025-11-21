@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserAdminService } from './user.service';
-import { PagingDto } from 'src/dto/admin';
+import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { GetAllUserDto, GetDetailDto } from './user.dto';
 import { UpdateUserPaymentAdminDto } from 'src/modules/userPayment/admin/userPayment.dto';

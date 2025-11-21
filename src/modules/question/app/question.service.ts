@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
 import { QuestionAppRepository } from './question.repository';
 import { IQuestion } from '../question.interface';
 

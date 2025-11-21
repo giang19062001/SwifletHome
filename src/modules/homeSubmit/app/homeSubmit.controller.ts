@@ -1,12 +1,12 @@
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { HomeSubmitAppService } from './homeSubmit.service';
 import { CreateHomeSubmitDto } from './homeSubmit.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { Msg } from 'src/helpers/message';
-import { GetUserApp } from 'src/decorator/auth';
+import { Msg } from 'src/helpers/message.helper';
+import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as userInterface from 'src/modules/user/app/user.interface';
 
 @ApiTags('app/homeSubmit')

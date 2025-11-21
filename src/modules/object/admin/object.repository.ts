@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/admin';
+import { PagingDto } from 'src/dto/admin.dto';
 import { IObject } from '../object.interface';
-import { AbAdminRepo } from 'src/abstract/admin.repository';
+import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
 export class ObjectAdminRepository extends AbAdminRepo {

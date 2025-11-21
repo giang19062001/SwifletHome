@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
 import { AnswerAdminRepository } from './answer.repository';
 import { IAnswer } from '../answer.interface';
 import {
@@ -9,7 +9,7 @@ import {
   UpdateAnswerDto,
 } from './answer.dto';
 import { QuestionAdminService } from 'src/modules/question/admin/question.service';
-import { AbAdminService } from 'src/abstract/admin.service';
+import { AbAdminService } from 'src/abstract/admin.abstract';
 
 @Injectable()
 export class AnswerAdminService extends AbAdminService{

@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/admin';
-import { AbAdminRepo } from 'src/abstract/admin.repository';
+import { PagingDto } from 'src/dto/admin.dto';
+import { AbAdminRepo } from 'src/abstract/admin.abstract';
 import { IPackage } from '../package.interface';
 
 @Injectable()

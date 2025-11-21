@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { HomeSubmitAppRepository } from './homeSubmit.repository';
 import { CreateHomeSubmitDto } from './homeSubmit.dto';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 import { HomeSaleAppService } from 'src/modules/homeSale/app/homeSale.service';
 import { CodeService } from 'src/modules/code/code.service';
 

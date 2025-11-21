@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/admin';
-import { generateCode } from 'src/helpers/func';
+import { PagingDto } from 'src/dto/admin.dto';
+import { generateCode } from 'src/helpers/func.helper';
 import { IDoctor, IDoctorFile } from '../doctor.interface';
 import { CreateDoctorDto } from './doctor.dto';
 

@@ -1,9 +1,9 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
-import { hashPassword } from 'src/helpers/auth';
+import { hashPassword } from 'src/helpers/auth.helper';
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { LoggingService } from 'src/common/logger/logger.service';

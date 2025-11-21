@@ -1,3 +1,5 @@
+import { YnEnum } from "src/interfaces/admin.interface";
+
 export interface IBlog {
   seq: number;
   blogCode: string;
@@ -5,8 +7,8 @@ export interface IBlog {
   blogContent: string;
   blogCategory: string;
   blogScreenCode: string;
-  isActive: 'Y' | 'N';
-  isFree: 'Y' | 'N';
+  isActive: YnEnum;
+  isFree: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;

@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserPaymentAppRepository } from './userPayment.repository';
 import { CreateUserPaymentAppDto } from './userPayment.dto';

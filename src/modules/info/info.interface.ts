@@ -1,10 +1,12 @@
+import { YnEnum } from "src/interfaces/admin.interface";
+
 export interface IInfo {
   seq: number;
   infoKeyword: 'BANK';
   infoName: string;
   infoContent: any;
   infoDescription: string;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId?: string;

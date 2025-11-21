@@ -1,16 +1,16 @@
-import { ApiAppResponse } from './../../../interfaces/app';
+import { ApiAppResponse } from '../../../interfaces/app.interface';
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { AuthAppService } from './auth.service';
-import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { RequestOtpDto, ResRequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAppGuard } from './auth.guard';
-import { GetUserApp } from 'src/decorator/auth';
+import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as userInterface from 'src/modules/user/app/user.interface';
-import { ApiAppResponseDto } from 'src/dto/app';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResUserAppInfoDto, ResUserAuthAppDto } from 'src/modules/user/app/user.dto';
 
 @ApiBearerAuth('app-auth')

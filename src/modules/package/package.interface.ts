@@ -1,3 +1,5 @@
+import { YnEnum } from "src/interfaces/admin.interface";
+
 export interface IPackage {
   seq: number;
   packageCode: string;
@@ -5,7 +7,7 @@ export interface IPackage {
   packageDescription: string;
   packagePrice: string;
   packageExpireDay: number;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;

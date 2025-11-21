@@ -1,7 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { PagingDto } from 'src/dto/admin';
-import { IsFreeEnum } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class GetAllBlogDto extends PagingDto {
   @ApiProperty({
@@ -38,12 +38,12 @@ export class UpdateBlogDto {
   blogCategory: string;
 
    @ApiProperty({
-    example: IsFreeEnum.Y,
-    enum: IsFreeEnum,
+    example: YnEnum.Y,
+    enum: YnEnum,
   })
-  @IsEnum(IsFreeEnum)
+  @IsEnum(YnEnum)
   @IsNotEmpty()
-  isFree: IsFreeEnum;
+  isFree: YnEnum;
 
   @ApiProperty({
     example: 'admin',

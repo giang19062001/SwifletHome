@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { IUserAuthAdmin } from './auth.interface';
 import { LoginAdminDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { AbAuthService } from '../auth.abstract';
 

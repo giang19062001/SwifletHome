@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
 import { IDoctorFileStr } from '../doctor.interface';
-import { getFileLocation } from 'src/config/multer';
+import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
 

@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ScreenAppService } from './screen.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 

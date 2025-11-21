@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAdminRepository } from './user.repository';
 import { IUserAdmin } from './user.interface';
-import { IList } from 'src/interfaces/admin';
+import { IList } from 'src/interfaces/admin.interface';
 import { IUserAppInfo } from '../app/user.interface';
 import { GetAllUserDto } from './user.dto';
 import { UserPaymentAdminService } from 'src/modules/userPayment/admin/userPayment.service';

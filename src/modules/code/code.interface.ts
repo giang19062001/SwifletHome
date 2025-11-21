@@ -1,3 +1,5 @@
+import { YnEnum } from "src/interfaces/admin.interface";
+
 export interface ICode {
   seq: number;
   code: string;
@@ -6,5 +8,5 @@ export interface ICode {
   keyCode: string;
   valueCode: string;
   sortOrder: number;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum;
 }

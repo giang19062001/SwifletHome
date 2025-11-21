@@ -20,14 +20,14 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeSaleAdminService } from './homeSale.service';
 import { IHomeSale } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto } from './homeSale.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { multerImgConfig } from 'src/config/multer';
+import { multerImgConfig } from 'src/config/multer.config';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/home')

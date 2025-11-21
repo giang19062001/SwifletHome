@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
 import { UpdateInfoDto } from './info.dto';
 import { IInfo } from '../info.interface';
 import { InfoAdminRepository } from './info.repository';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
-import { getFileLocation, validateImgExt } from 'src/config/multer';
-import { IMG_TYPES } from 'src/helpers/const';
-import { Msg } from 'src/helpers/message';
+import { getFileLocation, validateImgExt } from 'src/config/multer.config';
+import { IMG_TYPES } from 'src/helpers/const.helper';
+import { Msg } from 'src/helpers/message.helper';
 
 @Injectable()
 export class InfoAdminService {

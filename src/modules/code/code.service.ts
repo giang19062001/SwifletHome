@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CodeRepository } from './code.repository';
 import { GetCodeDto } from './code.dto';
 import { ICode } from './code.interface';
-import { AbAdminService } from 'src/abstract/admin.service';
+import { AbAdminService } from 'src/abstract/admin.abstract';
 
 @Injectable()
 export class CodeService extends AbAdminService {

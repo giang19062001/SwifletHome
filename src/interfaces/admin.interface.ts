@@ -9,7 +9,7 @@ export interface IList<T> {
   list: T[];
 }
 
-export enum IsFreeEnum {
+export enum YnEnum {
   Y = 'Y',
   N = 'N',
 }

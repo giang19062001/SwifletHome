@@ -5,9 +5,9 @@ import { UploadRepository } from './upload.repository';
 import { IAudioFreePay, IFileUpload } from './upload.interface';
 import * as path from 'path';
 import { UploadAudioFilesDto, UploadVideoLinkDto } from './upload.dto';
-import { sortByDate } from 'src/helpers/func';
+import { sortByDate } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()

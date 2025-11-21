@@ -30,7 +30,7 @@ import { ObjectAdminModule } from './modules/object/admin/object.module';
 import { ScreenAdminModule } from './modules/screen/admin/screen.module';
 import { InfoAdminModule } from './modules/info/admin/info.module';
 import { PackageAdminModule } from './modules/package/admin/package.module';
-import { IpMiddleware } from './middleware/ip';
+import { IpMiddleware } from './middleware/ip.middleware';
 import { CornModule } from './common/corn/corn.module';
 import { UserPaymentAdminModule } from './modules/userPayment/admin/userPayment.module';
 

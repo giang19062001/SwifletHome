@@ -1,3 +1,5 @@
+import { YnEnum } from "src/interfaces/admin.interface";
+
 export interface IDoctor {
   seq: number;
   userCode: string;
@@ -7,7 +9,7 @@ export interface IDoctor {
   noteAnswered: string;
   statusCode: string;
   uniqueId: string;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
@@ -29,5 +31,5 @@ export interface IDoctorFile {
   size: number;
   mimetype: string;
   uniqueId: string;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum;
 }

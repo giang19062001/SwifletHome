@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class ResUserAppDto {
   @ApiProperty({ example: 0 })
@@ -17,7 +18,7 @@ export class ResUserAppDto {
   deviceToken: string;
 
   @ApiProperty({ example: 'Y', enum: ['Y', 'N'] })
-  isActive: 'Y' | 'N';
+  isActive: YnEnum
 }
 
 export class ResUserAuthAppDto extends ResUserAppDto {

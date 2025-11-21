@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNotEmptyObject, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { IsStringOrObject } from 'src/decorator/dto';
 
 export class UpdateInfoDto {
   // @IsString()

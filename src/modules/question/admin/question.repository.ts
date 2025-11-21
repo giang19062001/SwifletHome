@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/admin';
+import { PagingDto } from 'src/dto/admin.dto';
 import { IQuestion } from '../question.interface';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
-import { generateCode } from 'src/helpers/func';
-import { AbAdminRepo } from 'src/abstract/admin.repository';
+import { generateCode } from 'src/helpers/func.helper';
+import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
 export class QuestionAdminRepository extends AbAdminRepo {

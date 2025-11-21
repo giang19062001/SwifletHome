@@ -1,5 +1,5 @@
 import { Injectable} from '@nestjs/common';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { PackageAppService } from 'src/modules/package/app/package.service';
 import { InfoAppService } from 'src/modules/info/app/info.service';

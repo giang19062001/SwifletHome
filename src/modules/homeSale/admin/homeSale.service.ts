@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
 import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
 import { HomeSaleAdminRepository } from './homeSale.repository';
 import { CreateHomeDto, UpdateHomeDto } from './homeSale.dto';
-import { diffByTwoArr } from 'src/helpers/func';
+import { diffByTwoArr } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { AbAdminService } from 'src/abstract/admin.service';
+import { AbAdminService } from 'src/abstract/admin.abstract';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()

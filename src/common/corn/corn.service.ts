@@ -4,7 +4,7 @@ import { CronJob } from 'cron';
 import { DoctorAdminRepository } from 'src/modules/doctor/admin/doctor.repository';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
 import { LoggingService } from '../logger/logger.service';
-import { getFileLocation } from 'src/config/multer';
+import { getFileLocation } from 'src/config/multer.config';
 import path from 'path';
 
 @Injectable()

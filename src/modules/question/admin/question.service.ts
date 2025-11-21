@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
 import { IQuestion } from '../question.interface';
 import { QuestionAdminRepository } from './question.repository';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
-import { AbAdminService } from 'src/abstract/admin.service';
+import { AbAdminService } from 'src/abstract/admin.abstract';
 
 @Injectable()
 export class QuestionAdminService extends AbAdminService {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
-import { fuseConfig, ISearchItem } from 'src/config/search';
-import { Msg } from 'src/helpers/message';
+import { fuseConfig, ISearchItem } from 'src/config/search.config';
+import { Msg } from 'src/helpers/message.helper';
 
 @Injectable()
 export class SearchService {

@@ -1,10 +1,10 @@
 // src/services/logging.service.ts
 import { Injectable, LoggerService, LogLevel, Scope } from '@nestjs/common';
-import { winstonConfig } from 'src/config/logger';
-import { requestContextStorage } from 'src/middleware/ip';
+import { winstonConfig } from 'src/config/logger.config';
+import { requestContextStorage } from 'src/middleware/ip.middleware';
 import { createLogger, Logger } from 'winston';
 
-@Injectable({ scope: Scope.DEFAULT }) // ✅ Chuyển sang DEFAULT scope
+@Injectable({ scope: Scope.DEFAULT }) //  Chuyển sang DEFAULT scope
 export class LoggingService implements LoggerService {
   private readonly logger: Logger;
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin';
-import { IList } from 'src/interfaces/admin';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IList } from 'src/interfaces/admin.interface';
 import {
   CreateBlogDto,
   GetAllBlogDto,
@@ -8,7 +8,7 @@ import {
 } from './blog.dto';
 import { BlogAdminRepository } from './blog.repository';
 import { IBlog } from '../blog.interface';
-import { AbAdminService } from 'src/abstract/admin.service';
+import { AbAdminService } from 'src/abstract/admin.abstract';
 
 @Injectable()
 export class BlogAdminService extends AbAdminService{

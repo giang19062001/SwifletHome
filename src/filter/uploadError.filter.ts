@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { Msg } from 'src/helpers/message';
+import { Msg } from 'src/helpers/message.helper';
 
 @Catch(BadRequestException)
 export class MulterBadRequestFilter implements ExceptionFilter {

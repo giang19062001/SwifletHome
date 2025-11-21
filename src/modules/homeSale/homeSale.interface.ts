@@ -1,3 +1,5 @@
+import { YnEnum } from "src/interfaces/admin.interface";
+
 export interface IHomeSale {
   seq: number;
   homeCode: string;
@@ -6,7 +8,7 @@ export interface IHomeSale {
   homeDescription: string;
   latitude: number;
   longitude: number;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
@@ -22,5 +24,5 @@ export interface IHomeSaleImg {
   originalname: string;
   size: number;
   mimetype: string;
-  isActive: 'Y' | 'N';
+  isActive: YnEnum;
 }
