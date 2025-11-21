@@ -364,46 +364,55 @@ CREATE TABLE `tbl_screen_config` (
   PRIMARY KEY (`seq`)
 );
 
-
-
+-- thông báo
 CREATE TABLE tbl_notification_topics (
   seq INT AUTO_INCREMENT PRIMARY KEY,
   topicCode VARCHAR(45) NOT NULL UNIQUE,
   topicName VARCHAR(45) NOT NULL UNIQUE,
   description TEXT,
-  isActive char(1) NOT NULL DEFAULT 'Y',
-  createdAt datetime DEFAULT CURRENT_TIMESTAMP,
-  updatedAt datetime DEFAULT NULL,
-  createdId varchar(45) DEFAULT 'SYSTEM',
-  updatedId varchar(45) DEFAULT NULL
-);
+  isActive CHAR(1) NOT NULL DEFAULT 'Y',
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT NULL,
+  createdId VARCHAR(45) DEFAULT 'SYSTEM',
+  updatedId VARCHAR(45) DEFAULT NULL
+) ENGINE=InnoDB;
+
 
 CREATE TABLE tbl_user_topics (
   seq INT AUTO_INCREMENT PRIMARY KEY,
-  userCode varchar(45) NOT NULL,
-  topicCode varchar(45) NOT NULL,
-  isActive char(1) NOT NULL DEFAULT 'Y',
-  createdAt datetime DEFAULT CURRENT_TIMESTAMP,
-  updatedAt datetime DEFAULT NULL,
-  createdId varchar(45) DEFAULT 'SYSTEM',
-  updatedId varchar(45) DEFAULT NULL
-);
+  userCode VARCHAR(45) NOT NULL,
+  topicCode VARCHAR(45) NOT NULL,
+  isActive CHAR(1) NOT NULL DEFAULT 'Y',
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT NULL,
+  createdId VARCHAR(45) DEFAULT 'SYSTEM',
+  updatedId VARCHAR(45) DEFAULT NULL,
+  CONSTRAINT fk_user_topics_user 
+    FOREIGN KEY (userCode) REFERENCES tbl_user_app (userCode) ON DELETE CASCADE,
+  CONSTRAINT fk_user_topics_topic 
+    FOREIGN KEY (topicCode) REFERENCES tbl_notification_topics (topicCode) ON DELETE CASCADE,
+  UNIQUE KEY uniq_user_topic (userCode, topicCode)  -- chống trùng
+) ENGINE=InnoDB;
+
 
 CREATE TABLE tbl_notifications (
   seq INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   body TEXT NOT NULL,
   data JSON,
-  userCode varchar(45), 
-  topicCode varchar(45),
+  userCode VARCHAR(45) NOT NULL,
+  topicCode VARCHAR(45) DEFAULT NULL,          -- có thể null
   status ENUM('SENT','READ','FAIL') DEFAULT 'SENT',
-  isActive char(1) NOT NULL DEFAULT 'Y',
-  createdAt datetime DEFAULT CURRENT_TIMESTAMP,
-  updatedAt datetime DEFAULT NULL,
-  createdId varchar(45) DEFAULT 'SYSTEM',
-  updatedId varchar(45) DEFAULT NULL
-);
-
+  isActive CHAR(1) NOT NULL DEFAULT 'Y',
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT NULL,
+  createdId VARCHAR(45) DEFAULT 'SYSTEM',
+  updatedId VARCHAR(45) DEFAULT NULL,
+  CONSTRAINT fk_notifications_user 
+    FOREIGN KEY (userCode) REFERENCES tbl_user_app (userCode) ON DELETE CASCADE,
+  CONSTRAINT fk_notifications_topic 
+    FOREIGN KEY (topicCode) REFERENCES tbl_notification_topics (topicCode) ON DELETE SET NULL
+) ENGINE=InnoDB;
 
 -- INSERT
 INSERT INTO `tbl_user_admin` (`userId`, `userName`, `userPassword`, `isActive`, `createdAt`, `updatedAt`) 

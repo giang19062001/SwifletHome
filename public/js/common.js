@@ -159,7 +159,7 @@ function hidePageLoader() {
 
 // time
 function formatDateTime(dateTime){
-   return moment.utc(dateTime).format('YYYY-MM-DD HH:mm:ss')
+   return moment(dateTime).format('YYYY-MM-DD HH:mm:ss')
 }
 
 async function loaderApiCall(promise) {

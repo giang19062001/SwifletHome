@@ -90,7 +90,7 @@ function renderAllUser(data, objElement) {
             <td><p>${ele.startDate ? formatDateTime(ele.startDate) : ''}</p></td>
             <td><p>${ele.endDate ? formatDateTime(ele.endDate) : ''}</p></td>
             <td>
-              <p class="txt-not-ok">${ele.endDate ? moment.utc(ele.endDate).startOf('day').diff(moment.utc().startOf('day'), 'days') + ' ngày' : ''}</p>
+              <p class="txt-not-ok">${ele.endDate ? moment(ele.endDate).startOf('day').diff(moment().startOf('day'), 'days') + ' ngày' : ''}</p>
             </td>
             <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
