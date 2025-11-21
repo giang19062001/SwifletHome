@@ -30,7 +30,7 @@ function renderAllHome(data, objElement) {
       const rowHtml = `
          <tr class="text-center">
             <td><p>${page * i++}</p></td>
-            <td class="p-3"><img class="home-img" src="${currentUrl}/uploads/images/homes/${ele.homeImage}"></img></td>
+            <td class="p-3"><img class="home-img" src="${CURRENT_URL}/uploads/images/homes/${ele.homeImage}"></img></td>
             <td><p>${ele.homeName}</p></td>
             <td><p>${ele.homeAddress}</p></td>
             <td><p>${ele.latitude}</p></td>
@@ -66,7 +66,7 @@ async function getAllHome(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/home/getAll',
+      CURRENT_URL + '/api/admin/home/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -92,7 +92,7 @@ async function deleteHome(homeCode) {
     return;
   }
   await axios
-    .delete(currentUrl + `/api/admin/home/delete/${homeCode}`, axiosAuth())
+    .delete(CURRENT_URL + `/api/admin/home/delete/${homeCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

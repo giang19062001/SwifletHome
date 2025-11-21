@@ -1,8 +1,4 @@
-const currentPath = window.location.pathname;
-const currentUrl = window.location.origin;
-const currentSearch = window.location.search;
-
-let pathParts = currentPath.split('/').filter(Boolean);
+let pathParts = CURRENT_PATH.split('/').filter(Boolean);
 let partType = pathParts[1] || '';
 
 document.addEventListener('DOMContentLoaded', initMenu);
@@ -29,9 +25,8 @@ function setActiveMenuByUrl(allLinks) {
     const href = link.getAttribute('href');
     if (!href || href === '#' || href === '') return;
 
-    console.log(currentPath, href);
-    // Ưu tiên href dài nhất khớp currentPath (tránh trùng lặp kiểu /question/ và /question-detail/)
-    if (currentPath.startsWith(href) && href.length > maxLength) {
+    // Ưu tiên href dài nhất khớp current path (tránh trùng lặp kiểu /question/ và /question-detail/)
+    if (CURRENT_PATH.startsWith(href) && href.length > maxLength) {
       maxLength = href.length;
       bestMatch = link;
     }

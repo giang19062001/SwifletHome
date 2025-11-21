@@ -47,7 +47,7 @@ async function getAllPackage(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/package/getAll',
+      CURRENT_URL + '/api/admin/package/getAll',
       {
         page: currentPage,
         limit: limit,

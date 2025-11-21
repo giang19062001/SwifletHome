@@ -60,7 +60,7 @@ async function getAllBlog(currentPage, limit) {
   
   await axios
     .post(
-      currentUrl + '/api/admin/blog/getAll',
+      CURRENT_URL + '/api/admin/blog/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -86,7 +86,7 @@ async function deleteBlog(blogCode) {
     return;
   }
   await axios
-    .delete(currentUrl + `/api/admin/blog/delete/${blogCode}`, axiosAuth())
+    .delete(CURRENT_URL + `/api/admin/blog/delete/${blogCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

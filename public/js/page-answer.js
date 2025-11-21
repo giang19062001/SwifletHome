@@ -60,7 +60,7 @@ async function getAllAnswer(currentPage, limit) {
   
   await axios
     .post(
-      currentUrl + '/api/admin/answer/getAll',
+      CURRENT_URL + '/api/admin/answer/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -85,7 +85,7 @@ async function deleteAnswer(answerCode) {
     return;
   }
   await axios
-    .delete(currentUrl + `/api/admin/answer/delete/${answerCode}`, axiosAuth())
+    .delete(CURRENT_URL + `/api/admin/answer/delete/${answerCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

@@ -1,12 +1,10 @@
 let page = 1;
 let limit = 10;
 let pageElement = 'page-doctor';
-let statusOptions = [];
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllDoctor(page, limit);
-  getStatusCode();
 });
 
 // TODO: FUNC
@@ -87,17 +85,19 @@ async function showDoctorModal(doctorData) {
   }
 
   // render danh sách status
-  const selectStatus = modalEl.querySelector('#statusCode');
+  const selectStatus = modalEl.querySelector('#status');
   selectStatus.innerHTML = '';
 
-  statusOptions.forEach((ele) => {
+  OPTIONS.DOCTOR_STATUS.forEach((ele) => {
     const option = document.createElement('option');
-    option.value = ele.code;
-    option.textContent = ele.valueOption;
-    if (doctorData.statusKey !== 'WAITING' && ele.keyOption == 'WAITING') {
+    option.value = ele.value;
+    option.textContent = ele.text;
+    // nếu đã là duyệt và hủy -> disable 'chờ'
+    if (doctorData.statusKey !== 'WAITING' && ele.value == 'WAITING') {
       option.disabled = true;
     }
-    if (ele.code === doctorData.statusCode) {
+    // nếu match  -> tự selected
+    if (ele.value === doctorData.status) {
       option.selected = true;
     }
 
@@ -125,7 +125,7 @@ function renderAllDoctor(data, objElement) {
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td><p>${ele.note}</p></td>
-            <td><b class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.statusValue}</b></td>
+            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${OPTIONS.DOCTOR_STATUS.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-main-out"  onclick="getDetailDoctor('${ele.seq}')">Chỉnh sửa</button>
@@ -147,33 +147,14 @@ function renderAllDoctor(data, objElement) {
   hideSkeleton(objElement);
 }
 // TODO: API
-async function getStatusCode() {
-  await axios
-    .post(
-      currentUrl + '/api/app/code/getAll',
-      {
-        mainOption: 'DOCTOR',
-        subOption: 'STATUS',
-      },
-      axiosAuth(),
-    )
-    .then(function (response) {
-      console.log('response', response);
-      if (response.status === 200 && response.data.data) {
-        statusOptions = response.data.data;
-      }
-    })
-    .catch(function (error) {
-      console.log('error', error);
-    });
-}
+
 async function getAllDoctor(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
   showSkeleton(objElement, limit, 6);
   await axios
     .post(
-      currentUrl + '/api/admin/doctor/getAll',
+      CURRENT_URL + '/api/admin/doctor/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -193,7 +174,7 @@ async function getAllDoctor(currentPage, limit) {
 async function getDetailDoctor(seq) {
   await loaderApiCall(
     axios
-      .get(currentUrl + '/api/admin/doctor/getDetail/' + seq, axiosAuth())
+      .get(CURRENT_URL + '/api/admin/doctor/getDetail/' + seq, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -210,7 +191,7 @@ async function updateDoctor() {
   try {
     const modalBody = document.querySelector('.doctor-update-modal .modal-body form');
     const seq = modalBody.querySelector('#seq').value;
-    const statusCode = modalBody.querySelector('#statusCode').value;
+    const status = modalBody.querySelector('#status').value;
     const noteAnswered = modalBody.querySelector('#noteAnswered').value;
     if (String(noteAnswered).trim() == '') {
       modalBody.querySelector('.err-noteAnswered').style.display = 'block';
@@ -218,9 +199,9 @@ async function updateDoctor() {
     }
     await axios
       .put(
-        currentUrl + '/api/admin/doctor/update/' + seq,
+        CURRENT_URL + '/api/admin/doctor/update/' + seq,
         {
-          statusCode: statusCode,
+          status: status,
           noteAnswered: noteAnswered,
           updatedId: user.userId,
         },

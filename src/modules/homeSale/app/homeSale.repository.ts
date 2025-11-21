@@ -66,12 +66,12 @@ export class HomeSaleAppRepository {
     return result;
   }
   // TODO: SUBMIT 
-  async createSubmit(dto: CreateHomeSubmitDto, userCode: string, statusCode: string): Promise<number> {
+  async createSubmit(dto: CreateHomeSubmitDto, userCode: string, status: string): Promise<number> {
     const sql = `
-        INSERT INTO ${this.tableSubmit}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, statusCode, createdId) 
+        INSERT INTO ${this.tableSubmit}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, status, createdId) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.homeCode, userCode, dto.userName, dto.userPhone, dto.numberAttendCode, dto.note, statusCode, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.homeCode, userCode, dto.userName, dto.userPhone, dto.numberAttendCode, dto.note, status, userCode]);
 
     return result.insertId;
   }

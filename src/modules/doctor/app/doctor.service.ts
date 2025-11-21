@@ -22,7 +22,8 @@ export class DoctorAppService {
 
     try {
       let result = 1;
-      const seq = await this.doctorAppRepository.create(userCode, dto);
+      // mặc định là chờ 'WAITING'
+      const seq = await this.doctorAppRepository.create(userCode, dto, "WAITING");
       if (seq) {
         const doctor = await this.doctorAppRepository.getDetail(seq);
         if (doctor) {

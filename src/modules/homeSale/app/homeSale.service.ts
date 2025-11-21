@@ -41,17 +41,9 @@ export class HomeSaleAppService {
     if (!attendCodes.map((c) => c.code).includes(dto.numberAttendCode)) {
       throw new BadRequestException(Msg.CodeInvalid);
     }
-    // lấy statusCode -> Đang chờ duyệt
-    const statusCodes = await this.optionService.getAll({
-      mainOption: 'SUBMIT',
-      subOption: 'STATUS',
-      keyOption: 'WAITING',
-    });
-    if (!statusCodes.length) {
-      throw new BadRequestException();
-    }
+    // mặc định status ban đầu là 'WAITING' -> Đang chờ duyệt
 
-    const result = await this.homeSaleAppRepository.createSubmit(dto, userCode, statusCodes[0].code);
+    const result = await this.homeSaleAppRepository.createSubmit(dto, userCode, "WAITING");
     return result;
   }
 }

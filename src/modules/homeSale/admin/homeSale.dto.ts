@@ -88,7 +88,7 @@ export class UpdateStatusDto {
   })
   @IsString()
   @IsNotEmpty()
-  statusCode: string;
+  status: string;
 
   @ApiProperty({
     example: 'admin',

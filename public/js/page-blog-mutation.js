@@ -1,5 +1,5 @@
 // TODO:INIT
-const blogCode = currentPath.includes('/update') ? currentPath.split('/').pop() : null;
+const blogCode = CURRENT_PATH.includes('/update') ? CURRENT_PATH.split('/').pop() : null;
 const pageElement = 'page-blog-mutation';
 
 // Theo dõi nút chế độ xem
@@ -67,7 +67,7 @@ function renderContentHtml() {
 
   // Xóa nút thanh toán nếu  chế độ xem là đã trả phí
   if (isPaidPreview == 'PAID') {
-    contentHtml = contentHtml.replaceAll(`<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`, '');
+    contentHtml = contentHtml.replaceAll(`<img src="${CURRENT_URL}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`, '');
   }
 
   // Replace [[payment]]
@@ -78,7 +78,7 @@ function renderContentHtml() {
       const parts = contentHtml.split('[[payment]]');
 
       // Chỉ giữ phần trước + nút thanh toán
-      contentHtml = parts[0] + `<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`;
+      contentHtml = parts[0] + `<img src="${CURRENT_URL}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`;
     }
     // Nếu không có [[payment]], giữ nguyên contentHtml
   } else {
@@ -133,7 +133,7 @@ async function createBlog() {
     const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
     await axios
       .post(
-        currentUrl + '/api/admin/blog/create',
+        CURRENT_URL + '/api/admin/blog/create',
         {
           blogContent,
           blogCategory,
@@ -179,7 +179,7 @@ async function updateBlog() {
 
     await axios
       .put(
-        currentUrl + '/api/admin/blog/update/' + blogCode,
+        CURRENT_URL + '/api/admin/blog/update/' + blogCode,
         {
           blogContent,
           blogCategory,

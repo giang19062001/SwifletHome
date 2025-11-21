@@ -123,11 +123,11 @@ function copyData(filename, mimetype) {
   let copiedName = '';
   if (mimetype.startsWith('audio/')) {
     if (filename.includes('editorAudio')) {
-      copiedName = `[[audio-data=${currentUrl}/uploads/audios/editors/${filename}]]`;
+      copiedName = `[[audio-data=${CURRENT_URL}/uploads/audios/editors/${filename}]]`;
     }
   } else if (mimetype.startsWith('image/')) {
     if (filename.includes('editorImg')) {
-      copiedName = `[[image-data=${currentUrl}/uploads/images/editors/${filename}]]`;
+      copiedName = `[[image-data=${CURRENT_URL}/uploads/images/editors/${filename}]]`;
     }
   } else if (mimetype.startsWith('video/')) {
     copiedName = `[[video-data=${convertToEmbedUrl(filename)}]]`;
@@ -343,7 +343,7 @@ async function uploadVideoLink(urlLink) {
   try {
     await axios
       .post(
-        currentUrl + '/api/admin/uploadFile/uploadVideoLink',
+        CURRENT_URL + '/api/admin/uploadFile/uploadVideoLink',
         {
           urlLink: urlLink,
           createdId: user.userId,
@@ -371,7 +371,7 @@ async function deleteFile(filename, seq, mimetype) {
   if (mimetype.startsWith('video/')) {
     // video youyube
     await axios
-      .delete(currentUrl + '/api/admin/uploadFile/deleteVideoLink/' + seq, axiosAuth())
+      .delete(CURRENT_URL + '/api/admin/uploadFile/deleteVideoLink/' + seq, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -387,7 +387,7 @@ async function deleteFile(filename, seq, mimetype) {
   } else if (mimetype.startsWith('audio/')) {
     // audio
     await axios
-      .delete(currentUrl + '/api/admin/uploadFile/deleteAudio/' + filename, axiosAuth())
+      .delete(CURRENT_URL + '/api/admin/uploadFile/deleteAudio/' + filename, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -403,7 +403,7 @@ async function deleteFile(filename, seq, mimetype) {
   } else if (mimetype.startsWith('image/')) {
     // audio
     await axios
-      .delete(currentUrl + '/api/admin/uploadFile/deleteImg/' + filename, axiosAuth())
+      .delete(CURRENT_URL + '/api/admin/uploadFile/deleteImg/' + filename, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -423,7 +423,7 @@ async function getAllFile() {
   const objElement = document.querySelector(`.file-box`);
 
   await axios
-    .get(currentUrl + '/api/admin/uploadFile/getAllFile', axiosAuth())
+    .get(CURRENT_URL + '/api/admin/uploadFile/getAllFile', axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

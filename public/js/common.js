@@ -21,7 +21,7 @@ function getShortTextFromHtml(html) {
 
 async function ChangeUrlToFile(filename, location) {
   try {
-    const response = await fetch(`${currentUrl}/uploads/${location}/${filename}`);
+    const response = await fetch(`${CURRENT_URL}/uploads/${location}/${filename}`);
     const blob = await response.blob();
     return new File([blob], filename, { type: blob.type });
   } catch (error) {

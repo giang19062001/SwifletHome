@@ -56,7 +56,7 @@ async function getAllScreen(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/screen/getAll',
+      CURRENT_URL + '/api/admin/screen/getAll',
       {
         page: currentPage,
         limit: limit,

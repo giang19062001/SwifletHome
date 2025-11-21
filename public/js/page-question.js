@@ -205,7 +205,7 @@ async function getAllQuestion(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/question/getAll',
+      CURRENT_URL + '/api/admin/question/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -224,7 +224,7 @@ async function getAllQuestion(currentPage, limit) {
 async function getAllCategory(currentPage, limit) {
   await axios
     .post(
-      currentUrl + '/api/admin/category/getAll',
+      CURRENT_URL + '/api/admin/category/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -244,7 +244,7 @@ async function getAllCategory(currentPage, limit) {
 async function getAllObject(currentPage, limit) {
   await axios
     .post(
-      currentUrl + '/api/admin/object/getAll',
+      CURRENT_URL + '/api/admin/object/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -265,7 +265,7 @@ async function getAllObject(currentPage, limit) {
 async function getDetailQuestion(questionCode) {
   await loaderApiCall(
     axios
-      .get(currentUrl + '/api/admin/question/getDetail/' + questionCode, axiosAuth())
+      .get(CURRENT_URL + '/api/admin/question/getDetail/' + questionCode, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -281,7 +281,7 @@ async function getDetailQuestion(questionCode) {
 async function getAllAnswer(currentPage, limit, answerCategory, answerObject) {
   return await axios
     .post(
-      currentUrl + '/api/admin/answer/getAll',
+      CURRENT_URL + '/api/admin/answer/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -309,7 +309,7 @@ async function deleteQuestion(questionCode) {
     return;
   }
   await axios
-    .delete(currentUrl + `/api/admin/question/delete/${questionCode}`, axiosAuth())
+    .delete(CURRENT_URL + `/api/admin/question/delete/${questionCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
@@ -341,7 +341,7 @@ async function createQuestion(btn) {
     btn.disabled = true;
 
     const response = await axios.post(
-      currentUrl + '/api/admin/question/create',
+      CURRENT_URL + '/api/admin/question/create',
       {
         questionContent,
         questionCategory,
@@ -387,7 +387,7 @@ async function updateQuestion(btn) {
 
     await axios
       .put(
-        currentUrl + '/api/admin/question/update/' + questionCode,
+        CURRENT_URL + '/api/admin/question/update/' + questionCode,
         {
           questionContent: questionContent,
           questionCategory: questionCategory,

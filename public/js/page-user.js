@@ -117,7 +117,7 @@ function renderAllUser(data, objElement) {
 async function getAllPackage(currentPage, limit) {
   await axios
     .post(
-      currentUrl + '/api/admin/package/getAll',
+      CURRENT_URL + '/api/admin/package/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -142,7 +142,7 @@ async function getAllUser(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/user/getAll',
+      CURRENT_URL + '/api/admin/user/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -165,7 +165,7 @@ async function getDetailUser(userCode) {
   await loaderApiCall(
     // lấy thông tin user
     axios
-      .post(currentUrl + '/api/admin/user/getDetail/' + userCode, { type: 'APP' }, axiosAuth())
+      .post(CURRENT_URL + '/api/admin/user/getDetail/' + userCode, { type: 'APP' }, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -190,7 +190,7 @@ async function updateUser(btn) {
 
     await axios
       .put(
-        currentUrl + '/api/admin/user/updatePackage/' + userCode,
+        CURRENT_URL + '/api/admin/user/updatePackage/' + userCode,
         {
           packageCode: packageCode,
           updatedId: user.userId,

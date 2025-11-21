@@ -297,7 +297,7 @@ async function getAllInfo(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/info/getAll',
+      CURRENT_URL + '/api/admin/info/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -318,7 +318,7 @@ async function getAllInfo(currentPage, limit) {
 async function getDetailInfo(infoKeyword) {
   await loaderApiCall(
     axios
-      .get(currentUrl + '/api/admin/info/getDetail/' + infoKeyword, axiosAuth())
+      .get(CURRENT_URL + '/api/admin/info/getDetail/' + infoKeyword, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -345,7 +345,7 @@ async function updateInfo(infoKeyword, btn) {
   btn.disabled = true;
 
   try {
-    const response = await axios.put(currentUrl + '/api/admin/info/update/' + infoKeyword, formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    const response = await axios.put(CURRENT_URL + '/api/admin/info/update/' + infoKeyword, formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
     if (response.data) {
       toastOk('Chỉnh sửa thành công');
       // đóng modal

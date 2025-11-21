@@ -1,5 +1,5 @@
 const pageElement = '#page-screen-mutation';
-const params = new URLSearchParams(currentSearch);
+const params = new URLSearchParams(CURRENT_PARAMS);
 const screenKeyword = params.get('screen-keyword');
 const screenMutationConstraints = {
   screenName: {
@@ -176,7 +176,7 @@ async function updateScreen() {
     }
     await axios
       .put(
-        currentUrl + '/api/admin/screen/update/' + screenKeyword,
+        CURRENT_URL + '/api/admin/screen/update/' + screenKeyword,
         {
           screenName: formData.screenName,
           screenDescription: formData.screenDescription,

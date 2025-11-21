@@ -1,7 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/admin.dto';
-import { generateCode } from 'src/helpers/func.helper';
 import { IDoctor, IDoctorFile } from '../doctor.interface';
 import { CreateDoctorDto } from './doctor.dto';
 
@@ -23,7 +21,7 @@ export class DoctorAppRepository {
   }
   async getDetail(seq: number): Promise<IDoctor | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.statusCode, A.uniqueId
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.uniqueId
           FROM ${this.table} A 
           WHERE A.seq = ? AND A.isActive = 'Y'
           LIMIT 1 `,
@@ -31,12 +29,12 @@ export class DoctorAppRepository {
     );
     return rows ? (rows[0] as IDoctor) : null;
   }
-  async create(userCode: string, dto: CreateDoctorDto): Promise<number> {
+  async create(userCode: string, dto: CreateDoctorDto, status: string): Promise<number> {
     const sql = `
-      INSERT INTO ${this.table}  (userCode, userName, userPhone, note, statusCode, uniqueId, createdId) 
+      INSERT INTO ${this.table}  (userCode, userName, userPhone, note, status, uniqueId, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.note, 'COD000008', dto.uniqueId, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.note, status, dto.uniqueId, userCode]);
 
     return result.insertId;
   }

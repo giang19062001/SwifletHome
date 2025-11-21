@@ -15,11 +15,8 @@ export class DoctorAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IDoctor[]> {
-    let query = `  SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.statusCode, A.createdAt,
-        B.valueOption AS statusValue, B.keyOption as statusKey
-        FROM ${this.table} A 
-         LEFT JOIN tbl_option_common B
-        ON A.statusCode = B.code `;
+    let query = `  SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
+        FROM ${this.table} A  `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -33,11 +30,8 @@ export class DoctorAdminRepository {
 
   async getDetail(seq: number): Promise<IDoctor | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.statusCode, A.createdAt,
-        B.valueOption AS statusValue, B.keyOption as statusKey
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
         FROM ${this.table} A 
-        LEFT JOIN tbl_option_common B
-        ON A.statusCode = B.code
         WHERE A.SEQ = ? AND A.isActive = 'Y'
         LIMIT 1 `,
       [seq],
@@ -46,10 +40,10 @@ export class DoctorAdminRepository {
   }
   async update(dto: UpdateDoctorDto, seq: number): Promise<number> {
     const sql = `
-          UPDATE ${this.table} SET noteAnswered = ?, statusCode = ?, updatedId = ?, updatedAt = ?
+          UPDATE ${this.table} SET noteAnswered = ?, status = ?, updatedId = ?, updatedAt = ?
           WHERE seq = ?
         `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.noteAnswered, dto.statusCode, dto.updatedId, new Date(), seq]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.noteAnswered, dto.status, dto.updatedId, new Date(), seq]);
 
     return result.affectedRows;
   }

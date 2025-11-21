@@ -1,5 +1,5 @@
 // TODO:INIT
-const answerCode = currentPath.includes('/update') ? currentPath.split('/').pop() : null;
+const answerCode = CURRENT_PATH.includes('/update') ? CURRENT_PATH.split('/').pop() : null;
 const pageElement = 'page-answer-mutation';
 
 // Theo dõi nút chế độ xem
@@ -67,7 +67,7 @@ function renderContentHtml() {
 
   // Xóa nút thanh toán nếu  chế độ xem là đã trả phí
   if (isPaidPreview == 'PAID') {
-    contentHtml = contentHtml.replaceAll(`<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`, '');
+    contentHtml = contentHtml.replaceAll(`<img src="${CURRENT_URL}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`, '');
   }
 
   // Replace [[payment]]
@@ -78,7 +78,7 @@ function renderContentHtml() {
       const parts = contentHtml.split('[[payment]]');
 
       // Chỉ giữ phần trước + nút thanh toán
-      contentHtml = parts[0] + `<img src="${currentUrl}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`;
+      contentHtml = parts[0] + `<img src="${CURRENT_URL}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`;
     }
     // Nếu không có [[payment]], giữ nguyên contentHtml
   } else {
@@ -134,7 +134,7 @@ async function createAnswer() {
     const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
     await axios
       .post(
-        currentUrl + '/api/admin/answer/create',
+        CURRENT_URL + '/api/admin/answer/create',
         {
           answerContent,
           answerCategory,
@@ -181,7 +181,7 @@ async function updateAnswer() {
 
     await axios
       .put(
-        currentUrl + '/api/admin/answer/update/' + answerCode,
+        CURRENT_URL + '/api/admin/answer/update/' + answerCode,
         {
           answerContent,
           answerCategory,

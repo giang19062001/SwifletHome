@@ -7,7 +7,7 @@ export interface IDoctor {
   userPhone: string;
   note: string;
   noteAnswered: string;
-  statusCode: string;
+  status: string;
   uniqueId: string;
   isActive: YnEnum;
   createdAt: Date;

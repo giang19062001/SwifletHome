@@ -46,7 +46,7 @@ async function getAllCategory(currentPage, limit) {
   showSkeleton(objElement, limit, 3);
 
   try {
-    const response = await axios.post(currentUrl + '/api/admin/category/getAll', { page: currentPage, limit: limit }, axiosAuth());
+    const response = await axios.post(CURRENT_URL + '/api/admin/category/getAll', { page: currentPage, limit: limit }, axiosAuth());
 
     console.log('response', response);
 

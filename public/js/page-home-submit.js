@@ -1,12 +1,10 @@
 let page = 1;
 let limit = 10;
 const pageElement = 'page-home-submit';
-let statusOptions = [];
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllHomeSubmit(page, limit);
-  getStatusCode();
 });
 
 // TODO: FUNC
@@ -36,24 +34,26 @@ async function showHomeSubmitModal(homeData) {
   const modalBody = modalEl.querySelector('.modal-body');
 
   modalEl.querySelector('#seq').value = homeData.seq;
-  modalBody.querySelector('.homeImage').src = currentUrl + '/uploads/images/homes/' + homeData.homeImage;
+  modalBody.querySelector('.homeImage').src = CURRENT_URL + '/uploads/images/homes/' + homeData.homeImage;
   modalEl.querySelector('.homeName').innerText = homeData.homeName;
   modalEl.querySelector('.userName').innerText = homeData.userName;
   modalEl.querySelector('.userPhone').innerText = homeData.userPhone;
   modalEl.querySelector('.numberAttend').innerText = homeData.numberAttend;
   modalEl.querySelector('.note').innerText = homeData.note ?? '';
 
-  const selectStatus = modalEl.querySelector('#statusCode');
+  const selectStatus = modalEl.querySelector('#status');
   selectStatus.innerHTML = '';
 
-  statusOptions.forEach((ele) => {
+  OPTIONS.HOME_SUMIT.forEach((ele) => {
     const option = document.createElement('option');
-    option.value = ele.code;
-    option.textContent = ele.valueOption;
-    if (homeData.statusKey !== 'WAITING' && ele.keyOption == 'WAITING') {
+    option.value = ele.value;
+    option.textContent = ele.text;
+    // nếu đã là duyệt và hủy -> disable 'chờ'
+    if (homeData.status !== 'WAITING' && ele.value == 'WAITING') {
       option.disabled = true;
     }
-    if (ele.code === homeData.statusCode) {
+    // nếu match  -> tự selected
+    if (ele.value === homeData.status) {
       option.selected = true;
     }
 
@@ -87,7 +87,7 @@ function renderAllHomeSubmit(data, objElement) {
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td><p>${ele.numberAttend}</p></td>
-            <td><b class="txt-status-${String(ele.statusKey).toLocaleLowerCase()}">${ele.statusValue}</b></td>
+            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${OPTIONS.HOME_SUMIT.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-main-out" onclick="getDetailHomeSubmit('${ele.seq}')">Chỉnh sửa</button>
@@ -117,7 +117,7 @@ async function getAllHomeSubmit(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/home/getAllSubmit',
+      CURRENT_URL + '/api/admin/home/getAllSubmit',
       {
         page: currentPage,
         limit: limit,
@@ -134,30 +134,11 @@ async function getAllHomeSubmit(currentPage, limit) {
       console.log('error', error);
     });
 }
-async function getStatusCode() {
-  await axios
-    .post(
-      currentUrl + '/api/app/code/getAll',
-      {
-        mainOption: 'SUBMIT',
-        subOption: 'STATUS',
-      },
-      axiosAuth(),
-    )
-    .then(function (response) {
-      console.log('response', response);
-      if (response.status === 200 && response.data.data) {
-        statusOptions = response.data.data;
-      }
-    })
-    .catch(function (error) {
-      console.log('error', error);
-    });
-}
+
 async function getDetailHomeSubmit(seq) {
   await loaderApiCall(
     axios
-      .get(currentUrl + '/api/admin/home/getDetailSubmit/' + seq, axiosAuth())
+      .get(CURRENT_URL + '/api/admin/home/getDetailSubmit/' + seq, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -174,14 +155,14 @@ async function updateHomeSubmit() {
   try {
     const modalBody = document.querySelector('.home-submit-update-modal .modal-body form');
     const seq = modalBody.querySelector('#seq').value;
-    const statusCode = modalBody.querySelector('#statusCode').value;
-    console.log(seq, statusCode);
+    const status = modalBody.querySelector('#status').value;
+    console.log(seq, status);
 
     await axios
       .put(
-        currentUrl + '/api/admin/home/updateSubmit/' + seq,
+        CURRENT_URL + '/api/admin/home/updateSubmit/' + seq,
         {
-          statusCode: statusCode,
+          status: status,
           updatedId: user.userId,
         },
         axiosAuth(),

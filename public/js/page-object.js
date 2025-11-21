@@ -46,7 +46,7 @@ async function getAllObject(currentPage, limit) {
 
   await axios
     .post(
-      currentUrl + '/api/admin/object/getAll',
+      CURRENT_URL + '/api/admin/object/getAll',
       {
         page: currentPage,
         limit: limit,
