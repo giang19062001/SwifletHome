@@ -149,13 +149,13 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
   }
   async getAllSubmit(dto: PagingDto): Promise<IHomeSubmit[]> {
     let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
-          B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
+          B.homeName, B.homeImage, C.valueOption AS numberAttend, D.valueOption AS statusValue, D.keyOption as statusKey
           FROM ${this.tableSubmit} A 
           LEFT JOIN tbl_home_sale B
           ON A.homeCode = B.homeCode
-          LEFT JOIN tbl_code_common C
+          LEFT JOIN tbl_option_common C
           ON A.numberAttendCode = C.code
-          LEFT JOIN tbl_code_common D
+          LEFT JOIN tbl_option_common D
           ON A.statusCode = D.code `;
 
     const params: any[] = [];
@@ -171,13 +171,13 @@ export class HomeSaleAdminRepository extends AbAdminRepo {
   async getDetailSubmit(seq: number): Promise<IHomeSubmit | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.statusCode, A.note, A.cancelReason, A.createdAt,
-          B.homeName, B.homeImage, C.valueCode AS numberAttend, D.valueCode AS statusValue, D.keyCode as statusKey
+          B.homeName, B.homeImage, C.valueOption AS numberAttend, D.valueOption AS statusValue, D.keyOption as statusKey
           FROM ${this.tableSubmit} A 
           LEFT JOIN tbl_home_sale B
           ON A.homeCode = B.homeCode
-          LEFT JOIN tbl_code_common C
+          LEFT JOIN tbl_option_common C
           ON A.numberAttendCode = C.code
-          LEFT JOIN tbl_code_common D
+          LEFT JOIN tbl_option_common D
           ON A.statusCode = D.code
           WHERE A.SEQ = ? 
           LIMIT 1 `,

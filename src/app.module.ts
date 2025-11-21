@@ -12,7 +12,7 @@ import { QuestionAppModule } from './modules/question/app/question.module';
 import { HomeSaleAdminModule } from './modules/homeSale/admin/homeSale.module';
 import { HomeSaleAppModule } from './modules/homeSale/app/homeSale.module';
 import { BlogAdminModule } from './modules/blog/admin/blog.module';
-import { CodeModule } from './modules/code/code.module';
+import { OptionModule } from './modules/options/option.module';
 import { DoctorAppModule } from './modules/doctor/app/doctor.module';
 import { DoctorAdminModule } from './modules/doctor/admin/doctor.module';
 import { LoggerModule } from './common/logger/logger.module';
@@ -39,7 +39,7 @@ import { CornModule } from './common/corn/corn.module';
     CornModule,
     DatabaseModule,
     LoggerModule,
-    CodeModule,
+    OptionModule,
 
     //app
     AuthAppModule,

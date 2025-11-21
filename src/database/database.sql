@@ -233,13 +233,13 @@ CREATE TABLE `tbl_doctor` (
 );
 
 -- mã code dùng chung
-CREATE TABLE `tbl_code_common` (
+CREATE TABLE `tbl_option_common` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `code` varchar(15) NOT NULL,
-  `mainCode` varchar(15) NOT NULL,
-  `subCode` varchar(15) NOT NULL,
-  `keyCode` varchar(15) NOT NULL,
-  `valueCode` varchar(255) NOT NULL,
+  `mainOption` varchar(15) NOT NULL,
+  `subOption` varchar(15) NOT NULL,
+  `keyOption` varchar(15) NOT NULL,
+  `valueOption` varchar(255) NOT NULL,
   `sortOrder` int DEFAULT '0',
   `isActive` char(1) DEFAULT 'Y',
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -247,7 +247,7 @@ CREATE TABLE `tbl_code_common` (
   `createdId` varchar(45) DEFAULT 'SYSTEM',
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`),
-  UNIQUE KEY `mainCode` (`mainCode`,`subCode`,`keyCode`),
+  UNIQUE KEY `mainOption` (`mainOption`,`subOption`,`keyOption`),
   UNIQUE KEY `code_UNIQUE` (`code`)
 ); 
 

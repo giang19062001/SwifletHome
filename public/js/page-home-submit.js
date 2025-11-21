@@ -49,8 +49,8 @@ async function showHomeSubmitModal(homeData) {
   statusOptions.forEach((ele) => {
     const option = document.createElement('option');
     option.value = ele.code;
-    option.textContent = ele.valueCode;
-    if (homeData.statusKey !== 'WAITING' && ele.keyCode == 'WAITING') {
+    option.textContent = ele.valueOption;
+    if (homeData.statusKey !== 'WAITING' && ele.keyOption == 'WAITING') {
       option.disabled = true;
     }
     if (ele.code === homeData.statusCode) {
@@ -139,8 +139,8 @@ async function getStatusCode() {
     .post(
       currentUrl + '/api/app/code/getAll',
       {
-        mainCode: 'SUBMIT',
-        subCode: 'STATUS',
+        mainOption: 'SUBMIT',
+        subOption: 'STATUS',
       },
       axiosAuth(),
     )

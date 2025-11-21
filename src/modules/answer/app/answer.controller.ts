@@ -22,7 +22,7 @@ export class AnswerAppController {
   @ApiBody({ type: AnswerReplyDto })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(String) })
-  async reply(@Body() dto: AnswerReplyDto): Promise<any> {
+  async reply(@Body() dto: AnswerReplyDto): Promise<string> {
     const faqData = await this.answerAppService.reply();
     const result = this.searchService.findAnswer(dto.question, faqData);
     return result;

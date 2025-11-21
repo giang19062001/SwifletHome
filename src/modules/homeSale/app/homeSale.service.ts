@@ -6,13 +6,13 @@ import { HomeSaleAppRepository } from './homeSale.repository';
 import { IListApp } from 'src/interfaces/app.interface';
 import { CreateHomeSubmitDto } from './homeSubmit.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { CodeService } from 'src/modules/code/code.service';
+import { OptionService } from 'src/modules/options/option.service';
 
 @Injectable()
 export class HomeSaleAppService {
   constructor(
     private readonly homeSaleAppRepository: HomeSaleAppRepository,
-    private readonly codeService: CodeService,
+    private readonly optionService: OptionService,
   ) {}
   async getAll(dto: PagingDto): Promise<IListApp<IHomeSale>> {
     const total = await this.homeSaleAppRepository.getTotal();
@@ -31,9 +31,9 @@ export class HomeSaleAppService {
       throw new BadRequestException(Msg.HomeNotFound);
     }
     // kiểm tra attendCode
-    const attendCodes = await this.codeService.getAll({
-      mainCode: 'SUBMIT',
-      subCode: 'NUMBER_ATTEND',
+    const attendCodes = await this.optionService.getAll({
+      mainOption: 'SUBMIT',
+      subOption: 'NUMBER_ATTEND',
     });
     if (!attendCodes.length) {
       throw new BadRequestException();
@@ -42,10 +42,10 @@ export class HomeSaleAppService {
       throw new BadRequestException(Msg.CodeInvalid);
     }
     // lấy statusCode -> Đang chờ duyệt
-    const statusCodes = await this.codeService.getAll({
-      mainCode: 'SUBMIT',
-      subCode: 'STATUS',
-      keyCode: 'WAITING',
+    const statusCodes = await this.optionService.getAll({
+      mainOption: 'SUBMIT',
+      subOption: 'STATUS',
+      keyOption: 'WAITING',
     });
     if (!statusCodes.length) {
       throw new BadRequestException();

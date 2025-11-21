@@ -16,9 +16,9 @@ export class DoctorAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<IDoctor[]> {
     let query = `  SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.statusCode, A.createdAt,
-        B.valueCode AS statusValue, B.keyCode as statusKey
+        B.valueOption AS statusValue, B.keyOption as statusKey
         FROM ${this.table} A 
-         LEFT JOIN tbl_code_common B
+         LEFT JOIN tbl_option_common B
         ON A.statusCode = B.code `;
 
     const params: any[] = [];
@@ -34,9 +34,9 @@ export class DoctorAdminRepository {
   async getDetail(seq: number): Promise<IDoctor | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.statusCode, A.createdAt,
-        B.valueCode AS statusValue, B.keyCode as statusKey
+        B.valueOption AS statusValue, B.keyOption as statusKey
         FROM ${this.table} A 
-        LEFT JOIN tbl_code_common B
+        LEFT JOIN tbl_option_common B
         ON A.statusCode = B.code
         WHERE A.SEQ = ? AND A.isActive = 'Y'
         LIMIT 1 `,

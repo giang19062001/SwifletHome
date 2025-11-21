@@ -63,7 +63,7 @@ export class HomeSaleAppController {
   // TODO: SUBMIT 
   @ApiBody({
     type: CreateHomeSubmitDto,
-    description: "numberAttendCode: mã code từ API getAll (mainCode: 'SUBMIT', subCode: 'NUMBER_ATTEND')",
+    description: "numberAttendCode: mã code từ API getAll (mainOption: 'SUBMIT', subOption: 'NUMBER_ATTEND')",
   })
   @Post('createSubmit')
   @HttpCode(HttpStatus.OK)

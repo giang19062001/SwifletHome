@@ -93,8 +93,8 @@ async function showDoctorModal(doctorData) {
   statusOptions.forEach((ele) => {
     const option = document.createElement('option');
     option.value = ele.code;
-    option.textContent = ele.valueCode;
-    if (doctorData.statusKey !== 'WAITING' && ele.keyCode == 'WAITING') {
+    option.textContent = ele.valueOption;
+    if (doctorData.statusKey !== 'WAITING' && ele.keyOption == 'WAITING') {
       option.disabled = true;
     }
     if (ele.code === doctorData.statusCode) {
@@ -152,8 +152,8 @@ async function getStatusCode() {
     .post(
       currentUrl + '/api/app/code/getAll',
       {
-        mainCode: 'DOCTOR',
-        subCode: 'STATUS',
+        mainOption: 'DOCTOR',
+        subOption: 'STATUS',
       },
       axiosAuth(),
     )
