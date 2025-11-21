@@ -19,7 +19,7 @@ import {
   Param,
   Put,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale } from '../homeSale.interface';
 import { HomeSaleAppService } from './homeSale.service';
@@ -30,6 +30,7 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { CreateHomeSubmitDto } from './homeSubmit.dto';
 import { Msg } from 'src/helpers/message.helper';
 import * as userInterface from 'src/modules/user/app/user.interface';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
 
 @ApiTags('app/home')
 @Controller('/api/app/home')
@@ -60,13 +61,16 @@ export class HomeSaleAppController {
     return result;
   }
 
-  // TODO: SUBMIT 
-  @ApiBody({
-    type: CreateHomeSubmitDto,
-    description: "numberAttendCode: mã code từ API getAll (mainOption: 'SUBMIT', subOption: 'NUMBER_ATTEND')",
-  })
+  // TODO: SUBMIT
+    @ApiBody({
+      description: `
+  **\`numberAttendCode\`**: - **\` api/app/options/getAll (mainOption: 'SUBMIT', subOption: 'NUMBER_ATTEND')\`** - code (đăng ký tham quan nhà yến)  
+    `,
+      type: CreateHomeSubmitDto,
+    })
   @Post('createSubmit')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async createSubmit(@Body() dto: CreateHomeSubmitDto, @GetUserApp() user: userInterface.IUserApp) {
     const result = await this.homeSaleAppService.createSubmit(dto, user.userCode);
     return {

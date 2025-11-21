@@ -29,9 +29,12 @@ export class ResOptionDto {
   seq: number;
 
   @ApiProperty({ example: 'COD000001' })
-  mainOption: string;
+  code: string;
 
   @ApiProperty({ example: 'SUBMIT' })
+  mainOption: string;
+
+  @ApiProperty({ example: 'NUMBER_ATTEND' })
   subOption: string;
 
   @ApiProperty({ example: '3-5' })
