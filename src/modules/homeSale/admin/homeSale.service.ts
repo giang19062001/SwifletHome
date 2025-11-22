@@ -79,10 +79,10 @@ export class HomeSaleAdminService extends AbAdminService {
       }
 
       const fileNeedDeletes: IHomeSaleImg[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
-      this.logger.log(logbase, `fileNeedDeletes --> ${JSON.stringify(fileNeedDeletes)}`);
+      this.logger.log(logbase, `Danh sách file cần xóa --> ${JSON.stringify(fileNeedDeletes)}`);
 
       const fileNeedCreates: IHomeSaleImg[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
-      this.logger.log(logbase, `fileNeedCreates --> ${JSON.stringify(fileNeedCreates)}`);
+      this.logger.log(logbase, `Danh sách file cần thêm mới --> ${JSON.stringify(fileNeedCreates)}`);
 
       // homeImages is changed -> delete old file
       if (fileNeedDeletes.length) {
@@ -95,8 +95,10 @@ export class HomeSaleAdminService extends AbAdminService {
         }
       }
       if (fileNeedCreates.length) {
+        // insert những ảnh mới
         for (const file of fileNeedCreates) {
-          await this.homSaleAdminRepository.createImages(home.seq, 'admin', file);
+          const insertImgResult = await this.homSaleAdminRepository.createImages(home.seq, 'admin', file);
+          this.logger.log(logbase, `Insdert file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
         }
       }
       const result = await this.homSaleAdminRepository.update(dto, homeCode);
@@ -132,7 +134,7 @@ export class HomeSaleAdminService extends AbAdminService {
     }
   }
 
-  // TODO: SUBMIT 
+  // TODO: SUBMIT
   async getAllSubmit(dto: PagingDto): Promise<IList<IHomeSaleSubmit>> {
     const total = await this.homSaleAdminRepository.getTotalSubmit();
     const list = await this.homSaleAdminRepository.getAllSubmit(dto);
