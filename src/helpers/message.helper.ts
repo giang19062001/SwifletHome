@@ -1,4 +1,6 @@
 export const Msg = {
+  CreateOk: 'Thên thông tin thành công',
+  CreateErr: 'Thêm thông tin thất bại',
   UpdateOk: 'Cập nhập thông tin thành công',
   UpdateErr: 'Cập nhập thông tin thất bại',
   CodeInvalid: 'Mã code không hợp lệ',
@@ -20,6 +22,7 @@ export const Msg = {
   HomeSummitCreateOk: 'Đăng ký tham quan thành công',
   DoctorCreateOk: 'Gửi thông tin khám bệnh nhà yến thành công',
   CannotReply: 'Hệ thống chưa có thông tin về câu trả lời của câu hỏi này',
+  uuidNotFound: 'Chưa từng có file nào được upload cùng với uuid này',
   FileEmpty: 'Không có file nào được upload',
   FileAudioRequire: 'Bắt buộc nhập 2 file audio',
   FileOvertake: 'Số file upload đã vượt quá số lượng tối đa',

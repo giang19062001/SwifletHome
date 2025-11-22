@@ -37,7 +37,7 @@ export class DoctorAppService {
           } else {
             // những files có uniqueId của doctor hiện tại không tồn tại -> xóa doctor để đông nhất dữ liệu
             await this.doctorAppRepository.delete(seq);
-            result = 0;
+            result = -1;
           }
         }
       }

@@ -33,6 +33,9 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     if (fieldname === 'homeImage' || fieldname.includes('homeImage') || fieldname === 'homeImages' || fieldname.includes('homeImages')) {
       return 'images/homes';
     }
+    if (fieldname === 'userHomeImage' || fieldname.includes('userHomeImage')) {
+      return 'images/userHomes';
+    }
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
       return 'images/doctors';
     }

@@ -1,6 +1,6 @@
 export interface IProvince{
     seq :number
-    provinceCode: string
+    provinceCode: number
     provinceName: string
     createdAt: Date
 }

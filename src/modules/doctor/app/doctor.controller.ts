@@ -1,9 +1,9 @@
+import { getDoctorMulterConfig } from './../../../config/multer.config';
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateDoctorDto, DoctorFileDto, ResDoctorFileStrDto } from './doctor.dto';
 import { DoctorAppService } from './doctor.service';
-import { getDoctorMulterConfig } from 'src/config/multer.config';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
@@ -26,6 +26,12 @@ export class DoctorAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async create(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateDoctorDto) {
     const result = await this.doctorAppService.create(user.userCode, dto);
+    if (result === -1) {
+      throw new BadRequestException({
+        message: Msg.uuidNotFound,
+        data: 0,
+      });
+    }
     if (result === 0) {
       throw new BadRequestException();
     }

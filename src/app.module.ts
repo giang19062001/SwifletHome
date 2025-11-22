@@ -26,6 +26,7 @@ import { PackageAdminModule } from './modules/package/admin/package.module';
 import { IpMiddleware } from './middleware/ip.middleware';
 import { CornModule } from './common/corn/corn.module';
 import { ProvinceModule } from './modules/province/province.module';
+import { UserHomeModule } from './modules/userHome/app/userHome.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ProvinceModule } from './modules/province/province.module';
     DoctorAppModule,
     HomeSaleAppModule,
     ScreenAppModule,
+    UserHomeModule,
 
     //admin
     AuthAdminModule,
