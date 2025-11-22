@@ -18,9 +18,7 @@ async function bootstrap() {
   app.enableCors();
 
   // (CSS, JS, IMG), views , engine
-  app.useStaticAssets(join(__dirname, '..', 'public'), {
-    prefix: '/',
-  });
+ app.useStaticAssets(join(__dirname, '..', 'public'));
 
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('ejs');
