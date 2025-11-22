@@ -204,7 +204,7 @@ export class AppController {
   //home/sale
   @Get('/dashboard/home/sale')
   @UseGuards(PageAuthAdminGuard)
-  @Render('pages/home')
+  @Render('pages/home-sale')
   renderHome(@Req() req: Request) {
     return {
       title: 'Danh sách nhà yến',
@@ -215,14 +215,14 @@ export class AppController {
 
   @Get('/dashboard/home/sale/create')
   @UseGuards(PageAuthAdminGuard)
-  @Render('pages/home-create')
+  @Render('pages/home-sale-create')
   renderHomeCreate(@Req() req: Request) {
     return { title: 'Thêm nhà yến', isLayout: true, user: req.session.user };
   }
 
   @Get('/dashboard/home/sale/update/:id')
   @UseGuards(PageAuthAdminGuard)
-  @Render('pages/home-update')
+  @Render('pages/home-sale-update')
   async renderHomeUpdate(@Req() req: Request) {
     const values = await this.appService.renderHomeUpdate(req.params.id);
     return {
@@ -236,7 +236,7 @@ export class AppController {
   // home/submit
   @Get('/dashboard/home/submit')
   @UseGuards(PageAuthAdminGuard)
-  @Render('pages/home-submit')
+  @Render('pages/home-sale-submit')
   renderHomeSubmit(@Req() req: Request) {
     return {
       title: 'Danh sách đăng ký tham quan',

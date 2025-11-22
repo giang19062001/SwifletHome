@@ -25,6 +25,7 @@ import { InfoAdminModule } from './modules/info/admin/info.module';
 import { PackageAdminModule } from './modules/package/admin/package.module';
 import { IpMiddleware } from './middleware/ip.middleware';
 import { CornModule } from './common/corn/corn.module';
+import { ProvinceModule } from './modules/province/province.module';
 
 @Module({
   imports: [
@@ -35,7 +36,9 @@ import { CornModule } from './common/corn/corn.module';
     CornModule,
     DatabaseModule,
     LoggerModule,
+    // commmon
     OptionModule,
+    ProvinceModule,
 
     //app
     AuthAppModule,
@@ -64,8 +67,6 @@ import { CornModule } from './common/corn/corn.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(IpMiddleware)
-      .forRoutes('*'); // Áp dụng cho tất cả routes
+    consumer.apply(IpMiddleware).forRoutes('*'); // Áp dụng cho tất cả routes
   }
 }

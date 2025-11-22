@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetOptionDto, ResOptionDto } from './option.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { IOpition } from './option.interface';
@@ -19,6 +19,9 @@ export default class OptionController {
   - **\`NUMBER_ATTEND\`** - số lượng người đăng ký tham quan nhà yến
   `,
     type: GetOptionDto,
+  })
+  @ApiOperation({
+    summary: 'Không cần xác thực',
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)

@@ -18759,22 +18759,22 @@ select {
   border-radius: 15px;
 }
 
-#page-home .home-img {
+#page-home-sale .home-img {
   width: 150px;
   border-radius: 15px;
 }
 
-.page-home-mutaion #editor {
+.page-home-sale-mutaion #editor {
   height: 30vh;
 }
-.page-home-mutaion .file-label {
+.page-home-sale-mutaion .file-label {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   cursor: pointer;
 }
-.page-home-mutaion .file-button {
+.page-home-sale-mutaion .file-button {
   background: #59ac77;
   color: white;
   border-radius: 15px;
@@ -18783,16 +18783,16 @@ select {
   transition: all 0.3s ease;
   text-align: center;
 }
-.page-home-mutaion .file-button:hover {
+.page-home-sale-mutaion .file-button:hover {
   background: #4a9164;
 }
-.page-home-mutaion .image-preview-container {
+.page-home-sale-mutaion .image-preview-container {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 15px;
 }
-.page-home-mutaion .image-preview {
+.page-home-sale-mutaion .image-preview {
   position: relative;
   width: 150px;
   height: 150px;
@@ -18800,12 +18800,12 @@ select {
   border-radius: 5px;
   overflow: hidden;
 }
-.page-home-mutaion .image-preview img {
+.page-home-sale-mutaion .image-preview img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.page-home-mutaion .delete-btn {
+.page-home-sale-mutaion .delete-btn {
   position: absolute;
   top: 5px;
   right: 5px;
@@ -18821,11 +18821,11 @@ select {
   cursor: pointer;
   font-size: 14px;
 }
-.page-home-mutaion .delete-btn:hover {
+.page-home-sale-mutaion .delete-btn:hover {
   background-color: rgba(255, 0, 0, 0.9);
 }
 
-#page-home-submit a {
+#page-home-sale-submit a {
   text-decoration: none;
 }
 

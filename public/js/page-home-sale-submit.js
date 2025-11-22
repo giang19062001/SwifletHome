@@ -1,6 +1,6 @@
 let page = 1;
 let limit = 10;
-const pageElement = 'page-home-submit';
+const pageElement = 'page-home-sale-submit';
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {

@@ -1,3 +1,51 @@
+-- tỉnh thành vn
+CREATE TABLE `tbl_provinces` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `provinceCode` varchar(45) NOT NULL,
+  `provinceName` varchar(45) NOT NULL,
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `provinceCode_UNIQUE` (`provinceCode`)
+);
+
+INSERT INTO `swiftlet`.`tbl_provinces` (`seq`, `provinceCode`, `provinceName`, `createdAt`)
+VALUES 
+(1, '91', 'An Giang', CURRENT_TIMESTAMP),
+(2, '24', 'Bắc Ninh', CURRENT_TIMESTAMP),
+(3, '04', 'Cao Bằng', CURRENT_TIMESTAMP),
+(4, '96', 'Cà Mau', CURRENT_TIMESTAMP),
+(5, '52', 'Gia Lai', CURRENT_TIMESTAMP),
+(6, '42', 'Hà Tĩnh', CURRENT_TIMESTAMP),
+(7, '33', 'Hưng Yên', CURRENT_TIMESTAMP),
+(8, '56', 'Khánh Hòa', CURRENT_TIMESTAMP),
+(9, '12', 'Lai Châu', CURRENT_TIMESTAMP),
+(10, '15', 'Lào Cai', CURRENT_TIMESTAMP),
+(11, '68', 'Lâm Đồng', CURRENT_TIMESTAMP),
+(12, '20', 'Lạng Sơn', CURRENT_TIMESTAMP),
+(13, '40', 'Nghệ An', CURRENT_TIMESTAMP),
+(14, '37', 'Ninh Bình', CURRENT_TIMESTAMP),
+(15, '25', 'Phú Thọ', CURRENT_TIMESTAMP),
+(16, '51', 'Quảng Ngãi', CURRENT_TIMESTAMP),
+(17, '22', 'Quảng Ninh', CURRENT_TIMESTAMP),
+(18, '44', 'Quảng Trị', CURRENT_TIMESTAMP),
+(19, '14', 'Sơn La', CURRENT_TIMESTAMP),
+(20, '38', 'Thanh Hóa', CURRENT_TIMESTAMP),
+(21, '92', 'Cần Thơ', CURRENT_TIMESTAMP),
+(22, '46', 'Huế', CURRENT_TIMESTAMP),
+(23, '01', 'Hà Nội', CURRENT_TIMESTAMP),
+(24, '31', 'Hải Phòng', CURRENT_TIMESTAMP),
+(25, '79', 'Hồ Chí Minh', CURRENT_TIMESTAMP),
+(26, '48', 'Đà Nẵng', CURRENT_TIMESTAMP),
+(27, '19', 'Thái Nguyên', CURRENT_TIMESTAMP),
+(28, '08', 'Tuyên Quang', CURRENT_TIMESTAMP),
+(29, '80', 'Tây Ninh', CURRENT_TIMESTAMP),
+(30, '86', 'Vĩnh Long', CURRENT_TIMESTAMP),
+(31, '11', 'Điện Biên', CURRENT_TIMESTAMP),
+(32, '66', 'Đắk Lắk', CURRENT_TIMESTAMP),
+(33, '75', 'Đồng Nai', CURRENT_TIMESTAMP),
+(34, '82', 'Đồng Tháp', CURRENT_TIMESTAMP);
+
+--  admin
 CREATE TABLE `tbl_user_admin` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `userId` varchar(45) NOT NULL,
@@ -195,6 +243,44 @@ CREATE TABLE `tbl_home_sale_submit` (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+
+
+-- nhàn yến của khách hàng
+CREATE TABLE `tbl_doctor_file` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `doctorSeq` int DEFAULT NULL,
+  `userCode` varchar(45) NOT NULL,
+  `uniqueId` char(255) NOT NULL,
+  `filename` varchar(255) NOT NULL,
+  `originalname` text NOT NULL,
+  `size` int NOT NULL,
+  `mimetype` varchar(45) NOT NULL,
+  `isActive` char(1) DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT NULL,
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `filename_UNIQUE` (`filename`)
+);
+
+CREATE TABLE `tbl_doctor` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `userCode` varchar(45) NOT NULL,
+  `userName` varchar(45) NOT NULL,
+  `userPhone` varchar(255) NOT NULL,
+  `note` text NOT NULL,
+  `noteAnswered` text,
+    `status` ENUM('WAITING','ANSWERED','CANCEL') DEFAULT 'WAITING',
+  `uniqueId` char(255) NOT NULL,
+  `isActive` char(1) DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
+);
 -- khám bệnh nhà yến
 CREATE TABLE `tbl_doctor_file` (
   `seq` int NOT NULL AUTO_INCREMENT,

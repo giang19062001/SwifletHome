@@ -1,11 +1,11 @@
-#page-home {
+#page-home-sale {
   .home-img {
     width: 150px;
     border-radius: 15px;
   }
 }
 
-.page-home-mutaion {
+.page-home-sale-mutaion {
   #editor{
     height: 30vh;
   }
@@ -71,3 +71,18 @@
   }
 }
 
+#page-home-sale-submit {
+  a {
+    text-decoration: none;
+  }
+}
+.home-submit-update-modal {
+  img {
+    width: 250px;
+    border-radius: 15px;
+  }
+  .homeName{
+    font-size: 18px !important;
+    font-weight: 600;
+  }
+}

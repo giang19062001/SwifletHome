@@ -6,7 +6,7 @@ export class DoctorFileDto {
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     format: 'uuid',
-    description: 'Được generate phía app khi màn hình mount',
+    description: 'Được generate phía app khi màn hình mount (uuid)',
   })
   @IsUUID()
   @IsNotEmpty()
@@ -18,7 +18,7 @@ export class DoctorFileDto {
       type: 'string',
       format: 'binary',
     },
-    description: 'Tối đa 5 file',
+    description: 'Tối đa 5 file (ảnh, video)',
   })
   doctorFiles: any[];
 }

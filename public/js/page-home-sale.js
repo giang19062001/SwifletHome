@@ -1,6 +1,6 @@
 let page = 1;
 let limit = 10;
-const pageElement = 'page-home';
+const pageElement = 'page-home-sale';
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
