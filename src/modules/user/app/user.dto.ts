@@ -44,7 +44,7 @@ export class ResUserAppInfoDto extends ResUserAppDto {
   packageDescription: string;
 }
 
-export class CreateUserPaymentAppDto {
+export class CreateUserPackageAppDto {
   @ApiProperty({
     example: '',
   })

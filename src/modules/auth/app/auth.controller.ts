@@ -2,7 +2,7 @@ import { ApiAppResponse } from '../../../interfaces/app.interface';
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { AuthAppService } from './auth.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { RequestOtpDto, ResRequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
@@ -31,12 +31,12 @@ export class AuthAppController {
     return user;
   }
   @ApiBody({
-    type: RegisterAppDto,
+    type: RegisterUserAppDto,
   })
   @Post('register')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async register(@Body() dto: RegisterAppDto) {
+  async register(@Body() dto: RegisterUserAppDto) {
     const result = await this.authAppService.register(dto);
     return {
       message: result ? Msg.RegisterOk : Msg.RegisterErr,

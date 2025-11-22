@@ -284,7 +284,7 @@ CREATE TABLE `tbl_user_app` (
   UNIQUE KEY `userCode_UNIQUE` (`userCode`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE `tbl_user_payment` (
+CREATE TABLE `tbl_user_package` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `userCode` varchar(45) NOT NULL,
   `packageCode` varchar(45) DEFAULT NULL,
@@ -302,7 +302,7 @@ CREATE TABLE `tbl_user_payment` (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE `tbl_user_payment_history` (
+CREATE TABLE `tbl_user_package_history` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `userCode` varchar(45) NOT NULL,
   `packageCode` varchar(45) DEFAULT NULL,

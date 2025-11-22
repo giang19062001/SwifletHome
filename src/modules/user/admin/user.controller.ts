@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserAdminService } from './user.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { GetAllUserDto, GetDetailDto, UpdateUserPaymentAdminDto } from './user.dto';
+import { GetAllUserDto, GetDetailDto, UpdateUserPackageAdminDto } from './user.dto';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/user')
@@ -33,11 +33,11 @@ export class UserAdminController {
     return result;
   }
 
-    @ApiBody({ type: UpdateUserPaymentAdminDto })
+    @ApiBody({ type: UpdateUserPackageAdminDto })
     @ApiParam({ name: 'userCode', type: String })
     @Put('updatePackage/:userCode')
     @HttpCode(HttpStatus.OK)
-    async update(@Body() dto: UpdateUserPaymentAdminDto,  @Param('userCode') userCode: string): Promise<number> {
+    async update(@Body() dto: UpdateUserPackageAdminDto,  @Param('userCode') userCode: string): Promise<number> {
       const result = await this.userAdminService.updatePackage(dto, userCode);
       if (result === 0) {
         throw new BadRequestException();

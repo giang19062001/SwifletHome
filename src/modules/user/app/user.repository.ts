@@ -2,15 +2,16 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { generateCode } from 'src/helpers/func.helper';
-import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
+import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserAppInfo } from './user.interface';
-import { CreateUserPaymentAppDto } from './user.dto';
+import { CreateUserPackageAppDto } from './user.dto';
 
 @Injectable()
 export class UserAppRepository {
   private readonly table = 'tbl_user_app';
-  private readonly tablePayment = 'tbl_user_payment';
-  private readonly tablePaymentHistory = 'tbl_user_payment_history';
+  private readonly tablePackage = 'tbl_user_package';
+  private readonly tablePackageHistory = 'tbl_user_package_history';
+  private readonly tableTopic = 'tbl_user_topics';
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -28,7 +29,7 @@ export class UserAppRepository {
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, 
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
      FROM ${this.table} A 
-     LEFT JOIN tbl_user_payment B
+     LEFT JOIN tbl_user_package B
      ON A.userCode = B.userCode
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
@@ -46,7 +47,7 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as IUserApp) : null;
   }
-  async create(dto: RegisterAppDto): Promise<number> {
+  async create(dto: RegisterUserAppDto): Promise<number> {
     const sqlLast = ` SELECT userCode FROM ${this.table} ORDER BY userCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let userCode = 'USR000001';
@@ -90,23 +91,46 @@ export class UserAppRepository {
     return result.affectedRows;
   }
 
-  // TODO: PAYMENT 
-    async createPaymentHistory(dto: CreateUserPaymentAppDto, createdAt: Date): Promise<number> {
-      const sql = `
-          INSERT INTO ${this.tablePaymentHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
+  // TODO: PACKAGE
+  async writePackageHistory(dto: CreateUserPackageAppDto, createdAt: Date): Promise<number> {
+    const sql = `
+          INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
           VALUES(?, ?, ?, ?, ?, ?)
         `;
-      const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, this.updator, createdAt]);
-  
-      return result.insertId;
-    }
-    async createPayment(dto: CreateUserPaymentAppDto, createdAt: Date): Promise<number> {
-      const sql = `
-          INSERT INTO ${this.tablePayment} (userCode, packageCode, startDate, endDate, isActive, createdId, createdAt) 
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, this.updator, createdAt]);
+
+    return result.insertId;
+  }
+  async createPackage(dto: CreateUserPackageAppDto, createdAt: Date): Promise<number> {
+    const sql = `
+          INSERT INTO ${this.tablePackage} (userCode, packageCode, startDate, endDate, isActive, createdId, createdAt) 
           VALUES(?, ?, ?, ?, ?, ?, ?)
         `;
-      const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, 'Y', this.updator, createdAt]);
-  
-      return result.insertId;
-    }
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, 'Y', this.updator, createdAt]);
+
+    return result.insertId;
+  }
+
+  // TODO: USER_TOPIC
+  // async subscribeToTopic(tokens: string[], topic: string): Promise<number> {
+  //   if (tokens.length > 0) {
+  //     const valuesPlaceholder = tokens.map(() => `(?, ?)`).join(', ');
+
+  //     const query = `
+  //       INSERT IGNORE INTO ${this.tableTopic} (fcm_token, topic)
+  //       VALUES ${valuesPlaceholder}
+  //     `;
+
+  //     const params: string[] = [];
+
+  //     for (const token of tokens) {
+  //       params.push(token, topic);
+  //     }
+
+  //     await this.db.query(query, params);
+  //     return 1;
+  //   } else {
+  //     return 0;
+  //   }
+  // }
 }

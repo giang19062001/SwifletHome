@@ -4,7 +4,7 @@ import { UserAdminRepository } from './user.repository';
 import { IUserAdmin } from './user.interface';
 import { IList } from 'src/interfaces/admin.interface';
 import { IUserAppInfo } from '../app/user.interface';
-import { GetAllUserDto, UpdateUserPaymentAdminDto } from './user.dto';
+import { GetAllUserDto, UpdateUserPackageAdminDto } from './user.dto';
 import { IPackage } from 'src/modules/package/package.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { PackageAdminService } from 'src/modules/package/admin/package.service';
@@ -47,14 +47,8 @@ export class UserAdminService {
     }
   }
 
-  async updatePackage(dto: UpdateUserPaymentAdminDto, userCode: string): Promise<number> {
-    const result = await this.updatePayment(dto, userCode);
-    return result;
-  }
-
-  //TODO: PAYMENT
-
-  async updatePayment(dto: UpdateUserPaymentAdminDto, userCode: string): Promise<number> {
+  //TODO: PACKAGE
+  async updatePackage(dto: UpdateUserPackageAdminDto, userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/update`;
 
     const updatedAt = new Date();
@@ -81,8 +75,8 @@ export class UserAdminService {
       this.logger.log(logbase, `${userCode} -> cập nhập gói ${packageData?.packageName}(${packageData?.packageDescription})`);
     }
 
-    await this.userAdminRepository.createPaymentHistory(dto, userCode, startDate, endDate, updatedAt);
-    const result = await this.userAdminRepository.updatePayment(dto, userCode, startDate, endDate, updatedAt);
+    await this.userAdminRepository.writePackageHistory(dto, userCode, startDate, endDate, updatedAt);
+    const result = await this.userAdminRepository.updatePackage(dto, userCode, startDate, endDate, updatedAt);
     if (result) {
       //gửi nofity
       this.firebaseService.sendNotification(

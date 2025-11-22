@@ -4,14 +4,14 @@ import { RowDataPacket } from 'mysql2/promise';
 import { IUserAdmin } from './user.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserAppInfo } from '../app/user.interface';
-import { UpdateUserPaymentAdminDto } from './user.dto';
+import { UpdateUserPackageAdminDto } from './user.dto';
 
 @Injectable()
 export class UserAdminRepository {
   private readonly tableAdmin = 'tbl_user_admin';
   private readonly tableApp = 'tbl_user_app';
-  private readonly tablePayment = 'tbl_user_payment';
-  private readonly tablePaymentHistory = 'tbl_user_payment_history';
+  private readonly tablePackage = 'tbl_user_package';
+  private readonly tablePackageHistory = 'tbl_user_package_history';
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -37,7 +37,7 @@ export class UserAdminRepository {
     let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
      FROM ${this.tableApp} A 
-     LEFT JOIN tbl_user_payment B
+     LEFT JOIN tbl_user_package B
      ON A.userCode = B.userCode
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
@@ -56,7 +56,7 @@ export class UserAdminRepository {
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
      FROM ${this.tableApp} A 
-     LEFT JOIN tbl_user_payment B
+     LEFT JOIN tbl_user_package B
      ON A.userCode = B.userCode
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
@@ -66,23 +66,26 @@ export class UserAdminRepository {
     );
     return rows.length ? (rows[0] as IUserAppInfo) : null;
   }
-  //TODO:PAYMENT
-  async createPaymentHistory(dto: UpdateUserPaymentAdminDto, userCode: string, startDate: string | null, endDate: string | null, createdAt: Date): Promise<number> {
+
+  //TODO:PACKAGE
+  async writePackageHistory(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, createdAt: Date): Promise<number> {
     const sql = `
-        INSERT INTO ${this.tablePaymentHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
+        INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
         VALUES(?, ?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, this.updator, createdAt]);
 
     return result.insertId;
   }
-  async updatePayment(dto: UpdateUserPaymentAdminDto, userCode: string, startDate: string | null, endDate: string | null, updatedAt: Date): Promise<number> {
+  async updatePackage(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, updatedAt: Date): Promise<number> {
     const sql = `
-        UPDATE  ${this.tablePayment} SET packageCode = ?, startDate = ?, endDate = ?, updatedId = ?, updatedAt = ?
+        UPDATE  ${this.tablePackage} SET packageCode = ?, startDate = ?, endDate = ?, updatedId = ?, updatedAt = ?
         WHERE userCode = ?
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, dto.updatedId, updatedAt, userCode]);
 
     return result.affectedRows;
   }
+
+
 }

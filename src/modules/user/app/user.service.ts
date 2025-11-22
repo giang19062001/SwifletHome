@@ -1,9 +1,10 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppRepository } from './user.repository';
-import { RegisterAppDto } from 'src/modules/auth/app/auth.dto';
+import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserAppInfo } from './user.interface';
-import { CreateUserPaymentAppDto } from './user.dto';
+import { CreateUserPackageAppDto } from './user.dto';
+import { NotificationAppService } from 'src/modules/notification/notification.service';
 
 @Injectable()
 export class UserAppService {
@@ -11,6 +12,7 @@ export class UserAppService {
 
   constructor(
     private readonly userAppRepository: UserAppRepository,
+    private readonly notificationAppService: NotificationAppService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -22,7 +24,7 @@ export class UserAppService {
     return await this.userAppRepository.getDetail(userCode);
   }
 
-  async create(dto: RegisterAppDto): Promise<number> {
+  async create(dto: RegisterUserAppDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/create`;
 
     const insertId = await this.userAppRepository.create(dto);
@@ -31,13 +33,17 @@ export class UserAppService {
       if (user) {
         this.logger.log(logbase, 'Thiết lập gói miễn phí cho người dùng đăng kí mới');
         // mặc định user mới sẽ sử dụng gói miễn phí
-        const dto: CreateUserPaymentAppDto = {
+        const dto: CreateUserPackageAppDto = {
           userCode: user.userCode,
           packageCode: null,
           endDate: null,
           startDate: null,
         };
-        await this.createPayment(dto);
+        await this.createPackage(dto);
+
+        // const topic = this.notificationAppService.getAllTopic({ limit: 0, page: 0 });
+        // this.logger.log(logbase, 'Đăng ký các Topic tự động cho người dùng đăng kí mới');
+        // await this.userAppRepository.subscribeToTopic(user.deviceToken);
       }
     }
     return 1;
@@ -54,10 +60,10 @@ export class UserAppService {
     return await this.userAppRepository.updateDeviceToken(deviceToken, userPhone);
   }
 
-  // TODO: PAYMENT
-  async createPayment(dto: CreateUserPaymentAppDto): Promise<number> {
+  // TODO: PACKAGE
+  async createPackage(dto: CreateUserPackageAppDto): Promise<number> {
     const createdAt = new Date();
-    await this.userAppRepository.createPaymentHistory(dto, createdAt);
-    return await this.userAppRepository.createPayment(dto, createdAt);
+    await this.userAppRepository.writePackageHistory(dto, createdAt);
+    return await this.userAppRepository.createPackage(dto, createdAt);
   }
 }

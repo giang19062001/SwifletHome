@@ -8,7 +8,6 @@ import { AnswerAdminModule } from './modules/answer/admin/answer.module';
 import { UploadAdminModule } from './modules/upload/upload.module';
 import { AuthAdminModule } from './modules/auth/admin/auth.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
-import { QuestionAppModule } from './modules/question/app/question.module';
 import { HomeSaleAdminModule } from './modules/homeSale/admin/homeSale.module';
 import { HomeSaleAppModule } from './modules/homeSale/app/homeSale.module';
 import { BlogAdminModule } from './modules/blog/admin/blog.module';
@@ -17,10 +16,7 @@ import { DoctorAppModule } from './modules/doctor/app/doctor.module';
 import { DoctorAdminModule } from './modules/doctor/admin/doctor.module';
 import { LoggerModule } from './common/logger/logger.module';
 import { AuthAppModule } from './modules/auth/app/auth.module';
-import { OtpAppModule } from './modules/otp/otp.module';
-import { UserAppModule } from './modules/user/app/user.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
-import { InfoAppModule } from './modules/info/app/info.module';
 import { CategoryAdminModule } from './modules/category/admin/category.module';
 import { ScreenAppModule } from './modules/screen/app/screen.module';
 import { ObjectAdminModule } from './modules/object/admin/object.module';
@@ -43,14 +39,10 @@ import { CornModule } from './common/corn/corn.module';
 
     //app
     AuthAppModule,
-    OtpAppModule,
-    UserAppModule,
-    QuestionAppModule,
     AnswerAppModule,
     DoctorAppModule,
     HomeSaleAppModule,
     ScreenAppModule,
-    InfoAppModule,
 
     //admin
     AuthAdminModule,

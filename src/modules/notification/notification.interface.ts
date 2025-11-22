@@ -20,3 +20,15 @@ export interface INotification {
   createdId: string;
   updatedId: string;
 }
+
+export interface INotificationTopic {
+  seq: number;
+  topicCode: string;
+  topicName: string;
+  topicDescription: string;
+  isActive: YnEnum;
+  createdAt: Date;
+  updatedAt: Date;
+  createdId: string;
+  updatedId: string;
+}

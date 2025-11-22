@@ -21,7 +21,7 @@ export class GetDetailDto {
   type: string;
 }
 
-export class UpdateUserPaymentAdminDto {
+export class UpdateUserPackageAdminDto {
   @ApiProperty({
     example: null,
     required: false,

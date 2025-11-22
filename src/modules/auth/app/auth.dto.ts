@@ -53,7 +53,7 @@ export class LoginAppDto {
   deviceToken: string;
 }
 
-export class RegisterAppDto {
+export class RegisterUserAppDto {
   @ApiProperty({
     example: '',
   })

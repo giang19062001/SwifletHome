@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message.helper';
-import { LoginAppDto, RegisterAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { hashPassword } from 'src/helpers/auth.helper';
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
@@ -85,7 +85,7 @@ export class AuthAppService extends AbAuthService {
     return { ...userWithoutPassword, deviceToken: dto.deviceToken, accessToken };
   }
 
-  async register(dto: RegisterAppDto): Promise<number> {
+  async register(dto: RegisterUserAppDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/register`;
     const user = await this.userAppService.findByPhone(dto.userPhone);
 

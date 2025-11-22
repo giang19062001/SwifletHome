@@ -11,7 +11,7 @@ export interface IUserApp {
   isActive: YnEnum
 }
 
-export interface IUserAppInfo extends IUserAppPayment {
+export interface IUserAppInfo extends IUserAppPackage {
   seq: number;
   userCode: string;
   userName: string;
@@ -22,7 +22,7 @@ export interface IUserAppInfo extends IUserAppPayment {
 }
 
 
-export interface IUserAppPayment extends IPackage {
+export interface IUserAppPackage extends IPackage {
   seq: number;
   userCode: string;
   packageCode: string;
