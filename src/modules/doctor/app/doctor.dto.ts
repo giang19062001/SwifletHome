@@ -23,12 +23,15 @@ export class DoctorFileDto {
   doctorFiles: any[];
 }
 
-class DoctorFileStrDto {
+export class ResDoctorFileStrDto {
   @ApiProperty({ example: '' })
   filename: string;
 }
-export class ResDoctorFileStrDto {
+
+class DoctorFileStrDto {
   @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
   filename: string;
 }
 export class CreateDoctorDto {
@@ -61,10 +64,10 @@ export class CreateDoctorDto {
   @IsNotEmpty()
   uniqueId: string;
 
-  @ApiProperty({
-    type: [DoctorFileStrDto],
-  })
-  @IsArray()
-  @ArrayMinSize(1)
-  doctorFiles: DoctorFileStrDto[];
+  // @ApiProperty({
+  //   type: [DoctorFileStrDto],
+  // })
+  // @IsArray()
+  // @ArrayMinSize(1)
+  // doctorFiles: DoctorFileStrDto[];
 }

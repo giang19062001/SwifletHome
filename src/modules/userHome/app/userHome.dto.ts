@@ -3,6 +3,7 @@ import { Transform, Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
+// REQUEST
 export class UploadUserHomeImageDto {
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
@@ -27,10 +28,6 @@ class UserHomeImageDto {
   filename: string;
 }
 
-export class ResUserHomeImageDto {
-  @ApiProperty({ example: '' })
-  filename: string;
-}
 export class CreateUserHomeDto {
   @ApiProperty({
     example: '',
@@ -76,13 +73,13 @@ export class CreateUserHomeDto {
   @IsNotEmpty()
   isIntegateCurrent: YnEnum;
 
-  @ApiProperty({
-    example: YnEnum.N,
-    enum: YnEnum,
-  })
-  @IsEnum(YnEnum)
-  @IsNotEmpty()
-  isMain: YnEnum;
+  // @ApiProperty({
+  //   example: YnEnum.N,
+  //   enum: YnEnum,
+  // })
+  // @IsEnum(YnEnum)
+  // @IsNotEmpty()
+  // isMain: YnEnum;
 
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
@@ -99,6 +96,11 @@ export class CreateUserHomeDto {
   //   userHomeImage: UserHomeImageDto;
 }
 
+// RESPONSE
+export class ResUserHomeImageDto {
+  @ApiProperty({ example: '' })
+  filename: string;
+}
 export class ResUserHomeDto {
   @ApiProperty({ example: 1 })
   seq: number;
@@ -129,6 +131,14 @@ export class ResUserHomeDto {
 
   @ApiProperty({ example: YnEnum.N })
   isIntegateCurrent: YnEnum;
+
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  @IsNotEmpty()
+  isTriggered: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
   isMain: YnEnum;

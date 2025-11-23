@@ -12,17 +12,17 @@ export class UserHomeAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotal(userCode: string): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE userCode = ?`,[userCode]);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE userCode = ?`, [userCode]);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto, userCode: string): Promise<IUserHome[]> {
-    let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage, A.isIntegateTempHum,
-          A.isIntegateCurrent, A.isMain
+    let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
+     A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain
           FROM ${this.table} A 
           WHERE A.userCode = ?`;
 
     const params: any[] = [];
-    params.push(userCode)
+    params.push(userCode);
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
       params.push(dto.limit, (dto.page - 1) * dto.limit);
@@ -33,8 +33,8 @@ export class UserHomeAppRepository {
   }
   async getDetail(seq: number): Promise<IUserHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage, A.isIntegateTempHum,
-          A.isIntegateCurrent, A.isMain
+      ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
+       A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain
           FROM ${this.table} A 
           WHERE A.seq = ? AND A.isActive = 'Y'
           LIMIT 1 `,
@@ -44,8 +44,8 @@ export class UserHomeAppRepository {
   }
   async getMainDetail(seq: number): Promise<IUserHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage, A.isIntegateTempHum,
-          A.isIntegateCurrent, A.isMain
+      ` SELECT A.seq, A.userCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
+       A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain
           FROM ${this.table} A 
           WHERE A.seq = ? AND A.isActive = 'Y' AND A.isMain = 'Y'
           LIMIT 1 `,
@@ -74,8 +74,8 @@ export class UserHomeAppRepository {
 
     const sql = `
       INSERT INTO ${this.table}  (userCode, userHomeCode, userHomeName, userHomeAddress, userHomeProvince, userHomeDescription, userHomeImage,
-       isIntegateTempHum, isIntegateCurrent, isMain, uniqueId, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       isIntegateTempHum, isIntegateCurrent, isTriggered, isMain, uniqueId, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       userCode,
@@ -87,7 +87,8 @@ export class UserHomeAppRepository {
       userHomeImage,
       dto.isIntegateTempHum,
       dto.isIntegateCurrent,
-      dto.isMain,
+      'N', // isTriggered
+      'N', // isMain
       dto.uniqueId,
       userCode,
     ]);

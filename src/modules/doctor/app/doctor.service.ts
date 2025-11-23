@@ -22,24 +22,18 @@ export class DoctorAppService {
 
     try {
       let result = 1;
-      // mặc định là chờ 'WAITING'
-      const seq = await this.doctorAppRepository.create(userCode, dto, "WAITING");
-      if (seq) {
-        const doctor = await this.doctorAppRepository.getDetail(seq);
-        if (doctor) {
-          // tìm tất cả file đã upload cùng uniqueId
-          const filesUploaded: { seq: number }[] = await this.doctorAppRepository.findFilesByUniqueId(doctor.uniqueId);
-          if (filesUploaded.length) {
-            for (const file of filesUploaded) {
-              // update doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created
-              await this.doctorAppRepository.updateSeqFiles(seq, file.seq, doctor.uniqueId);
-            }
-          } else {
-            // những files có uniqueId của doctor hiện tại không tồn tại -> xóa doctor để đông nhất dữ liệu
-            await this.doctorAppRepository.delete(seq);
-            result = -1;
-          }
+      // tìm tất cả file đã upload cùng uniqueId
+      const filesUploaded: { seq: number }[] = await this.doctorAppRepository.findFilesByUniqueId(dto.uniqueId);
+      if (filesUploaded.length) {
+        // mặc định là chờ 'WAITING'
+        const seq = await this.doctorAppRepository.create(userCode, dto, 'WAITING');
+        for (const file of filesUploaded) {
+          // cập nhập doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created
+          await this.doctorAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId);
         }
+      } else {
+        // không có file ảnh nào được upload của đơn khám bệnh này -> báo lỗi
+        result = -1;
       }
       return result;
     } catch (error) {

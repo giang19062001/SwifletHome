@@ -12,6 +12,7 @@ export interface IUserHome {
   uniqueId: string;
   isIntegateTempHum: YnEnum;
   isIntegateCurrent: YnEnum;
+  isTriggered: YnEnum;
   isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;

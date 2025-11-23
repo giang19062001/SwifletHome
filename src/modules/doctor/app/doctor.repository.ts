@@ -38,14 +38,6 @@ export class DoctorAppRepository {
 
     return result.insertId;
   }
-  async delete(seq: number): Promise<number> {
-    const sql = `
-      DELETE FROM ${this.table} WHERE seq = ?
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
-
-    return result.affectedRows;
-  }
   async findFilesByUniqueId(uniqueId: string): Promise<{ seq: number }[]> {
     const sql = `
       SELECT seq FROM tbl_doctor_file WHERE doctorSeq = 0 AND uniqueId = ?
