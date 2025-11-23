@@ -6,7 +6,7 @@ export interface IUserHome {
   userCode: string;
   userHomeName: string;
   userHomeAddress: string;
-  userHomeProvince: number;
+  userHomeProvince: string;
   userHomeDescription: string;
   userHomeImage: string;
   uniqueId: string;

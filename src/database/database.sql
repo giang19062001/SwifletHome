@@ -2,7 +2,7 @@
 CREATE TABLE
   `tbl_provinces` (
     `seq` int NOT NULL AUTO_INCREMENT,
-    `provinceCode` int NOT NULL,
+    `provinceCode` char(15) NOT NULL,
     `provinceName` varchar(45) NOT NULL,
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`seq`),
@@ -321,7 +321,7 @@ CREATE TABLE
     `userCode` varchar(45) NOT NULL,
     `userHomeName` varchar(255) NOT NULL,
     `userHomeAddress` text NOT NULL,
-    `userHomeProvince` int NOT NULL,
+    `userHomeProvince` char(15) NOT NULL,
     `userHomeDescription` text NOT NULL,
     `userHomeImage` varchar(255) NOT NULL,
     `uniqueId` char(255) NOT NULL,

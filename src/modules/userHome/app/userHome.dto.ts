@@ -46,9 +46,9 @@ export class CreateUserHomeDto {
   @ApiProperty({
     example: 0,
   })
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  userHomeProvince: number;
+  userHomeProvince: string;
 
   @ApiProperty({
     example: '',
