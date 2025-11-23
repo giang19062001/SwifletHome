@@ -24,26 +24,48 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private readonly logger: LoggingService) {}
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(this.SERVICE_NAME, `handleDisconnect:', ${client.id}`);
-  }
   handleConnection(client: Socket, ...args: Socket[]) {
-    this.logger.log(this.SERVICE_NAME, `handleConnection:', ${client.id}`);
+    this.logger.log(this.SERVICE_NAME, `Kết nối:', ${client.id}`);
+  }
+
+  handleDisconnect(client: Socket) {
+    this.logger.log(this.SERVICE_NAME, `Đóng kết nối: ${client.id}`);
+
+    const userCode = client.data.userCode;
+
+    if (!userCode) return; // Không có userCode thì không cần xử lý
+
+    const room = `user_${userCode}`;
+
+    // Kiểm tra xem còn client nào trong room không
+    const clientsInRoom = this.server.sockets.adapter && this.server.sockets.adapter.rooms.get(room);
+
+    if (!clientsInRoom || clientsInRoom.size === 0) {
+      // Không còn client nào → xóa interval
+      const interval = this.socketIntervals.get(userCode);
+      if (interval) {
+        clearInterval(interval);
+        this.socketIntervals.delete(userCode);
+        this.logger.log(this.SERVICE_NAME, `Xóa interval của userCode: ${userCode}`);
+      }
+    }
   }
 
   // Lưu interval theo userCode
   private socketIntervals = new Map<string, NodeJS.Timeout>(); // OBJECT SOCKET
 
-  @SubscribeMessage('joinUserHomeListRoom')
-  joinUserHomeListRoom(@MessageBody() { userCode }: { userCode: string }, @ConnectedSocket() client: Socket) {
+  @SubscribeMessage('joinUserHomesRoom')
+  joinUserHomesRoom(@MessageBody() { userCode }: { userCode: string }, @ConnectedSocket() client: Socket) {
     if (userCode) {
+      //Lưu userCode vào socket
+      client.data.userCode = userCode;
+
       // tạo phòng và tham gia
       const room = `user_${userCode}`;
       client.join(room);
-      console.log(`${client.id} đã tham gia phòng: ${room}`);
 
       this.logger.log(this.SERVICE_NAME, `${client.id} đã tham gia phòng: ${room}`);
-      this.logger.log(this.SERVICE_NAME, `Số lượng interval:', ${this.socketIntervals.size}`);
+      // this.logger.log(this.SERVICE_NAME, `Số lượng interval:', ${this.socketIntervals.size}`);
 
       // kiểm tra nếu chưa có dữ liệu userCode trong Mao thì thêm vào
       if (!this.socketIntervals.has(userCode)) {
@@ -59,7 +81,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
           }));
 
           // Gửi data tất cả nhà yến home của user này theo userCode
-          console.log("sensorData ===> ", JSON.stringify(sensorData));
+          console.log('sensorData ===> ', JSON.stringify(sensorData));
           this.server.to(room).emit('userhome-sensor-data', {
             userCode,
             data: sensorData,
