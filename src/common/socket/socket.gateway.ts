@@ -11,7 +11,7 @@ interface SensorData {
 
 // khai báo 1 gateway
 @WebSocketGateway({
-  namespace: 'UserHomesSocket', // ->  SOCKET_URL = 'http://<server-domain>/UserHomesSocket';
+  namespace: 'socket/userHomes', // ->  SOCKET_URL = 'http://<server-domain>/socket/userHomes';
   transports: ['websocket'], // polling || websocket
   cors: { origin: '*' },
 })
@@ -19,16 +19,16 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() // inject class socket cho biến server
   server: Server;
 
-  private readonly SERVICE_NAME = 'SocketGateway/UserHomesSocket';
+  private readonly SERVICE_NAME = 'SocketGateway/UserHomes';
   private readonly INTERVALS_TIME = 3000; // mỗi 3 giây
 
   constructor(private readonly logger: LoggingService) {}
 
-  handleDisconnect(client: any) {
-    throw new Error('Method not implemented.');
+  handleDisconnect(client: Socket) {
+    this.logger.log(this.SERVICE_NAME, `handleDisconnect:', ${client.id}`);
   }
-  handleConnection(client: any, ...args: any[]) {
-    throw new Error('Method not implemented.');
+  handleConnection(client: Socket, ...args: Socket[]) {
+    this.logger.log(this.SERVICE_NAME, `handleConnection:', ${client.id}`);
   }
 
   // Lưu interval theo userCode
@@ -51,7 +51,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
           // ! danh sách nhà yến của user này phải lấy từ DB
           const homesOfUser = ['HOM000001', 'HOM000002', 'HOM000003', 'HOM000004'];
           // ! dữ liệu sẽ gửi humidity, current, temperature cho từng home của user này (phải lấy từ sensor thật)
-          const realtimeData: SensorData[] = homesOfUser.map((userHomeCode) => ({
+          const sensorData: SensorData[] = homesOfUser.map((userHomeCode) => ({
             userHomeCode: userHomeCode,
             temperature: Math.floor(Math.random() * 8) + 24,
             humidity: Math.floor(Math.random() * 15) + 55,
@@ -59,9 +59,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
           }));
 
           // Gửi data tất cả nhà yến home của user này theo userCode
+          console.log("sensorData ===> ", JSON.stringify(sensorData));
           this.server.to(room).emit('userhome-sensor-data', {
             userCode,
-            data: realtimeData,
+            data: sensorData,
           });
         }, this.INTERVALS_TIME);
         this.socketIntervals.set(userCode, interval);
