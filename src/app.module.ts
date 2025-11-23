@@ -27,6 +27,7 @@ import { IpMiddleware } from './middleware/ip.middleware';
 import { CornModule } from './common/corn/corn.module';
 import { ProvinceModule } from './modules/province/province.module';
 import { UserHomeModule } from './modules/userHome/app/userHome.module';
+import { SocketModule } from './common/socket/socket.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UserHomeModule } from './modules/userHome/app/userHome.module';
     CornModule,
     DatabaseModule,
     LoggerModule,
+    SocketModule,
     // commmon
     OptionModule,
     ProvinceModule,
