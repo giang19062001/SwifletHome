@@ -132,12 +132,7 @@ export class ResUserHomeDto {
   @ApiProperty({ example: YnEnum.N })
   isIntegateCurrent: YnEnum;
 
-  @ApiProperty({
-    example: YnEnum.N,
-    enum: YnEnum,
-  })
-  @IsEnum(YnEnum)
-  @IsNotEmpty()
+  @ApiProperty({ example: YnEnum.N })
   isTriggered: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
