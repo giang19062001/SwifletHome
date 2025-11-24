@@ -21,7 +21,7 @@ export class DoctorAppController {
   constructor(private readonly doctorAppService: DoctorAppService) {}
 
   @Post('create')
-  @ApiBody({ type: CreateDoctorDto, description: '**\`uuid\`** dùng khi post dữ liệu phải trùng với **\`uuid\`** khi upload file' })
+  @ApiBody({ type: CreateDoctorDto, description: '**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file' })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async create(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateDoctorDto) {

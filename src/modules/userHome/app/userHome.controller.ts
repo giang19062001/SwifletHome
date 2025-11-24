@@ -30,13 +30,19 @@ export class UserHomeAppController {
   @Post('getHomes')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ResListDto(ResUserHomeDto)) })
-  async getSwtHouses(@Body() dto: PagingDto, @GetUserApp() user: userInterface.IUserApp,): Promise<IList<IUserHome>> {
+  async getSwtHouses(@Body() dto: PagingDto, @GetUserApp() user: userInterface.IUserApp): Promise<IList<IUserHome>> {
     const result = await this.userHomeAppService.getAll(dto, user.userCode);
     return result;
   }
 
   @Post('createHome')
-  @ApiBody({ type: CreateUserHomeDto, description: '**\`uuid\`** dùng khi post dữ liệu phải trùng với **\`uuid\`** khi upload file' })
+  @ApiBody({
+    type: CreateUserHomeDto,
+    description: `
+**uuid** dùng khi POST dữ liệu phải trùng với **uuid** khi upload file\n
+**userHomeProvince:** là **provinceCode** lấy từ /api/app/province/getAll
+  `,
+  })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async createSwtHouse(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateUserHomeDto) {

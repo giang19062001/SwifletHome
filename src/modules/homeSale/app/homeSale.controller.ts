@@ -66,7 +66,7 @@ export class HomeSaleAppController {
   // TODO: SUBMIT
   @ApiBody({
     description: `
-  **\`numberAttendCode\`**: - **\` api/app/options/getAll (mainOption: 'SUBMIT', subOption: 'NUMBER_ATTEND')\`** - code (đăng ký tham quan nhà yến)  
+**numberAttendCode**: lấy giá trị **code**  từ api/app/options/getAll {mainOption: 'SUBMIT', subOption: 'NUMBER_ATTEND'}
     `,
     type: CreateHomeSubmitDto,
   })

@@ -44,14 +44,14 @@ export class UserHomeAppRepository {
     );
     return rows ? (rows[0] as IUserHome) : null;
   }
-  async getMainDetail(seq: number): Promise<IUserHome | null> {
+  async findMainHomeDetail(userCode: string): Promise<IUserHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain
           FROM ${this.table} A 
-          WHERE A.seq = ? AND A.isActive = 'Y' AND A.isMain = 'Y'
+          WHERE A.userCode = ? AND A.isActive = 'Y' AND A.isMain = 'Y'
           LIMIT 1 `,
-      [seq],
+      [userCode],
     );
     return rows ? (rows[0] as IUserHome) : null;
   }
@@ -66,7 +66,7 @@ export class UserHomeAppRepository {
     return result.insertId;
   }
 
-  async create(userCode: string, dto: CreateUserHomeDto, userHomeImage: string): Promise<number> {
+  async create(userCode: string, dto: CreateUserHomeDto, isMain: string, userHomeImage: string): Promise<number> {
     const sqlLast = ` SELECT userHomeCode FROM ${this.table} ORDER BY userHomeCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let userHomeCode = 'HOM000001';
@@ -90,7 +90,7 @@ export class UserHomeAppRepository {
       dto.isIntegateTempHum,
       dto.isIntegateCurrent,
       'N', // isTriggered
-      'N', // isMain
+      isMain,
       dto.uniqueId,
       userCode,
     ]);

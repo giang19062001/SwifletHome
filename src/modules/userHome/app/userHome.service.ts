@@ -34,7 +34,13 @@ export class UserHomeAppService {
       if (filesUploaded.length) {
         // thêm nhà yến của user
         const filepath = `/uploads/${getFileLocation(filesUploaded[0].mimetype, filesUploaded[0].filename)}/${filesUploaded[0].filename}`;
-        const seq = await this.userHomeAppRepository.create(userCode, dto, filepath);
+        // kiểm tra user này có nhà nào là chính hay chưa
+        const checkMain = await this.userHomeAppRepository.findMainHomeDetail(userCode)
+        let isMain = 'N'
+        if(!checkMain){
+          isMain = 'Y'
+        }
+        const seq = await this.userHomeAppRepository.create(userCode, dto, isMain, filepath);
         // cập nhập userHomeSEQ của file đã tìm cùng uniqueId với doctor vừa created
         await this.userHomeAppRepository.updateSeqFiles(seq, filesUploaded[0].seq, dto.uniqueId);
       } else {
