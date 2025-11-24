@@ -54,7 +54,6 @@ export class CreateUserHomeDto {
     example: '',
   })
   @IsString()
-  @IsNotEmpty()
   userHomeDescription: string;
 
   @ApiProperty({

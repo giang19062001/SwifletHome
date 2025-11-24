@@ -322,7 +322,7 @@ CREATE TABLE
     `userHomeName` varchar(255) NOT NULL,
     `userHomeAddress` text NOT NULL,
     `userHomeProvince` char(15) NOT NULL,
-    `userHomeDescription` text NOT NULL,
+    `userHomeDescription` text NULL,
     `userHomeImage` varchar(255) NOT NULL,
     `uniqueId` char(255) NOT NULL,
     `isIntegateTempHum` char(1) DEFAULT 'N',
