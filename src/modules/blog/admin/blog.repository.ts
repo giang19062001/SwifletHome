@@ -4,14 +4,12 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IBlog } from '../blog.interface';
 import { CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { generateCode } from 'src/helpers/func.helper';
-import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
-export class BlogAdminRepository extends AbAdminRepo {
+export class BlogAdminRepository {
   private readonly table = 'tbl_blog';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-    super();
   }
 
   async getTotal(dto: GetAllBlogDto): Promise<number> {

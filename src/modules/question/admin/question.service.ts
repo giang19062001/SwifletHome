@@ -4,12 +4,10 @@ import { IList } from 'src/interfaces/admin.interface';
 import { IQuestion } from '../question.interface';
 import { QuestionAdminRepository } from './question.repository';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
-import { AbAdminService } from 'src/abstract/admin.abstract';
 
 @Injectable()
-export class QuestionAdminService extends AbAdminService {
+export class QuestionAdminService {
   constructor(private readonly questionAdminRepository: QuestionAdminRepository) {
-    super();
   }
   async getAll(dto: PagingDto): Promise<IList<IQuestion>> {
     const total = await this.questionAdminRepository.getTotal();

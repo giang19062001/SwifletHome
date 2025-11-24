@@ -4,16 +4,14 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale, IHomeSaleImg, IHomeSaleSubmit } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { generateCode } from 'src/helpers/func.helper';
-import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
-export class HomeSaleAdminRepository extends AbAdminRepo {
+export class HomeSaleAdminRepository   {
   private readonly table = 'tbl_home_sale';
   private readonly tableImg = 'tbl_home_sale_img';
   private readonly tableSubmit = 'tbl_home_sale_submit';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-    super();
   }
 
   async getTotal(): Promise<number> {

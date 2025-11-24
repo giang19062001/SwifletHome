@@ -1,22 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
-import {
-  CreateBlogDto,
-  GetAllBlogDto,
-  UpdateBlogDto,
-} from './blog.dto';
+import { CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { BlogAdminRepository } from './blog.repository';
 import { IBlog } from '../blog.interface';
-import { AbAdminService } from 'src/abstract/admin.abstract';
 
 @Injectable()
-export class BlogAdminService extends AbAdminService{
-  constructor(
-    private readonly blogAdminRepository: BlogAdminRepository,
-  ) {
-    super();
-  }
+export class BlogAdminService {
+  constructor(private readonly blogAdminRepository: BlogAdminRepository) {}
   async getAll(dto: GetAllBlogDto): Promise<IList<IBlog>> {
     const total = await this.blogAdminRepository.getTotal(dto);
     const list = await this.blogAdminRepository.getAll(dto);

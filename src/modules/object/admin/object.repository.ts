@@ -2,14 +2,12 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IObject } from '../object.interface';
-import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
-export class ObjectAdminRepository extends AbAdminRepo {
+export class ObjectAdminRepository   {
   private readonly table = 'tbl_object';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-    super();
   }
 
   async getTotal(): Promise<number> {
@@ -28,17 +26,5 @@ export class ObjectAdminRepository extends AbAdminRepo {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IObject[];
-  }
-  getDetail(dto: string | number): Promise<any | null> {
-    throw new Error('Method not implemented.');
-  }
-  create(dto: any): Promise<number> {
-    throw new Error('Method not implemented.');
-  }
-  update(dto: any, id: string | number): Promise<number> {
-    throw new Error('Method not implemented.');
-  }
-  delete(dto: string | number): Promise<number> {
-    throw new Error('Method not implemented.');
   }
 }

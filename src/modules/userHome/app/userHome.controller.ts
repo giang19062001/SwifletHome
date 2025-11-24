@@ -16,8 +16,8 @@ import { IUserHome } from './userHome.interface';
 import { ResListDto } from 'src/dto/common.dto';
 import { IList } from 'src/interfaces/admin.interface';
 
-@ApiTags('app/userHome')
-@Controller('/api/app/userHome')
+@ApiTags('app/user')
+@Controller('/api/app/user')
 @ApiBearerAuth('app-auth')
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
@@ -27,19 +27,19 @@ export class UserHomeAppController {
   @ApiBody({
     type: PagingDto,
   })
-  @Post('getAll')
+  @Post('getHomes')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ResListDto(ResUserHomeDto)) })
-  async getAll(@Body() dto: PagingDto, @GetUserApp() user: userInterface.IUserApp,): Promise<IList<IUserHome>> {
+  async getSwtHouses(@Body() dto: PagingDto, @GetUserApp() user: userInterface.IUserApp,): Promise<IList<IUserHome>> {
     const result = await this.userHomeAppService.getAll(dto, user.userCode);
     return result;
   }
 
-  @Post('create')
+  @Post('createHome')
   @ApiBody({ type: CreateUserHomeDto, description: '**\`uuid\`** dùng khi post dữ liệu phải trùng với **\`uuid\`** khi upload file' })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async create(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateUserHomeDto) {
+  async createSwtHouse(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateUserHomeDto) {
     const result = await this.userHomeAppService.create(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({
@@ -56,7 +56,7 @@ export class UserHomeAppController {
     };
   }
 
-  @Post('uploadImageForCreating')
+  @Post('uploadHomeImageForCreating')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadUserHomeImageDto })
   @UseFilters(MulterBadRequestFilter)

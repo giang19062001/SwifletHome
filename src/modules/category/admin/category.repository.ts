@@ -2,15 +2,12 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ICategory } from '../category.interface';
-import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
-export class CategoryAdminRepository extends AbAdminRepo {
+export class CategoryAdminRepository {
   private readonly table = 'tbl_category';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-    super();
-  }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
@@ -28,17 +25,5 @@ export class CategoryAdminRepository extends AbAdminRepo {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as ICategory[];
-  }
-  getDetail(dto: string | number): Promise<any | null> {
-    throw new Error('Method not implemented.');
-  }
-  create(dto: any): Promise<number> {
-    throw new Error('Method not implemented.');
-  }
-  update(dto: any, id: string | number): Promise<number> {
-    throw new Error('Method not implemented.');
-  }
-  delete(dto: string | number): Promise<number> {
-    throw new Error('Method not implemented.');
   }
 }

@@ -4,14 +4,12 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IQuestion } from '../question.interface';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { generateCode } from 'src/helpers/func.helper';
-import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
-export class QuestionAdminRepository extends AbAdminRepo {
+export class QuestionAdminRepository   {
   private readonly table = 'tbl_question';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-    super();
   }
 
   async getTotal(): Promise<number> {

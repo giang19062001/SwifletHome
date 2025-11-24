@@ -6,18 +6,16 @@ import { HomeSaleAdminRepository } from './homeSale.repository';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { diffByTwoArr } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { AbAdminService } from 'src/abstract/admin.abstract';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()
-export class HomeSaleAdminService extends AbAdminService {
+export class HomeSaleAdminService   {
   private readonly SERVICE_NAME = 'HomeSaleAdminService';
   constructor(
     private readonly homSaleAdminRepository: HomeSaleAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {
-    super();
   }
   async getAll(dto: PagingDto): Promise<IList<IHomeSale>> {
     const total = await this.homSaleAdminRepository.getTotal();

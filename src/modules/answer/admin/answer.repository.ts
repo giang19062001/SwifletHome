@@ -2,21 +2,14 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IAnswer } from '../answer.interface';
-import {
-  CreateAnswerDto,
-  GetAllAnswerDto,
-  UpdateAnswerDto,
-} from './answer.dto';
+import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
 import { generateCode } from 'src/helpers/func.helper';
-import { AbAdminRepo } from 'src/abstract/admin.abstract';
 
 @Injectable()
-export class AnswerAdminRepository extends AbAdminRepo {
+export class AnswerAdminRepository {
   private readonly table = 'tbl_answer';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-    super();
-  }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(dto: GetAllAnswerDto): Promise<number> {
     const params: any[] = [];
@@ -33,10 +26,7 @@ export class AnswerAdminRepository extends AbAdminRepo {
       params.push(dto.answerCategory);
     }
 
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`,
-      params,
-    );
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: GetAllAnswerDto): Promise<IAnswer[]> {
@@ -99,14 +89,7 @@ export class AnswerAdminRepository extends AbAdminRepo {
         INSERT INTO ${this.table}  (answerCode, answerContent, answerObject, answerCategory, isFree, createdId) 
         VALUES(?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      answerCode,
-      dto.answerContent,
-      dto.answerObject,
-      dto.answerCategory,
-      dto.isFree,
-      dto.createdId
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [answerCode, dto.answerContent, dto.answerObject, dto.answerCategory, dto.isFree, dto.createdId]);
 
     return result.insertId;
   }
@@ -116,15 +99,7 @@ export class AnswerAdminRepository extends AbAdminRepo {
       updatedId = ?, updatedAt = ?
       WHERE answerCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.answerContent,
-      dto.answerObject,
-      dto.answerCategory,
-      dto.isFree,
-      dto.updatedId,
-      new Date(),
-      answerCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.answerContent, dto.answerObject, dto.answerCategory, dto.isFree, dto.updatedId, new Date(), answerCode]);
 
     return result.affectedRows;
   }
@@ -134,9 +109,7 @@ export class AnswerAdminRepository extends AbAdminRepo {
       DELETE FROM ${this.table}
       WHERE answerCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      answerCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [answerCode]);
 
     return result.affectedRows;
   }
