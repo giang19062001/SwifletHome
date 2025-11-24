@@ -24,7 +24,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeSaleAdminService } from './homeSale.service';
-import { IHomeSale, IHomeSaleSubmit } from '../homeSale.interface';
+import { IHomeSale, IHomeSaleSightSeeing } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
@@ -147,23 +147,23 @@ export class HomeSaleAdminController {
     return result;
   }
 
-  // TODO: SUBMIT
+  // TODO: SIGHTSEEING
   @ApiBody({
     type: PagingDto,
   })
-  @Post('getAllSubmit')
+  @Post('getAllSightseeing')
   @HttpCode(HttpStatus.OK)
-  async getAllSubmit(@Body() dto: PagingDto): Promise<IList<IHomeSaleSubmit>> {
-    const result = await this.homeSaleAdminService.getAllSubmit(dto);
+  async getAllSightseeing(@Body() dto: PagingDto): Promise<IList<IHomeSaleSightSeeing>> {
+    const result = await this.homeSaleAdminService.getAllSightseeing(dto);
     return result;
   }
 
   @ApiBody({ type: UpdateStatusDto })
   @ApiParam({ name: 'seq', type: Number })
-  @Put('updateSubmit/:seq')
+  @Put('updateSightseeing/:seq')
   @HttpCode(HttpStatus.OK)
-  async updateSubmit(@Body() dto: UpdateStatusDto, @Param('seq') seq: number, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
-    const result = await this.homeSaleAdminService.updateSubmit(dto, admin.userId, seq);
+  async updateSightseeing(@Body() dto: UpdateStatusDto, @Param('seq') seq: number, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+    const result = await this.homeSaleAdminService.updateSightseeing(dto, admin.userId, seq);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -171,10 +171,10 @@ export class HomeSaleAdminController {
   }
 
   @ApiParam({ name: 'seq', type: Number })
-  @Get('getDetailSubmit/:seq')
+  @Get('getDetailSightseeing/:seq')
   @HttpCode(HttpStatus.OK)
-  async getDetailSubmit(@Param('seq') seq: number): Promise<IHomeSaleSubmit | null> {
-    const result = await this.homeSaleAdminService.getDetailSubmit(seq);
+  async getDetailSightseeing(@Param('seq') seq: number): Promise<IHomeSaleSightSeeing | null> {
+    const result = await this.homeSaleAdminService.getDetailSightseeing(seq);
     if (!result) {
       throw new BadRequestException();
     }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
-import { IHomeSale, IHomeSaleImg, IHomeSaleSubmit } from '../homeSale.interface';
+import { IHomeSale, IHomeSaleImg, IHomeSaleSightSeeing } from '../homeSale.interface';
 import { HomeSaleAdminRepository } from './homeSale.repository';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { diffByTwoArr } from 'src/helpers/func.helper';
@@ -132,18 +132,18 @@ export class HomeSaleAdminService   {
     }
   }
 
-  // TODO: SUBMIT
-  async getAllSubmit(dto: PagingDto): Promise<IList<IHomeSaleSubmit>> {
-    const total = await this.homSaleAdminRepository.getTotalSubmit();
-    const list = await this.homSaleAdminRepository.getAllSubmit(dto);
+  // TODO: SIGHTSEEING
+  async getAllSightseeing(dto: PagingDto): Promise<IList<IHomeSaleSightSeeing>> {
+    const total = await this.homSaleAdminRepository.getTotalSightseeing();
+    const list = await this.homSaleAdminRepository.getAllSightseeing(dto);
     return { total, list };
   }
-  async getDetailSubmit(seq: number): Promise<IHomeSaleSubmit | null> {
-    const result = await this.homSaleAdminRepository.getDetailSubmit(seq);
+  async getDetailSightseeing(seq: number): Promise<IHomeSaleSightSeeing | null> {
+    const result = await this.homSaleAdminRepository.getDetailSightseeing(seq);
     return result;
   }
-  async updateSubmit(dto: UpdateStatusDto, updatedId: string, seq: number): Promise<number> {
-    const result = await this.homSaleAdminRepository.updateSubmit(dto, updatedId, seq);
+  async updateSightseeing(dto: UpdateStatusDto, updatedId: string, seq: number): Promise<number> {
+    const result = await this.homSaleAdminRepository.updateSightseeing(dto, updatedId, seq);
     return result;
   }
 }

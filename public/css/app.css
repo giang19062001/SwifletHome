@@ -18825,15 +18825,15 @@ select {
   background-color: rgba(255, 0, 0, 0.9);
 }
 
-#page-home-sale-submit a {
+#page-home-sale-sightseeing a {
   text-decoration: none;
 }
 
-.home-submit-update-modal img {
+.home-sightseeing-update-modal img {
   width: 250px;
   border-radius: 15px;
 }
-.home-submit-update-modal .homeName {
+.home-sightseeing-update-modal .homeName {
   font-size: 18px !important;
   font-weight: 600;
 }

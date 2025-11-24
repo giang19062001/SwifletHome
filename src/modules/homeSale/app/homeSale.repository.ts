@@ -2,12 +2,12 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
-import { CreateHomeSubmitDto } from './homeSubmit.dto';
+import { CreateHomeSightSeeingDto } from './homeSale.dto';
 
 @Injectable()
 export class HomeSaleAppRepository {
   private readonly table = 'tbl_home_sale';
-  private readonly tableSubmit = 'tbl_home_sale_submit';
+  private readonly tableSightSeeing = 'tbl_home_sale_sightseeing';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -65,10 +65,10 @@ export class HomeSaleAppRepository {
     }
     return result;
   }
-  // TODO: SUBMIT 
-  async createSubmit(dto: CreateHomeSubmitDto, userCode: string, status: string): Promise<number> {
+  // TODO: SIGHTSEEING 
+  async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string, status: string): Promise<number> {
     const sql = `
-        INSERT INTO ${this.tableSubmit}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, status, createdId) 
+        INSERT INTO ${this.tableSightSeeing}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, status, createdId) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.homeCode, userCode, dto.userName, dto.userPhone, dto.numberAttendCode, dto.note, status, userCode]);

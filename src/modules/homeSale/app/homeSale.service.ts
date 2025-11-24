@@ -4,7 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
 import { HomeSaleAppRepository } from './homeSale.repository';
 import { IListApp } from 'src/interfaces/app.interface';
-import { CreateHomeSubmitDto } from './homeSubmit.dto';
+import { CreateHomeSightSeeingDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { OptionService } from 'src/modules/options/option.service';
 
@@ -23,8 +23,8 @@ export class HomeSaleAppService {
     const result = await this.homeSaleAppRepository.getDetail(homeCode);
     return result;
   }
-  // TODO: SUBMIT 
-  async createSubmit(dto: CreateHomeSubmitDto, userCode: string): Promise<number> {
+  // TODO: SIGHTSEEING 
+  async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string): Promise<number> {
     // kiểm tra homeCode
     const home = await this.homeSaleAppRepository.getDetail(dto.homeCode);
     if (!home) {
@@ -32,7 +32,7 @@ export class HomeSaleAppService {
     }
     // kiểm tra attendCode
     const attendCodes = await this.optionService.getAll({
-      mainOption: 'SUBMIT',
+      mainOption: 'SIGHTSEEING',
       subOption: 'NUMBER_ATTEND',
     });
     if (!attendCodes.length) {
@@ -43,7 +43,7 @@ export class HomeSaleAppService {
     }
     // mặc định status ban đầu là 'WAITING' -> Đang chờ duyệt
 
-    const result = await this.homeSaleAppRepository.createSubmit(dto, userCode, "WAITING");
+    const result = await this.homeSaleAppRepository.registerSightSeeing(dto, userCode, "WAITING");
     return result;
   }
 }

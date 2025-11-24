@@ -3,7 +3,7 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class GetOptionDto {
   @ApiProperty({
-    example: 'SUBMIT',
+    example: 'SIGHTSEEING',
   })
   @IsString()
   @IsNotEmpty()
@@ -31,7 +31,7 @@ export class ResOptionDto {
   @ApiProperty({ example: 'COD000001' })
   code: string;
 
-  @ApiProperty({ example: 'SUBMIT' })
+  @ApiProperty({ example: 'SIGHTSEEING' })
   mainOption: string;
 
   @ApiProperty({ example: 'NUMBER_ATTEND' })

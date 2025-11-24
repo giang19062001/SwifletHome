@@ -27,7 +27,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { IListApp } from 'src/interfaces/app.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { CreateHomeSubmitDto, ResHomeDto } from './homeSubmit.dto';
+import { CreateHomeSightSeeingDto, ResHomeDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
 import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
@@ -63,18 +63,18 @@ export class HomeSaleAppController {
     return result;
   }
 
-  // TODO: SUBMIT
+  // TODO: SIGHTSEEING
   @ApiBody({
     description: `
-**numberAttendCode**: lấy giá trị **code**  từ api/app/options/getAll {mainOption: 'SUBMIT', subOption: 'NUMBER_ATTEND'}
+**numberAttendCode**: lấy giá trị **code**  từ api/app/options/getAll {mainOption: 'SIGHTSEEING', subOption: 'NUMBER_ATTEND'}
     `,
-    type: CreateHomeSubmitDto,
+    type: CreateHomeSightSeeingDto,
   })
-  @Post('createSubmit')
+  @Post('registerSightSeeing')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async createSubmit(@Body() dto: CreateHomeSubmitDto, @GetUserApp() user: userInterface.IUserApp) {
-    const result = await this.homeSaleAppService.createSubmit(dto, user.userCode);
+  async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: userInterface.IUserApp) {
+    const result = await this.homeSaleAppService.registerSightSeeing(dto, user.userCode);
     return {
       message: Msg.HomeSummitCreateOk,
       data: result,

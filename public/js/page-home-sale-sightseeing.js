@@ -1,10 +1,10 @@
 let page = 1;
 let limit = 10;
-const pageElement = 'page-home-sale-submit';
+const pageElement = 'page-home-sale-sightseeing';
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
-  getAllHomeSubmit(page, limit);
+  getAllHomeSightseeing(page, limit);
 });
 
 // TODO: FUNC
@@ -12,12 +12,12 @@ document.addEventListener('DOMContentLoaded', function () {
 function changePage(p) {
   page = p;
   document.getElementById('privacy-main-pager').innerHTML = '';
-  getAllHomeSubmit(page, limit);
+  getAllHomeSightseeing(page, limit);
 }
 
-function closeHomeSubmitModal() {
+function closeHomeSightseeingModal() {
   // Xác định modal theo loại
-  const modalSelector = '.home-submit-update-modal';
+  const modalSelector = '.home-sightseeing-update-modal';
   const modalEl = document.querySelector(modalSelector);
 
   if (!modalEl) return;
@@ -27,9 +27,9 @@ function closeHomeSubmitModal() {
 }
 
 // TODO: RENDER
-async function showHomeSubmitModal(homeData) {
+async function showHomeSightseeingModal(homeData) {
   // init modal
-  const modalSelector = '.home-submit-update-modal';
+  const modalSelector = '.home-sightseeing-update-modal';
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body');
 
@@ -61,17 +61,17 @@ async function showHomeSubmitModal(homeData) {
   });
 
   // assign <event> update
-  modalEl.querySelector('.modal-footer button').onclick = updateHomeSubmit;
+  modalEl.querySelector('.modal-footer button').onclick = updateHomeSightseeing;
 
   // show modal
   const modal = new bootstrap.Modal(modalEl);
   modalEl.addEventListener('hidden.bs.modal', () => {
-    closeHomeSubmitModal();
+    closeHomeSightseeingModal();
   });
   modal.show();
 }
 
-function renderAllHomeSubmit(data, objElement) {
+function renderAllHomeSightseeing(data, objElement) {
   let HTML = '';
   if (data?.list?.length) {
     let i = 1;
@@ -90,7 +90,7 @@ function renderAllHomeSubmit(data, objElement) {
             <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${OPTIONS.HOME_SUMIT.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
-                <button class="btn-main-out" onclick="getDetailHomeSubmit('${ele.seq}')">Chỉnh sửa</button>
+                <button class="btn-main-out" onclick="getDetailHomeSightseeing('${ele.seq}')">Chỉnh sửa</button>
             </td>
          </tr>`;
       HTML += rowHtml;
@@ -110,14 +110,14 @@ function renderAllHomeSubmit(data, objElement) {
 }
 
 // TODO: API
-async function getAllHomeSubmit(currentPage, limit) {
+async function getAllHomeSightseeing(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
   showSkeleton(objElement, limit, 7);
 
   await axios
     .post(
-      CURRENT_URL + '/api/admin/homeSale/getAllSubmit',
+      CURRENT_URL + '/api/admin/homeSale/getAllSightseeing',
       {
         page: currentPage,
         limit: limit,
@@ -127,7 +127,7 @@ async function getAllHomeSubmit(currentPage, limit) {
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
-        renderAllHomeSubmit(response.data, objElement);
+        renderAllHomeSightseeing(response.data, objElement);
       }
     })
     .catch(function (error) {
@@ -135,14 +135,14 @@ async function getAllHomeSubmit(currentPage, limit) {
     });
 }
 
-async function getDetailHomeSubmit(seq) {
+async function getDetailHomeSightseeing(seq) {
   await loaderApiCall(
     axios
-      .get(CURRENT_URL + '/api/admin/homeSale/getDetailSubmit/' + seq, axiosAuth())
+      .get(CURRENT_URL + '/api/admin/homeSale/getDetailSightseeing/' + seq, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
-          showHomeSubmitModal(response.data);
+          showHomeSightseeingModal(response.data);
         }
       })
       .catch(function (err) {
@@ -151,16 +151,16 @@ async function getDetailHomeSubmit(seq) {
   );
 }
 
-async function updateHomeSubmit() {
+async function updateHomeSightseeing() {
   try {
-    const modalBody = document.querySelector('.home-submit-update-modal .modal-body form');
+    const modalBody = document.querySelector('.home-sightseeing-update-modal .modal-body form');
     const seq = modalBody.querySelector('#seq').value;
     const status = modalBody.querySelector('#status').value;
     console.log(seq, status);
 
     await axios
       .put(
-        CURRENT_URL + '/api/admin/homeSale/updateSubmit/' + seq,
+        CURRENT_URL + '/api/admin/homeSale/updateSightseeing/' + seq,
         {
           status: status,
         },
@@ -171,10 +171,10 @@ async function updateHomeSubmit() {
         if (response.status === 200 && response.data) {
           toastOk('Chỉnh sửa thành công');
           // đóng modal
-          closeHomeSubmitModal();
+          closeHomeSightseeingModal();
           // refresh list
           page = 1;
-          getAllHomeSubmit(page, limit);
+          getAllHomeSightseeing(page, limit);
         } else {
           toastErr('Chỉnh sửa thất bại');
         }

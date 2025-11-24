@@ -274,7 +274,7 @@ CREATE TABLE
 
 -- đăng ký tham quan nha yến
 CREATE TABLE
-  `tbl_home_sale_submit` (
+  `tbl_home_sale_sightseeing` (
     `seq` int NOT NULL AUTO_INCREMENT,
     `homeCode` varchar(45) NOT NULL,
     `userCode` varchar(45) NOT NULL,
@@ -289,7 +289,7 @@ CREATE TABLE
     `createdId` varchar(45) DEFAULT 'SYSTEM',
     `updatedId` varchar(45) DEFAULT NULL,
     PRIMARY KEY (`seq`),
-    CONSTRAINT `fk_home_submit_home` FOREIGN KEY (`homeCode`) REFERENCES `tbl_home_sale` (`homeCode`) ON DELETE CASCADE
+    CONSTRAINT `fk_home_sightseeing_home` FOREIGN KEY (`homeCode`) REFERENCES `tbl_home_sale` (`homeCode`) ON DELETE CASCADE
   ) ENGINE = InnoDB;
 
 

@@ -233,11 +233,11 @@ export class AppController {
     };
   }
 
-  // home/submit
-  @Get('/dashboard/home/submit')
+  // home/sightseeing
+  @Get('/dashboard/home/sightseeing')
   @UseGuards(PageAuthAdminGuard)
-  @Render('pages/home-sale-submit')
-  renderHomeSubmit(@Req() req: Request) {
+  @Render('pages/home-sale-sightseeing')
+  renderHomeSightseeing(@Req() req: Request) {
     return {
       title: 'Danh sách đăng ký tham quan',
       isLayout: true,

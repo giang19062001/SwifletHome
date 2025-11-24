@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
-export class CreateHomeSubmitDto {
+export class CreateHomeSightSeeingDto {
   @ApiProperty({
     example: 'HOM000001',
   })

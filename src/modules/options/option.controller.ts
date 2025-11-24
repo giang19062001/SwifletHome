@@ -15,7 +15,7 @@ export default class OptionController {
   @ApiBody({
     description: `
 **mainOption:**
-- **SUBMIT**: đăng ký tham quan nhà yến  
+- **SIGHTSEEING**: đăng ký tham quan nhà yến  
 
 **subOption:**
   - **NUMBER_ATTEND**: số lượng người đăng ký tham quan nhà yến

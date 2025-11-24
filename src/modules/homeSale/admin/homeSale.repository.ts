@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IHomeSale, IHomeSaleImg, IHomeSaleSubmit } from '../homeSale.interface';
+import { IHomeSale, IHomeSaleImg, IHomeSaleSightSeeing } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { generateCode } from 'src/helpers/func.helper';
 
@@ -9,7 +9,7 @@ import { generateCode } from 'src/helpers/func.helper';
 export class HomeSaleAdminRepository {
   private readonly table = 'tbl_home_sale';
   private readonly tableImg = 'tbl_home_sale_img';
-  private readonly tableSubmit = 'tbl_home_sale_submit';
+  private readonly tableSightseeing = 'tbl_home_sale_sightseeing';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -135,15 +135,15 @@ export class HomeSaleAdminRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, seqList);
     return result.affectedRows;
   }
-  // TODO: SUBMIT
-  async getTotalSubmit(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableSubmit}`);
+  // TODO: SIGHTSEEING
+  async getTotalSightseeing(): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableSightseeing}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllSubmit(dto: PagingDto): Promise<IHomeSaleSubmit[]> {
+  async getAllSightseeing(dto: PagingDto): Promise<IHomeSaleSightSeeing[]> {
     let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.status, A.note, A.cancelReason, A.createdAt,
           B.homeName, B.homeImage, C.valueOption AS numberAttend
-          FROM ${this.tableSubmit} A 
+          FROM ${this.tableSightseeing} A 
           LEFT JOIN tbl_home_sale B
           ON A.homeCode = B.homeCode
           LEFT JOIN tbl_option_common C
@@ -156,14 +156,14 @@ export class HomeSaleAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IHomeSaleSubmit[];
+    return rows as IHomeSaleSightSeeing[];
   }
 
-  async getDetailSubmit(seq: number): Promise<IHomeSaleSubmit | null> {
+  async getDetailSightseeing(seq: number): Promise<IHomeSaleSightSeeing | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.status, A.note, A.cancelReason, A.createdAt,
           B.homeName, B.homeImage, C.valueOption AS numberAttend
-          FROM ${this.tableSubmit} A 
+          FROM ${this.tableSightseeing} A 
           LEFT JOIN tbl_home_sale B
           ON A.homeCode = B.homeCode
           LEFT JOIN tbl_option_common C
@@ -172,12 +172,12 @@ export class HomeSaleAdminRepository {
           LIMIT 1 `,
       [seq],
     );
-    return rows ? (rows[0] as IHomeSaleSubmit) : null;
+    return rows ? (rows[0] as IHomeSaleSightSeeing) : null;
   }
 
-  async updateSubmit(dto: UpdateStatusDto, updatedId: string, seq: number): Promise<number> {
+  async updateSightseeing(dto: UpdateStatusDto, updatedId: string, seq: number): Promise<number> {
     const sql = `
-        UPDATE ${this.tableSubmit} SET status = ?, updatedId = ?, updatedAt = ?
+        UPDATE ${this.tableSightseeing} SET status = ?, updatedId = ?, updatedAt = ?
         WHERE seq = ?
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.status, updatedId, new Date(), seq]);
