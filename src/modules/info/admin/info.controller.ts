@@ -7,8 +7,10 @@ import { InfoAdminService } from './info.service';
 import { IInfo } from '../info.interface';
 import { UpdateInfoDto } from './info.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import * as userInterface from 'src/modules/user/admin/user.interface';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
-@ApiBearerAuth('admin-auth')  
+@ApiBearerAuth('admin-auth')
 @ApiTags('admin/info')
 @UseGuards(ApiAuthAdminGuard)
 @Controller('/api/admin/info')
@@ -43,6 +45,7 @@ export class InfoAdminController {
   async update(
     @Body() dto: UpdateInfoDto,
     @Param('keyword') infoKeyword: string,
+    @GetUserAdmin() admin: userInterface.IUserAdmin,
     @UploadedFiles() files: Express.Multer.File[], // tất cả file trong formData
   ): Promise<number> {
     const filedFile = this.infoAdminService.getFieldFileByKeyword(infoKeyword);
@@ -58,7 +61,7 @@ export class InfoAdminController {
     }
 
     // update
-    const result = await this.infoAdminService.update(dto, infoKeyword);
+    const result = await this.infoAdminService.update(dto, admin.userId, infoKeyword);
     if (result === 0) {
       throw new BadRequestException();
     }

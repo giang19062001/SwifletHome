@@ -37,7 +37,7 @@ export class UpdateAnswerDto {
   @IsNotEmpty()
   answerCategory: string;
 
-   @ApiProperty({
+  @ApiProperty({
     example: YnEnum.Y,
     enum: YnEnum,
   })
@@ -45,19 +45,6 @@ export class UpdateAnswerDto {
   @IsNotEmpty()
   isFree: YnEnum;
 
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  updatedId: string;
 }
 
-export class CreateAnswerDto extends OmitType(UpdateAnswerDto, ['updatedId']) {
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
-}
+export class CreateAnswerDto extends UpdateAnswerDto {}

@@ -41,12 +41,12 @@ export class ScreenAdminRepository {
     return rows ? (rows[0] as IScreen) : null;
   }
 
-  async update(dto: UpdateScreenDto, screenKeyword: string): Promise<number> {
+  async update(dto: UpdateScreenDto, updatedId: string, screenKeyword: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET screenName = ?, screenDescription = ?, screenContent = ?, updatedId = ?, updatedAt = ?
       WHERE screenKeyword = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.screenName, dto.screenDescription, dto.screenContent, dto.updatedId, new Date(), screenKeyword]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.screenName, dto.screenDescription, dto.screenContent, updatedId, new Date(), screenKeyword]);
 
     return result.affectedRows;
   }

@@ -77,12 +77,12 @@ export class UserAdminRepository {
 
     return result.insertId;
   }
-  async updatePackage(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, updatedAt: Date): Promise<number> {
+  async updatePackage(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, updatedId: string, updatedAt: Date): Promise<number> {
     const sql = `
         UPDATE  ${this.tablePackage} SET packageCode = ?, startDate = ?, endDate = ?, updatedId = ?, updatedAt = ?
         WHERE userCode = ?
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, dto.updatedId, updatedAt, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, updatedId, updatedAt, userCode]);
 
     return result.affectedRows;
   }

@@ -24,6 +24,8 @@ import {
   UpdateBlogDto,
 } from './blog.dto';
 import { BlogAdminService } from './blog.service';
+import * as userInterface from 'src/modules/user/admin/user.interface';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/blog')
@@ -58,8 +60,8 @@ export class BlogAdminController {
   @ApiBody({ type: CreateBlogDto })
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  async create(@Body() dto: CreateBlogDto): Promise<number> {
-    const result = await this.blogAdminService.create(dto);
+  async create(@Body() dto: CreateBlogDto,  @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+    const result = await this.blogAdminService.create(dto, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -70,8 +72,8 @@ export class BlogAdminController {
   @ApiParam({ name: 'blogCode', type: String })
   @Put('update/:blogCode')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateBlogDto, @Param('blogCode') blogCode: string): Promise<number> {
-    const result = await this.blogAdminService.update(dto, blogCode);
+  async update(@Body() dto: UpdateBlogDto, @Param('blogCode') blogCode: string, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+    const result = await this.blogAdminService.update(dto, admin.userId, blogCode);
     if (result === 0) {
       throw new BadRequestException();
     }

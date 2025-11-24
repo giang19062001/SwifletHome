@@ -23,10 +23,4 @@ export class UpdateScreenDto {
   @IsNotEmptyObject() // không rỗng
   screenContent: any;
 
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  updatedId: string;
 }

@@ -6,11 +6,10 @@ import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { generateCode } from 'src/helpers/func.helper';
 
 @Injectable()
-export class QuestionAdminRepository   {
+export class QuestionAdminRepository {
   private readonly table = 'tbl_question';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-  }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
@@ -51,7 +50,7 @@ export class QuestionAdminRepository   {
     );
     return rows ? (rows[0] as IQuestion) : null;
   }
-  async create(dto: CreateQuestionDto): Promise<number> {
+  async create(dto: CreateQuestionDto, createdId: string): Promise<number> {
     const sqlLast = ` SELECT questionCode FROM ${this.table} ORDER BY questionCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let questionCode = 'QUS000001';
@@ -62,17 +61,17 @@ export class QuestionAdminRepository   {
       INSERT INTO ${this.table}  (questionCode, answerCode, questionObject, questionContent, questionCategory, createdId) 
       VALUES(?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [questionCode, dto.answerCode, dto.questionObject, dto.questionContent, dto.questionCategory, dto.createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [questionCode, dto.answerCode, dto.questionObject, dto.questionContent, dto.questionCategory, createdId]);
 
     return result.insertId;
   }
-  async update(dto: UpdateQuestionDto, questionCode: string): Promise<number> {
+  async update(dto: UpdateQuestionDto, updatedId: string, questionCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET answerCode = ?, questionObject = ?, questionContent = ?, questionCategory = ?,
       updatedId = ?, updatedAt = ?
       WHERE questionCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.answerCode, dto.questionObject, dto.questionContent, dto.questionCategory, dto.updatedId, new Date(), questionCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.answerCode, dto.questionObject, dto.questionContent, dto.questionCategory, updatedId, new Date(), questionCode]);
 
     return result.affectedRows;
   }

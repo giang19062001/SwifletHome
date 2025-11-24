@@ -8,23 +8,9 @@ export class UploadVideoLinkDto {
   @IsString()
   @IsNotEmpty()
   urlLink: string;
-
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
 }
 
 export class UploadImgFileDto {
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
-
   @ApiProperty({
     type: 'string',
     format: 'binary',
@@ -33,13 +19,6 @@ export class UploadImgFileDto {
 }
 
 export class UploadAudioFilesDto {
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
-
   @ApiProperty({
     type: 'string',
     format: 'binary',

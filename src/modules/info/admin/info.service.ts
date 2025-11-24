@@ -48,8 +48,8 @@ export class InfoAdminService {
     return result;
   }
 
-  async update(dto: UpdateInfoDto, infoKeyword: string): Promise<number> {
-    const result = await this.infoAdminRepository.update(dto, infoKeyword);
+  async update(dto: UpdateInfoDto, updatedId: string, infoKeyword: string): Promise<number> {
+    const result = await this.infoAdminRepository.update(dto, updatedId, infoKeyword);
     return result;
   }
 }

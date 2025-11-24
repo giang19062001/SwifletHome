@@ -32,19 +32,6 @@ export class UpdateQuestionDto {
   @IsNotEmpty()
   questionCategory: string;
 
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  updatedId: string;
 }
 
-export class CreateQuestionDto extends OmitType(UpdateQuestionDto, ['updatedId']) {
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
-}
+export class CreateQuestionDto extends UpdateQuestionDto {}

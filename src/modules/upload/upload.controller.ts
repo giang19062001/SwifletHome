@@ -7,6 +7,8 @@ import { IAudioFreePay, IFileUpload } from './upload.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { multerAudioConfig, multerImgConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
+import * as userInterface from '../user/admin/user.interface';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/uploadFile')
@@ -19,12 +21,12 @@ export class UploadController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadImgFileDto })
   @UseInterceptors(FileInterceptor('editorImg', multerImgConfig))
-  async uploadImg(@Body() dto: UploadImgFileDto, @UploadedFile() file: Express.Multer.File): Promise<number> {
+  async uploadImg(@Body() dto: UploadImgFileDto, @UploadedFile() file: Express.Multer.File, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
     if (!file) {
       throw new BadRequestException(Msg.FileEmpty);
     }
 
-    return this.uploadService.uploadImg(file, dto.createdId);
+    return this.uploadService.uploadImg(file, admin.userId);
   }
 
   @Post('uploadAudios')
@@ -41,6 +43,7 @@ export class UploadController {
   )
   async uploadAudios(
     @Body() dto: UploadAudioFilesDto,
+    @GetUserAdmin() admin: userInterface.IUserAdmin,
     @UploadedFiles()
     files: {
       editorAudioFree?: Express.Multer.File;
@@ -52,9 +55,9 @@ export class UploadController {
     }
 
     try {
-      const seqPay = await this.uploadService.uploadAudioPay(files.editorAudioPay[0], dto.createdId);
+      const seqPay = await this.uploadService.uploadAudioPay(files.editorAudioPay[0], admin.userId);
       if (seqPay) {
-        await this.uploadService.uploadAudioFree(files.editorAudioFree[0], dto.createdId, seqPay);
+        await this.uploadService.uploadAudioFree(files.editorAudioFree[0], admin.userId, seqPay);
       }
       return 1;
     } catch (error) {
@@ -64,8 +67,8 @@ export class UploadController {
   @ApiBody({ type: UploadVideoLinkDto })
   @Post('uploadVideoLink')
   @HttpCode(HttpStatus.OK)
-  async uploadVideoLink(@Body() dto: UploadVideoLinkDto): Promise<number> {
-    const result = await this.uploadService.uploadVideoLink(dto);
+  async uploadVideoLink(@Body() dto: UploadVideoLinkDto, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+    const result = await this.uploadService.uploadVideoLink(dto, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
     }

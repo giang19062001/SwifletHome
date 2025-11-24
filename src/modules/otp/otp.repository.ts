@@ -26,15 +26,6 @@ export class OtpRepository {
     await this.db.query(sql, [purpose, otpCode, expiresAt, new Date(), userPhone]);
   }
 
-  async deleteOtp(userPhone: string, purpose: string): Promise<void> {
-    const sql = `
-      DELETE FROM ${this.table} 
-      WHERE userPhone = ? AND purpose = ?
-    `;
-
-    await this.db.query(sql, [userPhone, purpose]);
-  }
-
   async findOtpExist(userPhone: string): Promise<IOtp | null> {
     const sql = `
       SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed  FROM ${this.table} 

@@ -40,12 +40,12 @@ export class InfoAdminRepository {
     return rows ? (rows[0] as IInfo) : null;
   }
 
-  async update(dto: UpdateInfoDto, infoKeyword: string): Promise<number> {
+  async update(dto: UpdateInfoDto, updatedId: string, infoKeyword: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET infoContent = ?, updatedId = ?, updatedAt = ?
       WHERE infoKeyword = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.infoContent, dto.updatedId, new Date(), infoKeyword]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.infoContent, updatedId, new Date(), infoKeyword]);
 
     return result.affectedRows;
   }

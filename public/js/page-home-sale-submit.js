@@ -163,7 +163,6 @@ async function updateHomeSubmit() {
         CURRENT_URL + '/api/admin/homeSale/updateSubmit/' + seq,
         {
           status: status,
-          updatedId: user.userId,
         },
         axiosAuth(),
       )

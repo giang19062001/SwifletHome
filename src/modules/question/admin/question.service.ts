@@ -22,12 +22,12 @@ export class QuestionAdminService {
     const result = await this.questionAdminRepository.getDetail(questionCode);
     return result;
   }
-  async create(dto: CreateQuestionDto): Promise<number> {
-    const result = await this.questionAdminRepository.create(dto);
+  async create(dto: CreateQuestionDto, createdId: string): Promise<number> {
+    const result = await this.questionAdminRepository.create(dto, createdId);
     return result;
   }
-  async update(dto: UpdateQuestionDto, questionCode: string): Promise<number> {
-    const result = await this.questionAdminRepository.update(dto, questionCode);
+  async update(dto: UpdateQuestionDto, updatedId: string, questionCode: string): Promise<number> {
+    const result = await this.questionAdminRepository.update(dto, updatedId, questionCode);
     return result;
   }
   async delete(questionCode: string): Promise<number> {

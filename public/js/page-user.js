@@ -193,7 +193,6 @@ async function updateUser(btn) {
         CURRENT_URL + '/api/admin/user/updatePackage/' + userCode,
         {
           packageCode: packageCode,
-          updatedId: user.userId,
         },
         axiosAuth(),
       )

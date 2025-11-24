@@ -55,8 +55,8 @@ export class UploadService {
     }
   }
 
-  async uploadVideoLink(dto: UploadVideoLinkDto): Promise<number> {
-    const result = await this.uploadRepository.uploadVideoLink(dto);
+  async uploadVideoLink(dto: UploadVideoLinkDto, createdId:string): Promise<number> {
+    const result = await this.uploadRepository.uploadVideoLink(dto, createdId);
     return result;
   }
 

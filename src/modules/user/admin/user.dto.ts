@@ -31,10 +31,4 @@ export class UpdateUserPackageAdminDto {
   @IsString()
   packageCode: string | null;
 
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  updatedId: string;
 }

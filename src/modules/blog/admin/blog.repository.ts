@@ -9,13 +9,12 @@ import { generateCode } from 'src/helpers/func.helper';
 export class BlogAdminRepository {
   private readonly table = 'tbl_blog';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-  }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(dto: GetAllBlogDto): Promise<number> {
     const params: any[] = [];
 
-    let whereClause = 'WHERE 1 = 1';
+    let whereClause = ` WHERE isActive = 'Y' `;
 
     if (dto.blogObject) {
       whereClause += ' AND blogObject = ?';
@@ -33,7 +32,7 @@ export class BlogAdminRepository {
   async getAll(dto: GetAllBlogDto): Promise<IBlog[]> {
     const params: any[] = [];
 
-    let whereClause = 'WHERE 1 = 1';
+    let whereClause = ` WHERE  A.isActive = 'Y' `;
 
     if (dto.blogObject) {
       whereClause += ' AND A.blogObject = ?';
@@ -73,13 +72,13 @@ export class BlogAdminRepository {
         ON A.blogCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.blogObject = C.objectKeyword
-        WHERE A.blogCode = ? 
+        WHERE A.blogCode = ? AND A.isActive = 'Y'
         LIMIT 1 `,
       [blogCode],
     );
     return rows ? (rows[0] as IBlog) : null;
   }
-  async create(dto: CreateBlogDto): Promise<number> {
+  async create(dto: CreateBlogDto, createdId: string): Promise<number> {
     const sqlLast = ` SELECT blogCode FROM ${this.table} ORDER BY blogCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let blogCode = 'BLG000001';
@@ -90,24 +89,25 @@ export class BlogAdminRepository {
         INSERT INTO ${this.table}  (blogCode, blogContent, blogObject, blogCategory, isFree, createdId) 
         VALUES(?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode, dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, dto.createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode, dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, createdId]);
 
     return result.insertId;
   }
-  async update(dto: UpdateBlogDto, blogCode: string): Promise<number> {
+  async update(dto: UpdateBlogDto, updatedId: string, blogCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET blogContent = ?, blogObject = ?, blogCategory = ?, isFree = ?,
       updatedId = ?, updatedAt = ?
       WHERE blogCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, dto.updatedId, new Date(), blogCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, updatedId, new Date(), blogCode]);
 
     return result.affectedRows;
   }
 
   async delete(blogCode: string): Promise<number> {
     const sql = `
-      DELETE FROM ${this.table}
+      UPDATE  ${this.table}
+      SET isActive = 'N'
       WHERE blogCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode]);

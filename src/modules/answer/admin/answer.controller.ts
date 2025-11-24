@@ -1,31 +1,12 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Res,
-  HttpStatus,
-  Req,
-  Get,
-  HttpCode,
-  UseGuards,
-  Put,
-  BadRequestException,
-  Delete,
-  Param,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, BadRequestException, Delete, Param, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
-
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { AnswerAdminService } from './answer.service';
 import { IAnswer } from '../answer.interface';
-import {
-  CreateAnswerDto,
-  GetAllAnswerDto,
-  UpdateAnswerDto,
-} from './answer.dto';
+import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
+import * as userInterface from 'src/modules/user/admin/user.interface';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/answer')
@@ -47,12 +28,10 @@ export class AnswerAdminController {
   @Get('getDetail/:answerCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'answerCode', type: String })
-  async getDetail(
-    @Param('answerCode') answerCode: string,
-  ): Promise<IAnswer | null> {
+  async getDetail(@Param('answerCode') answerCode: string): Promise<IAnswer | null> {
     const result = await this.answerAdminService.getDetail(answerCode);
-     if(!result){
-      throw new BadRequestException()
+    if (!result) {
+      throw new BadRequestException();
     }
     return result;
   }
@@ -60,8 +39,8 @@ export class AnswerAdminController {
   @ApiBody({ type: CreateAnswerDto })
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  async create(@Body() dto: CreateAnswerDto): Promise<number> {
-    const result = await this.answerAdminService.create(dto);
+  async create(@Body() dto: CreateAnswerDto, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+    const result = await this.answerAdminService.create(dto, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -72,8 +51,8 @@ export class AnswerAdminController {
   @ApiParam({ name: 'answerCode', type: String })
   @Put('update/:answerCode')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateAnswerDto, @Param('answerCode') answerCode: string): Promise<number> {
-    const result = await this.answerAdminService.update(dto, answerCode);
+  async update(@Body() dto: UpdateAnswerDto, @Param('answerCode') answerCode: string,  @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+    const result = await this.answerAdminService.update(dto, admin.userId, answerCode);
     if (result === 0) {
       throw new BadRequestException();
     }

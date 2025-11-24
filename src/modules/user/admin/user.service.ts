@@ -48,7 +48,7 @@ export class UserAdminService {
   }
 
   //TODO: PACKAGE
-  async updatePackage(dto: UpdateUserPackageAdminDto, userCode: string): Promise<number> {
+  async updatePackage(dto: UpdateUserPackageAdminDto, updatedId: string, userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/update`;
 
     const updatedAt = new Date();
@@ -76,7 +76,7 @@ export class UserAdminService {
     }
 
     await this.userAdminRepository.writePackageHistory(dto, userCode, startDate, endDate, updatedAt);
-    const result = await this.userAdminRepository.updatePackage(dto, userCode, startDate, endDate, updatedAt);
+    const result = await this.userAdminRepository.updatePackage(dto, userCode, startDate, endDate, updatedId, updatedAt);
     if (result) {
       //gửi nofity
       this.firebaseService.sendNotification(

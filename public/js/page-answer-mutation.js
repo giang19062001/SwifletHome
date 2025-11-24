@@ -140,7 +140,6 @@ async function createAnswer() {
           answerCategory,
           answerObject,
           isFree: isFree,
-          createdId: user.userId,
         },
         axiosAuth(),
       )
@@ -187,7 +186,6 @@ async function updateAnswer() {
           answerCategory,
           answerObject,
           isFree: isFree,
-          updatedId: user.userId,
         },
         axiosAuth(),
       )

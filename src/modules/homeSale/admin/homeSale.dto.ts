@@ -50,12 +50,7 @@ export class CreateHomeDto {
   @IsNotEmpty()
   longitude: number;
 
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
+
 
   @ApiProperty({
     type: 'string',
@@ -73,14 +68,7 @@ export class CreateHomeDto {
   homeImages: any[];
 }
 
-export class UpdateHomeDto extends OmitType(CreateHomeDto, ['createdId']) {
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  updatedId: string;
-}
+export class UpdateHomeDto extends CreateHomeDto{}
 
 export class UpdateStatusDto {
   @ApiProperty({
@@ -90,9 +78,4 @@ export class UpdateStatusDto {
   @IsNotEmpty()
   status: string;
 
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  updatedId: string;
 }

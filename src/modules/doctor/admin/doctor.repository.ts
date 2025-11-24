@@ -38,12 +38,12 @@ export class DoctorAdminRepository {
     );
     return rows ? (rows[0] as IDoctor) : null;
   }
-  async update(dto: UpdateDoctorDto, seq: number): Promise<number> {
+  async update(dto: UpdateDoctorDto, updatedId: string, seq: number): Promise<number> {
     const sql = `
           UPDATE ${this.table} SET noteAnswered = ?, status = ?, updatedId = ?, updatedAt = ?
           WHERE seq = ?
         `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.noteAnswered, dto.status, dto.updatedId, new Date(), seq]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.noteAnswered, dto.status, updatedId, new Date(), seq]);
 
     return result.affectedRows;
   }
@@ -57,7 +57,6 @@ export class DoctorAdminRepository {
     return rows as IDoctorFile[];
   }
 
-  
   async deleteFile(seq: number): Promise<number> {
     const sql = `
       DELETE FROM tbl_doctor_file

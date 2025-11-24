@@ -283,7 +283,6 @@ async function uploadImg(file) {
   if (!file) return;
 
   const formData = new FormData();
-  formData.append('createdId', user.userId);
   formData.append('editorImg', file);
 
   try {
@@ -312,7 +311,6 @@ async function uploadImg(file) {
 async function uploadAudios(freeFile, payFile) {
   // Tạo FormData
   const formData = new FormData();
-  formData.append('createdId', user.userId);
   formData.append('editorAudioFree', freeFile);
   formData.append('editorAudioPay', payFile);
 
@@ -346,7 +344,6 @@ async function uploadVideoLink(urlLink) {
         CURRENT_URL + '/api/admin/uploadFile/uploadVideoLink',
         {
           urlLink: urlLink,
-          createdId: user.userId,
         },
         axiosAuth(),
       )

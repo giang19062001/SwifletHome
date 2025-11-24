@@ -17,12 +17,12 @@ export class BlogAdminService {
     const result = await this.blogAdminRepository.getDetail(blogCode);
     return result;
   }
-  async create(dto: CreateBlogDto): Promise<number> {
-    const result = await this.blogAdminRepository.create(dto);
+  async create(dto: CreateBlogDto, createdId: string): Promise<number> {
+    const result = await this.blogAdminRepository.create(dto, createdId);
     return result;
   }
-  async update(dto: UpdateBlogDto, blogCode: string): Promise<number> {
-    const result = await this.blogAdminRepository.update(dto, blogCode);
+  async update(dto: UpdateBlogDto, updatedId: string, blogCode: string): Promise<number> {
+    const result = await this.blogAdminRepository.update(dto, updatedId, blogCode);
     return result;
   }
   async delete(blogCode: string): Promise<number> {

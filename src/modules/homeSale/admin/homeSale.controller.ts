@@ -28,6 +28,8 @@ import { IHomeSale, IHomeSaleSubmit } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
+import * as userInterface from 'src/modules/user/admin/user.interface';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/homeSale')
@@ -73,6 +75,7 @@ export class HomeSaleAdminController {
   )
   async create(
     @Body() createHomeDto: CreateHomeDto,
+    @GetUserAdmin() admin: userInterface.IUserAdmin,
     // @UploadedFiles() files: Express.Multer.File[],
     @UploadedFiles()
     files: {
@@ -88,7 +91,7 @@ export class HomeSaleAdminController {
       homeImages,
     };
 
-    const result = await this.homeSaleAdminService.create(body);
+    const result = await this.homeSaleAdminService.create(body, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -111,6 +114,7 @@ export class HomeSaleAdminController {
   async update(
     @Body() createHomeDto: UpdateHomeDto,
     @Param('homeCode') homeCode: string,
+    @GetUserAdmin() admin: userInterface.IUserAdmin,
     @UploadedFiles()
     files: {
       homeImage?: Express.Multer.File[];
@@ -125,7 +129,7 @@ export class HomeSaleAdminController {
       homeImages,
     };
 
-    const result = await this.homeSaleAdminService.update(dto, homeCode);
+    const result = await this.homeSaleAdminService.update(dto, admin.userId, homeCode);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -143,7 +147,7 @@ export class HomeSaleAdminController {
     return result;
   }
 
-  // TODO: SUBMIT 
+  // TODO: SUBMIT
   @ApiBody({
     type: PagingDto,
   })
@@ -158,8 +162,8 @@ export class HomeSaleAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Put('updateSubmit/:seq')
   @HttpCode(HttpStatus.OK)
-  async updateSubmit(@Body() dto: UpdateStatusDto, @Param('seq') seq: number): Promise<number> {
-    const result = await this.homeSaleAdminService.updateSubmit(dto, seq);
+  async updateSubmit(@Body() dto: UpdateStatusDto, @Param('seq') seq: number, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+    const result = await this.homeSaleAdminService.updateSubmit(dto, admin.userId, seq);
     if (result === 0) {
       throw new BadRequestException();
     }

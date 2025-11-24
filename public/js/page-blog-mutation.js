@@ -139,7 +139,6 @@ async function createBlog() {
           blogCategory,
           blogObject,
           isFree: isFree,
-          createdId: user.userId,
         },
         axiosAuth(),
       )
@@ -185,7 +184,6 @@ async function updateBlog() {
           blogCategory,
           blogObject,
           isFree: isFree,
-          updatedId: user.userId,
         },
         axiosAuth(),
       )

@@ -17,10 +17,4 @@ export class UpdateDoctorDto {
   @IsNotEmpty()
   noteAnswered: string;
 
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  updatedId: string;
 }

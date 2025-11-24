@@ -44,20 +44,6 @@ export class UpdateBlogDto {
   @IsEnum(YnEnum)
   @IsNotEmpty()
   isFree: YnEnum;
-
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  updatedId: string;
 }
 
-export class CreateBlogDto extends OmitType(UpdateBlogDto, ['updatedId']) {
-  @ApiProperty({
-    example: 'admin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  createdId: string;
-}
+export class CreateBlogDto extends UpdateBlogDto {}

@@ -4,6 +4,8 @@ import { UserAdminService } from './user.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { GetAllUserDto, GetDetailDto, UpdateUserPackageAdminDto } from './user.dto';
+import * as userInterface from './user.interface';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/user')
@@ -37,8 +39,8 @@ export class UserAdminController {
     @ApiParam({ name: 'userCode', type: String })
     @Put('updatePackage/:userCode')
     @HttpCode(HttpStatus.OK)
-    async update(@Body() dto: UpdateUserPackageAdminDto,  @Param('userCode') userCode: string): Promise<number> {
-      const result = await this.userAdminService.updatePackage(dto, userCode);
+    async update(@Body() dto: UpdateUserPackageAdminDto,  @Param('userCode') userCode: string,  @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+      const result = await this.userAdminService.updatePackage(dto, admin.userId, userCode);
       if (result === 0) {
         throw new BadRequestException();
       }

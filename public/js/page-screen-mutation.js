@@ -181,7 +181,6 @@ async function updateScreen() {
           screenName: formData.screenName,
           screenDescription: formData.screenDescription,
           screenContent,
-          updatedId: user.userId,
         },
         axiosAuth(),
       )

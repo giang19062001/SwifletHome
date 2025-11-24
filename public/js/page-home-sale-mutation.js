@@ -270,7 +270,6 @@ async function submitHome(formData, url, method, successMessage) {
   const postData = new FormData();
   const fields = ['homeName', 'homeAddress', 'homeDescription', 'latitude', 'longitude'];
   fields.forEach((field) => postData.append(field, formData[field]));
-  postData.append(method == 'post' ? 'createdId' : 'updatedId', user.userId);
 
   // nếu có cập nhập file của homeImage hoặc homeImages -> đẩy vào formData
   if (formData.homeImage?.length) {

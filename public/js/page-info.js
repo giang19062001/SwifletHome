@@ -117,7 +117,6 @@ function getDataForm(modalBody) {
   const keywordInput = modalBody.querySelector('#infoKeyword');
   const infoKeyword = keywordInput ? keywordInput.value : '';
   formData.append('infoKeyword', infoKeyword);
-  formData.append('updatedId', user.userId);
   let infoContentChanged = {};
 
   // Lấy các field trong infoContent

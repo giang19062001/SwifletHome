@@ -6,13 +6,12 @@ import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { generateCode } from 'src/helpers/func.helper';
 
 @Injectable()
-export class HomeSaleAdminRepository   {
+export class HomeSaleAdminRepository {
   private readonly table = 'tbl_home_sale';
   private readonly tableImg = 'tbl_home_sale_img';
   private readonly tableSubmit = 'tbl_home_sale_submit';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-  }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
@@ -42,7 +41,7 @@ export class HomeSaleAdminRepository   {
     );
     return rows ? (rows[0] as IHomeSale) : null;
   }
-  async create(dto: CreateHomeDto): Promise<number> {
+  async create(dto: CreateHomeDto, createdId: string): Promise<number> {
     const sqlLast = ` SELECT homeCode FROM ${this.table} ORDER BY homeCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let homeCode = 'HOM000001';
@@ -53,11 +52,11 @@ export class HomeSaleAdminRepository   {
       INSERT INTO ${this.table}  (homeCode, homeName, homeAddress, homeDescription, latitude, longitude, homeImage, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [homeCode, dto.homeName, dto.homeAddress, dto.homeDescription, dto.latitude, dto.longitude, dto.homeImage.filename, dto.createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [homeCode, dto.homeName, dto.homeAddress, dto.homeDescription, dto.latitude, dto.longitude, dto.homeImage.filename, createdId]);
 
     return result.insertId;
   }
-  async update(dto: UpdateHomeDto, homeCode: string): Promise<number> {
+  async update(dto: UpdateHomeDto, updatedId: string, homeCode: string): Promise<number> {
     const sql = `
         UPDATE ${this.table} SET homeName = ?, homeAddress = ?, homeDescription = ?, latitude = ?, longitude = ?, homeImage = ?,
         updatedId = ?, updatedAt = ?
@@ -70,7 +69,7 @@ export class HomeSaleAdminRepository   {
       dto.latitude,
       dto.longitude,
       dto.homeImage.filename,
-      dto.updatedId,
+      updatedId,
       new Date(),
       homeCode,
     ]);
@@ -79,10 +78,6 @@ export class HomeSaleAdminRepository   {
   }
 
   async delete(homeCode: string): Promise<number> {
-    // const sql = `
-    //   DELETE FROM ${this.table}
-    //   WHERE homeCode = ?
-    // `;
     const sql = `
       UPDATE ${this.table} SET isActive = "N"
       WHERE homeCode = ?
@@ -140,7 +135,7 @@ export class HomeSaleAdminRepository   {
     const [result] = await this.db.execute<ResultSetHeader>(sql, seqList);
     return result.affectedRows;
   }
-  // TODO: SUBMIT 
+  // TODO: SUBMIT
   async getTotalSubmit(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableSubmit}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
@@ -180,12 +175,12 @@ export class HomeSaleAdminRepository   {
     return rows ? (rows[0] as IHomeSaleSubmit) : null;
   }
 
-  async updateSubmit(dto: UpdateStatusDto, seq: number): Promise<number> {
+  async updateSubmit(dto: UpdateStatusDto, updatedId: string, seq: number): Promise<number> {
     const sql = `
         UPDATE ${this.tableSubmit} SET status = ?, updatedId = ?, updatedAt = ?
         WHERE seq = ?
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.status, dto.updatedId, new Date(), seq]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.status, updatedId, new Date(), seq]);
 
     return result.affectedRows;
   }

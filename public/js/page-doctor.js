@@ -203,7 +203,6 @@ async function updateDoctor() {
         {
           status: status,
           noteAnswered: noteAnswered,
-          updatedId: user.userId,
         },
         axiosAuth(),
       )

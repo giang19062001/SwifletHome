@@ -347,7 +347,6 @@ async function createQuestion(btn) {
         questionCategory,
         questionObject,
         answerCode,
-        createdId: user.userId,
       },
       axiosAuth(),
     );
@@ -393,7 +392,6 @@ async function updateQuestion(btn) {
           questionCategory: questionCategory,
           questionObject: questionObject,
           answerCode: answerCode,
-          updatedId: user.userId,
         },
         axiosAuth(),
       )

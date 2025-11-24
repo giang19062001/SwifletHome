@@ -90,12 +90,12 @@ export class UploadRepository {
 
     return result.insertId;
   }
-  async uploadVideoLink(dto: UploadVideoLinkDto): Promise<number> {
+  async uploadVideoLink(dto: UploadVideoLinkDto, createdId: string): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableVideo} (urlLink, createdId) 
         VALUES(?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.urlLink, dto.createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.urlLink, createdId]);
 
     return result.insertId;
   }

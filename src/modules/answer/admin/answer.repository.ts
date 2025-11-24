@@ -78,7 +78,7 @@ export class AnswerAdminRepository {
     );
     return rows ? (rows[0] as IAnswer) : null;
   }
-  async create(dto: CreateAnswerDto): Promise<number> {
+  async create(dto: CreateAnswerDto, createdId: string): Promise<number> {
     const sqlLast = ` SELECT answerCode FROM ${this.table} ORDER BY answerCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let answerCode = 'ANS000001';
@@ -89,17 +89,17 @@ export class AnswerAdminRepository {
         INSERT INTO ${this.table}  (answerCode, answerContent, answerObject, answerCategory, isFree, createdId) 
         VALUES(?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [answerCode, dto.answerContent, dto.answerObject, dto.answerCategory, dto.isFree, dto.createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [answerCode, dto.answerContent, dto.answerObject, dto.answerCategory, dto.isFree, createdId]);
 
     return result.insertId;
   }
-  async update(dto: UpdateAnswerDto, answerCode: string): Promise<number> {
+  async update(dto: UpdateAnswerDto, updatedId: string, answerCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET answerContent = ?, answerObject = ?, answerCategory = ?, isFree = ?,
       updatedId = ?, updatedAt = ?
       WHERE answerCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.answerContent, dto.answerObject, dto.answerCategory, dto.isFree, dto.updatedId, new Date(), answerCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.answerContent, dto.answerObject, dto.answerCategory, dto.isFree, updatedId, new Date(), answerCode]);
 
     return result.affectedRows;
   }

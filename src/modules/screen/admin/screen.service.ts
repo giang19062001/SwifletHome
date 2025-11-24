@@ -18,8 +18,8 @@ export class ScreenAdminService {
     return result;
   }
 
-  async update(dto: UpdateScreenDto, screenKeyword: string): Promise<number> {
-    const result = await this.screenAdminRepository.update(dto, screenKeyword);
+  async update(dto: UpdateScreenDto, updatedId: string, screenKeyword: string): Promise<number> {
+    const result = await this.screenAdminRepository.update(dto, updatedId, screenKeyword);
     return result;
   }
 }

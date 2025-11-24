@@ -41,24 +41,24 @@ export class HomeSaleAdminService   {
       return null;
     }
   }
-  async create(dto: CreateHomeDto): Promise<number> {
-    const seq = await this.homSaleAdminRepository.create(dto);
+  async create(dto: CreateHomeDto, createdId: string): Promise<number> {
+    const seq = await this.homSaleAdminRepository.create(dto, createdId);
     if (seq) {
       //homeImage
       if (dto.homeImage) {
-        await this.homSaleAdminRepository.createImages(seq, dto.createdId, dto.homeImage);
+        await this.homSaleAdminRepository.createImages(seq, createdId, dto.homeImage);
       }
       //homeImages
       if (dto.homeImages.length > 0) {
         for (const file of dto.homeImages) {
-          await this.homSaleAdminRepository.createImages(seq, dto.createdId, file);
+          await this.homSaleAdminRepository.createImages(seq,createdId, file);
         }
       }
     }
     return seq;
   }
 
-  async update(dto: UpdateHomeDto, homeCode: string): Promise<number> {
+  async update(dto: UpdateHomeDto, updatedId: string, homeCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/update`;
 
     const home = await this.getDetail(homeCode);
@@ -99,7 +99,7 @@ export class HomeSaleAdminService   {
           this.logger.log(logbase, `Insdert file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
         }
       }
-      const result = await this.homSaleAdminRepository.update(dto, homeCode);
+      const result = await this.homSaleAdminRepository.update(dto, updatedId, homeCode);
       return result;
     } else {
       return 0;
@@ -142,8 +142,8 @@ export class HomeSaleAdminService   {
     const result = await this.homSaleAdminRepository.getDetailSubmit(seq);
     return result;
   }
-  async updateSubmit(dto: UpdateStatusDto, seq: number): Promise<number> {
-    const result = await this.homSaleAdminRepository.updateSubmit(dto, seq);
+  async updateSubmit(dto: UpdateStatusDto, updatedId: string, seq: number): Promise<number> {
+    const result = await this.homSaleAdminRepository.updateSubmit(dto, updatedId, seq);
     return result;
   }
 }
