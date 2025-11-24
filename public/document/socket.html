@@ -25,14 +25,14 @@
             <div class="lg:w-64 bg-gray-800 rounded-xl shadow-xl p-4 space-y-4" style="max-height: 85vh;">
                 <h3 class="text-lg font-semibold text-white">Namespaces</h3>
                 <div class="grid grid-cols-1 gap-2">
-                    <button
-                        class="flex-1 text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
-                        userHomes
+                    <button  onclick="window.location.href='?type=userHomes'"
+                        class="flex-1 text-sm text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
+                        /socket/userHomes
                     </button>
 
-                    <button disabled
-                        class="flex-1 text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
-                        userHomeMain
+                    <button disabled  onclick="window.location.href='?type=userHomeMain'"
+                        class="flex-1 text-sm text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
+                        /socket/userHomeMain
                     </button>
                 </div>
             </div>
