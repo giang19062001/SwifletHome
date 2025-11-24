@@ -71,7 +71,8 @@
                 leaveEvent: 'leaveUserHomesRoom',
                 streamEvent: 'streamUserHomeSensorData',
                 params: [
-                    { key: 'userCode', label: 'userCode', placeholder: 'USR000001', default: 'USR000001', required: true }
+                    { key: 'userCode', label: 'userCode', placeholder: 'USR000001', default: 'USR000001', required: true },
+                    { key: 'userHomeCodes', label: 'userHomeCodes', placeholder: 'HOM000001,HOM000002', default: 'HOM000001,HOM000002', required: true }
                 ]
             },
             userHomeMain: {
@@ -236,7 +237,13 @@
             if (!data) return;
 
             socket.emit(cfg.joinEvent, data);
-            const roomName = cfg.params.map(p => data[p.key]).join('_');
+
+            // Lấy tất cả key làm room
+            // const roomName = cfg.params.map(p => data[p.key]).join('_');
+            // roomEl.textContent = `${cfg.roomPrefix}${roomName}`;
+
+            // Lấy key đầu tiên từ cfg.params làm room
+            const roomName =  cfg.params[0].key ? data[ cfg.params[0].key] : '';
             roomEl.textContent = `${cfg.roomPrefix}${roomName}`;
             addLog('warn', cfg.joinEvent, data);
         }

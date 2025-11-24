@@ -20,6 +20,10 @@ export class JoinUserHomesRoomDto {
   @IsString()
   @IsNotEmpty()
   userCode: string;
+
+  @IsString()
+  @IsNotEmpty()
+  userHomeCodes: string; // string array
 }
 
 export class UserHomeSensorDataDto {

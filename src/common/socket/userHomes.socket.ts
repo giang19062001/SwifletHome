@@ -33,7 +33,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   // tham gia nhóm
   @SubscribeMessage('joinUserHomesRoom')
   joinUserHomesRoom(@MessageBody() data: JoinUserHomesRoomDto, @ConnectedSocket() client: Socket) {
-    const { userCode } = data;
+    const { userCode, userHomeCodes } = data;
     if (!userCode) return;
 
     client.data.userCode = userCode;
@@ -44,7 +44,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
 
     // Khởi tạo interval nếu chưa có
     if (!this.socketIntervals.has(userCode)) {
-      this.startSensorDataInterval(userCode, room);
+      this.startSensorDataInterval(userCode, userHomeCodes, room);
     }
 
     // Gửi dữ liệu rỗng lần đầu
@@ -70,9 +70,9 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // khởi tạo internal khi chưa có
-  private startSensorDataInterval(userCode: string, room: string) {
+  private startSensorDataInterval(userCode: string, userHomeCodes: string, room: string) {
     const interval = setInterval(() => {
-      const sensorData = this.generateMockSensorData();
+      const sensorData = this.generateMockSensorData(userHomeCodes);
       this.sendSensorData(room, { userCode, data: sensorData });
     }, this.INTERVALS_TIME);
 
@@ -81,8 +81,8 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // lấy dữ liệu fake
-  private generateMockSensorData(): SensorData[] {
-    const homesOfUser = ['HOM000001', 'HOM000002', 'HOM000003', 'HOM000004'];
+  private generateMockSensorData(userHomeCodes: string): SensorData[] {
+    const homesOfUser = userHomeCodes.split(',').map(s => s.trim()); // biến chuỗi string thành mảng
     return homesOfUser.map((home) => ({
       userHomeCode: home,
       temperature: Math.floor(Math.random() * 8) + 24,
