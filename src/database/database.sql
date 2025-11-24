@@ -313,6 +313,7 @@ CREATE TABLE
     `updatedId` varchar(45) DEFAULT NULL,
     PRIMARY KEY (`seq`),
     UNIQUE KEY `filename_UNIQUE` (`filename`),
+    UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
   )
 CREATE TABLE
   `tbl_user_home` (

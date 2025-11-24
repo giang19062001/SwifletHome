@@ -79,6 +79,7 @@ export class ResUserHomeImageDto {
   @ApiProperty({ example: '' })
   filename: string;
 }
+
 export class ResUserHomeDto {
   @ApiProperty({ example: 1 })
   seq: number;
@@ -119,3 +120,7 @@ export class ResUserHomeDto {
   @ApiProperty({ example: '' })
   uniqueId: string;
 }
+export class ResUserHomeListDto extends OmitType(
+  ResUserHomeDto,
+  ['uniqueId'] as const,
+) {}

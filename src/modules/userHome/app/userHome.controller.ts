@@ -10,7 +10,7 @@ import * as userInterface from 'src/modules/user/app/user.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { UserHomeAppService } from './userHome.service';
-import { MutationUserHomeDto, ResUserHomeDto, ResUserHomeImageDto, UploadUserHomeImageDto } from './userHome.dto';
+import { MutationUserHomeDto, ResUserHomeDto, ResUserHomeImageDto, ResUserHomeListDto, UploadUserHomeImageDto } from './userHome.dto';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserHome } from './userHome.interface';
 import { ResListDto } from 'src/dto/common.dto';
@@ -29,7 +29,7 @@ export class UserHomeAppController {
   })
   @Post('getHomes')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResListDto(ResUserHomeDto)) })
+  @ApiOkResponse({ type: ApiAppResponseDto(ResListDto(ResUserHomeListDto)) })
   async getSwtHouses(@Body() dto: PagingDto, @GetUserApp() user: userInterface.IUserApp): Promise<IList<IUserHome>> {
     const result = await this.userHomeAppService.getAll(dto, user.userCode);
     return result;

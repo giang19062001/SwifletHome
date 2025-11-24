@@ -17,7 +17,7 @@ export class UserHomeAppRepository {
   }
   async getAll(dto: PagingDto, userCode: string): Promise<IUserHome[]> {
     let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, B.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
-     A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain, A.uniqueId
+     A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain
     FROM ${this.table} A 
     LEFT JOIN  tbl_provinces B
     ON A.userHomeProvince = B.provinceCode
