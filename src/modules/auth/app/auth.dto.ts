@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, Matches } from 'class-validator';
+import { Msg } from 'src/helpers/message.helper';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -35,7 +36,7 @@ export class LoginAppDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+$/, { message:'Số điện thoại phải là số'})
+  @Matches(/^\d+$/, { message: Msg.PhoneMustNumber})
   userPhone: string;
 
   @ApiProperty({
@@ -66,7 +67,7 @@ export class RegisterUserAppDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+$/, { message:'Số điện thoại phải là số'})
+  @Matches(/^\d+$/, { message: Msg.PhoneMustNumber})
   userPhone: string;
 
   @ApiProperty({

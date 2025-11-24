@@ -28,7 +28,7 @@ export class DoctorAppController {
     const result = await this.doctorAppService.create(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({
-        message: Msg.uuidNotFound,
+        message: Msg.UuidNotFound,
         data: 0,
       });
     }

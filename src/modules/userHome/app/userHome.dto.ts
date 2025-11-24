@@ -8,7 +8,7 @@ export class UploadUserHomeImageDto {
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     format: 'uuid',
-    description: 'Được generate phía app khi màn hình mount (uuid)',
+    description: 'Luôn được generate phía app (uuid)',
   })
   @IsUUID()
   @IsNotEmpty()
@@ -21,14 +21,7 @@ export class UploadUserHomeImageDto {
   userHomeImage: any;
 }
 
-class UserHomeImageDto {
-  @ApiProperty({ example: '' })
-  @IsString()
-  @IsNotEmpty()
-  filename: string;
-}
-
-export class CreateUserHomeDto {
+export class MutationUserHomeDto {
   @ApiProperty({
     example: '',
   })
@@ -72,14 +65,6 @@ export class CreateUserHomeDto {
   @IsNotEmpty()
   isIntegateCurrent: YnEnum;
 
-  // @ApiProperty({
-  //   example: YnEnum.N,
-  //   enum: YnEnum,
-  // })
-  // @IsEnum(YnEnum)
-  // @IsNotEmpty()
-  // isMain: YnEnum;
-
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     format: 'uuid',
@@ -87,12 +72,6 @@ export class CreateUserHomeDto {
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
-
-  //   @ApiProperty({ type: UserHomeImageDto })
-  //   @IsNotEmpty()
-  //   @ValidateNested()
-  //   @Type(() => UserHomeImageDto) // phải có
-  //   userHomeImage: UserHomeImageDto;
 }
 
 // RESPONSE
@@ -136,4 +115,7 @@ export class ResUserHomeDto {
 
   @ApiProperty({ example: YnEnum.N })
   isMain: YnEnum;
+
+  @ApiProperty({ example: '' })
+  uniqueId: string;
 }

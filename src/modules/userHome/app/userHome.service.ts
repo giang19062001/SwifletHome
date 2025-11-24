@@ -1,13 +1,15 @@
 import { UploadService } from '../../upload/upload.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { IUserHome, IUserHomeImageStr } from './userHome.interface';
-import { CreateUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
+import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { UserHomeAppRepository } from './userHome.repository';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
+import { Msg } from 'src/helpers/message.helper';
+import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()
 export class UserHomeAppService {
@@ -15,6 +17,7 @@ export class UserHomeAppService {
 
   constructor(
     private readonly userHomeAppRepository: UserHomeAppRepository,
+    private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
   async getAll(dto: PagingDto, userCode: string): Promise<IList<IUserHome>> {
@@ -22,27 +25,84 @@ export class UserHomeAppService {
     const list = await this.userHomeAppRepository.getAll(dto, userCode);
     return { total, list };
   }
-  
-  async create(userCode: string, dto: CreateUserHomeDto): Promise<number> {
+
+  async getDetail(userHomeCode: string): Promise<IUserHome | null> {
+    const result = await this.userHomeAppRepository.getDetail(userHomeCode);
+    return result;
+  }
+  async delete(userHomeCode: string, userCode: string): Promise<number> {
+    const checkMain = await this.userHomeAppRepository.findMainHomeDetail(userCode);
+    // nếu nhà yến muốn xóa đang là chính -> ko thể xóa
+    if (checkMain && checkMain.userHomeCode == userHomeCode) {
+      throw new BadRequestException({ message: Msg.HomeIsMainCannotDelete, data: 0 });
+    }
+
+    const result = await this.userHomeAppRepository.delete(userHomeCode, userCode);
+    return result;
+  }
+  async update(userCode: string, userHomeCode: string, dto: MutationUserHomeDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/update:`;
+
+    try {
+      let result = 1;
+      const home = await this.userHomeAppRepository.getDetail(userHomeCode);
+      // nếu uuid khác nhau -> có sự upload ảnh home mới
+      if (home) {
+        //  cập nhập dữ liệu, ảnh
+        if (home.uniqueId != dto.uniqueId) {
+          // kiểm tra xem với uuid này có thật sự đã có file mới upload vào database hay không
+          const filesUploaded = await this.userHomeAppRepository.findFilesByUniqueId(dto.uniqueId);
+          if (filesUploaded) {
+            // xóa ảnh hiện tại trong local
+            await this.fileLocalService.deleteLocalFile(home.userHomeImage);
+
+            // xóa ảnh hiện tại trong database
+            await this.userHomeAppRepository.deleteFileByUniqueid(home.uniqueId);
+
+            // cập nhập -> cập nhập dữ liệu và ảnh mới
+            const userHomeImagePath = `${getFileLocation(filesUploaded.mimetype, filesUploaded.filename)}/${filesUploaded.filename}`;
+            await this.userHomeAppRepository.update(userCode, userHomeCode, dto, userHomeImagePath);
+
+            // cập nhập userHomeSEQ của file mới đã cùng uniqueId với nhà yến vừa updated
+            await this.userHomeAppRepository.updateSeqFiles(home.seq, filesUploaded.seq, dto.uniqueId);
+          } else {
+            throw new BadRequestException();
+          }
+        } else {
+          // cập nhập dữ liệu -> ảnh vẫn giữ nguyên
+          await this.userHomeAppRepository.update(userCode, userHomeCode, dto, home.userHomeImage);
+        }
+      } else {
+        throw new BadRequestException();
+      }
+
+      return result;
+    } catch (error) {
+      this.logger.error(logbase, error);
+      return 0;
+    }
+  }
+  async create(userCode: string, dto: MutationUserHomeDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/create:`;
 
     try {
       let result = 1;
 
       // tìm file đã upload cùng uniqueId
-      const filesUploaded: { seq: number; filename: string; mimetype: string }[] = await this.userHomeAppRepository.findFilesByUniqueId(dto.uniqueId);
-      if (filesUploaded.length) {
+      const filesUploaded = await this.userHomeAppRepository.findFilesByUniqueId(dto.uniqueId);
+      // có file được upload cùng uuid -> insert
+      if (filesUploaded) {
         // thêm nhà yến của user
-        const filepath = `/uploads/${getFileLocation(filesUploaded[0].mimetype, filesUploaded[0].filename)}/${filesUploaded[0].filename}`;
+        const userHomeImagePath = `${getFileLocation(filesUploaded.mimetype, filesUploaded.filename)}/${filesUploaded.filename}`;
         // kiểm tra user này có nhà nào là chính hay chưa
-        const checkMain = await this.userHomeAppRepository.findMainHomeDetail(userCode)
-        let isMain = 'N'
-        if(!checkMain){
-          isMain = 'Y'
+        const checkMain = await this.userHomeAppRepository.findMainHomeDetail(userCode);
+        let isMain = 'N';
+        if (!checkMain) {
+          isMain = 'Y';
         }
-        const seq = await this.userHomeAppRepository.create(userCode, dto, isMain, filepath);
-        // cập nhập userHomeSEQ của file đã tìm cùng uniqueId với doctor vừa created
-        await this.userHomeAppRepository.updateSeqFiles(seq, filesUploaded[0].seq, dto.uniqueId);
+        const seq = await this.userHomeAppRepository.create(userCode, dto, isMain, userHomeImagePath);
+        // cập nhập userHomeSEQ của file đã tìm cùng uniqueId với nhà yến vừa created
+        await this.userHomeAppRepository.updateSeqFiles(seq, filesUploaded.seq, dto.uniqueId);
       } else {
         // không có file ảnh nào được upload của nhà yến này -> báo lỗi
         result = -1;
@@ -54,15 +114,15 @@ export class UserHomeAppService {
       return 0;
     }
   }
-  async uploadImageForCreating(userCode: string, dto: UploadUserHomeImageDto, userHomeImage: Express.Multer.File): Promise<IUserHomeImageStr> {
-    const logbase = `${this.SERVICE_NAME}/uploadImageForCreating:`;
+  async uploadHomeImage(userCode: string, dto: UploadUserHomeImageDto, userHomeImage: Express.Multer.File): Promise<IUserHomeImageStr> {
+    const logbase = `${this.SERVICE_NAME}/uploadHomeImage:`;
     try {
       let res: IUserHomeImageStr = { filename: '' };
       if (userHomeImage) {
-        const result = await this.userHomeAppRepository.uploadImageForCreating(0, dto.uniqueId, userCode, userHomeImage);
+        const result = await this.userHomeAppRepository.uploadHomeImage(0, dto.uniqueId, userCode, userHomeImage);
         if (result > 0) {
           const location = getFileLocation(userHomeImage.mimetype, userHomeImage.fieldname);
-          res.filename = `/${location}/${userHomeImage.filename}`;
+          res.filename = `${location}/${userHomeImage.filename}`;
         }
       }
       return res;

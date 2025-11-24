@@ -26,37 +26,36 @@ export const validateImgExt = (originalname) => {
 };
 
 export const getFileLocation = (mimetype: string, fieldname: string) => {
+  let result = ""
   if (mimetype.startsWith('image/')) {
     if (fieldname === 'editorImg' || fieldname.includes('editorImg')) {
-      return 'images/editors';
+      result = 'images/editors';
     }
     if (fieldname === 'homeImage' || fieldname.includes('homeImage') || fieldname === 'homeImages' || fieldname.includes('homeImages')) {
-      return 'images/homes';
+      result = 'images/homes';
     }
     if (fieldname === 'userHomeImage' || fieldname.includes('userHomeImage')) {
-      return 'images/userHomes';
+      result = 'images/userHomes';
     }
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
-      return 'images/doctors';
+      result = 'images/doctors';
     }
     if (fieldname === 'configfiles' || fieldname.includes('configfiles')) {
-      return 'images/configs';
+      result = 'images/configs';
     }
-    return 'images/others';
   }
   if (mimetype.startsWith('video/')) {
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
-      return 'videos/doctors';
+      result = 'videos/doctors';
     }
-    return 'videos/others';
   }
   if (mimetype.startsWith('audio/')) {
     if (fieldname === 'editorAudio' || fieldname.includes('editorAudio')) {
-      return 'audios/editors';
+      result = 'audios/editors';
     }
-    return 'audios/others';
   }
-  return 'others';
+
+  return "uploads/" + result
 };
 
 export const createMulterConfig = (allowedExts: string[], customLimits?: MulterLimits) => {
@@ -71,7 +70,7 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
     storage: diskStorage({
       destination: (req, file, cb) => {
         const location = getFileLocation(file.mimetype, file.fieldname);
-        const folderPath = join(process.cwd(), 'public', 'uploads', location);
+        const folderPath = join(process.cwd(), 'public', location);
         if (!existsSync(folderPath)) {
           mkdirSync(folderPath, { recursive: true });
         }

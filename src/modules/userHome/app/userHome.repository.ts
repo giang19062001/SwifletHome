@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IUserHome, IUserHomeImage } from './userHome.interface';
-import { CreateUserHomeDto } from './userHome.dto';
+import { MutationUserHomeDto } from './userHome.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 @Injectable()
@@ -17,11 +17,11 @@ export class UserHomeAppRepository {
   }
   async getAll(dto: PagingDto, userCode: string): Promise<IUserHome[]> {
     let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, B.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
-     A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain
+     A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain, A.uniqueId
     FROM ${this.table} A 
     LEFT JOIN  tbl_provinces B
     ON A.userHomeProvince = B.provinceCode
-    WHERE A.userCode = ?`;
+    WHERE A.userCode = ? AND A.isActive = 'Y' `;
 
     const params: any[] = [];
     params.push(userCode);
@@ -33,21 +33,21 @@ export class UserHomeAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IUserHome[];
   }
-  async getDetail(seq: number): Promise<IUserHome | null> {
+  async getDetail(userHomeCode: string): Promise<IUserHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
-       A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain
+       A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
-          WHERE A.seq = ? AND A.isActive = 'Y'
+          WHERE A.userHomeCode = ? AND A.isActive = 'Y'
           LIMIT 1 `,
-      [seq],
+      [userHomeCode],
     );
     return rows ? (rows[0] as IUserHome) : null;
   }
   async findMainHomeDetail(userCode: string): Promise<IUserHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
-       A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain
+      ` SELECT A.seq, A.userCode,  A.userHomeCode,  A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
+       A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
           WHERE A.userCode = ? AND A.isActive = 'Y' AND A.isMain = 'Y'
           LIMIT 1 `,
@@ -55,18 +55,8 @@ export class UserHomeAppRepository {
     );
     return rows ? (rows[0] as IUserHome) : null;
   }
-  async uploadImageForCreating(seq: number, uniqueId: string, userCode: string, file: Express.Multer.File | IUserHomeImage): Promise<number> {
-    const sql = `
-      INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, uniqueId, userHomeSeq, userCode, createdId)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, uniqueId, seq, userCode, userCode]);
-
-    return result.insertId;
-  }
-
-  async create(userCode: string, dto: CreateUserHomeDto, isMain: string, userHomeImage: string): Promise<number> {
+  async create(userCode: string, dto: MutationUserHomeDto, isMain: string, userHomeImage: string): Promise<number> {
     const sqlLast = ` SELECT userHomeCode FROM ${this.table} ORDER BY userHomeCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let userHomeCode = 'HOM000001';
@@ -97,13 +87,61 @@ export class UserHomeAppRepository {
 
     return result.insertId;
   }
-  async findFilesByUniqueId(uniqueId: string): Promise<{ seq: number; filename: string; mimetype: string }[]> {
+  async update(userCode: string, userHomeCode: string, dto: MutationUserHomeDto, userHomeImage: string): Promise<number> {
     const sql = `
-      SELECT seq, filename, mimetype FROM ${this.tableImg} WHERE userHomeSeq = 0 AND uniqueId = ?
+    UPDATE ${this.table}
+    SET 
+      userHomeName = ?, userHomeAddress = ?, userHomeProvince = ?, userHomeDescription = ?, 
+      userHomeImage = ?, isIntegateTempHum = ?, isIntegateCurrent = ?, uniqueId = ?,  updatedId = ?, updatedAt = ?
+      WHERE userHomeCode = ?
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      dto.userHomeName,
+      dto.userHomeAddress,
+      dto.userHomeProvince,
+      dto.userHomeDescription,
+      userHomeImage,
+      dto.isIntegateTempHum,
+      dto.isIntegateCurrent,
+      dto.uniqueId,
+      userCode, // updatedId
+      new Date(),
+      userHomeCode,
+    ]);
+
+    return result.affectedRows;
+  }
+
+  async delete(userHomeCode: string, userCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET isActive = ?, updatedId = ? , updatedAt = ?
+      WHERE userHomeCode = ? AND userCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, ['N', userCode, new Date(), userHomeCode, userCode]);
+
+    return result.affectedRows;
+  }
+  // TODO: IMG
+
+  async uploadHomeImage(seq: number, uniqueId: string, userCode: string, file: Express.Multer.File | IUserHomeImage): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, uniqueId, userHomeSeq, userCode, createdId)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, uniqueId, seq, userCode, userCode]);
+
+    return result.insertId;
+  }
+
+  async findFilesByUniqueId(uniqueId: string): Promise<{ seq: number; filename: string; mimetype: string } | null> {
+    const sql = `
+      SELECT seq, filename, mimetype FROM ${this.tableImg} WHERE userHomeSeq = 0 AND uniqueId = ? LIMIT 1
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
 
-    return rows as { seq: number; filename: string; mimetype: string }[];
+    return rows ? (rows[0] as { seq: number; filename: string; mimetype: string }) : null;
   }
   async updateSeqFiles(userHomeSeq: number, seq: number, uniqueId: string): Promise<number> {
     const sql = `
@@ -111,6 +149,15 @@ export class UserHomeAppRepository {
       WHERE seq = ? AND uniqueId = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userHomeSeq, seq, uniqueId]);
+
+    return result.affectedRows;
+  }
+  async deleteFileByUniqueid(uniqueId: string): Promise<number> {
+    const sql = `
+         DELETE FROM ${this.tableImg}
+      WHERE uniqueId = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [uniqueId]);
 
     return result.affectedRows;
   }

@@ -1,7 +1,7 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters, UploadedFile } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { getDoctorMulterConfig, multerImgConfig } from 'src/config/multer.config';
+import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerImgConfig } from 'src/config/multer.config';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
@@ -10,7 +10,7 @@ import * as userInterface from 'src/modules/user/app/user.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { UserHomeAppService } from './userHome.service';
-import { CreateUserHomeDto, ResUserHomeDto, ResUserHomeImageDto, UploadUserHomeImageDto } from './userHome.dto';
+import { MutationUserHomeDto, ResUserHomeDto, ResUserHomeImageDto, UploadUserHomeImageDto } from './userHome.dto';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserHome } from './userHome.interface';
 import { ResListDto } from 'src/dto/common.dto';
@@ -35,21 +35,63 @@ export class UserHomeAppController {
     return result;
   }
 
+  @ApiParam({ name: 'userHomeCode', type: String })
+  @Get('getHomeDetail/:userHomeCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ResUserHomeDto) })
+  async getHomeDetail(@Param('userHomeCode') userHomeCode: string): Promise<IUserHome | null> {
+    const result = await this.userHomeAppService.getDetail(userHomeCode);
+    if (!result) {
+      throw new BadRequestException();
+    }
+    return result;
+  }
+  @Delete('deleteHome/:userHomeCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({ name: 'userHomeCode', type: String })
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  async delete(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserAppInfo): Promise<number> {
+    const result = await this.userHomeAppService.delete(userHomeCode, user.userCode);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+
+    return result;
+  }
+
+  @ApiBody({
+    type: MutationUserHomeDto,
+    description: 
+`Nếu chỉ thay đổi dữ liệu, không upload ảnh thì **uniqueId** giữ giá trị như cũ từ **/api/app/user/getHomeDetal** trả về.\n
+ Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uuid** được generate phía app\n
+ **userHomeProvince** là **provinceCode** lấy từ */api/app/province/getAll*`,
+  })
+  @ApiParam({ name: 'userHomeCode', type: String })
+  @Put('updateHome/:userHomeCode')
+  @HttpCode(HttpStatus.OK)
+  async updateHome(@Body() dto: MutationUserHomeDto, @Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserAppInfo): Promise<number> {
+    const result = await this.userHomeAppService.update(user.userCode, userHomeCode, dto);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+    return result;
+  }
+
   @Post('createHome')
   @ApiBody({
-    type: CreateUserHomeDto,
+    type: MutationUserHomeDto,
     description: `
-**uuid** dùng khi POST dữ liệu phải trùng với **uuid** khi upload file\n
-**userHomeProvince:** là **provinceCode** lấy từ /api/app/province/getAll
+**uniqueId** sẽ là giá trị **uuid** được generate phía app\n
+**userHomeProvince** là **provinceCode** lấy từ */api/app/province/getAll*
   `,
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async createSwtHouse(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateUserHomeDto) {
+  async createSwtHouse(@GetUserApp() user: userInterface.IUserApp, @Body() dto: MutationUserHomeDto) {
     const result = await this.userHomeAppService.create(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({
-        message: Msg.uuidNotFound,
+        message: Msg.UuidNotFound,
         data: 0,
       });
     }
@@ -62,14 +104,17 @@ export class UserHomeAppController {
     };
   }
 
-  @Post('uploadHomeImageForCreating')
+  @Post('uploadHomeImage')
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: UploadUserHomeImageDto })
+  @ApiBody({
+    type: UploadUserHomeImageDto,
+    description: `Dùng cho cả */api/app/user/createHome* và */api/app/user/updateHome* `,
+  })
   @UseFilters(MulterBadRequestFilter)
   @UseInterceptors(FileInterceptor('userHomeImage', multerImgConfig))
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ResUserHomeImageDto) })
-  async uploadImageForCreating(@GetUserApp() user: userInterface.IUserApp, @Body() dto: UploadUserHomeImageDto, @UploadedFile() userHomeImage: Express.Multer.File) {
-    return await this.userHomeAppService.uploadImageForCreating(user.userCode, dto, userHomeImage);
+  async uploadHomeImage(@GetUserApp() user: userInterface.IUserApp, @Body() dto: UploadUserHomeImageDto, @UploadedFile() userHomeImage: Express.Multer.File) {
+    return await this.userHomeAppService.uploadHomeImage(user.userCode, dto, userHomeImage);
   }
 }

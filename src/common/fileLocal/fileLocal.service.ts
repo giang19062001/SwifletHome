@@ -4,19 +4,19 @@ import { existsSync, promises as fs, mkdirSync } from 'fs';
 import * as path from 'path';
 @Injectable()
 export class FileLocalService {
-  private readonly UPLOAD_PATH = 'public/uploads';
-  private readonly SERVICE_NAME = 'UploadService';
+  private readonly PUBLIC_PATH = 'public';
+  private readonly SERVICE_NAME = 'FileLocalService';
   constructor(private readonly logger: LoggingService) {
     this.ensureUploadDirectoryExists();
   }
 
   private ensureUploadDirectoryExists(): void {
-    if (!existsSync(this.UPLOAD_PATH)) {
-      mkdirSync(this.UPLOAD_PATH, { recursive: true });
+    if (!existsSync(this.PUBLIC_PATH)) {
+      mkdirSync(this.PUBLIC_PATH, { recursive: true });
     }
   }
   public async replaceFile(file: Express.Multer.File, baseName: string, location: string) {
-    const filePath = path.join(process.cwd(), this.UPLOAD_PATH, location);
+    const filePath = path.join(process.cwd(), this.PUBLIC_PATH, location);
 
     const logbase = `${this.SERVICE_NAME}/replaceFile`;
 
@@ -41,7 +41,7 @@ export class FileLocalService {
   public async deleteLocalFile(filepath: string): Promise<void> {
     const logbase = `${this.SERVICE_NAME}/deleteLocalFile`;
     try {
-      const filePath = path.join(process.cwd(), this.UPLOAD_PATH, filepath);
+      const filePath = path.join(process.cwd(), this.PUBLIC_PATH, filepath);
 
       try {
         await fs.access(filePath);

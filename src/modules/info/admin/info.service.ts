@@ -32,7 +32,7 @@ export class InfoAdminService {
       const location = getFileLocation(file.mimetype, file.fieldname);
 
       const newFileName = await this.fileLocalService.replaceFile(file, filedFile, location);
-      return `/uploads/${location}/${newFileName}`;
+      return `${location}/${newFileName}`;
     } else {
       // lỗi type ảnh
       throw new BadRequestException(Msg.fileWrongType(file.originalname, IMG_TYPES));

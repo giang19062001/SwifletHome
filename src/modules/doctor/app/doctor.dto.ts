@@ -6,7 +6,7 @@ export class DoctorFileDto {
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     format: 'uuid',
-    description: 'Được generate phía app khi màn hình mount (uuid)',
+    description: 'Luôn được generate phía app (uuid)',
   })
   @IsUUID()
   @IsNotEmpty()

@@ -50,7 +50,7 @@ export class DoctorAppService {
           const result = await this.doctorAppRepository.uploadFile(0, dto.uniqueId, userCode, file);
           if (result > 0) {
             const location = getFileLocation(file.mimetype, file.fieldname);
-            filesResponse.push({ filename: `/${location}/${file.filename}` });
+            filesResponse.push({ filename: `${location}/${file.filename}` });
           }
         }
       }
