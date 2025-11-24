@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Document</title>
+    <script src="../../js/const.js"></script>
+    <script src="../../lib/moment.min.js"></script>
+    <script src="../../lib/socket.io.min.js"></script>
+    <script src="../../lib/tailwindcss.js"></script>
+</head>
+
+<body class="h-full bg-gray-900 text-gray-100">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-gray-800 border-b border-gray-700 px-6 py-4">
+            <h1 class="text-2xl font-bold text-white mb-2">Socket.IO Document</h1>
+            <p class="text-sm text-gray-400 mt-1">
+                Namespace: <code id="currentNamespace" class="bg-gray-700 px-2 py-1 rounded">Đang tải...</code>
+            </p>
+        </header>
+
+        <div class="flex-1 flex flex-col lg:flex-row gap-4 p-4">
+            <!-- Menu Namespaces -->
+            <div class="lg:w-64 bg-gray-800 rounded-xl shadow-xl p-4 space-y-4" style="max-height: 85vh;">
+                <h3 class="text-lg font-semibold text-white">Namespaces</h3>
+                <div class="grid grid-cols-1 gap-2">
+                    <button
+                        class="flex-1 text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
+                        userHomes
+                    </button>
+
+                    <button disabled
+                        class="flex-1 text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
+                        userHomeMain
+                    </button>
+                </div>
+            </div>
+
+            <!-- Control Panel - Động theo namespace -->
+            <div id="controlPanel" class="lg:w-96 bg-gray-800 rounded-xl shadow-xl p-4 space-y-5"
+                style="max-height: 85vh;">
+                <!-- Các input sẽ được render tự động bằng JS -->
+            </div>
+
+            <!-- Log Panel -->
+            <div class="flex-1 bg-gray-800 rounded-xl shadow-xl p-4 overflow-hidden flex flex-col"
+                style="max-height: 85vh;">
+                <h2 class="text-xl font-semibold mb-4 flex items-center justify-between">
+                    <span>Event Logs</span>
+                    <span id="counter" class="text-sm text-gray-500">0 messages</span>
+                </h2>
+                <div id="log" class="flex-1 overflow-y-auto font-mono text-xs space-y-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        tailwind.config = { darkMode: 'class' };
+
+        // Đọc type từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type') || 'userHomes';
+
+        // Cấu hình chi tiết từng namespace
+        const config = {
+            userHomes: {
+                namespace: '/socket/userHomes',
+                roomPrefix: 'user-',
+                joinEvent: 'joinUserHomesRoom',
+                leaveEvent: 'leaveUserHomesRoom',
+                streamEvent: 'streamUserHomeSensorData',
+                params: [
+                    { key: 'userCode', label: 'userCode', placeholder: 'USR000001', default: 'USR000001', required: true }
+                ]
+            },
+            userHomeMain: {
+                namespace: '/socket/userHomeMain',
+                roomPrefix: 'user-home-',
+                joinEvent: 'joinUserHomeMainRoom',
+                leaveEvent: 'leaveUserHomeMainRoom',
+                streamEvent: 'streamUserHomeMainData',
+                params: [
+                    { key: 'userCode', label: 'userCode', placeholder: 'USR000001', default: 'USR000001', required: true },
+                    { key: 'userHomeCode', label: 'userHomeCode', placeholder: 'HOM000001', default: 'HOM000001', required: true }
+                ]
+            },
+        };
+
+        const cfg = config[type] || config.userHomes;
+
+        // Cập nhật namespace hiện tại
+        document.getElementById('currentNamespace').textContent = cfg.namespace;
+
+        // Tạo các input động
+        const controlPanel = document.getElementById('controlPanel');
+        const inputs = {};
+
+        cfg.params.forEach(param => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <label class="block text-sm font-medium mb-2">${param.label}</label>
+                <input 
+                    type="text" 
+                    data-key="${param.key}"
+                    placeholder="${param.placeholder}"
+                    value="${param.default || ''}"
+                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-500"
+                    ${param.required ? 'required' : ''}
+                />
+            `;
+            controlPanel.appendChild(div);
+            inputs[param.key] = div.querySelector('input');
+        });
+
+        // Nút Join / Leave
+        const buttonDiv = document.createElement('div');
+        buttonDiv.className = 'mt-4';
+        buttonDiv.innerHTML = `
+            <div class="flex items-center gap-2">
+                  <span class="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    emit
+                </span>
+                <button onclick="joinRoom()" 
+                            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg transition">
+                            Join Room
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 mt-2">
+                  <span class="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    emit
+                </span>
+               <button onclick="leaveRoom()" 
+                            class="flex-1 bg-red-700 hover:bg-red-800 text-white font-medium py-2 rounded-lg transition">
+                            Leave Room
+                </button>
+            </div>
+        `;
+        controlPanel.appendChild(buttonDiv);
+
+        // Status
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'text-md text-gray-500 space-y-1 mt-4';
+        statusDiv.innerHTML = `
+            <p>Status: <span id="status" class="font-semibold text-orange-400">Disconnected</span></p>
+            <p>clientId: <span id="clientId" class="font-bold text-white">-</span></p>
+            <p>Room: <span id="room" class="font-bold text-white">-</span></p>
+        `;
+        controlPanel.appendChild(statusDiv);
+
+        // Nút xóa log
+        const clearBtn = document.createElement('button');
+        clearBtn.onclick = clearLog;
+        clearBtn.textContent = 'Clear log';
+        clearBtn.className = 'w-full mt-4 py-2 text-sm bg-neutral-600 hover:bg-neutral-700 rounded transition';
+        controlPanel.appendChild(clearBtn);
+
+        // Kết nối Socket.IO
+        const socket = io(`${CURRENT_URL}${cfg.namespace}`, {
+            transports: ['websocket'],
+        });
+
+        const $ = id => document.getElementById(id);
+        let count = 0;
+        const status = $('status');
+        const socketIdEl = $('clientId');
+        const roomEl = $('room');
+        const logEl = $('log');
+        const counter = $('counter');
+
+        const addLog = (type, title, data) => {
+            count++;
+            counter.textContent = `${count} messages`;
+            const time = moment().format('HH:mm:ss');
+            const line = document.createElement('div');
+            line.className = `p-3 rounded-lg bg-gray-700/50 border-l-4 ${type === 'success' ? 'border-green-500' :
+                type === 'info' ? 'border-blue-500' :
+                    type === 'warn' ? 'border-yellow-500' : 'border-red-500'}`;
+
+            const badge = type === 'info' ? `<span class="bg-orange-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-2">on</span>` : '';
+            const titleColor = type === 'success' ? 'text-green-400' :
+                type === 'info' ? 'text-blue-400' :
+                    type === 'warn' ? 'text-yellow-400' : 'text-red-400';
+
+            line.innerHTML = `
+                <div class="flex justify-between items-start mb-1">
+                    <span class="flex items-center font-semibold">
+                        <span class="${titleColor}">[${time}] ${badge} '${title}'</span>
+                    </span>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove(); count--; counter.textContent='${count} messages'" 
+                            class="text-gray-500 hover:text-gray-300 text-xs">×</button>
+                </div>
+                <pre class="json overflow-x-auto text-xs">${JSON.stringify(data, null, 2)}</pre>
+            `;
+            logEl.prepend(line);
+        };
+
+        socket.on('connect', () => {
+            status.textContent = 'Connected';
+            status.className = 'text-green-400 font-semibold';
+            socketIdEl.textContent = socket.id;
+            addLog('success', 'Connected', { clientId: socket.id, namespace: cfg.namespace });
+        });
+
+        socket.on('disconnect', () => {
+            status.textContent = 'Disconnected';
+            status.className = 'text-red-400 font-semibold';
+            addLog('error', 'Disconnected', {});
+        });
+
+        socket.on(cfg.streamEvent, (payload) => {
+            addLog('info', cfg.streamEvent, payload);
+        });
+
+        socket.on('roomJoined', d => addLog('success', 'roomJoined', d));
+        socket.on('roomLeft', d => addLog('warn', 'roomLeft', d));
+        socket.on('error', err => addLog('error', 'Server Error', err));
+
+        function getParams() {
+            const data = {};
+            let valid = true;
+            cfg.params.forEach(p => {
+                const val = inputs[p.key].value.trim();
+                if (p.required && !val) {
+                    alert(`Vui lòng nhập ${p.label}!`);
+                    valid = false;
+                }
+                data[p.key] = val;
+            });
+            return valid ? data : null;
+        }
+
+        function joinRoom() {
+            const data = getParams();
+            if (!data) return;
+
+            socket.emit(cfg.joinEvent, data);
+            const roomName = cfg.params.map(p => data[p.key]).join('_');
+            roomEl.textContent = `${cfg.roomPrefix}${roomName}`;
+            addLog('warn', cfg.joinEvent, data);
+        }
+
+        function leaveRoom() {
+            const data = getParams();
+            if (!data) return;
+
+            socket.emit(cfg.leaveEvent, data);
+            roomEl.textContent = '-';
+            addLog('warn', cfg.leaveEvent, data);
+        }
+
+        function clearLog() {
+            leaveRoom();
+            logEl.innerHTML = '';
+            count = 0;
+            counter.textContent = '0 messages';
+        }
+
+    </script>
+</body>
+
+</html>
