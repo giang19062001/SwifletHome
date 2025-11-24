@@ -14,7 +14,7 @@ export class ScreenAppController {
   constructor(private readonly screenAppService: ScreenAppService) {}
 
   @ApiParam({
-    description: '**keyword:** `SIGNUP_SERVICE`',
+    description: '`SIGNUP_SERVICE`: Màn hình đăng kí dịch vụ\n',
     name: 'keyword',
     type: String,
   })

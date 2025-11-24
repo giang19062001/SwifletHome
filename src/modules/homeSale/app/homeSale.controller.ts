@@ -32,8 +32,8 @@ import { Msg } from 'src/helpers/message.helper';
 import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 
-@ApiTags('app/home')
-@Controller('/api/app/home')
+@ApiTags('app/homeSale')
+@Controller('/api/app/homeSale')
 @ApiBearerAuth('app-auth')
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)

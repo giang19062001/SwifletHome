@@ -30,9 +30,9 @@ import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInter
 import { multerImgConfig } from 'src/config/multer.config';
 
 @ApiBearerAuth('admin-auth')
-@ApiTags('admin/home')
+@ApiTags('admin/homeSale')
 @UseGuards(ApiAuthAdminGuard)
-@Controller('/api/admin/home')
+@Controller('/api/admin/homeSale')
 export class HomeSaleAdminController {
   constructor(private readonly homeSaleAdminService: HomeSaleAdminService) {}
 

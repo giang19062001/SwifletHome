@@ -66,7 +66,7 @@ async function getAllHome(currentPage, limit) {
 
   await axios
     .post(
-      CURRENT_URL + '/api/admin/home/getAll',
+      CURRENT_URL + '/api/admin/homeSale/getAll',
       {
         page: currentPage,
         limit: limit,
@@ -92,7 +92,7 @@ async function deleteHome(homeCode) {
     return;
   }
   await axios
-    .delete(CURRENT_URL + `/api/admin/home/delete/${homeCode}`, axiosAuth())
+    .delete(CURRENT_URL + `/api/admin/homeSale/delete/${homeCode}`, axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
