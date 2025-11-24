@@ -54,7 +54,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   // gửi sensor data cho client
   private sendSensorData(room: string, payload: UserHomeSensorDataDto) {
     console.log('sendSensorData', JSON.stringify(payload));
-    this.server.to(room).emit('streamUserHomeSensorData', payload);
+    this.server.to(room).emit('streamUserHomesSensorData', payload);
   }
 
   // rời phòng -> xóa interval
@@ -93,7 +93,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
 
   // gửi mảng rỗng khi khởi tạo
   private sendInitialData(client: Socket, userCode: string) {
-    client.emit('streamUserHomeSensorData', {
+    client.emit('streamUserHomesSensorData', {
       userCode,
       data: [],
     });
