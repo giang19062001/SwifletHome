@@ -25,8 +25,9 @@ export class CornService implements OnModuleInit {
     // const job = new CronJob('0 1 * * *', () => {
     //   this.deleteDoctorFilesNotUse();
     // });
-    const job = new CronJob('0 54 8 * * *', () => {
+    const job = new CronJob('0 56 8 * * *', () => {
       this.deleteDoctorFilesNotUse();
+      this.deleteUserHomeFilesNotUse()
     });
 
     this.schedulerRegistry.addCronJob('deleteFilesNotUse', job);
