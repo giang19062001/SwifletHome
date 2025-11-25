@@ -102,7 +102,7 @@ async function showQuestionModal(type, questionData) {
   //  enable lại 'asnwer' và nút submit
   answerSelect.disabled = false;
   submitBtn.disabled = false;
-  submitBtn.innerHTML = type === 'create' ? 'Tạo mới' : 'Chỉnh sửa';
+  submitBtn.innerHTML = type === 'create' ? 'Thêm' : 'Lưu thông tin';
 
   // Trigger change để hiển thị link detail (nếu có)
   setTimeout(() => answerSelect.dispatchEvent(new Event('change')), 0);
@@ -179,8 +179,8 @@ function renderAllQuestion(data, objElement) {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-main-out"  onclick="getDetailQuestion('${ele.questionCode}')">Chỉnh sửa</button>
-                <button class="btn-err-out"  onclick="deleteQuestion('${ele.questionCode}')">Xóa</button>
+                <button class="btn-edit"  onclick="getDetailQuestion('${ele.questionCode}')">Chỉnh sửa</button>
+                <button class="btn-delete"  onclick="deleteQuestion('${ele.questionCode}')">Xóa</button>
             </td>
          </tr>`;
       HTML += rowHtml;

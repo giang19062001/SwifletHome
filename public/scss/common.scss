@@ -17,7 +17,7 @@
   color: #565c66;
 }
 //button
-#btn-main {
+#btn {
   padding: 7px 15px;
   border-radius: 15px;
   font-family: Pretendard;
@@ -35,10 +35,19 @@
     color: #aaa;
   }
 }
-
+.btn-closed {
+  @extend #btn;
+  min-width: 125px;
+  background-color: rgb(160, 160, 160);
+  border-color: rgb(160, 160, 160);
+  color: #ffffff;
+  &:hover {
+    background-color: gray
+  }
+}
 
 .btn-submit {
-  @extend #btn-main;
+  @extend #btn;
   min-width: 125px;
   background-color: $main-color;
   border-color: $main-color;
@@ -48,7 +57,7 @@
   }
 }
 .btn-submit-lg {
-  @extend #btn-main;
+  @extend #btn;
   font-size: medium;
   min-width: 175px;
   min-height: 40px;
@@ -61,8 +70,8 @@
 }
 
 
-.btn-main {
-  @extend #btn-main;
+.btn-info {
+  @extend #btn;
   background-color: $main-color;
   border-color: $main-color;
   color: #ffffff;
@@ -71,8 +80,8 @@
   }
 }
 
-.btn-main-image {
-  @extend #btn-main;
+.btn-info-image {
+  @extend #btn;
   background-color: #59ac77;
   border-color: #59ac77;
   color: #ffffff;
@@ -80,8 +89,8 @@
     background-color: #59ac77;
   }
 }
-.btn-main-audio {
-  @extend #btn-main;
+.btn-info-audio {
+  @extend #btn;
   background-color: #279eff;
   border-color: #279eff;
   color: #ffffff;
@@ -90,8 +99,8 @@
   }
 }
 
-.btn-main-video {
-  @extend #btn-main;
+.btn-info-video {
+  @extend #btn;
   background-color: #f75270;
   border-color: #f75270;
   color: #ffffff;
@@ -100,8 +109,8 @@
   }
 }
 
-.btn-main-out {
-  @extend #btn-main;
+.btn-info-out {
+  @extend #btn;
   background-color: #ffffff;
   border-color: #ffffff;
   color: $main-color;
@@ -111,8 +120,53 @@
   }
 }
 
-.btn-err {
-  @extend #btn-main;
+
+.btn-add {
+  @extend #btn;
+  background-color: #59ac77;
+  border-color: #59ac77;
+  color: #ffffff;
+  &:hover {
+    background-color: #4f976a;
+  }
+}
+
+.btn-add-out {
+  @extend #btn;
+  background-color: #ffffff;
+  border-color: #ffffff;
+  color: #59ac77;
+  &:hover {
+    background-color: #4f976a;
+    color: #ffffff;
+  }
+}
+
+
+.btn-edit {
+  @extend #btn;
+  background-color: #ff7e29;
+  border-color: #ff7e29;
+  color: #ffffff;
+  &:hover {
+    background-color: #fd7215;
+  }
+}
+
+.btn-edit-out {
+  @extend #btn;
+  background-color: #ffffff;
+  border-color: #ffffff;
+  color: #ff7e29;
+  &:hover {
+    background-color: #fd7215;
+    color: #ffffff;
+  }
+}
+
+
+.btn-delete {
+  @extend #btn;
   background-color: $err-color;
   border-color: $err-color;
   color: #ffffff;
@@ -121,8 +175,8 @@
   }
 }
 
-.btn-err-out {
-  @extend #btn-main;
+.btn-delete-out {
+  @extend #btn;
   background-color: #ffffff;
   border-color: #ffffff;
   color: $err-color;

@@ -33,8 +33,8 @@ const renderAllAnswer = (data, objElement) => {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-main-out" onClick="gotoAnswerUpdate('${ele.answerCode}')">Chỉnh sửa</button>
-                <button class="btn-err-out"  onclick="deleteAnswer('${ele.answerCode}')">Xóa</button>
+                <button class="btn-edit" onClick="gotoAnswerUpdate('${ele.answerCode}')">Chỉnh sửa</button>
+                <button class="btn-delete"  onclick="deleteAnswer('${ele.answerCode}')">Xóa</button>
             </td>
          </tr>`;
       HTML += rowHtml;

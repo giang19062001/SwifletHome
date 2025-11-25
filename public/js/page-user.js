@@ -19,7 +19,7 @@ function changePage(p) {
 
 function closeUserModal(type) {
   // Xác định modal theo loại
-  const modalSelector = type === 'create' ? '.user-create-modal' : '.user-update-modal';
+  const modalSelector = type === 'home-list' ? '.user-home-list-modal' : '.user-update-modal';
   const modalEl = document.querySelector(modalSelector);
 
   if (!modalEl) return;
@@ -30,35 +30,37 @@ function closeUserModal(type) {
 
 // TODO: RENDER
 async function showUserModal(type, userInfo) {
-  const modalSelector = type === 'create' ? '.user-create-modal' : '.user-update-modal';
+  const modalSelector = type === 'home-list' ? '.user-home-list-modal' : '.user-update-modal';
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body');
   const submitBtn = modalEl.querySelector('.modal-footer button');
 
-  console.log(userInfo.packageCode, packages);
-  // gói
-
-  const packageOptions = [
-    `
+  if (type == 'update') {
+    // gói
+    const packageOptions = [
+      `
     <option value="" ${!userInfo.packageCode ? 'selected' : ''}>
       Gói dùng thử
     </option>
   `,
-    ...packages.map(
-      (pak) => `
+      ...packages.map(
+        (pak) => `
       <option value="${pak.packageCode}" 
         ${userInfo.packageCode === pak.packageCode ? 'selected' : ''}>
         ${pak.packageName} (${pak.packageDescription})
       </option>
     `,
-    ),
-  ].join('');
+      ),
+    ].join('');
 
-  // Fill form
-  modalBody.querySelector('#userCode').value = userInfo.userCode || '';
-  modalBody.querySelector('#userName').value = userInfo.userName || '';
-  modalBody.querySelector('#userPhone').value = userInfo.userPhone || '';
-  modalBody.querySelector('#packageCode').innerHTML = packageOptions;
+    // Fill form
+    modalBody.querySelector('#userCode').value = userInfo.userCode || '';
+    modalBody.querySelector('#userName').value = userInfo.userName || '';
+    modalBody.querySelector('#userPhone').value = userInfo.userPhone || '';
+    modalBody.querySelector('#packageCode').innerHTML = packageOptions;
+  }else{
+
+  }
 
   // MỞ MODAL
   const modal = new bootstrap.Modal(modalEl);
@@ -69,7 +71,7 @@ async function showUserModal(type, userInfo) {
 
   // Gắn sự kiện submit
   submitBtn.onclick = () => {
-    if (type === 'create') {
+    if (type === 'home-list') {
       //
     } else {
       updateUser(submitBtn);
@@ -94,7 +96,8 @@ function renderAllUser(data, objElement) {
             </td>
             <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
-                <button class="btn-main-out" onclick="getDetailUser('${ele.userCode}')">Chi tiết</button> 
+                <button class="btn-edit" onclick="getDetailUser('${ele.userCode}', 'update')">Cập nhập gói</button> 
+                <button class="btn-info" onclick="getDetailUser('${ele.userCode}', 'home-list')">Danh sách nhà yến</button> 
             </td> 
          </tr>`;
       HTML += rowHtml;
@@ -161,7 +164,7 @@ async function getAllUser(currentPage, limit) {
     });
 }
 
-async function getDetailUser(userCode) {
+async function getDetailUser(userCode, typeModal) {
   await loaderApiCall(
     // lấy thông tin user
     axios
@@ -169,7 +172,7 @@ async function getDetailUser(userCode) {
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
-          showUserModal('update', response.data);
+          showUserModal(typeModal, response.data);
         }
       })
       .catch(function (err) {

@@ -139,7 +139,7 @@ function renderContentFileds() {
             <div class="file-name ${isActive ? 'active' : ''}">${showNameOfKey(key)}</div>
           </div>
           <div class="file-button">
-            <button class="copy-btn btn-main-out" data-set-key="${key}">Chỉnh sửa</button>
+            <button class="copy-btn btn-edit-out" data-set-key="${key}">Chỉnh sửa</button>
           </div>
         </div>
       </div>

@@ -33,8 +33,8 @@ const renderAllBlog = (data, objElement) => {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-main-out" onClick="gotoBlogUpdate('${ele.blogCode}')">Chỉnh sửa</button>
-                <button class="btn-err-out"  onclick="deleteBlog('${ele.blogCode}')">Xóa</button>
+                <button class="btn-edit" onClick="gotoBlogUpdate('${ele.blogCode}')">Chỉnh sửa</button>
+                <button class="btn-delete"  onclick="deleteBlog('${ele.blogCode}')">Xóa</button>
             </td>
          </tr>`;
       HTML += rowHtml;

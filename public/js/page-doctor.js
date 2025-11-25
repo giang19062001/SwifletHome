@@ -128,7 +128,7 @@ function renderAllDoctor(data, objElement) {
             <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${OPTIONS.DOCTOR_STATUS.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
-                <button class="btn-main-out"  onclick="getDetailDoctor('${ele.seq}')">Chỉnh sửa</button>
+                <button class="btn-edit"  onclick="getDetailDoctor('${ele.seq}')">Chỉnh sửa</button>
             </td>
          </tr>`;
       HTML += rowHtml;

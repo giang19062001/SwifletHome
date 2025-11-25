@@ -270,7 +270,7 @@ const renderAllInfo = (data, objElement) => {
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
-                <button class="btn-main-out"  onClick="getDetailInfo('${ele.infoKeyword}')">Chỉnh sửa</button>
+                <button class="btn-edit"  onClick="getDetailInfo('${ele.infoKeyword}')">Chỉnh sửa</button>
             </td>
          </tr>`;
       HTML += rowHtml;
