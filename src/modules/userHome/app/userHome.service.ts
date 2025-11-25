@@ -7,7 +7,7 @@ import { IUserHome, IUserHomeImageStr } from './userHome.interface';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { UserHomeAppRepository } from './userHome.repository';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
+import { IList, YnEnum } from 'src/interfaces/admin.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
@@ -30,10 +30,26 @@ export class UserHomeAppService {
     const result = await this.userHomeAppRepository.getDetail(userHomeCode);
     return result;
   }
+
+  async getMainHomeByUser(userCode: string): Promise<IUserHome | null> {
+    const result = await this.userHomeAppRepository.getMainHomeByUser(userCode);
+    return result;
+  }
+  async updateHomeToMain(userHomeCode: string, userCode: string): Promise<number> {
+    const homeMain = await this.userHomeAppRepository.getMainHomeByUser(userCode);
+    // cập nhập nhà yến đang nhà chính hiện tại thành phụ
+    if (homeMain && homeMain.userHomeCode !== userHomeCode) {
+      await this.userHomeAppRepository.updateHomeMain(YnEnum.N, userCode, homeMain.userHomeCode)
+    }
+    // cập nhập nhà yến != userHomeCode với nhà yến đang là chính -> để thành nhà yến chính
+    const result = await this.userHomeAppRepository.updateHomeMain(YnEnum.Y, userCode, userHomeCode);
+    return result;
+  }
+
   async delete(userHomeCode: string, userCode: string): Promise<number> {
-    const checkMain = await this.userHomeAppRepository.findMainHomeDetail(userCode);
+    const homeMain = await this.userHomeAppRepository.getMainHomeByUser(userCode);
     // nếu nhà yến muốn xóa đang là chính -> ko thể xóa
-    if (checkMain && checkMain.userHomeCode == userHomeCode) {
+    if (homeMain && homeMain.userHomeCode == userHomeCode) {
       throw new BadRequestException({ message: Msg.HomeIsMainCannotDelete, data: 0 });
     }
 
@@ -95,9 +111,9 @@ export class UserHomeAppService {
         // thêm nhà yến của user
         const userHomeImagePath = `${getFileLocation(filesUploaded.mimetype, filesUploaded.filename)}/${filesUploaded.filename}`;
         // kiểm tra user này có nhà nào là chính hay chưa
-        const checkMain = await this.userHomeAppRepository.findMainHomeDetail(userCode);
+        const homeMain = await this.userHomeAppRepository.getMainHomeByUser(userCode);
         let isMain = 'N';
-        if (!checkMain) {
+        if (!homeMain) {
           isMain = 'Y';
         }
         const seq = await this.userHomeAppRepository.create(userCode, dto, isMain, userHomeImagePath);

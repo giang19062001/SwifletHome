@@ -30,9 +30,6 @@ export default class OptionController {
   @ApiOkResponse({ type: ApiAppResponseDto([ResOptionDto]) })
   async getAll(@Body() dto: GetOptionDto): Promise<IOpition[]> {
     const result = await this.optionService.getAll(dto);
-    if (result.length == 0) {
-      throw new BadRequestException();
-    }
     return result;
   }
 }

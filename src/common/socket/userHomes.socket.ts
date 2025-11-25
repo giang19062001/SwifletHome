@@ -20,7 +20,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   constructor(private readonly logger: LoggingService) {}
 
   handleConnection(client: Socket) {
-    this.logger.log(this.SERVICE_NAME, `Kết nối: ${client.id}`);
+    this.logger.log(this.SERVICE_NAME, `Mở kết nối: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
@@ -53,7 +53,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
 
   // gửi sensor data cho client
   private sendSensorData(room: string, payload: UserHomeSensorDataDto) {
-    console.log('sendSensorData', JSON.stringify(payload));
+    this.logger.log(this.SERVICE_NAME, `streamUserHomesSensorData: ${JSON.stringify(payload)}`);
     this.server.to(room).emit('streamUserHomesSensorData', payload);
   }
 

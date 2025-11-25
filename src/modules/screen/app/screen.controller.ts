@@ -23,9 +23,6 @@ export class ScreenAppController {
   @ApiOkResponse({ type: ApiAppResponseDto({}) })
   async getContent(@Param('keyword') keyword: string) {
     const result = await this.screenAppService.getContent(keyword);
-    if (!result) {
-      throw new BadRequestException();
-    }
     return result;
   }
 }

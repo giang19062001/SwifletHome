@@ -1,6 +1,6 @@
 import { getDoctorMulterConfig } from './../../../config/multer.config';
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateDoctorDto, DoctorFileDto, ResDoctorFileStrDto } from './doctor.dto';
 import { DoctorAppService } from './doctor.service';
@@ -20,6 +20,9 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 export class DoctorAppController {
   constructor(private readonly doctorAppService: DoctorAppService) {}
 
+  @ApiOperation({
+    summary: 'Yêu cầu khám bệnh nhà yến',
+  })
   @Post('requestDoctor')
   @ApiBody({ type: CreateDoctorDto, description: '**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file' })
   @HttpCode(HttpStatus.OK)

@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
@@ -41,11 +41,20 @@ export class UserHomeAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(ResUserHomeDto) })
   async getHomeDetail(@Param('userHomeCode') userHomeCode: string): Promise<IUserHome | null> {
     const result = await this.userHomeAppService.getDetail(userHomeCode);
-    if (!result) {
-      throw new BadRequestException();
-    }
     return result;
   }
+
+   @ApiOperation({
+    summary: 'Lấy thông tin nhà yến chính của user hiện tại',
+  })
+  @Get('getMainHomeByUser')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ResUserHomeDto) })
+  async getMainHomeByUser(@GetUserApp() user: userInterface.IUserApp): Promise<IUserHome | null> {
+    const result = await this.userHomeAppService.getMainHomeByUser(user.userCode);
+    return result;
+  }
+
   @Delete('deleteHome/:userHomeCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'userHomeCode', type: String })
@@ -59,10 +68,25 @@ export class UserHomeAppController {
     return result;
   }
 
+  @ApiOperation({
+    summary: 'Cập nhập nhà yến thành nhà yến chính',
+  })
+  @Put('updateHomeToMain/:userHomeCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({ name: 'userHomeCode', type: String })
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  async updateHomeToMain(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserAppInfo): Promise<number> {
+    const result = await this.userHomeAppService.updateHomeToMain(userHomeCode, user.userCode);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+
+    return result;
+  }
+
   @ApiBody({
     type: MutationUserHomeDto,
-    description: 
-`Nếu chỉ thay đổi dữ liệu, không upload ảnh thì **uniqueId** giữ giá trị như cũ từ **/api/app/user/getHomeDetal** trả về.\n
+    description: `Nếu chỉ thay đổi dữ liệu, không upload ảnh thì **uniqueId** giữ giá trị như cũ từ **/api/app/user/getHomeDetal** trả về.\n
  Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uuid** được generate phía app\n
  **userHomeProvince** là **provinceCode** lấy từ */api/app/province/getAll*`,
   })

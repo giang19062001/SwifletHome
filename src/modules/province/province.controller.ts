@@ -21,9 +21,6 @@ export default class ProvinceController {
   @ApiOkResponse({ type: ApiAppResponseDto([ResProvinceDto]) })
   async getAll(): Promise<IProvince[]> {
     const result = await this.provinceService.getAll();
-    if (result.length == 0) {
-      throw new BadRequestException();
-    }
     return result;
   }
 }

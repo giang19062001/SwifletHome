@@ -19,7 +19,7 @@ import {
   Param,
   Put,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale } from '../homeSale.interface';
 import { HomeSaleAppService } from './homeSale.service';
@@ -57,13 +57,13 @@ export class HomeSaleAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(ResHomeDto) })
   async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
     const result = await this.homeSaleAppService.getDetail(homeCode);
-    if (!result) {
-      throw new BadRequestException();
-    }
     return result;
   }
 
   // TODO: SIGHTSEEING
+  @ApiOperation({
+    summary: 'Đăng ký tham quan nhà yến ',
+  })
   @ApiBody({
     description: `
 **numberAttendCode**: lấy giá trị **code**  từ api/app/options/getAll {mainOption: 'SIGHTSEEING', subOption: 'NUMBER_ATTEND'}

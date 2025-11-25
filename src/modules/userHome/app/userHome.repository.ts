@@ -4,6 +4,7 @@ import { IUserHome, IUserHomeImageFile } from './userHome.interface';
 import { MutationUserHomeDto } from './userHome.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { PagingDto } from 'src/dto/admin.dto';
+import { YnEnum } from 'src/interfaces/admin.interface';
 @Injectable()
 export class UserHomeAppRepository {
   private readonly table = 'tbl_user_home';
@@ -44,7 +45,7 @@ export class UserHomeAppRepository {
     );
     return rows ? (rows[0] as IUserHome) : null;
   }
-  async findMainHomeDetail(userCode: string): Promise<IUserHome | null> {
+  async getMainHomeByUser(userCode: string): Promise<IUserHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode,  A.userHomeCode,  A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
@@ -86,6 +87,21 @@ export class UserHomeAppRepository {
     ]);
 
     return result.insertId;
+  }
+
+  async updateHomeMain(isMain: YnEnum, userCode: string, userHomeCode: string): Promise<number> {
+    const sql = `
+    UPDATE ${this.table}
+    SET isMain = ?,  updatedId = ?, updatedAt = ?
+    WHERE userHomeCode = ?  `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      isMain,
+      userCode, // updatedId
+      new Date(),
+      userHomeCode,
+    ]);
+
+    return result.affectedRows;
   }
   async update(userCode: string, userHomeCode: string, dto: MutationUserHomeDto, userHomeImage: string): Promise<number> {
     const sql = `
