@@ -2,7 +2,7 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, Conne
 import { Server, Socket } from 'socket.io';
 import { SensorData } from './socket.interface';
 import { LoggingService } from '../logger/logger.service';
-import { JoinUserHomesRoomDto, UserHomeSensorDataDto } from './socket.dto';
+import { JoinUserHomesRoomDto, LeaveUserHomesRoomDto, UserHomeSensorDataDto } from './socket.dto';
 
 @WebSocketGateway({
   namespace: 'socket/userHomes',
@@ -37,7 +37,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
     if (!userCode) return;
 
     client.data.userCode = userCode;
-    const room = `user-${userCode}`;
+    const room = `user-${userCode}-room`;
     client.join(room);
 
     this.logger.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
@@ -59,11 +59,11 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
 
   // rời phòng -> xóa interval
   @SubscribeMessage('leaveUserHomesRoom')
-  leaveUserHomesRoom(@MessageBody() data: JoinUserHomesRoomDto, @ConnectedSocket() client: Socket) {
+  leaveUserHomesRoom(@MessageBody() data: LeaveUserHomesRoomDto, @ConnectedSocket() client: Socket) {
     const { userCode } = data;
     if (!userCode) return;
-
-    const room = `user-${userCode}`;
+    
+    const room = `user-${userCode}-room`;
     client.leave(room);
     this.cleanupUserInterval(client);
     this.logger.log(this.SERVICE_NAME, `${client.id} đã rời phòng: ${room}`);
@@ -108,7 +108,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
     const userCode = client.data?.userCode as string;
     if (!userCode) return;
 
-    const room = `user-${userCode}`;
+    const room = `user-${userCode}-room`;
     const roomClients = this.server.sockets.adapter?.rooms?.get(room);
 
     if (!roomClients || roomClients.size === 0) {

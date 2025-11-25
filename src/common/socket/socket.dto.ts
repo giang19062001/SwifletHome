@@ -16,6 +16,12 @@ class SensorDataDto {
   current: number;
 }
 
+export class LeaveUserHomesRoomDto {
+  @IsString()
+  @IsNotEmpty()
+  userCode: string;
+
+}
 export class JoinUserHomesRoomDto {
   @IsString()
   @IsNotEmpty()
