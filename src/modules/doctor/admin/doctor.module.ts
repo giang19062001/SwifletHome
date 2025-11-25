@@ -8,6 +8,6 @@ import { DoctorAdminService } from "./doctor.service";
   imports: [AuthAdminModule],
   controllers: [DoctorAdminController],
   providers: [DoctorAdminService, DoctorAdminRepository],
-  exports:[DoctorAdminRepository]
+  exports:[]
 })
 export class DoctorAdminModule {}

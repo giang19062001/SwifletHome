@@ -9,6 +9,6 @@ import { FileLocalModule } from 'src/common/fileLocal/fileLocal.module';
   imports: [AuthAppModule, FileLocalModule],
   controllers: [UserHomeAppController],
   providers: [UserHomeAppService, UserHomeAppRepository],
-  exports: [],
+  exports: [UserHomeAppRepository],
 })
-export class UserHomeModule {}
+export class UserHomeAppModule {}

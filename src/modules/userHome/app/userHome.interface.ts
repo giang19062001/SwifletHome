@@ -25,7 +25,7 @@ export interface IUserHomeImageStr {
 }
 
 
-export interface IUserHomeImage {
+export interface IUserHomeImageFile {
   seq: number;
   userHomeSeq: number;
   userCode: string;

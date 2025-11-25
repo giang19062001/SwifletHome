@@ -6,6 +6,8 @@ import { CreateDoctorDto } from './doctor.dto';
 @Injectable()
 export class DoctorAppRepository {
   private readonly table = 'tbl_doctor';
+  private readonly tableFile = 'tbl_doctor_file';
+
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -52,6 +54,25 @@ export class DoctorAppRepository {
       WHERE seq = ? AND uniqueId = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [doctorSeq, seq, uniqueId]);
+
+    return result.affectedRows;
+  }
+
+  async getFilesNotUse(): Promise<IDoctorFile[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.doctorSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A
+      WHERE A.doctorSeq = 0 AND A.uniqueId NOT IN (SELECT uniqueId FROM tbl_doctor)
+      `,
+    );
+    return rows as IDoctorFile[];
+  }
+
+  async deleteFile(seq: number): Promise<number> {
+    const sql = `
+      DELETE FROM ${this.tableFile}
+      WHERE seq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
 
     return result.affectedRows;
   }

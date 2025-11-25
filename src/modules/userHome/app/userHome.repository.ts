@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IUserHome, IUserHomeImage } from './userHome.interface';
+import { IUserHome, IUserHomeImageFile } from './userHome.interface';
 import { MutationUserHomeDto } from './userHome.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -124,7 +124,7 @@ export class UserHomeAppRepository {
   }
   // TODO: IMG
 
-  async uploadHomeImage(seq: number, uniqueId: string, userCode: string, file: Express.Multer.File | IUserHomeImage): Promise<number> {
+  async uploadHomeImage(seq: number, uniqueId: string, userCode: string, file: Express.Multer.File | IUserHomeImageFile): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, uniqueId, userHomeSeq, userCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -149,6 +149,24 @@ export class UserHomeAppRepository {
       WHERE seq = ? AND uniqueId = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userHomeSeq, seq, uniqueId]);
+
+    return result.affectedRows;
+  }
+  async getFilesNotUse(): Promise<IUserHomeImageFile[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.userHomeSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableImg} A
+        WHERE A.userHomeSeq = 0 AND A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table})
+        `,
+    );
+    return rows as IUserHomeImageFile[];
+  }
+
+  async deleteFile(seq: number): Promise<number> {
+    const sql = `
+        DELETE FROM ${this.tableImg}
+        WHERE seq = ?
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
 
     return result.affectedRows;
   }

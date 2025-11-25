@@ -7,6 +7,7 @@ import { UpdateDoctorDto } from './doctor.dto';
 @Injectable()
 export class DoctorAdminRepository {
   private readonly table = 'tbl_doctor';
+  private readonly tableFile = 'tbl_doctor_file';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -48,30 +49,11 @@ export class DoctorAdminRepository {
     return result.affectedRows;
   }
 
-  async getFilesNotUse(): Promise<IDoctorFile[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.doctorSeq, A.uniqueId, A.filename, A.mimetype FROM tbl_doctor_file A
-      WHERE A.doctorSeq = 0 AND A.uniqueId NOT IN (SELECT uniqueId FROM tbl_doctor)
-      `,
-    );
-    return rows as IDoctorFile[];
-  }
-
-  async deleteFile(seq: number): Promise<number> {
-    const sql = `
-      DELETE FROM tbl_doctor_file
-      WHERE seq = ?
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
-
-    return result.affectedRows;
-  }
-
   async getFilesBySeq(seq: number): Promise<IDoctorFile[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT B.seq, B.filename,  B.mimetype
         FROM ${this.table} A 
-        LEFT JOIN tbl_doctor_file B
+        LEFT JOIN ${this.tableFile} B
         ON A.seq = B.doctorSeq
         WHERE A.seq = ?
       `,

@@ -26,7 +26,7 @@ import { PackageAdminModule } from './modules/package/admin/package.module';
 import { IpMiddleware } from './middleware/ip.middleware';
 import { CornModule } from './common/corn/corn.module';
 import { ProvinceModule } from './modules/province/province.module';
-import { UserHomeModule } from './modules/userHome/app/userHome.module';
+import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { SocketModule } from './common/socket/socket.module';
 
 @Module({
@@ -49,7 +49,7 @@ import { SocketModule } from './common/socket/socket.module';
     DoctorAppModule,
     HomeSaleAppModule,
     ScreenAppModule,
-    UserHomeModule,
+    UserHomeAppModule,
 
     //admin
     AuthAdminModule,
