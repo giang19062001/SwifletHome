@@ -20,8 +20,3 @@ export class JoinRoomDto {
   @IsNotEmpty()
   userHomeCode: string;
 }
-
-export class StreamDataDto {
-  @IsNumber()
-  humidity: number;
-}

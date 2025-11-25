@@ -18,10 +18,3 @@ export class JoinRoomDto {
   @ArrayNotEmpty()
   userHomeCodes: string[];
 }
-
-export class StreamDataDto {
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => SensorDataDto)
-  sensorData: SensorDataDto[];
-}

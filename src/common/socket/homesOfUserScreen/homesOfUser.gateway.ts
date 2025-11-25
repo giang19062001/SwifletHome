@@ -1,8 +1,8 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ISensor } from '../socket.interface';
+import { ISensorHome } from '../socket.interface';
 import { LoggingService } from '../../logger/logger.service';
-import { JoinRoomDto, LeaveRoomDto, StreamDataDto } from './homesOfUser.dto';
+import { JoinRoomDto, LeaveRoomDto } from './homesOfUser.dto';
 
 @WebSocketGateway({
   namespace: 'socket/homesOfUser',
@@ -51,11 +51,11 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
     }
 
     // Gửi dữ liệu rỗng lần đầu
-    this.sendInitialData(client, userHomeCodes);
+    this.sendInitialData(client);
   }
 
   // gửi sensor data cho client
-  private sendSensorData(room: string, payload: StreamDataDto) {
+  private sendSensorData(room: string, payload: ISensorHome[]) {
     this.logger.log(this.SERVICE_NAME, `streamSensorData: ${JSON.stringify(payload)}`);
     this.server.to(room).emit('streamSensorData', payload);
   }
@@ -76,7 +76,7 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   private startSensorDataInterval(intervalName: string, userHomeCodes: string[], room: string) {
     const interval = setInterval(() => {
       const sensorData = this.generateMockSensorData(userHomeCodes);
-      this.sendSensorData(room, { sensorData: sensorData });
+      this.sendSensorData(room, sensorData);
     }, this.INTERVALS_TIME);
 
     this.socketIntervals.set(intervalName, interval);
@@ -84,7 +84,7 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   }
 
   // lấy dữ liệu fake
-  private generateMockSensorData(userHomeCodes: string[]): ISensor[] {
+  private generateMockSensorData(userHomeCodes: string[]): ISensorHome[] {
     return userHomeCodes.map((homeCode) => ({
       userHomeCode: homeCode,
       temperature: Math.floor(Math.random() * 8) + 24,
@@ -94,15 +94,8 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   }
 
   // gửi mảng rỗng khi khởi tạo
-  private sendInitialData(client: Socket, userHomeCodes: string[]) {
-    client.emit('streamSensorData', {
-      sensorData: userHomeCodes.map((homeCode) => ({
-        userHomeCode: homeCode,
-        temperature: 0,
-        humidity: 0,
-        current: 0,
-      })),
-    });
+  private sendInitialData(client: Socket) {
+    client.emit('streamSensorData', []);
   }
 
   // xóa interval

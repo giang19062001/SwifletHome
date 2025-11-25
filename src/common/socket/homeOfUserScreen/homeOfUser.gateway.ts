@@ -1,19 +1,19 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { IHumidity, ISensor } from '../socket.interface';
+import { ISensor } from '../socket.interface';
 import { LoggingService } from '../../logger/logger.service';
-import { JoinRoomDto, LeaveRoomDto, StreamDataDto } from './mainHomeOfUser.dto';
+import { JoinRoomDto, LeaveRoomDto } from './homeOfUser.dto';
 
 @WebSocketGateway({
-  namespace: 'socket/mainHomeOfUser',
+  namespace: 'socket/homeOfUser',
   transports: ['websocket'],
   cors: { origin: '*' },
 })
-export class MainHomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  private readonly SERVICE_NAME = 'SocketGateway/mainHomeOfUser';
+  private readonly SERVICE_NAME = 'SocketGateway/homeOfUser';
   private readonly INTERVALS_TIME = 5000;
   private socketIntervals = new Map<string, NodeJS.Timeout>();
 
@@ -48,7 +48,7 @@ export class MainHomeOfUserGateway implements OnGatewayConnection, OnGatewayDisc
 
     // Khởi tạo interval nếu chưa có
     if (!this.socketIntervals.has(intervalName)) {
-      this.startSensorDataInterval(intervalName, room);
+      this.startSensorDataInterval(intervalName, userHomeCode, room);
     }
 
     // Gửi dữ liệu rỗng lần đầu
@@ -56,7 +56,7 @@ export class MainHomeOfUserGateway implements OnGatewayConnection, OnGatewayDisc
   }
 
   // gửi sensor data cho client
-  private sendSensorData(room: string, payload: StreamDataDto) {
+  private sendSensorData(room: string, payload: ISensor) {
     this.logger.log(this.SERVICE_NAME, `streamSensorData: ${JSON.stringify(payload)}`);
     this.server.to(room).emit('streamSensorData', payload);
   }
@@ -75,7 +75,7 @@ export class MainHomeOfUserGateway implements OnGatewayConnection, OnGatewayDisc
   }
 
   // khởi tạo internal khi chưa có
-  private startSensorDataInterval(intervalName: string, room: string) {
+  private startSensorDataInterval(intervalName: string, userHomeCode: string, room: string) {
     const interval = setInterval(() => {
       const sensorData = this.generateMockSensorData();
       this.sendSensorData(room, sensorData);
@@ -86,14 +86,20 @@ export class MainHomeOfUserGateway implements OnGatewayConnection, OnGatewayDisc
   }
 
   // lấy dữ liệu fake
-  private generateMockSensorData(): IHumidity {
-    return { humidity: Math.floor(Math.random() * 15) + 55 };
+  private generateMockSensorData(): ISensor {
+    return {
+      temperature: Math.floor(Math.random() * 8) + 24,
+      humidity: Math.floor(Math.random() * 15) + 55,
+      current: Number((Math.random() * 4 + 1).toFixed(2)),
+    };
   }
 
   // gửi mảng rỗng khi khởi tạo
   private sendInitialData(client: Socket) {
     client.emit('streamSensorData', {
+      temperature: 0,
       humidity: 0,
+      current: 0,
     });
   }
 

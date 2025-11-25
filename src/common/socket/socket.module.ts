@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
 import { HomesOfUserGateway } from "./homesOfUserScreen/homesOfUser.gateway";
-import { MainHomeOfUserGateway } from "./mainHomeOfUserScreen/mainHomeOfUser.gateway";
+import { HomeOfUserGateway } from "./homeOfUserScreen/homeOfUser.gateway";
 
 @Module({
   imports: [],
-  providers: [HomesOfUserGateway, MainHomeOfUserGateway],
+  providers: [HomesOfUserGateway, HomeOfUserGateway],
 })
 export class SocketModule {}
