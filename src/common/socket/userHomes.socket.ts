@@ -48,7 +48,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     // Gửi dữ liệu rỗng lần đầu
-    this.sendInitialData(client, userCode);
+    this.sendInitialData(client, userHomeCodes, userCode);
   }
 
   // gửi sensor data cho client
@@ -70,7 +70,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // khởi tạo internal khi chưa có
-  private startSensorDataInterval(userCode: string, userHomeCodes: string, room: string) {
+  private startSensorDataInterval(userCode: string, userHomeCodes: string[], room: string) {
     const interval = setInterval(() => {
       const sensorData = this.generateMockSensorData(userHomeCodes);
       this.sendSensorData(room, { userCode, data: sensorData });
@@ -81,10 +81,9 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // lấy dữ liệu fake
-  private generateMockSensorData(userHomeCodes: string): SensorData[] {
-    const homesOfUser = userHomeCodes.split(',').map(s => s.trim()); // biến chuỗi string thành mảng
-    return homesOfUser.map((home) => ({
-      userHomeCode: home,
+  private generateMockSensorData(userHomeCodes: string[]): SensorData[] {
+    return userHomeCodes.map((homeCode) => ({
+      userHomeCode: homeCode,
       temperature: Math.floor(Math.random() * 8) + 24,
       humidity: Math.floor(Math.random() * 15) + 55,
       current: Number((Math.random() * 4 + 1).toFixed(2)),
@@ -92,10 +91,15 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // gửi mảng rỗng khi khởi tạo
-  private sendInitialData(client: Socket, userCode: string) {
+  private sendInitialData(client: Socket, userHomeCodes: string[], userCode: string) {
     client.emit('streamUserHomesSensorData', {
       userCode,
-      data: [],
+      data: userHomeCodes.map((homeCode) => ({
+        userHomeCode: homeCode,
+        temperature: 0,
+        humidity: 0,
+        current: 0,
+      })),
     });
   }
 

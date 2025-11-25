@@ -22,42 +22,88 @@
 
         <div class="flex-1 flex flex-col lg:flex-row gap-4 p-4">
             <!-- Menu Namespaces -->
-            <div class="lg:w-64 bg-gray-800 rounded-xl shadow-xl p-4 space-y-4" style="max-height: 85vh;">
+            <div class="lg:w-60 bg-gray-800 rounded-xl shadow-xl p-4 space-y-4" style="max-height: 85vh;">
                 <h3 class="text-lg font-semibold text-white">Namespaces</h3>
                 <div class="grid grid-cols-1 gap-2">
-                    <button  onclick="window.location.href='?type=userHomes'"
+                    <button onclick="window.location.href='?type=userHomes'"
                         class="flex-1 text-sm text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
                         /socket/userHomes
                     </button>
 
-                    <button disabled  onclick="window.location.href='?type=userHomeMain'"
+                    <button disabled onclick="window.location.href='?type=mainUserHome'"
                         class="flex-1 text-sm text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
-                        /socket/userHomeMain
+                        /socket/mainUserHome
                     </button>
                 </div>
             </div>
 
-            <!-- Control Panel - Động theo namespace -->
-            <div id="controlPanel" class="lg:w-96 bg-gray-800 rounded-xl shadow-xl p-4 space-y-5"
+            <!-- Control Panel -->
+            <div id="controlPanel" class="lg:w-1/3 bg-gray-800 rounded-xl shadow-xl p-5 space-y-5 overflow-y-auto"
                 style="max-height: 85vh;">
-                <!-- Các input sẽ được render tự động bằng JS -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-semibold text-white">Payload Editor (JSON)</h3>
+                        <button onclick="formatJson()"
+                            class="text-xs bg-cyan-600 hover:bg-cyan-700 px-3 py-1 rounded transition">
+                            Format
+                        </button>
+                    </div>
+
+                    <textarea id="jsonPayload"
+                        class="w-full h-64 bg-gray-900 text-gray-100 font-mono text-sm rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
+                        placeholder="Nhập payload JSON ở đây..."></textarea>
+
+
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-orange-500 text-white text-xs font-semibold p-2 rounded-full">
+                            emit
+                        </span>
+                        <button onclick="joinRoom()"
+                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium p-2 rounded-lg transition flex items-center justify-center gap-2">
+                            <span id="joinEventName">-</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-orange-500 text-white text-xs font-semibold p-2 rounded-full">
+                            emit
+                        </span>
+                        <button onclick="leaveRoom()"
+                            class="w-full bg-red-600 hover:bg-red-700 text-white font-medium p-2 rounded-lg transition flex items-center justify-center gap-2">
+                            <span id="leaveEventName">-</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="text-sm text-gray-400 space-y-1 bg-gray-900/50 p-4 rounded-lg font-mono">                   
+                    <p>Interval: <span  class="font-semibold text-white-400">5 seconds</span></p>
+                    <p>Status: <span id="status" class="font-semibold text-orange-400">Disconnected</span></p>
+                    <p>clientId: <span id="clientId" class="font-bold text-white">-</span></p>
+                    <p>Room: <span id="room" class="font-bold text-white">-</span></p>
+                </div>
+
+                <button onclick="clearLog()"
+                    class="w-full py-2 text-sm bg-neutral-600 hover:bg-neutral-700 rounded transition">
+                    Clear log
+                </button>
             </div>
 
             <!-- Log Panel -->
-            <div class="flex-1 bg-gray-800 rounded-xl shadow-xl p-4 overflow-hidden flex flex-col"
+            <div class="flex-1 bg-gray-800 rounded-xl shadow-xl p-5 overflow-hidden flex flex-col"
                 style="max-height: 85vh;">
                 <h2 class="text-xl font-semibold mb-4 flex items-center justify-between">
                     <span>Event Logs</span>
                     <span id="counter" class="text-sm text-gray-500">0 messages</span>
                 </h2>
-                <div id="log" class="flex-1 overflow-y-auto font-mono text-xs space-y-2"></div>
+                <div id="log" class="flex-1 overflow-y-auto font-mono text-xs space-y-2 pr-2"></div>
             </div>
         </div>
     </div>
 
     <script>
-        tailwind.config = { darkMode: 'class' };
-
         // Đọc type từ URL
         const urlParams = new URLSearchParams(window.location.search);
         const type = urlParams.get('type') || 'userHomes';
@@ -70,106 +116,44 @@
                 joinEvent: 'joinUserHomesRoom',
                 leaveEvent: 'leaveUserHomesRoom',
                 streamEvent: 'streamUserHomesSensorData',
-                params: [
-                    { key: 'userCode', label: 'userCode', placeholder: 'USR000001', default: 'USR000001', required: true },
-                    { key: 'userHomeCodes', label: 'userHomeCodes', placeholder: 'HOM000001,HOM000002', default: 'HOM000001,HOM000002', required: true }
-                ]
+                defaultPayload: {
+                    userCode: "USR000001",
+                    userHomeCodes: ["HOM000001", "HOM000002"]
+                }
             },
-            userHomeMain: {
-                namespace: '/socket/userHomeMain',
+            mainUserHome: {
+                namespace: '/socket/mainUserHome',
                 roomPrefix: 'user-home-',
-                joinEvent: 'joinUserHomeMainRoom',
-                leaveEvent: 'leaveUserHomeMainRoom',
-                streamEvent: 'streamUserHomeMainData',
-                params: [
-                    { key: 'userCode', label: 'userCode', placeholder: 'USR000001', default: 'USR000001', required: true },
-                    { key: 'userHomeCode', label: 'userHomeCode', placeholder: 'HOM000001', default: 'HOM000001', required: true }
-                ]
-            },
+                joinEvent: 'joinMainUserHomeRoom',
+                leaveEvent: 'leaveMainUserHomeRoom',
+                streamEvent: 'streamMainUserHomeData',
+                defaultPayload: {
+                    userCode: "USR000001",
+                    userHomeCode: "HOM000001"
+                }
+            }
         };
 
         const cfg = config[type] || config.userHomes;
 
-        // Cập nhật namespace hiện tại
+        // TỰ ĐỘNG ĐIỀN JSON DEFAULT 
+        const defaultJsonString = JSON.stringify(cfg.defaultPayload, null, 4);
+
         document.getElementById('currentNamespace').textContent = cfg.namespace;
-
-        // Tạo các input động
-        const controlPanel = document.getElementById('controlPanel');
-        const inputs = {};
-
-        cfg.params.forEach(param => {
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <label class="block text-sm font-medium mb-2">${param.label}</label>
-                <input 
-                    type="text" 
-                    data-key="${param.key}"
-                    placeholder="${param.placeholder}"
-                    value="${param.default || ''}"
-                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-500"
-                    ${param.required ? 'required' : ''}
-                />
-            `;
-            controlPanel.appendChild(div);
-            inputs[param.key] = div.querySelector('input');
-        });
-
-        // Nút Join / Leave
-        const buttonDiv = document.createElement('div');
-        buttonDiv.className = 'mt-4';
-        buttonDiv.innerHTML = `
-            <div class="flex items-center gap-2">
-                  <span class="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                    emit
-                </span>
-                <button onclick="joinRoom()" 
-                            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg transition">
-                            ${cfg.joinEvent}
-                </button>
-            </div>
-
-            <div class="flex items-center gap-2 mt-2">
-                  <span class="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                    emit
-                </span>
-               <button onclick="leaveRoom()" 
-                            class="flex-1 bg-red-700 hover:bg-red-800 text-white font-medium py-2 rounded-lg transition">
-                          ${cfg.leaveEvent}
-                </button>
-            </div>
-        `;
-        controlPanel.appendChild(buttonDiv);
-
-        // Status
-        const statusDiv = document.createElement('div');
-        statusDiv.className = 'text-md text-gray-500 space-y-1 mt-4';
-        statusDiv.innerHTML = `
-            <p>Interval: <span class="text-white">5 seconds</span></p>
-            <p>Status: <span id="status" class="font-semibold text-orange-400">Disconnected</span></p>
-            <p>clientId: <span id="clientId" class="font-bold text-white">-</span></p>
-            <p>Room: <span id="room" class="font-bold text-white">-</span></p>
-        `;
-        controlPanel.appendChild(statusDiv);
-
-        // Nút xóa log
-        const clearBtn = document.createElement('button');
-        clearBtn.onclick = clearLog;
-        clearBtn.textContent = 'Clear log';
-        clearBtn.className = 'w-full mt-4 py-2 text-sm bg-neutral-600 hover:bg-neutral-700 rounded transition';
-        controlPanel.appendChild(clearBtn);
+        document.getElementById('joinEventName').textContent = cfg.joinEvent;
+        document.getElementById('leaveEventName').textContent = cfg.leaveEvent;
+        document.getElementById('jsonPayload').value = defaultJsonString;
 
         // Kết nối Socket.IO
-        const socket = io(`${CURRENT_URL}${cfg.namespace}`, {
-            transports: ['websocket'],
-        });
+        const socket = io(`${CURRENT_URL}${cfg.namespace}`, { transports: ['websocket'] });
 
         const $ = id => document.getElementById(id);
         let count = 0;
-        const status = $('status');
-        const socketIdEl = $('clientId');
-        const roomEl = $('room');
         const logEl = $('log');
         const counter = $('counter');
+        const status = $('status');
+        const clientIdEl = $('clientId');
+        const roomEl = $('room');
 
         const addLog = (type, title, data) => {
             count++;
@@ -178,88 +162,103 @@
             const line = document.createElement('div');
             line.className = `p-3 rounded-lg bg-gray-700/50 border-l-4 ${type === 'success' ? 'border-green-500' :
                 type === 'info' ? 'border-blue-500' :
-                    type === 'warn' ? 'border-yellow-500' : 'border-red-500'}`;
+                    type === 'warn' ? 'border-yellow-500' : 'border-red-500'
+                }`;
 
-            const badge = type === 'info' ? `<span class="bg-orange-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-2">on</span>` : '';
+            const badge = type === 'info' ? `<span class="bg-orange-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full ml-2 mr-2">on</span>` : '';
             const titleColor = type === 'success' ? 'text-green-400' :
                 type === 'info' ? 'text-blue-400' :
                     type === 'warn' ? 'text-yellow-400' : 'text-red-400';
 
             line.innerHTML = `
                 <div class="flex justify-between items-start mb-1">
-                    <span class="flex items-center font-semibold">
-                        <span class="${titleColor}">[${time}] ${badge} '${title}'</span>
+                    <span class="flex items-center font-semibold ${titleColor}">
+                        [${time}] ${badge} '${title}'
                     </span>
                 </div>
-                <pre class="json overflow-x-auto text-xs">${JSON.stringify(data, null, 2)}</pre>
+                <pre class="json overflow-x-auto text-xs whitespace-pre-wrap">${JSON.stringify(data, null, 2)}</pre>
             `;
             logEl.prepend(line);
         };
 
         socket.on('connect', () => {
             status.textContent = 'Connected';
-            status.className = 'text-green-400 font-semibold';
-            socketIdEl.textContent = socket.id;
-            addLog('success', 'Connected', { clientId: socket.id, namespace: cfg.namespace });
+            status.className = 'font-semibold text-green-400';
+            clientIdEl.textContent = socket.id;
+            addLog('success', 'Connected', { clientId: socket.id });
         });
 
         socket.on('disconnect', () => {
             status.textContent = 'Disconnected';
-            status.className = 'text-red-400 font-semibold';
+            status.className = 'font-semibold text-red-400';
             addLog('error', 'Disconnected', {});
         });
 
-        socket.on(cfg.streamEvent, (payload) => {
-            addLog('info', cfg.streamEvent, payload);
-        });
-
+        socket.on(cfg.streamEvent, payload => addLog('info', cfg.streamEvent, payload));
         socket.on('roomJoined', d => addLog('success', 'roomJoined', d));
         socket.on('roomLeft', d => addLog('warn', 'roomLeft', d));
         socket.on('error', err => addLog('error', 'Server Error', err));
 
-        function getParams() {
-            const data = {};
-            let valid = true;
-            cfg.params.forEach(p => {
-                const val = inputs[p.key].value.trim();
-                if (p.required && !val) {
-                    alert(`Vui lòng nhập ${p.label}!`);
-                    valid = false;
-                }
-                data[p.key] = val;
-            });
-            return valid ? data : null;
+        function getPayload() {
+            try {
+                const raw = $('jsonPayload').value.trim();
+                if (!raw) throw new Error('Payload trống!');
+                return JSON.parse(raw); // Giữ nguyên kiểu: array, object, string...
+            } catch (e) {
+                alert('JSON không hợp lệ!\n' + e.message);
+                return null;
+            }
         }
 
-        function joinRoom() {
-            const data = getParams();
-            if (!data) return;
+        window.formatJson = () => {
+            try {
+                const obj = JSON.parse($('jsonPayload').value);
+                $('jsonPayload').value = JSON.stringify(obj, null, 4);
+            } catch (e) {
+                alert('Không thể format: JSON lỗi!');
+            }
+        };
 
-            socket.emit(cfg.joinEvent, data);
+        window.resetToDefault = () => {
+            if (confirm('Khôi phục về payload mặc định?')) {
+                $('jsonPayload').value = defaultJsonString;
+                formatJson();
+            }
+        };
 
+        window.joinRoom = () => {
+            const payload = getPayload();
+            if (!payload) return;
 
-            // Lấy key đầu tiên từ cfg.params làm room
-            const roomName = cfg.params[0].key ? data[cfg.params[0].key] : '';
+            socket.emit(cfg.joinEvent, payload);
+
+            // Lấy key đầu tiên để hiển thị room -> room name đồng nhất phía backend
+            const firstKey = Object.keys(cfg.defaultPayload)[0];
+            const roomValue = payload[firstKey];
+            const roomName = Array.isArray(roomValue) ? roomValue[0] : roomValue || 'unknown';
             roomEl.textContent = `${cfg.roomPrefix}${roomName}`;
-            addLog('warn', cfg.joinEvent, data);
-        }
 
-        function leaveRoom() {
-            const data = getParams();
-            if (!data) return;
+            addLog('warn', cfg.joinEvent, payload);
+        };
 
-            socket.emit(cfg.leaveEvent, data);
+        window.leaveRoom = () => {
+            const payload = getPayload();
+            if (!payload) return;
+
+            socket.emit(cfg.leaveEvent, payload);
             roomEl.textContent = '-';
-            addLog('warn', cfg.leaveEvent, data);
-        }
+            addLog('warn', cfg.leaveEvent, payload);
+        };
 
-        function clearLog() {
+        window.clearLog = () => {
             leaveRoom();
             logEl.innerHTML = '';
             count = 0;
             counter.textContent = '0 messages';
-        }
+        };
 
+        // Auto format khi rời textarea
+        $('jsonPayload').addEventListener('blur', formatJson);
     </script>
 </body>
 

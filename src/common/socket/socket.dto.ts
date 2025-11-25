@@ -1,4 +1,4 @@
-import { IsString, IsArray, IsNumber, ValidateNested, IsNotEmpty } from 'class-validator';
+import { IsString, IsArray, IsNumber, ValidateNested, IsNotEmpty, ArrayNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class SensorDataDto {
@@ -21,9 +21,10 @@ export class JoinUserHomesRoomDto {
   @IsNotEmpty()
   userCode: string;
 
-  @IsString()
-  @IsNotEmpty()
-  userHomeCodes: string; // string array
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayNotEmpty()
+  userHomeCodes: string[];
 }
 
 export class UserHomeSensorDataDto {
