@@ -1,19 +1,19 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { SensorData } from './socket.interface';
-import { LoggingService } from '../logger/logger.service';
-import { JoinUserHomesRoomDto, LeaveUserHomesRoomDto, UserHomeSensorDataDto } from './socket.dto';
+import { ISensor } from '../socket.interface';
+import { LoggingService } from '../../logger/logger.service';
+import { JoinRoomDto, LeaveRoomDto, StreamDataDto } from './homesOfUser.dto';
 
 @WebSocketGateway({
-  namespace: 'socket/userHomes',
+  namespace: 'socket/homesOfUser',
   transports: ['websocket'],
   cors: { origin: '*' },
 })
-export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect {
+export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  private readonly SERVICE_NAME = 'SocketGateway/UserHomes';
+  private readonly SERVICE_NAME = 'SocketGateway/HomeOfUser';
   private readonly INTERVALS_TIME = 5000;
   private socketIntervals = new Map<string, NodeJS.Timeout>();
 
@@ -31,8 +31,8 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // tham gia nhóm
-  @SubscribeMessage('joinUserHomesRoom')
-  joinUserHomesRoom(@MessageBody() data: JoinUserHomesRoomDto, @ConnectedSocket() client: Socket) {
+  @SubscribeMessage('joinRoom')
+  joinRoom(@MessageBody() data: JoinRoomDto, @ConnectedSocket() client: Socket) {
     const { userCode, userHomeCodes } = data;
     if (!userCode) return;
 
@@ -52,14 +52,14 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // gửi sensor data cho client
-  private sendSensorData(room: string, payload: UserHomeSensorDataDto) {
-    this.logger.log(this.SERVICE_NAME, `streamUserHomesSensorData: ${JSON.stringify(payload)}`);
-    this.server.to(room).emit('streamUserHomesSensorData', payload);
+  private sendSensorData(room: string, payload: StreamDataDto) {
+    this.logger.log(this.SERVICE_NAME, `streamSensorData: ${JSON.stringify(payload)}`);
+    this.server.to(room).emit('streamSensorData', payload);
   }
 
   // rời phòng -> xóa interval
-  @SubscribeMessage('leaveUserHomesRoom')
-  leaveUserHomesRoom(@MessageBody() data: LeaveUserHomesRoomDto, @ConnectedSocket() client: Socket) {
+  @SubscribeMessage('leaveRoom')
+  leaveRoom(@MessageBody() data: LeaveRoomDto, @ConnectedSocket() client: Socket) {
     const { userCode } = data;
     if (!userCode) return;
     
@@ -81,7 +81,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // lấy dữ liệu fake
-  private generateMockSensorData(userHomeCodes: string[]): SensorData[] {
+  private generateMockSensorData(userHomeCodes: string[]): ISensor[] {
     return userHomeCodes.map((homeCode) => ({
       userHomeCode: homeCode,
       temperature: Math.floor(Math.random() * 8) + 24,
@@ -92,7 +92,7 @@ export class UserHomesSocket implements OnGatewayConnection, OnGatewayDisconnect
 
   // gửi mảng rỗng khi khởi tạo
   private sendInitialData(client: Socket, userHomeCodes: string[], userCode: string) {
-    client.emit('streamUserHomesSensorData', {
+    client.emit('streamSensorData', {
       userCode,
       data: userHomeCodes.map((homeCode) => ({
         userHomeCode: homeCode,

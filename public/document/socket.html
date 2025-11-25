@@ -25,14 +25,14 @@
             <div class="lg:w-60 bg-gray-800 rounded-xl shadow-xl p-4 space-y-4" style="max-height: 85vh;">
                 <h3 class="text-lg font-semibold text-white">Namespaces</h3>
                 <div class="grid grid-cols-1 gap-2">
-                    <button onclick="window.location.href='?type=userHomes'"
+                    <button onclick="window.location.href='?type=homesOfUser'"
                         class="flex-1 text-sm text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
-                        /socket/userHomes
+                        /socket/homesOfUser
                     </button>
 
-                    <button disabled onclick="window.location.href='?type=mainUserHome'"
+                    <button onclick="window.location.href='?type=mainHomeOfUser'"
                         class="flex-1 text-sm text-center py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-600 disabled:text-neutral-800 disabled:cursor-not-allowed">
-                        /socket/mainUserHome
+                        /socket/mainHomeOfUser
                     </button>
                 </div>
             </div>
@@ -106,29 +106,29 @@
     <script>
         // Đọc type từ URL
         const urlParams = new URLSearchParams(window.location.search);
-        const type = urlParams.get('type') || 'userHomes';
+        const type = urlParams.get('type') || 'homesOfUser';
 
         // Cấu hình chi tiết từng namespace
         const config = {
-            userHomes: {
-                namespace: '/socket/userHomes',
+            homesOfUser: {
+                namespace: '/socket/homesOfUser',
                 roomPrefix: 'user-',
-                roomKey: "userCode",
-                joinEvent: 'joinUserHomesRoom',
-                leaveEvent: 'leaveUserHomesRoom',
-                streamEvent: 'streamUserHomesSensorData',
+                roomKey: ["userCode"],
+                joinEvent: 'joinRoom',
+                leaveEvent: 'leaveRoom',
+                streamEvent: 'streamSensorData',
                 defaultPayload: {
                     userCode: "USR000001",
                     userHomeCodes: ["HOM000001", "HOM000002"]
                 }
             },
-            mainUserHome: {
-                namespace: '/socket/mainUserHome',
-                roomPrefix: 'user-home-',
-                roomKey: "userCode",
-                joinEvent: 'joinMainUserHomeRoom',
-                leaveEvent: 'leaveMainUserHomeRoom',
-                streamEvent: 'streamMainUserHomeData',
+            mainHomeOfUser: {
+                namespace: '/socket/mainHomeOfUser',
+                roomPrefix: 'home-',
+                roomKey: ["userCode", "userHomeCode"],
+                joinEvent: 'joinRoom',
+                leaveEvent: 'leaveRoom',
+                streamEvent: 'streamSensorData',
                 defaultPayload: {
                     userCode: "USR000001",
                     userHomeCode: "HOM000001"
@@ -136,7 +136,7 @@
             }
         };
 
-        const cfg = config[type] || config.userHomes;
+        const cfg = config[type] || config.homesOfUser;
 
         // TỰ ĐỘNG ĐIỀN JSON DEFAULT 
         const defaultJsonString = JSON.stringify(cfg.defaultPayload, null, 4);
@@ -234,7 +234,8 @@
 
             socket.emit(cfg.joinEvent, payload);
             // Lấy key đầu tiên để hiển thị room -> room name đồng nhất phía backend
-            roomEl.textContent = `${cfg.roomPrefix}${cfg.defaultPayload[cfg.roomKey]}-room`;
+            const roomKeyValues = cfg.roomKey.map(k => cfg.defaultPayload[k]);
+            roomEl.textContent = `${cfg.roomPrefix}${roomKeyValues.join("-")}-room`;
 
             addLog('warn', cfg.joinEvent, payload);
         };
@@ -243,10 +244,14 @@
             const payload = getPayload();
             if (!payload) return;
 
-            console.log(payload);
-            socket.emit(cfg.leaveEvent, { [cfg.roomKey]: payload[cfg.roomKey] });
             roomEl.textContent = '-';
-            addLog('warn', cfg.leaveEvent, { [cfg.roomKey]: payload[cfg.roomKey] });
+
+            const roomPayload = Object.fromEntries(
+                cfg.roomKey.map(k => [k, payload[k]])
+            );
+
+            socket.emit(cfg.leaveEvent, roomPayload);
+            addLog('warn', cfg.leaveEvent, roomPayload);
         };
 
         window.clearLog = () => {
