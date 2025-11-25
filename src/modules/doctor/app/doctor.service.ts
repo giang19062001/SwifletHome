@@ -17,8 +17,8 @@ export class DoctorAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async create(userCode: string, dto: CreateDoctorDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/createDoctor:`;
+  async requestDoctor(userCode: string, dto: CreateDoctorDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/requestDoctor:`;
 
     try {
       let result = 1;
@@ -41,7 +41,7 @@ export class DoctorAppService {
       return 0;
     }
   }
-  async uploadFile(userCode: string, dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<IDoctorFileStr[]> {
+  async uploadRequestFile(userCode: string, dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<IDoctorFileStr[]> {
     const logbase = `${this.SERVICE_NAME}/uploadFile:`;
     try {
       let filesResponse: IDoctorFileStr[] = [];

@@ -3,7 +3,6 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message.helper';
 import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
-import { hashPassword } from 'src/helpers/auth.helper';
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
@@ -105,7 +104,7 @@ export class AuthAppService extends AbAuthService {
     }
 
     // hash -> insert thông tin bao gồm cả device token
-    const hashedPassword = await hashPassword(dto.userPassword);
+    const hashedPassword = await this.hashPassword(dto.userPassword);
     const result = await this.userAppService.create({
       ...dto,
       userPassword: hashedPassword,
@@ -152,7 +151,7 @@ export class AuthAppService extends AbAuthService {
     }
 
     // hash -> update pasword
-    const hashedNewPassword = await hashPassword(dto.newPassword);
+    const hashedNewPassword = await this.hashPassword(dto.newPassword);
     const result = await this.userAppService.updatePassword(hashedNewPassword, userPhone);
 
     // reset thông tin OTP của password để lần tiếp theo muốn đổi password lần nữa phải xác thực lại OTP
@@ -210,5 +209,11 @@ export class AuthAppService extends AbAuthService {
     } catch (err) {
       throw new ForbiddenException(Msg.TokenInvalid);
     }
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    const hashed = await bcrypt.hash(password, saltRounds);
+    return hashed;
   }
 }

@@ -20,12 +20,12 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 export class DoctorAppController {
   constructor(private readonly doctorAppService: DoctorAppService) {}
 
-  @Post('create')
+  @Post('requestDoctor')
   @ApiBody({ type: CreateDoctorDto, description: '**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file' })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async create(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateDoctorDto) {
-    const result = await this.doctorAppService.create(user.userCode, dto);
+  async requestDoctor(@GetUserApp() user: userInterface.IUserApp, @Body() dto: CreateDoctorDto) {
+    const result = await this.doctorAppService.requestDoctor(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({
         message: Msg.UuidNotFound,
@@ -41,15 +41,15 @@ export class DoctorAppController {
     };
   }
 
-  @Post('uploadFile')
+  @Post('uploadRequestFile')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: DoctorFileDto })
   @UseFilters(MulterBadRequestFilter)
   @UseInterceptors(FilesInterceptor('doctorFiles', 5, getDoctorMulterConfig(5)))
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([ResDoctorFileStrDto]) })
-  async uploadFile(@GetUserApp() user: userInterface.IUserApp, @Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {
-    const result = await this.doctorAppService.uploadFile(user.userCode, dto, doctorFiles);
+  async uploadRequestFile(@GetUserApp() user: userInterface.IUserApp, @Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {
+    const result = await this.doctorAppService.uploadRequestFile(user.userCode, dto, doctorFiles);
     return result;
   }
 }

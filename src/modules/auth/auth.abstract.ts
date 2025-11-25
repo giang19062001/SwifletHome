@@ -3,4 +3,5 @@ export abstract class AbAuthService {
   abstract login(dto: any): Promise<any>;
   abstract register(dto: any): Promise<any>;
   abstract verifyToken(token: string): any;
+  abstract hashPassword(password: string): Promise<string>;
 }
