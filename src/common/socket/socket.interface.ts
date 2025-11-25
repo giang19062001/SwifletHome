@@ -7,5 +7,4 @@ export interface ISensor {
 
 export interface IHumidity {
   humidity: number;
-
 }

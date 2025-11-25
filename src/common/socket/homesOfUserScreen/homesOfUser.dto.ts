@@ -20,12 +20,8 @@ export class JoinRoomDto {
 }
 
 export class StreamDataDto {
-  @IsString()
-  @IsNotEmpty()
-  userCode: string;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SensorDataDto)
-  data: SensorDataDto[];
+  sensorData: SensorDataDto[];
 }

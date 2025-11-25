@@ -13,7 +13,7 @@ export class MainHomeOfUserGateway implements OnGatewayConnection, OnGatewayDisc
   @WebSocketServer()
   server: Server;
 
-  private readonly SERVICE_NAME = 'SocketGateway/HomeOfUser';
+  private readonly SERVICE_NAME = 'SocketGateway/mainHomeOfUser';
   private readonly INTERVALS_TIME = 5000;
   private socketIntervals = new Map<string, NodeJS.Timeout>();
 

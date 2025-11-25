@@ -13,7 +13,7 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   @WebSocketServer()
   server: Server;
 
-  private readonly SERVICE_NAME = 'SocketGateway/HomeOfUser';
+  private readonly SERVICE_NAME = 'SocketGateway/homesOfUser';
   private readonly INTERVALS_TIME = 5000;
   private socketIntervals = new Map<string, NodeJS.Timeout>();
 
@@ -36,19 +36,22 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
     const { userCode, userHomeCodes } = data;
     if (!userCode) return;
 
-    client.data.userCode = userCode;
-    const room = `user-${userCode}-room`;
+    // lưu tạm dữ liệu cho biến socket
+    const intervalName = `${userCode}`;
+    client.data.intervalName = intervalName;
+
+    const room = `user-${intervalName}-room`;
     client.join(room);
 
     this.logger.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
 
     // Khởi tạo interval nếu chưa có
-    if (!this.socketIntervals.has(userCode)) {
-      this.startSensorDataInterval(userCode, userHomeCodes, room);
+    if (!this.socketIntervals.has(intervalName)) {
+      this.startSensorDataInterval(intervalName, userHomeCodes, room);
     }
 
     // Gửi dữ liệu rỗng lần đầu
-    this.sendInitialData(client, userHomeCodes, userCode);
+    this.sendInitialData(client, userHomeCodes);
   }
 
   // gửi sensor data cho client
@@ -62,7 +65,7 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   leaveRoom(@MessageBody() data: LeaveRoomDto, @ConnectedSocket() client: Socket) {
     const { userCode } = data;
     if (!userCode) return;
-    
+
     const room = `user-${userCode}-room`;
     client.leave(room);
     this.cleanupUserInterval(client);
@@ -70,14 +73,14 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   }
 
   // khởi tạo internal khi chưa có
-  private startSensorDataInterval(userCode: string, userHomeCodes: string[], room: string) {
+  private startSensorDataInterval(intervalName: string, userHomeCodes: string[], room: string) {
     const interval = setInterval(() => {
       const sensorData = this.generateMockSensorData(userHomeCodes);
-      this.sendSensorData(room, { userCode, data: sensorData });
+      this.sendSensorData(room, { sensorData: sensorData });
     }, this.INTERVALS_TIME);
 
-    this.socketIntervals.set(userCode, interval);
-    this.logger.log(this.SERVICE_NAME, `Đã khởi tạo interval cho userCode: ${userCode}`);
+    this.socketIntervals.set(intervalName, interval);
+    this.logger.log(this.SERVICE_NAME, `Đã khởi tạo interval cho tên: ${intervalName}`);
   }
 
   // lấy dữ liệu fake
@@ -91,10 +94,9 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   }
 
   // gửi mảng rỗng khi khởi tạo
-  private sendInitialData(client: Socket, userHomeCodes: string[], userCode: string) {
+  private sendInitialData(client: Socket, userHomeCodes: string[]) {
     client.emit('streamSensorData', {
-      userCode,
-      data: userHomeCodes.map((homeCode) => ({
+      sensorData: userHomeCodes.map((homeCode) => ({
         userHomeCode: homeCode,
         temperature: 0,
         humidity: 0,
@@ -105,18 +107,18 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
 
   // xóa interval
   private cleanupUserInterval(client: Socket) {
-    const userCode = client.data?.userCode as string;
-    if (!userCode) return;
+    const intervalName = client.data?.intervalName as string;
+    if (!intervalName) return;
 
-    const room = `user-${userCode}-room`;
+    const room = `user-${intervalName}-room`;
     const roomClients = this.server.sockets.adapter?.rooms?.get(room);
 
     if (!roomClients || roomClients.size === 0) {
-      const interval = this.socketIntervals.get(userCode);
+      const interval = this.socketIntervals.get(intervalName);
       if (interval) {
         clearInterval(interval);
-        this.socketIntervals.delete(userCode);
-        this.logger.log(this.SERVICE_NAME, `Đã xóa interval của userCode: ${userCode}`);
+        this.socketIntervals.delete(intervalName);
+        this.logger.log(this.SERVICE_NAME, `Đã xóa interval của tên: ${intervalName}`);
       }
     }
   }
