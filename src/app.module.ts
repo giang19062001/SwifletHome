@@ -28,6 +28,7 @@ import { CornModule } from './common/corn/corn.module';
 import { ProvinceModule } from './modules/province/province.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { SocketModule } from './common/socket/socket.module';
+import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { SocketModule } from './common/socket/socket.module';
     ScreenAdminModule,
     InfoAdminModule,
     PackageAdminModule,
+    UserHomeAdminModule
   ],
   controllers: [AppController],
   providers: [AppService],

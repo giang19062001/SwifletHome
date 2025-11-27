@@ -18549,8 +18549,13 @@ select {
 .common-modal .modal-content .modal-body {
   padding-left: 0px;
   padding-right: 0px;
+  max-height: 650px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
-.common-modal .modal-content .modal-body p, .common-modal .modal-content .modal-body label, .common-modal .modal-content .modal-body span {
+.common-modal .modal-content .modal-body p,
+.common-modal .modal-content .modal-body label,
+.common-modal .modal-content .modal-body span {
   font-family: Pretendard !important;
 }
 .common-modal .modal-content .modal-footer {
@@ -19254,6 +19259,32 @@ select {
 }
 #page-screen-mutation .contents .file-card:hover {
   transform: translateY(-4px);
+}
+
+.user-home-list-modal .home-item {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 15px;
+}
+.user-home-list-modal .home-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+.user-home-list-modal .home-img img {
+  width: 170px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+}
+.user-home-list-modal .home-info h5, .user-home-list-modal .home-info .h5 {
+  margin: 0 0 6px 0;
+  font-weight: 400;
+}
+.user-home-list-modal .home-info p {
+  margin: 2px 0;
 }
 
 .component-upload {

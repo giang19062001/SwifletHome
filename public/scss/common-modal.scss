@@ -31,7 +31,12 @@
     .modal-body {
       padding-left: 0px;
       padding-right: 0px;
-      p, label, span {
+      max-height: 650px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      p,
+      label,
+      span {
         font-family: Pretendard !important;
       }
     }

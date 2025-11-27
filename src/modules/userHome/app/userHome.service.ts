@@ -3,7 +3,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { IUserHome, IUserHomeImageStr } from './userHome.interface';
+import { IUserHome, IUserHomeImageStr } from '../userHome.interface';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { UserHomeAppRepository } from './userHome.repository';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -17,6 +17,7 @@ export class UserHomeAppService {
 
   constructor(
     private readonly userHomeAppRepository: UserHomeAppRepository,
+     private readonly userAppService: UserAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
@@ -103,6 +104,8 @@ export class UserHomeAppService {
 
     try {
       let result = 1;
+
+      
 
       // tìm file đã upload cùng uniqueId
       const filesUploaded = await this.userHomeAppRepository.findFilesByUniqueId(dto.uniqueId);

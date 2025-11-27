@@ -12,7 +12,7 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { UserHomeAppService } from './userHome.service';
 import { MutationUserHomeDto, ResUserHomeDto, ResUserHomeImageDto, ResUserHomeListDto, UploadUserHomeImageDto } from './userHome.dto';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IUserHome } from './userHome.interface';
+import { IUserHome } from '../userHome.interface';
 import { ResListDto } from 'src/dto/common.dto';
 import { IList } from 'src/interfaces/admin.interface';
 
@@ -30,7 +30,7 @@ export class UserHomeAppController {
   @Post('getHomes')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ResListDto(ResUserHomeListDto)) })
-  async getSwtHouses(@Body() dto: PagingDto, @GetUserApp() user: userInterface.IUserApp): Promise<IList<IUserHome>> {
+  async getSwtHousgetHomeses(@Body() dto: PagingDto, @GetUserApp() user: userInterface.IUserApp): Promise<IList<IUserHome>> {
     const result = await this.userHomeAppService.getAll(dto, user.userCode);
     return result;
   }
@@ -59,7 +59,7 @@ export class UserHomeAppController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'userHomeCode', type: String })
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async delete(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserAppInfo): Promise<number> {
+  async deleteHome(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserAppInfo): Promise<number> {
     const result = await this.userHomeAppService.delete(userHomeCode, user.userCode);
     if (result === 0) {
       throw new BadRequestException();
@@ -111,7 +111,7 @@ export class UserHomeAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async createSwtHouse(@GetUserApp() user: userInterface.IUserApp, @Body() dto: MutationUserHomeDto) {
+  async createHome(@GetUserApp() user: userInterface.IUserApp, @Body() dto: MutationUserHomeDto) {
     const result = await this.userHomeAppService.create(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({

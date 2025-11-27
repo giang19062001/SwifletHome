@@ -1,0 +1,31 @@
+.user-home-list-modal {
+  .home-item {
+    border: 1px solid #ddd;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 15px;
+  }
+
+  .home-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .home-img img {
+    width: 170px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+  }
+
+  .home-info h5 {
+    margin: 0 0 6px 0;
+    font-weight: 400;
+  }
+
+  .home-info p {
+    margin: 2px 0;
+  }
+}

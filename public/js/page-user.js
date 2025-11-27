@@ -17,6 +17,14 @@ function changePage(p) {
   getAllUser(page, limit);
 }
 
+function openUserModal(type, modalEl) {
+  // MỞ MODAL
+  const modal = new bootstrap.Modal(modalEl);
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    closeUserModal(type);
+  });
+  modal.show();
+}
 function closeUserModal(type) {
   // Xác định modal theo loại
   const modalSelector = type === 'home-list' ? '.user-home-list-modal' : '.user-update-modal';
@@ -24,19 +32,73 @@ function closeUserModal(type) {
 
   if (!modalEl) return;
 
+  // reset danh sách nhà yến về rỗng
+  if (type == 'home-list') {
+    const modalBody = modalEl.querySelector('.modal-body');
+    modalBody.innerHTML = '';
+  }
+
   // đóng modal boostrap
   closeModal(modalEl);
 }
 
 // TODO: RENDER
-async function showUserModal(type, userInfo) {
-  const modalSelector = type === 'home-list' ? '.user-home-list-modal' : '.user-update-modal';
+async function showHomesOfUserModal(type = 'home-list', homes) {
+  const modalSelector = type === 'home-list' && '.user-home-list-modal';
+  const modalEl = document.querySelector(modalSelector);
+  const modalBody = modalEl.querySelector('.modal-body');
+  const submitBtn = modalEl.querySelector('.modal-footer button');
+
+  if (type == 'home-list') {
+    console.log('homes', homes);
+    // render danh sách nhà yến của user
+    if (homes.length) {
+      homes.forEach((home) => {
+        const div = document.createElement('div');
+        div.classList.add('home-item');
+
+        div.innerHTML = `
+      <div class="home-row">
+        <div class="home-img">
+          <img src="http://3.107.58.138/${home.userHomeImage}" alt="${home.userHomeName}">
+        </div>
+
+        <div class="home-info">
+          <h5>${home.userHomeName} ${home.isMain === 'Y' ? `<b>(Chính)</b>` : ''}</h5>
+          <p><span>Địa chỉ:</span> ${home.userHomeAddress}, ${home.userHomeProvince}</p>
+          <p><span>Mô tả:</span> ${home.userHomeDescription || 'No description'}</p>
+          <p><span>Tích hợp độ ẩm/ nhiệt độ:</span> ${home.isIntegateTempHum == "Y" ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
+          <p><span>Tích hợp dòng diện:</span> ${home.isIntegateCurrent == "Y" ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
+        </div>
+      </div>
+    `;
+
+        modalBody.appendChild(div);
+      });
+    } else {
+      const p = document.createElement('p');
+      p.innerText = 'Danh sách nhà yến trống';
+      modalBody.appendChild(p);
+    }
+  }
+
+  // MỞ MODAL
+  openUserModal(type, modalEl);
+  // Gắn sự kiện submit
+  submitBtn.onclick = () => {
+    if (type === 'home-list') {
+      closeUserModal(type);
+    }
+  };
+}
+async function showUpdatePackageModal(type = 'update', userInfo) {
+  const modalSelector = type === 'update' && '.user-update-modal';
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body');
   const submitBtn = modalEl.querySelector('.modal-footer button');
 
   if (type == 'update') {
-    // gói
+    // render form cập nhập gói
     const packageOptions = [
       `
     <option value="" ${!userInfo.packageCode ? 'selected' : ''}>
@@ -58,23 +120,14 @@ async function showUserModal(type, userInfo) {
     modalBody.querySelector('#userName').value = userInfo.userName || '';
     modalBody.querySelector('#userPhone').value = userInfo.userPhone || '';
     modalBody.querySelector('#packageCode').innerHTML = packageOptions;
-  }else{
-
   }
 
   // MỞ MODAL
-  const modal = new bootstrap.Modal(modalEl);
-  modalEl.addEventListener('hidden.bs.modal', () => {
-    closeUserModal();
-  });
-  modal.show();
-
+  openUserModal(type, modalEl);
   // Gắn sự kiện submit
   submitBtn.onclick = () => {
-    if (type === 'home-list') {
-      //
-    } else {
-      updateUser(submitBtn);
+    if (type === 'update') {
+      updatePackage(submitBtn);
     }
   };
 }
@@ -137,6 +190,28 @@ async function getAllPackage(currentPage, limit) {
       console.log('error', error);
     });
 }
+async function getHomesOfUser(userCode) {
+  return await axios
+    .post(
+      CURRENT_URL + '/api/admin/user/getHomes',
+      {
+        page: 0,
+        limit: 0,
+        userCode,
+      },
+      axiosAuth(),
+    )
+    .then(function (response) {
+      console.log('response', response);
+      if (response.status === 200 && response.data) {
+        return response.data.list ?? [];
+      }
+    })
+    .catch(function (error) {
+      console.log('error', error);
+      return [];
+    });
+}
 
 async function getAllUser(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
@@ -164,24 +239,35 @@ async function getAllUser(currentPage, limit) {
     });
 }
 
-async function getDetailUser(userCode, typeModal) {
-  await loaderApiCall(
+async function getDetailUser(userCode, type) {
+  const res = await loaderApiCall(
     // lấy thông tin user
     axios
       .post(CURRENT_URL + '/api/admin/user/getDetail/' + userCode, { type: 'APP' }, axiosAuth())
       .then(function (response) {
-        console.log('response', response);
         if (response.status === 200 && response.data) {
-          showUserModal(typeModal, response.data);
+          return response;
         }
       })
       .catch(function (err) {
         console.log('err', err);
       }),
   );
+  // form cập nhập gói
+  if (res && type === 'update') {
+    showUpdatePackageModal(type, res.data);
+  }
+
+  // lấy danh sách nhà yến của user
+  if (type === 'home-list') {
+    const homes = await loaderApiCall(getHomesOfUser(userCode));
+    if (homes) {
+      showHomesOfUserModal(type, homes);
+    }
+  }
 }
 
-async function updateUser(btn) {
+async function updatePackage(btn) {
   const modalBody = document.querySelector('.user-update-modal .modal-body form');
 
   try {
