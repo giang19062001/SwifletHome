@@ -39,4 +39,5 @@ export const Msg = {
   OtpExpire: 'OTP không tồn tại hoặc đã hết hạn',
   OtpOvertake: 'Đã vượt quá số lần nhập OTP cho phép',
   OtpRemainAttempt: (num: number) => `Mã OTP không đúng. Còn ${num} lần thử.`,
+  InvalidPackageToAddHome:"Vui lòng nâng cấp gói để có thể thêm nhà yến mới"
 };

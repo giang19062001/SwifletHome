@@ -60,7 +60,7 @@ async function showHomesOfUserModal(type = 'home-list', homes) {
         div.innerHTML = `
       <div class="home-row">
         <div class="home-img">
-          <img src="http://3.107.58.138/${home.userHomeImage}" alt="${home.userHomeName}">
+          <img src="${CURRENT_URL}/${home.userHomeImage}" alt="${home.userHomeName}">
         </div>
 
         <div class="home-info">

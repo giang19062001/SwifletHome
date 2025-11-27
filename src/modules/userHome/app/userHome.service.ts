@@ -17,18 +17,18 @@ export class UserHomeAppService {
 
   constructor(
     private readonly userHomeAppRepository: UserHomeAppRepository,
-     private readonly userAppService: UserAppService,
+    private readonly userAppService: UserAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
   async getAll(dto: PagingDto, userCode: string): Promise<IList<IUserHome>> {
-    const total = await this.userHomeAppRepository.getTotal(userCode);
-    const list = await this.userHomeAppRepository.getAll(dto, userCode);
+    const total = await this.userHomeAppRepository.getTotalHomes(userCode);
+    const list = await this.userHomeAppRepository.getAllHomes(dto, userCode);
     return { total, list };
   }
 
   async getDetail(userHomeCode: string): Promise<IUserHome | null> {
-    const result = await this.userHomeAppRepository.getDetail(userHomeCode);
+    const result = await this.userHomeAppRepository.getDetailHome(userHomeCode);
     return result;
   }
 
@@ -40,7 +40,7 @@ export class UserHomeAppService {
     const homeMain = await this.userHomeAppRepository.getMainHomeByUser(userCode);
     // cập nhập nhà yến đang nhà chính hiện tại thành phụ
     if (homeMain && homeMain.userHomeCode !== userHomeCode) {
-      await this.userHomeAppRepository.updateHomeMain(YnEnum.N, userCode, homeMain.userHomeCode)
+      await this.userHomeAppRepository.updateHomeMain(YnEnum.N, userCode, homeMain.userHomeCode);
     }
     // cập nhập nhà yến != userHomeCode với nhà yến đang là chính -> để thành nhà yến chính
     const result = await this.userHomeAppRepository.updateHomeMain(YnEnum.Y, userCode, userHomeCode);
@@ -62,7 +62,7 @@ export class UserHomeAppService {
 
     try {
       let result = 1;
-      const home = await this.userHomeAppRepository.getDetail(userHomeCode);
+      const home = await this.userHomeAppRepository.getDetailHome(userHomeCode);
       // nếu uuid khác nhau -> có sự upload ảnh home mới
       if (home) {
         //  cập nhập dữ liệu, ảnh
@@ -105,8 +105,14 @@ export class UserHomeAppService {
     try {
       let result = 1;
 
-      
-
+      // lấy tất cả home của user
+      const homeTotal = await this.userHomeAppRepository.getTotalHomes(userCode);
+      const userPackage = await this.userAppService.getDetail(userCode);
+      // nếu user xài gói miễn phí và đã có 1 nhà yến rồi -> ko thể thêm nữa trừ khi nâng cập
+      if (homeTotal == 1 && userPackage?.packageCode == null) {
+        result = -2;
+        return result
+      }
       // tìm file đã upload cùng uniqueId
       const filesUploaded = await this.userHomeAppRepository.findFilesByUniqueId(dto.uniqueId);
       // có file được upload cùng uuid -> insert
@@ -125,6 +131,7 @@ export class UserHomeAppService {
       } else {
         // không có file ảnh nào được upload của nhà yến này -> báo lỗi
         result = -1;
+        return result
       }
 
       return result;

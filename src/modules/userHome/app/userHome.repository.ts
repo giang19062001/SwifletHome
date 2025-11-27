@@ -12,11 +12,11 @@ export class UserHomeAppRepository {
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async getTotal(userCode: string): Promise<number> {
+  async getTotalHomes(userCode: string): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE userCode = ?`, [userCode]);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto, userCode: string): Promise<IUserHome[]> {
+  async getAllHomes(dto: PagingDto, userCode: string): Promise<IUserHome[]> {
     let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, B.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
      A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain
     FROM ${this.table} A 
@@ -34,7 +34,7 @@ export class UserHomeAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IUserHome[];
   }
-  async getDetail(userHomeCode: string): Promise<IUserHome | null> {
+  async getDetailHome(userHomeCode: string): Promise<IUserHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId

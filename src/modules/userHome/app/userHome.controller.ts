@@ -119,6 +119,12 @@ export class UserHomeAppController {
         data: 0,
       });
     }
+      if (result === -2) {
+      throw new BadRequestException({
+        message: Msg.InvalidPackageToAddHome,
+        data: 0,
+      });
+    }
     if (result === 0) {
       throw new BadRequestException();
     }
