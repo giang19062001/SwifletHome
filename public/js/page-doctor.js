@@ -85,24 +85,24 @@ async function showDoctorModal(doctorData) {
   }
 
   // render danh sách status
-  const selectStatus = modalEl.querySelector('#status');
-  selectStatus.innerHTML = '';
+  // const selectStatus = modalEl.querySelector('#status');
+  // selectStatus.innerHTML = '';
 
-  OPTIONS.DOCTOR_STATUS.forEach((ele) => {
-    const option = document.createElement('option');
-    option.value = ele.value;
-    option.textContent = ele.text;
-    // nếu đã là duyệt và hủy -> disable 'chờ'
-    if (doctorData.statusKey !== 'WAITING' && ele.value == 'WAITING') {
-      option.disabled = true;
-    }
-    // nếu match  -> tự selected
-    if (ele.value === doctorData.status) {
-      option.selected = true;
-    }
+  // OPTIONS.DOCTOR_STATUS.forEach((ele) => {
+  //   const option = document.createElement('option');
+  //   option.value = ele.value;
+  //   option.textContent = ele.text;
+  //   // nếu đã là duyệt và hủy -> disable 'chờ'
+  //   if (doctorData.statusKey !== 'WAITING' && ele.value == 'WAITING') {
+  //     option.disabled = true;
+  //   }
+  //   // nếu match  -> tự selected
+  //   if (ele.value === doctorData.status) {
+  //     option.selected = true;
+  //   }
 
-    selectStatus.appendChild(option);
-  });
+  //   selectStatus.appendChild(option);
+  // });
 
   // assign <event> update
   modalEl.querySelector('.modal-footer button').onclick = updateDoctor;
@@ -191,7 +191,7 @@ async function updateDoctor() {
   try {
     const modalBody = document.querySelector('.doctor-update-modal .modal-body form');
     const seq = modalBody.querySelector('#seq').value;
-    const status = modalBody.querySelector('#status').value;
+    // const status = modalBody.querySelector('#status').value;
     const noteAnswered = modalBody.querySelector('#noteAnswered').value;
     if (String(noteAnswered).trim() == '') {
       modalBody.querySelector('.err-noteAnswered').style.display = 'block';
@@ -201,7 +201,7 @@ async function updateDoctor() {
       .put(
         CURRENT_URL + '/api/admin/doctor/update/' + seq,
         {
-          status: status,
+          status: "ANSWERED",
           noteAnswered: noteAnswered,
         },
         axiosAuth(),
