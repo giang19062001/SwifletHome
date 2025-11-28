@@ -9,12 +9,30 @@ const quillGlobal = new Quill('#editor', {
   placeholder: 'Nhập nội dung của bạn...',
 });
 
-// listen event copy/paste
+// lắng nghe sự kiện copy/paste
 quillGlobal.root.addEventListener('paste', (e) => {
   e.preventDefault();
   // >> santizer string >> html
   getThenRenderEditorContent();
 });
+
+// lắng nghe sự kiện nhập
+quillGlobal.on('text-change', (delta, oldDelta, source) => {
+  if (source !== 'user') return; // Chỉ kiểm tra khi  nhập
+
+  const text = quillGlobal.getText(); // Lấy plain text
+
+  const countPayment = (text.match(/\[\[payment\]\]/g) || []).length;
+
+  if (countPayment > 1) {
+    // Xóa  [[payment]] tag mới nhất mà vừa chèn
+    quillGlobal.setContents(oldDelta);
+
+    alert('Chỉ được thêm duy nhất một [[payment]] tag');
+    return
+  }
+});
+
 
 function removeEditorText(text) {
   let html = quillGlobal.root.innerHTML;

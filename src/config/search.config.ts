@@ -1,6 +1,6 @@
 export interface ISearchItem {
   questions: string[];
-  answer: string;
+  answer: { isFree: string; answerContent: string };
 }
 
 export const fuseConfig = {

@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/admin.dto';
 import { IAnswer } from '../answer.interface';
 
 @Injectable()
@@ -9,11 +8,11 @@ export class AnswerAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-    async getAnswerContent(answerCode: string): Promise<IAnswer | null> {
+    async getAnswerReply(answerCode: string): Promise<IAnswer | null> {
       const [rows] = await this.db.query<RowDataPacket[]>(
-        ` SELECT A.answerCode, A.answerContent
+        ` SELECT A.answerCode, A.answerContent, A.isFree
           FROM ${this.table} A
-          WHERE A.answerCode = ? `,
+          WHERE A.answerCode = ? AND A.isActive = 'Y' `,
         [answerCode],
       );
       return rows ? (rows[0] as IAnswer) : null;

@@ -25,7 +25,6 @@ export class AnswerAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(String) })
   async reply(@Body() dto: AnswerReplyDto, @GetUserApp() user: userInterface.IUserApp): Promise<string> {
-    console.log("user", user);
     const result = await this.answerAppService.reply();
     const res = this.searchService.reply(dto.question, user.packageRemainDays, result);
     return res;

@@ -8,15 +8,15 @@ const BlogConstraints = {
   },
 };
 // Theo dõi nút chế độ xem
-document.getElementById('isPaidPreview').addEventListener('change', (event) => {
+document.getElementById('isUpgradePreview').addEventListener('change', (event) => {
   getThenRenderEditorContent(); // getThenRenderEditorContent() -> renderContentHtml()
 });
 
 // Theo dõi radio isFree thay đổi
 document.querySelectorAll('input[name="isFree"]').forEach((radio) => {
   radio.addEventListener('change', () => {
-    // set chế độ xem là NOT_PAID_YET
-    document.getElementById('isPaidPreview').checked = false;
+    // set chế độ xem là FREE
+    document.getElementById('isUpgradePreview').checked = false;
     //re-render
     getThenRenderEditorContent(); // getThenRenderEditorContent() -> renderContentHtml()
     // ẩn/ hiện nút thanh toán
@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
 /// Hàm hiển thị/ẩn hộp chế độ xem
 function togglePreview() {
   const isFree = document.querySelector('input[name="isFree"]:checked')?.value;
-  console.log(isFree);
   if (isFree == 'Y') {
     document.querySelector('.preview-box').style.display = 'none';
   } else {
@@ -62,7 +61,7 @@ function togglePreview() {
 // TODO:RENDER
 function renderContentHtml() {
   const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
-  const isPaidPreview = document.getElementById('isPaidPreview').checked ? 'PAID' : 'NOT_PAID_YET';
+  const isUpgradePreview = document.getElementById('isUpgradePreview').checked ? 'UPGRADE' : 'FREE';
 
   // lấy content từ bong bóng message html
   const bot = document.getElementById('content-message');
@@ -73,15 +72,14 @@ function renderContentHtml() {
   if (isFree == 'Y') {
     contentHtml = removeEditorText('[[payment]]');
   }
-  console.log(isPaidPreview);
 
   // Xóa nút thanh toán nếu  chế độ xem là đã trả phí
-  if (isPaidPreview == 'PAID') {
+  if (isUpgradePreview == 'UPGRADE') {
     contentHtml = contentHtml.replaceAll(`<img src="${CURRENT_URL}/images/pay-btn.png" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`, '');
   }
 
   // Replace [[payment]]
-  if (isPaidPreview == 'NOT_PAID_YET') {
+  if (isUpgradePreview == 'FREE') {
     // chưa trả phí → hiển nút thanh toán
     if (contentHtml.includes('[[payment]]')) {
       // Lấy phần trước [[payment]]
@@ -102,17 +100,21 @@ function renderContentHtml() {
   });
 
   // Replace [[audio-data=...]]
-  contentHtml = contentHtml.replace(/\[\[audio-data=(.*?)\]\]/g, (match, url) => {
+  contentHtml = contentHtml.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
     const lastSlashIndex = url.lastIndexOf('/');
     const fileUrl = url.substring(0, lastSlashIndex);
     const filename = url.substring(lastSlashIndex + 1);
-    const fileInfo = fileList?.find((ele) => ele.filename === filename);
-    const audioPay = fileInfo?.filenamePay ?? filename; // audio miễn phí
 
-    const audioSrc = isPaidPreview == 'NOT_PAID_YET' ? `${url}` : `${fileUrl}/${audioPay}`;
-    return `<audio controls style="width:100%; margin:8px 0;">
-              <source src="${audioSrc}" type="audio/mpeg">
-            </audio>`;
+    const fileInfo = fileList?.find((ele) => ele.filename === filename);
+    const audioPay = fileInfo?.filenamePay || filename;
+
+    const audioSrc = isUpgradePreview === 'FREE' ? `${url}` : `${fileUrl}/${audioPay}`;
+
+    return `
+    <audio controls style="width:100%; margin:8px 0;">
+      <source src="${audioSrc}" type="audio/mpeg">
+    </audio>
+  `;
   });
 
   // Replace [[video-data=...]]

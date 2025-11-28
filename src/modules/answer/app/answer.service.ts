@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
+import { IList, YnEnum } from 'src/interfaces/admin.interface';
 import { AnswerAppRepository } from './answer.repository';
 import { IAnswer } from '../answer.interface';
 import { QuestionAppService } from 'src/modules/question/app/question.service';
@@ -23,7 +23,7 @@ export class AnswerAppService {
     if (questions.length) {
       for (const ques of questions) {
         // get answer
-        const answer = await this.answerAppRepository.getAnswerContent(ques.answerCode);
+        const answer = await this.answerAppRepository.getAnswerReply(ques.answerCode);
         if (answer) {
           answers.push(answer);
         }
@@ -31,7 +31,7 @@ export class AnswerAppService {
     }
 
     const questionMap = new Map<string, string[]>();
-    const answerMap = new Map<string, string>();
+    const answerMap = new Map<string, { isFree: string; answerContent: string }>();
 
     questions.forEach((ques) => {
       if (!questionMap.has(ques.answerCode)) {
@@ -41,20 +41,22 @@ export class AnswerAppService {
     });
 
     answers.forEach((answer) => {
-      const answerCode = (answer as any).answerCode; 
+      const answerCode = (answer as any).answerCode;
       if (answerCode && !answerMap.has(answerCode)) {
-        answerMap.set(answerCode, answer.answerContent);
+        answerMap.set(answerCode, {
+          isFree: answer.isFree,
+          answerContent: answer.answerContent,
+        });
       }
     });
 
-    //  merged
-    const mergedResults = Array.from(questionMap.entries()).map(([answerCode, questionContents]) => {
+    const results = Array.from(questionMap.entries()).map(([answerCode, questionContents]) => {
       return {
         questions: questionContents,
         answer: answerMap.get(answerCode),
       };
     });
 
-    return mergedResults;
+    return results;
   }
 }
