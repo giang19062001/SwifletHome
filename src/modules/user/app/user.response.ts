@@ -40,7 +40,7 @@ class UserPackageAppResDto {
 
 export class GetInfoUserAppResDto extends IntersectionType(UserAppResDto, UserPackageAppResDto) {
   @ApiProperty({ example: 0 })
-  totalHomes: number;
+  homesTotal: number;
 }
 
 export class LoginResDto extends UserAppResDto {

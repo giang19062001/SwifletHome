@@ -47,7 +47,7 @@ export class UserAppRepository {
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
       B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,  B.startDate, B.endDate,  
-      COUNT(D.seq) AS totalHomes
+      COUNT(D.seq) AS homesTotal
       FROM ${this.table} A 
       LEFT JOIN ${this.tablePackage} B
         ON A.userCode = B.userCode
