@@ -63,7 +63,7 @@ export class SearchService {
 
         const audioSrc = packageRemainDays <= 0 ? `${url}` : `${fileUrl}/${audioPay}`;
 
-        return `[[audio-data='${audioSrc}']]`;
+        return `[[audio-data=${audioSrc}]]`;
       });
     }
     return content;
