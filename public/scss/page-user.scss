@@ -9,15 +9,20 @@
   .home-row {
     display: flex;
     gap: 15px;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .home-img img {
-    width: 170px;
-    height: 140px;
+    width: 180px;
+    height: 150px;
     object-fit: cover;
     border-radius: 15px;
     border: 1px solid #ccc;
+  }
+
+  .home-info {
+    flex-grow: 1;
   }
 
   .home-info h5 {
@@ -28,4 +33,14 @@
   .home-info p {
     margin: 2px 0;
   }
+
+  .home-actions {
+    display: flex;
+    align-items: center;
+    button{
+      margin-right: 2vw;
+    }
+  }
+
+
 }

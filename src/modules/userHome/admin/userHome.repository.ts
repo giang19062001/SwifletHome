@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IUserHome } from '../userHome.interface';
 import { GetHomesAdminDto } from './userHome.dto';
+import { YnEnum } from 'src/interfaces/admin.interface';
 @Injectable()
 export class UserHomeAdminRepository {
   private readonly table = 'tbl_user_home';
@@ -30,5 +31,19 @@ export class UserHomeAdminRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IUserHome[];
+  }
+
+  async triggerHome(isTriggered: YnEnum, userCode: string, userHomeCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table}
+      SET isTriggered = ?,  updatedId = ?, updatedAt = ?
+      WHERE userHomeCode = ?  `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      isTriggered == "Y" ? "N" : "Y",
+      userCode, // updatedId
+      new Date(),
+      userHomeCode,
+    ]);
+    return result.affectedRows;
   }
 }

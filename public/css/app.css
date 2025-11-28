@@ -19270,14 +19270,18 @@ select {
 .user-home-list-modal .home-row {
   display: flex;
   gap: 15px;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
 }
 .user-home-list-modal .home-img img {
-  width: 170px;
-  height: 140px;
+  width: 180px;
+  height: 150px;
   object-fit: cover;
   border-radius: 15px;
   border: 1px solid #ccc;
+}
+.user-home-list-modal .home-info {
+  flex-grow: 1;
 }
 .user-home-list-modal .home-info h5, .user-home-list-modal .home-info .h5 {
   margin: 0 0 6px 0;
@@ -19285,6 +19289,13 @@ select {
 }
 .user-home-list-modal .home-info p {
   margin: 2px 0;
+}
+.user-home-list-modal .home-actions {
+  display: flex;
+  align-items: center;
+}
+.user-home-list-modal .home-actions button {
+  margin-right: 2vw;
 }
 
 .component-upload {

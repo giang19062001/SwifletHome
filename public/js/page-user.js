@@ -44,35 +44,44 @@ function closeUserModal(type) {
 
 // TODO: RENDER
 async function showHomesOfUserModal(type = 'home-list', homes) {
-  const modalSelector = type === 'home-list' && '.user-home-list-modal';
+  const modalSelector = type === 'home-list' ? '.user-home-list-modal' : null;
   const modalEl = document.querySelector(modalSelector);
+  if (!modalEl) return;
+
   const modalBody = modalEl.querySelector('.modal-body');
   const submitBtn = modalEl.querySelector('.modal-footer button');
 
-  if (type == 'home-list') {
-    console.log('homes', homes);
-    // render danh sách nhà yến của user
+  // reset nội dung
+  modalBody.innerHTML = '';
+
+  if (type === 'home-list') {
     if (homes.length) {
       homes.forEach((home) => {
         const div = document.createElement('div');
         div.classList.add('home-item');
 
         div.innerHTML = `
-      <div class="home-row">
-        <div class="home-img">
-          <img src="${CURRENT_URL}/${home.userHomeImage}" alt="${home.userHomeName}">
-        </div>
+          <div class="home-row">
+            <div class="home-img">
+              <img src="${CURRENT_URL}/${home.userHomeImage}" alt="${home.userHomeName}">
+            </div>
 
-        <div class="home-info">
-          <h5>${home.userHomeName} ${home.isMain === 'Y' ? `<b>(Chính)</b>` : ''}</h5>
-          <p><span>Địa chỉ:</span> ${home.userHomeAddress}, ${home.userHomeProvince}</p>
-          <p><span>Mô tả:</span> ${home.userHomeDescription || 'No description'}</p>
-          <p><span>Tích hợp độ ẩm/ nhiệt độ:</span> ${home.isIntegateTempHum == "Y" ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
-          <p><span>Tích hợp dòng diện:</span> ${home.isIntegateCurrent == "Y" ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
-        </div>
-      </div>
-    `;
+            <div class="home-info">
+              <h5>${home.userHomeName} ${home.isMain === 'Y' ? `<b>(Chính)</b>` : ''}</h5>
+              <p><span>Địa chỉ:</span> ${home.userHomeAddress}, ${home.userHomeProvince}</p>
+              <p><span>Mô tả:</span> ${home.userHomeDescription || 'No description'}</p>
+              <p><span>Tích hợp độ ẩm/ nhiệt độ:</span> ${home.isIntegateTempHum == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
+              <p><span>Tích hợp dòng diện:</span> ${home.isIntegateCurrent == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
+              <p><span>Tình trạng:</span> ${home.isTriggered == 'Y' ? `<span class="txt-ok">Đã kích hoạt</span>` : `<span class="txt-not-ok">Chưa kích hoạt</span>`}</p>
+            </div>
 
+            <div class="home-actions">
+              <button class="${home.isTriggered == 'Y' ? 'btn-delete' : 'btn-info'}" onclick="triggerHome('${home.userCode}','${home.userHomeCode}','${home.isTriggered}')">
+                ${home.isTriggered == 'Y' ? 'Hủy kích hoạt' : 'Kích hoạt'}
+              </button>
+            </div>
+          </div>
+        `;
         modalBody.appendChild(div);
       });
     } else {
@@ -82,8 +91,11 @@ async function showHomesOfUserModal(type = 'home-list', homes) {
     }
   }
 
-  // MỞ MODAL
-  openUserModal(type, modalEl);
+  // chỉ mở modal nếu nó chưa mở
+  if (!modalEl.classList.contains('show')) {
+    openUserModal(type, modalEl);
+  }
+
   // Gắn sự kiện submit
   submitBtn.onclick = () => {
     if (type === 'home-list') {
@@ -91,6 +103,7 @@ async function showHomesOfUserModal(type = 'home-list', homes) {
     }
   };
 }
+
 async function showUpdatePackageModal(type = 'update', userInfo) {
   const modalSelector = type === 'update' && '.user-update-modal';
   const modalEl = document.querySelector(modalSelector);
@@ -267,6 +280,36 @@ async function getDetailUser(userCode, type) {
   }
 }
 
+// kích hoạt nhà yến
+async function triggerHome(userCode, userHomeCode, isTriggered) {
+  const txtConfirm = isTriggered == 'Y' ? 'Bạn có thật sự muốn hủy kích hoạt cảm biến cho nhà yến này?' : 'Bạn thật sự đã kích hoạt cảm biến cho nhà yến này rồi ?';
+  if (window.confirm(txtConfirm)) {
+    await axios
+      .put(
+        CURRENT_URL + '/api/admin/user/triggerHome/' + userHomeCode,
+        {
+          isTriggered: isTriggered,
+        },
+        axiosAuth(),
+      )
+      .then(async function (response) {
+        console.log('response', response);
+        if (response.status === 200 && response.data) {
+          toastOk('Chỉnh sửa thành công');
+
+          // refresh data
+          const updatedHomes = await getHomesOfUser(userCode); 
+          showHomesOfUserModal('home-list', updatedHomes);
+        } else {
+          toastErr('Chỉnh sửa thất bại');
+        }
+      })
+      .catch(function (err) {
+        console.log('err', err);
+      });
+  } else {
+  }
+}
 async function updatePackage(btn) {
   const modalBody = document.querySelector('.user-update-modal .modal-body form');
 

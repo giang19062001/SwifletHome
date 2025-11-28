@@ -18,4 +18,8 @@ export class UserHomeAdminService {
     const list = await this.userHomeAdminRepository.getAll(dto);
     return { total, list };
   }
+  async triggerHome(isTriggered: YnEnum, userCode: string, userHomeCode: string): Promise<number> {
+    const result = await this.userHomeAdminRepository.triggerHome(isTriggered, userCode, userHomeCode);
+    return result;
+  }
 }
