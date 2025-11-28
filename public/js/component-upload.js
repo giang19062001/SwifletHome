@@ -166,7 +166,6 @@ function copyData(filename, mimetype) {
 
 // TODO: RENDER
 const renderAllFile = (data, objElement) => {
-  console.log(objElement);
   fileList = data; // set global
 
   const getFileIcon = (mimetype) => {

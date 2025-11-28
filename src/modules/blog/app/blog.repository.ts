@@ -10,7 +10,7 @@ export class BlogAdppRepository {
 
   async getOne(): Promise<IBlog | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.blogCode, A.blogName, A.blogContent
+      ` SELECT A.blogCode, A.blogName, A.blogContent, A.isFree
         FROM ${this.table} A 
         WHERE A.isActive = 'Y'
         LIMIT 1 `,

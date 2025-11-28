@@ -12,7 +12,6 @@ import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()
 export class UploadService {
-  private readonly UPLOAD_PATH = 'public/uploads';
   private readonly SERVICE_NAME = 'UploadService';
 
   constructor(
@@ -59,7 +58,10 @@ export class UploadService {
     const result = await this.uploadRepository.uploadVideoLink(dto, createdId);
     return result;
   }
-
+  async getAllAudioFile(): Promise<IFileUpload[]> {
+    const audios = await this.uploadRepository.getAllAudioFile();
+    return audios
+  }
   async getAllFile(): Promise<IFileUpload[]> {
     const files = await this.uploadRepository.getAllImgFile();
     const audios = await this.uploadRepository.getAllAudioFile();
