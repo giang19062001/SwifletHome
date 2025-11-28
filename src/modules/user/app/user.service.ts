@@ -20,8 +20,8 @@ export class UserAppService {
     return await this.userAppRepository.findByPhone(userPhone);
   }
 
-  async getDetail(userCode: string): Promise<IUserAppInfo | null> {
-    return await this.userAppRepository.getDetail(userCode);
+  async getFullInfo(userCode: string): Promise<IUserAppInfo | null> {
+    return await this.userAppRepository.getFullInfo(userCode);
   }
 
   async create(dto: RegisterUserAppDto): Promise<number> {

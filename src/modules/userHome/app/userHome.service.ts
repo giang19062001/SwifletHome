@@ -107,7 +107,7 @@ export class UserHomeAppService {
 
       // lấy tất cả home của user
       const homeTotal = await this.userHomeAppRepository.getTotalHomes(userCode);
-      const userPackage = await this.userAppService.getDetail(userCode);
+      const userPackage = await this.userAppService.getFullInfo(userCode);
       // nếu user xài gói miễn phí và đã có 1 nhà yến rồi -> ko thể thêm nữa trừ khi nâng cập
       if (homeTotal == 1 && userPackage?.packageCode == null) {
         result = -2;

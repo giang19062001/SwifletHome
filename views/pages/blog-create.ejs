@@ -6,10 +6,17 @@
         <div class="card-body">
           <div class="row">
             <div class="col-md-3">
+              <label for="blogCategory" class="form-label">Tên bài viết</label>
+              <input type="text" class="form-control form-control-sm" id="blogName" name="blogName">
+              <div class="error-message" data-error="blogName"></div>
+            </div>
+
+            <div class="col-md-3">
               <label for="blogCategory" class="form-label">Thể loại</label>
               <select class="form-select form-select-sm" id="blogCategory" name="blogCategory">
-                  <% values.categories.forEach(function(cate) { %>
-                  <option value="<%= cate.categoryCode %>" <%=(values.blogCategory && values.blogCategory===cate.categoryCode) ? 'selected' : '' %>>
+                <% values.categories.forEach(function(cate) { %>
+                  <option value="<%= cate.categoryCode %>" <%=(values.blogCategory &&
+                    values.blogCategory===cate.categoryCode) ? 'selected' : '' %>>
                     <%= cate.categoryName %>
                   </option>
                   <% }); %>
@@ -19,8 +26,9 @@
             <div class="col-md-3">
               <label for="blogObject" class="form-label">Đối tượng</label>
               <select class="form-select form-select-sm" id="blogObject">
-                  <% values.objects.forEach(function(obj) { %>
-                  <option value="<%= obj.objectKeyword %>" <%=(values.blogObject && values.blogObject===obj.objectKeyword) ? 'selected' : '' %>>
+                <% values.objects.forEach(function(obj) { %>
+                  <option value="<%= obj.objectKeyword %>" <%=(values.blogObject &&
+                    values.blogObject===obj.objectKeyword) ? 'selected' : '' %>>
                     <%= obj.objectName %>
                   </option>
                   <% }); %>
@@ -50,9 +58,9 @@
       <div class="preview">
         <div class="chat-box">
           <div class="message bot">
-              <div class="bubble" id="content-message">
-                <%- values.blogContent %>
-              </div>
+            <div class="bubble" id="content-message">
+              <%- values.blogContent %>
+            </div>
           </div>
         </div>
         <div class="bottom-button bottom-swtich">
@@ -89,3 +97,5 @@
   let blogContent = `<%- values.blogContent %>`;
 </script>
 <script src="/js/page-blog-mutation.js"></script>
+<script src="/lib/validate.min.js"></script>
+<script src="/js/common-validate.js"></script>

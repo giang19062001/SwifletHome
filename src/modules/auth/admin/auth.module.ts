@@ -12,7 +12,7 @@ import { UserAdminModule } from 'src/modules/user/admin/user.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_KEY'),
-        signOptions: { expiresIn: '1h' },
+        signOptions: { expiresIn: '24h' },
       }),
     }),
     forwardRef(() => UserAdminModule), // ← phá phụ thuộc vòng tròn

@@ -13,7 +13,7 @@ import { UserAppModule } from 'src/modules/user/app/user.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_KEY'),
-        signOptions: { expiresIn: '24h' },
+        signOptions: { expiresIn: '365d' },
       }),
     }),
     OtpAppModule,

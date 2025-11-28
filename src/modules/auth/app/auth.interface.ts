@@ -1,4 +1,4 @@
-import { YnEnum } from "src/interfaces/admin.interface";
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export interface IUserAuthApp {
   seq: number;
@@ -8,4 +8,7 @@ export interface IUserAuthApp {
   deviceToken: string;
   isActive: YnEnum;
   accessToken: string;
+  packageCode: string;
+  packageName: string;
+  packageRemainDays: number; // calculate
 }

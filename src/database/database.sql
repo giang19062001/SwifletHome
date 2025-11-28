@@ -147,28 +147,24 @@ CREATE TABLE
   );
 
 
-
-
-CREATE TABLE
-  `tbl_blog` (
-    `seq` int NOT NULL AUTO_INCREMENT,
-    `blogCode` varchar(45) NOT NULL,
-    `blogObject` char(10) NOT NULL,
-    `blogCategory` varchar(45) NOT NULL,
-    `blogContent` text NOT NULL,
-    `blogScreenCode` char(15) DEFAULT '', -- màn hình code trên app
-    `isActive` char(1) DEFAULT 'Y',
-    `isFree` char(1) DEFAULT 'Y',
-    `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
-    `updatedAt` datetime DEFAULT NULL,
-    `createdId` varchar(45) DEFAULT 'SYSTEM',
-    `updatedId` varchar(45) DEFAULT NULL,
-    PRIMARY KEY (`seq`),
-    UNIQUE KEY `blogCode_UNIQUE` (`blogCode`)
-  );
-
-
-
+CREATE TABLE `tbl_blog` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `blogCode` varchar(45) NOT NULL,
+  `blogName` varchar(45) NOT NULL,
+  `blogObject` char(10) NOT NULL,
+  `blogCategory` varchar(45) NOT NULL,
+  `blogContent` text NOT NULL,
+  `blogScreenCode` char(15) DEFAULT '',  -- màn hình code trên app
+  `isActive` char(1) DEFAULT 'Y',
+  `isFree` char(1) DEFAULT 'Y',
+  `isMain` varchar(45) DEFAULT 'N',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `blogCode_UNIQUE` (`blogCode`)
+)
 
 CREATE TABLE
   `tbl_uploads_image` (

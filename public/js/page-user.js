@@ -220,7 +220,7 @@ async function getAllUser(currentPage, limit) {
 
   await axios
     .post(
-      CURRENT_URL + '/api/admin/user/getAll',
+      CURRENT_URL + '/api/admin/user/getAllUser',
       {
         page: currentPage,
         limit: limit,
@@ -243,7 +243,7 @@ async function getDetailUser(userCode, type) {
   const res = await loaderApiCall(
     // lấy thông tin user
     axios
-      .post(CURRENT_URL + '/api/admin/user/getDetail/' + userCode, { type: 'APP' }, axiosAuth())
+      .post(CURRENT_URL + '/api/admin/user/getDetailUser/' + userCode, { type: 'APP' }, axiosAuth())
       .then(function (response) {
         if (response.status === 200 && response.data) {
           return response;

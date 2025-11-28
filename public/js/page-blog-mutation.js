@@ -2,6 +2,11 @@
 const blogCode = CURRENT_PATH.includes('/update') ? CURRENT_PATH.split('/').pop() : null;
 const pageElement = 'page-blog-mutation';
 
+const BlogConstraints = {
+  blogName: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập tên bài viết.' },
+  },
+};
 // Theo dõi nút chế độ xem
 document.getElementById('isPaidPreview').addEventListener('change', (event) => {
   getThenRenderEditorContent(); // getThenRenderEditorContent() -> renderContentHtml()
@@ -24,6 +29,11 @@ document.querySelectorAll('input[name="isFree"]').forEach((radio) => {
 
 // Chờ fileList sẵn sàng và re-render
 document.addEventListener('DOMContentLoaded', () => {
+  // theo dõi validate input
+  const blogNameInput = document.getElementById('blogName');
+  blogNameInput.addEventListener('input', () => validateField(BlogConstraints, blogNameInput));
+
+  // chờ filelist
   const waitForFileList = setInterval(() => {
     if (Array.isArray(fileList) && fileList.length > 0) {
       clearInterval(waitForFileList);
@@ -118,6 +128,22 @@ function renderContentHtml() {
 async function createBlog() {
   getThenRenderEditorContent(); // assisgn value
 
+  // kiểm lỗi input
+  const formData = {
+    blogContent: blogContent,
+    blogName: document.getElementById('blogName').value,
+    blogCategory: document.getElementById('blogCategory').value,
+    blogObject: document.getElementById('blogObject').value,
+    isFree: document.querySelector('input[name="isFree"]:checked').value, // Y | N
+  };
+
+  const errors = validate(formData, BlogConstraints);
+  console.log(errors);
+  if (errors) {
+    displayErrors(errors);
+    return;
+  }
+
   // validate
   if (validateEditorContent() == false) {
     toastErr('Vui lòng nhập nội dung.');
@@ -128,20 +154,8 @@ async function createBlog() {
   submitBtn.disabled = true;
 
   try {
-    const blogCategory = document.getElementById('blogCategory').value;
-    const blogObject = document.getElementById('blogObject').value;
-    const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
     await axios
-      .post(
-        CURRENT_URL + '/api/admin/blog/create',
-        {
-          blogContent,
-          blogCategory,
-          blogObject,
-          isFree: isFree,
-        },
-        axiosAuth(),
-      )
+      .post(CURRENT_URL + '/api/admin/blog/create', formData, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         toastOk('Thêm thành công');
@@ -162,6 +176,22 @@ async function createBlog() {
 async function updateBlog() {
   getThenRenderEditorContent(); // assisgn value
 
+  // kiểm lỗi input
+  const formData = {
+    blogContent: blogContent,
+    blogName: document.getElementById('blogName').value,
+    blogCategory: document.getElementById('blogCategory').value,
+    blogObject: document.getElementById('blogObject').value,
+    isFree: document.querySelector('input[name="isFree"]:checked').value, // Y | N
+  };
+
+  const errors = validate(formData, BlogConstraints);
+  console.log(errors);
+  if (errors) {
+    displayErrors(errors);
+    return;
+  }
+
   // validate
   if (validateEditorContent() == false) {
     toastErr('Vui lòng nhập nội dung.');
@@ -172,21 +202,8 @@ async function updateBlog() {
   submitBtn.disabled = true;
 
   try {
-    const blogCategory = document.getElementById('blogCategory').value;
-    const blogObject = document.getElementById('blogObject').value;
-    const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
-
     await axios
-      .put(
-        CURRENT_URL + '/api/admin/blog/update/' + blogCode,
-        {
-          blogContent,
-          blogCategory,
-          blogObject,
-          isFree: isFree,
-        },
-        axiosAuth(),
-      )
+      .put(CURRENT_URL + '/api/admin/blog/update/' + blogCode, formData, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         toastOk('Chỉnh sửa thành công');

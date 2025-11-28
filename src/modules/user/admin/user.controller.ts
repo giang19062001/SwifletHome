@@ -17,18 +17,18 @@ export class UserAdminController {
   @ApiBody({
     type: GetAllUserDto,
   })
-  @Post('getAll')
+  @Post('getAllUser')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: GetAllUserDto) {
-    const result = await this.userAdminService.getAll(dto);
+  async getAllUser(@Body() dto: GetAllUserDto) {
+    const result = await this.userAdminService.getAllUser(dto);
     return result;
   }
 
   @ApiParam({ name: 'userCode', type: String })
-  @Post('getDetail/:userCode')
+  @Post('getDetailUser/:userCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('userCode') userCode: string, @Body() dto: GetDetailDto) {
-    const result = await this.userAdminService.getDetail(userCode, dto.type);
+  async getDetailUser(@Param('userCode') userCode: string, @Body() dto: GetDetailDto) {
+    const result = await this.userAdminService.getDetailUser(userCode, dto.type);
     if (!result) {
       throw new BadRequestException();
     }

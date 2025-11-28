@@ -24,10 +24,11 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as IUserApp) : null;
   }
-  async getDetail(userCode: string): Promise<IUserAppInfo | null> {
+  async getFullInfo(userCode: string): Promise<IUserAppInfo | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, 
-     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
+     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
+    IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDays
      FROM ${this.table} A 
      LEFT JOIN tbl_user_package B
      ON A.userCode = B.userCode

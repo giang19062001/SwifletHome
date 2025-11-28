@@ -55,7 +55,6 @@ export class AnswerAppService {
       };
     });
 
-    console.log("mergedResults", mergedResults);
     return mergedResults;
   }
 }

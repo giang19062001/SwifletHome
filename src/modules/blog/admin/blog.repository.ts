@@ -52,7 +52,7 @@ export class BlogAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.blogCode, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId,
+      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain,
       B.categoryName, C.objectName
       FROM ${this.table} A 
       LEFT JOIN tbl_category B ON A.blogCategory = B.categoryCode
@@ -65,7 +65,7 @@ export class BlogAdminRepository {
   }
   async getDetail(blogCode: string): Promise<IBlog | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.blogCode, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId,
+      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
@@ -86,20 +86,20 @@ export class BlogAdminRepository {
       blogCode = generateCode(rows[0].blogCode, 'BLG', 6);
     }
     const sql = `
-        INSERT INTO ${this.table}  (blogCode, blogContent, blogObject, blogCategory, isFree, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?)
+        INSERT INTO ${this.table}  (blogCode, blogName, blogContent, blogObject, blogCategory, isFree, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode, dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode, dto.blogName, dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, createdId]);
 
     return result.insertId;
   }
   async update(dto: UpdateBlogDto, updatedId: string, blogCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET blogContent = ?, blogObject = ?, blogCategory = ?, isFree = ?,
+      UPDATE ${this.table} SET blogName = ?, blogContent = ?, blogObject = ?, blogCategory = ?, isFree = ?,
       updatedId = ?, updatedAt = ?
       WHERE blogCode = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, updatedId, new Date(), blogCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.blogName, dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, updatedId, new Date(), blogCode]);
 
     return result.affectedRows;
   }

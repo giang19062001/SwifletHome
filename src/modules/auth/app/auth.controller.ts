@@ -52,7 +52,7 @@ export class AuthAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ResUserAppInfoDto) })
   async getInfo(@GetUserApp() user: userInterface.IUserAppInfo): Promise<userInterface.IUserAppInfo | null> {
-    const result = await this.authAppService.getInfo(user.userCode);
+    const result = await this.authAppService.getFullInfo(user.userCode);
     return result;
   }
 

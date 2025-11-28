@@ -167,7 +167,6 @@ async function updateScreen() {
       screenDescription: document.querySelector('#screenDescription').value,
     };
 
-    console.log(formData);
 
     const errors = validate(formData, screenMutationConstraints);
     if (errors) {
@@ -187,7 +186,7 @@ async function updateScreen() {
       .then(function (response) {
         console.log('response', response);
         toastOk('Chỉnh sửa thành công');
-        reloadPage('/dashboard/screen/list');
+        reloadPage('/dashboard/config/screen');
       })
       .catch(function (error) {
         console.log('error', error);

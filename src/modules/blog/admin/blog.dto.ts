@@ -18,6 +18,12 @@ export class GetAllBlogDto extends PagingDto {
 }
 
 export class UpdateBlogDto {
+   @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  blogName: string;
+
   @ApiProperty({ example: '<p>Hello word</p>' })
   @IsNotEmpty()
   @IsString()

@@ -17,7 +17,7 @@ export class SearchService {
     );
   }
 
-  findAnswer(query: string, data: ISearchItem[]): string {
+  reply(query: string, packageRemainDays : number, data: ISearchItem[]): string {
     if (!data?.length) {
       return Msg.CannotReply;
     }

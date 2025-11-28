@@ -29,6 +29,7 @@ import { ProvinceModule } from './modules/province/province.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { SocketModule } from './common/socket/socket.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
+import { BlogAppModule } from './modules/blog/app/blog.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
     HomeSaleAppModule,
     ScreenAppModule,
     UserHomeAppModule,
+    BlogAppModule,
 
     //admin
     AuthAdminModule,

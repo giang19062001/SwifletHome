@@ -25,7 +25,7 @@ export class UserAdminService {
     return await this.userAdminRepository.findByUserId(userId);
   }
 
-  async getAll(dto: GetAllUserDto): Promise<IList<IUserAppInfo> | IList<IUserAdmin>> {
+  async getAllUser(dto: GetAllUserDto): Promise<IList<IUserAppInfo> | IList<IUserAdmin>> {
     if (dto.type == 'APP') {
       // app
       const total = await this.userAdminRepository.getTotalUserApp(dto);
@@ -37,7 +37,7 @@ export class UserAdminService {
     }
   }
 
-  async getDetail(userCode: string, type: string): Promise<IUserAppInfo | IUserAdmin | null> {
+  async getDetailUser(userCode: string, type: string): Promise<IUserAppInfo | IUserAdmin | null> {
     if (type == 'APP') {
       // app
       return await this.userAdminRepository.getDetailUserApp(userCode);

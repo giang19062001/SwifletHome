@@ -53,6 +53,7 @@ export class AuthAppService extends AbAuthService {
     const logbase = `${this.SERVICE_NAME}/login`;
 
     const user = await this.userAppService.findByPhone(dto.userPhone);
+
     // số điện không tồn tại | sai
     if (!user) {
       this.logger.error(logbase, `${dto.userPhone} -> ${Msg.PhoneLoginWrong}`);
@@ -75,13 +76,26 @@ export class AuthAppService extends AbAuthService {
 
     // Chỉnh sửa lại device mỗi lần đăng nhập
     await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
+
+    // lấy thông tin gói
+    const userPayload = (await this.userAppService.getFullInfo(user.userCode)) as IUserAppInfo;
+
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
 
     // generate token
-    const payload = { userCode: user.userCode, userName: user.userName, userPhone: user.userPhone, deviceToken: dto.deviceToken };
+    const payload = {
+      ...userWithoutPassword,
+      packageCode: userPayload?.packageCode,
+      packageName: userPayload?.packageName,
+      packageRemainDays: userPayload.packageRemainDays,
+      deviceToken: dto.deviceToken,
+    };
     const accessToken = this.jwtService.sign(payload);
-    return { ...userWithoutPassword, deviceToken: dto.deviceToken, accessToken };
+    return {
+      ...payload,
+      accessToken,
+    };
   }
 
   async register(dto: RegisterUserAppDto): Promise<number> {
@@ -188,8 +202,8 @@ export class AuthAppService extends AbAuthService {
     return 1;
   }
 
-  async getInfo(userCode: string): Promise<IUserAppInfo | null> {
-    return await this.userAppService.getDetail(userCode);
+  async getFullInfo(userCode: string): Promise<IUserAppInfo | null> {
+    return await this.userAppService.getFullInfo(userCode);
   }
 
   async requestOtp(dto: RequestOtpDto): Promise<string> {

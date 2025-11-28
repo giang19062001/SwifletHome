@@ -85,6 +85,7 @@ export class AppService {
     return {
       isFree: blog?.isFree,
       blogContent: blog?.blogContent,
+      blogName: blog?.blogName,
       blogObject: blog?.blogObject,
       blogCategory: blog?.blogCategory,
       categories: categories,
