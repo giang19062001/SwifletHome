@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class ResPackageDto {
+export class PackageResDto {
   @ApiProperty()
   seq: number;
 

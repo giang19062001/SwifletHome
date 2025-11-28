@@ -3,50 +3,75 @@ import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { generateCode } from 'src/helpers/func.helper';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { IUserApp, IUserAppInfo } from './user.interface';
+import { IUserApp, IUserPackageApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
+import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 
 @Injectable()
 export class UserAppRepository {
   private readonly table = 'tbl_user_app';
   private readonly tablePackage = 'tbl_user_package';
   private readonly tablePackageHistory = 'tbl_user_package_history';
+  private readonly tableHome = 'tbl_user_home';
   private readonly tableTopic = 'tbl_user_topics';
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async findByPhone(userPhone: string): Promise<IUserApp | null> {
+  async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
      FROM ${this.table} WHERE userPhone = ? AND isActive = 'Y' LIMIT 1`,
       [userPhone],
     );
-    return rows.length ? (rows[0] as IUserApp) : null;
+    return rows.length ? (rows[0] as ITokenUserApp) : null;
   }
-  async getFullInfo(userCode: string): Promise<IUserAppInfo | null> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
-     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
-    IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDays
-     FROM ${this.table} A 
-     LEFT JOIN tbl_user_package B
-     ON A.userCode = B.userCode
-     LEFT JOIN tbl_package C
-     ON B.packageCode = C.packageCode
-     WHERE A.userCode = ? AND A.isActive = 'Y'
-     LIMIT 1`,
+  async getUserPackageInfo(userCode: string): Promise<IUserPackageApp | null> {
+     const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
+      IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
+      FROM ${this.table} A 
+      LEFT JOIN ${this.tablePackage} B
+        ON A.userCode = B.userCode
+      LEFT JOIN tbl_package C
+        ON B.packageCode = C.packageCode
+      WHERE A.userCode = ? AND A.isActive = 'Y' 
+       LIMIT 1`,
       [userCode],
     );
-    return rows.length ? (rows[0] as IUserAppInfo) : null;
+    return rows.length ? (rows[0] as IUserPackageApp) : null;
+
   }
-  async findBySeq(seq: number): Promise<IUserApp | null> {
+  async geInfo(userCode: string): Promise<IUserApp | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
+      B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
+      IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,  B.startDate, B.endDate,  
+      COUNT(D.seq) AS totalHomes
+      FROM ${this.table} A 
+      LEFT JOIN ${this.tablePackage} B
+        ON A.userCode = B.userCode
+      LEFT JOIN tbl_package C
+        ON B.packageCode = C.packageCode
+      LEFT JOIN ${this.tableHome} D
+        ON D.userCode = A.userCode AND D.isActive = 'Y' 
+      WHERE A.userCode = ? AND A.isActive = 'Y' 
+      GROUP BY 
+      A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
+      B.startDate, B.endDate, B.packageCode,
+      C.packageName, C.packageDescription
+       LIMIT 1`,
+      [userCode],
+    );
+    return rows.length ? (rows[0] as IUserApp) : null;
+  }
+  async findBySeq(seq: number): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
      FROM ${this.table} WHERE seq = ? LIMIT 1`,
       [seq],
     );
-    return rows.length ? (rows[0] as IUserApp) : null;
+    return rows.length ? (rows[0] as ITokenUserApp) : null;
   }
   async create(dto: RegisterUserAppDto): Promise<number> {
     const sqlLast = ` SELECT userCode FROM ${this.table} ORDER BY userCode DESC LIMIT 1`;

@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class ResInfoBankDto {
+export class InfoBankResDto {
   @ApiProperty()
   qrcode: string;
 

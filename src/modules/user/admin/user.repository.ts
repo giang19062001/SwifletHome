@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
-import { IUserAdmin } from './user.interface';
+import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IUserAppInfo } from '../app/user.interface';
+import { IUserApp } from '../app/user.interface';
 import { UpdateUserPackageAdminDto } from './user.dto';
 
 @Injectable()
@@ -16,9 +16,9 @@ export class UserAdminRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async findByUserId(userId: string): Promise<IUserAdmin | null> {
+  async findByUserId(userId: string): Promise<ITokenUserAdmin | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT seq, userId, userPassword, userName, isActive FROM ${this.tableAdmin} WHERE userId = ? LIMIT 1`, [userId]);
-    return rows.length ? (rows[0] as IUserAdmin) : null;
+    return rows.length ? (rows[0] as ITokenUserAdmin) : null;
   }
 
   async getTotalUserApp(dto: PagingDto): Promise<number> {
@@ -33,7 +33,7 @@ export class UserAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 
-  async getAllUserApp(dto: PagingDto): Promise<IUserAppInfo[]> {
+  async getAllUserApp(dto: PagingDto): Promise<IUserApp[]> {
     let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
      FROM ${this.tableApp} A 
@@ -49,9 +49,9 @@ export class UserAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IUserAppInfo[];
+    return rows as IUserApp[];
   }
-  async getDetailUserApp(userCode: string): Promise<IUserAppInfo | null> {
+  async getDetailUserApp(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
@@ -64,7 +64,7 @@ export class UserAdminRepository {
      LIMIT 1`,
       [userCode],
     );
-    return rows.length ? (rows[0] as IUserAppInfo) : null;
+    return rows.length ? (rows[0] as IUserApp) : null;
   }
 
   //TODO:PACKAGE

@@ -7,7 +7,7 @@ import { InfoAdminService } from './info.service';
 import { IInfo } from '../info.interface';
 import { UpdateInfoDto } from './info.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import * as userInterface from 'src/modules/user/admin/user.interface';
+import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
@@ -45,7 +45,7 @@ export class InfoAdminController {
   async update(
     @Body() dto: UpdateInfoDto,
     @Param('keyword') infoKeyword: string,
-    @GetUserAdmin() admin: userInterface.IUserAdmin,
+    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
     @UploadedFiles() files: Express.Multer.File[], // tất cả file trong formData
   ): Promise<number> {
     const filedFile = this.infoAdminService.getFieldFileByKeyword(infoKeyword);

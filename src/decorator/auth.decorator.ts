@@ -1,13 +1,13 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { IUserAdmin } from 'src/modules/user/admin/user.interface';
-import { IUserApp } from 'src/modules/user/app/user.interface';
+import { ITokenUserAdmin } from 'src/modules/auth/admin/auth.interface';
+import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 
-export const GetUserApp = createParamDecorator<IUserApp>((data: unknown, ctx: ExecutionContext): IUserApp => {
+export const GetUserApp = createParamDecorator<ITokenUserApp>((data: unknown, ctx: ExecutionContext): ITokenUserApp => {
   const req = ctx.switchToHttp().getRequest();
   return req.user;
 });
 
-export const GetUserAdmin = createParamDecorator<IUserAdmin>((data: unknown, ctx: ExecutionContext): IUserAdmin => {
+export const GetUserAdmin = createParamDecorator<ITokenUserAdmin>((data: unknown, ctx: ExecutionContext): ITokenUserAdmin => {
   const req = ctx.switchToHttp().getRequest();
   return req.user;
 });

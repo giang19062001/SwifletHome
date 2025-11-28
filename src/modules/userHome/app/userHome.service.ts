@@ -2,7 +2,6 @@ import { UploadService } from '../../upload/upload.service';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { UserAppService } from 'src/modules/user/app/user.service';
 import { IUserHome, IUserHomeImageStr } from '../userHome.interface';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { UserHomeAppRepository } from './userHome.repository';
@@ -10,6 +9,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IList, YnEnum } from 'src/interfaces/admin.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { UserAppRepository } from 'src/modules/user/app/user.repository';
 
 @Injectable()
 export class UserHomeAppService {
@@ -17,7 +17,7 @@ export class UserHomeAppService {
 
   constructor(
     private readonly userHomeAppRepository: UserHomeAppRepository,
-    private readonly userAppService: UserAppService,
+    private readonly userAppRepository: UserAppRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
@@ -107,7 +107,7 @@ export class UserHomeAppService {
 
       // lấy tất cả home của user
       const homeTotal = await this.userHomeAppRepository.getTotalHomes(userCode);
-      const userPackage = await this.userAppService.getFullInfo(userCode);
+      const userPackage = await this.userAppRepository.getUserPackageInfo(userCode);
       // nếu user xài gói miễn phí và đã có 1 nhà yến rồi -> ko thể thêm nữa trừ khi nâng cập
       if (homeTotal == 1 && userPackage?.packageCode == null) {
         result = -2;

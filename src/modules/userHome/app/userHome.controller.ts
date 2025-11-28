@@ -10,11 +10,13 @@ import * as userInterface from 'src/modules/user/app/user.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { UserHomeAppService } from './userHome.service';
-import { MutationUserHomeDto, ResUserHomeDto, ResUserHomeImageDto, ResUserHomeListDto, UploadUserHomeImageDto } from './userHome.dto';
+import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserHome } from '../userHome.interface';
-import { ResListDto } from 'src/dto/common.dto';
+import { ListResonseDto } from 'src/dto/common.dto';
 import { IList } from 'src/interfaces/admin.interface';
+import { GetHomeUserResDto, UserHomeImageResDto, GetHomesUserResDto } from './userHome.response';
+import * as authInterface from 'src/modules/auth/app/auth.interface';
 
 @ApiTags('app/user')
 @Controller('/api/app/user')
@@ -29,8 +31,8 @@ export class UserHomeAppController {
   })
   @Post('getHomes')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResListDto(ResUserHomeListDto)) })
-  async getSwtHousgetHomeses(@Body() dto: PagingDto, @GetUserApp() user: userInterface.IUserApp): Promise<IList<IUserHome>> {
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResonseDto(GetHomesUserResDto)) })
+  async getSwtHousgetHomeses(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<IList<IUserHome>> {
     const result = await this.userHomeAppService.getAll(dto, user.userCode);
     return result;
   }
@@ -38,7 +40,7 @@ export class UserHomeAppController {
   @ApiParam({ name: 'userHomeCode', type: String })
   @Get('getHomeDetail/:userHomeCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResUserHomeDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetHomeUserResDto) })
   async getHomeDetail(@Param('userHomeCode') userHomeCode: string): Promise<IUserHome | null> {
     const result = await this.userHomeAppService.getDetail(userHomeCode);
     return result;
@@ -49,8 +51,8 @@ export class UserHomeAppController {
   })
   @Get('getMainHomeByUser')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResUserHomeDto) })
-  async getMainHomeByUser(@GetUserApp() user: userInterface.IUserApp): Promise<IUserHome | null> {
+  @ApiOkResponse({ type: ApiAppResponseDto(GetHomeUserResDto) })
+  async getMainHomeByUser(@GetUserApp() user: authInterface.ITokenUserApp): Promise<IUserHome | null> {
     const result = await this.userHomeAppService.getMainHomeByUser(user.userCode);
     return result;
   }
@@ -59,7 +61,7 @@ export class UserHomeAppController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'userHomeCode', type: String })
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async deleteHome(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserAppInfo): Promise<number> {
+  async deleteHome(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
     const result = await this.userHomeAppService.delete(userHomeCode, user.userCode);
     if (result === 0) {
       throw new BadRequestException();
@@ -75,7 +77,7 @@ export class UserHomeAppController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'userHomeCode', type: String })
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async updateHomeToMain(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserAppInfo): Promise<number> {
+  async updateHomeToMain(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
     const result = await this.userHomeAppService.updateHomeToMain(userHomeCode, user.userCode);
     if (result === 0) {
       throw new BadRequestException();
@@ -93,7 +95,7 @@ export class UserHomeAppController {
   @ApiParam({ name: 'userHomeCode', type: String })
   @Put('updateHome/:userHomeCode')
   @HttpCode(HttpStatus.OK)
-  async updateHome(@Body() dto: MutationUserHomeDto, @Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserAppInfo): Promise<number> {
+  async updateHome(@Body() dto: MutationUserHomeDto, @Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
     const result = await this.userHomeAppService.update(user.userCode, userHomeCode, dto);
     if (result === 0) {
       throw new BadRequestException();
@@ -111,7 +113,7 @@ export class UserHomeAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async createHome(@GetUserApp() user: userInterface.IUserApp, @Body() dto: MutationUserHomeDto) {
+  async createHome(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: MutationUserHomeDto) {
     const result = await this.userHomeAppService.create(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({
@@ -143,8 +145,8 @@ export class UserHomeAppController {
   @UseFilters(MulterBadRequestFilter)
   @UseInterceptors(FileInterceptor('userHomeImage', multerImgConfig))
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResUserHomeImageDto) })
-  async uploadHomeImage(@GetUserApp() user: userInterface.IUserApp, @Body() dto: UploadUserHomeImageDto, @UploadedFile() userHomeImage: Express.Multer.File) {
+  @ApiOkResponse({ type: ApiAppResponseDto(UserHomeImageResDto) })
+  async uploadHomeImage(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UploadUserHomeImageDto, @UploadedFile() userHomeImage: Express.Multer.File) {
     return await this.userHomeAppService.uploadHomeImage(user.userCode, dto, userHomeImage);
   }
 }

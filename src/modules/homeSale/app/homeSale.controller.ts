@@ -27,10 +27,12 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { IListApp } from 'src/interfaces/app.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { CreateHomeSightSeeingDto, ResHomeDto } from './homeSale.dto';
+import { CreateHomeSightSeeingDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
 import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { GetHomeSaleResDto } from './homesale.response';
+import * as authInterface from 'src/modules/auth/app/auth.interface';
 
 @ApiTags('app/homeSale')
 @Controller('/api/app/homeSale')
@@ -45,7 +47,7 @@ export class HomeSaleAppController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([ResHomeDto]) })
+  @ApiOkResponse({ type: ApiAppResponseDto([GetHomeSaleResDto]) })
   async getAll(@Body() dto: PagingDto): Promise<IListApp<IHomeSale>> {
     const result = await this.homeSaleAppService.getAll(dto);
     return result;
@@ -54,7 +56,7 @@ export class HomeSaleAppController {
   @ApiParam({ name: 'homeCode', type: String })
   @Get('getDetail/:homeCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResHomeDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetHomeSaleResDto) })
   async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
     const result = await this.homeSaleAppService.getDetail(homeCode);
     return result;
@@ -73,7 +75,7 @@ export class HomeSaleAppController {
   @Post('registerSightSeeing')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: userInterface.IUserApp) {
+  async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.homeSaleAppService.registerSightSeeing(dto, user.userCode);
     return {
       message: Msg.HomeSummitCreateOk,

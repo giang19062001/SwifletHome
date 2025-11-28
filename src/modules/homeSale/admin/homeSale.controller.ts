@@ -28,7 +28,7 @@ import { IHomeSale, IHomeSaleSightSeeing } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
-import * as userInterface from 'src/modules/user/admin/user.interface';
+import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
@@ -75,7 +75,7 @@ export class HomeSaleAdminController {
   )
   async create(
     @Body() createHomeDto: CreateHomeDto,
-    @GetUserAdmin() admin: userInterface.IUserAdmin,
+    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
     // @UploadedFiles() files: Express.Multer.File[],
     @UploadedFiles()
     files: {
@@ -114,7 +114,7 @@ export class HomeSaleAdminController {
   async update(
     @Body() createHomeDto: UpdateHomeDto,
     @Param('homeCode') homeCode: string,
-    @GetUserAdmin() admin: userInterface.IUserAdmin,
+    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
     @UploadedFiles()
     files: {
       homeImage?: Express.Multer.File[];
@@ -162,7 +162,7 @@ export class HomeSaleAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Put('updateSightseeing/:seq')
   @HttpCode(HttpStatus.OK)
-  async updateSightseeing(@Body() dto: UpdateStatusDto, @Param('seq') seq: number, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+  async updateSightseeing(@Body() dto: UpdateStatusDto, @Param('seq') seq: number, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
     const result = await this.homeSaleAdminService.updateSightseeing(dto, admin.userId, seq);
     if (result === 0) {
       throw new BadRequestException();

@@ -7,7 +7,7 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { ScreenAdminService } from './screen.service';
 import { IScreen } from '../screen.interface';
 import { UpdateScreenDto } from './screen.dto';
-import * as userInterface from 'src/modules/user/admin/user.interface';
+import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
@@ -31,7 +31,7 @@ export class ScreenAdminController {
   @ApiParam({ name: 'keyword', type: String })
   @Put('update/:keyword')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateScreenDto, @Param('keyword') screenKeyword: string,  @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+  async update(@Body() dto: UpdateScreenDto, @Param('keyword') screenKeyword: string,  @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
     const result = await this.screenAdminService.update(dto, admin.userId, screenKeyword);
     if (result === 0) {
       throw new BadRequestException();

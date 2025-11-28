@@ -6,6 +6,6 @@ import { NotificationAppModule } from "src/modules/notification/notification.mod
 @Module({
   imports:[NotificationAppModule],
   providers: [UserAppService, UserAppRepository],
-  exports: [UserAppService],
+  exports: [UserAppService, UserAppRepository],
 })
 export class UserAppModule {}

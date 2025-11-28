@@ -1,11 +1,11 @@
 import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { IUserAuthAdmin } from './auth.interface';
 import { LoginAdminDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message.helper';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { AbAuthService } from '../auth.abstract';
+import { ITokenUserAdmin } from 'src/modules/auth/admin/auth.interface';
 
 @Injectable()
 export class AuthAdminService extends AbAuthService {
@@ -15,7 +15,7 @@ export class AuthAdminService extends AbAuthService {
   ) {
     super();
   }
-  async login(dto: LoginAdminDto): Promise<Omit<IUserAuthAdmin, 'userPassword'>> {
+  async login(dto: LoginAdminDto): Promise<Omit<ITokenUserAdmin, 'userPassword'> & { accessToken: string }> {
     const user = await this.userAdminService.findByUserId(dto.userId);
 
     if (!user) {

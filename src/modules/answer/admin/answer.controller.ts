@@ -5,7 +5,7 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { AnswerAdminService } from './answer.service';
 import { IAnswer } from '../answer.interface';
 import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
-import * as userInterface from 'src/modules/user/admin/user.interface';
+import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
@@ -39,7 +39,7 @@ export class AnswerAdminController {
   @ApiBody({ type: CreateAnswerDto })
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  async create(@Body() dto: CreateAnswerDto, @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+  async create(@Body() dto: CreateAnswerDto, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
     const result = await this.answerAdminService.create(dto, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
@@ -51,7 +51,7 @@ export class AnswerAdminController {
   @ApiParam({ name: 'answerCode', type: String })
   @Put('update/:answerCode')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateAnswerDto, @Param('answerCode') answerCode: string,  @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+  async update(@Body() dto: UpdateAnswerDto, @Param('answerCode') answerCode: string,  @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
     const result = await this.answerAdminService.update(dto, admin.userId, answerCode);
     if (result === 0) {
       throw new BadRequestException();

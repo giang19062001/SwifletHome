@@ -23,17 +23,7 @@ export class DoctorFileDto {
   doctorFiles: any[];
 }
 
-export class ResDoctorFileStrDto {
-  @ApiProperty({ example: '' })
-  filename: string;
-}
 
-class DoctorFileStrDto {
-  @ApiProperty({ example: '' })
-  @IsString()
-  @IsNotEmpty()
-  filename: string;
-}
 export class CreateDoctorDto {
   @ApiProperty({
     example: '',

@@ -2,9 +2,10 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppRepository } from './user.repository';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { IUserApp, IUserAppInfo } from './user.interface';
+import { IUserApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
 import { NotificationAppService } from 'src/modules/notification/notification.service';
+import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 
 @Injectable()
 export class UserAppService {
@@ -16,12 +17,12 @@ export class UserAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async findByPhone(userPhone: string): Promise<IUserApp | null> {
+  async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
     return await this.userAppRepository.findByPhone(userPhone);
   }
 
-  async getFullInfo(userCode: string): Promise<IUserAppInfo | null> {
-    return await this.userAppRepository.getFullInfo(userCode);
+  async geInfo(userCode: string): Promise<IUserApp | null> {
+    return await this.userAppRepository.geInfo(userCode);
   }
 
   async create(dto: RegisterUserAppDto): Promise<number> {

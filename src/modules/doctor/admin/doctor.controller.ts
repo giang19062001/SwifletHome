@@ -7,7 +7,7 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { DoctorAdminService } from './doctor.service';
 import { IDoctor } from '../doctor.interface';
 import { UpdateDoctorDto } from './doctor.dto';
-import * as userInterface from 'src/modules/user/admin/user.interface';
+import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
 @ApiBearerAuth('admin-auth')
@@ -42,7 +42,7 @@ export class DoctorAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Put('update/:seq')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateDoctorDto, @Param('seq') seq: number,  @GetUserAdmin() admin: userInterface.IUserAdmin): Promise<number> {
+  async update(@Body() dto: UpdateDoctorDto, @Param('seq') seq: number,  @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
     const result = await this.doctorAdminService.update(dto, admin.userId, seq);
     if (result === 0) {
       throw new BadRequestException();

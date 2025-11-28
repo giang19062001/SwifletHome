@@ -5,13 +5,15 @@ import type { Request, Response } from 'express';
 import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { AuthAppService } from './auth.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { RequestOtpDto, ResRequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
+import { RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAppGuard } from './auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { ResUserAppInfoDto, ResUserAuthAppDto } from 'src/modules/user/app/user.dto';
+import { GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
+import { RequestOtpResDto } from 'src/modules/otp/otp.response';
+import * as authInterface from './auth.interface';
 
 @ApiBearerAuth('app-auth')
 @ApiTags('app/auth')
@@ -25,7 +27,7 @@ export class AuthAppController {
   })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResUserAuthAppDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(LoginResDto) })
   async login(@Body() dto: LoginAppDto) {
     const user = await this.authAppService.login(dto);
     return user;
@@ -50,9 +52,9 @@ export class AuthAppController {
     summary: 'Cần xác thực',
   })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResUserAppInfoDto) })
-  async getInfo(@GetUserApp() user: userInterface.IUserAppInfo): Promise<userInterface.IUserAppInfo | null> {
-    const result = await this.authAppService.getFullInfo(user.userCode);
+  @ApiOkResponse({ type: ApiAppResponseDto(GetInfoUserAppResDto) })
+  async getInfo(@GetUserApp() user: userInterface.IUserApp): Promise<userInterface.IUserApp | null> {
+    const result = await this.authAppService.geInfo(user.userCode);
     return result;
   }
 
@@ -65,7 +67,7 @@ export class AuthAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async update(@GetUserApp() user: userInterface.IUserApp, @Body() dto: UpdateUserDto, @Param('userPhone') userPhone: string, @Req() req: Request) {
+  async update(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UpdateUserDto, @Param('userPhone') userPhone: string, @Req() req: Request) {
     const result = await this.authAppService.update(dto, userPhone, user.userCode);
     return {
       message: result ? Msg.UpdateOk : Msg.UpdateErr,
@@ -117,7 +119,7 @@ export class AuthAppController {
   })
   @Post('requestOtp')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ResRequestOtpDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(RequestOtpResDto) })
   async requestOtp(@Body() dto: RequestOtpDto) {
     const otpCode = await this.authAppService.requestOtp(dto);
     return {

@@ -6,10 +6,10 @@ import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDt
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IUserAuthApp } from './auth.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { AbAuthService } from '../auth.abstract';
-import { IUserApp, IUserAppInfo } from 'src/modules/user/app/user.interface';
+import { IUserApp } from 'src/modules/user/app/user.interface';
+import { ITokenUserApp } from './auth.interface';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -49,7 +49,7 @@ export class AuthAppService extends AbAuthService {
       }
     }
   }
-  async login(dto: LoginAppDto): Promise<IUserAuthApp> {
+  async login(dto: LoginAppDto): Promise<Omit<ITokenUserApp, 'userPassword'> & { accessToken: string }> {
     const logbase = `${this.SERVICE_NAME}/login`;
 
     const user = await this.userAppService.findByPhone(dto.userPhone);
@@ -77,23 +77,17 @@ export class AuthAppService extends AbAuthService {
     // Chỉnh sửa lại device mỗi lần đăng nhập
     await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
 
-    // lấy thông tin gói
-    const userPayload = (await this.userAppService.getFullInfo(user.userCode)) as IUserAppInfo;
-
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
 
     // generate token
     const payload = {
       ...userWithoutPassword,
-      packageCode: userPayload?.packageCode,
-      packageName: userPayload?.packageName,
-      packageRemainDays: userPayload.packageRemainDays,
       deviceToken: dto.deviceToken,
     };
     const accessToken = this.jwtService.sign(payload);
     return {
-      ...payload,
+      ...userWithoutPassword,
       accessToken,
     };
   }
@@ -202,8 +196,8 @@ export class AuthAppService extends AbAuthService {
     return 1;
   }
 
-  async getFullInfo(userCode: string): Promise<IUserAppInfo | null> {
-    return await this.userAppService.getFullInfo(userCode);
+  async geInfo(userCode: string): Promise<IUserApp | null> {
+    return await this.userAppService.geInfo(userCode);
   }
 
   async requestOtp(dto: RequestOtpDto): Promise<string> {

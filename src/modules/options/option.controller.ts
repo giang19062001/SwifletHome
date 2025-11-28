@@ -1,10 +1,11 @@
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { GetOptionDto, ResOptionDto } from './option.dto';
+import { GetOptionDto } from './option.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { IOpition } from './option.interface';
 import { OptionService } from './option.service';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { GetOptionResDto } from './option.response';
 
 @ApiTags('app/options')
 @Controller('/api/app/options')
@@ -27,7 +28,7 @@ export default class OptionController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([ResOptionDto]) })
+  @ApiOkResponse({ type: ApiAppResponseDto([GetOptionResDto]) })
   async getAll(@Body() dto: GetOptionDto): Promise<IOpition[]> {
     const result = await this.optionService.getAll(dto);
     return result;

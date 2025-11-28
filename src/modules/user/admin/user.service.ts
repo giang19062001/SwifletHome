@@ -1,9 +1,9 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAdminRepository } from './user.repository';
-import { IUserAdmin } from './user.interface';
+import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
 import { IList } from 'src/interfaces/admin.interface';
-import { IUserAppInfo } from '../app/user.interface';
+import { IUserApp } from '../app/user.interface';
 import { GetAllUserDto, UpdateUserPackageAdminDto } from './user.dto';
 import { IPackage } from 'src/modules/package/package.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
@@ -21,11 +21,11 @@ export class UserAdminService {
     private readonly logger: LoggingService,
   ) {}
 
-  async findByUserId(userId: string): Promise<IUserAdmin | null> {
+  async findByUserId(userId: string): Promise<ITokenUserAdmin | null> {
     return await this.userAdminRepository.findByUserId(userId);
   }
 
-  async getAllUser(dto: GetAllUserDto): Promise<IList<IUserAppInfo> | IList<IUserAdmin>> {
+  async getAllUser(dto: GetAllUserDto): Promise<IList<IUserApp> | IList<ITokenUserAdmin>> {
     if (dto.type == 'APP') {
       // app
       const total = await this.userAdminRepository.getTotalUserApp(dto);
@@ -37,7 +37,7 @@ export class UserAdminService {
     }
   }
 
-  async getDetailUser(userCode: string, type: string): Promise<IUserAppInfo | IUserAdmin | null> {
+  async getDetailUser(userCode: string, type: string): Promise<IUserApp | ITokenUserAdmin | null> {
     if (type == 'APP') {
       // app
       return await this.userAdminRepository.getDetailUserApp(userCode);

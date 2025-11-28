@@ -4,7 +4,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ProvinceService } from './province.service';
 import { IProvince } from './province.interface';
-import { ResProvinceDto } from './province.dto';
+import { GetProvinceResDto } from './province.response';
 
 @ApiTags('app/province')
 @Controller('/api/app/province')
@@ -18,7 +18,7 @@ export default class ProvinceController {
   })
   @Get('getAll')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([ResProvinceDto]) })
+  @ApiOkResponse({ type: ApiAppResponseDto([GetProvinceResDto]) })
   async getAll(): Promise<IProvince[]> {
     const result = await this.provinceService.getAll();
     return result;

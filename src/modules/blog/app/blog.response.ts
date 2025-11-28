@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-export class ResBlogDto {
+export class GetContentBlogResDto {
   @ApiProperty()
   blogCode: string;
 
