@@ -31,7 +31,7 @@ import { CreateHomeSightSeeingDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
 import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetHomeSaleResDto } from './homesale.response';
+import { GetHomeSaleDetailResDto, GetHomeSaleResDto } from './homesale.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 
 @ApiTags('app/homeSale')
@@ -56,7 +56,7 @@ export class HomeSaleAppController {
   @ApiParam({ name: 'homeCode', type: String })
   @Get('getDetail/:homeCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetHomeSaleResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetHomeSaleDetailResDto) })
   async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
     const result = await this.homeSaleAppService.getDetail(homeCode);
     return result;
