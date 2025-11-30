@@ -261,8 +261,7 @@ CREATE TABLE
     `createdId` varchar(45) DEFAULT 'SYSTEM',
     `updatedId` varchar(45) DEFAULT NULL,
     PRIMARY KEY (`seq`),
-    UNIQUE KEY `filename_UNIQUE` (`filename`),
-    CONSTRAINT `fk_home_img_home` FOREIGN KEY (`homeSeq`) REFERENCES `tbl_home_sale` (`seq`) ON DELETE CASCADE
+    UNIQUE KEY `filename_UNIQUE` (`filename`)
   ) ENGINE = InnoDB;
 
 
@@ -284,8 +283,7 @@ CREATE TABLE
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
     `updatedId` varchar(45) DEFAULT NULL,
-    PRIMARY KEY (`seq`),
-    CONSTRAINT `fk_home_sightseeing_home` FOREIGN KEY (`homeCode`) REFERENCES `tbl_home_sale` (`homeCode`) ON DELETE CASCADE
+    PRIMARY KEY (`seq`)
   ) ENGINE = InnoDB;
 
 

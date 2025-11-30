@@ -7,16 +7,16 @@ import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { diffByTwoArr } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { getFileLocation } from 'src/config/multer.config';
 
 @Injectable()
-export class HomeSaleAdminService   {
+export class HomeSaleAdminService {
   private readonly SERVICE_NAME = 'HomeSaleAdminService';
   constructor(
     private readonly homSaleAdminRepository: HomeSaleAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) {
-  }
+  ) {}
   async getAll(dto: PagingDto): Promise<IList<IHomeSale>> {
     const total = await this.homSaleAdminRepository.getTotal();
     const list = await this.homSaleAdminRepository.getAll(dto);
@@ -42,16 +42,18 @@ export class HomeSaleAdminService   {
     }
   }
   async create(dto: CreateHomeDto, createdId: string): Promise<number> {
-    const seq = await this.homSaleAdminRepository.create(dto, createdId);
+    const homeImagePath = dto.homeImage ? `${getFileLocation(dto.homeImage.mimetype, dto.homeImage.fieldname)}/${dto.homeImage.filename}` : '';
+    const seq = await this.homSaleAdminRepository.create(dto, homeImagePath, createdId);
     if (seq) {
       //homeImage
       if (dto.homeImage) {
-        await this.homSaleAdminRepository.createImages(seq, createdId, dto.homeImage);
+        await this.homSaleAdminRepository.createImages(seq, createdId, homeImagePath, dto.homeImage);
       }
       //homeImages
       if (dto.homeImages.length > 0) {
         for (const file of dto.homeImages) {
-          await this.homSaleAdminRepository.createImages(seq,createdId, file);
+          const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+          await this.homSaleAdminRepository.createImages(seq, createdId, filenamePath, file);
         }
       }
     }
@@ -62,44 +64,45 @@ export class HomeSaleAdminService   {
     const logbase = `${this.SERVICE_NAME}/update`;
 
     const home = await this.getDetail(homeCode);
+    let homeImagePath = (home?.homeImage as IHomeSaleImg).filename
     if (home) {
-      // homeImage is changed -> delete old file
+      // homeImage bị thay đổi -> xóa ảnh hiện tại của nó
       if (dto.homeImage.filename !== (home.homeImage as IHomeSaleImg).filename) {
-        // delete old physical file
-        const homeImagePath = `/images/homes/${(home.homeImage as IHomeSaleImg).filename}`;
-        await this.fileLocalService.deleteLocalFile(homeImagePath);
+        // xóa file local
+        await this.fileLocalService.deleteLocalFile((home.homeImage as IHomeSaleImg).filename);
 
-        // delete old db file
+        // xóa trong db
         await this.homSaleAdminRepository.deleteHomeImagesOne((home.homeImage as IHomeSaleImg).seq);
 
-        //insert new homeImage
-        await this.homSaleAdminRepository.createImages(home.seq, 'admin', dto.homeImage);
+        // instart file mới vào db
+         homeImagePath = `${getFileLocation(dto.homeImage.mimetype, dto.homeImage.fieldname)}/${dto.homeImage.filename}`;
+        await this.homSaleAdminRepository.createImages(home.seq, 'admin', homeImagePath, dto.homeImage);
       }
 
       const fileNeedDeletes: IHomeSaleImg[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
-      this.logger.log(logbase, `Danh sách file cần xóa --> ${JSON.stringify(fileNeedDeletes)}`);
+      this.logger.log(logbase, `Danh sách file cần xóa --> ${JSON.stringify(fileNeedDeletes.map((fi)=>fi.filename))}`);
 
       const fileNeedCreates: IHomeSaleImg[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
-      this.logger.log(logbase, `Danh sách file cần thêm mới --> ${JSON.stringify(fileNeedCreates)}`);
+      this.logger.log(logbase, `Danh sách file cần thêm mới --> ${JSON.stringify(fileNeedCreates.map((fi)=>fi.filename))}`);
 
-      // homeImages is changed -> delete old file
-      if (fileNeedDeletes.length) {
-        // delete db
+      // homeImages bị thay đổi -> xóa ~ ảnh hiện tại của nó
+      if (fileNeedDeletes.length) { 
+        // xóa ~ file local
         await this.homSaleAdminRepository.deleteHomeImagesMulti(fileNeedDeletes.map((ele) => ele.seq));
-        // delete physical
+        // xóa ~ trong db
         for (const file of fileNeedDeletes) {
-          const filepath = `/images/homes/${file.filename}`;
-          await this.fileLocalService.deleteLocalFile(filepath);
+          await this.fileLocalService.deleteLocalFile(file.filename);
         }
       }
       if (fileNeedCreates.length) {
-        // insert những ảnh mới
+        // instart ~ file mới vào db
         for (const file of fileNeedCreates) {
-          const insertImgResult = await this.homSaleAdminRepository.createImages(home.seq, 'admin', file);
+          const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
+          const insertImgResult = await this.homSaleAdminRepository.createImages(home.seq, 'admin', filenamePath, file);
           this.logger.log(logbase, `Insdert file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
         }
       }
-      const result = await this.homSaleAdminRepository.update(dto, updatedId, homeCode);
+      const result = await this.homSaleAdminRepository.update(dto, homeImagePath, updatedId, homeCode);
       return result;
     } else {
       return 0;
@@ -109,23 +112,7 @@ export class HomeSaleAdminService   {
     const home = await this.homSaleAdminRepository.getDetail(homeCode);
     if (home) {
       // const images = await this.homSaleAdminRepository.getImages(home?.seq ?? 0);
-
       const resultHome = await this.homSaleAdminRepository.delete(homeCode);
-
-      // xóa các file ảnh của nhà yến trong databse
-      // if (resultHome) {
-      //   await this.homSaleAdminRepository.deleteHomeImages(home?.seq ?? 0);
-      // }
-      // const homeImagePath = `/image/homes/${home.homeImage}`;
-      // await this.fileLocalService.deleteLocalFile(homeImagePath);
-      // if (images.length) {
-      // xóa các file ảnh của nhà yến trong thư mục uploads
-      //   for (const file of images) {
-      //     const filepath = `/images/homes/${file.filename}`;
-      //     await this.fileLocalService.deleteLocalFile(filepath);
-      //   }
-      // }
-
       return resultHome;
     } else {
       return 0;

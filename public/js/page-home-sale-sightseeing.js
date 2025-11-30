@@ -34,7 +34,7 @@ async function showHomeSightseeingModal(homeData) {
   const modalBody = modalEl.querySelector('.modal-body');
 
   modalEl.querySelector('#seq').value = homeData.seq;
-  modalBody.querySelector('.homeImage').src = CURRENT_URL + '/uploads/images/homes/' + homeData.homeImage;
+  modalBody.querySelector('.homeImage').src = CURRENT_URL + '/' + homeData.homeImage;
   modalEl.querySelector('.homeName').innerText = homeData.homeName;
   modalEl.querySelector('.userName').innerText = homeData.userName;
   modalEl.querySelector('.userPhone').innerText = homeData.userPhone;

@@ -55,7 +55,7 @@ async function showDoctorModal(doctorData) {
     const imageHTML = doctorData.doctorFiles
       .filter((file) => file.mimetype.startsWith('image/'))
       .map((file) => {
-        const fileUrl = `/uploads/images/doctors/${file.filename}`;
+        const fileUrl = `/${file.filename}`;
         return `
         <div class="file-item">
           <img src="${fileUrl}" alt="${file.filename}">
@@ -68,7 +68,7 @@ async function showDoctorModal(doctorData) {
     const videoHTML = doctorData.doctorFiles
       .filter((file) => file.mimetype.startsWith('video/'))
       .map((file) => {
-        const fileUrl = `/uploads/videos/doctors/${file.filename}`;
+        const fileUrl = `/${file.filename}`;
         return `
         <div class="file-item">
           <video controls>
@@ -84,25 +84,6 @@ async function showDoctorModal(doctorData) {
     videoContainer.innerHTML = videoHTML || '<p>Không có video.</p>';
   }
 
-  // render danh sách status
-  // const selectStatus = modalEl.querySelector('#status');
-  // selectStatus.innerHTML = '';
-
-  // OPTIONS.DOCTOR_STATUS.forEach((ele) => {
-  //   const option = document.createElement('option');
-  //   option.value = ele.value;
-  //   option.textContent = ele.text;
-  //   // nếu đã là duyệt và hủy -> disable 'chờ'
-  //   if (doctorData.statusKey !== 'WAITING' && ele.value == 'WAITING') {
-  //     option.disabled = true;
-  //   }
-  //   // nếu match  -> tự selected
-  //   if (ele.value === doctorData.status) {
-  //     option.selected = true;
-  //   }
-
-  //   selectStatus.appendChild(option);
-  // });
 
   // assign <event> update
   modalEl.querySelector('.modal-footer button').onclick = updateDoctor;
@@ -191,7 +172,6 @@ async function updateDoctor() {
   try {
     const modalBody = document.querySelector('.doctor-update-modal .modal-body form');
     const seq = modalBody.querySelector('#seq').value;
-    // const status = modalBody.querySelector('#status').value;
     const noteAnswered = modalBody.querySelector('#noteAnswered').value;
     if (String(noteAnswered).trim() == '') {
       modalBody.querySelector('.err-noteAnswered').style.display = 'block';

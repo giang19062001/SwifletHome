@@ -140,13 +140,13 @@ export class UserHomeAppRepository {
   }
   // TODO: IMG
 
-  async uploadHomeImage(seq: number, uniqueId: string, userCode: string, file: Express.Multer.File | IUserHomeImageFile): Promise<number> {
+  async uploadHomeImage(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | IUserHomeImageFile): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, uniqueId, userHomeSeq, userCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, uniqueId, seq, userCode, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, uniqueId, seq, userCode, userCode]);
 
     return result.insertId;
   }

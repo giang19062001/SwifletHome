@@ -111,7 +111,7 @@ export class UserHomeAppService {
       // nếu user xài gói miễn phí và đã có 1 nhà yến rồi -> ko thể thêm nữa trừ khi nâng cập
       if (homesTotal == 1 && userPackage?.packageCode == null) {
         result = -2;
-        return result
+        return result;
       }
       // tìm file đã upload cùng uniqueId
       const filesUploaded = await this.userHomeAppRepository.findFilesByUniqueId(dto.uniqueId);
@@ -131,7 +131,7 @@ export class UserHomeAppService {
       } else {
         // không có file ảnh nào được upload của nhà yến này -> báo lỗi
         result = -1;
-        return result
+        return result;
       }
 
       return result;
@@ -140,15 +140,15 @@ export class UserHomeAppService {
       return 0;
     }
   }
-  async uploadHomeImage(userCode: string, dto: UploadUserHomeImageDto, userHomeImage: Express.Multer.File): Promise<IUserHomeImageStr> {
+  async uploadHomeImage(userCode: string, dto: UploadUserHomeImageDto, userHomeImageFile: Express.Multer.File): Promise<IUserHomeImageStr> {
     const logbase = `${this.SERVICE_NAME}/uploadHomeImage:`;
     try {
       let res: IUserHomeImageStr = { filename: '' };
-      if (userHomeImage) {
-        const result = await this.userHomeAppRepository.uploadHomeImage(0, dto.uniqueId, userCode, userHomeImage);
+      if (userHomeImageFile) {
+        const filenamePath = `${getFileLocation(userHomeImageFile.mimetype, userHomeImageFile.fieldname)}/${userHomeImageFile.filename}`;
+        const result = await this.userHomeAppRepository.uploadHomeImage(0, dto.uniqueId, userCode, filenamePath, userHomeImageFile);
         if (result > 0) {
-          const location = getFileLocation(userHomeImage.mimetype, userHomeImage.fieldname);
-          res.filename = `${location}/${userHomeImage.filename}`;
+          res.filename = `${location}/${userHomeImageFile.filename}`;
         }
       }
       return res;

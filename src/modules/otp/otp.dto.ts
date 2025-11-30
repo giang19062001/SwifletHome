@@ -13,7 +13,6 @@ export class RequestOtpDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+$/, { message: Msg.PhoneMustNumber })
   userPhone: string;
 
   @ApiProperty({
@@ -31,7 +30,6 @@ export class VerifyOtpDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+$/, { message: Msg.PhoneMustNumber })
   userPhone: string;
 
   @ApiProperty({
@@ -39,7 +37,6 @@ export class VerifyOtpDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+$/, { message: Msg.OtpMustNumber })
   otpCode: string;
 
   @ApiProperty({

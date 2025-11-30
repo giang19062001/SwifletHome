@@ -123,11 +123,11 @@ function copyData(filename, mimetype) {
   let copiedName = '';
   if (mimetype.startsWith('audio/')) {
     if (filename.includes('editorAudio')) {
-      copiedName = `[[audio-data=${CURRENT_URL}/uploads/audios/editors/${filename}]]`;
+      copiedName = `[[audio-data=${CURRENT_URL}/${filename}]]`;
     }
   } else if (mimetype.startsWith('image/')) {
     if (filename.includes('editorImg')) {
-      copiedName = `[[image-data=${CURRENT_URL}/uploads/images/editors/${filename}]]`;
+      copiedName = `[[image-data=${CURRENT_URL}/${filename}]]`;
     }
   } else if (mimetype.startsWith('video/')) {
     copiedName = `[[video-data=${convertToEmbedUrl(filename)}]]`;

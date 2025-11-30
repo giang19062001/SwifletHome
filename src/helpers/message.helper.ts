@@ -1,5 +1,4 @@
 export const Msg = {
-  OtpMustNumber: 'OTP phải là số',
   CreateOk: 'Thêm thông tin thành công',
   CreateErr: 'Thêm thông tin thất bại',
   UpdateOk: 'Cập nhập thông tin thành công',
@@ -8,7 +7,6 @@ export const Msg = {
   TokenMissing: 'Vui lòng xác thực token',
   TokenInvalid: 'Token không hợp lệ',
   PhoneExist: 'Số điện thoại đã tồn tại',
-  PhoneMustNumber: 'Số điện thoại phải là số',
   PhoneOk: 'Số điện thoại hợp lệ có thể thêm mới',
   PhoneExistForNew: 'Số điện thoại đã tồn tại cho việc đăng ký mới',
   PhoneNotExist: 'Số điện thoại không tồn tại',

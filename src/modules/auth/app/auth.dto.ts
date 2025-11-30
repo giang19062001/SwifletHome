@@ -36,7 +36,6 @@ export class LoginAppDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+$/, { message: Msg.PhoneMustNumber})
   userPhone: string;
 
   @ApiProperty({
@@ -67,7 +66,6 @@ export class RegisterUserAppDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+$/, { message: Msg.PhoneMustNumber})
   userPhone: string;
 
   @ApiProperty({

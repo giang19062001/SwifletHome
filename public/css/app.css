@@ -18999,6 +18999,15 @@ select {
   justify-content: space-between;
   gap: 10px;
 }
+#page-blog-mutation .preview audio {
+  padding: 3px !important;
+  border-radius: 15px;
+  border: 1px solid rgb(216, 216, 216);
+  width: 20em !important;
+  outline: none;
+  background: #f0f0f0;
+  transition: all 0.3s ease;
+}
 #page-blog-mutation .preview .if-video {
   width: 30em !important;
   min-height: 230px;

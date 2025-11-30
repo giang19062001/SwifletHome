@@ -1,4 +1,3 @@
-import { UploadService } from '../../upload/upload.service';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';

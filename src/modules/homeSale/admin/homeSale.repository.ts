@@ -41,7 +41,7 @@ export class HomeSaleAdminRepository {
     );
     return rows ? (rows[0] as IHomeSale) : null;
   }
-  async create(dto: CreateHomeDto, createdId: string): Promise<number> {
+  async create(dto: CreateHomeDto, homeImagePath: string, createdId: string): Promise<number> {
     const sqlLast = ` SELECT homeCode FROM ${this.table} ORDER BY homeCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let homeCode = 'HOM000001';
@@ -52,11 +52,11 @@ export class HomeSaleAdminRepository {
       INSERT INTO ${this.table}  (homeCode, homeName, homeAddress, homeDescription, latitude, longitude, homeImage, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [homeCode, dto.homeName, dto.homeAddress, dto.homeDescription, dto.latitude, dto.longitude, dto.homeImage.filename, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [homeCode, dto.homeName, dto.homeAddress, dto.homeDescription, dto.latitude, dto.longitude, homeImagePath, createdId]);
 
     return result.insertId;
   }
-  async update(dto: UpdateHomeDto, updatedId: string, homeCode: string): Promise<number> {
+  async update(dto: UpdateHomeDto, homeImagePath: string, updatedId: string, homeCode: string): Promise<number> {
     const sql = `
         UPDATE ${this.table} SET homeName = ?, homeAddress = ?, homeDescription = ?, latitude = ?, longitude = ?, homeImage = ?,
         updatedId = ?, updatedAt = ?
@@ -68,7 +68,7 @@ export class HomeSaleAdminRepository {
       dto.homeDescription,
       dto.latitude,
       dto.longitude,
-      dto.homeImage.filename,
+      homeImagePath,
       updatedId,
       new Date(),
       homeCode,
@@ -96,13 +96,13 @@ export class HomeSaleAdminRepository {
     );
     return rows as IHomeSaleImg[];
   }
-  async createImages(seq: number, createdId: string, file: Express.Multer.File | IHomeSaleImg): Promise<number> {
+  async createImages(seq: number, createdId: string, filenamePath: string, file: Express.Multer.File | IHomeSaleImg): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, homeSeq, createdId)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, seq, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, seq, createdId]);
 
     return result.insertId;
   }

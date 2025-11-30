@@ -9,6 +9,7 @@ import { sortByDate } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { getFileLocation } from 'src/config/multer.config';
 
 @Injectable()
 export class UploadService {
@@ -17,11 +18,12 @@ export class UploadService {
   constructor(
     private readonly uploadRepository: UploadRepository,
     private readonly logger: LoggingService,
-    private readonly fileLocalService : FileLocalService
+    private readonly fileLocalService: FileLocalService,
   ) {}
   async uploadImg(file: Express.Multer.File, createdId: string): Promise<number> {
     try {
-      const result = await this.uploadRepository.uploadImg(file, createdId);
+      const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
+      const result = await this.uploadRepository.uploadImg(file, filenamePath, createdId);
       return result;
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -32,7 +34,8 @@ export class UploadService {
   }
   async uploadAudioPay(file: Express.Multer.File, createdId: string): Promise<number> {
     try {
-      const result = await this.uploadRepository.uploadAudioPay(file, createdId);
+      const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
+      const result = await this.uploadRepository.uploadAudioPay(file, filenamePath, createdId)
       return result;
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -44,7 +47,8 @@ export class UploadService {
 
   async uploadAudioFree(file: Express.Multer.File, createdId: string, seqPay: number): Promise<number> {
     try {
-      const result = await this.uploadRepository.uploadAudioFree(file, createdId, seqPay);
+      const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
+      const result = await this.uploadRepository.uploadAudioFree(file, filenamePath, createdId, seqPay);
       return result;
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -54,13 +58,13 @@ export class UploadService {
     }
   }
 
-  async uploadVideoLink(dto: UploadVideoLinkDto, createdId:string): Promise<number> {
+  async uploadVideoLink(dto: UploadVideoLinkDto, createdId: string): Promise<number> {
     const result = await this.uploadRepository.uploadVideoLink(dto, createdId);
     return result;
   }
   async getAllAudioFile(): Promise<IFileUpload[]> {
     const audios = await this.uploadRepository.getAllAudioFile();
-    return audios
+    return audios;
   }
   async getAllFile(): Promise<IFileUpload[]> {
     const files = await this.uploadRepository.getAllImgFile();

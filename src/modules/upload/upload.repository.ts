@@ -59,34 +59,34 @@ export class UploadRepository {
     );
     return rows ? (rows[0] as IAudioFreePay) : null;
   }
-  async uploadImg(file: Express.Multer.File, createdId: string): Promise<number> {
+  async uploadImg(file: Express.Multer.File, filenamePath: string, createdId: string): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, createdId)
       VALUES (?, ?, ?, ?, ?)
     `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, createdId]);
 
     return result.insertId;
   }
-  async uploadAudioFree(file: Express.Multer.File, createdId: string, seqPay: number): Promise<number> {
+  async uploadAudioFree(file: Express.Multer.File, filenamePath: string, createdId: string, seqPay: number): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableAudio} (filename, originalname, size, mimetype, isFree, seqPay, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, 'Y', seqPay, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, 'Y', seqPay, createdId]);
 
     return result.insertId;
   }
 
-  async uploadAudioPay(file: Express.Multer.File, createdId: string): Promise<number> {
+  async uploadAudioPay(file: Express.Multer.File, filenamePath: string, createdId: string): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableAudio} (filename, originalname, size, mimetype, isFree, createdId)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, 'N', createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, 'N', createdId]);
 
     return result.insertId;
   }

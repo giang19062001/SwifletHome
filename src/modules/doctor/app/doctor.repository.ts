@@ -11,13 +11,13 @@ export class DoctorAppRepository {
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async uploadFile(seq: number, uniqueId: string, userCode: string, file: Express.Multer.File | IDoctorFile): Promise<number> {
+  async uploadFile(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | IDoctorFile): Promise<number> {
     const sql = `
       INSERT INTO tbl_doctor_file (filename, originalname, size, mimetype, uniqueId, doctorSeq, userCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [file.filename, file.originalname, file.size, file.mimetype, uniqueId, seq, userCode, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, uniqueId, seq, userCode, userCode]);
 
     return result.insertId;
   }

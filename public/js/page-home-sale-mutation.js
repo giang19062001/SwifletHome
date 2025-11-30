@@ -166,7 +166,7 @@ async function assignForm(homeData) {
   // gán giá trị homeImage với dữ liệu từ API
   if (pageType === 'update' && homeData.homeImage) {
     // lấy đường dẫn từ filename -> trả ra file
-    const file = await ChangeUrlToFile(homeData.homeImage.filename, 'images/homes');
+    const file = await ChangeUrlToFile(homeData.homeImage.filename);
     if (file) {
       // cập nhập FileList cho homeImage
       const dataTransfer = new DataTransfer();
@@ -184,7 +184,7 @@ async function assignForm(homeData) {
   // gán giá trị homeImageS với dữ liệu từ API
   if (pageType === 'update' && homeData.homeImages && Array.isArray(homeData.homeImages)) {
     // lấy đường dẫn từ filename -> trả ra file list
-    const files = await Promise.all(homeData.homeImages.map((img) => ChangeUrlToFile(img.filename, 'images/homes')));
+    const files = await Promise.all(homeData.homeImages.map((img) => ChangeUrlToFile(img.filename)));
     homeImagesFiles = files.filter((file) => file !== null);
     if (homeImagesFiles.length > 0) {
       // cập nhập FileList cho homeImages
