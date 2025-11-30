@@ -25,6 +25,8 @@ export interface IHomeSaleImg {
   size: number;
   mimetype: string;
   isActive: YnEnum;
+  width? : number;
+  height?: number
 }
 
 

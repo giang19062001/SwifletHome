@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { LoggingService } from '../logger/logger.service';
 import { existsSync, promises as fs, mkdirSync } from 'fs';
 import * as path from 'path';
+import sharp from 'sharp';
 @Injectable()
 export class FileLocalService {
   private readonly PUBLIC_PATH = 'public';
@@ -54,6 +55,23 @@ export class FileLocalService {
       this.logger.log(logbase, `Đã xóa thành công tệp ${filepath} khỏi thư mục`);
     } catch (error) {
       this.logger.error(logbase, `Không xóa được tệp ${filepath} khỏi thư mục -> ${error}`);
+    }
+  }
+  async getImageDimensions(filepath: string): Promise<{ width: number; height: number } | null> {
+    const thePath = path.join(process.cwd(), this.PUBLIC_PATH, filepath)
+    if (!existsSync(thePath)) {
+      return null;
+    }
+
+    try {
+      const metadata = await sharp(thePath).metadata();
+      return {
+        width: metadata.width!,
+        height: metadata.height!,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return null;
     }
   }
 }
