@@ -19,15 +19,15 @@ const OPTIONS = {
   DOCTOR_STATUS: [
     {
       value: 'WAITING',
-      text: 'Đang chờ',
+      text: 'Đang chờ phản hồi',
     },
     {
       value: 'ANSWERED',
-      text: 'Đã phản hồi',
+      text: 'Đã xác nhận phản hồi',
     },
-    {
-      value: 'CANCEL',
-      text: 'Hủy',
-    },
+    // {
+    //   value: 'CANCEL',
+    //   text: 'Hủy',
+    // },
   ],
 };

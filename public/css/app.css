@@ -18267,6 +18267,10 @@ p {
 }
 
 label, p, span, a, li, td {
+  font-size: large;
+}
+
+label, p, span, a, li, td, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
   font-family: "Pretendard" !important;
 }
 
@@ -19065,10 +19069,12 @@ select {
 .doctor-update-modal .file-item img {
   width: 200px;
   min-height: 150px;
+  border-radius: 5px;
 }
 .doctor-update-modal .file-item video {
   width: 250px;
-  height: 200px;
+  height: 150px;
+  border-radius: 5px;
 }
 
 .page-main .content-area {
