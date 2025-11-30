@@ -101,7 +101,7 @@ function renderContentHtml() {
 
   // Replace [[audio-data=...]]
   contentHtml = contentHtml.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
-    const filename = url.split(CURRENT_URL)[1].replace(/^\//, '');
+    const filename = String(url.split(CURRENT_URL)[1]).replace(/^\//, '');
 
     const fileInfo = fileList?.find((ele) => ele.filename === filename);
     const audioPay = fileInfo?.filenamePay || filename;

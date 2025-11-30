@@ -90,22 +90,17 @@ function renderContentHtml() {
     return `<img src="${url}" alt="image" style="max-width:100%; border-radius:8px; margin:8px 0;">`;
   });
 
-   // Replace [[audio-data=...]]
+  // Replace [[audio-data=...]]
   contentHtml = contentHtml.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
-    const lastSlashIndex = url.lastIndexOf('/');
-    const fileUrl = url.substring(0, lastSlashIndex);
-    const filename = url.substring(lastSlashIndex + 1);
+    const filename = String(url.split(CURRENT_URL)[1]).replace(/^\//, '');
 
     const fileInfo = fileList?.find((ele) => ele.filename === filename);
     const audioPay = fileInfo?.filenamePay || filename;
 
-    const audioSrc = isUpgradePreview === 'FREE' ? `${url}` : `${fileUrl}/${audioPay}`;
-
-    return `
-    <audio controls style="width:100%; margin:8px 0;">
-      <source src="${audioSrc}" type="audio/mpeg">
-    </audio>
-  `;
+    const audioSrc = isUpgradePreview === 'FREE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
+    return `  <audio controls style="width:100%; margin:8px 0;">
+              <source src="${audioSrc}" type="audio/mpeg">
+            </audio>`;
   });
 
   // Replace [[video-data=...]]
