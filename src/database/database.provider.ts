@@ -15,6 +15,7 @@ export const databaseProviders = {
       connectionLimit: 10,
       queueLimit: 0,
       timezone: '+07:00', // VN
+      charset: 'utf8mb4',
     });
     return pool;
   },
