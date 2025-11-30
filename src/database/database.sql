@@ -242,7 +242,7 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `homeCode_UNIQUE` (`homeCode`),
     UNIQUE KEY `homeImage_UNIQUE` (`homeImage`)
-  ) ENGINE = InnoDB;
+  );
 
 
 
@@ -262,7 +262,7 @@ CREATE TABLE
     `updatedId` varchar(45) DEFAULT NULL,
     PRIMARY KEY (`seq`),
     UNIQUE KEY `filename_UNIQUE` (`filename`)
-  ) ENGINE = InnoDB;
+  );
 
 
 
@@ -284,7 +284,7 @@ CREATE TABLE
     `createdId` varchar(45) DEFAULT 'SYSTEM',
     `updatedId` varchar(45) DEFAULT NULL,
     PRIMARY KEY (`seq`)
-  ) ENGINE = InnoDB;
+  );
 
 
 
