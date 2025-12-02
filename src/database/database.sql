@@ -147,25 +147,27 @@ CREATE TABLE
   );
 
 
-CREATE TABLE `tbl_blog` (
-  `seq` int NOT NULL AUTO_INCREMENT,
-  `blogCode` varchar(45) NOT NULL,
-  `blogName` varchar(45) NOT NULL,
-  `blogObject` char(10) NOT NULL,
-  `blogCategory` varchar(45) NOT NULL,
-  `blogContent` text NOT NULL,
-  `blogScreenCode` char(15) DEFAULT '',  -- màn hình code trên app
-  `isActive` char(1) DEFAULT 'Y',
-  `isFree` char(1) DEFAULT 'Y',
-  `isMain` varchar(45) DEFAULT 'N',
-  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` datetime DEFAULT NULL,
-  `createdId` varchar(45) DEFAULT 'SYSTEM',
-  `updatedId` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`seq`),
-  UNIQUE KEY `blogCode_UNIQUE` (`blogCode`)
-)
 
+
+CREATE TABLE
+  `tbl_blog` (
+    `seq` int NOT NULL AUTO_INCREMENT,
+    `blogCode` varchar(45) NOT NULL,
+    `blogName` varchar(45) NOT NULL,
+    `blogObject` char(10) NOT NULL,
+    `blogCategory` varchar(45) NOT NULL,
+    `blogContent` text NOT NULL,
+    `blogScreenCode` char(15) DEFAULT '', -- màn hình code trên app
+    `isActive` char(1) DEFAULT 'Y',
+    `isFree` char(1) DEFAULT 'Y',
+    `isMain` varchar(45) DEFAULT 'N',
+    `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt` datetime DEFAULT NULL,
+    `createdId` varchar(45) DEFAULT 'SYSTEM',
+    `updatedId` varchar(45) DEFAULT NULL,
+    PRIMARY KEY (`seq`),
+    UNIQUE KEY `blogCode_UNIQUE` (`blogCode`)
+  )
 CREATE TABLE
   `tbl_uploads_image` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -333,6 +335,9 @@ CREATE TABLE
     UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
   );
 
+
+
+
 CREATE TABLE
   `tbl_user_home_sensor` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -349,6 +354,7 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
   );
+
 
 
 
@@ -606,6 +612,38 @@ CREATE TABLE
   ) ENGINE = InnoDB;
 
 
+-- to do list
+
+CREATE TABLE
+  tbl_todo_tasks (
+    seq INT AUTO_INCREMENT PRIMARY KEY,
+    taskCode VARCHAR(45)  UNIQUE NOT NULL,
+    taskName VARCHAR(255) NOT NULL,
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT NULL,
+    createdId VARCHAR(45) DEFAULT 'SYSTEM',
+    updatedId VARCHAR(45) DEFAULT NULL
+  ) 
+
+CREATE TABLE
+  tbl_todo_home_task (
+    seq INT AUTO_INCREMENT PRIMARY KEY,
+    taskCode VARCHAR(45) DEFAULT NULL, -- task chọn từ list
+    userCode VARCHAR(45) NOT NULL,
+    userHomeCode VARCHAR(45) NOT NULL,
+    isCustomTask CHAR(1) NOT NULL DEFAULT 'Y', -- N chọn task hoặc Y nhập task
+    taskCustomName VARCHAR(255) DEFAULT NULL,  -- task nhập từ input
+    taskType ENUM ('WEEK', 'MONTH', 'SPECIFIC') DEFAULT 'SPECIFIC', -- chu kỳ tuần, tháng hay chỉ 1 ngày cụ thể trong tương lai
+    taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL') DEFAULT 'WAITING',
+    periodValue INT  DEFAULT NULL, --  week ( 0 - 6 : CN - T7); month (1-31)
+    specificValue DATETIME  DEFAULT NULL, -- date cụ thể nếu taskType  là 'SPECIFIC'
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT NULL,
+    createdId VARCHAR(45) DEFAULT 'SYSTEM',
+    updatedId VARCHAR(45) DEFAULT NULL
+  ) 
 
 
 -- INSERT
@@ -627,7 +665,5 @@ VALUES
     '2025-10-20 10:39:20',
     NULL
   ),
-
---   SELECT TABLE_NAME, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'swiftlet';
---  ALTER TABLE tbl_user_home_sensor CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-
+  --   SELECT TABLE_NAME, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'swiftlet';
+  --  ALTER TABLE tbl_user_home_sensor CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;

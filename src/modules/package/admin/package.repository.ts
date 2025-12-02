@@ -11,12 +11,13 @@ export class PackageAdminRepository   {
   }
 
   async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y' `);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IPackage[]> {
     let query = `  SELECT seq, packageCode, packageName, packagePrice, packageExpireDay, packageDescription, isActive, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table} `;
+        FROM ${this.table}
+         WHERE isActive = 'Y' `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -31,7 +32,7 @@ export class PackageAdminRepository   {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, packageCode, packageName, packagePrice, packageExpireDay, packageDescription, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} 
-        WHERE packageCode = ?`,
+        WHERE packageCode = ? AND isActive = 'Y'`,
       [packageCode],
     );
     return rows ? (rows[0] as IPackage) : null;

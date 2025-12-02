@@ -1,21 +1,22 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ICategory } from '../category.interface';
+import { ITodoTask } from '../todo.interface';
 
 @Injectable()
-export class CategoryAdminRepository {
-  private readonly table = 'tbl_category';
+export class TodoAdminRepository {
+  private readonly tableTask = 'tbl_todo_tasks';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y'`);
+  async getTotalTasks(): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableTask} WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<ICategory[]> {
-    let query = `  SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table} WHERE isActive = 'Y' `;
+  async getAllTasks(dto: PagingDto): Promise<ITodoTask[]> {
+    let query = `  SELECT seq, taskCode, taskName, createdId, createdAt
+        FROM ${this.tableTask} 
+        WHERE isActive = 'Y'`;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -24,6 +25,6 @@ export class CategoryAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as ICategory[];
+    return rows as ITodoTask[];
   }
 }

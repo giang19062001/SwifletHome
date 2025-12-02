@@ -269,6 +269,20 @@ export class AppController {
       user: req.session.user,
     };
   }
+
+
+  // to do list
+  @Get('/dashboard/todo/tasks')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/todo-tasks')
+  renderTodoTasks(@Req() req: Request) {
+    return {
+      title: 'Danh sách công việc',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+  // 404
   @Get('/404')
   @Render('pages/404')
   render404(@Req() req: Request) {

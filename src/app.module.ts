@@ -30,6 +30,8 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { SocketModule } from './common/socket/socket.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { BlogAppModule } from './modules/blog/app/blog.module';
+import { TodoAppModule } from './modules/todo/app/todo.module';
+import { TodoAdminModule } from './modules/todo/admin/todo.module';
 
 @Module({
   imports: [
@@ -53,6 +55,7 @@ import { BlogAppModule } from './modules/blog/app/blog.module';
     ScreenAppModule,
     UserHomeAppModule,
     BlogAppModule,
+    TodoAppModule,
 
     //admin
     AuthAdminModule,
@@ -68,7 +71,8 @@ import { BlogAppModule } from './modules/blog/app/blog.module';
     ScreenAdminModule,
     InfoAdminModule,
     PackageAdminModule,
-    UserHomeAdminModule
+    UserHomeAdminModule,
+    TodoAdminModule
   ],
   controllers: [AppController],
   providers: [AppService],
