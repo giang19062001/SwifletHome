@@ -15,7 +15,7 @@ export class UserHomeAdminService {
     private readonly logger: LoggingService,
   ) {}
   async getAll(dto: GetHomesAdminDto): Promise<IList<IUserHome>> {
-    const total = await this.userHomeAdminRepository.getTotal(dto.userCode);
+    const total = await this.userHomeAdminRepository.getTotal(dto);
     const list = await this.userHomeAdminRepository.getAll(dto);
     return { total, list };
   }

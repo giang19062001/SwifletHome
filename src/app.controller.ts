@@ -166,11 +166,14 @@ export class AppController {
   @Get('/dashboard/user/homes')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/user-homes')
-  renderUserHomes(@Req() req: Request) {
+  async renderUserHomes(@Req() req: Request) {
+    const values = await this.appService.renderUserHomes();
+
     return {
       title: 'Danh sách nhà yến khách hàng',
       isLayout: true,
       user: req.session.user,
+      values: values,
     };
   }
   //blog

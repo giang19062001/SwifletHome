@@ -6,6 +6,7 @@ import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
 import { ObjectAdminService } from './modules/object/admin/object.service';
 import { ScreenAdminService } from './modules/screen/admin/screen.service';
+import { ProvinceService } from './modules/province/province.service';
 
 @Injectable()
 export class AppService {
@@ -15,6 +16,7 @@ export class AppService {
     private readonly homeAdminService: HomeSaleAdminService,
     private readonly blogAdminService: BlogAdminService,
     private readonly objectAdminService: ObjectAdminService,
+    private readonly provinceService: ProvinceService,
     private readonly screenAdminService: ScreenAdminService,
   ) {}
 
@@ -105,6 +107,13 @@ export class AppService {
     const screenData = await this.screenAdminService.getDetail(screenKeyword);
     return {
       screenData: screenData,
+    };
+  }
+  // user home
+  async renderUserHomes(): Promise<any> {
+    const provinces = await this.provinceService.getAll();
+    return {
+      provinces: provinces,
     };
   }
 }

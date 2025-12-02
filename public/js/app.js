@@ -1,7 +1,22 @@
 let pathParts = CURRENT_PATH.split('/').filter(Boolean);
 let partType = pathParts[1] || '';
+document.addEventListener('DOMContentLoaded', () => {
+    initMenu();
 
-document.addEventListener('DOMContentLoaded', initMenu);
+    // xử lí filter chung
+    const collapseEl = document.getElementById('filterCollapse');
+    const iconEl = document.getElementById('filterIcon');
+
+    if (collapseEl && iconEl) {
+        collapseEl.addEventListener('show.bs.collapse', () => {
+            iconEl.innerHTML  = `<i class="fa fa-chevron-up"></i>`  // when opened
+        });
+
+        collapseEl.addEventListener('hide.bs.collapse', () => {
+            iconEl.innerHTML  = `<i class="fa fa-chevron-down"></i>`;   // when closed
+        });
+    }
+});
 
 function initMenu() {
   const menu = document.getElementById('side-menu');

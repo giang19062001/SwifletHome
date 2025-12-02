@@ -1,6 +1,11 @@
 let page = 1;
 let limit = 10;
 let pageElement = 'page-user-homes';
+let filterValueDefault = {
+  userName: '',
+  userPhone: '',
+  provinceCode: '',
+};
 const TriggerHomeConstraints = {
   macId: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập Mac Id của  bộ thiết bị cảm biến.' },
@@ -12,14 +17,44 @@ const TriggerHomeConstraints = {
     presence: { allowEmpty: false, message: '^Vui lòng nhập mật khẩu wifi.' },
   },
 };
+
+// TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
-  getAllUserHomes(page, limit);
+  getAllUserHomes(page, limit, filterValueDefault);
+});
+
+// FILTER
+document.getElementById('btnFilterReset').addEventListener('click', () => {
+  document.getElementById('userName').value = '';
+  document.getElementById('userPhone').value = '';
+  document.getElementById('provinceCode').value = '';
+
+  //refresh
+  page = 1;
+  getAllUserHomes(page, limit, filterValueDefault);
+});
+
+document.getElementById('btnFilterApply').addEventListener('click', () => {
+  const filterValue = getFilterValue();
+
+  //refresh
+  page = 1;
+  getAllUserHomes(page, limit, filterValue);
 });
 // TODO: FUNC
+function getFilterValue() {
+  const userName = document.getElementById('userName').value;
+  const userPhone = document.getElementById('userPhone').value;
+  const provinceCode = document.getElementById('provinceCode').value;
+
+  return { userName, userPhone, provinceCode };
+}
 function changePage(p) {
   page = p;
   document.getElementById('privacy-main-pager').innerHTML = '';
-  getAllUserHomes(page, limit);
+  //refresh
+  const filterValue = getFilterValue();
+  getAllUserHomes(page, limit, filterValue);
 }
 
 function closeModal(type) {
@@ -93,31 +128,30 @@ const renderAllUserHomes = (data, objElement) => {
     data?.list.forEach((ele) => {
       const rowHtml = `
         <tr class="text-center">
-            <td><p>${page * i++}</p></td>
-            <td><img src="${CURRENT_URL}/${ele.userHomeImage}" alt="${ele.userHomeName}"></td>
-                <td><p>${ele.userName} (${ele.userPhone})</p></td>
-            <td>
+        <td class="py-3"><p>${page * i++}</p></td>
+        <td class="py-3"><img src="${CURRENT_URL}/${ele.userHomeImage}" alt="${ele.userHomeName}"></td>
+        <td class="py-3"><p>${ele.userName} (${ele.userPhone})</p></td>
+        <td class="py-3">
             <p>${ele.userHomeName} ${ele.isMain === 'Y' ? `<b>(Chính)</b>` : ''}</p>
-            <p> ${ele.userHomeAddress}, ${ele.userHomeProvince}</p>
-            </td>
-            <td><p>${ele.isIntegateTempHum == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
-            <td><p>${ele.isIntegateCurrent == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
-            <td><p>${ele.isTriggered == 'Y' ? `<span class="txt-ok">Đã kích hoạt</span>` : `<span class="txt-not-ok">Chưa kích hoạt</span>`}</p></td>
-            <td style="max-width: 125px;"><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
-            <td style="max-width: 125px;"><p>${ele.updatedAt ? formatDateTime(ele.updatedAt) : ''}</p></td>
-            <td>
-                ${
-                  ele.isIntegateTempHum == 'Y' || ele.isIntegateCurrent == 'Y'
-                    ? ele.isTriggered == 'N'
-                      ? ` <button class="btn-edit" onclick="openModal('${ele.userCode}', '${ele.userHomeCode}', 'trigger')">Kích hoạt</button> `
-                      : `  
-                    <button class="btn-info" onclick="getDetailHome('${ele.userCode}', '${ele.userHomeCode}', 'detail')">Chi tiết</button> 
-                    <button class="btn-error"  onclick="getDetailHome('${ele.userCode}', '${ele.userHomeCode}', 'reset')">Reset</button> 
-                  `
-                    : ''
-                }
-            </td> 
-         </tr>`;
+            <p>${ele.userHomeAddress}, ${ele.userHomeProvince}</p>
+        </td>
+        <td class="py-3"><p>${ele.isIntegateTempHum == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
+        <td class="py-3"><p>${ele.isIntegateCurrent == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
+        <td class="py-3"><p>${ele.isTriggered == 'Y' ? `<span class="txt-ok">Đã kích hoạt</span>` : `<span class="txt-not-ok">Chưa kích hoạt</span>`}</p></td>
+        <td class="py-3" style="max-width: 125px;"><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
+        <td class="py-3" style="max-width: 125px;"><p>${ele.updatedAt ? formatDateTime(ele.updatedAt) : ''}</p></td>
+        <td class="py-3">
+            ${
+              ele.isIntegateTempHum == 'Y' || ele.isIntegateCurrent == 'Y'
+                ? ele.isTriggered == 'N'
+                  ? `<button class="btn-edit" onclick="openModal('${ele.userCode}', '${ele.userHomeCode}', 'trigger')">Kích hoạt</button>`
+                  : `<button class="btn-info" onclick="getDetailHome('${ele.userCode}', '${ele.userHomeCode}', 'detail')">Chi tiết</button>
+                    <button class="btn-edit" onclick="getDetailHome('${ele.userCode}', '${ele.userHomeCode}', 'reset')">Thiết lập lại</button>`
+                : ''
+            }
+        </td>
+    </tr>
+    `;
       HTML += rowHtml;
     });
     objElement.innerHTML = HTML;
@@ -134,7 +168,7 @@ const renderAllUserHomes = (data, objElement) => {
   hideSkeleton(objElement);
 };
 // API
-async function getAllUserHomes(currentPage, limit) {
+async function getAllUserHomes(currentPage, limit, filterValue) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
   showSkeleton(objElement, limit, 9);
@@ -145,7 +179,7 @@ async function getAllUserHomes(currentPage, limit) {
       {
         page: currentPage,
         limit: limit,
-        userCode: '',
+        ...filterValue,
       },
       axiosAuth(),
     )
@@ -223,8 +257,7 @@ async function triggerHome(modalForm) {
   }
 }
 
-
-// reset kích hoạt nhà yến 
+// reset kích hoạt nhà yến
 async function resetTriggeringHome(modalForm) {
   const userHomeCode = modalForm.querySelector('#userHomeCode').value;
 

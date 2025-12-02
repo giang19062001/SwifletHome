@@ -14,14 +14,29 @@ export class UserHomeAdminRepository {
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async getTotal(userCode: string): Promise<number> {
-    let query = ` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE 1 = 1 `;
+  async getTotal(dto: GetHomesAdminDto): Promise<number> {
+    let query = ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A
+      LEFT JOIN ${this.tableUser} B
+        ON A.userCode = B.userCode
+      LEFT JOIN tbl_provinces C
+        ON A.userHomeProvince = C.provinceCode
+       WHERE A.isActive = 'Y'  `;
     const params: any[] = [];
-    if (userCode) {
-      query += ' AND  userCode = ? ';
-      params.push(userCode);
+
+    if (dto.userName) {
+      query += ` AND B.userName LIKE ?`;
+      params.push(`%${dto.userName}%`);
     }
 
+    if (dto.userPhone) {
+      query += ` AND B.userPhone LIKE ?`;
+      params.push(`%${dto.userPhone}%`);
+    }
+
+    if (dto.provinceCode) {
+      query += ` AND C.provinceCode = ?`;
+      params.push(`${dto.provinceCode}`);
+    }
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
@@ -38,11 +53,20 @@ export class UserHomeAdminRepository {
 
     const params: any[] = [];
 
-    if (dto.userCode) {
-      query += ` AND A.userCode = ?`;
-      params.push(dto.userCode);
+    if (dto.userName) {
+      query += ` AND B.userName LIKE ?`;
+      params.push(`%${dto.userName}%`);
     }
 
+    if (dto.userPhone) {
+      query += ` AND B.userPhone LIKE ?`;
+      params.push(`%${dto.userPhone}%`);
+    }
+
+    if (dto.provinceCode) {
+      query += ` AND C.provinceCode = ?`;
+      params.push(`${dto.provinceCode}`);
+    }
     query += ` ORDER BY COALESCE(A.updatedAt,  A.createdAt, A.seq) DESC `;
 
     if (dto.limit > 0 && dto.page > 0) {
@@ -54,7 +78,7 @@ export class UserHomeAdminRepository {
     return rows as IUserHome[];
   }
 
-    async getDetail(userHomeCode: string): Promise<IUserHomeSensor | null> {
+  async getDetail(userHomeCode: string): Promise<IUserHomeSensor | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `
        SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
@@ -113,7 +137,7 @@ export class UserHomeAdminRepository {
       updatedId,
       new Date(),
       dto.userCode,
-      userHomeCode
+      userHomeCode,
     ]);
 
     return result.affectedRows;

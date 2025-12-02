@@ -631,3 +631,7 @@ VALUES
     '2025-10-20 10:39:20',
     NULL
   ),
+
+--   SELECT TABLE_NAME, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'swiftlet';
+--  ALTER TABLE tbl_user_home_sensor CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+

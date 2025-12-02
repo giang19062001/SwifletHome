@@ -4,22 +4,69 @@
          <div class="col-12">
             <div class="card">
                <div class="card-body">
-                  <div class="d-flex justify-content-between">
-                     <p class="title-page">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <p class="title-page mb-0">
                         <%= title %>
                      </p>
+
+                     <!-- Nút mở filter -->
+                     <button id="btnFilterToggle" class="btn btn-outline-primary btn-sm" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                        <span id="filterIcon">
+                           <i class="fa fa-chevron-down"></i>
+                        </span>
+                     </button>
+
                   </div>
                </div>
             </div>
          </div>
       </div>
+
+      <!-- COLLAPSE -->
+      <div class="collapse mb-3" id="filterCollapse">
+         <div class="card py-3">
+            <div class="card-body">
+               <div class="row g-3 align-items-end">
+                  <div class="col-md-3">
+                     <label class="form-label">Tên khách hàng</label>
+                     <input type="text" class="form-control" id="userName">
+                  </div>
+
+                  <div class="col-md-3">
+                     <label class="form-label">Số điện thoại</label>
+                     <input type="text" class="form-control" id="userPhone">
+                  </div>
+
+                  <div class="col-md-3">
+                     <label class="form-label">Tỉnh / Thành phố nhà yến</label>
+                     <select class="form-select" id="provinceCode">
+                        <option value="">-- Chọn tỉnh/thành phố --</option>
+                        <% values.provinces.forEach(function(pro) { %>
+                           <option value="<%= pro.provinceCode %>">
+                              <%= pro.provinceName %>
+                           </option>
+                           <% }); %>
+                     </select>
+                  </div>
+                  <div class="col-md-3 d-flex align-items-end justify-content-end gap-2">
+                     <button class="btn btn-secondary " id="btnFilterReset">Làm mới</button>
+                     <button class="btn btn-primary" id="btnFilterApply">Lọc dữ liệu</button>
+                  </div>
+
+               </div>
+
+            </div>
+         </div>
+      </div>
+
       <div class="row">
          <div class="col-12">
             <div class="container-table">
                <div class="table-responsive">
                   <table class="table table-striped">
                      <thead class="table-dark">
-                        <tr class="text-center">
+                        <tr tr class="text-center">
                            <th>
                               <p>STT</p>
                            </th>
@@ -83,21 +130,21 @@
                <input type="hidden" id="userCode" value="">
                <input type="hidden" id="userHomeCode" value="">
 
-                <div class="mb-3">
+               <div class="mb-3">
                   <label for="macId" class="form-label">MAC Id của cảm biến</label>
-                  <input type="text" class="form-control" id="macId"  name="macId" placeholder="24:6F:28:AB:3F:10">
+                  <input type="text" class="form-control" id="macId" name="macId" placeholder="24:6F:28:AB:3F:10">
                   <div class="error-message" data-error="macId"></div>
                </div>
 
                <div class="mb-3">
                   <label for="wifiId" class="form-label">Id của Wifi</label>
-                  <input type="text" class="form-control" id="wifiId"  name="wifiId" placeholder="wificuatoi">
+                  <input type="text" class="form-control" id="wifiId" name="wifiId" placeholder="wificuatoi">
                   <div class="error-message" data-error="wifiId"></div>
                </div>
 
                <div class="mb-3">
                   <label for="wifiPassword" class="form-label">Mật khẩu của Wifi</label>
-                  <input type="text" class="form-control" id="wifiPassword"  name="wifiPassword" placeholder="123456">
+                  <input type="text" class="form-control" id="wifiPassword" name="wifiPassword" placeholder="123456">
                   <div class="error-message" data-error="wifiPassword"></div>
                </div>
             </form>
@@ -128,28 +175,28 @@
                <input type="hidden" id="userCode" value="">
                <input type="hidden" id="userHomeCode" value="">
 
-                <div class="mb-3">
+               <div class="mb-3">
                   <label for="macId" class="form-label">MAC Id của cảm biến</label>
-                  <input type="text" class="form-control" id="macId"  name="macId" placeholder="24:6F:28:AB:3F:10">
+                  <input type="text" class="form-control" id="macId" name="macId" placeholder="24:6F:28:AB:3F:10">
                   <div class="error-message" data-error="macId"></div>
                </div>
 
                <div class="mb-3">
                   <label for="wifiId" class="form-label">Id của Wifi</label>
-                  <input type="text" class="form-control" id="wifiId"  name="wifiId" placeholder="wificuatoi">
+                  <input type="text" class="form-control" id="wifiId" name="wifiId" placeholder="wificuatoi">
                   <div class="error-message" data-error="wifiId"></div>
                </div>
 
                <div class="mb-3">
                   <label for="wifiPassword" class="form-label">Mật khẩu của Wifi</label>
-                  <input type="text" class="form-control" id="wifiPassword"  name="wifiPassword" placeholder="123456">
+                  <input type="text" class="form-control" id="wifiPassword" name="wifiPassword" placeholder="123456">
                   <div class="error-message" data-error="wifiPassword"></div>
                </div>
             </form>
 
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn-submit">Reset</button>
+            <button type="button" class="btn-submit">Thiết lập lại</button>
          </div>
       </div>
    </div>
@@ -172,21 +219,21 @@
                <input type="hidden" id="userCode" value="">
                <input type="hidden" id="userHomeCode" value="">
 
-                <div class="mb-3">
+               <div class="mb-3">
                   <label for="macId" class="form-label">MAC Id của cảm biến</label>
-                  <input type="text" class="form-control" id="macId"  name="macId" disabled>
+                  <input type="text" class="form-control" id="macId" name="macId" disabled>
                   <div class="error-message" data-error="macId"></div>
                </div>
 
                <div class="mb-3">
                   <label for="wifiId" class="form-label">Id của Wifi</label>
-                  <input type="text" class="form-control" id="wifiId"  name="wifiId"  disabled>
+                  <input type="text" class="form-control" id="wifiId" name="wifiId" disabled>
                   <div class="error-message" data-error="wifiId"></div>
                </div>
 
                <div class="mb-3">
                   <label for="wifiPassword" class="form-label">Mật khẩu của Wifi</label>
-                  <input type="text" class="form-control" id="wifiPassword"  name="wifiPassword"  disabled> 
+                  <input type="text" class="form-control" id="wifiPassword" name="wifiPassword" disabled>
                   <div class="error-message" data-error="wifiPassword"></div>
                </div>
             </form>

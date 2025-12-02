@@ -8,7 +8,19 @@ export class GetHomesAdminDto extends PagingDto {
     example: '',
   })
   @IsOptional()
-  userCode: string;
+  userName: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsOptional()
+  userPhone: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsOptional()
+  provinceCode: string;
 }
 
 export class TriggerUserHomeSensorDto {
@@ -26,7 +38,6 @@ export class TriggerUserHomeSensorDto {
   // @IsNotEmpty()
   // userHomeCode: string;
 
-  
   @ApiProperty({
     example: '',
   })
