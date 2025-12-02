@@ -128,7 +128,7 @@ const renderAllUserHomes = (data, objElement) => {
     data?.list.forEach((ele) => {
       const rowHtml = `
         <tr class="text-center">
-        <td class="py-3"><p>${page * i++}</p></td>
+        <td class="py-3" style="min-width: 75px;"><p>${page * i++}</p></td>
         <td class="py-3"><img src="${CURRENT_URL}/${ele.userHomeImage}" alt="${ele.userHomeName}"></td>
         <td class="py-3"><p>${ele.userName} (${ele.userPhone})</p></td>
         <td class="py-3">
