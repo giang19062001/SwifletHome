@@ -9,6 +9,7 @@ import { IPackage } from 'src/modules/package/package.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { PackageAdminService } from 'src/modules/package/admin/package.service';
 import moment from 'moment';
+import { APP_SCREENS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class UserAdminService {
@@ -80,14 +81,12 @@ export class UserAdminService {
     if (result) {
       const user = await this.userAdminRepository.getDetailUserApp(userCode);
       if (user) {
-        // 'c5IcFc-dS9apRp4PbSgqoU:APA91bFyHwpnHANDbQUUzywUOTOIsT2xamQzjwI3J9SjpAh4H1HBaPad3e0kk2VFQ4hx1PegPmzizHOYl4FNnIOnGRLU2MxZBeSTIJOv_Vgk2C0oCEqd174',
-
         //gửi nofity
         this.firebaseService.sendNotification(
           user.deviceToken,
           'Thông báo cập nhập gói',
           `Gói ${!packageData ? 'Miễn phí' : (packageData as unknown as IPackage).packageName} đã được cập nhập thành công`,
-          {}
+          { targetScreen: APP_SCREENS.PROFILE_SCREEN },
         );
       }
     }

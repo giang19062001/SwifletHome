@@ -5,6 +5,7 @@ import { MulticastMessage } from 'firebase-admin/messaging';
 import { NotificationAppRepository } from 'src/modules/notification/notification.repository';
 import { LoggingService } from '../logger/logger.service';
 import { IUserNotificationTopic } from 'src/modules/notification/notification.interface';
+import { IFcmPayload } from './firebase.interface';
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
@@ -26,18 +27,17 @@ export class FirebaseService implements OnModuleInit {
   }
 
   // Single device token (của bạn)
-  async sendNotification(deviceToken: string, title: string, body: string, data?: Record<string, string>) {
+  async sendNotification(deviceToken: string, title: string, body: string, data?: IFcmPayload) {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
 
     const message: admin.messaging.Message = {
       token: deviceToken, // token
       notification: { title, body },
-      data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
+      data: data ? data : undefined, // data object muốn app nhận => ko hiện ra thông báo
     };
 
     try {
       const response = await this.messaging.send(message);
-      console.log('sendNotification -->', response);
       this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
 
       return response;
@@ -49,11 +49,11 @@ export class FirebaseService implements OnModuleInit {
   }
 
   //  Gửi theo topic
-  // async sendNotificationToTopic(topic: string, title: string, body: string, data?: Record<string, string>) {
+  // async sendNotificationToTopic(topic: string, title: string, body: string, data?: IFcmPayload) {
   //   const message: admin.messaging.Message = {
   //     topic, //  topic
   //     notification: { title, body },
-  //     data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
+  //     data: data ? data : undefined, // data object muốn app nhận => ko hiện ra thông báo
   //   };
 
   //   try {
@@ -67,13 +67,13 @@ export class FirebaseService implements OnModuleInit {
   // }
 
   //  Gửi cho nhiều device tokens (multicast)
-  // async sendNotificationToMultipleTokens(tokens: string[], title: string, body: string, data?: Record<string, any>) {
+  // async sendNotificationToMultipleTokens(tokens: string[], title: string, body: string, data?: IFcmPayload) {
   //   if (tokens.length === 0) return;
 
   //   const message: MulticastMessage = {
   //     tokens, // mảng tokens
   //     notification: { title, body },
-  //     data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
+  //     data: data ? data : undefined, // data object muốn app nhận => ko hiện ra thông báo
   //   };
 
   //   try {

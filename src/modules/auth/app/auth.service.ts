@@ -125,7 +125,7 @@ export class AuthAppService extends AbAuthService {
 
     if (userInserted) {
       // đăng ký topic cho push
-      await this.firebaseService.subscribeToTopic(userInserted.deviceToken, userInserted.userCode);
+      await this.firebaseService.subscribeToTopic(userInserted.userCode, userInserted.deviceToken);
     }
 
     this.logger.log(logbase, `${dto.userPhone} -> ${userInserted ? Msg.RegisterOk : Msg.RegisterErr}`);
