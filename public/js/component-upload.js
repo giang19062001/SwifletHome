@@ -218,7 +218,7 @@ const renderAllFile = (data, objElement) => {
          }
       ${
         fileData.filename !== 'PAYMENT'
-          ? ` <button class="btn-delete-out" 
+          ? ` <button class="btn-error-out" 
         onclick="deleteFile('${fileData.filename}','${fileData.seq}','${fileData.mimetype}')">
         Xóa
       </button>`

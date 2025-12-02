@@ -34,7 +34,7 @@ const renderAllAnswer = (data, objElement) => {
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
                 <button class="btn-edit" onClick="gotoAnswerUpdate('${ele.answerCode}')">Chỉnh sửa</button>
-                <button class="btn-delete"  onclick="deleteAnswer('${ele.answerCode}')">Xóa</button>
+                <button class="btn-error"  onclick="deleteAnswer('${ele.answerCode}')">Xóa</button>
             </td>
          </tr>`;
       HTML += rowHtml;

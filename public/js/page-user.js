@@ -17,94 +17,19 @@ function changePage(p) {
   getAllUser(page, limit);
 }
 
-function openUserModal(type, modalEl) {
-  // MỞ MODAL
-  const modal = new bootstrap.Modal(modalEl);
-  modalEl.addEventListener('hidden.bs.modal', () => {
-    closeUserModal(type);
-  });
-  modal.show();
-}
-function closeUserModal(type) {
+function closeModal(type) {
   // Xác định modal theo loại
-  const modalSelector = type === 'home-list' ? '.user-home-list-modal' : '.user-update-modal';
+  const modalSelector = type === 'update' && '.user-update-modal';
   const modalEl = document.querySelector(modalSelector);
 
   if (!modalEl) return;
 
-  // reset danh sách nhà yến về rỗng
-  if (type == 'home-list') {
-    const modalBody = modalEl.querySelector('.modal-body');
-    modalBody.innerHTML = '';
-  }
-
   // đóng modal boostrap
-  closeModal(modalEl);
+  closeCommonModal(modalEl);
 }
 
 // TODO: RENDER
-async function showHomesOfUserModal(type = 'home-list', homes) {
-  const modalSelector = type === 'home-list' ? '.user-home-list-modal' : null;
-  const modalEl = document.querySelector(modalSelector);
-  if (!modalEl) return;
-
-  const modalBody = modalEl.querySelector('.modal-body');
-  const submitBtn = modalEl.querySelector('.modal-footer button');
-
-  // reset nội dung
-  modalBody.innerHTML = '';
-
-  if (type === 'home-list') {
-    if (homes.length) {
-      homes.forEach((home) => {
-        const div = document.createElement('div');
-        div.classList.add('home-item');
-
-        div.innerHTML = `
-          <div class="home-row">
-            <div class="home-img">
-              <img src="${CURRENT_URL}/${home.userHomeImage}" alt="${home.userHomeName}">
-            </div>
-
-            <div class="home-info">
-              <h5>${home.userHomeName} ${home.isMain === 'Y' ? `<b>(Chính)</b>` : ''}</h5>
-              <p><span>Địa chỉ:</span> ${home.userHomeAddress}, ${home.userHomeProvince}</p>
-              <p><span>Mô tả:</span> ${home.userHomeDescription || 'No description'}</p>
-              <p><span>Tích hợp độ ẩm/ nhiệt độ:</span> ${home.isIntegateTempHum == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
-              <p><span>Tích hợp dòng diện:</span> ${home.isIntegateCurrent == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p>
-              <p><span>Tình trạng:</span> ${home.isTriggered == 'Y' ? `<span class="txt-ok">Đã kích hoạt</span>` : `<span class="txt-not-ok">Chưa kích hoạt</span>`}</p>
-            </div>
-
-            <div class="home-actions">
-              <button class="${home.isTriggered == 'Y' ? 'btn-delete' : 'btn-info'}" onclick="triggerHome('${home.userCode}','${home.userHomeCode}','${home.isTriggered}')">
-                ${home.isTriggered == 'Y' ? 'Hủy kích hoạt' : 'Kích hoạt'}
-              </button>
-            </div>
-          </div>
-        `;
-        modalBody.appendChild(div);
-      });
-    } else {
-      const p = document.createElement('p');
-      p.innerText = 'Danh sách nhà yến trống';
-      modalBody.appendChild(p);
-    }
-  }
-
-  // chỉ mở modal nếu nó chưa mở
-  if (!modalEl.classList.contains('show')) {
-    openUserModal(type, modalEl);
-  }
-
-  // Gắn sự kiện submit
-  submitBtn.onclick = () => {
-    if (type === 'home-list') {
-      closeUserModal(type);
-    }
-  };
-}
-
-async function showUpdatePackageModal(type = 'update', userInfo) {
+async function openModal(type = 'update', userInfo) {
   const modalSelector = type === 'update' && '.user-update-modal';
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body');
@@ -136,7 +61,11 @@ async function showUpdatePackageModal(type = 'update', userInfo) {
   }
 
   // MỞ MODAL
-  openUserModal(type, modalEl);
+  const modal = new bootstrap.Modal(modalEl);
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    closeModal(type);
+  });
+  modal.show();
   // Gắn sự kiện submit
   submitBtn.onclick = () => {
     if (type === 'update') {
@@ -163,7 +92,6 @@ function renderAllUser(data, objElement) {
             <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
                 <button class="btn-edit" onclick="getDetailUser('${ele.userCode}', 'update')">Cập nhập gói</button> 
-                <button class="btn-info" onclick="getDetailUser('${ele.userCode}', 'home-list')">Danh sách nhà yến</button> 
             </td> 
          </tr>`;
       HTML += rowHtml;
@@ -268,48 +196,10 @@ async function getDetailUser(userCode, type) {
   );
   // form cập nhập gói
   if (res && type === 'update') {
-    showUpdatePackageModal(type, res.data);
-  }
-
-  // lấy danh sách nhà yến của user
-  if (type === 'home-list') {
-    const homes = await loaderApiCall(getHomesOfUser(userCode));
-    if (homes) {
-      showHomesOfUserModal(type, homes);
-    }
+    openModal(type, res.data);
   }
 }
 
-// kích hoạt nhà yến
-async function triggerHome(userCode, userHomeCode, isTriggered) {
-  const txtConfirm = isTriggered == 'Y' ? 'Bạn có thật sự muốn hủy kích hoạt cảm biến cho nhà yến này?' : 'Bạn thật sự đã kích hoạt cảm biến cho nhà yến này rồi ?';
-  if (window.confirm(txtConfirm)) {
-    await axios
-      .put(
-        CURRENT_URL + '/api/admin/user/triggerHome/' + userHomeCode,
-        {
-          isTriggered: isTriggered,
-        },
-        axiosAuth(),
-      )
-      .then(async function (response) {
-        console.log('response', response);
-        if (response.status === 200 && response.data) {
-          toastOk('Chỉnh sửa thành công');
-
-          // refresh data
-          const updatedHomes = await getHomesOfUser(userCode); 
-          showHomesOfUserModal('home-list', updatedHomes);
-        } else {
-          toastErr('Chỉnh sửa thất bại');
-        }
-      })
-      .catch(function (err) {
-        console.log('err', err);
-      });
-  } else {
-  }
-}
 async function updatePackage(btn) {
   const modalBody = document.querySelector('.user-update-modal .modal-body form');
 
@@ -333,7 +223,7 @@ async function updatePackage(btn) {
         if (response.status === 200 && response.data) {
           toastOk('Chỉnh sửa thành công');
           // đóng modal
-          closeUserModal('update');
+          closeModal('update');
           // refresh list
           page = 1;
           getAllUser(page, limit);

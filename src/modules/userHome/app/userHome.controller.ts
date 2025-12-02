@@ -38,10 +38,10 @@ export class UserHomeAppController {
   }
 
   @ApiParam({ name: 'userHomeCode', type: String })
-  @Get('getHomeDetail/:userHomeCode')
+  @Get('getDetailHome/:userHomeCode')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetHomeUserResDto) })
-  async getHomeDetail(@Param('userHomeCode') userHomeCode: string): Promise<IUserHome | null> {
+  async getDetailHome(@Param('userHomeCode') userHomeCode: string): Promise<IUserHome | null> {
     const result = await this.userHomeAppService.getDetail(userHomeCode);
     return result;
   }

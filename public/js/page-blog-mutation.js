@@ -1,7 +1,6 @@
 // TODO:INIT
 const blogCode = CURRENT_PATH.includes('/update') ? CURRENT_PATH.split('/').pop() : null;
 const pageElement = 'page-blog-mutation';
-
 const BlogConstraints = {
   blogName: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên bài viết.' },

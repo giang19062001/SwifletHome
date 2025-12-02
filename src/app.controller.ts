@@ -118,7 +118,7 @@ export class AppController {
     };
   }
 
-    // catalog/package
+  // catalog/package
   @Get('/dashboard/catalog/package')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/package')
@@ -153,12 +153,22 @@ export class AppController {
     };
   }
   //user
-  @Get('/dashboard/user')
+  @Get('/dashboard/user/info')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/user')
   renderUser(@Req() req: Request) {
     return {
       title: 'Danh sách khách hàng',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+  @Get('/dashboard/user/homes')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/user-homes')
+  renderUserHomes(@Req() req: Request) {
+    return {
+      title: 'Danh sách nhà yến khách hàng',
       isLayout: true,
       user: req.session.user,
     };

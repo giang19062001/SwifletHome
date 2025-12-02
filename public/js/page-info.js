@@ -148,7 +148,7 @@ function getDataForm(modalBody) {
   return formData;
 }
 
-function closeInfoModal(type) {
+function closeModal(type) {
   // Xác định modal theo loại
   const modalSelector = type === 'create' ? '.info-create-modal' : '.info-update-modal';
   const modalEl = document.querySelector(modalSelector);
@@ -156,11 +156,11 @@ function closeInfoModal(type) {
   if (!modalEl) return;
 
   // đóng modal boostrap
-  closeModal(modalEl);
+  closeCommonModal(modalEl);
 }
 
 // TODO: RENDER
-async function showInfoModal(type, infoData) {
+async function openModal(type, infoData) {
   const modalSelector = type === 'create' ? '.info-create-modal' : '.info-update-modal';
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body form');
@@ -244,7 +244,7 @@ async function showInfoModal(type, infoData) {
   // MỞ MODAL
   const modal = new bootstrap.Modal(modalEl);
   modalEl.addEventListener('hidden.bs.modal', () => {
-    closeInfoModal();
+    closeModal();
   });
   modal.show();
 
@@ -321,7 +321,7 @@ async function getDetailInfo(infoKeyword) {
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
-          showInfoModal('update', response.data);
+          openModal('update', response.data);
         }
       })
       .catch(function (err) {
@@ -348,7 +348,7 @@ async function updateInfo(infoKeyword, btn) {
     if (response.data) {
       toastOk('Chỉnh sửa thành công');
       // đóng modal
-      closeInfoModal('update');
+      closeModal('update');
       // refresh list
       page = 1;
       getAllInfo(page, limit);

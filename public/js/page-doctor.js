@@ -14,7 +14,7 @@ function changePage(p) {
   getAllDoctor(page, limit);
 }
 
-function closeDoctorModal(type) {
+function closeModal(type) {
   // Xác định modal theo loại
   const modalSelector = type === 'create' ? '.doctor-create-modal' : '.doctor-update-modal';
   const modalEl = document.querySelector(modalSelector);
@@ -26,10 +26,10 @@ function closeDoctorModal(type) {
   modalBody.querySelector('.err-noteAnswered').style.display = 'none';
 
   // đóng modal boostrap
-  closeModal(modalEl);
+  closeCommonModal(modalEl);
 }
 // TODO: RENDER
-async function showDoctorModal(doctorData) {
+async function openModal(doctorData) {
   // init modal
   const modalSelector = '.doctor-update-modal';
   const modalEl = document.querySelector(modalSelector);
@@ -110,7 +110,7 @@ async function showDoctorModal(doctorData) {
   // show modal
   const modal = new bootstrap.Modal(modalEl);
   modalEl.addEventListener('hidden.bs.modal', () => {
-    closeDoctorModal();
+    closeModal();
   });
   modal.show();
 }
@@ -178,7 +178,7 @@ async function getDetailDoctor(seq) {
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
-          showDoctorModal(response.data);
+          openModal(response.data);
         }
       })
       .catch(function (err) {
@@ -213,7 +213,7 @@ async function updateDoctor() {
         if (response.status === 200 && response.data) {
           toastOk('Chỉnh sửa thành công');
           // đóng modal
-          closeDoctorModal();
+          closeModal();
           // refresh list
           page = 1;
           getAllDoctor(page, limit);

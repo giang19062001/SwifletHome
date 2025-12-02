@@ -1,12 +1,15 @@
 #page-home-sale {
   .home-img {
     width: 150px;
+    height: 120px;
     border-radius: 15px;
+    object-fit: contain;
+    border: 1px solid #ccc;
   }
 }
 
 .page-home-sale-mutaion {
-  #editor{
+  #editor {
     height: 30vh;
   }
   .file-label {
@@ -28,7 +31,7 @@
   }
 
   .file-button:hover {
-    background: #4a9164
+    background: #4a9164;
   }
 
   .image-preview-container {
@@ -81,7 +84,7 @@
     width: 250px;
     border-radius: 15px;
   }
-  .homeName{
+  .homeName {
     font-size: 18px !important;
     font-weight: 600;
   }

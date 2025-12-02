@@ -15,7 +15,7 @@ function changePage(p) {
   getAllHomeSightseeing(page, limit);
 }
 
-function closeHomeSightseeingModal() {
+function closeModal() {
   // Xác định modal theo loại
   const modalSelector = '.home-sightseeing-update-modal';
   const modalEl = document.querySelector(modalSelector);
@@ -23,11 +23,11 @@ function closeHomeSightseeingModal() {
   if (!modalEl) return;
 
   // đóng modal boostrap
-  closeModal(modalEl);
+  closeCommonModal(modalEl);
 }
 
 // TODO: RENDER
-async function showHomeSightseeingModal(homeData) {
+async function openModal(homeData) {
   // init modal
   const modalSelector = '.home-sightseeing-update-modal';
   const modalEl = document.querySelector(modalSelector);
@@ -66,7 +66,7 @@ async function showHomeSightseeingModal(homeData) {
   // show modal
   const modal = new bootstrap.Modal(modalEl);
   modalEl.addEventListener('hidden.bs.modal', () => {
-    closeHomeSightseeingModal();
+    closeModal();
   });
   modal.show();
 }
@@ -142,7 +142,7 @@ async function getDetailHomeSightseeing(seq) {
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
-          showHomeSightseeingModal(response.data);
+          openModal(response.data);
         }
       })
       .catch(function (err) {
@@ -171,7 +171,7 @@ async function updateHomeSightseeing() {
         if (response.status === 200 && response.data) {
           toastOk('Chỉnh sửa thành công');
           // đóng modal
-          closeHomeSightseeingModal();
+          closeModal();
           // refresh list
           page = 1;
           getAllHomeSightseeing(page, limit);

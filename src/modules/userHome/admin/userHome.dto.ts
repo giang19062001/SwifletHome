@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
@@ -7,17 +7,44 @@ export class GetHomesAdminDto extends PagingDto {
   @ApiProperty({
     example: '',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   userCode: string;
 }
 
-export class TriggerHomeDto {
+export class TriggerUserHomeSensorDto {
   @ApiProperty({
-    example: YnEnum.Y,
-    enum: YnEnum,
+    example: '',
   })
-  @IsEnum(YnEnum)
+  @IsString()
   @IsNotEmpty()
-  isTriggered: YnEnum;
+  userCode: string;
+
+  // @ApiProperty({
+  //   example: '',
+  // })
+  // @IsString()
+  // @IsNotEmpty()
+  // userHomeCode: string;
+
+  
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  macId: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  wifiId: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  wifiPassword: string;
 }

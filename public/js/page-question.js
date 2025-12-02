@@ -6,6 +6,11 @@ let objects = [];
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
+  // gán event cho nút add
+  document.querySelector('.btn-add').addEventListener('click', () => {
+    openModal('create', {});
+  });
+
   getAllQuestion(page, limit);
   getAllCategory(0, 0);
   getAllObject(0, 0);
@@ -18,7 +23,7 @@ function changePage(p) {
   getAllQuestion(page, limit);
 }
 
-function closeQuestionModal(type) {
+function closeModal(type) {
   // Xác định modal theo loại
   const modalSelector = type === 'create' ? '.question-create-modal' : '.question-update-modal';
   const modalEl = document.querySelector(modalSelector);
@@ -26,7 +31,7 @@ function closeQuestionModal(type) {
   if (!modalEl) return;
 
   // đóng modal boostrap
-  closeModal(modalEl);
+  closeCommonModal(modalEl);
 }
 
 // tắt/ hiện link chi tiết câu trả lời
@@ -44,7 +49,7 @@ function toggleAnswerDetailLink(modalBody) {
 }
 
 // TODO: RENDER
-async function showQuestionModal(type, questionData) {
+async function openModal(type, questionData) {
   const modalSelector = type === 'create' ? '.question-create-modal' : '.question-update-modal';
   const modalEl = document.querySelector(modalSelector);
   const modalBody = modalEl.querySelector('.modal-body');
@@ -92,7 +97,7 @@ async function showQuestionModal(type, questionData) {
   // MỞ MODAL
   const modal = new bootstrap.Modal(modalEl);
   modalEl.addEventListener('hidden.bs.modal', () => {
-    closeQuestionModal();
+    closeModal();
   });
   modal.show();
 
@@ -180,7 +185,7 @@ function renderAllQuestion(data, objElement) {
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
                 <button class="btn-edit"  onclick="getDetailQuestion('${ele.questionCode}')">Chỉnh sửa</button>
-                <button class="btn-delete"  onclick="deleteQuestion('${ele.questionCode}')">Xóa</button>
+                <button class="btn-error"  onclick="deleteQuestion('${ele.questionCode}')">Xóa</button>
             </td>
          </tr>`;
       HTML += rowHtml;
@@ -269,7 +274,7 @@ async function getDetailQuestion(questionCode) {
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
-          showQuestionModal('update', response.data);
+          openModal('update', response.data);
         }
       })
       .catch(function (err) {
@@ -353,7 +358,7 @@ async function createQuestion(btn) {
 
     if (response.status === 200 && response.data) {
       toastOk('Thêm thành công');
-      closeQuestionModal('create');
+      closeModal('create');
       page = 1;
       getAllQuestion(page, limit);
     } else {
@@ -400,7 +405,7 @@ async function updateQuestion(btn) {
         if (response.status === 200 && response.data) {
           toastOk('Chỉnh sửa thành công');
           // đóng modal
-          closeQuestionModal('update');
+          closeModal('update');
           // refresh list
           page = 1;
           getAllQuestion(page, limit);

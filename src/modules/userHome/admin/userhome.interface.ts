@@ -1,6 +1,6 @@
-import { YnEnum } from 'src/interfaces/admin.interface';
+import { YnEnum } from "src/interfaces/admin.interface";
 
-export interface IUserHome {
+export interface IUserHomeSensor {
   seq: number;
   userHomeCode: string;
   userCode: string;
@@ -20,20 +20,7 @@ export interface IUserHome {
   updatedAt: Date;
   createdId: string;
   updatedId: string;
-}
-
-export interface IUserHomeImageStr {
-  filename: string;
-}
-
-export interface IUserHomeImageFile {
-  seq: number;
-  userHomeSeq: number;
-  userCode: string;
-  uniqueId: string;
-  filename: string;
-  originalname: string;
-  size: number;
-  mimetype: string;
-  isActive: YnEnum;
+  macId: string;
+  wifiId: string;
+  wifiPassword: string
 }

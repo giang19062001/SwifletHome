@@ -165,7 +165,7 @@
 }
 
 
-.btn-delete {
+.btn-error {
   @extend #btn;
   background-color: $err-color;
   border-color: $err-color;
@@ -175,7 +175,7 @@
   }
 }
 
-.btn-delete-out {
+.btn-error-out {
   @extend #btn;
   background-color: #ffffff;
   border-color: #ffffff;

@@ -39,7 +39,7 @@ function renderAllHome(data, objElement) {
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
                 <button class="btn-edit" onclick="gotoHomeUpdate('${ele.homeCode}')">Chỉnh sửa</button>
-                <button class="btn-delete" onclick="deleteHome('${ele.homeCode}')">Xóa</button>
+                <button class="btn-error" onclick="deleteHome('${ele.homeCode}')">Xóa</button>
             </td>
          </tr>`;
       HTML += rowHtml;

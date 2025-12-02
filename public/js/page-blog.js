@@ -34,7 +34,7 @@ const renderAllBlog = (data, objElement) => {
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
                 <button class="btn-edit" onClick="gotoBlogUpdate('${ele.blogCode}')">Chỉnh sửa</button>
-                <button class="btn-delete"  onclick="deleteBlog('${ele.blogCode}')">Xóa</button>
+                <button class="btn-error"  onclick="deleteBlog('${ele.blogCode}')">Xóa</button>
             </td>
          </tr>`;
       HTML += rowHtml;

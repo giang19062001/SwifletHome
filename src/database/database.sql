@@ -333,6 +333,22 @@ CREATE TABLE
     UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
   );
 
+CREATE TABLE
+  `tbl_user_home_sensor` (
+    `seq` int NOT NULL AUTO_INCREMENT,
+    `userHomeCode` varchar(45) NOT NULL,
+    `userCode` varchar(45) NOT NULL,
+    `macId` varchar(255) NOT NULL,
+    `wifiId` text NOT NULL,
+    `wifiPassword` char(15) NOT NULL,
+    `isActive` char(1) DEFAULT 'Y',
+    `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt` datetime DEFAULT NULL,
+    `createdId` varchar(45) DEFAULT 'SYSTEM',
+    `updatedId` varchar(45) DEFAULT NULL,
+    PRIMARY KEY (`seq`),
+    UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
+  );
 
 
 

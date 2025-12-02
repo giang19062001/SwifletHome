@@ -101,7 +101,7 @@ function renderPager(totalCount, offset, currentPage, pageBlockCount, callBack) 
   }
 }
 // modal
-function closeModal(modalEl) {
+function closeCommonModal(modalEl) {
   // Lấy instance modal hiện tại
   const modalInstance = bootstrap.Modal.getInstance(modalEl);
 
