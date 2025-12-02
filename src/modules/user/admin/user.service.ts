@@ -78,12 +78,17 @@ export class UserAdminService {
     await this.userAdminRepository.writePackageHistory(dto, userCode, startDate, endDate, updatedAt);
     const result = await this.userAdminRepository.updatePackage(dto, userCode, startDate, endDate, updatedId, updatedAt);
     if (result) {
-      //gửi nofity
-      this.firebaseService.sendNotification(
-        'c5IcFc-dS9apRp4PbSgqoU:APA91bFyHwpnHANDbQUUzywUOTOIsT2xamQzjwI3J9SjpAh4H1HBaPad3e0kk2VFQ4hx1PegPmzizHOYl4FNnIOnGRLU2MxZBeSTIJOv_Vgk2C0oCEqd174',
-        'Thông báo YenHome',
-        `Gói ${!packageData ? 'Miễn phí' : (packageData as unknown as IPackage).packageName} đã được cập nhập thành công`,
-      );
+      const user = await this.userAdminRepository.getDetailUserApp(userCode);
+      if (user) {
+        // 'c5IcFc-dS9apRp4PbSgqoU:APA91bFyHwpnHANDbQUUzywUOTOIsT2xamQzjwI3J9SjpAh4H1HBaPad3e0kk2VFQ4hx1PegPmzizHOYl4FNnIOnGRLU2MxZBeSTIJOv_Vgk2C0oCEqd174',
+
+        //gửi nofity
+        this.firebaseService.sendNotification(
+          user.deviceToken,
+          'Thông báo cập nhập gói',
+          `Gói ${!packageData ? 'Miễn phí' : (packageData as unknown as IPackage).packageName} đã được cập nhập thành công`,
+        );
+      }
     }
     return result;
   }

@@ -27,6 +27,8 @@ export class FirebaseService implements OnModuleInit {
 
   // Single device token (của bạn)
   async sendNotification(deviceToken: string, title: string, body: string, data?: Record<string, string>) {
+    const logbase = `${this.SERVICE_NAME}/sendNotification`;
+
     const message: admin.messaging.Message = {
       token: deviceToken, // token
       notification: { title, body },
@@ -35,10 +37,13 @@ export class FirebaseService implements OnModuleInit {
 
     try {
       const response = await this.messaging.send(message);
-      console.log('Gửi theo token thành công:', response);
+      console.log('sendNotification -->', response);
+      this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
+
       return response;
     } catch (error) {
-      console.error('Gửi theo token thất bại:', error);
+      this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại: ${JSON.stringify(error)}`);
+
       throw error;
     }
   }
@@ -112,8 +117,6 @@ export class FirebaseService implements OnModuleInit {
     for (const topic of missingTopics) {
       await this.notificationAppRepository.subscribeToTopic(userCode, topic.topicCode);
     }
-
-    this.logger.log(logbase, `Đã tự động subscribe thêm ${missingTopics.length} topic  cho user ${userCode}`);
     return 1;
   }
 
