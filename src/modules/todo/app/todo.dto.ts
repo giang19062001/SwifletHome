@@ -2,10 +2,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
-// export enum PurposeEnum {
-//   REGISTER = 'REGISTER',
-//   FORGOT_PASSWORD = 'FORGOT_PASSWORD',
-// }
+export enum TaskTypeEnum {
+  WEEK = 'WEEK',
+  MONTH = 'MONTH',
+  SPECIFIC = 'SPECIFIC',
+}
+
+export enum TaskStatusEnum {
+  WAITING = 'WAITING',
+  COMPLETE = 'COMPLETE',
+  CANCEL = 'CANCEL',
+}
 
 export class CreateHomeSightSeeingDto {
   @ApiProperty({
@@ -46,30 +53,37 @@ export class CreateHomeSightSeeingDto {
   @IsOptional()
   taskCustomName: string | null;
 
-//   @ApiProperty({
-//     example: PurposeEnum.REGISTER,
-//     enum: PurposeEnum,
-//   })
-//   @IsNotEmpty()
-//   @IsEnum(PurposeEnum)
-//   purpose: PurposeEnum;
-}
+  @ApiProperty({
+    example: TaskTypeEnum.SPECIFIC,
+    enum: TaskTypeEnum,
+  })
+  @IsNotEmpty()
+  @IsEnum(TaskTypeEnum)
+  taskType: TaskTypeEnum;
 
-// CREATE TABLE
-//   tbl_todo_home_task (
-//     seq INT AUTO_INCREMENT PRIMARY KEY,
-//     taskCode VARCHAR(45) DEFAULT NULL, -- task chọn từ list
-//     userCode VARCHAR(45) NOT NULL,
-//     userHomeCode VARCHAR(45) NOT NULL,
-//     isCustomTask CHAR(1) NOT NULL DEFAULT 'Y', -- N chọn task hoặc Y nhập task
-//     taskCustomName VARCHAR(255) DEFAULT NULL,  -- task nhập từ input
-//     taskType ENUM ('WEEK', 'MONTH', 'SPECIFIC') DEFAULT 'SPECIFIC', -- chu kỳ tuần, tháng hay chỉ 1 ngày cụ thể trong tương lai
-//     taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL') DEFAULT 'WAITING',
-//     periodValue INT  DEFAULT NULL, --  week ( 0 - 6 : CN - T7); month (1-31)
-//     specificValue DATETIME  DEFAULT NULL, -- date cụ thể nếu taskType  là 'SPECIFIC'
-//     isActive CHAR(1) NOT NULL DEFAULT 'Y',
-//     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-//     updatedAt DATETIME DEFAULT NULL,
-//     createdId VARCHAR(45) DEFAULT 'SYSTEM',
-//     updatedId VARCHAR(45) DEFAULT NULL
-//   )
+  @ApiProperty({
+    example: TaskStatusEnum.WAITING,
+    enum: TaskStatusEnum,
+  })
+  @IsNotEmpty()
+  @IsEnum(TaskStatusEnum)
+  taskStatus: TaskStatusEnum;
+
+  @ApiProperty({
+    example: null,
+    nullable: true,
+    required: false,
+  })
+  @IsOptional()
+  periodValue: number | null;
+
+  @ApiProperty({
+    example: '2025-12-02 08:30:00',
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    required: false,
+  })
+  @IsOptional()
+  specificValue: string | null;
+}

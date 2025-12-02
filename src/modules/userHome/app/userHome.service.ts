@@ -153,7 +153,8 @@ export class UserHomeAppService {
       }
       return res;
     } catch (error) {
-      this.logger.error(logbase, error);
+      // this.logger.error(logbase, error);
+      console.log("error", error);
       return { filename: '' };
     }
   }
