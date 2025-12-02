@@ -1,19 +1,20 @@
 
-export interface  IUserApp  {
-  seq: number;
-  userCode: string;
-  userName: string;
-  userPassword: string;
-  userPhone: string;
-  deviceToken: string;
-}
+import { ApiProperty } from '@nestjs/swagger';
+import { YnEnum } from 'src/interfaces/admin.interface';
+import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
+
 
 export interface IUserPackageApp {
   userCode: string;
-  packageCode: string;
+  packageCode: string | null;     
   packageName: string;
   packageDescription: string;
-  packageRemainDay: number; // calculate
-  startDate: string;
-  endDate: string;
+  packageRemainDay: number;
+  startDate: string | null;        
+  endDate: string | null;
 }
+
+export interface IUserApp extends ITokenUserApp, IUserPackageApp {
+  homesTotal: number;
+}
+

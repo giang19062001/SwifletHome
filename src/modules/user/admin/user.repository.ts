@@ -34,7 +34,7 @@ export class UserAdminRepository {
   }
 
   async getAllUserApp(dto: PagingDto): Promise<IUserApp[]> {
-    let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
+    let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone,  A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
      FROM ${this.tableApp} A 
      LEFT JOIN tbl_user_package B
@@ -53,7 +53,7 @@ export class UserAdminRepository {
   }
   async getDetailUserApp(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.createdAt, A.updatedAt,
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
      FROM ${this.tableApp} A 
      LEFT JOIN tbl_user_package B

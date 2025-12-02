@@ -8,9 +8,9 @@ import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dt
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { AbAuthService } from '../auth.abstract';
-import { IUserApp } from 'src/modules/user/app/user.interface';
 import { ITokenUserApp } from './auth.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
+import { IUserApp } from 'src/modules/user/app/user.interface';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -206,8 +206,8 @@ export class AuthAppService extends AbAuthService {
     return 1;
   }
 
-  async geInfo(userCode: string): Promise<IUserApp | null> {
-    return await this.userAppService.geInfo(userCode);
+  async getInfo(userCode: string): Promise<IUserApp | null> {
+    return await this.userAppService.getInfo(userCode);
   }
 
   async requestOtp(dto: RequestOtpDto): Promise<string> {

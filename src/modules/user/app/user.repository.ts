@@ -40,7 +40,7 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as IUserPackageApp) : null;
   }
-  async geInfo(userCode: string): Promise<IUserApp | null> {
+  async getInfo(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
       B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,

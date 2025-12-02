@@ -19,8 +19,8 @@ export class UserAppService {
     return await this.userAppRepository.findByPhone(userPhone);
   }
 
-  async geInfo(userCode: string): Promise<IUserApp | null> {
-    return await this.userAppRepository.geInfo(userCode);
+  async getInfo(userCode: string): Promise<IUserApp | null> {
+    return await this.userAppRepository.getInfo(userCode);
   }
 
   async register(dto: RegisterUserAppDto): Promise<ITokenUserApp | null> {

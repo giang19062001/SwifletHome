@@ -87,6 +87,7 @@ export class UserAdminService {
           user.deviceToken,
           'Thông báo cập nhập gói',
           `Gói ${!packageData ? 'Miễn phí' : (packageData as unknown as IPackage).packageName} đã được cập nhập thành công`,
+          {}
         );
       }
     }

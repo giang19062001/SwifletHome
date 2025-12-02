@@ -53,8 +53,8 @@ export class AuthAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetInfoUserAppResDto) })
-  async getInfo(@GetUserApp() user: userInterface.IUserApp): Promise<userInterface.IUserApp | null> {
-    const result = await this.authAppService.geInfo(user.userCode);
+  async getInfo(@GetUserApp() user: authInterface.ITokenUserApp): Promise<userInterface.IUserApp | null> {
+    const result = await this.authAppService.getInfo(user.userCode);
     return result;
   }
 
