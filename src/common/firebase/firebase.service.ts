@@ -31,20 +31,28 @@ export class FirebaseService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
 
     const message: admin.messaging.Message = {
-      token: deviceToken, // token
+      token: deviceToken,
       notification: { title, body },
-      data: data ? data : undefined, // data object muốn app nhận => ko hiện ra thông báo
+      data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined,
     };
 
     try {
       const response = await this.messaging.send(message);
       this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
-
       return response;
     } catch (error) {
-      this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại: ${JSON.stringify(error)}`);
 
-      throw error;
+      // bắt các lỗi FCM phổ biến
+      if (error.code === 'messaging/registration-token-not-registered' || error.code === 'messaging/invalid-registration-token') {
+        this.logger.log(logbase, `Token không hợp lệ hoặc đã bị thu hồi: ${deviceToken}`);
+      }
+
+      if (error.code === 'messaging/unregistered') {
+        this.logger.log(logbase, `Token chưa được đăng ký: ${deviceToken}`);
+      }
+
+      // lỗi
+      this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại: ${JSON.stringify(error)}`);
     }
   }
 
@@ -53,7 +61,7 @@ export class FirebaseService implements OnModuleInit {
   //   const message: admin.messaging.Message = {
   //     topic, //  topic
   //     notification: { title, body },
-  //     data: data ? data : undefined, // data object muốn app nhận => ko hiện ra thông báo
+  //     data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
   //   };
 
   //   try {
@@ -73,7 +81,7 @@ export class FirebaseService implements OnModuleInit {
   //   const message: MulticastMessage = {
   //     tokens, // mảng tokens
   //     notification: { title, body },
-  //     data: data ? data : undefined, // data object muốn app nhận => ko hiện ra thông báo
+  //     data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
   //   };
 
   //   try {
@@ -98,7 +106,6 @@ export class FirebaseService implements OnModuleInit {
 
     if (missingTopics.length === 0) {
       this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
-      return 1;
     }
 
     // Chỉ subscribe những topic còn thiếu ( FCM )
@@ -117,7 +124,6 @@ export class FirebaseService implements OnModuleInit {
     for (const topic of missingTopics) {
       await this.notificationAppRepository.subscribeToTopic(userCode, topic.topicCode);
     }
-    return 1;
   }
 
   // // Unsubscribe
