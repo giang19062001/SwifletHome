@@ -54,6 +54,7 @@ export class DoctorAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadFileDoctorResDto]) })
   async uploadRequestFile(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {
+    console.log("doctorFiles", doctorFiles);
     const result = await this.doctorAppService.uploadRequestFile(user.userCode, dto, doctorFiles);
     return result;
   }

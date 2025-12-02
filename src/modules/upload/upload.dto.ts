@@ -3,7 +3,7 @@ import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class UploadVideoLinkDto {
   @ApiProperty({
-    example: 'https://www.youtube.com/watch?v=6KJrNWC0tfw&list=RDQGa6FL98h-c&index=2',
+    example: 'https://www.youtube.com/watch?v=...',
   })
   @IsString()
   @IsNotEmpty()
