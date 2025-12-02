@@ -80,7 +80,7 @@ export class AuthAppService extends AbAuthService {
     await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
 
     // kiểm tra va re-subcribe lại topic mỗi lần đăng nhập
-    await this.firebaseService.subscribeToTopic(dto.deviceToken, user.userCode);
+    await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken);
 
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
