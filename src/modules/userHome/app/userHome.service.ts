@@ -148,9 +148,10 @@ export class UserHomeAppService {
         const filenamePath = `${getFileLocation(userHomeImageFile.mimetype, userHomeImageFile.fieldname)}/${userHomeImageFile.filename}`;
         const result = await this.userHomeAppRepository.uploadHomeImage(0, dto.uniqueId, userCode, filenamePath, userHomeImageFile);
         if (result > 0) {
-          res.filename = `${location}/${userHomeImageFile.filename}`;
+          res.filename = filenamePath;
         }
       }
+      console.log("uploadHomeImage --> ", res);
       return res;
     } catch (error) {
       // this.logger.error(logbase, error);
