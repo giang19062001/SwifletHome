@@ -41,18 +41,18 @@ export class FirebaseService implements OnModuleInit {
       this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
       return response;
     } catch (error) {
-
       // bắt các lỗi FCM phổ biến
       if (error.code === 'messaging/registration-token-not-registered' || error.code === 'messaging/invalid-registration-token') {
         this.logger.log(logbase, `Token không hợp lệ hoặc đã bị thu hồi: ${deviceToken}`);
-      }
-
-      if (error.code === 'messaging/unregistered') {
+        return;
+      } else if (error.code === 'messaging/unregistered') {
         this.logger.log(logbase, `Token chưa được đăng ký: ${deviceToken}`);
+        return;
+      } else {
+        // lỗi
+        this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại: ${JSON.stringify(error)}`);
+        return;
       }
-
-      // lỗi
-      this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại: ${JSON.stringify(error)}`);
     }
   }
 
