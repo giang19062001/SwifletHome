@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OtpAppModule } from 'src/modules/otp/otp.module';
 import { UserAppModule } from 'src/modules/user/app/user.module';
+import { FirebaseModule } from 'src/common/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserAppModule } from 'src/modules/user/app/user.module';
     }),
     OtpAppModule,
     UserAppModule,
+    FirebaseModule
   ],
   controllers: [AuthAppController],
   providers: [AuthAppService],

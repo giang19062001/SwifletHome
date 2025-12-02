@@ -21,11 +21,23 @@ export interface INotification {
   updatedId: string;
 }
 
+
 export interface INotificationTopic {
   seq: number;
   topicCode: string;
   topicName: string;
   topicDescription: string;
+  isActive: YnEnum;
+  createdAt: Date;
+  updatedAt: Date;
+  createdId: string;
+  updatedId: string;
+}
+
+export interface IUserNotificationTopic {
+  seq: number;
+  userCode: string;
+  topicCode: string;
   isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;

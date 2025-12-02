@@ -13,7 +13,6 @@ export class UserAppRepository {
   private readonly tablePackage = 'tbl_user_package';
   private readonly tablePackageHistory = 'tbl_user_package_history';
   private readonly tableHome = 'tbl_user_home';
-  private readonly tableTopic = 'tbl_user_topics';
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -27,7 +26,7 @@ export class UserAppRepository {
     return rows.length ? (rows[0] as ITokenUserApp) : null;
   }
   async getUserPackageInfo(userCode: string): Promise<IUserPackageApp | null> {
-     const [rows] = await this.db.query<RowDataPacket[]>(
+    const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
       FROM ${this.table} A 
@@ -40,7 +39,6 @@ export class UserAppRepository {
       [userCode],
     );
     return rows.length ? (rows[0] as IUserPackageApp) : null;
-
   }
   async geInfo(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
@@ -137,26 +135,5 @@ export class UserAppRepository {
     return result.insertId;
   }
 
-  // TODO: USER_TOPIC
-  // async subscribeToTopic(tokens: string[], topic: string): Promise<number> {
-  //   if (tokens.length > 0) {
-  //     const valuesPlaceholder = tokens.map(() => `(?, ?)`).join(', ');
 
-  //     const query = `
-  //       INSERT IGNORE INTO ${this.tableTopic} (fcm_token, topic)
-  //       VALUES ${valuesPlaceholder}
-  //     `;
-
-  //     const params: string[] = [];
-
-  //     for (const token of tokens) {
-  //       params.push(token, topic);
-  //     }
-
-  //     await this.db.query(query, params);
-  //     return 1;
-  //   } else {
-  //     return 0;
-  //   }
-  // }
 }

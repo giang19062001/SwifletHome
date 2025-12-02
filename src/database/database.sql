@@ -574,7 +574,7 @@ CREATE TABLE
 
 
 CREATE TABLE
-  tbl_user_topics (
+  tbl_user_notification_topics (
     seq INT AUTO_INCREMENT PRIMARY KEY,
     userCode VARCHAR(45) NOT NULL,
     topicCode VARCHAR(45) NOT NULL,
@@ -583,8 +583,6 @@ CREATE TABLE
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
     updatedId VARCHAR(45) DEFAULT NULL,
-    CONSTRAINT fk_user_topics_user FOREIGN KEY (userCode) REFERENCES tbl_user_app (userCode) ON DELETE CASCADE,
-    CONSTRAINT fk_user_topics_topic FOREIGN KEY (topicCode) REFERENCES tbl_notification_topics (topicCode) ON DELETE CASCADE,
     UNIQUE KEY uniq_user_topic (userCode, topicCode) -- chống trùng
   ) ENGINE = InnoDB;
 
@@ -604,9 +602,7 @@ CREATE TABLE
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
-    updatedId VARCHAR(45) DEFAULT NULL,
-    CONSTRAINT fk_notifications_user FOREIGN KEY (userCode) REFERENCES tbl_user_app (userCode) ON DELETE CASCADE,
-    CONSTRAINT fk_notifications_topic FOREIGN KEY (topicCode) REFERENCES tbl_notification_topics (topicCode) ON DELETE SET NULL
+    updatedId VARCHAR(45) DEFAULT NULL
   ) ENGINE = InnoDB;
 
 

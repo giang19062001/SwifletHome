@@ -4,7 +4,6 @@ import { UserAppRepository } from './user.repository';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
-import { NotificationAppService } from 'src/modules/notification/notification.service';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 
 @Injectable()
@@ -13,7 +12,6 @@ export class UserAppService {
 
   constructor(
     private readonly userAppRepository: UserAppRepository,
-    private readonly notificationAppService: NotificationAppService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -25,13 +23,14 @@ export class UserAppService {
     return await this.userAppRepository.geInfo(userCode);
   }
 
-  async create(dto: RegisterUserAppDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/create`;
-
+  async register(dto: RegisterUserAppDto): Promise<ITokenUserApp | null> {
+    const logbase = `${this.SERVICE_NAME}/register`;
+    let userInserted: ITokenUserApp | null = null;
     const insertId = await this.userAppRepository.create(dto);
     if (insertId) {
       const user = await this.userAppRepository.findBySeq(insertId);
       if (user) {
+        userInserted = user; // gán giá trị
         this.logger.log(logbase, 'Thiết lập gói miễn phí cho người dùng đăng kí mới');
         // mặc định user mới sẽ sử dụng gói miễn phí
         const dto: CreateUserPackageAppDto = {
@@ -42,12 +41,9 @@ export class UserAppService {
         };
         await this.createPackage(dto);
 
-        // const topic = this.notificationAppService.getAllTopic({ limit: 0, page: 0 });
-        // this.logger.log(logbase, 'Đăng ký các Topic tự động cho người dùng đăng kí mới');
-        // await this.userAppRepository.subscribeToTopic(user.deviceToken);
       }
     }
-    return 1;
+    return userInserted;
   }
 
   async update(userName: string, userPhone: string, userCode: string): Promise<number> {

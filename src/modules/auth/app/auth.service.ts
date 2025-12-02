@@ -10,6 +10,7 @@ import { UserAppService } from 'src/modules/user/app/user.service';
 import { AbAuthService } from '../auth.abstract';
 import { IUserApp } from 'src/modules/user/app/user.interface';
 import { ITokenUserApp } from './auth.interface';
+import { FirebaseService } from 'src/common/firebase/firebase.service';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -17,6 +18,7 @@ export class AuthAppService extends AbAuthService {
 
   constructor(
     private readonly userAppService: UserAppService,
+    private readonly firebaseService: FirebaseService,
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
     private readonly logger: LoggingService,
@@ -77,6 +79,9 @@ export class AuthAppService extends AbAuthService {
     // Chỉnh sửa lại device mỗi lần đăng nhập
     await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
 
+    // kiểm tra va re-subcribe lại topic mỗi lần đăng nhập
+    await this.firebaseService.subscribeToTopic(dto.deviceToken, user.userCode);
+
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
 
@@ -113,13 +118,18 @@ export class AuthAppService extends AbAuthService {
 
     // hash -> insert thông tin bao gồm cả device token
     const hashedPassword = await this.hashPassword(dto.userPassword);
-    const result = await this.userAppService.create({
+    const userInserted: ITokenUserApp | null = await this.userAppService.register({
       ...dto,
       userPassword: hashedPassword,
     });
 
-    this.logger.log(logbase, `${dto.userPhone} -> ${result ? Msg.RegisterOk : Msg.RegisterErr}`);
-    return result;
+    if (userInserted) {
+      // đăng ký topic cho push
+      await this.firebaseService.subscribeToTopic(userInserted.deviceToken, userInserted.userCode);
+    }
+
+    this.logger.log(logbase, `${dto.userPhone} -> ${userInserted ? Msg.RegisterOk : Msg.RegisterErr}`);
+    return userInserted ? 1 : 0;
   }
 
   async update(dto: UpdateUserDto, userPhone: string, userCode: string): Promise<number> {

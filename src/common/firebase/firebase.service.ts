@@ -2,12 +2,20 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import admin from 'firebase-admin';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { MulticastMessage } from 'firebase-admin/messaging';
+import { NotificationAppRepository } from 'src/modules/notification/notification.repository';
+import { LoggingService } from '../logger/logger.service';
+import { IUserNotificationTopic } from 'src/modules/notification/notification.interface';
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
 export class FirebaseService implements OnModuleInit {
+  private readonly SERVICE_NAME = 'FirebaseService';
   private messaging: admin.messaging.Messaging;
 
+  constructor(
+    private readonly notificationAppRepository: NotificationAppRepository,
+    private readonly logger: LoggingService,
+  ) {}
   onModuleInit() {
     if (!admin.apps.length) {
       admin.initializeApp({
@@ -36,73 +44,78 @@ export class FirebaseService implements OnModuleInit {
   }
 
   //  Gửi theo topic
-  async sendNotificationToTopic(topic: string, title: string, body: string, data?: Record<string, string>) {
-    const message: admin.messaging.Message = {
-      topic, //  topic
-      notification: { title, body },
-      data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
-    };
+  // async sendNotificationToTopic(topic: string, title: string, body: string, data?: Record<string, string>) {
+  //   const message: admin.messaging.Message = {
+  //     topic, //  topic
+  //     notification: { title, body },
+  //     data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
+  //   };
 
-    try {
-      const response = await this.messaging.send(message);
-      console.log(`Gửi theo topic thành công ${topic}:`, response);
-      return response;
-    } catch (error) {
-      console.error('Gửi theo topic thất bại:', error);
-      throw error;
-    }
-  }
+  //   try {
+  //     const response = await this.messaging.send(message);
+  //     console.log(`Gửi theo topic thành công ${topic}:`, response);
+  //     return response;
+  //   } catch (error) {
+  //     console.error('Gửi theo topic thất bại:', error);
+  //     throw error;
+  //   }
+  // }
 
   //  Gửi cho nhiều device tokens (multicast)
-  async sendNotificationToMultipleTokens(tokens: string[], title: string, body: string, data?: Record<string, any>) {
-    if (tokens.length === 0) return;
+  // async sendNotificationToMultipleTokens(tokens: string[], title: string, body: string, data?: Record<string, any>) {
+  //   if (tokens.length === 0) return;
 
-    const message: MulticastMessage = {
-      tokens, // mảng tokens
-      notification: { title, body },
-      data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
-    };
+  //   const message: MulticastMessage = {
+  //     tokens, // mảng tokens
+  //     notification: { title, body },
+  //     data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
+  //   };
 
-    try {
-      const response = await this.messaging.sendEachForMulticast(message);
-      console.log(`Gửi multicast thành công: ${response.successCount}/${tokens.length}`);
-      return response;
-    } catch (error) {
-      console.error('Gửi multicast thất bại:', error);
-      throw error;
-    }
-  }
-  // Subscribe 1 hoặc nhiều token vào topic
-  // async subscribeToTopic(tokens: string | string[], topic: string): Promise<number> {
-  //   const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
-
-  //   // Gọi FCM
-  //   const fcmResponse = await admin.messaging().subscribeToTopic(tokenArray, topic);
-
-  //   if (fcmResponse.failureCount > 0) {
-  //     console.warn('FCM subscribe errors:', fcmResponse.errors);
+  //   try {
+  //     const response = await this.messaging.sendEachForMulticast(message);
+  //     console.log(`Gửi multicast thành công: ${response.successCount}/${tokens.length}`);
+  //     return response;
+  //   } catch (error) {
+  //     console.error('Gửi multicast thất bại:', error);
+  //     throw error;
   //   }
-
-  //   // Lưu vào MySQL bằng INSERT IGNORE → không lỗi duplicate
-  //   if (tokenArray.length > 0) {
-  //     const valuesPlaceholder = tokenArray.map(() => `(?, ?)`).join(', ');
-
-  //     const query = `
-  //       INSERT IGNORE INTO topic_subscription (fcm_token, topic)
-  //       VALUES ${valuesPlaceholder}
-  //     `;
-
-  //     const params: string[] = [];
-  //     tokenArray.forEach((token) => {
-  //       params.push(token, topic);
-  //     });
-
-  //     // await this.dataSource.query(query, params);
-  //   }
-
-  //   console.log(`Subscribed ${fcmResponse.successCount}/${tokenArray.length} tokens to topic "${topic}"`);
-  //   return fcmResponse.successCount;
   // }
+  async subscribeToTopic(userCode: string, deviceToken: string) {
+    const logbase = `${this.SERVICE_NAME}/subscribeToTopic`;
+
+    // lấy topics đã đang đăng ký của user này
+    const existingSubs = await this.notificationAppRepository.getUserSubscribedTopics(userCode);
+    // lấy tất cả topics
+    const allTopics = await this.notificationAppRepository.getAllTopic({ limit: 0, page: 0 });
+
+    // lọc ra các topic chưa đăng ký
+    const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: IUserNotificationTopic) => sub.topicCode === topic.topicCode));
+
+    if (missingTopics.length === 0) {
+      this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
+      return 1;
+    }
+
+    // Chỉ subscribe những topic còn thiếu ( FCM )
+    for (const topic of missingTopics) {
+      const fcmResponse = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+      console.log(fcmResponse);
+      if (fcmResponse.failureCount > 0) {
+        this.logger.error(logbase, `Đăng ký ${topic.topicName} tự động cho người dùng đăng kí mới (${userCode}) thất bại`);
+      }
+      if (fcmResponse.successCount > 0) {
+        this.logger.log(logbase, `Đăng ký ${topic.topicName} tự động cho người dùng đăng kí mới (${userCode}) thành công`);
+      }
+    }
+
+    // Chỉ subscribe những topic còn thiếu ( DB )
+    for (const topic of missingTopics) {
+      await this.notificationAppRepository.subscribeToTopic(userCode, topic.topicCode);
+    }
+
+    this.logger.log(logbase, `Đã tự động subscribe thêm ${missingTopics.length} topic  cho user ${userCode}`);
+    return 1;
+  }
 
   // // Unsubscribe
   // async unsubscribeFromTopic(tokens: string | string[], topic: string): Promise<number> {
@@ -129,8 +142,8 @@ export class FirebaseService implements OnModuleInit {
   // // Lấy danh sách token của 1 topic
   // async getTokensByTopic(topic: string): Promise<string[]> {
   //   const query = `
-  //     SELECT fcm_token 
-  //     FROM topic_subscription 
+  //     SELECT fcm_token
+  //     FROM topic_subscription
   //     WHERE topic = ?
   //   `;
 
@@ -159,8 +172,8 @@ export class FirebaseService implements OnModuleInit {
   // // 5ấy danh sách topic mà 1 token đang subscribe
   // async getTopicsByToken(fcmToken: string): Promise<string[]> {
   //   const query = `
-  //     SELECT topic 
-  //     FROM topic_subscription 
+  //     SELECT topic
+  //     FROM topic_subscription
   //     WHERE fcm_token = ?
   //   `;
 

@@ -1,12 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { INotification, INotificationTopic } from './notification.interface';
+import { INotification, INotificationTopic, IUserNotificationTopic } from './notification.interface';
 
 @Injectable()
 export class NotificationAppRepository {
   private readonly table = 'tbl_notifications';
   private readonly tableTopic = 'tbl_notification_topics';
+  private readonly tableUserTopic = 'tbl_user_notification_topics';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -44,7 +45,7 @@ export class NotificationAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllTopic(dto: PagingDto): Promise<INotificationTopic[]> {
-    let query = ` SELECT A.seq, A.topicCode, A.topicName, A.data, A.topicDescription, A.isActive, A.createdAt, A.createdId
+    let query = ` SELECT A.seq, A.topicCode, A.topicName, A.topicDescription, A.isActive, A.createdAt, A.createdId
         FROM ${this.tableTopic} A `;
 
     const params: any[] = [];
@@ -66,5 +67,22 @@ export class NotificationAppRepository {
     );
     return rows ? (rows[0] as INotificationTopic) : null;
   }
+  // TODO: USER_TOPIC
+  async getUserSubscribedTopics(userCode: string): Promise<IUserNotificationTopic[]> {
+    let query = ` SELECT A.seq, A.topicCode, A.userCode
+        FROM ${this.tableUserTopic} A 
+        WHERE userCode = ? AND A.isActive = 'Y' `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
+    return rows as IUserNotificationTopic[];
+  }
 
+  async subscribeToTopic(userCode: string, topicCode: string): Promise<number> {
+    const query = `
+        INSERT IGNORE INTO ${this.tableUserTopic} (userCode, topicCode)
+        VALUES (?, ?)
+      `;
+
+    await this.db.query(query, [userCode, topicCode]);
+    return 1;
+  }
 }
