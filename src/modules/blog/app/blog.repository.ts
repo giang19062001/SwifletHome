@@ -8,11 +8,11 @@ export class BlogAdppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getOne(): Promise<IBlog | null> {
+  async getMain(): Promise<IBlog | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.blogCode, A.blogName, A.blogContent, A.isFree
         FROM ${this.table} A 
-        WHERE A.isActive = 'Y'
+        WHERE A.isActive = 'Y' AND A.isMain = 'Y'
         LIMIT 1 `,
       [],
     );

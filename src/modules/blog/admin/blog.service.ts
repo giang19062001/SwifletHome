@@ -18,7 +18,13 @@ export class BlogAdminService {
     return result;
   }
   async create(dto: CreateBlogDto, createdId: string): Promise<number> {
-    const result = await this.blogAdminRepository.create(dto, createdId);
+    // kiểm tra có blog nào là chính hay chưa
+    const homeMain = await this.blogAdminRepository.getMainBlog();
+    let isMain = 'N';
+    if (!homeMain) {
+      isMain = 'Y';
+    }
+    const result = await this.blogAdminRepository.create(dto, isMain, createdId);
     return result;
   }
   async update(dto: UpdateBlogDto, updatedId: string, blogCode: string): Promise<number> {

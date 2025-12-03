@@ -26,7 +26,7 @@ export class BlogAppController {
   @Get('getContent')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetContentBlogResDto) })
-  async getDetail(@GetUserApp() user: authInterface.ITokenUserApp): Promise<string | null> {
+  async getContent(@GetUserApp() user: authInterface.ITokenUserApp): Promise<string | null> {
     const blog = await this.blogAppService.getContent();
     if (blog) {
       const res = this.searchService.replyBaseOnUserPackage(blog?.blogContent, blog?.isFree, user.userCode);

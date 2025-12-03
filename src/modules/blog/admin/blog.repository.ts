@@ -63,6 +63,16 @@ export class BlogAdminRepository {
     );
     return rows as IBlog[];
   }
+  async getMainBlog(): Promise<IBlog | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain
+            FROM ${this.table} A 
+            WHERE A.isActive = 'Y' AND A.isMain = 'Y'
+            LIMIT 1 `,
+      [],
+    );
+    return rows ? (rows[0] as IBlog) : null;
+  }
   async getDetail(blogCode: string): Promise<IBlog | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain,
@@ -78,7 +88,7 @@ export class BlogAdminRepository {
     );
     return rows ? (rows[0] as IBlog) : null;
   }
-  async create(dto: CreateBlogDto, createdId: string): Promise<number> {
+  async create(dto: CreateBlogDto, isMain: string, createdId: string): Promise<number> {
     const sqlLast = ` SELECT blogCode FROM ${this.table} ORDER BY blogCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let blogCode = 'BLG000001';
@@ -86,10 +96,10 @@ export class BlogAdminRepository {
       blogCode = generateCode(rows[0].blogCode, 'BLG', 6);
     }
     const sql = `
-        INSERT INTO ${this.table}  (blogCode, blogName, blogContent, blogObject, blogCategory, isFree, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO ${this.table}  (blogCode, blogName, blogContent, blogObject, blogCategory, isFree, isMain, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode, dto.blogName, dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode, dto.blogName, dto.blogContent, dto.blogObject, dto.blogCategory, dto.isFree, isMain, createdId]);
 
     return result.insertId;
   }

@@ -6,7 +6,7 @@ import { BlogAdppRepository } from './blog.repository';
 export class BlogAppService {
   constructor(private readonly blogAppRepository: BlogAdppRepository) {}
   async getContent(): Promise<IBlog | null> {
-    const result = await this.blogAppRepository.getOne();
+    const result = await this.blogAppRepository.getMain();
     return result;
   }
 
