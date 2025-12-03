@@ -2,10 +2,12 @@ import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards,
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetTaskResDto } from './todo.response';
+import { GetScheduledTasksResDto, GetTaskResDto } from './todo.response';
 import { ITodoTask } from '../todo.interface';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import * as authInterface from 'src/modules/auth/app/auth.interface';
+import { GetUserApp } from 'src/decorator/auth.decorator';
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -23,10 +25,13 @@ export default class TodoAppController {
     return result;
   }
 
+  @ApiOperation({
+    summary: 'Thông tin todo của nhà yến được chọn là chính của user đăng nhập hiện tại',
+  })
   @Get('getScheduledTasks')
   @HttpCode(HttpStatus.OK)
-  // @ApiOkResponse({ type: ApiAppResponseDto([GetTaskResDto]) })
-  async getScheduledTasks() {
+  @ApiOkResponse({ type: ApiAppResponseDto(GetScheduledTasksResDto) })
+  async getScheduledTasks(@GetUserApp() user: authInterface.ITokenUserApp) {
     return {
       harvest: 'NA',
       rollMedicine: 'NA',
