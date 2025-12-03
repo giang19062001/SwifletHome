@@ -19,5 +19,5 @@ export class GetScheduledTasksResDto {
   rollMedicine: string;
 
   @ApiProperty({ example: 'NA' })
-  attractBird: string;
+  luringBird: string;
 }

@@ -35,7 +35,7 @@ export default class TodoAppController {
     return {
       harvest: 'NA',
       rollMedicine: 'NA',
-      attractBird: 'NA',
+      luringBird: 'NA',
     };
   }
 }
