@@ -31,6 +31,10 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
           defaultMessage = Msg.UpdateOk;
           break;
         }
+        case 'DELETE': {
+          defaultMessage = Msg.DeleteOk;
+          break;
+        }
         default:
           defaultMessage = 'Success';
           break;
@@ -56,6 +60,10 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
         }
         case 'PUT': {
           defaultMessage = Msg.UpdateErr;
+          break;
+        }
+        case 'DELETE': {
+          defaultMessage = Msg.DeleteErr;
           break;
         }
         default:

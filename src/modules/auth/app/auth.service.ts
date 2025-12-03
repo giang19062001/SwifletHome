@@ -42,7 +42,7 @@ export class AuthAppService extends AbAuthService {
     }
 
     // quên password
-    if (purpose ==  KEYWORDS.OTP_PURPOSE.FORGOT_PASSWORD) {
+    if (purpose == KEYWORDS.OTP_PURPOSE.FORGOT_PASSWORD) {
       const phone = await this.userAppService.findByPhone(userPhone);
 
       // lỗi -> số điện thoại không tồn tại -> không thể đổi mật khẩu -> ko phải gửi sms xác thực nữa
@@ -129,7 +129,7 @@ export class AuthAppService extends AbAuthService {
       await this.firebaseService.subscribeToTopic(userInserted.userCode, userInserted.deviceToken);
     }
 
-    this.logger.log(logbase, `${dto.userPhone} -> ${userInserted ? Msg.RegisterOk : Msg.RegisterErr}`);
+    this.logger.log(logbase, `${dto.userPhone} -> ${userInserted ? Msg.RegisterAccountOk : Msg.RegisterAccountErr}`);
     return userInserted ? 1 : 0;
   }
 
@@ -208,7 +208,12 @@ export class AuthAppService extends AbAuthService {
   }
 
   async getInfo(userCode: string): Promise<IUserApp | null> {
-    return await this.userAppService.getInfo(userCode);
+    const logbase = `${this.SERVICE_NAME}/getInfo`;
+
+    const result = await this.userAppService.getInfo(userCode);
+    this.logger.log(logbase, `Thông tin người dùng: ${result && JSON.stringify({ userName: result.userName, packageName: result.packageName, packageRemainDay: result.packageRemainDay })}`);
+
+    return result;
   }
 
   async requestOtp(dto: RequestOtpDto): Promise<string> {

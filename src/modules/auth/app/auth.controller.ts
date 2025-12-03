@@ -44,7 +44,7 @@ export class AuthAppController {
   async register(@Body() dto: RegisterUserAppDto) {
     const result = await this.authAppService.register(dto);
     return {
-      message: result ? Msg.RegisterOk : Msg.RegisterErr,
+      message: result ? Msg.RegisterAccountOk : Msg.RegisterAccountErr,
       data: result,
     };
   }

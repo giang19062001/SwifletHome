@@ -96,7 +96,10 @@ export class UserHomeAppService {
             // cập nhập userHomeSEQ của file mới đã cùng uniqueId với nhà yến vừa updated
             await this.userHomeAppRepository.updateSeqFiles(home.seq, filesUploaded.seq, dto.uniqueId);
           } else {
-            throw new BadRequestException();
+            throw new BadRequestException({
+              message: Msg.UpdateErr,
+              data: 0,
+            });
           }
         } else {
           // cập nhập dữ liệu -> ảnh vẫn giữ nguyên
@@ -104,7 +107,10 @@ export class UserHomeAppService {
         }
         this.logger.log(logbase, `cập nhập nhà yến(${userHomeCode}) thành công`);
       } else {
-        throw new BadRequestException();
+        throw new BadRequestException({
+          message: Msg.UpdateErr,
+          data: 0,
+        });
       }
 
       return result;

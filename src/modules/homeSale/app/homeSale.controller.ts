@@ -77,8 +77,14 @@ export class HomeSaleAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.homeSaleAppService.registerSightSeeing(dto, user.userCode);
+     if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.RegisterErr,
+        data: 0,
+      });
+    }
     return {
-      message: result ? Msg.CreateOk : Msg.CreateErr,
+      message: Msg.RegisterOk,
       data: result,
     };
   }

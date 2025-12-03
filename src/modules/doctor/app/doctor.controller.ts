@@ -38,10 +38,13 @@ export class DoctorAppController {
       });
     }
     if (result === 0) {
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: Msg.RegisterErr,
+        data: 0,
+      });
     }
     return {
-      message: Msg.CreateOk,
+      message: Msg.RegisterOk,
       data: result,
     };
   }

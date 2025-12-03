@@ -64,7 +64,10 @@ export class UserHomeAppController {
   async deleteHome(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
     const result = await this.userHomeAppService.deleteHome(userHomeCode, user.userCode);
     if (result === 0) {
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: Msg.DeleteErr,
+        data: 0,
+      });
     }
 
     return result;
@@ -80,7 +83,10 @@ export class UserHomeAppController {
   async updateHomeToMain(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
     const result = await this.userHomeAppService.updateHomeToMain(userHomeCode, user.userCode);
     if (result === 0) {
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: Msg.UpdateErr,
+        data: 0,
+      });
     }
 
     return result;
@@ -98,7 +104,10 @@ export class UserHomeAppController {
   async updateHome(@Body() dto: MutationUserHomeDto, @Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
     const result = await this.userHomeAppService.updateHome(user.userCode, userHomeCode, dto);
     if (result === 0) {
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: Msg.UpdateErr,
+        data: 0,
+      });
     }
     return result;
   }
@@ -128,7 +137,10 @@ export class UserHomeAppController {
       });
     }
     if (result === 0) {
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: Msg.CreateErr,
+        data: 0,
+      });
     }
     return {
       message: Msg.CreateOk,

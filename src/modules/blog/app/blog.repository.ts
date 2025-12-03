@@ -8,7 +8,7 @@ export class BlogAdppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getMain(): Promise<IBlog | null> {
+  async getOneContent(): Promise<IBlog | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.blogCode, A.blogName, A.blogContent, A.isFree
         FROM ${this.table} A 

@@ -1,7 +1,5 @@
 import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { PackageAppService } from 'src/modules/package/app/package.service';
 import { InfoAppRepository } from './info.repository';
 import { IInfo } from '../info.interface';
 
@@ -15,6 +13,8 @@ export class InfoAppService {
   ) {}
 
   async getDetail(infoKeyword: string): Promise<IInfo | null> {
+    const logbase = `${this.SERVICE_NAME}/getDetail:`;
+    this.logger.log(logbase, `infoKeyword(${infoKeyword})`);
     const result = await this.infoAppRepository.getDetail(infoKeyword);
     return result;
   }

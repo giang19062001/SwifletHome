@@ -48,7 +48,7 @@ export const winstonConfig = {
           }
 
           const ipStr = ip ? `[IP: ${ip}]` : '';
-          return `${level}: [${timestamp}]${ipStr}-[${message}]:\t${stack ? `${stack}` : `${contextStr}`}`;
+          return `${level}: [${timestamp}]${ipStr}-[${message}]: ${stack ? `${stack}` : `${contextStr}`}`;
         }),
       ),
     }),

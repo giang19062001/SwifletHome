@@ -37,7 +37,7 @@ export class SearchService {
     const userPackage = await this.userAppRepository.getUserPackageInfo(userCode);
     const remainDay = userPackage?.packageRemainDay ?? 0;
 
-    this.logger.log(logbase, `Dữ liệu là miễn phí: ${isFree}; Số ngày hiệu lực còn lại của gói user:${remainDay}`);
+    // this.logger.log(logbase, `Dữ liệu là miễn phí: ${isFree}; Số ngày hiệu lực còn lại của gói user:${remainDay}`);
 
     // LẤY DANH SÁCH AUDIO LIST
     const fileList = await this.uploadService.getAllAudioFile();

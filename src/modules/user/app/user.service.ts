@@ -39,6 +39,7 @@ export class UserAppService {
           endDate: null,
           startDate: null,
         };
+        // tạo package cho user mới
         await this.createPackage(dto);
 
       }

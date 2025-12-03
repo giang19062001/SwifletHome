@@ -1,20 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin.dto';
-import { IList, YnEnum } from 'src/interfaces/admin.interface';
 import { AnswerAppRepository } from './answer.repository';
 import { IAnswer } from '../answer.interface';
 import { QuestionAppService } from 'src/modules/question/app/question.service';
 import { IQuestion } from 'src/modules/question/question.interface';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { SearchService } from 'src/common/search/search.service';
 @Injectable()
 export class AnswerAppService {
+  private readonly SERVICE_NAME = 'AnswerAppService';
+
   constructor(
     private readonly answerAppRepository: AnswerAppRepository,
     private readonly questionAppService: QuestionAppService,
+    private readonly searchService: SearchService,
+
     private readonly logger: LoggingService,
   ) {}
 
-  async reply(): Promise<any[]> {
+  async reply(question: string, userCode: string): Promise<string> {
+    const logbase = `${this.SERVICE_NAME}/reply`;
+    this.logger.log(logbase, `Câu hỏi(${question})`);
+
     // get question
     const questions: IQuestion[] = await this.questionAppService.getQuestionReplied();
 
@@ -50,13 +56,15 @@ export class AnswerAppService {
       }
     });
 
-    const results = Array.from(questionMap.entries()).map(([answerCode, questionContents]) => {
+    const answerMapQuestionsResult = Array.from(questionMap.entries()).map(([answerCode, questionContents]) => {
       return {
         questions: questionContents,
         answer: answerMap.get(answerCode),
       };
     });
 
-    return results;
+    // gọi search service
+    const result = await this.searchService.reply(question, userCode, answerMapQuestionsResult);
+    return result;
   }
 }
