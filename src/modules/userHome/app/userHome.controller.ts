@@ -159,6 +159,10 @@ export class UserHomeAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(UserHomeImageResDto) })
   async uploadHomeImage(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UploadUserHomeImageDto, @UploadedFile() userHomeImage: Express.Multer.File) {
-    return await this.userHomeAppService.uploadHomeImage(user.userCode, dto, userHomeImage);
+    const result = await this.userHomeAppService.uploadHomeImage(user.userCode, dto, userHomeImage);
+    return {
+      message: result.filename != '' ? Msg.UploadOk : Msg.UploadErr,
+      data: result,
+    };
   }
 }
