@@ -118,7 +118,7 @@ export class UserHomeAppService {
       // có file được upload cùng uuid -> insert
       if (filesUploaded) {
         // thêm nhà yến của user
-        const userHomeImagePath = `${getFileLocation(filesUploaded.mimetype, filesUploaded.filename)}/${filesUploaded.filename}`;
+        const userHomeImagePath = filesUploaded.filename
         // kiểm tra user này có nhà nào là chính hay chưa
         const homeMain = await this.userHomeAppRepository.getMainHomeByUser(userCode);
         let isMain = 'N';
