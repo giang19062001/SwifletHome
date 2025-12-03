@@ -108,11 +108,11 @@ export class UserHomeAppService {
       // lấy tất cả home của user
       const homesTotal = await this.userHomeAppRepository.getTotalHomes(userCode);
       const userPackage = await this.userAppRepository.getUserPackageInfo(userCode);
-      // nếu user xài gói miễn phí và đã có 1 nhà yến rồi -> ko thể thêm nữa trừ khi nâng cập
-      if (homesTotal == 1 && userPackage?.packageCode == null) {
-        result = -2;
-        return result;
+      // nếu user xài gói miễn phí hoặc hết hạn và đã có hơn 1 nhà yến rồi -> ko thể thêm nữa trừ khi nâng cập
+      if (homesTotal >= 1 && (!userPackage?.packageCode || (userPackage?.packageRemainDay ?? 0) <= 0)) {
+        return -2;
       }
+
       // tìm file đã upload cùng uniqueId
       const filesUploaded = await this.userHomeAppRepository.findFilesByUniqueId(dto.uniqueId);
       // có file được upload cùng uuid -> insert
@@ -151,11 +151,10 @@ export class UserHomeAppService {
           res.filename = filenamePath;
         }
       }
-      console.log("uploadHomeImage --> ", res);
       return res;
     } catch (error) {
       // this.logger.error(logbase, error);
-      console.log("error", error);
+      console.log('error', error);
       return { filename: '' };
     }
   }

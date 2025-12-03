@@ -64,7 +64,10 @@ audioAddBtn.addEventListener('click', async () => {
 // Push: video
 videoAddBtn.addEventListener('click', async () => {
   const url = videoInput.value.trim();
-  if (!url) return alert('Vui lòng nhập link video!');
+  if (!url) {
+    toastErr('Vui lòng nhập link video!');
+    return;
+  }
 
   await uploadVideoLink(url);
 

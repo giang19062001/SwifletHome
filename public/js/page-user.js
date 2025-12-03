@@ -69,7 +69,7 @@ async function openModal(type = 'update', userInfo) {
   // Gắn sự kiện submit
   submitBtn.onclick = () => {
     if (type === 'update') {
-      updatePackage(submitBtn);
+      updatePackage(submitBtn, userInfo);
     }
   };
 }
@@ -87,7 +87,7 @@ function renderAllUser(data, objElement) {
             <td><p>${ele.startDate ? formatDateTime(ele.startDate) : ''}</p></td>
             <td><p>${ele.endDate ? formatDateTime(ele.endDate) : ''}</p></td>
             <td>
-              <p class="txt-not-ok">${ele.endDate ? moment(ele.endDate).startOf('day').diff(moment().startOf('day'), 'days') + ' ngày' : ''}</p>
+              <p class="txt-not-ok">${ele.packageRemainDay} ngày</p>
             </td>
             <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
@@ -200,11 +200,16 @@ async function getDetailUser(userCode, type) {
   }
 }
 
-async function updatePackage(btn) {
+async function updatePackage(btn, userInfo) {
   const modalBody = document.querySelector('.user-update-modal .modal-body form');
 
   try {
     const packageCode = modalBody.querySelector('#packageCode').value;
+    // gói cao cấp hiện tại còn hạn -> ko thể hạ xuống gói miễn phí
+    if (!packageCode && userInfo.packageCode && userInfo.packageRemainDay > 0) {
+      toastErr('Gói nâng cấp hiện tại đang còn hạn sử dụng, không thể hạ xuống gói miễn phí');
+      return;
+    }
     const userCode = modalBody.querySelector('#userCode').value;
 
     // disable nút summit

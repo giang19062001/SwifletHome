@@ -28,7 +28,7 @@ quillGlobal.on('text-change', (delta, oldDelta, source) => {
     // Xóa  [[payment]] tag mới nhất mà vừa chèn
     quillGlobal.setContents(oldDelta);
 
-    alert('Chỉ được thêm duy nhất một [[payment]] tag');
+    toastErr('Chỉ được thêm duy nhất một [[payment]] tag');
     return
   }
 });

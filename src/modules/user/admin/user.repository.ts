@@ -35,9 +35,10 @@ export class UserAdminRepository {
 
   async getAllUserApp(dto: PagingDto): Promise<IUserApp[]> {
     let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone,  A.deviceToken, A.createdAt, A.updatedAt,
-     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
+     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
+     IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
      FROM ${this.tableApp} A 
-     LEFT JOIN tbl_user_package B
+     LEFT JOIN ${this.tablePackage} B
      ON A.userCode = B.userCode
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
@@ -54,9 +55,10 @@ export class UserAdminRepository {
   async getDetailUserApp(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.createdAt, A.updatedAt,
-     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription
+     B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
+     IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
      FROM ${this.tableApp} A 
-     LEFT JOIN tbl_user_package B
+     LEFT JOIN ${this.tablePackage} B
      ON A.userCode = B.userCode
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
