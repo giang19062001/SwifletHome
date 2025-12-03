@@ -87,7 +87,7 @@ function renderAllUser(data, objElement) {
             <td><p>${ele.startDate ? formatDateTime(ele.startDate) : ''}</p></td>
             <td><p>${ele.endDate ? formatDateTime(ele.endDate) : ''}</p></td>
             <td>
-              <p class="txt-not-ok">${ele.packageRemainDay} ngày</p>
+              <p class="txt-not-ok">${ele.packageRemainDay ?  ele.packageRemainDay + ' ngày' : ""}</p>
             </td>
             <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
