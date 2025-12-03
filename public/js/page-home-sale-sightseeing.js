@@ -44,7 +44,7 @@ async function openModal(homeData) {
   const selectStatus = modalEl.querySelector('#status');
   selectStatus.innerHTML = '';
 
-  OPTIONS.HOME_SUMIT.forEach((ele) => {
+  KEYWORDS.HOME_SALE_SIGHTSEEING_STATUS.forEach((ele) => {
     const option = document.createElement('option');
     option.value = ele.value;
     option.textContent = ele.text;
@@ -87,7 +87,7 @@ function renderAllHomeSightseeing(data, objElement) {
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td><p>${ele.numberAttend}</p></td>
-            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${OPTIONS.HOME_SUMIT.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
+            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${KEYWORDS.HOME_SALE_SIGHTSEEING_STATUS.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-edit" onclick="getDetailHomeSightseeing('${ele.seq}')">Chỉnh sửa</button>

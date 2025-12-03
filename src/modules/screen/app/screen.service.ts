@@ -6,6 +6,7 @@ import { InfoAppService } from 'src/modules/info/app/info.service';
 import { IInfoBank } from 'src/modules/info/info.interface';
 import { IScreenSignupService } from '../screen.interface';
 import { ScreenAppRepository } from './screen.repository';
+import { KEYWORDS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class ScreenAppService {
@@ -24,7 +25,7 @@ export class ScreenAppService {
 
     if (screen) {
       switch (keyword) {
-        case 'SIGNUP_SERVICE':
+        case KEYWORDS.SCREEN.SIGNUP_SERVICE:
           if (screen.screenContent) {
             const packages = await this.packageAppService.getAll({ limit: 0, page: 0 });
             const bankInfo = await this.infoAppService.getDetail('BANK');

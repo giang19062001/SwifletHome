@@ -9,6 +9,7 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as userInterface from 'src/modules/user/app/user.interface';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
+import { Msg } from 'src/helpers/message.helper';
 
 @ApiTags('app/answer')
 @Controller('/api/app/answer')
@@ -25,9 +26,12 @@ export class AnswerAppController {
   @ApiBody({ type: AnswerReplyDto })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(String) })
-  async reply(@Body() dto: AnswerReplyDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<string> {
+  async reply(@Body() dto: AnswerReplyDto, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.answerAppService.reply();
-    const res = this.searchService.reply(dto.question, user.userCode, result);
-    return res;
+    const res = await this.searchService.reply(dto.question, user.userCode, result);
+    return {
+      message: Msg.GetOk,
+      data: res,
+    };
   }
 }

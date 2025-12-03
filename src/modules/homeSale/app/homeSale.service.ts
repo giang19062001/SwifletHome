@@ -7,6 +7,7 @@ import { CreateHomeSightSeeingDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { OptionService } from 'src/modules/options/option.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { KEYWORDS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class HomeSaleAppService {
@@ -58,9 +59,9 @@ export class HomeSaleAppService {
     if (!attendCodes.map((c) => c.code).includes(dto.numberAttendCode)) {
       throw new BadRequestException(Msg.CodeInvalid);
     }
-    // mặc định status ban đầu là 'WAITING' -> Đang chờ duyệt
+    // mặc định status ban đầu là  'Đang chờ duyệt'
 
-    const result = await this.homeSaleAppRepository.registerSightSeeing(dto, userCode, 'WAITING');
+    const result = await this.homeSaleAppRepository.registerSightSeeing(dto, userCode,  KEYWORDS.HOME_SALE_SIGHTSEEING_STATUS.WAITING);
     return result;
   }
 }

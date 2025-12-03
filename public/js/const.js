@@ -1,8 +1,8 @@
 const CURRENT_PATH = window.location.pathname;
 const CURRENT_URL = window.location.origin;
 const CURRENT_PARAMS = window.location.search;
-const OPTIONS = {
-  HOME_SUMIT: [
+const KEYWORDS = {
+  HOME_SALE_SIGHTSEEING_STATUS: [
     {
       value: 'WAITING',
       text: 'Đang chờ duyệt',

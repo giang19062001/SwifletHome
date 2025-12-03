@@ -29,8 +29,11 @@ export class AuthAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(LoginResDto) })
   async login(@Body() dto: LoginAppDto) {
-    const user = await this.authAppService.login(dto);
-    return user;
+    const result = await this.authAppService.login(dto);
+    return {
+      message: result ? Msg.LoginOk : Msg.LoginErr,
+      data: result,
+    };
   }
   @ApiBody({
     type: RegisterUserAppDto,
@@ -53,9 +56,12 @@ export class AuthAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetInfoUserAppResDto) })
-  async getInfo(@GetUserApp() user: authInterface.ITokenUserApp): Promise<userInterface.IUserApp | null> {
+  async getInfo(@GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.authAppService.getInfo(user.userCode);
-    return result;
+    return {
+      message: result ? Msg.GetOk : Msg.GetErr,
+      data: result,
+    };
   }
 
   @ApiParam({ name: 'userPhone', type: String })
@@ -82,7 +88,10 @@ export class AuthAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async updateDeviceToken(@Body() dto: UpdateDeviceTokenDto, @Param('userPhone') userPhone: string) {
     const result = await this.authAppService.updateDeviceToken(dto, userPhone);
-    return { data: result };
+    return {
+      message: result ? Msg.UpdateOk : Msg.UpdateErr,
+      data: result,
+    };
   }
 
   @ApiParam({ name: 'userPhone', type: String })

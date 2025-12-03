@@ -14,6 +14,9 @@ import { GetContentScreenResDto } from './screen.response';
 export class ScreenAppController {
   constructor(private readonly screenAppService: ScreenAppService) {}
 
+  @ApiOperation({
+    summary: 'Màn hình đăng kí dịch vụ,..',
+  })
   @ApiParam({
     description: '`SIGNUP_SERVICE`: Màn hình đăng kí dịch vụ\n',
     name: 'keyword',

@@ -1,6 +1,7 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpStatus } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponse } from 'src/interfaces/app.interface';
 
 @Injectable()
@@ -8,7 +9,62 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
   intercept(context: ExecutionContext, next: CallHandler): Observable<ApiAppResponse<T>> {
     const ctx = context.switchToHttp();
     const response = ctx.getResponse();
-    // const request = ctx.getRequest();
+    const request = ctx.getRequest();
+
+    // lấy message ok (khi ko set message trong controller)
+    function getOkDefaultMessage(method: string, url: string) {
+      let defaultMessage = '';
+      switch (method) {
+        case 'GET': {
+          defaultMessage = Msg.GetOk;
+          break;
+        }
+        case 'POST': {
+          if (url.includes('get')) {
+            defaultMessage = Msg.GetOk;
+          } else {
+            defaultMessage = Msg.CreateOk;
+          }
+          break;
+        }
+        case 'PUT': {
+          defaultMessage = Msg.UpdateOk;
+          break;
+        }
+        default:
+          defaultMessage = 'Success';
+          break;
+      }
+      return defaultMessage;
+    }
+
+    // lấy message error (khi ko set message trong controller)
+    function getErrDefaultMessage(method: string, url: string) {
+      let defaultMessage = '';
+      switch (method) {
+        case 'GET': {
+          defaultMessage = Msg.GetErr;
+          break;
+        }
+        case 'POST': {
+          if (url.includes('get')) {
+            defaultMessage = Msg.GetErr;
+          } else {
+            defaultMessage = Msg.CreateErr;
+          }
+          break;
+        }
+        case 'PUT': {
+          defaultMessage = Msg.UpdateErr;
+          break;
+        }
+        default:
+          defaultMessage = 'Internal server error';
+          break;
+      }
+      return defaultMessage;
+    }
+
     return next.handle().pipe(
       map((data) => {
         // Trường hợp controller trả về object đã có success, message...
@@ -19,12 +75,11 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
           };
         }
 
-        // Trường hợp data là null, undefined, 0, false,...
-        // if (data === null || data === undefined || data === 0 || data === false) {
+        // Trường hợp data là null, undefined trừ 0, false,...
         if (data === null || data === undefined) {
           return {
             success: true, // vẫn coi là thành công nếu controller chủ động trả null/0
-            message: data?.message || 'Success',
+            message: data?.message || getOkDefaultMessage(request.method, request.url),
             data: data ?? null,
             statusCode: response.statusCode,
           };
@@ -33,7 +88,7 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
         // Trường hợp bình thường
         return {
           success: true,
-          message: data?.message || 'Success',
+          message: data?.message || getOkDefaultMessage(request.method, request.url),
           data: data?.data ?? data,
           statusCode: response.statusCode,
         };
@@ -43,7 +98,7 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
       catchError((err) => {
         const statusCode = err?.status || err?.response?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
 
-        const message = err?.response?.message || err?.message || 'Internal server error';
+        const message = err?.response?.message || err?.message || getErrDefaultMessage(request.method, request.url);
 
         // Nếu là mảng lỗi (validation), lấy hết
         const errorMessage = Array.isArray(message) ? message.join(', ') : message;

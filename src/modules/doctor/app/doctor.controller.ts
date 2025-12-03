@@ -41,7 +41,7 @@ export class DoctorAppController {
       throw new BadRequestException();
     }
     return {
-      message: Msg.DoctorCreateOk,
+      message: Msg.CreateOk,
       data: result,
     };
   }

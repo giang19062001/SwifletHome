@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, BadRequestException, Delete, Param, UseInterceptors } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { IBlog } from '../blog.interface';
 import { BlogAppService } from './blog.service';
@@ -23,6 +23,9 @@ export class BlogAppController {
     private readonly searchService: SearchService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Dẫn dụ chim đêm tab,..',
+  })
   @Get('getContent')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetContentBlogResDto) })

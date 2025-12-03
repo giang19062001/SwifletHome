@@ -4,7 +4,7 @@ import { IPackage } from '../package/package.interface';
 
 export interface IScreen {
   seq: number;
-  screenKeyword: 'SIGNUP_SERVICE'; // enum('SIGNUP_SERVICE')
+  screenKeyword: string; // enum('')
   screenName: string;
   screenContent: any;
   screenDescription: string;

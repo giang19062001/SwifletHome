@@ -78,7 +78,7 @@ export class HomeSaleAppController {
   async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.homeSaleAppService.registerSightSeeing(dto, user.userCode);
     return {
-      message: Msg.HomeSummitCreateOk,
+      message: result ? Msg.CreateOk : Msg.CreateErr,
       data: result,
     };
   }

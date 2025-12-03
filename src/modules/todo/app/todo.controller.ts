@@ -17,9 +17,6 @@ export default class TodoAppController {
   constructor(private readonly todoAppService: TodoAppService) {}
 
 
-  @ApiOperation({
-    summary: 'Không cần xác thực',
-  })
   @Get('getTasks')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([GetTaskResDto]) })
