@@ -57,7 +57,7 @@ export class UserHomeAppRepository {
     return rows ? (rows[0] as IUserHome) : null;
   }
 
-  async create(userCode: string, dto: MutationUserHomeDto, isMain: string, userHomeImage: string): Promise<number> {
+  async createHome(userCode: string, dto: MutationUserHomeDto, isMain: string, userHomeImage: string): Promise<number> {
     const sqlLast = ` SELECT userHomeCode FROM ${this.table} ORDER BY userHomeCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let userHomeCode = 'HOM000001';
@@ -103,7 +103,7 @@ export class UserHomeAppRepository {
 
     return result.affectedRows;
   }
-  async update(userCode: string, userHomeCode: string, dto: MutationUserHomeDto, userHomeImage: string): Promise<number> {
+  async updateHome(userCode: string, userHomeCode: string, dto: MutationUserHomeDto, userHomeImage: string): Promise<number> {
     const sql = `
     UPDATE ${this.table}
     SET 
@@ -129,7 +129,7 @@ export class UserHomeAppRepository {
     return result.affectedRows;
   }
 
-  async delete(userHomeCode: string, userCode: string): Promise<number> {
+  async deleteHome(userHomeCode: string, userCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET isActive = ?, updatedId = ? , updatedAt = ?
       WHERE userHomeCode = ? AND userCode = ?

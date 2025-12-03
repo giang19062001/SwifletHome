@@ -46,7 +46,7 @@ export class UserHomeAppController {
     return result;
   }
 
-   @ApiOperation({
+  @ApiOperation({
     summary: 'Lấy thông tin nhà yến chính của user hiện tại',
   })
   @Get('getMainHomeByUser')
@@ -62,7 +62,7 @@ export class UserHomeAppController {
   @ApiParam({ name: 'userHomeCode', type: String })
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async deleteHome(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
-    const result = await this.userHomeAppService.delete(userHomeCode, user.userCode);
+    const result = await this.userHomeAppService.deleteHome(userHomeCode, user.userCode);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -96,7 +96,7 @@ export class UserHomeAppController {
   @Put('updateHome/:userHomeCode')
   @HttpCode(HttpStatus.OK)
   async updateHome(@Body() dto: MutationUserHomeDto, @Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
-    const result = await this.userHomeAppService.update(user.userCode, userHomeCode, dto);
+    const result = await this.userHomeAppService.updateHome(user.userCode, userHomeCode, dto);
     if (result === 0) {
       throw new BadRequestException();
     }
@@ -114,14 +114,14 @@ export class UserHomeAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async createHome(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: MutationUserHomeDto) {
-    const result = await this.userHomeAppService.create(user.userCode, dto);
+    const result = await this.userHomeAppService.createHome(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({
         message: Msg.UuidNotFound,
         data: 0,
       });
     }
-      if (result === -2) {
+    if (result === -2) {
       throw new BadRequestException({
         message: Msg.InvalidPackageToAddHome,
         data: 0,

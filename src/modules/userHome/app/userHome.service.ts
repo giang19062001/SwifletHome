@@ -22,21 +22,29 @@ export class UserHomeAppService {
     private readonly logger: LoggingService,
   ) {}
   async getAll(dto: PagingDto, userCode: string): Promise<IList<IUserHome>> {
+    const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.userHomeAppRepository.getTotalHomes(userCode);
     const list = await this.userHomeAppRepository.getAllHomes(dto, userCode);
+    this.logger.log(logbase, `userCode(${userCode})`);
     return { total, list };
   }
 
   async getDetail(userHomeCode: string): Promise<IUserHome | null> {
+    const logbase = `${this.SERVICE_NAME}/getDetail:`;
     const result = await this.userHomeAppRepository.getDetailHome(userHomeCode);
+    this.logger.log(logbase, `userHomeCode(${userHomeCode})`);
     return result;
   }
 
   async getMainHomeByUser(userCode: string): Promise<IUserHome | null> {
+    const logbase = `${this.SERVICE_NAME}/getMainHomeByUser:`;
     const result = await this.userHomeAppRepository.getMainHomeByUser(userCode);
+    this.logger.log(logbase, `userCode(${userCode})`);
     return result;
   }
   async updateHomeToMain(userHomeCode: string, userCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/updateHomeToMain:`;
+
     const homeMain = await this.userHomeAppRepository.getMainHomeByUser(userCode);
     // cập nhập nhà yến đang nhà chính hiện tại thành phụ
     if (homeMain && homeMain.userHomeCode !== userHomeCode) {
@@ -44,21 +52,26 @@ export class UserHomeAppService {
     }
     // cập nhập nhà yến != userHomeCode với nhà yến đang là chính -> để thành nhà yến chính
     const result = await this.userHomeAppRepository.updateHomeMain(YnEnum.Y, userCode, userHomeCode);
+    this.logger.log(logbase, `cập nhập nhà yến(${userHomeCode}) thành nhà yến chính thành công`);
     return result;
   }
 
-  async delete(userHomeCode: string, userCode: string): Promise<number> {
+  async deleteHome(userHomeCode: string, userCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/deleteHome:`;
+
     const homeMain = await this.userHomeAppRepository.getMainHomeByUser(userCode);
     // nếu nhà yến muốn xóa đang là chính -> ko thể xóa
     if (homeMain && homeMain.userHomeCode == userHomeCode) {
       throw new BadRequestException({ message: Msg.HomeIsMainCannotDelete, data: 0 });
     }
 
-    const result = await this.userHomeAppRepository.delete(userHomeCode, userCode);
+    const result = await this.userHomeAppRepository.deleteHome(userHomeCode, userCode);
+    this.logger.log(logbase, `xóa nhà yến(${userHomeCode}) thành công`);
+
     return result;
   }
-  async update(userCode: string, userHomeCode: string, dto: MutationUserHomeDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/update:`;
+  async updateHome(userCode: string, userHomeCode: string, dto: MutationUserHomeDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/updateHome:`;
 
     try {
       let result = 1;
@@ -78,7 +91,7 @@ export class UserHomeAppService {
 
             // cập nhập -> cập nhập dữ liệu và ảnh mới
             const userHomeImagePath = `${getFileLocation(filesUploaded.mimetype, filesUploaded.filename)}/${filesUploaded.filename}`;
-            await this.userHomeAppRepository.update(userCode, userHomeCode, dto, userHomeImagePath);
+            await this.userHomeAppRepository.updateHome(userCode, userHomeCode, dto, userHomeImagePath);
 
             // cập nhập userHomeSEQ của file mới đã cùng uniqueId với nhà yến vừa updated
             await this.userHomeAppRepository.updateSeqFiles(home.seq, filesUploaded.seq, dto.uniqueId);
@@ -87,8 +100,9 @@ export class UserHomeAppService {
           }
         } else {
           // cập nhập dữ liệu -> ảnh vẫn giữ nguyên
-          await this.userHomeAppRepository.update(userCode, userHomeCode, dto, home.userHomeImage);
+          await this.userHomeAppRepository.updateHome(userCode, userHomeCode, dto, home.userHomeImage);
         }
+        this.logger.log(logbase, `cập nhập nhà yến(${userHomeCode}) thành công`);
       } else {
         throw new BadRequestException();
       }
@@ -99,8 +113,8 @@ export class UserHomeAppService {
       return 0;
     }
   }
-  async create(userCode: string, dto: MutationUserHomeDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/create:`;
+  async createHome(userCode: string, dto: MutationUserHomeDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/createHome:`;
 
     try {
       let result = 1;
@@ -118,14 +132,14 @@ export class UserHomeAppService {
       // có file được upload cùng uuid -> insert
       if (filesUploaded) {
         // thêm nhà yến của user
-        const userHomeImagePath = filesUploaded.filename
+        const userHomeImagePath = filesUploaded.filename;
         // kiểm tra user này có nhà nào là chính hay chưa
         const homeMain = await this.userHomeAppRepository.getMainHomeByUser(userCode);
         let isMain = 'N';
         if (!homeMain) {
           isMain = 'Y';
         }
-        const seq = await this.userHomeAppRepository.create(userCode, dto, isMain, userHomeImagePath);
+        const seq = await this.userHomeAppRepository.createHome(userCode, dto, isMain, userHomeImagePath);
         // cập nhập userHomeSEQ của file đã tìm cùng uniqueId với nhà yến vừa created
         await this.userHomeAppRepository.updateSeqFiles(seq, filesUploaded.seq, dto.uniqueId);
       } else {
@@ -134,6 +148,9 @@ export class UserHomeAppService {
         return result;
       }
 
+      if (result == 1) {
+        this.logger.log(logbase, `thêm nhà yến cho người dùng(${userCode}) thành công`);
+      }
       return result;
     } catch (error) {
       this.logger.error(logbase, error);
