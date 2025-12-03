@@ -1,10 +1,12 @@
 export const Msg = {
-  GetOk: 'Lấy dữ liệu thành công',
-  GetErr: 'Lấy dữ liệu thất bại',
-  CreateOk: 'Thêm dữ liệu thành công',
-  CreateErr: 'Thêm dữ liệu thất bại',
-  UpdateOk: 'Cập nhập dữ liệu thành công',
-  UpdateErr: 'Cập nhập dữ liệu thất bại',
+  UploadOk: 'Tải ảnh lên thành công',
+  UploadErr: 'Tải ảnh lên thất bại',
+  GetOk: 'Lấy thông tin thành công',
+  GetErr: 'Lấy thông tin thất bại',
+  CreateOk: 'Thêm thông tin thành công',
+  CreateErr: 'Thêm thông tin thất bại',
+  UpdateOk: 'Cập nhập thông tin thành công',
+  UpdateErr: 'Cập nhập thông tin thất bại',
   CodeInvalid: 'Mã code không hợp lệ',
   TokenMissing: 'Vui lòng xác thực token',
   TokenInvalid: 'Token không hợp lệ',
@@ -39,5 +41,5 @@ export const Msg = {
   OtpExpire: 'OTP không tồn tại hoặc đã hết hạn',
   OtpOvertake: 'Đã vượt quá số lần nhập OTP cho phép',
   OtpRemainAttempt: (num: number) => `Mã OTP không đúng. Còn ${num} lần thử.`,
-  InvalidPackageToAddHome:"Vui lòng nâng cấp gói để có thể thêm nhà yến mới"
+  InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
 };

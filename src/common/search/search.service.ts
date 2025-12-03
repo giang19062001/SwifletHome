@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
-import { fuseConfig, ISearchItem } from 'src/config/search.config';
 import { Msg } from 'src/helpers/message.helper';
 import { UploadService } from 'src/modules/upload/upload.service';
 import { LoggingService } from '../logger/logger.service';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import { ISearchItem } from './search.interface';
 
 @Injectable()
 export class SearchService {
-  private readonly fuseOptions: IFuseOptions<ISearchItem> = fuseConfig;
+  private readonly fuseOptions: IFuseOptions<ISearchItem> = {
+    keys: ['questions'],
+    threshold: 0.3, // Nhỏ hơn → kết quả chính xác hơn
+    includeScore: true,
+    ignoreLocation: true,
+    ignoreFieldNorm: true,
+  };
   private readonly SERVICE_NAME = 'SearchService';
 
   constructor(

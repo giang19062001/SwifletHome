@@ -1,6 +1,5 @@
-// src/services/logging.service.ts
 import { Injectable, LoggerService, LogLevel, Scope } from '@nestjs/common';
-import { winstonConfig } from 'src/config/logger.config';
+import { winstonConfig } from 'src/common/logger/logger.config';
 import { requestContextStorage } from 'src/middleware/ip.middleware';
 import { createLogger, Logger } from 'winston';
 

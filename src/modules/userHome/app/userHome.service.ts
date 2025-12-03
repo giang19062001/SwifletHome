@@ -90,7 +90,7 @@ export class UserHomeAppService {
             await this.userHomeAppRepository.deleteFileByUniqueid(home.uniqueId);
 
             // cập nhập -> cập nhập dữ liệu và ảnh mới
-            const userHomeImagePath = `${getFileLocation(filesUploaded.mimetype, filesUploaded.filename)}/${filesUploaded.filename}`;
+            const userHomeImagePath = filesUploaded.filename;
             await this.userHomeAppRepository.updateHome(userCode, userHomeCode, dto, userHomeImagePath);
 
             // cập nhập userHomeSEQ của file mới đã cùng uniqueId với nhà yến vừa updated
@@ -109,7 +109,7 @@ export class UserHomeAppService {
 
       return result;
     } catch (error) {
-      this.logger.error(logbase, error);
+      this.logger.error(logbase, JSON.stringify(error));
       return 0;
     }
   }
@@ -153,7 +153,7 @@ export class UserHomeAppService {
       }
       return result;
     } catch (error) {
-      this.logger.error(logbase, error);
+      this.logger.error(logbase, JSON.stringify(error));
       return 0;
     }
   }
@@ -170,8 +170,7 @@ export class UserHomeAppService {
       }
       return res;
     } catch (error) {
-      // this.logger.error(logbase, error);
-      console.log('error', error);
+      this.logger.error(logbase, JSON.stringify(error));
       return { filename: '' };
     }
   }

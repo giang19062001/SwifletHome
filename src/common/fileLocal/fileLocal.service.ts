@@ -54,7 +54,7 @@ export class FileLocalService {
       await fs.unlink(filePath);
       this.logger.log(logbase, `Đã xóa thành công tệp ${filepath} khỏi thư mục`);
     } catch (error) {
-      this.logger.error(logbase, `Không xóa được tệp ${filepath} khỏi thư mục -> ${error}`);
+      this.logger.error(logbase, `Không xóa được tệp ${filepath} khỏi thư mục -> ${JSON.stringify(error)}`);
     }
   }
   async getImageDimensions(filepath: string): Promise<{ width: number; height: number } | null> {

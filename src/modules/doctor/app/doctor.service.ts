@@ -25,8 +25,8 @@ export class DoctorAppService {
       const filesUploaded: { seq: number }[] = await this.doctorAppRepository.findFilesByUniqueId(dto.uniqueId);
 
       if (filesUploaded.length) {
-        // mặc định là chờ 
-        const seq = await this.doctorAppRepository.create(userCode, dto,  KEYWORDS.DOCTOR_STATUS.WAITING);
+        // mặc định là chờ
+        const seq = await this.doctorAppRepository.create(userCode, dto, KEYWORDS.DOCTOR_STATUS.WAITING);
         for (const file of filesUploaded) {
           // cập nhập doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created
           await this.doctorAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId);
@@ -36,9 +36,13 @@ export class DoctorAppService {
         result = -1;
         this.logger.error(logbase, `${Msg.UuidNotFound} --> uniqueId: ${dto.uniqueId}`);
       }
+
+      if (result == 1) {
+        this.logger.log(logbase, `Đăng ký khám bệnh thành công: ${JSON.stringify(dto)}`);
+      }
       return result;
     } catch (error) {
-      this.logger.error(logbase, error);
+      this.logger.error(logbase, JSON.stringify(error));
       return 0;
     }
   }
@@ -48,6 +52,8 @@ export class DoctorAppService {
       let res: IDoctorFileStr[] = [];
       if (doctorFiles.length > 0) {
         for (const file of doctorFiles) {
+          this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);
+
           const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
           const result = await this.doctorAppRepository.uploadFile(0, dto.uniqueId, userCode, filenamePath, file);
           if (result > 0) {
@@ -58,7 +64,7 @@ export class DoctorAppService {
       this.logger.log(logbase, `Upload file thành công: ${JSON.stringify(res)}`);
       return res;
     } catch (error) {
-      this.logger.error(logbase, `Upload file thất bại: ${error}`);
+      this.logger.error(logbase, `Upload file thất bại: ${JSON.stringify(error)}`);
       return [];
     }
   }

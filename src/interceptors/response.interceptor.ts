@@ -74,7 +74,6 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
             statusCode: response.statusCode,
           };
         }
-
         // Trường hợp data là null, undefined trừ 0, false,...
         if (data === null || data === undefined) {
           return {
