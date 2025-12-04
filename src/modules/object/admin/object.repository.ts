@@ -11,13 +11,13 @@ export class ObjectAdminRepository   {
   }
 
   async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y' `);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isDelete = 'Y' `);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IObject[]> {
-    let query = `  SELECT seq, objectKeyword, objectName, isActive, createdAt, updatedAt, createdId, updatedId 
+    let query = `  SELECT seq, objectKeyword, objectName, isDelete, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} 
-         WHERE isActive = 'Y' `;
+         WHERE isDelete = 'Y' `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

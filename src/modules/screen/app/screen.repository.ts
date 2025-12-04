@@ -11,8 +11,8 @@ export class ScreenAppRepository {
 
   async getDetail(screenKeyword: string): Promise<IScreen | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.screenKeyword, A.screenName, A.screenContent, A.screenDescription, A.isActive
-        FROM ${this.table} A WHERE A.screenKeyword = ? AND A.isActive = 'Y'
+      ` SELECT A.seq, A.screenKeyword, A.screenName, A.screenContent, A.screenDescription, A.isDelete
+        FROM ${this.table} A WHERE A.screenKeyword = ? AND A.isDelete = 'Y'
         LIMIT 1`,
       [screenKeyword],
     );

@@ -8,7 +8,7 @@ export class TodoAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTasks(): Promise<ITodoTask[]> {
-    let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' `;
+    let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isDelete = 'Y' `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
     return rows as ITodoTask[];

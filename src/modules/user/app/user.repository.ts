@@ -20,7 +20,7 @@ export class UserAppRepository {
   async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
-     FROM ${this.table} WHERE userPhone = ? AND isActive = 'Y' LIMIT 1`,
+     FROM ${this.table} WHERE userPhone = ? AND isDelete = 'Y' LIMIT 1`,
       [userPhone],
     );
     return rows.length ? (rows[0] as ITokenUserApp) : null;
@@ -34,7 +34,7 @@ export class UserAppRepository {
         ON A.userCode = B.userCode
       LEFT JOIN tbl_package C
         ON B.packageCode = C.packageCode
-      WHERE A.userCode = ? AND A.isActive = 'Y' 
+      WHERE A.userCode = ? AND A.isDelete = 'Y' 
        LIMIT 1`,
       [userCode],
     );
@@ -52,8 +52,8 @@ export class UserAppRepository {
       LEFT JOIN tbl_package C
         ON B.packageCode = C.packageCode
       LEFT JOIN ${this.tableHome} D
-        ON D.userCode = A.userCode AND D.isActive = 'Y' 
-      WHERE A.userCode = ? AND A.isActive = 'Y' 
+        ON D.userCode = A.userCode AND D.isDelete = 'Y' 
+      WHERE A.userCode = ? AND A.isDelete = 'Y' 
       GROUP BY 
       A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
       B.startDate, B.endDate, B.packageCode,
@@ -79,7 +79,7 @@ export class UserAppRepository {
       userCode = generateCode(rows[0].userCode, 'USR', 6);
     }
     const sql = `
-      INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, deviceToken, isActive, createdId) 
+      INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, deviceToken, isDelete, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.deviceToken, 'Y', this.updator]);
@@ -127,7 +127,7 @@ export class UserAppRepository {
   }
   async createPackage(dto: CreateUserPackageAppDto, createdAt: Date): Promise<number> {
     const sql = `
-          INSERT INTO ${this.tablePackage} (userCode, packageCode, startDate, endDate, isActive, createdId, createdAt) 
+          INSERT INTO ${this.tablePackage} (userCode, packageCode, startDate, endDate, isDelete, createdId, createdAt) 
           VALUES(?, ?, ?, ?, ?, ?, ?)
         `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, 'Y', this.updator, createdAt]);

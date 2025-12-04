@@ -8,7 +8,7 @@ export interface IBlog {
   blogContent: string;
   blogCategory: string;
   blogScreenCode: string;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   isFree: YnEnum;
   isMain: YnEnum;
   createdAt: Date;

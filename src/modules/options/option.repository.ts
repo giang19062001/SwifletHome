@@ -14,7 +14,7 @@ export class OptionRepository {
       ` SELECT A.seq, A.code, A.mainOption, A.subOption, A.keyOption, A.valueOption, A.sortOrder
         FROM ${this.table} A
         WHERE A.mainOption = ? AND A.subOption = ? ${'keyOption' in dto && dto.keyOption ? 'AND A.keyOption = ?' : ''}
-        AND A.isActive = 'Y' 
+        AND A.isDelete = 'Y' 
         ORDER BY A.sortOrder ASC`,
         'keyOption' in dto && dto.keyOption ? [dto.mainOption, dto.subOption, dto.keyOption] : [dto.mainOption, dto.subOption],
     );

@@ -17,7 +17,7 @@ export class UserAdminRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async findByUserId(userId: string): Promise<ITokenUserAdmin | null> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT seq, userId, userPassword, userName, isActive FROM ${this.tableAdmin} WHERE userId = ? LIMIT 1`, [userId]);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT seq, userId, userPassword, userName, isDelete FROM ${this.tableAdmin} WHERE userId = ? LIMIT 1`, [userId]);
     return rows.length ? (rows[0] as ITokenUserAdmin) : null;
   }
 
@@ -42,7 +42,7 @@ export class UserAdminRepository {
      ON A.userCode = B.userCode
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
-     WHERE A.isActive = 'Y' `;
+     WHERE A.isDelete = 'Y' `;
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
@@ -62,7 +62,7 @@ export class UserAdminRepository {
      ON A.userCode = B.userCode
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
-     WHERE A.userCode = ? AND A.isActive = 'Y'
+     WHERE A.userCode = ? AND A.isDelete = 'Y'
      LIMIT 1`,
       [userCode],
     );

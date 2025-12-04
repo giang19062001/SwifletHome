@@ -6,7 +6,7 @@ export interface IInfo {
   infoName: string;
   infoContent: any;
   infoDescription: string;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId?: string;

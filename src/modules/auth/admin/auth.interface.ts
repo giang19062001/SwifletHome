@@ -5,5 +5,5 @@ export interface ITokenUserAdmin {
   userId: string;
   userPassword: string;
   userName: string;
-  isActive: YnEnum
+  isDelete: YnEnum
 }

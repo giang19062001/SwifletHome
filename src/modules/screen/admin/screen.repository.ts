@@ -17,7 +17,7 @@ export class ScreenAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IScreen[]> {
-    let query = `  SELECT seq, screenKeyword, screenName, screenContent, screenDescription, isActive, createdAt, updatedAt, createdId, updatedId 
+    let query = `  SELECT seq, screenKeyword, screenName, screenContent, screenDescription, isDelete, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} `;
 
     const params: any[] = [];
@@ -31,7 +31,7 @@ export class ScreenAdminRepository {
   }
   async getDetail(screenKeyword: string): Promise<IScreen | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `  SELECT A.seq, A.screenKeyword, A.screenName, A.screenContent, A.screenDescription, A.isActive,
+      `  SELECT A.seq, A.screenKeyword, A.screenName, A.screenContent, A.screenDescription, A.isDelete,
         A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A
         WHERE A.screenKeyword = ? 

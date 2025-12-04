@@ -4,7 +4,7 @@ export interface ITodoTask {
   seq: number;
   taskCode: string;
   taskName: string;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;

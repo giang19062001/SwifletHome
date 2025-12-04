@@ -22,7 +22,7 @@ export class UserHomeAppRepository {
     FROM ${this.table} A 
     LEFT JOIN  tbl_provinces B
     ON A.userHomeProvince = B.provinceCode
-    WHERE A.userCode = ? AND A.isActive = 'Y' `;
+    WHERE A.userCode = ? AND A.isDelete = 'Y' `;
 
     const params: any[] = [];
     params.push(userCode);
@@ -39,7 +39,7 @@ export class UserHomeAppRepository {
       ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
-          WHERE A.userHomeCode = ? AND A.isActive = 'Y'
+          WHERE A.userHomeCode = ? AND A.isDelete = 'Y'
           LIMIT 1 `,
       [userHomeCode],
     );
@@ -50,7 +50,7 @@ export class UserHomeAppRepository {
       ` SELECT A.seq, A.userCode,  A.userHomeCode,  A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
-          WHERE A.userCode = ? AND A.isActive = 'Y' AND A.isMain = 'Y'
+          WHERE A.userCode = ? AND A.isDelete = 'Y' AND A.isMain = 'Y'
           LIMIT 1 `,
       [userCode],
     );
@@ -131,7 +131,7 @@ export class UserHomeAppRepository {
 
   async deleteHome(userHomeCode: string, userCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET isActive = ?, updatedId = ? , updatedAt = ?
+      UPDATE ${this.table} SET isDelete = ?, updatedId = ? , updatedAt = ?
       WHERE userHomeCode = ? AND userCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, ['N', userCode, new Date(), userHomeCode, userCode]);

@@ -15,7 +15,7 @@ export interface IUserHome {
   isIntegateTempHum: YnEnum;
   isIntegateCurrent: YnEnum;
   isTriggered: YnEnum;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
@@ -35,5 +35,5 @@ export interface IUserHomeImageFile {
   originalname: string;
   size: number;
   mimetype: string;
-  isActive: YnEnum;
+  isDelete: YnEnum;
 }

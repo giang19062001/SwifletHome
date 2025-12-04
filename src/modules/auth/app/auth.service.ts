@@ -72,7 +72,7 @@ export class AuthAppService extends AbAuthService {
     }
 
     // tài khoản bị khóa
-    if (user.isActive === 'N') {
+    if (user.isDelete === 'N') {
       this.logger.error(logbase, `${dto.userPhone} -> ${Msg.AccountLoginBlock}`);
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }

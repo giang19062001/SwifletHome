@@ -12,7 +12,7 @@ export class BlogAdppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.blogCode, A.blogName, A.blogContent, A.isFree
         FROM ${this.table} A 
-        WHERE A.isActive = 'Y' AND A.isMain = 'Y'
+        WHERE A.isDelete = 'Y' AND A.isMain = 'Y'
         LIMIT 1 `,
       [],
     );

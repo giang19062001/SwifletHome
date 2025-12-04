@@ -20,7 +20,7 @@ export class UserHomeAdminRepository {
         ON A.userCode = B.userCode
       LEFT JOIN tbl_provinces C
         ON A.userHomeProvince = C.provinceCode
-       WHERE A.isActive = 'Y'  `;
+       WHERE A.isDelete = 'Y'  `;
     const params: any[] = [];
 
     if (dto.userName) {
@@ -49,7 +49,7 @@ export class UserHomeAdminRepository {
       ON A.userCode = B.userCode
     LEFT JOIN tbl_provinces C
       ON A.userHomeProvince = C.provinceCode
-    WHERE A.isActive = 'Y' `;
+    WHERE A.isDelete = 'Y' `;
 
     const params: any[] = [];
 
@@ -86,7 +86,7 @@ export class UserHomeAdminRepository {
           FROM  ${this.table} A 
           LEFT JOIN ${this.tableSensor} B
           ON A.userHomeCode = B.userHomeCode
-          WHERE A.userHomeCode = ? AND A.isActive = 'Y'
+          WHERE A.userHomeCode = ? AND A.isDelete = 'Y'
           LIMIT 1 `,
       [userHomeCode],
     );
@@ -108,7 +108,7 @@ export class UserHomeAdminRepository {
   // TODO: SENSOR
   async insertSensorForHome(dto: TriggerUserHomeSensorDto, userHomeCode: string, createdId: string): Promise<number> {
     const sql = `
-        INSERT INTO ${this.tableSensor}  (userHomeCode, userCode, macId, wifiId, wifiPassword, isActive, createdId) 
+        INSERT INTO ${this.tableSensor}  (userHomeCode, userCode, macId, wifiId, wifiPassword, isDelete, createdId) 
         VALUES(?, ?, ?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
@@ -117,7 +117,7 @@ export class UserHomeAdminRepository {
       dto.macId,
       dto.wifiId,
       dto.wifiPassword,
-      'Y', // isActive
+      'Y', // isDelete
       createdId,
     ]);
 
@@ -126,14 +126,14 @@ export class UserHomeAdminRepository {
   async updateSensorForHome(dto: TriggerUserHomeSensorDto, userHomeCode: string, updatedId: string): Promise<number> {
     const sql = `
           UPDATE ${this.tableSensor}
-      SET macId = ?,  wifiId = ?, wifiPassword = ?, isActive = ? , updatedId = ?, updatedAt = ?
+      SET macId = ?,  wifiId = ?, wifiPassword = ?, isDelete = ? , updatedId = ?, updatedAt = ?
       WHERE userCode = ? AND userHomeCode = ? 
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       dto.macId,
       dto.wifiId,
       dto.wifiPassword,
-      'Y', // isActive
+      'Y', // isDelete
       updatedId,
       new Date(),
       dto.userCode,

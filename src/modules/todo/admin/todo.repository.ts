@@ -10,13 +10,13 @@ export class TodoAdminRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotalTasks(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableTask} WHERE isActive = 'Y'`);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableTask} WHERE isDelete = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllTasks(dto: PagingDto): Promise<ITodoTask[]> {
     let query = `  SELECT seq, taskCode, taskName, createdId, createdAt
         FROM ${this.tableTask} 
-        WHERE isActive = 'Y'`;
+        WHERE isDelete = 'Y'`;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

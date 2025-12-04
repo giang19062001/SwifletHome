@@ -15,7 +15,7 @@ export interface IUserHomeSensor {
   isIntegateTempHum: YnEnum;
   isIntegateCurrent: YnEnum;
   isTriggered: YnEnum;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;

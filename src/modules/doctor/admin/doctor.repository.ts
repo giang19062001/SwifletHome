@@ -33,7 +33,7 @@ export class DoctorAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
         FROM ${this.table} A 
-        WHERE A.SEQ = ? AND A.isActive = 'Y'
+        WHERE A.SEQ = ? AND A.isDelete = 'Y'
         LIMIT 1 `,
       [seq],
     );

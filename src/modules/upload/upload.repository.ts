@@ -13,28 +13,28 @@ export class UploadRepository {
 
   async getAllImgFile(): Promise<IFileUpload[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
+      ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isDelete, A.createdAt, '' as urlLink
         FROM ${this.tableImg} A 
-        WHERE isActive = 'Y' `,
+        WHERE isDelete = 'Y' `,
     );
     return rows as IFileUpload[];
   }
   async getAllAudioFile(): Promise<IFileUpload[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, B.filename AS filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
+      ` SELECT A.seq, B.filename AS filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isDelete, A.createdAt, '' as urlLink
         FROM ${this.tableAudio} A 
         LEFT JOIN  ${this.tableAudio} B
         ON A.seqPay = B.seq
-        WHERE A.isActive = 'Y' AND A.isFree = 'Y'
+        WHERE A.isDelete = 'Y' AND A.isFree = 'Y'
          `,
     );
     return rows as IFileUpload[];
   }
   async getAllVideoLink(): Promise<IFileUpload[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, '' as filenamePay, '' as filename, '' as originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink
+      ` SELECT A.seq, '' as filenamePay, '' as filename, '' as originalname, 0 as size, 'video/youtube' as mimetype, A.isDelete, A.createdAt, A.urlLink
         FROM tbl_uploads_video A 
-        WHERE isActive = 'Y' `,
+        WHERE isDelete = 'Y' `,
     );
     return rows as IFileUpload[];
   }
@@ -101,7 +101,7 @@ export class UploadRepository {
   }
   async deleteVideoLink(seq: number): Promise<number> {
     const sql = `
-      UPDATE  ${this.tableVideo} SET isActive = 'N' WHERE seq = ?
+      UPDATE  ${this.tableVideo} SET isDelete = 'N' WHERE seq = ?
     `;
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
@@ -110,7 +110,7 @@ export class UploadRepository {
   }
   async deleteAudio(filename: string): Promise<number> {
     const sql = `
-      UPDATE ${this.tableAudio} SET isActive = 'N' WHERE filename = ?
+      UPDATE ${this.tableAudio} SET isDelete = 'N' WHERE filename = ?
     `;
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, [filename]);
@@ -128,7 +128,7 @@ export class UploadRepository {
   }
   async deleteImg(filename: string): Promise<number> {
     const sql = `
-      UPDATE ${this.tableImg} SET isActive = 'N' WHERE filename = ?
+      UPDATE ${this.tableImg} SET isDelete = 'N' WHERE filename = ?
     `;
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, [filename]);

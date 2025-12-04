@@ -52,7 +52,7 @@ export class AnswerAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.answerCode, A.answerContent, A.answerObject, A.answerCategory, A.isActive, A.isFree, A.createdAt, A.createdId,
+      ` SELECT A.seq, A.answerCode, A.answerContent, A.answerObject, A.answerCategory, A.isDelete, A.isFree, A.createdAt, A.createdId,
       B.categoryName, C.objectName
       FROM ${this.table} A 
       LEFT JOIN tbl_category B ON A.answerCategory = B.categoryCode
@@ -65,7 +65,7 @@ export class AnswerAdminRepository {
   }
   async getDetail(answerCode: string): Promise<IAnswer | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.answerCode, A.answerContent, A.answerObject, A.answerCategory, A.isActive, A.isFree, A.createdAt, A.createdId,
+      ` SELECT A.seq, A.answerCode, A.answerContent, A.answerObject, A.answerCategory, A.isDelete, A.isFree, A.createdAt, A.createdId,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B

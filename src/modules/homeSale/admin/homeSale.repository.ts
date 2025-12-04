@@ -18,9 +18,9 @@ export class HomeSaleAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IHomeSale[]> {
-    let query = `   SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
+    let query = `   SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isDelete, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A  
-        WHERE A.isActive = 'Y' `;
+        WHERE A.isDelete = 'Y' `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -33,9 +33,9 @@ export class HomeSaleAdminRepository {
   }
   async getDetail(homeCode: string): Promise<IHomeSale | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive
+      ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isDelete
           FROM ${this.table} A 
-          WHERE A.homeCode = ? AND A.isActive = 'Y'
+          WHERE A.homeCode = ? AND A.isDelete = 'Y'
           LIMIT 1 `,
       [homeCode],
     );
@@ -79,7 +79,7 @@ export class HomeSaleAdminRepository {
 
   async delete(homeCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET isActive = "N"
+      UPDATE ${this.table} SET isDelete = "N"
       WHERE homeCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [homeCode]);
@@ -89,7 +89,7 @@ export class HomeSaleAdminRepository {
   // IMAGE
   async getImages(seq: number): Promise<IHomeSaleImg[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.homeSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive
+      ` SELECT A.seq, A.homeSeq, A.filename, A.originalname, A.size, A.mimetype, A.isDelete
           FROM ${this.tableImg} A 
           WHERE A.homeSeq = ? `,
       [seq],

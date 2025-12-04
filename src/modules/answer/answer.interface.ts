@@ -6,7 +6,7 @@ export interface IAnswer {
   answerObject: string;
   answerContent: string;
   answerCategory: string;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   isFree: string;
   createdAt: Date;
   updatedAt: Date;

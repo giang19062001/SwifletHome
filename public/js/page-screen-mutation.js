@@ -113,15 +113,14 @@ function renderContentFileds() {
   // Reset
   parentBox.innerHTML = '';
 
-  console.log(screenContent);
   Object.entries(screenContent).forEach(([key, value]) => {
-    const isActive = String(keyActive) === String(key);
+    const isKeyActive = String(keyActive) === String(key);
 
     const html = `
       <div class="file-box" data-key="${key}">
         <div class="file-card">
           <div class="file-icon">  
-          <svg class="${isActive ? 'active' : ''}" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg class="${isKeyActive ? 'active' : ''}" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <rect width="24" height="24" fill="none" />
                   <g transform="matrix(0.5 0 0 0.5 12 12)">
                       <path transform="translate(-25, -25)" d="M 8 5 C 6.3550302 5 5 6.3550302 5 8 L 5 42 C 5 43.64497 6.3550302 45 8 45 L 42 45 C 43.64497 45 45 43.64497 45 42 L 45 8 C 45 6.3550302 43.64497 5 42 5 L 8 5 z 
@@ -136,7 +135,7 @@ function renderContentFileds() {
                </svg>
           </div>
           <div class="file-info">
-            <div class="file-name ${isActive ? 'active' : ''}">${showNameOfKey(key)}</div>
+            <div class="file-name ${isKeyActive ? 'active' : ''}">${showNameOfKey(key)}</div>
           </div>
           <div class="file-button">
             <button class="copy-btn btn-edit-out" data-set-key="${key}">Chỉnh sửa</button>

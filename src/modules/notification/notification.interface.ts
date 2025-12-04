@@ -14,7 +14,7 @@ export interface INotification {
   userCode: string;
   topicCode: string;
   status: NotifyStatusEnum;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
@@ -27,7 +27,7 @@ export interface INotificationTopic {
   topicCode: string;
   topicName: string;
   topicDescription: string;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
@@ -38,7 +38,7 @@ export interface IUserNotificationTopic {
   seq: number;
   userCode: string;
   topicCode: string;
-  isActive: YnEnum;
+  isDelete: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
