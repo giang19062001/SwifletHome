@@ -42,8 +42,6 @@ export class AuthAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async register(@Body() dto: RegisterUserAppDto) {
-    console.log('register:', dto);
-
     const result = await this.authAppService.register(dto);
     return {
       message: result ? Msg.RegisterAccountOk : Msg.RegisterAccountErr,
@@ -132,8 +130,6 @@ export class AuthAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(RequestOtpResDto) })
   async requestOtp(@Body() dto: RequestOtpDto) {
-    console.log('requestOtp:', dto);
-
     const otpCode = await this.authAppService.requestOtp(dto);
     return {
       message: Msg.OtpSent,

@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import { NotFoundExceptionFilter } from './filter/notFound.filter';
 import { initSwagger } from './config/swagger.config';
 import { ConfigService } from '@nestjs/config';
+import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -30,6 +31,9 @@ async function bootstrap() {
 
   // filter
   app.useGlobalFilters(new NotFoundExceptionFilter());
+
+  // interceptor
+  app.useGlobalInterceptors(new RequestLoggerInterceptor())
 
   //cookie
   app.use(cookieParser());
