@@ -33,7 +33,20 @@ export default class TodoAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(GetScheduledTasksResDto) })
   async getScheduledTasks(@GetUserApp() user: authInterface.ITokenUserApp) {
     return {
-      keys: ['harvest', 'rollMedicine', 'luringBird'],
+      keys: [
+        {
+          key: 'harvest',
+          text: 'Thu hoạch',
+        },
+        {
+          key: 'rollMedicine',
+          text: 'Lăn thuốc',
+        },
+        {
+          key: 'luringBird',
+          text: 'Chim đêm',
+        },
+      ],
       values: {
         harvest: 'NA',
         rollMedicine: 'NA',
