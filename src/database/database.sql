@@ -65,7 +65,7 @@ CREATE TABLE
     `userId` varchar(45) NOT NULL,
     `userName` varchar(45) NOT NULL,
     `userPassword` varchar(255) NOT NULL,
-    `isDelete` char(1) NOT NULL DEFAULT 'Y',
+    `isActive` char(1) NOT NULL DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     PRIMARY KEY (`seq`),
@@ -80,7 +80,7 @@ CREATE TABLE
     `seq` int NOT NULL AUTO_INCREMENT,
     `categoryCode` varchar(45) NOT NULL,
     `categoryName` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -97,7 +97,7 @@ CREATE TABLE
     `seq` int NOT NULL AUTO_INCREMENT,
     `objectKeyword` enum ('SWIFTLET', 'TEA', 'COFFEE') NOT NULL DEFAULT 'SWIFTLET',
     `objectName` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -117,7 +117,7 @@ CREATE TABLE
     `questionObject` char(10) NOT NULL,
     `questionContent` text NOT NULL,
     `questionCategory` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -136,7 +136,7 @@ CREATE TABLE
     `answerContent` text NOT NULL,
     `answerObject` char(10) NOT NULL,
     `answerCategory` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `isFree` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE
     `blogCategory` varchar(45) NOT NULL,
     `blogContent` text NOT NULL,
     `blogScreenCode` char(15) DEFAULT '', -- màn hình code trên app
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `isFree` char(1) DEFAULT 'Y',
     `isMain` varchar(45) DEFAULT 'N',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -175,7 +175,7 @@ CREATE TABLE
     `originalname` text NOT NULL,
     `size` int NOT NULL,
     `mimetype` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `isFree` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
@@ -196,7 +196,7 @@ CREATE TABLE
     `originalname` text NOT NULL,
     `size` int NOT NULL,
     `mimetype` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `isFree` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
@@ -213,7 +213,7 @@ CREATE TABLE
   `tbl_uploads_video` (
     `seq` int NOT NULL AUTO_INCREMENT,
     `urlLink` varchar(255) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -236,7 +236,7 @@ CREATE TABLE
     `latitude` float NOT NULL,
     `longitude` float NOT NULL,
     `homeImage` varchar(255) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -257,7 +257,7 @@ CREATE TABLE
     `originalname` text NOT NULL,
     `size` int NOT NULL,
     `mimetype` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -302,7 +302,7 @@ CREATE TABLE
     `originalname` text NOT NULL,
     `size` int NOT NULL,
     `mimetype` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT NULL,
@@ -326,7 +326,7 @@ CREATE TABLE
     `isIntegateCurrent` char(1) DEFAULT 'N',
     `isTriggered` char(1) DEFAULT 'N',
     `isMain` char(1) DEFAULT 'N',
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -346,7 +346,7 @@ CREATE TABLE
     `macId` varchar(255) NOT NULL,
     `wifiId` text NOT NULL,
     `wifiPassword` char(15) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -369,7 +369,7 @@ CREATE TABLE
     `originalname` text NOT NULL,
     `size` int NOT NULL,
     `mimetype` varchar(45) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT NULL,
@@ -391,7 +391,7 @@ CREATE TABLE
     `noteAnswered` text,
     `status` ENUM ('WAITING', 'ANSWERED', 'CANCEL') DEFAULT 'WAITING',
     `uniqueId` char(255) NOT NULL,
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -413,7 +413,7 @@ CREATE TABLE
     `keyOption` varchar(15) NOT NULL,
     `valueOption` varchar(255) NOT NULL,
     `sortOrder` int DEFAULT '0',
-    `isDelete` char(1) DEFAULT 'Y',
+    `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -454,7 +454,7 @@ CREATE TABLE
     `userPassword` varchar(255) NOT NULL,
     `userPhone` varchar(15) NOT NULL,
     `deviceToken` text NOT NULL,
-    `isDelete` char(1) NOT NULL DEFAULT 'Y',
+    `isActive` char(1) NOT NULL DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -474,7 +474,7 @@ CREATE TABLE
     `packageCode` varchar(45) DEFAULT NULL,
     `startDate` datetime DEFAULT NULL,
     `endDate` datetime DEFAULT NULL,
-    `isDelete` char(1) NOT NULL DEFAULT 'Y',
+    `isActive` char(1) NOT NULL DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -511,7 +511,7 @@ CREATE TABLE
     `packagePrice` decimal(10, 3) NOT NULL,
     `packageExpireDay` int NOT NULL,
     `packageDescription` varchar(255) NOT NULL,
-    `isDelete` char(1) NOT NULL DEFAULT 'Y',
+    `isActive` char(1) NOT NULL DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -531,7 +531,7 @@ CREATE TABLE
     `infoName` varchar(45) NOT NULL,
     `infoContent` json NOT NULL,
     `infoDescription` varchar(255) NOT NULL,
-    `isDelete` char(1) NOT NULL DEFAULT 'Y',
+    `isActive` char(1) NOT NULL DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -551,7 +551,7 @@ CREATE TABLE
     `screenName` varchar(45) NOT NULL,
     `screenContent` JSON NOT NULL,
     `screenDescription` varchar(255) NOT NULL,
-    `isDelete` char(1) NOT NULL DEFAULT 'Y',
+    `isActive` char(1) NOT NULL DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -569,7 +569,7 @@ CREATE TABLE
     topicCode VARCHAR(45) NOT NULL UNIQUE,
     topicName VARCHAR(45) NOT NULL UNIQUE,
     topicDescription TEXT,
-    isDelete CHAR(1) NOT NULL DEFAULT 'Y',
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
@@ -584,7 +584,7 @@ CREATE TABLE
     seq INT AUTO_INCREMENT PRIMARY KEY,
     userCode VARCHAR(45) NOT NULL,
     topicCode VARCHAR(45) NOT NULL,
-    isDelete CHAR(1) NOT NULL DEFAULT 'Y',
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
@@ -604,7 +604,7 @@ CREATE TABLE
     userCode VARCHAR(45) NOT NULL,
     topicCode VARCHAR(45) DEFAULT NULL, -- có thể null
     status ENUM ('SENT', 'READ', 'FAIL') DEFAULT 'SENT',
-    isDelete CHAR(1) NOT NULL DEFAULT 'Y',
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
@@ -619,7 +619,7 @@ CREATE TABLE
     seq INT AUTO_INCREMENT PRIMARY KEY,
     taskCode VARCHAR(45)  UNIQUE NOT NULL,
     taskName VARCHAR(255) NOT NULL,
-    isDelete CHAR(1) NOT NULL DEFAULT 'Y',
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
@@ -638,7 +638,7 @@ CREATE TABLE
     taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL') DEFAULT 'WAITING',
     periodValue INT  DEFAULT NULL, --  week ( 0 - 6 : CN - T7); month (1-31)
     specificValue DATETIME  DEFAULT NULL, -- date cụ thể nếu taskType  là 'SPECIFIC'
-    isDelete CHAR(1) NOT NULL DEFAULT 'Y',
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
@@ -652,7 +652,7 @@ INSERT INTO
     `userId`,
     `userName`,
     `userPassword`,
-    `isDelete`,
+    `isActive`,
     `createdAt`,
     `updatedAt`
   )
@@ -667,3 +667,43 @@ VALUES
   ),
   --   SELECT TABLE_NAME, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'swiftlet';
   --  ALTER TABLE tbl_user_home_sensor CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+
+  DELIMITER $$
+
+CREATE PROCEDURE rename_isActive_to_isDelete()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_sql TEXT;
+    DECLARE cur CURSOR FOR 
+        SELECT CONCAT(
+            'ALTER TABLE `', TABLE_NAME,
+            '` CHANGE `isActive` `isActive` CHAR(1) NULL DEFAULT ''Y'';'
+        )
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE COLUMN_NAME = 'isActive'
+          AND TABLE_SCHEMA = 'swiftlet';
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    loop_statements: LOOP
+        FETCH cur INTO v_sql;
+        IF done THEN 
+            LEAVE loop_statements;
+        END IF;
+
+        SET @stmt = v_sql;
+        PREPARE exe_stmt FROM @stmt;
+        EXECUTE exe_stmt;
+        DEALLOCATE PREPARE exe_stmt;
+    END LOOP;
+
+    CLOSE cur;
+END$$
+
+DELIMITER ;
+
+-- GỌI PROCEDURE
+CALL rename_isActive_to_isDelete();

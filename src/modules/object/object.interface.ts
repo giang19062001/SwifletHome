@@ -4,7 +4,7 @@ export interface IObject {
   seq: number;
   objectKeyword: 'SWIFTLET' | 'TEA' | 'COFFEE';
   objectName: string;
-  isDelete: YnEnum;
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;

@@ -16,7 +16,7 @@ export class QuestionAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IQuestion[]> {
-    let query = ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isDelete, A.createdAt, A.createdId, A.answerCode,
+    let query = ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
@@ -35,7 +35,7 @@ export class QuestionAdminRepository {
   }
   async getDetail(questionCode: string): Promise<IQuestion | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isDelete, A.createdAt, A.createdId, A.answerCode,
+      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName, D.answerContent
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
@@ -88,7 +88,7 @@ export class QuestionAdminRepository {
 
   async getAllByAnswer(answerCode: string): Promise<IQuestion[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isDelete, A.createdAt, A.createdId, A.answerCode,
+      ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B

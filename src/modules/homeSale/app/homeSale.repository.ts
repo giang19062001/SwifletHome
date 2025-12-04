@@ -17,7 +17,7 @@ export class HomeSaleAppRepository {
   }
   async getAll(dto: PagingDto): Promise<IHomeSale[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT  A.seq, A.homeCode, A.homeName, A.homeAddress,A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isDelete,
+      ` SELECT  A.seq, A.homeCode, A.homeName, A.homeAddress,A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive,
           COALESCE(
               JSON_ARRAYAGG(
                   JSON_OBJECT('seq', B.seq,'filename', B.filename,'mimetype', B.mimetype)
@@ -27,7 +27,7 @@ export class HomeSaleAppRepository {
       FROM tbl_home_sale A
       LEFT JOIN tbl_home_sale_img B ON A.seq = B.homeSeq
       GROUP BY 
-          A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isDelete 
+          A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive 
          ${dto.limit == 0 && dto.page == 0 ? '' : 'LIMIT ? OFFSET ?'} `,
       dto.limit == 0 && dto.page == 0 ? [] : [dto.limit, (dto.page - 1) * dto.limit],
     );
@@ -42,7 +42,7 @@ export class HomeSaleAppRepository {
 
   async getDetail(homeCode: string): Promise<IHomeSale | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT  A.seq, A.homeCode, A.homeName, A.homeAddress,A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isDelete,
+      ` SELECT  A.seq, A.homeCode, A.homeName, A.homeAddress,A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive,
           COALESCE(
               JSON_ARRAYAGG(
                   JSON_OBJECT('seq', B.seq,'filename', B.filename,'mimetype', B.mimetype)
@@ -53,7 +53,7 @@ export class HomeSaleAppRepository {
       LEFT JOIN tbl_home_sale_img B ON A.seq = B.homeSeq
       WHERE A.homeCode = ? 
       GROUP BY 
-          A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isDelete 
+          A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive 
       LIMIT 1
         `,
       [homeCode],

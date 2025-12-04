@@ -16,7 +16,7 @@ export class InfoAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IInfo[]> {
-    let query = `  SELECT seq, infoKeyword, infoName, infoContent, infoDescription, isDelete, createdAt, updatedAt, createdId, updatedId 
+    let query = `  SELECT seq, infoKeyword, infoName, infoContent, infoDescription, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} `;
 
     const params: any[] = [];
@@ -30,7 +30,7 @@ export class InfoAdminRepository {
   }
   async getDetail(infoKeyword: string): Promise<IInfo | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `  SELECT A.seq, A.infoKeyword, A.infoName, A.infoContent, A.infoDescription, A.isDelete,
+      `  SELECT A.seq, A.infoKeyword, A.infoName, A.infoContent, A.infoDescription, A.isActive,
         A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A
         WHERE A.infoKeyword = ? 

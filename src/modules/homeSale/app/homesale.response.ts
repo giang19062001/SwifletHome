@@ -55,7 +55,7 @@ export class GetHomeSaleResDto {
   homeImage: string;
 
   @ApiProperty({ example: YnEnum.Y })
-  isDelete: YnEnum;
+  isActive: YnEnum;
 
   @ApiProperty({ type: [HomeImagesResDto], isArray: true, example: [{ seq: 0, filename: '', mimetype: '' }] })
   homeImages: HomeImagesResDto[];

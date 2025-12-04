@@ -25,7 +25,7 @@ export class DoctorAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.uniqueId
           FROM ${this.table} A 
-          WHERE A.seq = ? AND A.isDelete = 'Y'
+          WHERE A.seq = ? AND A.isActive = 'Y'
           LIMIT 1 `,
       [seq],
     );

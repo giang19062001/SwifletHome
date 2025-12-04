@@ -4,7 +4,7 @@ export interface ICategory {
   seq: number;
   categoryCode: string;
   categoryName: string;
-  isDelete: YnEnum;
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;

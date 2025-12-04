@@ -8,5 +8,5 @@ export interface IOpition {
   keyOption: string;
   valueOption: string;
   sortOrder: number;
-  isDelete: YnEnum;
+  isActive: YnEnum;
 }

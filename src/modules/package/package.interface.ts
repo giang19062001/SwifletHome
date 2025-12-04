@@ -7,7 +7,7 @@ export interface IPackage {
   packageDescription: string;
   packagePrice: string;
   packageExpireDay: number;
-  isDelete: YnEnum;
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;

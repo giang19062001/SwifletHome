@@ -10,12 +10,12 @@ export class CategoryAdminRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isDelete = 'Y'`);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<ICategory[]> {
-    let query = `  SELECT seq, categoryCode, categoryName, isDelete, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table} WHERE isDelete = 'Y' `;
+    let query = `  SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
+        FROM ${this.table} WHERE isActive = 'Y' `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

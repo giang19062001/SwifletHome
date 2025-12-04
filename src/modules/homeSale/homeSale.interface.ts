@@ -8,7 +8,7 @@ export interface IHomeSale {
   homeDescription: string;
   latitude: number;
   longitude: number;
-  isDelete: YnEnum;
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
@@ -24,7 +24,7 @@ export interface IHomeSaleImg {
   originalname: string;
   size: number;
   mimetype: string;
-  isDelete: YnEnum;
+  isActive: YnEnum;
   width? : number;
   height?: number
 }

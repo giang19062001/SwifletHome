@@ -9,7 +9,7 @@ export interface IDoctor {
   noteAnswered: string;
   status: string;
   uniqueId: string;
-  isDelete: YnEnum;
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
@@ -31,5 +31,5 @@ export interface IDoctorFile {
   size: number;
   mimetype: string;
   uniqueId: string;
-  isDelete: YnEnum;
+  isActive: YnEnum;
 }

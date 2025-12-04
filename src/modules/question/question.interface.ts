@@ -6,7 +6,7 @@ export interface IQuestion {
   questionContent: string;
   questionObject: string;
   questionCategory: string;
-  isDelete: YnEnum;
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;

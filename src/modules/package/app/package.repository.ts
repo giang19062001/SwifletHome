@@ -12,7 +12,7 @@ export class PackageAppRepository {
   async getAll(dto: PagingDto): Promise<IPackage[]> {
     let query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageExpireDay, A.packageDescription
                FROM ${this.table} A
-               WHERE A.isDelete = 'Y' `;
+               WHERE A.isActive = 'Y' `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

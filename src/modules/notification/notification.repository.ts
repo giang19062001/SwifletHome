@@ -16,7 +16,7 @@ export class NotificationAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<INotification[]> {
-    let query = ` SELECT A.seq, A.title, A.body, A.data, A.userCode, A.topicCode, A.status, A.isDelete, A.createdAt, A.createdId
+    let query = ` SELECT A.seq, A.title, A.body, A.data, A.userCode, A.topicCode, A.status, A.isActive, A.createdAt, A.createdId
         FROM ${this.table} A `;
 
     const params: any[] = [];
@@ -30,7 +30,7 @@ export class NotificationAppRepository {
   }
   async getDetail(seq: number): Promise<INotification | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.title, A.body, A.data, A.userCode, A.topicCode, A.status, A.isDelete, A.createdAt, A.createdId
+      ` SELECT A.seq, A.title, A.body, A.data, A.userCode, A.topicCode, A.status, A.isActive, A.createdAt, A.createdId
         FROM ${this.table} A 
         WHERE A.seq = ? 
         LIMIT 1`,
@@ -45,7 +45,7 @@ export class NotificationAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllTopic(dto: PagingDto): Promise<INotificationTopic[]> {
-    let query = ` SELECT A.seq, A.topicCode, A.topicName, A.topicDescription, A.isDelete, A.createdAt, A.createdId
+    let query = ` SELECT A.seq, A.topicCode, A.topicName, A.topicDescription, A.isActive, A.createdAt, A.createdId
         FROM ${this.tableTopic} A `;
 
     const params: any[] = [];
@@ -59,7 +59,7 @@ export class NotificationAppRepository {
   }
   async getDetailTopic(topicCode: string): Promise<INotificationTopic | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.topicCode, A.topicName, A.data, A.topicDescription, A.isDelete, A.createdAt, A.createdId
+      ` SELECT A.seq, A.topicCode, A.topicName, A.data, A.topicDescription, A.isActive, A.createdAt, A.createdId
         FROM ${this.tableTopic} A
         WHERE A.topicCode = ? 
         LIMIT 1`,
@@ -71,7 +71,7 @@ export class NotificationAppRepository {
   async getUserSubscribedTopics(userCode: string): Promise<IUserNotificationTopic[]> {
     let query = ` SELECT A.seq, A.topicCode, A.userCode
         FROM ${this.tableUserTopic} A 
-        WHERE userCode = ? AND A.isDelete = 'Y' `;
+        WHERE userCode = ? AND A.isActive = 'Y' `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
     return rows as IUserNotificationTopic[];
   }

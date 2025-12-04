@@ -12,8 +12,8 @@ export class InfoAppRepository {
 
   async getDetail(infoKeyword: string): Promise<IInfo | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.infoKeyword, A.infoName, A.infoContent, A.infoDescription, A.isDelete
-        FROM ${this.table} A WHERE A.infoKeyword = ? AND A.isDelete = 'Y'
+      ` SELECT A.seq, A.infoKeyword, A.infoName, A.infoContent, A.infoDescription, A.isActive
+        FROM ${this.table} A WHERE A.infoKeyword = ? AND A.isActive = 'Y'
         LIMIT 1`,
       [infoKeyword],
     );

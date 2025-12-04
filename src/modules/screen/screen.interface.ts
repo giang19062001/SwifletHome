@@ -8,7 +8,7 @@ export interface IScreen {
   screenName: string;
   screenContent: any;
   screenDescription: string;
-  isDelete: YnEnum;
+  isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId?: string;

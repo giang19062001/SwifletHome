@@ -28,7 +28,7 @@ export class AuthAdminService extends AbAuthService {
       throw new UnauthorizedException(Msg.AccountLoginWrong);
     }
 
-    if (user.isDelete === 'N') {
+    if (user.isActive === 'N') {
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
     // hide password

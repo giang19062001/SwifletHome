@@ -12,7 +12,7 @@ export class AnswerAppRepository {
       const [rows] = await this.db.query<RowDataPacket[]>(
         ` SELECT A.answerCode, A.answerContent, A.isFree
           FROM ${this.table} A
-          WHERE A.answerCode = ? AND A.isDelete = 'Y' `,
+          WHERE A.answerCode = ? AND A.isActive = 'Y' `,
         [answerCode],
       );
       return rows ? (rows[0] as IAnswer) : null;

@@ -14,7 +14,7 @@ export class BlogAdminRepository {
   async getTotal(dto: GetAllBlogDto): Promise<number> {
     const params: any[] = [];
 
-    let whereClause = ` WHERE isDelete = 'Y' `;
+    let whereClause = ` WHERE isActive = 'Y' `;
 
     if (dto.blogObject) {
       whereClause += ' AND blogObject = ?';
@@ -32,7 +32,7 @@ export class BlogAdminRepository {
   async getAll(dto: GetAllBlogDto): Promise<IBlog[]> {
     const params: any[] = [];
 
-    let whereClause = ` WHERE  A.isDelete = 'Y' `;
+    let whereClause = ` WHERE  A.isActive = 'Y' `;
 
     if (dto.blogObject) {
       whereClause += ' AND A.blogObject = ?';
@@ -52,7 +52,7 @@ export class BlogAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isDelete, A.isFree, A.createdAt, A.createdId, A.isMain,
+      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain,
       B.categoryName, C.objectName
       FROM ${this.table} A 
       LEFT JOIN tbl_category B ON A.blogCategory = B.categoryCode
@@ -65,9 +65,9 @@ export class BlogAdminRepository {
   }
   async getMainBlog(): Promise<IBlog | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isDelete, A.isFree, A.createdAt, A.createdId, A.isMain
+      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain
             FROM ${this.table} A 
-            WHERE A.isDelete = 'Y' AND A.isMain = 'Y'
+            WHERE A.isActive = 'Y' AND A.isMain = 'Y'
             LIMIT 1 `,
       [],
     );
@@ -75,14 +75,14 @@ export class BlogAdminRepository {
   }
   async getDetail(blogCode: string): Promise<IBlog | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isDelete, A.isFree, A.createdAt, A.createdId, A.isMain,
+      ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain,
         B.categoryName, C.objectName
         FROM ${this.table} A 
         LEFT JOIN tbl_category B
         ON A.blogCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.blogObject = C.objectKeyword
-        WHERE A.blogCode = ? AND A.isDelete = 'Y'
+        WHERE A.blogCode = ? AND A.isActive = 'Y'
         LIMIT 1 `,
       [blogCode],
     );
@@ -117,7 +117,7 @@ export class BlogAdminRepository {
   async delete(blogCode: string): Promise<number> {
     const sql = `
       UPDATE  ${this.table}
-      SET isDelete = 'N'
+      SET isActive = 'N'
       WHERE blogCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [blogCode]);
