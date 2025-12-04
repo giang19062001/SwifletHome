@@ -217,11 +217,16 @@ export class AuthAppService extends AbAuthService {
   }
 
   async requestOtp(dto: RequestOtpDto): Promise<string> {
+    const logbase = `${this.SERVICE_NAME}/requestOtp`;
+    this.logger.log(logbase, `${JSON.stringify(dto)}`);
+
     await this.verifyPhoneBeforeOtp(dto.userPhone, dto.purpose);
     return await this.otpService.generateOtp(dto);
   }
 
   async verifyOtp(dto: VerifyOtpDto): Promise<boolean> {
+    const logbase = `${this.SERVICE_NAME}/requestOtp`;
+    this.logger.log(logbase, `${JSON.stringify(dto)}`);
     await this.verifyPhoneBeforeOtp(dto.userPhone, dto.purpose);
     return await this.otpService.verifyOtp(dto);
   }
