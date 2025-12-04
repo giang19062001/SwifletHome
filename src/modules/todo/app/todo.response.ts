@@ -12,12 +12,18 @@ export class GetTaskResDto {
 }
 
 export class GetScheduledTasksResDto {
-  @ApiProperty({ example: 'NA' })
-  harvest: string;
+  @ApiProperty({
+    example: ['harvest', 'rollMedicine', 'luringBird'],
+    type: [String],
+  })
+  keys: string[];
 
-  @ApiProperty({ example: 'NA' })
-  rollMedicine: string;
-
-  @ApiProperty({ example: 'NA' })
-  luringBird: string;
+  @ApiProperty({
+    example: {
+      harvest: 'NA',
+      rollMedicine: '3 Ngày',
+      luringBird: '5 Ngày',
+    },
+  })
+  values: Record<string, string>;
 }
