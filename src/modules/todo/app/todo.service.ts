@@ -42,9 +42,9 @@ export class TodoAppService {
           },
         ],
         values: {
-          harvest: 'NA',
-          rollMedicine: 'NA',
-          luringBird: 'NA',
+          harvest: 'NAN',
+          rollMedicine: 'NAN',
+          luringBird: 'NAN',
         },
       };
     } else {
