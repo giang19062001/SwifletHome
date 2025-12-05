@@ -6,6 +6,7 @@ export interface IPackage {
   packageName: string;
   packageDescription: string;
   packagePrice: string;
+  packageItemSamePrice: string;
   packageExpireDay: number;
   isActive: YnEnum;
   createdAt: Date;

@@ -30,7 +30,14 @@ export class ScreenAppService {
       switch (keyword) {
         case KEYWORDS.SCREEN.SIGNUP_SERVICE:
           if (screen.screenContent) {
-            const packages = await this.packageAppService.getAll({ limit: 0, page: 0 });
+            const packageList = await this.packageAppService.getAll({ limit: 0, page: 0 });
+            let packages: string[] = [];
+            if (packageList.length) {
+              for (const pack of packageList) {
+                const text = `Gói trả phí ${pack.packageDescription} ${pack.packageName}: ${pack.packagePrice}đ ${pack.packageItemSamePrice ? '/ ' + pack.packageItemSamePrice : ''} `;
+                packages.push(text);
+              }
+            }
             const bankInfo = await this.infoAppService.getDetail('BANK');
 
             result = {

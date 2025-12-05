@@ -82,13 +82,21 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
             statusCode: response.statusCode,
           };
         }
-        // Trường hợp data là null, undefined trừ 0, false,...
+        // Trường hợp data là 0, false vẫn coi là ok
+        // if (data === 0 || data === false) {
+        //   return {
+        //     success: true,
+        //     message: data?.message || getOkDefaultMessage(request.method, request.url),
+        //     data: data ?? null,
+        //     statusCode: response.statusCode,
+        //   };
+        // }
         if (data === null || data === undefined) {
           return {
-            success: true, // vẫn coi là thành công nếu controller chủ động trả null/0
-            message: data?.message || getOkDefaultMessage(request.method, request.url),
+            success: false,
+            message: data?.message || getErrDefaultMessage(request.method, request.url),
             data: data ?? null,
-            statusCode: response.statusCode,
+            statusCode: 400, // bad request
           };
         }
 

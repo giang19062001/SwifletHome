@@ -10,7 +10,7 @@ export class PackageAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAll(dto: PagingDto): Promise<IPackage[]> {
-    let query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageExpireDay, A.packageDescription
+    let query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageItemSamePrice, A.packageExpireDay, A.packageDescription
                FROM ${this.table} A
                WHERE A.isActive = 'Y' `;
 

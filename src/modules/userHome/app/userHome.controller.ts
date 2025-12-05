@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
@@ -13,7 +13,7 @@ import { UserHomeAppService } from './userHome.service';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserHome } from '../userHome.interface';
-import { ListResonseDto } from 'src/dto/common.dto';
+import { ListResonseDto, NullResponseDto } from 'src/dto/common.dto';
 import { IList } from 'src/interfaces/admin.interface';
 import { GetHomeUserResDto, UserHomeImageResDto, GetHomesUserResDto } from './userHome.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
@@ -52,6 +52,7 @@ export class UserHomeAppController {
   @Get('getMainHomeByUser')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetHomeUserResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
   async getMainHomeByUser(@GetUserApp() user: authInterface.ITokenUserApp): Promise<IUserHome | null> {
     const result = await this.userHomeAppService.getMainHomeByUser(user.userCode);
     return result;

@@ -1,6 +1,5 @@
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { IInfoBank } from '../info/info.interface';
-import { IPackage } from '../package/package.interface';
 
 export interface IScreen {
   seq: number;
@@ -18,5 +17,5 @@ export interface IScreen {
 export interface IScreenSignupService {
   contentEnd: string;
   contentStart: string;
-  contentCenter: { packages: IPackage[]; bankInfo: IInfoBank | null };
+  contentCenter: { packages: string[]; bankInfo: IInfoBank | null };
 }

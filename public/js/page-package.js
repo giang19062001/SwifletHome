@@ -21,6 +21,8 @@ const renderAllPackage = (data, objElement) => {
             <td><p>${page * i++}</p></td>
             <td><p>${ele.packageName}</p></td>
             <td><p>${ele.packageDescription}</p></td>
+            <td><p>${ele.packagePrice}</p></td>
+            <td><p>${ele.packageItemSamePrice ? ele.packageItemSamePrice : ""}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
          </tr>`;
@@ -33,7 +35,7 @@ const renderAllPackage = (data, objElement) => {
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     // dữ liệu trống
-    renderEmptyRowTable(objElement, 4);
+    renderEmptyRowTable(objElement, 6);
   }
 
   // xóa skeleton
@@ -43,7 +45,7 @@ const renderAllPackage = (data, objElement) => {
 async function getAllPackage(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
-  showSkeleton(objElement, limit, 4);
+  showSkeleton(objElement, limit, 6);
 
   await axios
     .post(

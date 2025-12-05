@@ -4,18 +4,17 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IPackage } from '../package.interface';
 
 @Injectable()
-export class PackageAdminRepository   {
+export class PackageAdminRepository {
   private readonly table = 'tbl_package';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-  }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y' `);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<IPackage[]> {
-    let query = `  SELECT seq, packageCode, packageName, packagePrice, packageExpireDay, packageDescription, isActive, createdAt, updatedAt, createdId, updatedId 
+    let query = `  SELECT seq, packageCode, packageName, packagePrice, packageItemSamePrice, packageExpireDay, packageDescription, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table}
          WHERE isActive = 'Y' `;
 
@@ -30,12 +29,11 @@ export class PackageAdminRepository   {
   }
   async getDetail(packageCode: string): Promise<IPackage | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, packageCode, packageName, packagePrice, packageExpireDay, packageDescription, isActive, createdAt, updatedAt, createdId, updatedId 
+      ` SELECT seq, packageCode, packageName, packagePrice, packageItemSamePrice, packageExpireDay, packageDescription, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} 
         WHERE packageCode = ? AND isActive = 'Y'`,
       [packageCode],
     );
     return rows ? (rows[0] as IPackage) : null;
   }
-
 }

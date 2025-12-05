@@ -1,4 +1,3 @@
-import { UploadService } from '../../upload/upload.service';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';

@@ -275,7 +275,7 @@ CREATE TABLE
     `seq` int NOT NULL AUTO_INCREMENT,
     `homeCode` varchar(45) NOT NULL,
     `userCode` varchar(45) NOT NULL,
-    `userName` char(10) NOT NULL,
+    `userName` VARCHAR(45) NOT NULL,
     `userPhone` text NOT NULL,
     `numberAttendCode` char(15) NOT NULL,
     `status` ENUM ('WAITING', 'APPROVED', 'CANCEL') DEFAULT 'WAITING',
