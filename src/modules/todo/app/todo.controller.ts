@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetScheduledTasksResDto, GetTaskResDto } from './todo.response';
@@ -9,6 +9,9 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { NullResponseDto } from 'src/dto/common.dto';
+import { Msg } from 'src/helpers/message.helper';
+import { SetupTodoTaskDto } from './todo.dto';
+import TodoAppValidate from './todo.validate';
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -37,5 +40,43 @@ export default class TodoAppController {
   async getScheduledTasks(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.todoAppService.getScheduledTasks(user.userCode, userHomeCode);
     return result;
+  }
+
+  @ApiOperation({
+    summary: 'Thiết lập lịch nhắc cho 1 nhà yến nào đó',
+  })
+  @Post('setupTodoTask')
+  @ApiBody({
+    type: SetupTodoTaskDto,
+    description: `**taskCode** là giá trị lấy từ api/app/todo/getTasks, được phép **null** nếu **isCustomTask** của lịch nhắc là **Y**, không được phép **null** nếu **isCustomTask** của lịch nhắc là **N** \n
+**taskCustomName** giá trị được phép rỗng nếu **isCustomTask** của lịch nhắc là **N**, giá trị không được phép rỗng nếu **isCustomTask** của lịch nhắc là **Y**\n
+**taskType** enum('WEEK','MONTH','SPECIFIC') với **WEEK** là lịch nhắc lặp lại theo tuần, **MONTH** là lịch nhắc lặp lại theo tháng,  **SPECIFIC** là lịch nhắc cho 1 ngày cụ thể trong tương lai\n
+**periodValue** number | null, được phép **null** nếu **taskType** là **SPECIFIC**, không được phép **null** nếu **taskType** là **WEEK** hoặc **MONTH**, nếu **taskType** là **WEEK** thì giá trị sẽ là (0 -> 6) (Chủ nhật -> Thứ Bảy),
+nếu **taskType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
+**specificValue** date | null, được phép **null** nếu **taskType** là **WEEK** hoặc **MONTH**, không được phép **null** nếu **taskType** là **SPECIFIC**, giá trị sẽ có định dạng **YYYY-MM-DD** 
+       `,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  async setupTodoTask(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetupTodoTaskDto) {
+    const err: string = TodoAppValidate.SetupTodoTaskValidate(dto);
+    if (err) {
+      throw new BadRequestException({
+        message: err,
+        data: 0,
+      });
+    }
+    const result = await this.todoAppService.setupTodoTask(user.userCode, dto);
+
+    if (!result) {
+      throw new BadRequestException({
+        message: Msg.RegisterErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.RegisterOk,
+      data: result,
+    };
   }
 }

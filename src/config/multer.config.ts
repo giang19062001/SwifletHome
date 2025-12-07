@@ -88,7 +88,7 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
       if (allowedExts.includes(ext)) {
         cb(null, true);
       } else {
-        cb(new BadRequestException(Msg.fileWrongType(ext, allowedExts)), false);
+        cb(new BadRequestException(Msg.FileWrongType(ext, allowedExts)), false);
       }
     },
   };

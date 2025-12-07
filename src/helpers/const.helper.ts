@@ -19,4 +19,9 @@ export const KEYWORDS = {
     ANSWERED: 'ANSWERED',
     CANCEL: 'CANCEL',
   },
+  TODO_HOME_TASK_STATUS:{
+    WAITING: 'WAITING',
+    COMPLETE: 'COMPLETE',
+    CANCEL: 'CANCEL',
+  },
 };

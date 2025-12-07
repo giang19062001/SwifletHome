@@ -35,7 +35,7 @@ export const Msg = {
   FileEmpty: 'Không có file nào được upload',
   FileAudioRequire: 'Bắt buộc nhập 2 file audio',
   FileOvertake: 'Số file upload đã vượt quá số lượng tối đa',
-  fileWrongType: (ext: string, allowedExts: string[]) => `File không hỗ trợ: ${ext}. Cho phép: ${allowedExts.join(', ')}`,
+  FileWrongType: (ext: string, allowedExts: string[]) => `File không hỗ trợ: ${ext}. Cho phép: ${allowedExts.join(', ')}`,
   FileDeleteFail: 'Lỗi khi xóa file',
   FileUploadFail: 'Lỗi khi xóa file',
   OtpNotVerify: 'Vui lòng xác thực OTP',
@@ -46,4 +46,8 @@ export const Msg = {
   OtpOvertake: 'Đã vượt quá số lần nhập OTP cho phép',
   OtpRemainAttempt: (num: number) => `Mã OTP không đúng. Còn ${num} lần thử.`,
   InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
+  DateCannotInThePast: 'Ngày phải là ngày hôm nay hoặc trong tương lai',
+  CannotNull: (filedName: string) => `${filedName} không thể trống`,
+  InvalidValue: (filedName: string) => `${filedName} sai giá trị cho phép`,
+  InvalidRange: (filedName: string, range: string) => `${filedName} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
 };

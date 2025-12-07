@@ -3,6 +3,7 @@ import { ITodoTask } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
+import { SetupTodoTaskDto } from './todo.dto';
 
 @Injectable()
 export class TodoAppService {
@@ -24,7 +25,7 @@ export class TodoAppService {
 
   async getScheduledTasks(userCode: string, userHomeCode: string) {
     const home = await this.userHomeAppService.getDetail(userHomeCode);
-    // nếu nhà yến chính có 
+    // nếu nhà yến chính có
     if (home) {
       return {
         keys: [
@@ -50,5 +51,12 @@ export class TodoAppService {
     } else {
       return null;
     }
+  }
+
+  async setupTodoTask(userCode: string, dto: SetupTodoTaskDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setupTodoTask:`;
+    const result = await this.todoAppRepository.setupTodoTask(userCode, dto);
+    this.logger.log(logbase, `Thiết lập lịch nhắc cho nhà yến${dto.userHomeCode} thành công`);
+    return result;
   }
 }

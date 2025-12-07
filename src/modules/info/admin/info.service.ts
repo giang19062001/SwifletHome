@@ -35,7 +35,7 @@ export class InfoAdminService {
       return `${location}/${newFileName}`;
     } else {
       // lỗi type ảnh
-      throw new BadRequestException(Msg.fileWrongType(file.originalname, IMG_TYPES));
+      throw new BadRequestException(Msg.FileWrongType(file.originalname, IMG_TYPES));
     }
   }
   async getAll(dto: PagingDto): Promise<IList<IInfo>> {

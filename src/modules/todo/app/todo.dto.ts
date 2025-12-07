@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
 export enum TaskTypeEnum {
@@ -14,7 +15,20 @@ export enum TaskStatusEnum {
   CANCEL = 'CANCEL',
 }
 
-export class CreateHomeSightSeeingDto {
+export class SetupTodoTaskDto {
+  // @ApiProperty({
+  //   example: '',
+  // })
+  // @IsString()
+  // @IsNotEmpty()
+  // userCode: string;
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+
   @ApiProperty({
     example: null,
     nullable: true,
@@ -22,20 +36,6 @@ export class CreateHomeSightSeeingDto {
   })
   @IsOptional()
   taskCode: string | null;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userCode: string;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userHomeCode: string;
 
   @ApiProperty({
     example: YnEnum.Y,
@@ -46,12 +46,11 @@ export class CreateHomeSightSeeingDto {
   isCustomTask: YnEnum;
 
   @ApiProperty({
-    example: null,
-    nullable: true,
-    required: false,
+    example: 'Kiểm tra camera',
   })
+  @IsString()
   @IsOptional()
-  taskCustomName: string | null;
+  taskCustomName: string;
 
   @ApiProperty({
     example: TaskTypeEnum.SPECIFIC,
@@ -61,29 +60,32 @@ export class CreateHomeSightSeeingDto {
   @IsEnum(TaskTypeEnum)
   taskType: TaskTypeEnum;
 
-  @ApiProperty({
-    example: TaskStatusEnum.WAITING,
-    enum: TaskStatusEnum,
-  })
-  @IsNotEmpty()
-  @IsEnum(TaskStatusEnum)
-  taskStatus: TaskStatusEnum;
+  // @ApiProperty({
+  //   example: TaskStatusEnum.WAITING,
+  //   enum: TaskStatusEnum,
+  // })
+  // @IsNotEmpty()
+  // @IsEnum(TaskStatusEnum)
+  // taskStatus: TaskStatusEnum;
 
   @ApiProperty({
     example: null,
     nullable: true,
     required: false,
   })
+  @IsNumber()
   @IsOptional()
   periodValue: number | null;
 
   @ApiProperty({
-    example: '2025-12-02 08:30:00',
+    example: '2025-12-01',
     type: String,
-    format: 'date-time',
+    format: 'date',
     nullable: true,
     required: false,
   })
   @IsOptional()
-  specificValue: string | null;
+  @Transform(({ value }) => (value === null ? null : new Date(value + 'T00:00:00')))
+  @IsDate()
+  specificValue: Date | null;
 }
