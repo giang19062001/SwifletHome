@@ -33,8 +33,8 @@ export class GetScheduledTasksResDto {
   @ApiProperty({
     example: {
       harvest: 'NaN',
-      rollMedicine: '3 ngày',
-      luringBird: '6 ngày',
+      rollMedicine: '3',
+      luringBird: '6',
     },
   })
   values: Record<string, string>;

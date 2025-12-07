@@ -42,7 +42,7 @@ export class TodoAppService {
           },
         ],
         values: {
-          harvest: 'NaN',
+          harvest: '5',
           rollMedicine: 'NaN',
           luringBird: 'NaN',
         },
