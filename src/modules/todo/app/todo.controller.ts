@@ -31,7 +31,7 @@ export default class TodoAppController {
   }
 
   @ApiOperation({
-    summary: 'Thông tin todo của nhà yến được chọn là chính của user đăng nhập hiện tại',
+    summary: 'Thông tin todo của 1 nhà yến (thu hoạch, lăn thuốc,...)',
   })
   @ApiParam({ name: 'userHomeCode', type: String })
   @Get('getScheduledTasks/:userHomeCode')
@@ -43,6 +43,9 @@ export default class TodoAppController {
     return result;
   }
 
+  @ApiOperation({
+    summary: 'Danh sách lịch nhắc việc của 1 nhà yến',
+  })
   @ApiBody({
     type: GetListTaskAlarmsDTO,
   })
@@ -50,7 +53,7 @@ export default class TodoAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: ApiAppResponseDto(ListResponseDto(GetListTaskAlarmsResDto)),
-    description: `**taskStatus**: enum('WAITING','COMPLETE','CANCEL')\n`
+    description: `**taskStatus**: enum('WAITING','COMPLETE','CANCEL')\n`,
   })
   async getAll(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: GetListTaskAlarmsDTO): Promise<IListApp<ITodoHomeTaskAlram>> {
     const result = await this.todoAppService.getListTaskAlarms(user.userCode, dto.userHomeCode, dto);
