@@ -33,7 +33,7 @@ export class FirebaseService implements OnModuleInit {
     const message: admin.messaging.Message = {
       token: deviceToken,
       notification: { title, body },
-      data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined,
+      data: data ? { title, body, image_logo: 'https://3fam.ai/images/favicon.ico', image_detail: 'https://3fam.ai/images/favicon.ico' } : undefined,
     };
 
     try {
