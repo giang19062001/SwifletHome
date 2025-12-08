@@ -12,8 +12,9 @@ export interface ITodoTask {
   updatedId: string;
 }
 
-export interface ITodoHomeTask {
+export interface ITodoHomeTaskAlram {
   seq: number;
+  taskAlarmCode: string;
   userCode: string;
   userHomeCode: string;
   taskCode: string | null;

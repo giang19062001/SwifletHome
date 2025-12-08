@@ -1,9 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
-import { SetupTodoTaskDto } from './todo.dto';
+import { SetTaskAlarmDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 
 export default class TodoAppValidate {
-  static SetupTodoTaskValidate(dto: SetupTodoTaskDto): string {
+  static SetTaskAlarmValidate(dto: SetTaskAlarmDto): string {
     let error = '';
     // BẮT LỖI LOGIC
     if (dto.isCustomTask == 'Y' && String(dto.taskCustomName) == '') {

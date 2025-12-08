@@ -27,7 +27,8 @@ export class HomeSaleAppService {
     const list = await this.homeSaleAppRepository.getAll(dto);
     this.logger.log(logbase, `total(${total})`);
 
-    return { limit: dto.limit, page: dto.page, total, list };
+    // return { limit: dto.limit, page: dto.page, total, list };
+    return { total, list };
   }
   async getDetail(homeCode: string): Promise<IHomeSale | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail:`;

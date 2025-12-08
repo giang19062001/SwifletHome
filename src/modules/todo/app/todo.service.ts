@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ITodoTask } from '../todo.interface';
+import { ITodoHomeTaskAlram, ITodoTask } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { SetupTodoTaskDto } from './todo.dto';
+import { SetTaskAlarmDto } from './todo.dto';
+import { Msg } from 'src/helpers/message.helper';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IListApp } from 'src/interfaces/app.interface';
 
 @Injectable()
 export class TodoAppService {
@@ -52,11 +55,25 @@ export class TodoAppService {
       return null;
     }
   }
+  async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<IListApp<ITodoHomeTaskAlram>> {
+    const logbase = `${this.SERVICE_NAME}/getTaskAlarms:`;
 
-  async setupTodoTask(userCode: string, dto: SetupTodoTaskDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setupTodoTask:`;
-    const result = await this.todoAppRepository.setupTodoTask(userCode, dto);
-    this.logger.log(logbase, `Thiết lập lịch nhắc cho nhà yến${dto.userHomeCode} thành công`);
+    const total = await this.todoAppRepository.getTotalTaskAlarm(userCode, userHomeCode);
+    const list = await this.todoAppRepository.getListTaskAlarms(userCode, userHomeCode, dto);
+    this.logger.log(logbase, `total(${total})`);
+
+    return { total, list };
+  }
+
+  async setTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setTaskAlarm:`;
+    const isDuplicate = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, dto);
+    if (isDuplicate) {
+      this.logger.log(logbase, Msg.DuplicateTaskAlram + `(${dto.userHomeCode})`);
+      return -1;
+    }
+    const result = await this.todoAppRepository.setTaskAlarm(userCode, dto);
+    this.logger.log(logbase, `Thiết lập lịch nhắc cho nhà yến ${dto.userHomeCode} thành công`);
     return result;
   }
 }

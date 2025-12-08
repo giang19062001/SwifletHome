@@ -33,6 +33,7 @@ import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetHomeSaleDetailResDto, GetHomeSaleResDto } from './homesale.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
+import { ListResponseDto } from 'src/dto/common.dto';
 
 @ApiTags('app/homeSale')
 @Controller('/api/app/homeSale')
@@ -47,7 +48,7 @@ export class HomeSaleAppController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([GetHomeSaleResDto]) })
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetHomeSaleResDto)) })
   async getAll(@Body() dto: PagingDto): Promise<IListApp<IHomeSale>> {
     const result = await this.homeSaleAppService.getAll(dto);
     return result;
@@ -77,7 +78,7 @@ export class HomeSaleAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
   async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.homeSaleAppService.registerSightSeeing(dto, user.userCode);
-     if (result === 0) {
+    if (result === 0) {
       throw new BadRequestException({
         message: Msg.RegisterErr,
         data: 0,

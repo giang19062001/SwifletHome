@@ -4,6 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IBlog } from '../blog.interface';
 import { CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { generateCode } from 'src/helpers/func.helper';
+import { CODES } from 'src/helpers/const.helper';
 
 @Injectable()
 export class BlogAdminRepository {
@@ -91,9 +92,9 @@ export class BlogAdminRepository {
   async create(dto: CreateBlogDto, isMain: string, createdId: string): Promise<number> {
     const sqlLast = ` SELECT blogCode FROM ${this.table} ORDER BY blogCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
-    let blogCode = 'BLG000001';
+    let blogCode = CODES.blogCode.FRIST_CODE;
     if (rows.length > 0) {
-      blogCode = generateCode(rows[0].blogCode, 'BLG', 6);
+      blogCode = generateCode(rows[0].blogCode, CODES.blogCode.PRE, CODES.blogCode.LEN);
     }
     const sql = `
         INSERT INTO ${this.table}  (blogCode, blogName, blogContent, blogObject, blogCategory, isFree, isMain, createdId) 

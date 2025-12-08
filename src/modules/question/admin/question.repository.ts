@@ -4,6 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IQuestion } from '../question.interface';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { generateCode } from 'src/helpers/func.helper';
+import { CODES } from 'src/helpers/const.helper';
 
 @Injectable()
 export class QuestionAdminRepository {
@@ -53,9 +54,9 @@ export class QuestionAdminRepository {
   async create(dto: CreateQuestionDto, createdId: string): Promise<number> {
     const sqlLast = ` SELECT questionCode FROM ${this.table} ORDER BY questionCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
-    let questionCode = 'QUS000001';
+    let questionCode = CODES.questionCode.FRIST_CODE;
     if (rows.length > 0) {
-      questionCode = generateCode(rows[0].questionCode, 'QUS', 6);
+      questionCode = generateCode(rows[0].questionCode, CODES.questionCode.PRE, CODES.questionCode.LEN);
     }
     const sql = `
       INSERT INTO ${this.table}  (questionCode, answerCode, questionObject, questionContent, questionCategory, createdId) 

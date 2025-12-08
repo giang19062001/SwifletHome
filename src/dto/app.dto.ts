@@ -23,6 +23,7 @@ export const ApiAppResponseDto = <TModel>(model: any) => {
     })
     data: TModel;
   }
+  // đặt tên động cho class -> chống ghi đè
 
   Object.defineProperty(ApiResponseDtoClass, 'name', { value: className });
   return ApiResponseDtoClass;

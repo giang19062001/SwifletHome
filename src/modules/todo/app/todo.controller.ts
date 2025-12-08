@@ -2,16 +2,18 @@ import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards,
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetScheduledTasksResDto, GetTaskResDto } from './todo.response';
-import { ITodoTask } from '../todo.interface';
+import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto } from './todo.response';
+import { ITodoHomeTaskAlram, ITodoTask } from '../todo.interface';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { NullResponseDto } from 'src/dto/common.dto';
+import { ListResponseDto, NullResponseDto, ZeroResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { SetupTodoTaskDto } from './todo.dto';
+import { GetListTaskAlarmsDTO, SetTaskAlarmDto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IListApp } from 'src/interfaces/app.interface';
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -42,12 +44,26 @@ export default class TodoAppController {
     return result;
   }
 
+  @ApiBody({
+    type: GetListTaskAlarmsDTO,
+  })
+  @Post('getListTaskAlarms')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetListTaskAlarmsResDto)), description:`**taskCode**: string | null\n
+**taskType**: enum('WEEK','MONTH','SPECIFIC')\n
+**periodValue**: number | null\n
+**specificValue**: date (YYYY-MM-DD) | null` })
+  async getAll(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: GetListTaskAlarmsDTO): Promise<IListApp<ITodoHomeTaskAlram>> {
+    const result = await this.todoAppService.getListTaskAlarms(user.userCode, dto.userHomeCode, dto);
+    return result;
+  }
+
   @ApiOperation({
     summary: 'Thiết lập lịch nhắc cho 1 nhà yến nào đó',
   })
-  @Post('setupTodoTask')
+  @Post('setTaskAlarm')
   @ApiBody({
-    type: SetupTodoTaskDto,
+    type: SetTaskAlarmDto,
     description: `**taskCode** là giá trị lấy từ api/app/todo/getTasks, được phép **null** nếu **isCustomTask** của lịch nhắc là **Y**, không được phép **null** nếu **isCustomTask** của lịch nhắc là **N** \n
 **taskCustomName** giá trị được phép rỗng nếu **isCustomTask** của lịch nhắc là **N**, giá trị không được phép rỗng nếu **isCustomTask** của lịch nhắc là **Y**\n
 **taskType** enum('WEEK','MONTH','SPECIFIC') với **WEEK** là lịch nhắc lặp lại theo tuần, **MONTH** là lịch nhắc lặp lại theo tháng,  **SPECIFIC** là lịch nhắc cho 1 ngày cụ thể trong tương lai\n
@@ -58,17 +74,24 @@ nếu **taskType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async setupTodoTask(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetupTodoTaskDto) {
-    const err: string = TodoAppValidate.SetupTodoTaskValidate(dto);
+  @ApiBadRequestResponse({ type: ZeroResponseDto })
+  async setTaskAlarm(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskAlarmDto) {
+    const err: string = TodoAppValidate.SetTaskAlarmValidate(dto);
     if (err) {
       throw new BadRequestException({
         message: err,
         data: 0,
       });
     }
-    const result = await this.todoAppService.setupTodoTask(user.userCode, dto);
+    const result = await this.todoAppService.setTaskAlarm(user.userCode, dto);
 
-    if (!result) {
+    if (result == -1) {
+      throw new BadRequestException({
+        message: Msg.DuplicateTaskAlram,
+        data: 0,
+      });
+    }
+    if (result == 0) {
       throw new BadRequestException({
         message: Msg.RegisterErr,
         data: 0,

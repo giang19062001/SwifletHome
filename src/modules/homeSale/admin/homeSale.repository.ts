@@ -4,6 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale, IHomeSaleImg, IHomeSaleSightSeeing } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { generateCode } from 'src/helpers/func.helper';
+import { CODES } from 'src/helpers/const.helper';
 
 @Injectable()
 export class HomeSaleAdminRepository {
@@ -44,9 +45,9 @@ export class HomeSaleAdminRepository {
   async create(dto: CreateHomeDto, homeImagePath: string, createdId: string): Promise<number> {
     const sqlLast = ` SELECT homeCode FROM ${this.table} ORDER BY homeCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
-    let homeCode = 'HOM000001';
+    let homeCode = CODES.homeCode.FRIST_CODE;
     if (rows.length > 0) {
-      homeCode = generateCode(rows[0].homeCode, 'HOM', 6);
+      homeCode = generateCode(rows[0].homeCode, CODES.homeCode.PRE, CODES.homeCode.LEN);
     }
     const sql = `
       INSERT INTO ${this.table}  (homeCode, homeName, homeAddress, homeDescription, latitude, longitude, homeImage, createdId) 
@@ -62,17 +63,7 @@ export class HomeSaleAdminRepository {
         updatedId = ?, updatedAt = ?
         WHERE homeCode = ?
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.homeName,
-      dto.homeAddress,
-      dto.homeDescription,
-      dto.latitude,
-      dto.longitude,
-      homeImagePath,
-      updatedId,
-      new Date(),
-      homeCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.homeName, dto.homeAddress, dto.homeDescription, dto.latitude, dto.longitude, homeImagePath, updatedId, new Date(), homeCode]);
 
     return result.affectedRows;
   }

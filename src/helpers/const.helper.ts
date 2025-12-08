@@ -8,7 +8,7 @@ export const APP_SCREENS = {
 export const KEYWORDS = {
   OTP_PURPOSE: {
     REGISTER: 'REGISTER',
-    FORGOT_PASSWORD: 'FORGOT_PASSWORD'
+    FORGOT_PASSWORD: 'FORGOT_PASSWORD',
   },
   SCREEN: {
     SIGNUP_SERVICE: 'SIGNUP_SERVICE',
@@ -19,9 +19,47 @@ export const KEYWORDS = {
     ANSWERED: 'ANSWERED',
     CANCEL: 'CANCEL',
   },
-  TODO_HOME_TASK_STATUS:{
+  TODO_HOME_TASK_STATUS: {
     WAITING: 'WAITING',
     COMPLETE: 'COMPLETE',
     CANCEL: 'CANCEL',
   },
+};
+
+export const CODES = {
+  answerCode: {
+    PRE: 'ANS',
+    LEN: 6,
+    FRIST_CODE: 'ANS000001',
+  },
+  blogCode: {
+    PRE: 'BLG',
+    LEN: 6,
+    FRIST_CODE: 'BLG000001',
+  },
+  homeCode: {
+    PRE: 'HOM',
+    LEN: 6,
+    FRIST_CODE: 'HOM000001',
+  },
+  userHomeCode:{
+    PRE: 'HOM',
+    LEN: 6,
+    FRIST_CODE: 'HOM000001',
+  },
+  questionCode: {
+    PRE: 'QUS',
+    LEN: 6,
+    FRIST_CODE: 'QUS000001',
+  },
+  taskAlarmCode: {
+    PRE: 'TAA',
+    LEN: 6,
+    FRIST_CODE: 'TAA000001',
+  },
+  userCode:{
+    PRE: 'USR',
+    LEN: 6,
+    FRIST_CODE: 'USR000001',
+  }
 };

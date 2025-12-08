@@ -5,6 +5,7 @@ import { MutationUserHomeDto } from './userHome.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { CODES } from 'src/helpers/const.helper';
 @Injectable()
 export class UserHomeAppRepository {
   private readonly table = 'tbl_user_home';
@@ -60,9 +61,9 @@ export class UserHomeAppRepository {
   async createHome(userCode: string, dto: MutationUserHomeDto, isMain: string, userHomeImage: string): Promise<number> {
     const sqlLast = ` SELECT userHomeCode FROM ${this.table} ORDER BY userHomeCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
-    let userHomeCode = 'HOM000001';
+    let userHomeCode = CODES.userHomeCode.FRIST_CODE;
     if (rows.length > 0) {
-      userHomeCode = generateCode(rows[0].userHomeCode, 'HOM', 6);
+      userHomeCode = generateCode(rows[0].userHomeCode, CODES.userHomeCode.PRE, 6);
     }
 
     const sql = `

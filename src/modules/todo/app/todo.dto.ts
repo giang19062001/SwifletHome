@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from 'class-validator';
+import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
 export enum TaskTypeEnum {
@@ -15,7 +16,16 @@ export enum TaskStatusEnum {
   CANCEL = 'CANCEL',
 }
 
-export class SetupTodoTaskDto {
+export class GetListTaskAlarmsDTO extends PagingDto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+}
+
+export class SetTaskAlarmDto {
   // @ApiProperty({
   //   example: '',
   // })

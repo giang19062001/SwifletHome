@@ -627,8 +627,9 @@ CREATE TABLE
   ) 
 
 CREATE TABLE
-  tbl_todo_home_task (
+  tbl_todo_home_task_alarm (
     seq INT AUTO_INCREMENT PRIMARY KEY,
+    taskAlarmCode VARCHAR(45) NOT NULL UNIQUE,
     taskCode VARCHAR(45) DEFAULT NULL, -- task chọn từ list
     userCode VARCHAR(45) NOT NULL,
     userHomeCode VARCHAR(45) NOT NULL,

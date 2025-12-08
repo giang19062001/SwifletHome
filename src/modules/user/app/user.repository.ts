@@ -6,6 +6,7 @@ import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserPackageApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
+import { CODES } from 'src/helpers/const.helper';
 
 @Injectable()
 export class UserAppRepository {
@@ -74,9 +75,9 @@ export class UserAppRepository {
   async create(dto: RegisterUserAppDto): Promise<number> {
     const sqlLast = ` SELECT userCode FROM ${this.table} ORDER BY userCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
-    let userCode = 'USR000001';
+    let userCode = CODES.userCode.FRIST_CODE;
     if (rows.length > 0) {
-      userCode = generateCode(rows[0].userCode, 'USR', 6);
+      userCode = generateCode(rows[0].userCode, CODES.userCode.PRE, 6);
     }
     const sql = `
       INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, deviceToken, isActive, createdId) 

@@ -1,8 +1,8 @@
 
 export interface IListApp<T> {
   total: number;
-  limit: number;
-  page: number;
+  // limit: number;
+  // page: number;
   list: T[];
 }
 export interface ApiAppResponse<T> {

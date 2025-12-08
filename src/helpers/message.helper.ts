@@ -47,6 +47,7 @@ export const Msg = {
   OtpRemainAttempt: (num: number) => `Mã OTP không đúng. Còn ${num} lần thử.`,
   InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
   DateCannotInThePast: 'Ngày phải là ngày hôm nay hoặc trong tương lai',
+  DuplicateTaskAlram:"Lịch nhắc này đã tồn tại",
   CannotNull: (filedName: string) => `${filedName} không thể trống`,
   InvalidValue: (filedName: string) => `${filedName} sai giá trị cho phép`,
   InvalidRange: (filedName: string, range: string) => `${filedName} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
