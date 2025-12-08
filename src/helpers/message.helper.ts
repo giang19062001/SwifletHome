@@ -46,7 +46,6 @@ export const Msg = {
   OtpOvertake: 'Đã vượt quá số lần nhập OTP cho phép',
   OtpRemainAttempt: (num: number) => `Mã OTP không đúng. Còn ${num} lần thử.`,
   InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
-  DateCannotInThePast: 'Ngày phải là ngày hôm nay hoặc trong tương lai',
   DuplicateTaskAlram:"Lịch nhắc này đã tồn tại",
   CannotNull: (filedName: string) => `${filedName} không thể trống`,
   InvalidValue: (filedName: string) => `${filedName} sai giá trị cho phép`,

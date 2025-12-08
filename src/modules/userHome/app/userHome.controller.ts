@@ -62,7 +62,7 @@ export class UserHomeAppController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'userHomeCode', type: String })
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async deleteHome(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
+  async deleteHome(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
     const result = await this.userHomeAppService.deleteHome(userHomeCode, user.userCode);
     if (result === 0) {
       throw new BadRequestException({
@@ -81,7 +81,7 @@ export class UserHomeAppController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'userHomeCode', type: String })
   @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  async updateHomeToMain(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
+  async updateHomeToMain(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
     const result = await this.userHomeAppService.updateHomeToMain(userHomeCode, user.userCode);
     if (result === 0) {
       throw new BadRequestException({
@@ -102,7 +102,7 @@ export class UserHomeAppController {
   @ApiParam({ name: 'userHomeCode', type: String })
   @Put('updateHome/:userHomeCode')
   @HttpCode(HttpStatus.OK)
-  async updateHome(@Body() dto: MutationUserHomeDto, @Param('userHomeCode') userHomeCode: string, @GetUserApp() user: userInterface.IUserApp): Promise<number> {
+  async updateHome(@Body() dto: MutationUserHomeDto, @Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
     const result = await this.userHomeAppService.updateHome(user.userCode, userHomeCode, dto);
     if (result === 0) {
       throw new BadRequestException({

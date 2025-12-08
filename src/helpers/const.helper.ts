@@ -19,7 +19,7 @@ export const KEYWORDS = {
     ANSWERED: 'ANSWERED',
     CANCEL: 'CANCEL',
   },
-  TODO_HOME_TASK_STATUS: {
+  TODO_HOME_TASK_ALARAM_STATUS: {
     WAITING: 'WAITING',
     COMPLETE: 'COMPLETE',
     CANCEL: 'CANCEL',
@@ -42,7 +42,7 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'HOM000001',
   },
-  userHomeCode:{
+  userHomeCode: {
     PRE: 'HOM',
     LEN: 6,
     FRIST_CODE: 'HOM000001',
@@ -57,9 +57,14 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'TAA000001',
   },
-  userCode:{
+  taskPeriodCode: {
+    PRE: 'TAP',
+    LEN: 6,
+    FRIST_CODE: 'TAP000001',
+  },
+  userCode: {
     PRE: 'USR',
     LEN: 6,
     FRIST_CODE: 'USR000001',
-  }
+  },
 };

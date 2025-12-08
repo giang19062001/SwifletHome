@@ -10,6 +10,6 @@ import { UserHomeAppModule } from 'src/modules/userHome/app/userHome.module';
   imports: [AuthAppModule, UserHomeAppModule],
   controllers: [TodoAppController],
   providers: [TodoAppService, TodoAppRepository],
-  exports: []
+  exports: [TodoAppService, TodoAppRepository]
 })
 export class TodoAppModule {}

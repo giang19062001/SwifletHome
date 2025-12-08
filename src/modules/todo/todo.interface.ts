@@ -12,17 +12,28 @@ export interface ITodoTask {
   updatedId: string;
 }
 
-export interface ITodoHomeTaskAlram {
+export interface ITodoHomeTaskPeriod {
   seq: number;
-  taskAlarmCode: string;
+  taskPeriodCode: string;
   userCode: string;
   userHomeCode: string;
   taskCode: string | null;
   isCustomTask: YnEnum;
   taskCustomName: string;
   taskType: TaskTypeEnum;
-  taskStatus: TaskStatusEnum;
   periodValue: number | null;
   specificValue: Date | null;
-  isActive: YnEnum
+  isActive: YnEnum;
+}
+
+export interface ITodoHomeTaskAlram {
+  seq: number;
+  taskAlarmCode: string;
+  taskPeriodCode: string;
+  userCode: string;
+  userHomeCode: string;
+  taskName: string;
+  taskDate: Date;
+  taskStatus: TaskStatusEnum;
+  isActive: YnEnum;
 }

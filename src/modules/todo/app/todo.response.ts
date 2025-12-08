@@ -21,54 +21,6 @@ class TaskKeyDto {
   text: string;
 }
 
-export class GetListTaskAlarmsResDto {
-  @ApiProperty({ example: 0 })
-  seq: number;
-  
-  @ApiProperty({ example: '' })
-  taskAlarmCode: string;
-
-  @ApiProperty({ example: '' })
-  userCode: string;
-
-  @ApiProperty({ example: '' })
-  userHomeCode: string;
-
-  @ApiProperty({ example: null })
-  taskCode: string | null;
-
-  @ApiProperty({
-    example: YnEnum.Y,
-    enum: YnEnum,
-  })
-  isCustomTask: YnEnum;
-
-  @ApiProperty({ example: '' })
-  taskCustomName: string;
-
-  @ApiProperty({
-    example: TaskTypeEnum.SPECIFIC,
-    enum: TaskTypeEnum,
-  })
-  taskType: TaskTypeEnum;
-
-  @ApiProperty({
-    example: TaskStatusEnum.WAITING,
-    enum: TaskStatusEnum,
-  })
-  taskStatus: TaskTypeEnum;
-
-  @ApiProperty({
-    example: null,
-  })
-  periodValue: number | null;
-
-  @ApiProperty({
-    example: '2025-12-01',
-  })
-  specificValue: Date | null;
-}
-
 export class GetScheduledTasksResDto {
   @ApiProperty({
     type: [TaskKeyDto],
@@ -88,4 +40,35 @@ export class GetScheduledTasksResDto {
     },
   })
   values: Record<string, string>;
+}
+
+export class GetListTaskAlarmsResDto {
+  @ApiProperty({ example: 0 })
+  seq: number;
+
+  @ApiProperty({ example: '' })
+  userCode: string;
+
+  @ApiProperty({ example: '' })
+  userHomeCode: string;
+
+  @ApiProperty({ example: '' })
+  taskAlarmCode: string;
+
+  @ApiProperty({ example: '' })
+  taskPeriodCode: string;
+
+  @ApiProperty({ example: '' })
+  taskName: string;
+
+  @ApiProperty({
+    example: '2025-12-01',
+  })
+  taskDate: Date
+
+  @ApiProperty({
+    example: TaskStatusEnum.WAITING,
+    enum: TaskStatusEnum,
+  })
+  taskStatus: TaskTypeEnum;
 }

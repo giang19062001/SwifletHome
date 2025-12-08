@@ -1,9 +1,7 @@
-import { BadRequestException } from '@nestjs/common';
-import { SetTaskAlarmDto } from './todo.dto';
+import { SetTaskPeriodDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
-
 export default class TodoAppValidate {
-  static SetTaskAlarmValidate(dto: SetTaskAlarmDto): string {
+  static SetTaskPeriodValidate(dto: SetTaskPeriodDto): string {
     let error = '';
     // BẮT LỖI LOGIC
     if (dto.isCustomTask == 'Y' && String(dto.taskCustomName) == '') {
@@ -40,10 +38,10 @@ export default class TodoAppValidate {
         return error;
       }
 
-      // WEEK: 0–6
+      // WEEK: 1 - 7
       if (dto.taskType === 'WEEK') {
-        if (dto.periodValue < 0 || dto.periodValue > 6 || !Number.isInteger(dto.periodValue)) {
-          error = Msg.InvalidRange('periodValue', '0 -> 6');
+        if (dto.periodValue < 1 || dto.periodValue > 7 || !Number.isInteger(dto.periodValue)) {
+          error = Msg.InvalidRange('periodValue', '1 -> 7');
           return error;
         }
       }
@@ -64,15 +62,10 @@ export default class TodoAppValidate {
         error = Msg.CannotNull('specificValue');
         return error;
       }
-      // kiểm tra date
-      const parsedDate = new Date(dto.specificValue);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (parsedDate < today) {
-        error = Msg.DateCannotInThePast;
-        return error;
-      }
+      // trách lệnh múi giờ UTC khi chỉ dùng date thay vì datetime
+      dto.specificValue = new Date(dto.specificValue);
     }
-    return error
+    return error;
   }
+
 }

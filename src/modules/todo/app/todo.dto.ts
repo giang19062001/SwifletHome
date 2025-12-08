@@ -24,14 +24,59 @@ export class GetListTaskAlarmsDTO extends PagingDto {
   @IsNotEmpty()
   userHomeCode: string;
 }
-
+export class ChangeTaskAlarmStatusDto {
+  @ApiProperty({
+    example: TaskStatusEnum.COMPLETE,
+    enum: TaskStatusEnum,
+  })
+  @IsNotEmpty()
+  @IsEnum(TaskStatusEnum)
+  taskStatus: TaskStatusEnum;
+}
 export class SetTaskAlarmDto {
-  // @ApiProperty({
-  //   example: '',
-  // })
-  // @IsString()
-  // @IsNotEmpty()
-  // userCode: string;
+  @IsString()
+  @IsOptional()
+  userCode?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  taskPeriodCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  taskName: string;
+
+  @ApiProperty({
+    example: '2025-12-01',
+    type: String,
+    format: 'date',
+    nullable: true,
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => (value === null ? null : new Date(value + 'T00:00:00')))
+  @IsDate()
+  taskDate: Date | null;
+
+  @ApiProperty({
+    example: TaskStatusEnum.WAITING,
+    enum: TaskStatusEnum,
+  })
+  @IsNotEmpty()
+  @IsEnum(TaskStatusEnum)
+  taskStatus: TaskStatusEnum;
+}
+export class SetTaskPeriodDto {
   @ApiProperty({
     example: '',
   })
@@ -69,14 +114,6 @@ export class SetTaskAlarmDto {
   @IsNotEmpty()
   @IsEnum(TaskTypeEnum)
   taskType: TaskTypeEnum;
-
-  // @ApiProperty({
-  //   example: TaskStatusEnum.WAITING,
-  //   enum: TaskStatusEnum,
-  // })
-  // @IsNotEmpty()
-  // @IsEnum(TaskStatusEnum)
-  // taskStatus: TaskStatusEnum;
 
   @ApiProperty({
     example: null,

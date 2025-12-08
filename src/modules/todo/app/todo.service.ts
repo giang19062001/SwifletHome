@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { ITodoHomeTaskAlram, ITodoTask } from '../todo.interface';
+import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { SetTaskAlarmDto } from './todo.dto';
+import { SetTaskAlarmDto, SetTaskPeriodDto, TaskStatusEnum, TaskTypeEnum } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
+import moment from 'moment';
 
 @Injectable()
 export class TodoAppService {
@@ -17,14 +18,6 @@ export class TodoAppService {
     private readonly userHomeAppService: UserHomeAppService,
     private readonly logger: LoggingService,
   ) {}
-
-  async getTasks(): Promise<ITodoTask[]> {
-    const logbase = `${this.SERVICE_NAME}/getTasks:`;
-    const list = await this.todoAppRepository.getTasks();
-    this.logger.log(logbase, `list.length(${list.length})`);
-
-    return list;
-  }
 
   async getScheduledTasks(userCode: string, userHomeCode: string) {
     const home = await this.userHomeAppService.getDetail(userHomeCode);
@@ -55,6 +48,17 @@ export class TodoAppService {
       return null;
     }
   }
+
+  // TODO: TASK
+  async getTasks(): Promise<ITodoTask[]> {
+    const logbase = `${this.SERVICE_NAME}/getTasks:`;
+    const list = await this.todoAppRepository.getTasks();
+    this.logger.log(logbase, `list.length(${list.length})`);
+
+    return list;
+  }
+
+  // TODO: ALARM
   async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<IListApp<ITodoHomeTaskAlram>> {
     const logbase = `${this.SERVICE_NAME}/getTaskAlarms:`;
 
@@ -65,15 +69,116 @@ export class TodoAppService {
     return { total, list };
   }
 
-  async setTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setTaskAlarm:`;
-    const isDuplicate = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, dto);
-    if (isDuplicate) {
+  async changeTaskAlarmStatus(taskStatus: TaskStatusEnum, userCode: string, taskAlarmCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/changeTaskAlarmStatus:`;
+    const result = await this.todoAppRepository.changeTaskAlarmStatus(taskStatus, userCode, taskAlarmCode);
+    this.logger.log(logbase, `cập nhập trạng thái của lịch nhắc thành (${taskStatus})`);
+    return result;
+  }
+  // TODO: PERIOD
+
+  // TODO: PERIOD + ALARM
+  async handleAlarmDataByPeriodData(dto: SetTaskPeriodDto, taskPeriodCode: string): Promise<SetTaskAlarmDto> {
+    let alramDto: SetTaskAlarmDto = {
+      taskPeriodCode: taskPeriodCode,
+      userHomeCode: dto.userHomeCode,
+      taskName: '',
+      taskDate: new Date(),
+      taskStatus: TaskStatusEnum.WAITING,
+    };
+
+    // gán giá trị taskName vào alarm DTO
+    if (dto.isCustomTask == 'Y') {
+      alramDto.taskName = dto.taskCustomName;
+    }
+    if (dto.isCustomTask == 'N' && dto.taskCode != null) {
+      {
+        // lấy taskName dựa vào taskCode
+        const task = await this.todoAppRepository.getDetailTask(dto.taskCode);
+        if (task) {
+          alramDto.taskName = task.taskName;
+        }
+      }
+    }
+    // gán giá trị taskDate vào alarm DTO cho ngày cụ thể
+    if (dto.taskType == 'SPECIFIC' && dto.specificValue != null) {
+      alramDto.taskDate = dto.specificValue;
+    }
+
+    // const today = moment.utc('2026-02-02'); // ! DEV
+    const today = moment.utc(); // ! PROD
+
+    // gán giá trị taskDate vào alarm DTO cho chu kỳ ngày trong tháng
+    if (dto.taskType === 'MONTH' && dto.periodValue != null) {
+      // dto.periodValue (1 - 31)
+      const date = today.clone().date(dto.periodValue); // set ngày cho tháng/năm hiện tại
+
+      console.log(`MONTH(${today.format('YYYY-MM-DD')}) ---->  date  ----> `, dto.periodValue, '  ----> ', date.toDate());
+      // Nếu tháng bị thay đổi → nghĩa là ngày không tồn tại
+      if (date.month() !== today.month()) {
+        alramDto.taskDate = null;
+      } else {
+        alramDto.taskDate = date.toDate(); // YYYY-MM-DD
+      }
+    }
+
+    // gán giá trị taskDate vào alarm DTO cho chu kỳ thứ trong tuần
+    if (dto.taskType === 'WEEK' && dto.periodValue != null) {
+      const isoDay = dto.periodValue; // 1 = Thứ 2 -> 7 = Chủ nhật
+
+      const date = today.clone().isoWeekday(isoDay);
+      console.log(`WEEK(${today.format('YYYY-MM-DD')})  ----> date  ----> `, dto.periodValue, '  ----> ', date.toDate());
+
+      // Kiểm tra có bị nhảy sang tuần khác không 
+      if (date.isoWeek() !== today.isoWeek()) {
+        alramDto.taskDate = null;
+      } else {
+        alramDto.taskDate = date.toDate();
+      }
+    }
+    return alramDto;
+  }
+
+  async setTaskAlarmPeriod(userCode: string, dto: SetTaskPeriodDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setTaskAlarmPeriod:`;
+
+    // kiểm tra duplicate chu kỳ lịch nhắc
+    const isDuplicatePeriod = await this.todoAppRepository.checkDuplicateTaskPeriod(userCode, dto);
+    if (isDuplicatePeriod) {
       this.logger.log(logbase, Msg.DuplicateTaskAlram + `(${dto.userHomeCode})`);
       return -1;
     }
-    const result = await this.todoAppRepository.setTaskAlarm(userCode, dto);
-    this.logger.log(logbase, `Thiết lập lịch nhắc cho nhà yến ${dto.userHomeCode} thành công`);
-    return result;
+
+    // kiểm tra duplicate lịch nhắc
+    let alramDto = await this.handleAlarmDataByPeriodData(dto, '');
+    if (alramDto.taskDate == null) {
+      this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ (VD: 2025-02-31,..) -> không thể thêm`);
+      // ? Vẫn trả ok vì ko hợp lệ thời điểm tháng hiện tại nhưng tháng kế tiếp có thể hợp lệ
+      // ? VD:  2025-02-31 - KO  HỢP LỆ,  2025-03-31 - HỢP LỆ
+      return 1;
+    }
+
+    const isDuplicateAlarm = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, alramDto);
+    if (isDuplicateAlarm) {
+      this.logger.log(logbase, Msg.DuplicateTaskAlram + `(${dto.userHomeCode})`);
+      return -1;
+    }
+
+    // insert chu kỳ lich nhắc
+    const { taskPeriodCode, insertId } = await this.todoAppRepository.insertTaskPeriod(userCode, dto);
+    if (insertId) {
+      this.logger.log(logbase, `Đã thiết lập cấu hình lịch nhắc theo chu kỳ cho nhà yến ${dto.userHomeCode}`);
+
+      let result = 0;
+      alramDto.taskPeriodCode = taskPeriodCode; // gán biến chu kỳ
+      if (alramDto.taskDate != null) {
+        result = await this.todoAppRepository.insertTaskAlarm(userCode, alramDto);
+        this.logger.log(logbase, `Đã thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến ${dto.userHomeCode}`);
+      }
+
+      return result;
+    } else {
+      return 0;
+    }
   }
 }

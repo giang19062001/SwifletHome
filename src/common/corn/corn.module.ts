@@ -4,9 +4,10 @@ import { CornService } from './corn.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DoctorAppModule } from 'src/modules/doctor/app/doctor.module';
 import { UserHomeAppModule } from 'src/modules/userHome/app/userHome.module';
+import { TodoAppModule } from 'src/modules/todo/app/todo.module';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), FileLocalModule, DoctorAppModule, UserHomeAppModule],
+  imports: [ScheduleModule.forRoot(), FileLocalModule, DoctorAppModule, TodoAppModule, UserHomeAppModule],
   controllers: [],
   providers: [CornService],
   exports: [],
