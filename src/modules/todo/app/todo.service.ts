@@ -129,7 +129,7 @@ export class TodoAppService {
       const date = today.clone().isoWeekday(isoDay);
       console.log(`WEEK(${today.format('YYYY-MM-DD')})  ----> date  ----> `, dto.periodValue, '  ----> ', date.toDate());
 
-      // Kiểm tra có bị nhảy sang tuần khác không 
+      // Kiểm tra có bị nhảy sang tuần khác không
       if (date.isoWeek() !== today.isoWeek()) {
         alramDto.taskDate = null;
       } else {
@@ -151,12 +151,6 @@ export class TodoAppService {
 
     // kiểm tra duplicate lịch nhắc
     let alramDto = await this.handleAlarmDataByPeriodData(dto, '');
-    if (alramDto.taskDate == null) {
-      this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ (VD: 2025-02-31,..) -> không thể thêm`);
-      // ? Vẫn trả ok vì ko hợp lệ thời điểm tháng hiện tại nhưng tháng kế tiếp có thể hợp lệ
-      // ? VD:  2025-02-31 - KO  HỢP LỆ,  2025-03-31 - HỢP LỆ
-      return 1;
-    }
 
     const isDuplicateAlarm = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, alramDto);
     if (isDuplicateAlarm) {
@@ -166,15 +160,19 @@ export class TodoAppService {
 
     // insert chu kỳ lich nhắc
     const { taskPeriodCode, insertId } = await this.todoAppRepository.insertTaskPeriod(userCode, dto);
-    if (insertId) {
+    if (alramDto.taskDate == null) {
+      this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ (VD: 2025-02-31,..) -> không thể thêm lịch nhắc, chỉ có thể thêm cấu hình chu kỳ`);
+      // ? Vẫn trả ok vì ko hợp lệ thời điểm tháng hiện tại nhưng tháng kế tiếp có thể hợp lệ
+      // ? VD:  2025-02-31 - KO  HỢP LỆ,  2025-03-31 - HỢP LỆ
+      return 1;
+    }
+    if (insertId && alramDto.taskDate != null) {
       this.logger.log(logbase, `Đã thiết lập cấu hình lịch nhắc theo chu kỳ cho nhà yến ${dto.userHomeCode}`);
 
       let result = 0;
       alramDto.taskPeriodCode = taskPeriodCode; // gán biến chu kỳ
-      if (alramDto.taskDate != null) {
-        result = await this.todoAppRepository.insertTaskAlarm(userCode, alramDto);
-        this.logger.log(logbase, `Đã thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến ${dto.userHomeCode}`);
-      }
+      result = await this.todoAppRepository.insertTaskAlarm(userCode, alramDto);
+      this.logger.log(logbase, `Đã thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến ${dto.userHomeCode}`);
 
       return result;
     } else {
