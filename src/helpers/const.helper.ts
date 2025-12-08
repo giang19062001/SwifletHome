@@ -1,8 +1,16 @@
+import { IPackage } from "src/modules/package/package.interface";
+
 export const IMG_TYPES = ['.png', '.jpg', '.jpeg', '.heic'];
 export const AUDIO_TYPES = ['.mp3'];
 export const VIDEO_TYPES = ['.mp4', '.mov', '.hevc'];
 export const APP_SCREENS = {
   PROFILE_SCREEN: 'PROFILE_SCREEN',
+};
+export const NOTIFICATIONS = {
+  updatePackage: (packageData?: IPackage | null) => ({
+    TITLE: "Thông báo cập nhập gói",
+    BODY: `Gói ${!packageData ? "Miễn phí" : packageData.packageName} đã được cập nhập thành công`
+  })
 };
 
 export const KEYWORDS = {

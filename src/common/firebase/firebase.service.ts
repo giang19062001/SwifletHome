@@ -5,7 +5,7 @@ import { MulticastMessage } from 'firebase-admin/messaging';
 import { NotificationAppRepository } from 'src/modules/notification/notification.repository';
 import { LoggingService } from '../logger/logger.service';
 import { IUserNotificationTopic } from 'src/modules/notification/notification.interface';
-import { IFcmPayload } from './firebase.interface';
+import { PushDataPayload } from './firebase.interface';
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
@@ -27,13 +27,20 @@ export class FirebaseService implements OnModuleInit {
   }
 
   // Single device token (của bạn)
-  async sendNotification(deviceToken: string, title: string, body: string, data?: IFcmPayload) {
+  async sendNotification(deviceToken: string, title: string, body: string, data?: any) {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
 
+    const dataPayload: PushDataPayload = {
+      title,
+      body,
+      image_logo: 'https://3fam.ai/images/favicon.ico',
+      image_detail: 'https://3fam.ai/images/favicon.ico',
+      count: "1",
+    };
     const message: admin.messaging.Message = {
       token: deviceToken,
       notification: { title, body },
-      data: data ? { title, body, image_logo: 'https://3fam.ai/images/favicon.ico', image_detail: 'https://3fam.ai/images/favicon.ico' } : undefined,
+      data: dataPayload
     };
 
     try {
@@ -57,7 +64,7 @@ export class FirebaseService implements OnModuleInit {
   }
 
   //  Gửi theo topic
-  // async sendNotificationToTopic(topic: string, title: string, body: string, data?: IFcmPayload) {
+  // async sendNotificationToTopic(topic: string, title: string, body: string, data?: any) {
   //   const message: admin.messaging.Message = {
   //     topic, //  topic
   //     notification: { title, body },
@@ -75,7 +82,7 @@ export class FirebaseService implements OnModuleInit {
   // }
 
   //  Gửi cho nhiều device tokens (multicast)
-  // async sendNotificationToMultipleTokens(tokens: string[], title: string, body: string, data?: IFcmPayload) {
+  // async sendNotificationToMultipleTokens(tokens: string[], title: string, body: string, data?: any) {
   //   if (tokens.length === 0) return;
 
   //   const message: MulticastMessage = {

@@ -9,7 +9,7 @@ import { IPackage } from 'src/modules/package/package.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { PackageAdminService } from 'src/modules/package/admin/package.service';
 import moment from 'moment';
-import { APP_SCREENS } from 'src/helpers/const.helper';
+import { APP_SCREENS, NOTIFICATIONS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class UserAdminService {
@@ -82,12 +82,8 @@ export class UserAdminService {
       const user = await this.userAdminRepository.getDetailUserApp(userCode);
       if (user) {
         //gửi nofity
-        this.firebaseService.sendNotification(
-          user.deviceToken,
-          'Thông báo cập nhập gói',
-          `Gói ${!packageData ? 'Miễn phí' : (packageData as unknown as IPackage).packageName} đã được cập nhập thành công`,
-          { targetScreen: APP_SCREENS.PROFILE_SCREEN },
-        );
+        const notify = NOTIFICATIONS.updatePackage(packageData);
+        this.firebaseService.sendNotification(user.deviceToken, notify.TITLE, notify.BODY);
       }
     }
     return result;
