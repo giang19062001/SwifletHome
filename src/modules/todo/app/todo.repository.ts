@@ -12,6 +12,7 @@ export class TodoAppRepository {
   private readonly tableTask = 'tbl_todo_tasks';
   private readonly tableHomeTaskAlarm = 'tbl_todo_home_task_alarm';
   private readonly tableHomeTaskPeriod = 'tbl_todo_home_task_period';
+  private readonly maxDayToGet = 5
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   // TODO: TASK
@@ -30,15 +31,17 @@ export class TodoAppRepository {
 
   // TODO: ALARM
   async getTotalTaskAlarm(userCode: string, userHomeCode: string): Promise<number> {
+    let whereQuery = ` AND userCode = ? AND userHomeCode = ? AND taskDate <= CURDATE() + INTERVAL ${this.maxDayToGet} DAY`;
+
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT COUNT(seq) AS TOTAL FROM ${this.tableHomeTaskAlarm}
-      WHERE isActive = 'Y' AND userCode = ? AND userHomeCode = ? `,
+      WHERE isActive = 'Y' ${whereQuery} `,
       [userCode, userHomeCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<ITodoHomeTaskAlram[]> {
-    let whereQuery = ` AND userCode = ? AND userHomeCode = ?  `;
+    let whereQuery = ` AND userCode = ? AND userHomeCode = ? AND taskDate <= CURDATE() + INTERVAL ${this.maxDayToGet} DAY`;
     let offsetQuery = ` `;
 
     let params: (string | number)[] = [userCode, userHomeCode];
@@ -54,6 +57,7 @@ export class TodoAppRepository {
             ORDER BY taskDate DESC
               ${offsetQuery}`;
 
+              console.log(query);
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as ITodoHomeTaskAlram[];
   }

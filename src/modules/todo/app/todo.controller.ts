@@ -44,7 +44,7 @@ export default class TodoAppController {
   }
 
   @ApiOperation({
-    summary: 'Danh sách lịch nhắc việc của 1 nhà yến',
+    summary: 'Danh sách lịch nhắc việc của 1 nhà yến ( chỉ hiển thị lịch nhắc quá khứ, lịch nhắc trong ngầy hiện tại nếu có, và 5 ngày sắp tới )',
   })
   @ApiBody({
     type: GetListTaskAlarmsDTO,
