@@ -108,8 +108,8 @@ export class TodoAppService {
       alramDto.taskDate = dto.specificValue;
     }
 
-    const today = moment.utc('2026-02-02'); // ! DEV
-    // const today = moment.utc(); // ! PROD
+    // const today = moment.utc('2026-02-02'); // ! DEV
+    const today = moment.utc(); // ! PROD
 
     // gán giá trị taskDate vào alarm DTO cho chu kỳ ngày trong tháng
     if (dto.isPeriod == 'Y' && dto.periodType === 'MONTH' && dto.periodValue != null) {
