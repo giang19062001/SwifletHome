@@ -1,9 +1,11 @@
+import { PeriodTypeEnum } from '../todo.interface';
 import { SetTaskPeriodDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 export default class TodoAppValidate {
   static SetTaskPeriodValidate(dto: SetTaskPeriodDto): string {
     let error = '';
-    // BẮT LỖI LOGIC
+
+    // BẮT LỖI RỖNG
     if (dto.isCustomTask == 'Y' && String(dto.taskCustomName) == '') {
       error = Msg.CannotNull('taskCustomName');
       return error;
@@ -12,7 +14,26 @@ export default class TodoAppValidate {
       error = Msg.CannotNull('taskCode');
       return error;
     }
-    // ĐỒNG HÓA LOGIC DỮ LIỆU
+
+    if (dto.isPeriod == 'Y' && dto.periodType == null) {
+      error = Msg.CannotNull('periodType');
+      return error;
+    }
+    if (dto.isPeriod == 'Y' && dto.periodType != null && dto.periodValue == null) {
+      error = Msg.CannotNull('periodValue');
+      return error;
+    }
+    if (dto.isPeriod === 'Y' && dto.periodType != null && !Object.values(PeriodTypeEnum).includes(dto.periodType)) {
+      error = Msg.InvalidValue('periodType');
+      return error;
+    }
+
+    if (dto.isPeriod == 'N' && dto.specificValue == null) {
+      error = Msg.CannotNull('specificValue');
+      return error;
+    }
+
+    // CHUẨN HÓA DỮ LIỆU TÊN TASK
     if (dto.isCustomTask === 'Y') {
       dto.taskCode = null;
     }
@@ -20,15 +41,8 @@ export default class TodoAppValidate {
       dto.taskCustomName = '';
     }
 
-    // Kiểm tra type
-    const validTaskTypes: string[] = ['WEEK', 'MONTH', 'SPECIFIC'];
-    if (!validTaskTypes.includes(dto.taskType)) {
-      error = Msg.InvalidValue('taskType');
-      return error;
-    }
-
-    // nếu là  WEEK | MONTH
-    if (dto.taskType === 'WEEK' || dto.taskType === 'MONTH') {
+    //CHUẨN TASK PERIOD
+    if (dto.isPeriod == 'Y' && (dto.periodType === 'WEEK' || dto.periodType === 'MONTH')) {
       // specificValue phải null
       dto.specificValue = null;
 
@@ -39,7 +53,7 @@ export default class TodoAppValidate {
       }
 
       // WEEK: 1 - 7
-      if (dto.taskType === 'WEEK') {
+      if (dto.periodType === 'WEEK') {
         if (dto.periodValue < 1 || dto.periodValue > 7 || !Number.isInteger(dto.periodValue)) {
           error = Msg.InvalidRange('periodValue', '1 -> 7');
           return error;
@@ -47,13 +61,16 @@ export default class TodoAppValidate {
       }
 
       // MONTH: 1–31
-      if (dto.taskType === 'MONTH') {
+      if (dto.periodType === 'MONTH') {
         if (dto.periodValue < 1 || dto.periodValue > 31 || !Number.isInteger(dto.periodValue)) {
           error = Msg.InvalidRange('periodValue', '1 -> 31');
           return error;
         }
       }
-    } else if (dto.taskType === 'SPECIFIC') {
+    }
+    //CHUẨN TASK TÙY CHỈNH
+
+    if (dto.isPeriod === 'N') {
       // periodValue phải null
       dto.periodValue = null;
 
@@ -62,10 +79,9 @@ export default class TodoAppValidate {
         error = Msg.CannotNull('specificValue');
         return error;
       }
-      // trách lệnh múi giờ UTC khi chỉ dùng date thay vì datetime
+
       dto.specificValue = new Date(dto.specificValue);
     }
     return error;
   }
-
 }

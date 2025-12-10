@@ -3,18 +3,7 @@ import { Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
-
-export enum TaskTypeEnum {
-  WEEK = 'WEEK',
-  MONTH = 'MONTH',
-  SPECIFIC = 'SPECIFIC',
-}
-
-export enum TaskStatusEnum {
-  WAITING = 'WAITING',
-  COMPLETE = 'COMPLETE',
-  CANCEL = 'CANCEL',
-}
+import { PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
 
 export class GetListTaskAlarmsDTO extends PagingDto {
   @ApiProperty({
@@ -39,8 +28,8 @@ export class SetTaskAlarmDto {
   userCode?: string;
 
   @IsString()
-  @IsNotEmpty()
-  taskPeriodCode: string;
+  @IsOptional()
+  taskPeriodCode: string | null;
 
   @ApiProperty({
     example: '',
@@ -75,6 +64,13 @@ export class SetTaskAlarmDto {
   @IsNotEmpty()
   @IsEnum(TaskStatusEnum)
   taskStatus: TaskStatusEnum;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsOptional()
+  taskNote: string;
 }
 export class SetTaskPeriodDto {
   @ApiProperty({
@@ -108,12 +104,21 @@ export class SetTaskPeriodDto {
   taskCustomName: string;
 
   @ApiProperty({
-    example: TaskTypeEnum.SPECIFIC,
-    enum: TaskTypeEnum,
+    example: YnEnum.N,
+    enum: YnEnum,
   })
+  @IsEnum(YnEnum)
   @IsNotEmpty()
-  @IsEnum(TaskTypeEnum)
-  taskType: TaskTypeEnum;
+  isPeriod: YnEnum;
+
+  @ApiProperty({
+    example: null,
+    enum: PeriodTypeEnum,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsEnum(PeriodTypeEnum)
+  periodType: PeriodTypeEnum | null;
 
   @ApiProperty({
     example: null,
@@ -135,4 +140,11 @@ export class SetTaskPeriodDto {
   @Transform(({ value }) => (value === null ? null : new Date(value + 'T00:00:00')))
   @IsDate()
   specificValue: Date | null;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsOptional()
+  taskNote: string;
 }

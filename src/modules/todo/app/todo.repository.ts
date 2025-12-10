@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask } from '../todo.interface';
-import { SetTaskAlarmDto, SetTaskPeriodDto, TaskStatusEnum, TaskTypeEnum } from './todo.dto';
+import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
+import { SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
 import { CODES, KEYWORDS } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode } from 'src/helpers/func.helper';
@@ -12,7 +12,7 @@ export class TodoAppRepository {
   private readonly tableTask = 'tbl_todo_tasks';
   private readonly tableHomeTaskAlarm = 'tbl_todo_home_task_alarm';
   private readonly tableHomeTaskPeriod = 'tbl_todo_home_task_period';
-  private readonly maxDayToGet = 5
+  private readonly maxDayToGet = 5;
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   // TODO: TASK
@@ -51,13 +51,12 @@ export class TodoAppRepository {
       params.push((dto.page - 1) * dto.limit);
     }
     let query = `
-             SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, taskStatus, isActive
+             SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, taskStatus, taskNote, isActive
             FROM ${this.tableHomeTaskAlarm} WHERE isActive = 'Y'
               ${whereQuery} 
             ORDER BY taskDate DESC
               ${offsetQuery}`;
 
-              console.log(query);
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as ITodoHomeTaskAlram[];
   }
@@ -75,9 +74,25 @@ export class TodoAppRepository {
 
     return result.affectedRows;
   }
+
+  async insertTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<number> {
+    const sqlLast = ` SELECT taskAlarmCode FROM ${this.tableHomeTaskAlarm} ORDER BY taskAlarmCode DESC LIMIT 1`;
+    const [rows] = await this.db.execute<any[]>(sqlLast);
+    let taskAlarmCode = CODES.taskAlarmCode.FRIST_CODE;
+    if (rows.length > 0) {
+      taskAlarmCode = generateCode(rows[0].taskAlarmCode, CODES.taskAlarmCode.PRE, 6);
+    }
+    const sql = `
+      INSERT INTO ${this.tableHomeTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, taskDate, taskStatus, taskNote, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userHomeCode, taskAlarmCode, dto.taskPeriodCode, dto.taskName, dto.taskDate, dto.taskStatus, dto.taskNote, userCode]);
+
+    return result.insertId;
+  }
   async checkDuplicateTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<ITodoHomeTaskAlram | null> {
     const query = `
-      SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, taskDate, isActive
+      SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, taskDate, taskNote, isActive
       FROM ${this.tableHomeTaskAlarm}
       WHERE isActive = 'Y'
         AND taskName = ?
@@ -93,59 +108,44 @@ export class TodoAppRepository {
 
     return rows?.length ? (rows[0] as ITodoHomeTaskAlram) : null;
   }
-  async insertTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<number> {
-    const sqlLast = ` SELECT taskAlarmCode FROM ${this.tableHomeTaskAlarm} ORDER BY taskAlarmCode DESC LIMIT 1`;
-    const [rows] = await this.db.execute<any[]>(sqlLast);
-    let taskAlarmCode = CODES.taskAlarmCode.FRIST_CODE;
-    if (rows.length > 0) {
-      taskAlarmCode = generateCode(rows[0].taskAlarmCode, CODES.taskAlarmCode.PRE, 6);
-    }
-    const sql = `
-      INSERT INTO ${this.tableHomeTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, taskDate, taskStatus, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userHomeCode, taskAlarmCode, dto.taskPeriodCode, dto.taskName, dto.taskDate, dto.taskStatus, userCode]);
-
-    return result.insertId;
-  }
   // TODO: PERIOD
   async checkDuplicateTaskPeriod(userCode: string, dto: SetTaskPeriodDto): Promise<ITodoHomeTaskPeriod | null> {
     const query = `
-      SELECT seq, userCode, userHomeCode, taskPeriodCode, taskCode, isCustomTask, taskCustomName, taskType, periodValue, specificValue, isActive
+      SELECT seq, userCode, userHomeCode, taskPeriodCode, taskCode, isCustomTask, taskCustomName, isPeriod, periodType, taskNote, periodValue, specificValue, isActive
       FROM ${this.tableHomeTaskPeriod}
       WHERE isActive = 'Y'
         AND (taskCode = ? OR (? IS NULL AND taskCode IS NULL))
-        AND isCustomTask = ? AND taskCustomName = ?  AND taskType = ?
+        AND isCustomTask = ? AND taskCustomName = ? 
+        AND isPeriod = ? 
+        AND (periodType = ? OR (? IS NULL AND periodType IS NULL))
         AND (periodValue = ? OR (? IS NULL AND periodValue IS NULL))
         AND (specificValue = ? OR (? IS NULL AND specificValue IS NULL))
         AND userHomeCode = ? AND userCode = ?
       LIMIT 1
     `;
 
+    // prettier-ignore
     const params = [
-      dto.taskCode,
-      dto.taskCode,
-      dto.isCustomTask,
-      dto.taskCustomName,
-      dto.taskType,
-      dto.periodValue,
-      dto.periodValue,
+      dto.taskCode, dto.taskCode,
+      dto.isCustomTask, dto.taskCustomName,
+      dto.isPeriod,
+      dto.periodType, dto.periodType,
+      dto.periodValue, dto.periodValue,
       dto.specificValue ? moment(dto.specificValue).format('YYYY-MM-DD') : null,
       dto.specificValue ? moment(dto.specificValue).format('YYYY-MM-DD') : null,
-      dto.userHomeCode,
-      userCode,
+      dto.userHomeCode, userCode,
     ];
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows?.length ? (rows[0] as ITodoHomeTaskPeriod) : null;
   }
 
-  async getListTaskPeriodByType(taskType: TaskTypeEnum): Promise<ITodoHomeTaskPeriod[]> {
+  async getListTaskPeriodType(periodType: PeriodTypeEnum): Promise<ITodoHomeTaskPeriod[]> {
     let query = `
-      SELECT seq, userCode, userHomeCode, taskPeriodCode, taskCode, isCustomTask, taskCustomName, taskType, periodValue, specificValue, isActive
-      FROM ${this.tableHomeTaskPeriod} WHERE isActive = 'Y' AND taskType = ?
+      SELECT seq, userCode, userHomeCode, taskPeriodCode, taskCode, isCustomTask, taskCustomName, isPeriod, periodType, periodValue, specificValue, taskNote, isActive
+      FROM ${this.tableHomeTaskPeriod} WHERE isActive = 'Y' AND periodType = ?
       `;
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [taskType]);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [periodType]);
     return rows as ITodoHomeTaskPeriod[];
   }
   async insertTaskPeriod(userCode: string, dto: SetTaskPeriodDto): Promise<{ taskPeriodCode: string; insertId: number }> {
@@ -156,8 +156,9 @@ export class TodoAppRepository {
       taskPeriodCode = generateCode(rows[0].taskPeriodCode, CODES.taskPeriodCode.PRE, 6);
     }
     const sql = `
-      INSERT INTO ${this.tableHomeTaskPeriod}  (userCode, userHomeCode, taskPeriodCode, taskCode, isCustomTask, taskCustomName, taskType, periodValue, specificValue, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.tableHomeTaskPeriod}  (userCode, userHomeCode, taskPeriodCode, taskCode, isCustomTask, taskCustomName, isPeriod, periodType,
+      periodValue, specificValue, taskNote, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       userCode,
@@ -166,9 +167,11 @@ export class TodoAppRepository {
       dto.taskCode,
       dto.isCustomTask,
       dto.taskCustomName,
-      dto.taskType,
+      dto.isPeriod,
+      dto.periodType,
       dto.periodValue,
       dto.specificValue,
+      dto.taskNote,
       userCode,
     ]);
 

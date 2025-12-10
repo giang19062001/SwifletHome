@@ -1,5 +1,15 @@
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { TaskStatusEnum, TaskTypeEnum } from './app/todo.dto';
+
+export enum PeriodTypeEnum {
+  WEEK = 'WEEK',
+  MONTH = 'MONTH',
+}
+
+export enum TaskStatusEnum {
+  WAITING = 'WAITING',
+  COMPLETE = 'COMPLETE',
+  CANCEL = 'CANCEL',
+}
 
 export interface ITodoTask {
   seq: number;
@@ -20,9 +30,11 @@ export interface ITodoHomeTaskPeriod {
   taskCode: string | null;
   isCustomTask: YnEnum;
   taskCustomName: string;
-  taskType: TaskTypeEnum;
+  isPeriod: YnEnum;
+  periodType: PeriodTypeEnum | null;
   periodValue: number | null;
   specificValue: Date | null;
+  taskNote: string;
   isActive: YnEnum;
 }
 
@@ -35,5 +47,6 @@ export interface ITodoHomeTaskAlram {
   taskName: string;
   taskDate: Date;
   taskStatus: TaskStatusEnum;
+  taskNote: string;
   isActive: YnEnum;
 }

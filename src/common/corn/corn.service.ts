@@ -8,9 +8,10 @@ import path from 'path';
 import { DoctorAppRepository } from 'src/modules/doctor/app/doctor.repository';
 import { UserHomeAppRepository } from 'src/modules/userHome/app/userHome.repository';
 import { TodoAppService } from 'src/modules/todo/app/todo.service';
-import { SetTaskAlarmDto, TaskTypeEnum } from 'src/modules/todo/app/todo.dto';
+import { SetTaskAlarmDto } from 'src/modules/todo/app/todo.dto';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import moment from 'moment';
+import { PeriodTypeEnum } from 'src/modules/todo/todo.interface';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -26,7 +27,7 @@ export class CornService implements OnModuleInit {
     private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  onModuleInit() {
+  async onModuleInit() {
     // DAILY – mỗi ngày lúc 01:00
     const jobDaily = new CronJob('0 1 * * *', () => {
       this.deleteDoctorFilesNotUse();
@@ -37,52 +38,53 @@ export class CornService implements OnModuleInit {
 
     // MONTHLY – ngày 01 mỗi tháng lúc 01:00
     const jobMonthly = new CronJob('0 1 1 * *', () => {
-      this.insertTodoTaskAlarm(TaskTypeEnum.MONTH); // tháng
+      this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
     });
     this.schedulerRegistry.addCronJob('monthlyTask', jobMonthly);
     jobMonthly.start();
 
     // WEEKLY – Thứ Hai mỗi tuần lúc 01:00
     const jobWeekly = new CronJob('0 1 * * 1', () => {
-      this.insertTodoTaskAlarm(TaskTypeEnum.WEEK); // tuần
+      this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
     });
     this.schedulerRegistry.addCronJob('weeklyTask', jobWeekly);
     jobWeekly.start();
 
-    // ! TEST
-    // this.insertTodoTaskAlarm(TaskTypeEnum.MONTH); // tháng
-    // this.insertTodoTaskAlarm(TaskTypeEnum.WEEK); // tuần
+    // ! TEST — chạy TUẦN TỰ
+    // await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH); 
+    // await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
   }
-  async insertTodoTaskAlarm(taskType: TaskTypeEnum) { 
+
+  async insertTodoTaskAlarm(periodType: PeriodTypeEnum) {
     const logbase = `${this.SERVICE_NAME}/insertTodoTaskAlarm`;
-    this.logger.log(logbase, `Chuẩn bị tạo các lịch nhắc tự động dựa vào các thiết lập của chu kỳ ${taskType}...`);
+    this.logger.log(logbase, `Chuẩn bị tạo các lịch nhắc tự động dựa vào các thiết lập của chu kỳ ${periodType}...`);
 
-    const taskPeriodList = await this.todoAppRepository.getListTaskPeriodByType(taskType);
+    const taskPeriodList = await this.todoAppRepository.getListTaskPeriodType(periodType);
 
-    this.logger.log(logbase, `Tổng các chu kỳ hiện có ${taskPeriodList.length} của ${taskType}`);
+    this.logger.log(logbase, `Tổng các chu kỳ hiện có của ${periodType} là ${taskPeriodList.length}`);
 
     // lọc các alarm dựa vào chu kỳ -> nếu đã tồn tại bỏ qua
     let taskAlarmCanInsert: SetTaskAlarmDto[] = [];
     for (const periodDto of taskPeriodList) {
       const alramDto: SetTaskAlarmDto = await this.todoAppService.handleAlarmDataByPeriodData(periodDto, periodDto.taskPeriodCode);
       if (alramDto.taskDate == null) {
-        this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ (VD: 2025-02-31,..) -> không thể thêm`);
+        this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ -> không thể thêm`);
       } else {
         const isDuplicateAlarm = await this.todoAppRepository.checkDuplicateTaskAlarm(periodDto.userCode, alramDto);
         if (isDuplicateAlarm) {
-          this.logger.error(logbase, `${moment(isDuplicateAlarm.taskDate).format('YYYY-MM-DD')} đã tồn tại của nhà yến (${alramDto.userHomeCode})`);
+          this.logger.error(logbase, `Thời gian lịch nhắc (${moment(isDuplicateAlarm.taskDate).format('YYYY-MM-DD')}) của nhà yến (${alramDto.userHomeCode}) không thể thêm vì đã tồn tại `);
         } else {
           taskAlarmCanInsert.push({ ...alramDto, userCode: periodDto.userCode });
         }
       }
     }
 
-    this.logger.log(logbase, `Tổng các lịch nhắc chuẩn bị thêm ${taskAlarmCanInsert.length} của ${taskType}`);
+    this.logger.log(logbase, `Tổng các lịch nhắc chuẩn bị thêm của ${periodType} là ${taskAlarmCanInsert.length}`);
 
     // insert các alarm đã được lọc trùng lặp
     for (const alramDto of taskAlarmCanInsert) {
       await this.todoAppRepository.insertTaskAlarm(alramDto.userCode ? alramDto.userCode : '', alramDto);
-      this.logger.log(logbase, `Đã thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến (${alramDto.userHomeCode})`);
+      this.logger.log(logbase, `Thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến (${alramDto.userHomeCode}) thành công`);
     }
   }
   async deleteDoctorFilesNotUse() {

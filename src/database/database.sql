@@ -635,9 +635,11 @@ CREATE TABLE
     userHomeCode VARCHAR(45) NOT NULL,
     isCustomTask CHAR(1) NOT NULL DEFAULT 'Y', -- N chọn task hoặc Y nhập task
     taskCustomName VARCHAR(255) DEFAULT "", -- task nhập từ input
-    taskType ENUM ('WEEK', 'MONTH', 'SPECIFIC') DEFAULT 'SPECIFIC', -- chu kỳ tuần, tháng hay chỉ 1 ngày cụ thể trong tương lai
-    periodValue INT DEFAULT NULL, --  week ( 0 - 6 : CN - T7); month (1-31)
-    specificValue DATE DEFAULT NULL, -- date cụ thể nếu taskType  là 'SPECIFIC'
+    isPeriod CHAR(1) NOT NULL DEFAULT 'Y', -- dạng chu kỳ và dạng tùy chỉnh
+    periodType ENUM('WEEK', 'MONTH') DEFAULT NULL, -- NULL nếu là tùy chỉnh
+    periodValue INT DEFAULT NULL, --  week ( 1 - 6 : T2 - CN); month (1-31)
+    specificValue DATE DEFAULT NULL, -- date cụ thể nếu isPeriod  là 'N'
+    taskNote VARCHAR(255) DEFAULT '',
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
@@ -645,16 +647,20 @@ CREATE TABLE
     updatedId VARCHAR(45) DEFAULT NULL
   );
 
+
+
+
 CREATE TABLE
   tbl_todo_home_task_alarm (
     seq INT AUTO_INCREMENT PRIMARY KEY,
     taskAlarmCode VARCHAR(45) NOT NULL UNIQUE,
-    taskPeriodCode VARCHAR(45) NOT NULL,
+    taskPeriodCode VARCHAR(45) DEFAULT NULL, -- có thể null nếu ko phải là periodType
     taskName VARCHAR(45) NOT NULL, -- taskCode hoặc taskCustomName
     taskDate DATE NOT NULL, -- render từ periodValue Hoặc specificValue của tbl_todo_home_task_period
     taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL') DEFAULT 'WAITING',
     userCode VARCHAR(45) NOT NULL,
     userHomeCode VARCHAR(45) NOT NULL,
+    taskNote VARCHAR(255) DEFAULT '',
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,

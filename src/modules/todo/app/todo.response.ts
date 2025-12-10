@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { TaskStatusEnum, TaskTypeEnum } from './todo.dto';
+import { TaskStatusEnum } from '../todo.interface';
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })
@@ -64,11 +64,20 @@ export class GetListTaskAlarmsResDto {
   @ApiProperty({
     example: '2025-12-01',
   })
-  taskDate: Date
+  taskDate: Date;
 
   @ApiProperty({
     example: TaskStatusEnum.WAITING,
     enum: TaskStatusEnum,
   })
-  taskStatus: TaskTypeEnum;
+  taskStatus: TaskStatusEnum;
+
+  @ApiProperty({ example: '' })
+  taskNote: string;
+
+  @ApiProperty({
+    example: YnEnum.Y,
+    enum: YnEnum,
+  })
+  isActive: YnEnum;
 }

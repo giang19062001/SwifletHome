@@ -53,7 +53,8 @@ export default class TodoAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: ApiAppResponseDto(ListResponseDto(GetListTaskAlarmsResDto)),
-    description: `**taskStatus**: enum('WAITING','COMPLETE','CANCEL')\n`,
+    description: `**taskStatus**: enum('WAITING','COMPLETE','CANCEL')\n
+  **taskPeriodCode*: string | null`,
   })
   async getAll(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: GetListTaskAlarmsDTO): Promise<IListApp<ITodoHomeTaskAlram>> {
     const result = await this.todoAppService.getListTaskAlarms(user.userCode, dto.userHomeCode, dto);
@@ -97,12 +98,14 @@ export default class TodoAppController {
   @Post('setTaskAlarm')
   @ApiBody({
     type: SetTaskPeriodDto,
-    description: `**taskCode** là giá trị lấy từ api/app/todo/getTasks, được phép **null** nếu **isCustomTask** của lịch nhắc là **Y**, không được phép **null** nếu **isCustomTask** của lịch nhắc là **N** \n
-**taskCustomName** giá trị được phép rỗng nếu **isCustomTask** của lịch nhắc là **N**, giá trị không được phép rỗng nếu **isCustomTask** của lịch nhắc là **Y**\n
-**taskType** enum('WEEK','MONTH','SPECIFIC') với **WEEK** là lịch nhắc lặp lại theo tuần, **MONTH** là lịch nhắc lặp lại theo tháng,  **SPECIFIC** là lịch nhắc cho 1 ngày cụ thể trong tương lai\n
-**periodValue** number | null, được phép **null** nếu **taskType** là **SPECIFIC**, không được phép **null** nếu **taskType** là **WEEK** hoặc **MONTH**, nếu **taskType** là **WEEK** thì giá trị sẽ là (1 -> 7) (Thứ 2 -> Chủ nhật) *ISO Day of Week*,
-nếu **taskType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
-**specificValue** date | null, được phép **null** nếu **taskType** là **WEEK** hoặc **MONTH**, không được phép **null** nếu **taskType** là **SPECIFIC**, giá trị sẽ có định dạng **YYYY-MM-DD** 
+    description: `**isPeriod** enum('Y','N')\n
+**periodType** enum('WEEK','MONTH'), nếu **isPeriod** của lịch nhắc là **Y** thì giá trị không được phép **null** và phải mang giá trị **WEEK** hoặc **MONTH**, nếu **isPeriod** là **N** thì giá trị được phép **null**\n
+**periodValue** number | null, được phép **null** nếu **isPeriod** là **N** và **periodType** là **null** , không được phép **null** nếu **isPeriod** là **Y** và **periodType** là **WEEK** hoặc **MONTH**, nếu **periodType** là **WEEK** thì giá trị sẽ là (1 -> 7) (Thứ 2 -> Chủ nhật),
+nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
+**specificValue** date | null, được phép **null** nếu **isPeriod** là **Y**, không được phép **null** nếu **isPeriod** là **N**, giá trị sẽ có định dạng **YYYY-MM-DD**\n
+**taskCode** là giá trị lấy từ api/app/todo/getTasks, giá trị được phép **null** nếu **isCustomTask** của lịch nhắc là **Y**, không được phép **null** nếu **isCustomTask** của lịch nhắc là **N** \n
+**isCustomTask** enum('Y','N')\n
+**taskCustomName** giá trị được phép rỗng ("") nếu **isCustomTask** của lịch nhắc là **N**, giá trị không được phép rỗng ("") nếu **isCustomTask** của lịch nhắc là **Y**\n 
        `,
   })
   @HttpCode(HttpStatus.OK)
@@ -118,6 +121,12 @@ nếu **taskType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     }
     const result = await this.todoAppService.setTaskAlarmPeriod(user.userCode, dto);
 
+    if (result == -2) {
+      throw new BadRequestException({
+        message: Msg.DuplicateTaskPeriod,
+        data: 0,
+      });
+    }
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.DuplicateTaskAlram,
@@ -126,12 +135,12 @@ nếu **taskType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     }
     if (result == 0) {
       throw new BadRequestException({
-        message: Msg.RegisterErr,
+        message: Msg.SetTaskErr,
         data: 0,
       });
     }
     return {
-      message: Msg.RegisterOk,
+      message: Msg.SetTaskOk,
       data: result,
     };
   }
