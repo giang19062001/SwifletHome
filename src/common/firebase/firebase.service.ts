@@ -35,16 +35,18 @@ export class FirebaseService implements OnModuleInit {
       body,
       image_logo: 'https://3fam.ai/images/favicon.ico',
       image_detail: 'https://3fam.ai/images/favicon.ico',
-      count: "1",
+      count: '1',
     };
     const message: admin.messaging.Message = {
       token: deviceToken,
       notification: { title, body },
-      data: dataPayload
+      data: dataPayload,
     };
 
     try {
       const response = await this.messaging.send(message);
+      console.log('response --------', response);
+
       this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
       return response;
     } catch (error) {
@@ -56,6 +58,7 @@ export class FirebaseService implements OnModuleInit {
         this.logger.log(logbase, `Token chưa được đăng ký: ${deviceToken}`);
         return;
       } else {
+        console.log("error -----> ", error);
         // lỗi
         this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại: ${JSON.stringify(error)}`);
         return;
@@ -117,12 +120,12 @@ export class FirebaseService implements OnModuleInit {
 
     // Chỉ subscribe những topic còn thiếu ( FCM )
     for (const topic of missingTopics) {
-      const fcmResponse = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
-      console.log(fcmResponse);
-      if (fcmResponse.failureCount > 0) {
+      const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+      console.log('response --------', response);
+      if (response.failureCount > 0) {
         this.logger.error(logbase, `Đăng ký ${topic.topicName} tự động cho người dùng đăng kí mới (${userCode}) thất bại`);
       }
-      if (fcmResponse.successCount > 0) {
+      if (response.successCount > 0) {
         this.logger.log(logbase, `Đăng ký ${topic.topicName} tự động cho người dùng đăng kí mới (${userCode}) thành công`);
       }
     }
@@ -138,7 +141,7 @@ export class FirebaseService implements OnModuleInit {
   //   const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
 
   //   // Gọi FCM
-  //   const fcmResponse = await admin.messaging().unsubscribeFromTopic(tokenArray, topic);
+  //   const response = await admin.messaging().unsubscribeFromTopic(tokenArray, topic);
 
   //   // Xóa khỏi DB
   //   if (tokenArray.length > 0) {
@@ -151,8 +154,8 @@ export class FirebaseService implements OnModuleInit {
   //     // await this.dataSource.query(query, [topic, ...tokenArray]);
   //   }
 
-  //   console.log(`Unsubscribed ${fcmResponse.successCount}/${tokenArray.length} tokens from topic "${topic}"`);
-  //   return fcmResponse.successCount;
+  //   console.log(`Unsubscribed ${response.successCount}/${tokenArray.length} tokens from topic "${topic}"`);
+  //   return response.successCount;
   // }
 
   // // Lấy danh sách token của 1 topic

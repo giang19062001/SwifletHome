@@ -23,7 +23,7 @@ export class UpdatePasswordDto {
 
 export class UpdateDeviceTokenDto {
   @ApiProperty({
-    example: 'c5IcFc-dS9apRp4PbSgqoU:APA91bFyHwpnHANDbQUUzywUOTOIsT2xamQzjwI3J9SjpAh4H1HBaPad3e0kk2VFQ4hx1PegPmzizHOYl4FNnIOnGRLU2MxZBeSTIJOv_Vgk2C0oCEqd174',
+    example: 'c7MkjIGhQsayyKMRmlwlh-:APA91bG5je2rIYLXGmji70lflu8auuyE3CMP0t2fByBs8vohBMDHdMBp3zvd_NihqAXYRVJ8JbrxTaR7bfr4sxaCGV588_RrHEah-j_X14uFJ58slLW4C1Q',
   })
   @IsString()
   @IsNotEmpty()
@@ -46,7 +46,7 @@ export class LoginAppDto {
   userPassword: string;
 
   @ApiProperty({
-    example: 'c5IcFc-dS9apRp4PbSgqoU:APA91bFyHwpnHANDbQUUzywUOTOIsT2xamQzjwI3J9SjpAh4H1HBaPad3e0kk2VFQ4hx1PegPmzizHOYl4FNnIOnGRLU2MxZBeSTIJOv_Vgk2C0oCEqd174',
+    example: 'c7MkjIGhQsayyKMRmlwlh-:APA91bG5je2rIYLXGmji70lflu8auuyE3CMP0t2fByBs8vohBMDHdMBp3zvd_NihqAXYRVJ8JbrxTaR7bfr4sxaCGV588_RrHEah-j_X14uFJ58slLW4C1Q',
   })
   @IsString()
   @IsNotEmpty()
