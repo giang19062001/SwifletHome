@@ -5,10 +5,9 @@ import { MulticastMessage } from 'firebase-admin/messaging';
 import { LoggingService } from '../logger/logger.service';
 import { PushDataPayload } from './firebase.interface';
 import { NotificationAppRepository } from 'src/modules/notification/app/notification.repository';
-import { IUserNotificationTopic } from 'src/modules/notification/app/notification.interface';
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { NotificationStatusEnum } from 'src/modules/notification/notification.interface';
+import { IUserNotificationTopic, NotificationStatusEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
@@ -34,12 +33,12 @@ export class FirebaseService implements OnModuleInit {
   }
 
   // Single device token (của bạn)
-  async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any) {
+  async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType?: NotificationTypeEnum) {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
     const notificationId = uuidv4();
 
     // lấy số lượng các notify chưa được đọc của user hiện tại
-    const count = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode)
+    const count = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode);
 
     const dataPayload: PushDataPayload = {
       notificationId: notificationId,
@@ -47,7 +46,7 @@ export class FirebaseService implements OnModuleInit {
       body,
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
-      count: String(count), 
+      count: String(count),
     };
 
     // gửi bằng token
@@ -70,7 +69,8 @@ export class FirebaseService implements OnModuleInit {
           data: data ?? null,
           userCode: userCode,
           topicCode: null,
-          status: NotificationStatusEnum.SENT,
+          notificationType: notificationType ? notificationType : NotificationTypeEnum.ADMIN,
+          notificationStatus: NotificationStatusEnum.SENT,
         };
         await this.notificationAppRepository.createNotification(notificationDto);
         this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);

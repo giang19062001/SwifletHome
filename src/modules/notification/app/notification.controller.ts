@@ -6,11 +6,13 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { NotificationAppService } from './notification.service';
-import { NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
-import { INotification } from './notification.interface';
+import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetNotificationResDto } from './notification.response';
+import { INotification } from '../notification.interface';
+import { PagingDto } from 'src/dto/admin.dto';
+import { IListApp } from 'src/interfaces/app.interface';
 
 @ApiTags('app/notification')
 @Controller('/api/app/notification')
@@ -22,6 +24,18 @@ export class NotificationAppController {
     private readonly notificationAppService: NotificationAppService,
     private readonly logger: LoggingService,
   ) {}
+
+  @ApiBody({
+    type: PagingDto,
+  })
+  @Post('getAll')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetNotificationResDto)), description: `**notificationType enum('ADMIN','TODO')**\n
+**notificationStatus** enum('SENT','READ')` })
+  async getAll(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp,): Promise<IListApp<INotification>> {
+    const result = await this.notificationAppService.getAll(dto, user.userCode);
+    return result;
+  }
 
   @Get('getDetail/:notificationId')
   @HttpCode(HttpStatus.OK)

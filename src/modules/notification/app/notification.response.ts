@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { NotificationStatusEnum } from '../notification.interface';
+import { NotificationStatusEnum, NotificationTypeEnum } from '../notification.interface';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class GetNotificationResDto {
@@ -27,8 +27,11 @@ export class GetNotificationResDto {
   @ApiProperty({ example: '' })
   topicCode: string | null;
 
+  @ApiProperty({ example: NotificationTypeEnum.ADMIN })
+  notificationType: NotificationTypeEnum;
+
   @ApiProperty({ example: NotificationStatusEnum.READ })
-  status: NotificationStatusEnum;
+  notificationStatus: NotificationStatusEnum;
 
   @ApiProperty({ example: YnEnum.Y })
   isActive: YnEnum;

@@ -1,11 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { INotification, INotificationTopic, IUserNotificationTopic } from './notification.interface';
 import { CreateNotificationDto } from './notification.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { NotificationStatusEnum } from '../notification.interface';
+import { INotification, INotificationTopic, IUserNotificationTopic, NotificationStatusEnum } from '../notification.interface';
 
 @Injectable()
 export class NotificationAppRepository {
@@ -17,15 +16,18 @@ export class NotificationAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
+  async getTotal(userCode: string): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE userCode = ?`,[userCode]);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<INotification[]> {
-    let query = ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, A.userCode, A.topicCode, A.status, A.isActive, A.createdAt, A.createdId
-        FROM ${this.table} A `;
+  async getAll(dto: PagingDto, userCode:string): Promise<INotification[]> {
+    let query = ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, A.userCode, A.topicCode,
+    A.notificationType, A.notificationStatus, A.isActive, A.createdAt, A.createdId
+        FROM ${this.table} A 
+      WHERE userCode = ? `;
 
     const params: any[] = [];
+    params.push(userCode)
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
       params.push(dto.limit, (dto.page - 1) * dto.limit);
@@ -36,7 +38,8 @@ export class NotificationAppRepository {
   }
   async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, A.userCode, A.topicCode, A.status, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt
+      ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, A.userCode, A.topicCode,
+      A.notificationType, A.notificationStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt
         FROM ${this.table} A 
         WHERE A.notificationId = ? AND A.userCode = ?
         LIMIT 1`,
@@ -48,7 +51,7 @@ export class NotificationAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT COUNT(seq)  AS TOTAL
         FROM ${this.table} 
-        WHERE userCode = ? AND status = ?;
+        WHERE userCode = ? AND notificationStatus = ?;
         `,
       [userCode, NotificationStatusEnum.SENT],
     );
@@ -57,17 +60,18 @@ export class NotificationAppRepository {
 
   async createNotification(dto: CreateNotificationDto): Promise<number> {
     const sql = `
-        INSERT INTO ${this.table}  (notificationId, messageId, title, body, data, userCode, topicCode, status, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO ${this.table}  (notificationId, messageId, title, body, data, userCode, topicCode, notificationType, notificationStatus, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.notificationId, dto.messageId, dto.title, dto.body, dto.data, dto.userCode, dto.topicCode, dto.status, this.updator]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.notificationId, dto.messageId, dto.title, dto.body, dto.data, dto.userCode, dto.topicCode,
+      dto.notificationType, dto.notificationStatus, this.updator]);
 
     return result.insertId;
   }
 
   async maskAsRead(notificationId: string, userCode: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET status = ? , updatedId = ?, updatedAt = NOW()
+      UPDATE ${this.table} SET notificationStatus = ? , updatedId = ?, updatedAt = NOW()
       WHERE notificationId = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [NotificationStatusEnum.READ, userCode, notificationId]);

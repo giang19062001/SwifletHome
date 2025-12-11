@@ -1,9 +1,10 @@
-import { INotification, INotificationTopic } from './notification.interface';
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
 import { NotificationAppRepository } from './notification.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { IListApp } from 'src/interfaces/app.interface';
+import { INotification, INotificationTopic } from '../notification.interface';
 
 @Injectable()
 export class NotificationAppService {
@@ -18,6 +19,15 @@ export class NotificationAppService {
 
     const total = await this.notificationAppRepository.getTotalTopic();
     const list = await this.notificationAppRepository.getAllTopic(dto);
+    return { total, list };
+  }
+  async getAll(dto: PagingDto, userCode: string): Promise<IListApp<INotification>> {
+    const logbase = `${this.SERVICE_NAME}/getAll:`;
+
+    const total = await this.notificationAppRepository.getTotal(userCode);
+    const list = await this.notificationAppRepository.getAll(dto, userCode);
+    this.logger.log(logbase, `total(${total})`);
+
     return { total, list };
   }
   async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
