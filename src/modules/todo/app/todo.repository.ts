@@ -60,6 +60,22 @@ export class TodoAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as ITodoHomeTaskAlram[];
   }
+  async getListTaskAlarmsToday(dateStr: string): Promise<(ITodoHomeTaskAlram & { deviceToken: string })[]> {
+    const query = `
+    SELECT 
+      A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, 
+      A.taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, 
+      A.taskStatus, A.taskNote, A.isActive, B.deviceToken
+    FROM ${this.tableHomeTaskAlarm} A
+    JOIN tbl_user_app B
+    ON A.userCode = B.userCode
+    WHERE A.isActive = 'Y'
+      AND DATE(A.taskDate) = ?
+  `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [dateStr]);
+    return rows as (ITodoHomeTaskAlram & { deviceToken: string })[];
+  }
   async changeTaskAlarmStatus(taskStatus: TaskStatusEnum, userCode: string, taskAlarmCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableHomeTaskAlarm}

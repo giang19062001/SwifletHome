@@ -12,6 +12,8 @@ import { SetTaskAlarmDto } from 'src/modules/todo/app/todo.dto';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import moment from 'moment';
 import { PeriodTypeEnum } from 'src/modules/todo/todo.interface';
+import { FirebaseService } from '../firebase/firebase.service';
+import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -23,36 +25,64 @@ export class CornService implements OnModuleInit {
     private readonly todoAppService: TodoAppService,
     private readonly todoAppRepository: TodoAppRepository,
     private readonly fileLocalService: FileLocalService,
+    private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
     private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
   async onModuleInit() {
-    // DAILY – mỗi ngày lúc 01:00
-    const jobDaily = new CronJob('0 1 * * *', () => {
-      this.deleteDoctorFilesNotUse();
-      this.deleteUserHomeFilesNotUse();
+    // DAILY – mỗi ngày lúc 01:00 KHUYA
+    const jobDaily = new CronJob('0 1 * * *', async () => {
+      await this.deleteDoctorFilesNotUse();
+      await this.deleteUserHomeFilesNotUse();
     });
-    this.schedulerRegistry.addCronJob('dailyTask', jobDaily);
+    this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();
 
     // MONTHLY – ngày 01 mỗi tháng lúc 01:00
-    const jobMonthly = new CronJob('0 1 1 * *', () => {
-      this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
+    const jobMonthly = new CronJob('0 1 1 * *', async () => {
+      await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
     });
     this.schedulerRegistry.addCronJob('monthlyTask', jobMonthly);
     jobMonthly.start();
 
     // WEEKLY – Thứ Hai mỗi tuần lúc 01:00
-    const jobWeekly = new CronJob('0 1 * * 1', () => {
-      this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
+    const jobWeekly = new CronJob('0 1 * * 1', async () => {
+      await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
     });
     this.schedulerRegistry.addCronJob('weeklyTask', jobWeekly);
     jobWeekly.start();
 
-    // ! TEST — chạy TUẦN TỰ
-    // await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH); 
+    // DAILY: MỖI NGÀY LÚC 8H SÁNG
+    const jobDailyAt8AM = new CronJob('0 8 * * *', async () => {
+      console.log('Running daily task at 8:00 AM');
+      await this.pushNotificationsByTaskAlarms();
+    });
+
+    this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
+    jobDailyAt8AM.start();
+    // ! DEV
+    // await this.pushNotificationsByTaskAlarms();
+    // await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
+  }
+
+  async pushNotificationsByTaskAlarms() {
+    const logbase = `${this.SERVICE_NAME}/pushNotificationsByTaskAlarms`;
+
+    // const todayStr = '2025-12-12'; // ! DEV
+    const todayStr = moment.utc().format('YYYY-MM-DD'); // !PROD
+
+    this.logger.log(logbase, `Chuẩn bị tìm các lịch nhắc hôm nay để gửi thông báo...`);
+
+    const taskAlarmList = await this.todoAppRepository.getListTaskAlarmsToday(todayStr);
+    this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskAlarmList.length}`);
+    if (taskAlarmList.length) {
+      for (const task of taskAlarmList) {
+        // insert thông và đẩy thông báo
+        await this.firebaseService.sendNotification(task.userCode, task.deviceToken, task.taskName, task.taskNote, { taskAlarmCode: task.taskAlarmCode }, NotificationTypeEnum.TODO);
+      }
+    }
   }
 
   async insertTodoTaskAlarm(periodType: PeriodTypeEnum) {
