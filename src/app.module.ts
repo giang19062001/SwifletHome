@@ -32,6 +32,7 @@ import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { BlogAppModule } from './modules/blog/app/blog.module';
 import { TodoAppModule } from './modules/todo/app/todo.module';
 import { TodoAdminModule } from './modules/todo/admin/todo.module';
+import { FirebaseModule } from './common/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { TodoAdminModule } from './modules/todo/admin/todo.module';
     DatabaseModule,
     LoggerModule,
     SocketModule,
+    FirebaseModule,
     // commmon
     OptionModule,
     ProvinceModule,

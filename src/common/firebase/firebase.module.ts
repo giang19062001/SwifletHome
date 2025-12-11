@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { FirebaseService } from './firebase.service';
-import { NotificationAppModule } from 'src/modules/notification/notification.module';
+import { NotificationAppModule } from 'src/modules/notification/app/notification.module';
 
+@Global()
 @Module({
   imports:[NotificationAppModule],
   providers: [FirebaseService],

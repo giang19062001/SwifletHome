@@ -13,7 +13,7 @@ import { UserHomeAppService } from './userHome.service';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserHome } from '../userHome.interface';
-import { ListResponseDto, NullResponseDto } from 'src/dto/common.dto';
+import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { IList } from 'src/interfaces/admin.interface';
 import { GetHomeUserResDto, UserHomeImageResDto, GetHomesUserResDto } from './userHome.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
@@ -61,7 +61,7 @@ export class UserHomeAppController {
   @Delete('deleteHome/:userHomeCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'userHomeCode', type: String })
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async deleteHome(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
     const result = await this.userHomeAppService.deleteHome(userHomeCode, user.userCode);
     if (result === 0) {
@@ -80,7 +80,7 @@ export class UserHomeAppController {
   @Put('updateHomeToMain/:userHomeCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'userHomeCode', type: String })
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async updateHomeToMain(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
     const result = await this.userHomeAppService.updateHomeToMain(userHomeCode, user.userCode);
     if (result === 0) {
@@ -122,7 +122,7 @@ export class UserHomeAppController {
   `,
   })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async createHome(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: MutationUserHomeDto) {
     const result = await this.userHomeAppService.createHome(user.userCode, dto);
     if (result === -1) {

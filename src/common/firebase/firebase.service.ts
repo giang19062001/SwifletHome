@@ -2,15 +2,22 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import admin from 'firebase-admin';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { MulticastMessage } from 'firebase-admin/messaging';
-import { NotificationAppRepository } from 'src/modules/notification/notification.repository';
 import { LoggingService } from '../logger/logger.service';
-import { IUserNotificationTopic } from 'src/modules/notification/notification.interface';
 import { PushDataPayload } from './firebase.interface';
+import { NotificationAppRepository } from 'src/modules/notification/app/notification.repository';
+import { IUserNotificationTopic } from 'src/modules/notification/app/notification.interface';
+import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { NotificationStatusEnum } from 'src/modules/notification/notification.interface';
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
 export class FirebaseService implements OnModuleInit {
   private readonly SERVICE_NAME = 'FirebaseService';
+  private readonly IMAGE = {
+    LOGO: 'https://3fam.ai/images/favicon.ico',
+    DETAIL: 'https://3fam.ai/images/favicon.ico',
+  };
   private messaging: admin.messaging.Messaging;
 
   constructor(
@@ -27,16 +34,23 @@ export class FirebaseService implements OnModuleInit {
   }
 
   // Single device token (của bạn)
-  async sendNotification(deviceToken: string, title: string, body: string, data?: any) {
+  async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any) {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
+    const notificationId = uuidv4();
+
+    // lấy số lượng các notify chưa được đọc của user hiện tại
+    const count = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode)
 
     const dataPayload: PushDataPayload = {
+      notificationId: notificationId,
       title,
       body,
-      image_logo: 'https://3fam.ai/images/favicon.ico',
-      image_detail: 'https://3fam.ai/images/favicon.ico',
-      count: '1',
+      image_logo: this.IMAGE.LOGO,
+      image_detail: this.IMAGE.DETAIL,
+      count: String(count), 
     };
+
+    // gửi bằng token
     const message: admin.messaging.Message = {
       token: deviceToken,
       notification: { title, body },
@@ -45,9 +59,25 @@ export class FirebaseService implements OnModuleInit {
 
     try {
       const response = await this.messaging.send(message);
-      console.log('response --------', response);
 
-      this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
+      if (response) {
+        const messageId = response.split('/messages/')[1]; // VD: projects/fam-b055e/messages/0:1765439199615028%3bad3e4c3bad3e4c --> 1765439199615028%3bad3e4c3bad3e4c
+        const notificationDto: CreateNotificationDto = {
+          notificationId: notificationId,
+          messageId: messageId,
+          title: title,
+          body: title,
+          data: data ?? null,
+          userCode: userCode,
+          topicCode: null,
+          status: NotificationStatusEnum.SENT,
+        };
+        await this.notificationAppRepository.createNotification(notificationDto);
+        this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
+      } else {
+        this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại : ${JSON.stringify(response)}`);
+      }
+
       return response;
     } catch (error) {
       // bắt các lỗi FCM phổ biến
@@ -58,7 +88,7 @@ export class FirebaseService implements OnModuleInit {
         this.logger.log(logbase, `Token chưa được đăng ký: ${deviceToken}`);
         return;
       } else {
-        console.log("error -----> ", error);
+        console.log('error -----> ', error);
         // lỗi
         this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại: ${JSON.stringify(error)}`);
         return;

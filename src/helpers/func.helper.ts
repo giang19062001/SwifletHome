@@ -9,7 +9,7 @@ export const generateCode = (code: string, keyword: string, lengthNum: number) =
   return `${keyword}${nextNumberString}`;
 };
 
-export function diffByTwoArr(arr1, arr2, field) {
+export function diffByTwoArr(arr1: any[], arr2: any[], field: string) {
   const arrCompare = new Set(arr1.map((item) => item[field]));
   return arr2.filter((item) => !arrCompare.has(item[field]));
 }

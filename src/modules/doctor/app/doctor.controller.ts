@@ -13,6 +13,7 @@ import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { UploadFileDoctorResDto } from './doctor.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
+import { NumberOkResponseDto } from 'src/dto/common.dto';
 
 @ApiTags('app/doctor')
 @Controller('/api/app/doctor')
@@ -28,7 +29,7 @@ export class DoctorAppController {
   @Post('requestDoctor')
   @ApiBody({ type: CreateDoctorDto, description: '**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file' })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async requestDoctor(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CreateDoctorDto) {
     const result = await this.doctorAppService.requestDoctor(user.userCode, dto);
     if (result === -1) {

@@ -32,6 +32,10 @@ export const KEYWORDS = {
     COMPLETE: 'COMPLETE',
     CANCEL: 'CANCEL',
   },
+   NOTIFICATION_STATUS: {
+    SENT: 'SENT',
+    READ: 'READ',
+  },
 };
 
 export const CODES = {

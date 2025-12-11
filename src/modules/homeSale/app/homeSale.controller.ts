@@ -33,7 +33,7 @@ import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetHomeSaleDetailResDto, GetHomeSaleResDto } from './homesale.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
-import { ListResponseDto } from 'src/dto/common.dto';
+import { ListResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 
 @ApiTags('app/homeSale')
 @Controller('/api/app/homeSale')
@@ -75,7 +75,7 @@ export class HomeSaleAppController {
   })
   @Post('registerSightSeeing')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.homeSaleAppService.registerSightSeeing(dto, user.userCode);
     if (result === 0) {

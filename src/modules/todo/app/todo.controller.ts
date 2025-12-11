@@ -8,7 +8,7 @@ import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { ListResponseDto, NullResponseDto, ZeroResponseDto } from 'src/dto/common.dto';
+import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ChangeTaskAlarmStatusDto, GetListTaskAlarmsDTO, SetTaskPeriodDto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
@@ -71,7 +71,7 @@ export default class TodoAppController {
     type: ChangeTaskAlarmStatusDto,
     description: `**taskStatus**: enum('COMPLETE','CANCEL')`,
   })
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async changeTaskAlarmStatus(@Param('taskAlarmCode') taskAlarmCode: string, @Body() dto: ChangeTaskAlarmStatusDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
     const result = await this.todoAppService.changeTaskAlarmStatus(dto.taskStatus, user.userCode, taskAlarmCode);
 
@@ -109,8 +109,8 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
        `,
   })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
-  @ApiBadRequestResponse({ type: ZeroResponseDto })
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async setTaskAlarm(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskPeriodDto) {
     const err: string = TodoAppValidate.SetTaskPeriodValidate(dto);
     if (err) {

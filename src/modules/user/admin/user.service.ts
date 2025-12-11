@@ -83,7 +83,7 @@ export class UserAdminService {
       if (user) {
         //gửi nofity
         const notify = NOTIFICATIONS.updatePackage(packageData);
-        this.firebaseService.sendNotification(user.deviceToken, notify.TITLE, notify.BODY);
+        this.firebaseService.sendNotification(user.userCode, user.deviceToken, notify.TITLE, notify.BODY);
       }
     }
     return result;

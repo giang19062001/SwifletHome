@@ -14,6 +14,7 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
 import { RequestOtpResDto } from 'src/modules/otp/otp.response';
 import * as authInterface from './auth.interface';
+import { NumberOkResponseDto } from 'src/dto/common.dto';
 
 @ApiBearerAuth('app-auth')
 @ApiTags('app/auth')
@@ -40,7 +41,7 @@ export class AuthAppController {
   })
   @Post('register')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async register(@Body() dto: RegisterUserAppDto) {
     const result = await this.authAppService.register(dto);
     return {
@@ -72,7 +73,7 @@ export class AuthAppController {
     summary: 'Cần xác thực',
   })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async update(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UpdateUserDto, @Param('userPhone') userPhone: string, @Req() req: Request) {
     const result = await this.authAppService.update(dto, userPhone, user.userCode);
     return {
@@ -85,7 +86,7 @@ export class AuthAppController {
   @ApiBody({ type: UpdateDeviceTokenDto })
   @Put('updateDeviceToken/:userPhone')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async updateDeviceToken(@Body() dto: UpdateDeviceTokenDto, @Param('userPhone') userPhone: string) {
     const result = await this.authAppService.updateDeviceToken(dto, userPhone);
     return {
@@ -98,7 +99,7 @@ export class AuthAppController {
   @ApiBody({ type: UpdatePasswordDto })
   @Put('updatePassword/:userPhone')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async updatePassword(@Body() dto: UpdatePasswordDto, @Param('userPhone') userPhone: string) {
     const result = await this.authAppService.updatePassword(dto, userPhone);
     return {
@@ -113,7 +114,7 @@ export class AuthAppController {
   })
   @Get('checkDuplicatePhone/:userPhone')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async checkDuplicatePhone(@Param('userPhone') userPhone: string) {
     const result = await this.authAppService.checkDuplicatePhone(userPhone);
     return {
@@ -143,7 +144,7 @@ export class AuthAppController {
   })
   @Post('verifyOtp')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(Number) })
+  @ApiOkResponse({ type: NumberOkResponseDto })
   async verifyOtp(@Body() dto: VerifyOtpDto) {
     const isValid = await this.authAppService.verifyOtp(dto);
 

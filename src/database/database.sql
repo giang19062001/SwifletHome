@@ -598,12 +598,14 @@ CREATE TABLE
 CREATE TABLE
   tbl_notifications (
     seq INT AUTO_INCREMENT PRIMARY KEY,
+  notificationId CHAR(36) NOT NULL UNIQUE,   -- UUID v4 lưu dạng string
+    messageId VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
     body TEXT NOT NULL,
     data JSON,
     userCode VARCHAR(45) NOT NULL,
     topicCode VARCHAR(45) DEFAULT NULL, -- có thể null
-    status ENUM ('SENT', 'READ', 'FAIL') DEFAULT 'SENT',
+    status ENUM ('SENT', 'READ') DEFAULT 'SENT',
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,

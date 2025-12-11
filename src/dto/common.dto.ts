@@ -17,7 +17,21 @@ export function ListResponseDto<TModel extends Type<any>>(model: TModel) {
   return ListDtoClass;
 }
 
-export class ZeroResponseDto {
+export class NumberOkResponseDto {
+  @ApiProperty({ example: true })
+  success: boolean;
+
+  @ApiProperty({ example: 'Success' })
+  message: string;
+
+  @ApiProperty({ example: 1 })
+  data: number;
+
+  @ApiProperty({ example: 200 })
+  statusCode: number;
+}
+
+export class NumberErrResponseDto {
   @ApiProperty({ example: false })
   success: boolean;
 
