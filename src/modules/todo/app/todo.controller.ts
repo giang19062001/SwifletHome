@@ -31,7 +31,7 @@ export default class TodoAppController {
   }
 
   @ApiOperation({
-    summary: 'Thông tin todo của 1 nhà yến (thu hoạch, lăn thuốc,...) - Dữ liệu là động có thể thay đổi',
+    summary: 'Thông tin todo của 1 nhà yến (thu hoạch, lăn thuốc,...)',
   })
   @ApiParam({ name: 'userHomeCode', type: String })
   @Get('getScheduledTasks/:userHomeCode')
