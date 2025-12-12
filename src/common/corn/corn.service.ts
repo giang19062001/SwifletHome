@@ -55,14 +55,13 @@ export class CornService implements OnModuleInit {
 
     // DAILY: MỖI NGÀY LÚC 8H SÁNG
     const jobDailyAt8AM = new CronJob('0 8 * * *', async () => {
-      console.log('Running daily task at 8:00 AM');
       await this.pushNotificationsByTaskAlarms();
     });
 
     this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
     jobDailyAt8AM.start();
     // ! DEV
-    // await this.pushNotificationsByTaskAlarms();
+    await this.pushNotificationsByTaskAlarms();
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
   }

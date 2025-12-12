@@ -93,7 +93,7 @@ import { GlobalErrorLoggerFilter } from './filter/globalError.filter';
     },
      {
       provide: APP_FILTER,
-      useClass: GlobalErrorLoggerFilter,
+      useClass: GlobalErrorLoggerFilter, // log lỗi toàn service nếu có
     },
     {
       provide: APP_INTERCEPTOR,
@@ -103,6 +103,6 @@ import { GlobalErrorLoggerFilter } from './filter/globalError.filter';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(IpMiddleware).forRoutes('*'); // Áp dụng cho tất cả routes
+    consumer.apply(IpMiddleware).forRoutes('*'); // bắt ip cho toàn server
   }
 }
