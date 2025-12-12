@@ -41,7 +41,6 @@ export class UserAppService {
         };
         // tạo package cho user mới
         await this.createPackage(dto);
-
       }
     }
     return userInserted;
@@ -55,6 +54,8 @@ export class UserAppService {
   }
 
   async updateDeviceToken(deviceToken: string, userPhone: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/updateDeviceToken`;
+    this.logger.log(logbase, `Cập nhập device token mới cho người dùng (${userPhone})`);
     return await this.userAppRepository.updateDeviceToken(deviceToken, userPhone);
   }
 

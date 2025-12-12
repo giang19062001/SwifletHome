@@ -109,13 +109,13 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
         };
       }),
 
-      // Bắt tất cả lỗi (throw Exception) → format lại
+      // Bắt tất cả lỗi (throw Exception)-> format lại
       catchError((err) => {
         const statusCode = err?.status || err?.response?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
 
         const message = err?.response?.message || err?.message || getErrDefaultMessage(request.method, request.url);
 
-        // Nếu là mảng lỗi (validation), lấy hết
+        // Nếu là mảng lỗi -> lấy hết
         const errorMessage = Array.isArray(message) ? message.join(', ') : message;
 
         return of({

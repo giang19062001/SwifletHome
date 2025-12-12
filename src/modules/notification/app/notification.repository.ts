@@ -109,9 +109,11 @@ export class NotificationAppRepository {
   }
   // TODO: USER_TOPIC
   async getUserSubscribedTopics(userCode: string): Promise<IUserNotificationTopic[]> {
-    let query = ` SELECT A.seq, A.topicCode, A.userCode
+    let query = ` SELECT A.seq, A.topicCode, A.userCode, B.topicName
         FROM ${this.tableUserTopic} A 
-        WHERE userCode = ? AND A.isActive = 'Y' `;
+        LEFT JOIN ${this.tableTopic} B
+        ON A.topicCode = B.topicCode
+        WHERE A.userCode = ? AND A.isActive = 'Y' `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
     return rows as IUserNotificationTopic[];
   }

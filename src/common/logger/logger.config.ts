@@ -69,6 +69,5 @@ export const winstonConfig = {
     }),
   ],
   
-  // Thêm exitOnError false để tránh crash app khi có lỗi ghi log
-  exitOnError: false,
+  exitOnError: false, // tránh crash app khi có lỗi ghi log
 };

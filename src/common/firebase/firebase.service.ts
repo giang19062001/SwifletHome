@@ -88,12 +88,65 @@ export class FirebaseService implements OnModuleInit {
         this.logger.log(logbase, `Token chưa được đăng ký: ${deviceToken}`);
         return;
       } else {
-        console.log('error -----> ', error);
         // lỗi
-        this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại: ${JSON.stringify(error)}`);
+        this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại ---> ${JSON.stringify(error)}`);
         return;
       }
     }
+  }
+
+  // todo: Khi tạo 1 topic nào đó nên tự động đăng kí topic đó cho tất cả user
+  async subscribeToTopic(userCode: string, deviceToken: string) {
+    const logbase = `${this.SERVICE_NAME}/subscribeToTopic`;
+
+    // lấy topics đã đang đăng ký của user này
+    const existingSubs = await this.notificationAppRepository.getUserSubscribedTopics(userCode);
+    // lấy tất cả topics
+    const allTopics = await this.notificationAppRepository.getAllTopic({ limit: 0, page: 0 });
+
+    // lọc ra các topic chưa đăng ký
+    const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: IUserNotificationTopic) => sub.topicCode === topic.topicCode));
+
+    if (missingTopics.length === 0) {
+      this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
+    }
+
+    
+    // Chỉ subscribe những topic còn thiếu ( FCM )
+    for (const topic of missingTopics) {
+      const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+      if (response.failureCount > 0) {
+        this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại`);
+      }
+      if (response.successCount > 0) {
+        this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+      }
+    }
+
+    // Chỉ subscribe những topic còn thiếu ( DB )
+    for (const topic of missingTopics) {
+      await this.notificationAppRepository.subscribeToTopic(userCode, topic.topicCode);
+    }
+  }
+
+  // Unsubscribe
+  async unsubscribeFromTopic(userCode: string, deviceToken: string) {
+    const logbase = `${this.SERVICE_NAME}/unsubscribeFromTopic`;
+
+    // lấy topics đã đang đăng ký của user này
+    const existingSubs = await this.notificationAppRepository.getUserSubscribedTopics(userCode);
+
+    // Chỉ unsubscribe những topic đã đăng ký ( FCM )
+    for (const topic of existingSubs) {
+      const response = await admin.messaging().unsubscribeFromTopic(deviceToken, topic.topicCode);
+      if (response.failureCount > 0) {
+        this.logger.error(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thất bại --> ${JSON.stringify(response.errors[0].error)}`);
+      }
+      if (response.successCount > 0) {
+        this.logger.log(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thành công`);
+      }
+    }
+
   }
 
   //  Gửi theo topic
@@ -133,61 +186,6 @@ export class FirebaseService implements OnModuleInit {
   //     throw error;
   //   }
   // }
-  async subscribeToTopic(userCode: string, deviceToken: string) {
-    const logbase = `${this.SERVICE_NAME}/subscribeToTopic`;
-
-    // lấy topics đã đang đăng ký của user này
-    const existingSubs = await this.notificationAppRepository.getUserSubscribedTopics(userCode);
-    // lấy tất cả topics
-    const allTopics = await this.notificationAppRepository.getAllTopic({ limit: 0, page: 0 });
-
-    // lọc ra các topic chưa đăng ký
-    const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: IUserNotificationTopic) => sub.topicCode === topic.topicCode));
-
-    if (missingTopics.length === 0) {
-      this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
-    }
-
-    // Chỉ subscribe những topic còn thiếu ( FCM )
-    for (const topic of missingTopics) {
-      const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
-      console.log('response --------', response);
-      if (response.failureCount > 0) {
-        this.logger.error(logbase, `Đăng ký ${topic.topicName} tự động cho người dùng đăng kí mới (${userCode}) thất bại`);
-      }
-      if (response.successCount > 0) {
-        this.logger.log(logbase, `Đăng ký ${topic.topicName} tự động cho người dùng đăng kí mới (${userCode}) thành công`);
-      }
-    }
-
-    // Chỉ subscribe những topic còn thiếu ( DB )
-    for (const topic of missingTopics) {
-      await this.notificationAppRepository.subscribeToTopic(userCode, topic.topicCode);
-    }
-  }
-
-  // // Unsubscribe
-  // async unsubscribeFromTopic(tokens: string | string[], topic: string): Promise<number> {
-  //   const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
-
-  //   // Gọi FCM
-  //   const response = await admin.messaging().unsubscribeFromTopic(tokenArray, topic);
-
-  //   // Xóa khỏi DB
-  //   if (tokenArray.length > 0) {
-  //     const placeholders = tokenArray.map(() => '?').join(', ');
-  //     const query = `
-  //       DELETE FROM topic_subscription
-  //       WHERE topic = ? AND fcm_token IN (${placeholders})
-  //     `;
-
-  //     // await this.dataSource.query(query, [topic, ...tokenArray]);
-  //   }
-
-  //   console.log(`Unsubscribed ${response.successCount}/${tokenArray.length} tokens from topic "${topic}"`);
-  //   return response.successCount;
-  // }
-
   // // Lấy danh sách token của 1 topic
   // async getTokensByTopic(topic: string): Promise<string[]> {
   //   const query = `

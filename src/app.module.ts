@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -33,6 +33,9 @@ import { BlogAppModule } from './modules/blog/app/blog.module';
 import { TodoAppModule } from './modules/todo/app/todo.module';
 import { TodoAdminModule } from './modules/todo/admin/todo.module';
 import { FirebaseModule } from './common/firebase/firebase.module';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
+import { NotFoundExceptionFilter } from './filter/notFound.filter';
 
 @Module({
   imports: [
@@ -74,10 +77,24 @@ import { FirebaseModule } from './common/firebase/firebase.module';
     InfoAdminModule,
     PackageAdminModule,
     UserHomeAdminModule,
-    TodoAdminModule
+    TodoAdminModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+     {
+      provide: APP_PIPE,
+      useClass: ValidationPipe, // bật bắt lỗi tự động dựa vào cấu hình DTO
+    },
+    {
+      provide: APP_FILTER,
+      useClass: NotFoundExceptionFilter, // bắt lỗi tự động điều hướng sang trang 404.ejs
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RequestLoggerInterceptor, // log cho các request gửi đến server
+    }, 
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

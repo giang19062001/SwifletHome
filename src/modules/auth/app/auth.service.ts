@@ -77,8 +77,14 @@ export class AuthAppService extends AbAuthService {
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
 
-    // Chỉnh sửa lại device mỗi lần đăng nhập
-    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
+    // Chỉnh sửa lại device mỗi lần đăng nhập (nếu khác)
+    if (String(user.deviceToken) !== String(dto.deviceToken)) {
+      // cập nhập token mới
+      await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
+      // unscribe topic cho token cũ
+      await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
+
+    }
 
     // kiểm tra va re-subcribe lại topic mỗi lần đăng nhập
     await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken);

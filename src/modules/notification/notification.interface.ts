@@ -44,6 +44,7 @@ export interface IUserNotificationTopic {
   seq: number;
   userCode: string;
   topicCode: string;
+  topicName?: string;
   isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;

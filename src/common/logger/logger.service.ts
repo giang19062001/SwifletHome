@@ -16,7 +16,7 @@ export class LoggingService implements LoggerService {
 
     return {
       context,
-      ip: requestContext?.ip || 'localhost', // 'máy chủ' cho cron jobs
+      ip: requestContext?.ip || 'localhost', // 'localhost' cho cron jobs
       requestId: requestContext?.requestId,
       userId: requestContext?.userId,
       path: requestContext?.path,
@@ -45,7 +45,6 @@ export class LoggingService implements LoggerService {
   }
 
   fatal(message: string, context?: any) {
-    // Winston không có 'fatal', dùng error với severity cao
     this.logger.error(`[FATAL] ${message}`, {
       ...this.getLogMetadata(context),
       severity: 'fatal',
@@ -53,8 +52,6 @@ export class LoggingService implements LoggerService {
   }
 
   setLogLevels(levels: LogLevel[]) {
-    // Winston config thường set levels khi khởi tạo
-    // Nếu cần dynamic, có thể implement thêm
     this.logger.level = levels[0] || 'info';
   }
 }
