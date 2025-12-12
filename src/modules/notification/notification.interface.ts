@@ -31,6 +31,7 @@ export interface INotification {
 export interface INotificationTopic {
   seq: number;
   topicCode: string;
+  topicKeyword:string;
   topicName: string;
   topicDescription: string;
   isActive: YnEnum;

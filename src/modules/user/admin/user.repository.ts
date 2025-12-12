@@ -85,7 +85,6 @@ export class UserAdminRepository {
         WHERE userCode = ?
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, updatedId, updatedAt, userCode]);
-
     return result.affectedRows;
   }
 

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { NotificationStatusEnum, NotificationTypeEnum } from '../notification.interface';
 
 export class CreateNotificationDto {
@@ -41,10 +41,20 @@ export class CreateNotificationDto {
 
   @ApiProperty({
     example: '',
+    required: false,
+    nullable: true,
   })
   @IsString()
-  @IsNotEmpty()
-  userCode: string;
+  @IsOptional()
+  userCode: string | null;
+
+  @ApiProperty({
+    example: [],
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  userCodesMuticast: string[];
 
   @ApiProperty({
     example: null,
@@ -55,8 +65,7 @@ export class CreateNotificationDto {
   @IsOptional()
   topicCode: string | null;
 
-
-   @ApiProperty({
+  @ApiProperty({
     example: 'ADMIN',
     enum: NotificationTypeEnum,
   })

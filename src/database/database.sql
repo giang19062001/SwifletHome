@@ -565,6 +565,7 @@ CREATE TABLE
   tbl_notification_topics (
     seq INT AUTO_INCREMENT PRIMARY KEY,
     topicCode VARCHAR(45) NOT NULL UNIQUE,
+    topicKeyword char(255) NOT NULL,
     topicName VARCHAR(45) NOT NULL UNIQUE,
     topicDescription TEXT,
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
@@ -601,7 +602,8 @@ CREATE TABLE
     title VARCHAR(255) NOT NULL,
     body TEXT NOT NULL,
     data JSON,
-    userCode VARCHAR(45) NOT NULL,
+    userCode VARCHAR(45) DEFAULT NULL, -- có thể null nếu notifications gửi bằng topic thay vì riêng user,
+    userCodesMuticast JSON DEFAULT NULL, -- mảng user code nếu gửi multicase
     topicCode VARCHAR(45) DEFAULT NULL, -- có thể null
     notificationType ENUM ('ADMIN', 'TODO') DEFAULT 'ADMIN',
     notificationStatus ENUM ('SENT', 'READ') DEFAULT 'SENT',
@@ -616,7 +618,6 @@ CREATE TABLE
 
 
 -- to do list
-
 CREATE TABLE
   tbl_todo_box_tasks (
     seq INT AUTO_INCREMENT PRIMARY KEY,
@@ -628,7 +629,6 @@ CREATE TABLE
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
     updatedId VARCHAR(45) DEFAULT NULL
   )
-
 CREATE TABLE
   tbl_todo_tasks (
     seq INT AUTO_INCREMENT PRIMARY KEY,

@@ -36,6 +36,9 @@ export const KEYWORDS = {
     SENT: 'SENT',
     READ: 'READ',
   },
+  NOTIFICATION_TOPIC:{
+    COMMON: 'COMMON',
+  }
 };
 
 export const CODES = {

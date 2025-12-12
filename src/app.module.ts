@@ -36,6 +36,7 @@ import { FirebaseModule } from './common/firebase/firebase.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
 import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
+import { NotificationAdminModule } from './modules/notification/admin/notification.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
     PackageAdminModule,
     UserHomeAdminModule,
     TodoAdminModule,
+    NotificationAdminModule
   ],
   controllers: [AppController],
   providers: [

@@ -60,10 +60,10 @@ export class NotificationAppRepository {
 
   async createNotification(dto: CreateNotificationDto): Promise<number> {
     const sql = `
-        INSERT INTO ${this.table}  (notificationId, messageId, title, body, data, userCode, topicCode, notificationType, notificationStatus, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO ${this.table}  (notificationId, messageId, title, body, data, userCode, userCodesMuticast, topicCode, notificationType, notificationStatus, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.notificationId, dto.messageId, dto.title, dto.body, dto.data, dto.userCode, dto.topicCode,
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.notificationId, dto.messageId, dto.title, dto.body, dto.data, dto.userCode, dto.userCodesMuticast, dto.topicCode,
       dto.notificationType, dto.notificationStatus, this.updator]);
 
     return result.insertId;
@@ -96,16 +96,6 @@ export class NotificationAppRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as INotificationTopic[];
-  }
-  async getDetailTopic(topicCode: string): Promise<INotificationTopic | null> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.topicCode, A.topicName, A.data, A.topicDescription, A.isActive, A.createdAt, A.createdId
-        FROM ${this.tableTopic} A
-        WHERE A.topicCode = ? 
-        LIMIT 1`,
-      [topicCode],
-    );
-    return rows ? (rows[0] as INotificationTopic) : null;
   }
   // TODO: USER_TOPIC
   async getUserSubscribedTopics(userCode: string): Promise<IUserNotificationTopic[]> {

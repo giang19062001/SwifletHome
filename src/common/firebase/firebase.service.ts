@@ -33,7 +33,7 @@ export class FirebaseService implements OnModuleInit {
   }
 
   // Single device token (của bạn)
-  async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType?: NotificationTypeEnum) {
+  async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN) {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
     const notificationId = uuidv4();
 
@@ -58,7 +58,7 @@ export class FirebaseService implements OnModuleInit {
 
     try {
       const response = await this.messaging.send(message);
-
+      console.log(response);
       if (response) {
         const messageId = response.split('/messages/')[1]; // VD: projects/fam-b055e/messages/0:1765439199615028%3bad3e4c3bad3e4c --> 1765439199615028%3bad3e4c3bad3e4c
         const notificationDto: CreateNotificationDto = {
@@ -68,8 +68,9 @@ export class FirebaseService implements OnModuleInit {
           body: title,
           data: data ?? null,
           userCode: userCode,
+          userCodesMuticast: [],
           topicCode: null,
-          notificationType: notificationType ? notificationType : NotificationTypeEnum.ADMIN,
+          notificationType: notificationType,
           notificationStatus: NotificationStatusEnum.SENT,
         };
         await this.notificationAppRepository.createNotification(notificationDto);
@@ -80,6 +81,7 @@ export class FirebaseService implements OnModuleInit {
 
       return response;
     } catch (error) {
+      console.log(error);
       // bắt các lỗi FCM phổ biến
       if (error.code === 'messaging/registration-token-not-registered' || error.code === 'messaging/invalid-registration-token') {
         this.logger.log(logbase, `Token không hợp lệ hoặc đã bị thu hồi: ${deviceToken}`);
@@ -92,6 +94,60 @@ export class FirebaseService implements OnModuleInit {
         this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại ---> ${JSON.stringify(error)}`);
         return;
       }
+    }
+  }
+
+  //  Gửi theo topic
+  async sendNotificationToTopic(topic: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN) {
+    const logbase = `${this.SERVICE_NAME}/sendNotificationToTopic`;
+    const notificationId = uuidv4();
+
+    const dataPayload: PushDataPayload = {
+      notificationId,
+      title,
+      body,
+      image_logo: this.IMAGE.LOGO,
+      image_detail: this.IMAGE.DETAIL,
+      count: '0',
+    };
+
+    const message: admin.messaging.Message = {
+      topic,
+      notification: { title, body },
+      data: dataPayload,
+    };
+
+    try {
+      const response = await this.messaging.send(message);
+
+      this.logger.log(logbase, `Gửi thông báo đến topic [${topic}] thành công: (${JSON.stringify(response)})`);
+
+      // Lưu vào DB một bản ghi chung (cho thống kê, audit log, hoặc resend sau)
+      const notificationDto: CreateNotificationDto = {
+        notificationId,
+        messageId: response.includes('/messages/') ? response.split('/messages/')[1] : response,
+        title,
+        body,
+        data: data ?? null,
+        userCode: null, // null vì gửi theo topic
+        userCodesMuticast: [],
+        topicCode: topic, // lưu lại topic để trace
+        notificationType,
+        notificationStatus: NotificationStatusEnum.SENT,
+      };
+
+      await this.notificationAppRepository.createNotification(notificationDto);
+
+      return response;
+    } catch (error: any) {
+      this.logger.log(logbase, `Gửi thông báo theo topic (${topic}) thất bại: (${JSON.stringify(error)}) `);
+
+      // Xử lý các lỗi FCM phổ biến khi gửi topic
+      if (error.code === 'messaging/topic-not-found' || error.code === 'messaging/invalid-argument') {
+        this.logger.error(logbase, `Topic không tồn tại: [${topic}] thất bại`);
+      }
+
+      throw error;
     }
   }
 
@@ -111,7 +167,6 @@ export class FirebaseService implements OnModuleInit {
       this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
     }
 
-    
     // Chỉ subscribe những topic còn thiếu ( FCM )
     for (const topic of missingTopics) {
       const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
@@ -146,26 +201,7 @@ export class FirebaseService implements OnModuleInit {
         this.logger.log(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thành công`);
       }
     }
-
   }
-
-  //  Gửi theo topic
-  // async sendNotificationToTopic(topic: string, title: string, body: string, data?: any) {
-  //   const message: admin.messaging.Message = {
-  //     topic, //  topic
-  //     notification: { title, body },
-  //     data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
-  //   };
-
-  //   try {
-  //     const response = await this.messaging.send(message);
-  //     console.log(`Gửi theo topic thành công ${topic}:`, response);
-  //     return response;
-  //   } catch (error) {
-  //     console.error('Gửi theo topic thất bại:', error);
-  //     throw error;
-  //   }
-  // }
 
   //  Gửi cho nhiều device tokens (multicast)
   // async sendNotificationToMultipleTokens(tokens: string[], title: string, body: string, data?: any) {
