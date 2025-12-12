@@ -11,6 +11,10 @@ export class RequestLoggerInterceptor implements NestInterceptor {
 
     const req = context.switchToHttp().getRequest();
 
+    // Chỉ bắt log các API chứa của APP
+    if (!req.url.includes('/api/app/')) {
+      return next.handle();
+    }
     const contentType = req.headers['content-type'] || '';
     const logObj: any = {
       url: req.url,
