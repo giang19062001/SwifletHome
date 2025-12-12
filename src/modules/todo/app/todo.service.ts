@@ -30,8 +30,8 @@ export class TodoAppService {
     if (!home) return [];
     if (!boxTasks.length) return [];
 
-    // const today = moment().startOf('day'); // ! PROD
-    const today = moment('2025-12-13') // ! DEV
+    const today = moment().startOf('day'); // ! PROD
+    // const today = moment('2025-12-13') // ! DEV
 
     const result = await Promise.all(
       boxTasks.map(async (ele) => {
