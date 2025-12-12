@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { NotificationStatusEnum, NotificationTypeEnum } from '../notification.interface';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { IsArray } from 'class-validator';
 
 export class GetNotificationResDto {
   @ApiProperty({ example: 1 })
@@ -23,6 +24,13 @@ export class GetNotificationResDto {
 
   @ApiProperty({ example: '' })
   userCode: string;
+
+  @ApiProperty({
+    example: [""],
+    type: [String],
+  })
+  @IsArray()
+  userCodesMuticast: string[];
 
   @ApiProperty({ example: '' })
   topicCode: string | null;

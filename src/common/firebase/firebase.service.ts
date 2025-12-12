@@ -33,7 +33,7 @@ export class FirebaseService implements OnModuleInit {
   }
 
   // Single device token (của bạn)
-  async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN) {
+  async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
     const notificationId = uuidv4();
 
@@ -79,26 +79,26 @@ export class FirebaseService implements OnModuleInit {
         this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại : ${JSON.stringify(response)}`);
       }
 
-      return response;
+      return 1;
     } catch (error) {
       console.log(error);
       // bắt các lỗi FCM phổ biến
       if (error.code === 'messaging/registration-token-not-registered' || error.code === 'messaging/invalid-registration-token') {
         this.logger.log(logbase, `Token không hợp lệ hoặc đã bị thu hồi: ${deviceToken}`);
-        return;
+        return 0;
       } else if (error.code === 'messaging/unregistered') {
         this.logger.log(logbase, `Token chưa được đăng ký: ${deviceToken}`);
-        return;
+        return 0;
       } else {
         // lỗi
         this.logger.error(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại ---> ${JSON.stringify(error)}`);
-        return;
+        return 0;
       }
     }
   }
 
   //  Gửi theo topic
-  async sendNotificationToTopic(topic: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN) {
+  async sendNotificationToTopic(topic: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/sendNotificationToTopic`;
     const notificationId = uuidv4();
 
@@ -120,9 +120,9 @@ export class FirebaseService implements OnModuleInit {
     try {
       const response = await this.messaging.send(message);
 
-      this.logger.log(logbase, `Gửi thông báo đến topic [${topic}] thành công: (${JSON.stringify(response)})`);
+      this.logger.log(logbase, `Gửi thông báo đến topic (${topic}) thành công: (${JSON.stringify(response)})`);
 
-      // Lưu vào DB một bản ghi chung (cho thống kê, audit log, hoặc resend sau)
+      // Lưu vào DB
       const notificationDto: CreateNotificationDto = {
         notificationId,
         messageId: response.includes('/messages/') ? response.split('/messages/')[1] : response,
@@ -138,7 +138,7 @@ export class FirebaseService implements OnModuleInit {
 
       await this.notificationAppRepository.createNotification(notificationDto);
 
-      return response;
+      return 1;
     } catch (error: any) {
       this.logger.log(logbase, `Gửi thông báo theo topic (${topic}) thất bại: (${JSON.stringify(error)}) `);
 
@@ -147,7 +147,84 @@ export class FirebaseService implements OnModuleInit {
         this.logger.error(logbase, `Topic không tồn tại: [${topic}] thất bại`);
       }
 
-      throw error;
+      return 0;
+    }
+  }
+
+  //  Gửi cho nhiều device tokens (multicast)
+  async sendNotificationToMulticast(
+    userDeviceTokens: { userCode: string; deviceToken: string }[],
+    title: string,
+    body: string,
+    data?: any,
+    notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN,
+  ): Promise<number> {
+    const tokens = userDeviceTokens.map((ele) => ele.deviceToken);
+    const userCodes = userDeviceTokens.map((ele) => ele.userCode);
+
+    console.log('tokens --> ', tokens);
+
+    if (tokens.length === 0) return 0;
+
+    const logbase = `${this.SERVICE_NAME}/sendNotificationToMultipleTokens`;
+
+    const notificationId = uuidv4();
+
+    const dataPayload: PushDataPayload = {
+      notificationId,
+      title,
+      body,
+      image_logo: this.IMAGE.LOGO,
+      image_detail: this.IMAGE.DETAIL,
+      count: '0',
+    };
+
+    const message: admin.messaging.MulticastMessage = {
+      tokens,
+      notification: { title, body },
+      data: dataPayload,
+    };
+
+    try {
+      const batchResponse = await this.messaging.sendEachForMulticast(message);
+      console.log('batchResponse ---> ', batchResponse);
+
+      this.logger.log(logbase, `Gửi thông báo multicast hoàn tất | Tổng ${tokens.length} | Thành công: ${batchResponse.successCount} | Thất bại: ${batchResponse.failureCount}`);
+      if (batchResponse.failureCount > 0) {
+        batchResponse.responses.forEach((resp, index) => {
+          if (!resp.success && resp.error) {
+            const failedToken = tokens[index];
+            const errorCode = resp.error.code || 'unknown';
+            const errorMessage = resp.error.message || 'No message';
+
+            this.logger.error(logbase, `Token thất bại [${index}] | Token: ${failedToken.substring(0, 30)}... | Error: ${errorCode} - ${errorMessage}`);
+          }
+        });
+      }
+      // insert những thông báo thành công vào DB
+      if (batchResponse.successCount > 0) {
+        this.logger.log(logbase, `Có ${batchResponse.successCount} token nhận thông báo multicast thành công`);
+        // Lưu vào DB
+        const notificationDto: CreateNotificationDto = {
+          notificationId,
+          messageId: 'mutilcast',
+          title,
+          body,
+          data: data ?? null,
+          userCode: null, // null vì gửi theo multicast
+          userCodesMuticast: userCodes,
+          topicCode: null, // ko gửi bằng topic
+          notificationType,
+          notificationStatus: NotificationStatusEnum.SENT,
+        };
+
+        await this.notificationAppRepository.createNotification(notificationDto);
+      }
+      return 1;
+    } catch (error) {
+      this.logger.log(logbase, `Gửi thông báo multicast thất bại: (${JSON.stringify(error)}) `);
+
+      return 0;
     }
   }
 
@@ -203,25 +280,6 @@ export class FirebaseService implements OnModuleInit {
     }
   }
 
-  //  Gửi cho nhiều device tokens (multicast)
-  // async sendNotificationToMultipleTokens(tokens: string[], title: string, body: string, data?: any) {
-  //   if (tokens.length === 0) return;
-
-  //   const message: MulticastMessage = {
-  //     tokens, // mảng tokens
-  //     notification: { title, body },
-  //     data: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) : undefined, // data object muốn app nhận => ko hiện ra thông báo
-  //   };
-
-  //   try {
-  //     const response = await this.messaging.sendEachForMulticast(message);
-  //     console.log(`Gửi multicast thành công: ${response.successCount}/${tokens.length}`);
-  //     return response;
-  //   } catch (error) {
-  //     console.error('Gửi multicast thất bại:', error);
-  //     throw error;
-  //   }
-  // }
   // // Lấy danh sách token của 1 topic
   // async getTokensByTopic(topic: string): Promise<string[]> {
   //   const query = `

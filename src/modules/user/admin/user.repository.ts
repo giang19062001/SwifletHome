@@ -21,6 +21,22 @@ export class UserAdminRepository {
     return rows.length ? (rows[0] as ITokenUserAdmin) : null;
   }
 
+  async getDeviceTokensByUsers(userCodesMuticast: string[]): Promise<{ userCode: string; deviceToken: string }[]> {
+    if (!userCodesMuticast || userCodesMuticast.length === 0) {
+      return [];
+    }
+
+    const placeholders = userCodesMuticast.map(() => '?').join(', ');
+    const query = ` SELECT userCode, deviceToken
+          FROM tbl_user_app
+          WHERE userCode IN (${placeholders})
+            AND isActive = 'Y'
+            AND deviceToken IS NOT NULL 
+            AND deviceToken != '';`;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, userCodesMuticast);
+    return rows as { userCode: string; deviceToken: string }[];
+  }
+
   async getTotalUserApp(dto: PagingDto): Promise<number> {
     let query = ` SELECT COUNT(seq) AS TOTAL  FROM ${this.tableApp}  `;
     const params: any[] = [];
@@ -87,6 +103,4 @@ export class UserAdminRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, updatedId, updatedAt, userCode]);
     return result.affectedRows;
   }
-
-
 }

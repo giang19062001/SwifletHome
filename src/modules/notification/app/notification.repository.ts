@@ -2,8 +2,6 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CreateNotificationDto } from './notification.dto';
-import { CODES } from 'src/helpers/const.helper';
-import { generateCode } from 'src/helpers/func.helper';
 import { INotification, INotificationTopic, IUserNotificationTopic, NotificationStatusEnum } from '../notification.interface';
 
 @Injectable()
@@ -16,18 +14,24 @@ export class NotificationAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getTotal(userCode: string): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE userCode = ?`,[userCode]);
+  async getTotal(userCode: string, topicCode: string): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} 
+      WHERE (userCode = ? OR JSON_CONTAINS(userCodesMuticast, JSON_QUOTE(?)) OR topicCode = ?) `, [userCode, userCode, topicCode]);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto, userCode:string): Promise<INotification[]> {
-    let query = ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, A.userCode, A.topicCode,
-    A.notificationType, A.notificationStatus, A.isActive, A.createdAt, A.createdId
-        FROM ${this.table} A 
-      WHERE userCode = ? `;
+  async getAll(dto: PagingDto, userCode: string, topicCode: string): Promise<INotification[]> {
+    let query = `
+    SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, 
+           A.userCode, A.userCodesMuticast, A.topicCode,
+           A.notificationType, A.notificationStatus, A.isActive, 
+           A.createdAt, A.createdId
+    FROM ${this.table} A
+    WHERE (A.userCode = ? OR JSON_CONTAINS(A.userCodesMuticast, JSON_QUOTE(?)) OR A.topicCode = ?)
+  `;
 
-    const params: any[] = [];
-    params.push(userCode)
+    const params: any[] = [userCode, userCode, topicCode];
+
+    // paging
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
       params.push(dto.limit, (dto.page - 1) * dto.limit);
@@ -36,12 +40,13 @@ export class NotificationAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as INotification[];
   }
+
   async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, A.userCode, A.topicCode,
+      ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, A.userCode, A.userCodesMuticast, A.topicCode,
       A.notificationType, A.notificationStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt
         FROM ${this.table} A 
-        WHERE A.notificationId = ? AND A.userCode = ?
+        WHERE A.notificationId = ?
         LIMIT 1`,
       [notificationId, userCode],
     );
@@ -63,8 +68,19 @@ export class NotificationAppRepository {
         INSERT INTO ${this.table}  (notificationId, messageId, title, body, data, userCode, userCodesMuticast, topicCode, notificationType, notificationStatus, createdId) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.notificationId, dto.messageId, dto.title, dto.body, dto.data, dto.userCode, dto.userCodesMuticast, dto.topicCode,
-      dto.notificationType, dto.notificationStatus, this.updator]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      dto.notificationId,
+      dto.messageId,
+      dto.title,
+      dto.body,
+      dto.data,
+      dto.userCode,
+      dto.userCodesMuticast,
+      dto.topicCode,
+      dto.notificationType,
+      dto.notificationStatus,
+      this.updator,
+    ]);
 
     return result.insertId;
   }
@@ -96,6 +112,16 @@ export class NotificationAppRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as INotificationTopic[];
+  }
+  async getDetailTopic(topicKeyword: string): Promise<INotificationTopic | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.topicCode, A.topicKeyword, A.topicName, A.topicDescription
+        FROM ${this.tableTopic} A
+        WHERE A.topicKeyword = ? 
+        LIMIT 1`,
+      [topicKeyword],
+    );
+    return rows ? (rows[0] as INotificationTopic) : null;
   }
   // TODO: USER_TOPIC
   async getUserSubscribedTopics(userCode: string): Promise<IUserNotificationTopic[]> {

@@ -5,6 +5,7 @@ import { NotificationAppRepository } from './notification.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { IListApp } from 'src/interfaces/app.interface';
 import { INotification, INotificationTopic } from '../notification.interface';
+import { KEYWORDS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class NotificationAppService {
@@ -23,9 +24,11 @@ export class NotificationAppService {
   }
   async getAll(dto: PagingDto, userCode: string): Promise<IListApp<INotification>> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
+    // lấy danh sách topic dùng cho tất cả user
+    const topicCommon = await this.notificationAppRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
 
-    const total = await this.notificationAppRepository.getTotal(userCode);
-    const list = await this.notificationAppRepository.getAll(dto, userCode);
+    const total = await this.notificationAppRepository.getTotal(userCode, topicCommon?.topicCode ?? "");
+    const list = await this.notificationAppRepository.getAll(dto, userCode, topicCommon?.topicCode ?? "");
     this.logger.log(logbase, `total(${total})`);
 
     return { total, list };

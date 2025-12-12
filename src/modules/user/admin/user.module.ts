@@ -9,6 +9,6 @@ import { PackageAdminModule } from 'src/modules/package/admin/package.module';
   imports:[PackageAdminModule, forwardRef(() => AuthAdminModule)], // ← phá phụ thuộc vòng tròn
   controllers: [UserAdminController],
   providers: [UserAdminService, UserAdminRepository],
-  exports: [UserAdminService],
+  exports: [UserAdminService, UserAdminRepository],
 })
 export class UserAdminModule {}
