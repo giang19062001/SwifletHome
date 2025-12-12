@@ -24,21 +24,19 @@ export class UserHomeAppService {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.userHomeAppRepository.getTotalHomes(userCode);
     const list = await this.userHomeAppRepository.getAllHomes(dto, userCode);
-    this.logger.log(logbase, `userCode(${userCode})`);
     return { total, list };
   }
 
   async getDetail(userHomeCode: string): Promise<IUserHome | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail:`;
     const result = await this.userHomeAppRepository.getDetailHome(userHomeCode);
-    this.logger.log(logbase, `userHomeCode(${userHomeCode})`);
     return result;
   }
 
   async getMainHomeByUser(userCode: string): Promise<IUserHome | null> {
     const logbase = `${this.SERVICE_NAME}/getMainHomeByUser:`;
-    const result = await this.userHomeAppRepository.getMainHomeByUser(userCode);
     this.logger.log(logbase, `userCode(${userCode})`);
+    const result = await this.userHomeAppRepository.getMainHomeByUser(userCode);
     return result;
   }
   async updateHomeToMain(userHomeCode: string, userCode: string): Promise<number> {

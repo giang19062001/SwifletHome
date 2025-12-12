@@ -13,34 +13,19 @@ export class GetTaskResDto {
   taskName: string;
 }
 
-class TaskKeyDto {
-  @ApiProperty({ example: 'harvest' })
-  key: string;
-
-  @ApiProperty({ example: 'Thu hoạch' })
-  text: string;
-}
-
 export class GetScheduledTasksResDto {
-  @ApiProperty({
-    type: [TaskKeyDto],
-    example: [
-      { key: 'harvest', text: 'Thu hoạch' },
-      { key: 'rollMedicine', text: 'Lăn thuốc' },
-      { key: 'luringBird', text: 'Chim đêm' },
-    ],
-  })
-  keys: TaskKeyDto[];
+  @ApiProperty({ example: 'Thu hoạch' })
+  label: string;
 
-  @ApiProperty({
-    example: {
-      harvest: 'NaN',
-      rollMedicine: '3',
-      luringBird: '6',
-    },
-  })
-  values: Record<string, string>;
+  @ApiProperty({ example: 'NaN' })
+  value: string;
+
+  
+  @ApiProperty({ example: '2025-12-12' })
+  date: string;
 }
+
+
 
 export class GetListTaskAlarmsResDto {
   @ApiProperty({ example: 0 })

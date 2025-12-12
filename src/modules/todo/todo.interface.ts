@@ -11,6 +11,15 @@ export enum TaskStatusEnum {
   CANCEL = 'CANCEL',
 }
 
+
+export interface ITodoBoxTask {
+  seq: number;
+  taskCode: string;
+  taskName?: string;
+  sortOrder: number;
+  isActive: YnEnum;
+}
+
 export interface ITodoTask {
   seq: number;
   taskCode: string;

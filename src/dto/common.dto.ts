@@ -45,6 +45,22 @@ export class NumberErrResponseDto {
   statusCode: number;
 }
 
+
+export class EmptyArrayResponseDto {
+  @ApiProperty({ example: false })
+  success: boolean;
+
+  @ApiProperty({ example: 'Failed' })
+  message: string;
+
+  @ApiProperty({ type: 'array', example: [] })
+  data: [];
+
+  @ApiProperty({ example: 400 })
+  statusCode: number;
+}
+
+
 export class NullResponseDto {
   @ApiProperty({ example: false })
   success: boolean;

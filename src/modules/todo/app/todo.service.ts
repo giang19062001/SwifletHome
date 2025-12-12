@@ -19,36 +19,48 @@ export class TodoAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async getScheduledTasks(userCode: string, userHomeCode: string) {
-    const home = await this.userHomeAppService.getDetail(userHomeCode);
-    // nếu nhà yến chính có
-    if (home) {
-      return {
-        keys: [
-          {
-            key: 'harvest',
-            text: 'Thu hoạch',
-          },
-          {
-            key: 'rollMedicine',
-            text: 'Lăn thuốc',
-          },
-          {
-            key: 'luringBird',
-            text: 'Chim đêm',
-          },
-        ],
-        values: {
-          harvest: '5',
-          rollMedicine: 'NaN',
-          luringBird: 'NaN',
-        },
-      };
-    } else {
-      return null;
-    }
-  }
+  // TODO: BOX-TASK
+  async getScheduledTasks(userCode: string, userHomeCode: string): Promise<{ [key: string]: string }[]> {
+    const logbase = `${this.SERVICE_NAME}/getScheduledTasks:`;
 
+    const home = await this.userHomeAppService.getDetail(userHomeCode);
+    const boxTasks = await this.todoAppRepository.getBoxTasks();
+
+    // nếu nhà yến chính có
+    if (!home) return [];
+    if (!boxTasks.length) return [];
+
+    // const today = moment().startOf('day'); // ! PROD
+    const today = moment('2025-12-13') // ! DEV
+
+    const result = await Promise.all(
+      boxTasks.map(async (ele) => {
+        const data = await this.todoAppRepository.getOneTaskAlarmsNearly(userCode, userHomeCode, ele.taskCode, ele.taskName, today.format('YYYY-MM-DD'));
+
+        this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate}`);
+
+        if (!data || !data.taskDate) {
+          return {
+            label: ele.taskName,
+            value: 'NaN',
+            date: '',
+          };
+        }
+
+        const taskDate = moment(data.taskDate);
+
+        const diff = taskDate.diff(today, 'days');
+
+        return {
+          label: ele.taskName,
+          value: diff.toString(), // số ngày còn lại
+          date: taskDate.format('YYYY-MM-DD'),
+        };
+      }),
+    );
+
+    return result;
+  }
   // TODO: TASK
   async getTasks(): Promise<ITodoTask[]> {
     const logbase = `${this.SERVICE_NAME}/getTasks:`;
@@ -64,7 +76,6 @@ export class TodoAppService {
 
     const total = await this.todoAppRepository.getTotalTaskAlarm(userCode, userHomeCode);
     const list = await this.todoAppRepository.getListTaskAlarms(userCode, userHomeCode, dto);
-    this.logger.log(logbase, `total(${total})`);
 
     return { total, list };
   }
@@ -108,8 +119,8 @@ export class TodoAppService {
       alramDto.taskDate = dto.specificValue;
     }
 
-    // const today = moment.utc('2026-02-02'); // ! DEV
-    const today = moment.utc(); // ! PROD
+    // const today = moment('2026-02-02'); // ! DEV
+    const today = moment(); // ! PROD
 
     // gán giá trị taskDate vào alarm DTO cho chu kỳ ngày trong tháng
     if (dto.isPeriod == 'Y' && dto.periodType === 'MONTH' && dto.periodValue != null) {
@@ -176,10 +187,7 @@ export class TodoAppService {
       const { taskPeriodCode, insertId } = await this.todoAppRepository.insertTaskPeriod(userCode, dto);
       if (alramDto.taskDate == null) {
         //* VD:  2025-02-31 - KO  HỢP LỆ,  2025-03-31 - HỢP LỆ
-        this.logger.log(
-          logbase,
-          `Thời gian lịch nhắc không hợp lệ nhưng có thể hợp lệ vào thời điểm khác -> không thể thêm lịch nhắc, chỉ có thể thêm cấu hình chu kỳ, không thêm dữ liệu lịch nhắc`,
-        );
+        this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ nhưng có thể hợp lệ vào thời điểm khác -> không thể thêm lịch nhắc, chỉ có thể thêm cấu hình chu kỳ, không thêm dữ liệu lịch nhắc`);
         return 1;
       }
       if (insertId && alramDto.taskDate != null) {

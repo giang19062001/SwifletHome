@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
 import { SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
@@ -12,9 +12,21 @@ export class TodoAppRepository {
   private readonly tableTask = 'tbl_todo_tasks';
   private readonly tableHomeTaskAlarm = 'tbl_todo_home_task_alarm';
   private readonly tableHomeTaskPeriod = 'tbl_todo_home_task_period';
+  private readonly tableBoxTask = 'tbl_todo_box_tasks';
   private readonly maxDayToGet = 5;
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+
+  // TODO: BOX - TASK
+  async getBoxTasks(): Promise<ITodoTask[]> {
+    let query = `  SELECT A.seq, A.taskCode, B.taskName, A.sortOrder FROM ${this.tableBoxTask} A
+    LEFT JOIN ${this.tableTask} B
+    ON A.taskCode = B.taskCode
+    WHERE A.isActive = 'Y' `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, []);
+    return rows as ITodoTask[];
+  }
   // TODO: TASK
   async getTasks(): Promise<ITodoTask[]> {
     let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' `;
@@ -30,6 +42,35 @@ export class TodoAppRepository {
   }
 
   // TODO: ALARM
+  async getOneTaskAlarmsNearly(userCode: string, userHomeCode: string, taskCode: string, taskName: string, today: string): Promise<ITodoHomeTaskAlram | null> {
+    let query = `
+             SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskName,
+             DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
+             FROM ${this.tableHomeTaskAlarm} A
+             LEFT JOIN ${this.tableHomeTaskPeriod} B
+             ON A.taskPeriodCode = B.taskPeriodCode
+             WHERE A.isActive = 'Y'
+             AND A.userCode = ? AND A.userHomeCode = ?
+             AND (
+                 (A.taskPeriodCode IS NOT NULL AND B.taskCode = ?)
+                 OR
+                 (A.taskPeriodCode IS NULL AND A.taskName = ?)
+             )
+             AND A.taskDate >= ? AND A.taskDate <= ? + INTERVAL ${this.maxDayToGet} DAY
+             ORDER BY A.taskDate ASC
+             LIMIT 1`;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [
+      userCode,
+      userHomeCode,
+      taskCode,
+      taskName,
+      today, // CURDATE()
+      today, // o CURDATE()
+    ]);
+
+    return rows.length ? (rows[0] as ITodoHomeTaskAlram) : null;
+  }
   async getTotalTaskAlarm(userCode: string, userHomeCode: string): Promise<number> {
     let whereQuery = ` AND userCode = ? AND userHomeCode = ? AND taskDate <= CURDATE() + INTERVAL ${this.maxDayToGet} DAY`;
 

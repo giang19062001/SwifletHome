@@ -18571,7 +18571,7 @@ select {
   display: flex;
   justify-content: end;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 10px;
 }
 
 .page-item:first-child .page-link {
@@ -19286,6 +19286,27 @@ select {
   object-fit: contain;
   border-radius: 15px;
   border: 1px solid #ccc;
+}
+
+#page-todo-tasks .card-title {
+  font-family: PretendardBold !important;
+  font-size: 1.2rem;
+  color: #565c66;
+}
+#page-todo-tasks .card-badge {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  background: #565C66;
+  color: #fff;
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  z-index: 2;
+}
+#page-todo-tasks .card-box {
+  position: relative;
+  overflow: visible;
 }
 
 .component-upload {

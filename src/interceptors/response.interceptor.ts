@@ -118,6 +118,8 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
         // Nếu là mảng lỗi -> lấy hết
         const errorMessage = Array.isArray(message) ? message.join(', ') : message;
 
+        // set status code response
+        response.status(statusCode);
         return of({
           success: false,
           message: errorMessage,

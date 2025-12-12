@@ -1,11 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
-import type { Pool, RowDataPacket } from 'mysql2/promise';
+import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ITodoTask } from '../todo.interface';
+import { ITodoBoxTask, ITodoTask } from '../todo.interface';
+import { UpdateBoxTaskDto } from './todo.dto';
 
 @Injectable()
 export class TodoAdminRepository {
   private readonly tableTask = 'tbl_todo_tasks';
+  private readonly tableBoxTask = 'tbl_todo_box_tasks';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -26,5 +28,24 @@ export class TodoAdminRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as ITodoTask[];
+  }
+  // todo: BOX-TASK
+  async getBoxTasks():  Promise<ITodoBoxTask[]> {
+    let query = `  SELECT seq, taskCode, sortOrder, isActive
+        FROM ${this.tableBoxTask} 
+        WHERE isActive = 'Y' AND seq IN(1,2,3)
+        ORDER BY sortOrder ASC
+        LIMIT 3 `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, []);
+    return rows as ITodoBoxTask[];
+  }
+    async updateBoxTask(dto: UpdateBoxTaskDto, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableBoxTask} SET taskCode = ?,  updatedId = ?, updatedAt = ?
+      WHERE seq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.taskCode,  updatedId, new Date(), dto.seq]);
+
+    return result.affectedRows;
   }
 }

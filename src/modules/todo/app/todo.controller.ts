@@ -8,7 +8,7 @@ import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ChangeTaskAlarmStatusDto, GetListTaskAlarmsDTO, SetTaskPeriodDto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
@@ -31,15 +31,20 @@ export default class TodoAppController {
   }
 
   @ApiOperation({
-    summary: 'Thông tin todo của 1 nhà yến (thu hoạch, lăn thuốc,...)',
+    summary: 'Thông tin todo của 1 nhà yến (thu hoạch, lăn thuốc,...) - Dữ liệu là động có thể thay đổi',
   })
   @ApiParam({ name: 'userHomeCode', type: String })
   @Get('getScheduledTasks/:userHomeCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetScheduledTasksResDto) })
-  @ApiBadRequestResponse({ type: NullResponseDto })
+  @ApiOkResponse({ type: ApiAppResponseDto([GetScheduledTasksResDto]) })
+  @ApiBadRequestResponse({ type: EmptyArrayResponseDto })
   async getScheduledTasks(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.todoAppService.getScheduledTasks(user.userCode, userHomeCode);
+    if(!result.length){
+       throw new BadRequestException({
+        data: [],
+      });
+    }
     return result;
   }
 

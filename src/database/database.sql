@@ -616,6 +616,19 @@ CREATE TABLE
 
 
 -- to do list
+
+CREATE TABLE
+  tbl_todo_box_tasks (
+    seq INT AUTO_INCREMENT PRIMARY KEY,
+    taskCode VARCHAR(45) UNIQUE NOT NULL,
+    sortOrder int DEFAULT 0,
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT NULL,
+    createdId VARCHAR(45) DEFAULT 'SYSTEM',
+    updatedId VARCHAR(45) DEFAULT NULL
+  )
+
 CREATE TABLE
   tbl_todo_tasks (
     seq INT AUTO_INCREMENT PRIMARY KEY,

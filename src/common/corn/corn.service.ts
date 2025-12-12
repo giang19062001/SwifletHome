@@ -70,7 +70,7 @@ export class CornService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/pushNotificationsByTaskAlarms`;
 
     // const todayStr = '2025-12-12'; // ! DEV
-    const todayStr = moment.utc().format('YYYY-MM-DD'); // !PROD
+    const todayStr = moment().format('YYYY-MM-DD'); // !PROD
 
     this.logger.log(logbase, `Chuẩn bị tìm các lịch nhắc hôm nay để gửi thông báo...`);
 
