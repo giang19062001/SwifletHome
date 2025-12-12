@@ -35,7 +35,8 @@ import { TodoAdminModule } from './modules/todo/admin/todo.module';
 import { FirebaseModule } from './common/firebase/firebase.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
-import { NotFoundExceptionFilter } from './filter/notFound.filter';
+import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
+import { GlobalErrorLoggerFilter } from './filter/globalError.filter';
 
 @Module({
   imports: [
@@ -88,7 +89,11 @@ import { NotFoundExceptionFilter } from './filter/notFound.filter';
     },
     {
       provide: APP_FILTER,
-      useClass: NotFoundExceptionFilter, // bắt lỗi tự động điều hướng sang trang 404.ejs
+      useClass: PageNotFoundExceptionFilter, // bắt lỗi tự động điều hướng sang trang 404.ejs
+    },
+     {
+      provide: APP_FILTER,
+      useClass: GlobalErrorLoggerFilter,
     },
     {
       provide: APP_INTERCEPTOR,
