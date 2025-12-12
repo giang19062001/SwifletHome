@@ -61,7 +61,7 @@ export class CornService implements OnModuleInit {
     this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
     jobDailyAt8AM.start();
     // ! DEV
-    await this.pushNotificationsByTaskAlarms();
+    // await this.pushNotificationsByTaskAlarms();
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
   }
