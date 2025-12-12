@@ -480,8 +480,7 @@ CREATE TABLE
     `createdId` varchar(45) DEFAULT 'SYSTEM',
     `updatedId` varchar(45) DEFAULT NULL,
     PRIMARY KEY (`seq`),
-    UNIQUE KEY `userCode_UNIQUE` (`userCode`),
-    CONSTRAINT `fk_user_payment_user` FOREIGN KEY (`userCode`) REFERENCES `tbl_user_app` (`userCode`) ON DELETE CASCADE
+    UNIQUE KEY `userCode_UNIQUE` (`userCode`)
   ) ENGINE = InnoDB;
 
 
@@ -496,8 +495,7 @@ CREATE TABLE
     `endDate` datetime DEFAULT NULL,
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
-    PRIMARY KEY (`seq`),
-    CONSTRAINT `fk_user_payment_history_user` FOREIGN KEY (`userCode`) REFERENCES `tbl_user_app` (`userCode`) ON DELETE CASCADE
+    PRIMARY KEY (`seq`)
   ) ENGINE = InnoDB;
 
 
@@ -598,7 +596,7 @@ CREATE TABLE
 CREATE TABLE
   tbl_notifications (
     seq INT AUTO_INCREMENT PRIMARY KEY,
-    notificationId CHAR(36) NOT NULL UNIQUE,   -- UUID v4 lưu dạng string
+    notificationId CHAR(36) NOT NULL UNIQUE, -- UUID v4 lưu dạng string
     messageId VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
     body TEXT NOT NULL,
@@ -639,7 +637,7 @@ CREATE TABLE
     isCustomTask CHAR(1) NOT NULL DEFAULT 'Y', -- N chọn task hoặc Y nhập task
     taskCustomName VARCHAR(255) DEFAULT "", -- task nhập từ input
     isPeriod CHAR(1) NOT NULL DEFAULT 'Y', -- dạng chu kỳ và dạng tùy chỉnh
-    periodType ENUM('WEEK', 'MONTH') DEFAULT NULL, -- NULL nếu là tùy chỉnh
+    periodType ENUM ('WEEK', 'MONTH') DEFAULT NULL, -- NULL nếu là tùy chỉnh
     periodValue INT DEFAULT NULL, --  week ( 1 - 6 : T2 - CN); month (1-31)
     specificValue DATE DEFAULT NULL, -- date cụ thể nếu isPeriod  là 'N'
     taskNote VARCHAR(255) DEFAULT '',
@@ -689,5 +687,3 @@ VALUES
     '2025-10-20 10:39:20',
     NULL
   ),
-  --   SELECT TABLE_NAME, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'swiftlet';
-  --  ALTER TABLE tbl_user_home_sensor CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;

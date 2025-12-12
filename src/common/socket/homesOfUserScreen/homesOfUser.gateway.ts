@@ -56,7 +56,8 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
 
   // gửi sensor data cho client
   private sendSensorData(room: string, payload: ISensorHome[]) {
-    this.logger.log(this.SERVICE_NAME, `streamSensorData: ${JSON.stringify(payload)}`);
+    // this.logger.log(this.SERVICE_NAME, `streamSensorData: ${JSON.stringify(payload)}`);
+    console.log(this.SERVICE_NAME, `streamSensorData: ${JSON.stringify(payload)}`);
     this.server.to(room).emit('streamSensorData', payload);
   }
 

@@ -16,7 +16,7 @@ export class LoggingService implements LoggerService {
 
     return {
       context,
-      ip: requestContext?.ip || 'localhost', // 'localhost' cho cron jobs
+      ip: requestContext?.ip,
       requestId: requestContext?.requestId,
       userId: requestContext?.userId,
       path: requestContext?.path,
