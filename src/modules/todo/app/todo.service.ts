@@ -23,15 +23,21 @@ export class TodoAppService {
   async getScheduledTasks(userCode: string, userHomeCode: string): Promise<{ [key: string]: string }[]> {
     const logbase = `${this.SERVICE_NAME}/getScheduledTasks:`;
 
+    const defaultData = Array.from({ length: 3 }, () => ({
+      label: 'NaN',
+      value: 'NaN',
+      date: '',
+      unit: '',
+    }));
+
     const home = await this.userHomeAppService.getDetail(userHomeCode);
     const boxTasks = await this.todoAppRepository.getBoxTasks();
 
-    // nếu nhà yến chính có
-    if (!home) return [];
-    if (!boxTasks.length) return [];
+    if (!home || !boxTasks.length) {
+      return defaultData;
+    }
 
-    const today = moment().startOf('day'); // ! PROD
-    // const today = moment('2025-12-13') // ! DEV
+    const today = moment().startOf('day');
 
     const result = await Promise.all(
       boxTasks.map(async (ele) => {
@@ -39,7 +45,7 @@ export class TodoAppService {
 
         this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate}`);
 
-        if (!data || !data.taskDate) {
+        if (!data?.taskDate) {
           return {
             label: ele.taskName,
             value: 'NaN',
@@ -49,12 +55,11 @@ export class TodoAppService {
         }
 
         const taskDate = moment(data.taskDate);
-
         const diff = taskDate.diff(today, 'days');
 
         return {
           label: ele.taskName,
-          value: diff.toString(), // số ngày còn lại
+          value: diff.toString(),
           date: taskDate.format('YYYY-MM-DD'),
           unit: 'ngày',
         };
@@ -63,6 +68,7 @@ export class TodoAppService {
 
     return result;
   }
+
   // TODO: TASK
   async getTasks(): Promise<ITodoTask[]> {
     const logbase = `${this.SERVICE_NAME}/getTasks:`;

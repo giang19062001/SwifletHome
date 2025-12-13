@@ -122,8 +122,6 @@ function initSubmitForm() {
       userCodesMuticast: isSendAll === 'N' ? userCodesMuticast : [],
     };
 
-    console.log('SUBMIT DATA:', payload);
-
     // disable nút summit
     let btn = form.querySelector('button');
     btn.disabled = true;

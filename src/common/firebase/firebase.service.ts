@@ -14,8 +14,8 @@ const serviceAccount = serviceAccountJson as any;
 export class FirebaseService implements OnModuleInit {
   private readonly SERVICE_NAME = 'FirebaseService';
   private readonly IMAGE = {
-    LOGO: 'https://3fam.ai/images/favicon.ico',
-    DETAIL: 'https://3fam.ai/images/favicon.ico',
+    LOGO: 'https://3fam.ai/images/favicon.ico', // ảnh nhỏ logo
+    DETAIL: 'https://3fam.ai/images/favicon.ico', // ảnh nội dung mở rộng
   };
   private messaging: admin.messaging.Messaging;
 
