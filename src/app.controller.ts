@@ -270,7 +270,6 @@ export class AppController {
     };
   }
 
-
   // to do list
   @Get('/dashboard/todo/tasks')
   @UseGuards(PageAuthAdminGuard)
@@ -278,6 +277,16 @@ export class AppController {
   renderTodoTasks(@Req() req: Request) {
     return {
       title: 'Danh sách công việc',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+  @Get('/dashboard/todo/box-tasks')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/todo-box-tasks')
+  renderTodoBoxTasks(@Req() req: Request) {
+    return {
+      title: 'Thiết lập hộp thoại công việc',
       isLayout: true,
       user: req.session.user,
     };

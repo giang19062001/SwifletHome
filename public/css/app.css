@@ -19288,25 +19288,29 @@ select {
   border: 1px solid #ccc;
 }
 
-#page-todo-tasks .card-title {
-  font-family: PretendardBold !important;
-  font-size: 1.2rem;
-  color: #565c66;
+#page-todo-box-tasks .box-tall {
+  min-height: 180px;
 }
-#page-todo-tasks .card-badge {
+#page-todo-box-tasks .card-badge {
   position: absolute;
   top: -8px;
   left: -8px;
-  background: #565C66;
+  background: #565c66;
   color: #fff;
   padding: 3px 10px;
-  font-size: 12px;
+  font-size: 14px;
   border-radius: 8px;
   z-index: 2;
 }
-#page-todo-tasks .card-box {
+#page-todo-box-tasks .card-box {
   position: relative;
   overflow: visible;
+}
+#page-todo-box-tasks .select-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .component-upload {

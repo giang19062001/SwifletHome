@@ -1,0 +1,61 @@
+<div class="common-table-container row" id="page-todo-box-tasks">
+   <div class="col-xl-12">
+      <div class="row mb-3">
+         <div class="col-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="d-flex justify-content-between">
+                     <p class="title-page">
+                        <%= title %>
+                     </p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+
+      <div class="row mb-3" id="box-tasks" style="display: none;">
+         <div class="col-12">
+            <div class="card p-3">
+
+               <div class="d-flex gap-3 flex-wrap p-3">
+                  <div class="card card-box flex-fill shadow-sm rounded-3 p-3 box-tall">
+                     <span class="card-badge">Hộp thoại 1</span>
+                     <div class="card-body select-center">
+                        <select class="form-select form-select-lg" id="box-1" data-seq="1" name="select-tasks">
+                           <option value="">--Chọn công việc--</option>
+                        </select>
+                     </div>
+                  </div>
+                  <div class="card card-box flex-fill shadow-sm rounded-3 p-3 box-tall">
+                     <span class="card-badge">Hộp thoại 2</span>
+                     <div class="card-body select-center">
+                        <select class="form-select form-select-lg" id="box-2" data-seq="2" name="select-tasks">
+                           <option value="">--Chọn công việc--</option>
+                        </select>
+                     </div>
+                  </div>
+                  <div class="card card-box flex-fill shadow-sm rounded-3 p-3 box-tall">
+                     <span class="card-badge">Hộp thoại 3</span>
+                     <div class="card-body select-center">
+                        <select class="form-select form-select-lg" id="box-3" data-seq="3" name="select-tasks">
+                           <option value="">--Chọn công việc--</option>
+                        </select>
+                     </div>
+                  </div>
+               </div>
+
+               <button type="button" class="btn-submit btn-sm d-block mx-auto mt-3" id="update-box-task-btn">
+                  Cập nhập
+               </button>
+
+
+            </div>
+         </div>
+      </div>
+
+   </div>
+</div>
+</div>
+<script src="/js/page-todo-box-tasks.js"></script>
