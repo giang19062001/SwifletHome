@@ -22,7 +22,7 @@ export class NotificationAppRepository {
   async getAll(dto: PagingDto, userCode: string, topicCode: string): Promise<INotification[]> {
     let query = `
     SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, 
-           A.userCode, A.userCodesMuticast, A.topicCode,
+           -- A.userCode, A.userCodesMuticast, A.topicCode,
            A.notificationType, A.notificationStatus, A.isActive, 
            A.createdAt, A.createdId
     FROM ${this.table} A
@@ -43,7 +43,8 @@ export class NotificationAppRepository {
 
   async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, A.userCode, A.userCodesMuticast, A.topicCode,
+      ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.data, 
+      -- A.userCode, A.userCodesMuticast, A.topicCode,
       A.notificationType, A.notificationStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt
         FROM ${this.table} A 
         WHERE A.notificationId = ?

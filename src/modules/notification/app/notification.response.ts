@@ -22,18 +22,18 @@ export class GetNotificationResDto {
   @ApiProperty({ example: null })
   data: any | null;
 
-  @ApiProperty({ example: '' })
-  userCode: string;
+  // @ApiProperty({ example: '' })
+  // userCode: string;
 
-  @ApiProperty({
-    example: [""],
-    type: [String],
-  })
-  @IsArray()
-  userCodesMuticast: string[];
+  // @ApiProperty({
+  //   example: [""],
+  //   type: [String],
+  // })
+  // @IsArray()
+  // userCodesMuticast: string[];
 
-  @ApiProperty({ example: '' })
-  topicCode: string | null;
+  // @ApiProperty({ example: '' })
+  // topicCode: string | null;
 
   @ApiProperty({ example: NotificationTypeEnum.ADMIN })
   notificationType: NotificationTypeEnum;

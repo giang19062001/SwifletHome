@@ -17,8 +17,9 @@ export interface INotification {
   title: string;
   body: Text;
   data: string | any;
-  userCode: string;
-  topicCode: string;
+  userCode?: string;
+  userCodesMuticast?: string[];
+  topicCode?: string;
   notificationType: NotificationTypeEnum;
   notificationStatus: NotificationStatusEnum;
   isActive: YnEnum;
