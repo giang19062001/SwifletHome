@@ -1,0 +1,73 @@
+<div class="common-table-container row" id="page-notification">
+    <div class="col-xl-12">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <p class="title-page">
+                                <%= title %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <form id="push-notification-form" class="card shadow-sm p-4 rounded-3">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Tiêu đề</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Nhập tiêu đề" />
+                        <div class="error-message" data-error="title"></div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="body" class="form-label">Nội dung</label>
+                        <textarea class="form-control" id="body" name="body" rows="4"
+                            placeholder="Nhập nội dung thông báo"></textarea>
+                        <div class="error-message" data-error="body"></div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block">Hình thức gửi</label>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="isSendAll" id="sendAll" value="Y"
+                                checked />
+                            <label class="form-check-label" for="sendAll">
+                                Gửi tất cả người dùng
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="isSendAll" id="sendEach" value="N" />
+                            <label class="form-check-label" for="sendEach">
+                                Gửi người dùng cụ thể
+                            </label>
+                        </div>
+                    </div>
+                    <!-- User checkbox list -->
+                    <div class="mb-3 d-none" id="userCodesMuticastBox">
+                        <label class="form-label">Chọn người dùng</label>
+
+                        <div id="userCodesMuticastList" class="border rounded p-2 d-flex flex-wrap gap-3"
+                            style="max-height: 220px; overflow-y: auto;"></div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn-submit px-4">
+                            Gửi thông báo
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script src="/js/common-validate.js"></script>
+<script src="/js/page-notification.js"></script>

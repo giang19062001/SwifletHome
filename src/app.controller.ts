@@ -291,6 +291,17 @@ export class AppController {
       user: req.session.user,
     };
   }
+  //notification
+  @Get('/dashboard/notification')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/notification')
+  renderNotification(@Req() req: Request) {
+    return {
+      title: 'Gửi thông báo',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   // 404
   @Get('/404')
   @Render('pages/404')

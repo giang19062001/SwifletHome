@@ -23,7 +23,7 @@ export class GetScheduledTasksResDto {
   @ApiProperty({ example: '2025-12-12' })
   date: string;
 
-  @ApiProperty({ example: 'Ngày' })
+  @ApiProperty({ example: 'ngày' })
   unit: string;
 }
 

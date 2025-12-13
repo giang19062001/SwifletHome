@@ -35,7 +35,7 @@ export class AuthAdminController {
     res.cookie('swf-token', user.accessToken, {
       httpOnly: false,
       sameSite: 'strict',
-      maxAge: 60 * 60 * 1000, // 1 hrs
+      maxAge: 24 * 60 * 60 * 1000, // 1day
     });
     // hide token
     const { accessToken, ...userWithoutToken } = user;

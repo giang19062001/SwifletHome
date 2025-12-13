@@ -56,7 +56,7 @@ export class TodoAppService {
           label: ele.taskName,
           value: diff.toString(), // số ngày còn lại
           date: taskDate.format('YYYY-MM-DD'),
-          unit: 'Ngày',
+          unit: 'ngày',
         };
       }),
     );
