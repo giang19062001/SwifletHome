@@ -229,8 +229,8 @@ export class FirebaseService implements OnModuleInit {
   }
 
   // todo: Khi tạo 1 topic nào đó nên tự động đăng kí topic đó cho tất cả user
-  async subscribeToTopic(userCode: string, deviceToken: string) {
-    const logbase = `${this.SERVICE_NAME}/subscribeToTopic`;
+  async subscribeToTopic(userCode: string, deviceToken: string, isNewOrChange: boolean) {
+    const logbase = `${this.SERVICE_NAME}/subscribeToTopic: Device Token có thay đổi ? (${isNewOrChange}) `;
 
     // lấy topics đã đang đăng ký của user này
     const existingSubs = await this.notificationAppRepository.getUserSubscribedTopics(userCode);
@@ -240,18 +240,32 @@ export class FirebaseService implements OnModuleInit {
     // lọc ra các topic chưa đăng ký
     const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: IUserNotificationTopic) => sub.topicCode === topic.topicCode));
 
-    if (missingTopics.length === 0) {
-      this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
-    }
-
-    // Chỉ subscribe những topic còn thiếu ( FCM )
-    for (const topic of missingTopics) {
-      const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
-      if (response.failureCount > 0) {
-        this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại`);
+    // đăng ký tất cả topic cho device token mới
+    if (isNewOrChange) {
+      //  subscribe tất cả topic ( FCM )
+      for (const topic of allTopics) {
+        const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+        if (response.failureCount > 0) {
+          this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+        }
+        if (response.successCount > 0) {
+          this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+        }
       }
-      if (response.successCount > 0) {
-        this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+    } else {
+      if (missingTopics.length === 0) {
+        this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
+      }
+
+      // Chỉ subscribe những topic còn thiếu ( FCM )
+      for (const topic of missingTopics) {
+        const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+        if (response.failureCount > 0) {
+          this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+        }
+        if (response.successCount > 0) {
+          this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+        }
       }
     }
 

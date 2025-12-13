@@ -77,17 +77,20 @@ export class AuthAppService extends AbAuthService {
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
 
-    // Chỉnh sửa lại device mỗi lần đăng nhập (nếu khác)
+    // Chỉnh sửa lại device token mỗi lần đăng nhập (nếu khác)
     if (String(user.deviceToken) !== String(dto.deviceToken)) {
       // cập nhập token mới
       await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
       // unscribe topic cho token cũ
       await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
-
+      // kiểm tra va đăng ký thêm ~ topic mới nếu có và subcribe lại topic cũ với devicetoken mới 
+      const isNewOrChange = true;
+      await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken, isNewOrChange);
+    } else {
+      // kiểm tra va đăng ký thêm ~ topic mới nếu có
+      const isNewOrChange = false;
+      await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken, isNewOrChange);
     }
-
-    // kiểm tra va re-subcribe lại topic mỗi lần đăng nhập
-    await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken);
 
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
@@ -132,7 +135,8 @@ export class AuthAppService extends AbAuthService {
 
     if (userInserted) {
       // đăng ký topic cho push
-      await this.firebaseService.subscribeToTopic(userInserted.userCode, userInserted.deviceToken);
+      const isNewOrChange = true;
+      await this.firebaseService.subscribeToTopic(userInserted.userCode, userInserted.deviceToken, isNewOrChange);
     }
 
     this.logger.log(logbase, `${dto.userPhone} -> ${userInserted ? Msg.RegisterAccountOk : Msg.RegisterAccountErr}`);

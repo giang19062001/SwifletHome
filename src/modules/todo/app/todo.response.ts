@@ -20,12 +20,12 @@ export class GetScheduledTasksResDto {
   @ApiProperty({ example: 'NaN' })
   value: string;
 
-  
   @ApiProperty({ example: '2025-12-12' })
   date: string;
+
+  @ApiProperty({ example: 'Ngày' })
+  unit: string;
 }
-
-
 
 export class GetListTaskAlarmsResDto {
   @ApiProperty({ example: 0 })
