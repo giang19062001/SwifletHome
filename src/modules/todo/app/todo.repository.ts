@@ -2,7 +2,7 @@ import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
 import { SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
-import { CODES, KEYWORDS } from 'src/helpers/const.helper';
+import { CODES } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import moment from 'moment';

@@ -4,6 +4,7 @@ import { AuthAdminService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserAdminModule } from 'src/modules/user/admin/user.module';
+import { AUTH_CONFIG } from 'src/helpers/const.helper';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { UserAdminModule } from 'src/modules/user/admin/user.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_KEY'),
-        signOptions: { expiresIn: '1d' },
+        signOptions: { expiresIn: AUTH_CONFIG.EXPIRED_ADMIN},
       }),
     }),
     forwardRef(() => UserAdminModule), // ← phá phụ thuộc vòng tròn

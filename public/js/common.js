@@ -1,7 +1,7 @@
 function axiosAuth(config) {
   const token = document.cookie
     .split('; ')
-    .find((row) => row.startsWith('swf-token='))
+    .find((row) => row.startsWith(`${TOKEN_NAME}=`))
     ?.split('=')[1];
 
   return {

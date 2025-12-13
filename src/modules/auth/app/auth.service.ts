@@ -11,7 +11,6 @@ import { AbAuthService } from '../auth.abstract';
 import { ITokenUserApp } from './auth.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { IUserApp } from 'src/modules/user/app/user.interface';
-import { KEYWORDS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -31,7 +30,7 @@ export class AuthAppService extends AbAuthService {
     const logbase = `${this.SERVICE_NAME}/verifyPhoneBeforeOtp`;
 
     // nếu đăng ký mới cần kiểm tra số điện thoại đã được sử dụng hay chưa
-    if (purpose == KEYWORDS.OTP_PURPOSE.REGISTER) {
+    if (purpose == PurposeEnum.REGISTER) {
       const phone = await this.userAppService.findByPhone(userPhone);
 
       // lỗi -> số điện thoại đã tồn tại -> không thể tạo mới nữa -> ko phải gửi sms xác thực nữa
@@ -42,7 +41,7 @@ export class AuthAppService extends AbAuthService {
     }
 
     // quên password
-    if (purpose == KEYWORDS.OTP_PURPOSE.FORGOT_PASSWORD) {
+    if (purpose == PurposeEnum.FORGOT_PASSWORD) {
       const phone = await this.userAppService.findByPhone(userPhone);
 
       // lỗi -> số điện thoại không tồn tại -> không thể đổi mật khẩu -> ko phải gửi sms xác thực nữa

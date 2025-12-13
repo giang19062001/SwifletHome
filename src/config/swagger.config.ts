@@ -1,4 +1,5 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AUTH_CONFIG } from 'src/helpers/const.helper';
 
 export const initSwagger = (app) => {
   const config = new DocumentBuilder()
@@ -11,7 +12,7 @@ export const initSwagger = (app) => {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        description: 'Admin token (cookie: swf-token)',
+        description: `Admin token (cookie: ${AUTH_CONFIG.TOKEN_NAME})`,
       },
       'admin-auth',
     )

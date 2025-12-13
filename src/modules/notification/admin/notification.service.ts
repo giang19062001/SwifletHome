@@ -17,11 +17,14 @@ export class NotificationAdminService {
   async pushNotifycationByAdmin(dto: PushNotifycationByAdminDto, createdId: string): Promise<number> {
     try {
       if (dto.isSendAll == 'Y') {
+        // lấy danh sách topic dùng cho tất cả user
         const topicCommon = await this.notificationAdminRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
+        // gửi thông báo chung
         await this.firebaseService.sendNotificationToTopic(topicCommon?.topicCode ?? '', dto.title, dto.body);
       } else if (dto.isSendAll == 'N') {
         const userDeviceTokens = await this.userAdminRepository.getDeviceTokensByUsers(dto.userCodesMuticast);
         if (userDeviceTokens.length) {
+          // gửi thông báo cho 1 vài user cụ thể
           await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body);
         }
       }

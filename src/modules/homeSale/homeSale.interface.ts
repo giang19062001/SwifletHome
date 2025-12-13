@@ -1,5 +1,11 @@
 import { YnEnum } from "src/interfaces/admin.interface";
 
+export enum HomeSaleSightSeeingStatusEnum {
+  WAITING = 'WAITING',
+  APPROVED = 'APPROVED',
+  CANCEL = 'CANCEL'
+}
+
 export interface IHomeSale {
   seq: number;
   homeCode: string;
@@ -37,7 +43,7 @@ export interface IHomeSaleSightSeeing {
   userName: string;
   userPhone: string;
   numberAttend: string;
-  status: string;
+  status: HomeSaleSightSeeingStatusEnum;
   note: string;
   cancelReason: string;
   createdId: string;

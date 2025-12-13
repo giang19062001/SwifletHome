@@ -22,9 +22,10 @@ export class NotificationAppService {
     const list = await this.notificationAppRepository.getAllTopic(dto);
     return { total, list };
   }
+  //* lấy các thông báo có userCode là user hiện tại OR có userCodesMulticast chứa userCode của user hiện tại OR thông báo là thông báo chung cho toàn user
   async getAll(dto: PagingDto, userCode: string): Promise<IListApp<INotification>> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
-    // lấy danh sách topic dùng cho tất cả user
+    // lấy mã code của topic thông báo chung
     const topicCommon = await this.notificationAppRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
 
     const total = await this.notificationAppRepository.getTotal(userCode, topicCommon?.topicCode ?? "");

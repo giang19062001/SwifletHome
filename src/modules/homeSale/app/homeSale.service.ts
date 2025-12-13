@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
+import { HomeSaleSightSeeingStatusEnum, IHomeSale, IHomeSaleImg } from '../homeSale.interface';
 import { HomeSaleAppRepository } from './homeSale.repository';
 import { IListApp } from 'src/interfaces/app.interface';
 import { CreateHomeSightSeeingDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { OptionService } from 'src/modules/options/option.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
-import { KEYWORDS } from 'src/helpers/const.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 
 @Injectable()
@@ -73,7 +72,7 @@ export class HomeSaleAppService {
       throw new BadRequestException({ message: Msg.CodeInvalid, data: 0 });
     }
     // mặc định status ban đầu là  'Đang chờ duyệt'
-    const result = await this.homeSaleAppRepository.registerSightSeeing(dto, userCode, KEYWORDS.HOME_SALE_SIGHTSEEING_STATUS.WAITING);
+    const result = await this.homeSaleAppRepository.registerSightSeeing(dto, userCode, HomeSaleSightSeeingStatusEnum.WAITING);
     this.logger.log(logbase, `homeCode(${dto.homeCode}) -> ${result ? Msg.RegisterOk : Msg.RegisterErr}`);
 
     return result;

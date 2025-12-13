@@ -1,44 +1,35 @@
-import { IPackage } from "src/modules/package/package.interface";
+import { CookieOptions } from 'express';
+import { IPackage } from 'src/modules/package/package.interface';
 
+export const AUTH_CONFIG = {
+  TOKEN_NAME: 'swf-token',
+  EXPIRED_ADMIN: '1d' as const,
+  EXPIRED_APP: '365d' as const,
+  COOKIE_CONFIG: {
+    httpOnly: false, //  có thể truy cập bằng JavaScript
+    sameSite: 'strict', //  chỉ gửi khi request cùng site # login redirect từ domain khác → lỗi
+    secure: true, // HTTPS
+    maxAge: 24 * 60 * 60 * 1000, // 1day
+  } satisfies CookieOptions,
+};
 export const IMG_TYPES = ['.png', '.jpg', '.jpeg', '.heic'];
 export const AUDIO_TYPES = ['.mp3'];
 export const VIDEO_TYPES = ['.mp4', '.mov', '.hevc'];
 export const APP_SCREENS = {
   PROFILE_SCREEN: 'PROFILE_SCREEN',
+  SIGNUP_SERVICE: 'SIGNUP_SERVICE',
 };
 export const NOTIFICATIONS = {
   updatePackage: (packageData?: IPackage | null) => ({
-    TITLE: "Thông báo cập nhập gói",
-    BODY: `Gói ${!packageData ? "Miễn phí" : packageData.packageName} đã được cập nhập thành công`
-  })
+    TITLE: 'Thông báo cập nhập gói',
+    BODY: `Gói ${!packageData ? 'Miễn phí' : packageData.packageName} đã được cập nhập thành công`,
+  }),
 };
 
 export const KEYWORDS = {
-  OTP_PURPOSE: {
-    REGISTER: 'REGISTER',
-    FORGOT_PASSWORD: 'FORGOT_PASSWORD',
-  },
-  SCREEN: {
-    SIGNUP_SERVICE: 'SIGNUP_SERVICE',
-  },
-  HOME_SALE_SIGHTSEEING_STATUS: { WAITING: 'WAITING', APPROVED: 'APPROVED', CANCEL: 'CANCEL' },
-  DOCTOR_STATUS: {
-    WAITING: 'WAITING',
-    ANSWERED: 'ANSWERED',
-    CANCEL: 'CANCEL',
-  },
-  TODO_HOME_TASK_ALARAM_STATUS: {
-    WAITING: 'WAITING',
-    COMPLETE: 'COMPLETE',
-    CANCEL: 'CANCEL',
-  },
-   NOTIFICATION_STATUS: {
-    SENT: 'SENT',
-    READ: 'READ',
-  },
-  NOTIFICATION_TOPIC:{
+  NOTIFICATION_TOPIC: {
     COMMON: 'COMMON',
-  }
+  },
 };
 
 export const CODES = {

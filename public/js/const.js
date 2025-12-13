@@ -1,7 +1,8 @@
+const TOKEN_NAME = 'swf-token'
 const CURRENT_PATH = window.location.pathname;
 const CURRENT_URL = window.location.origin;
 const CURRENT_PARAMS = window.location.search;
-const KEYWORDS = {
+const VARIABLE_ENUM = {
   HOME_SALE_SIGHTSEEING_STATUS: [
     {
       value: 'WAITING',

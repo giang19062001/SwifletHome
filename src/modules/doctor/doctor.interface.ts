@@ -1,5 +1,11 @@
 import { YnEnum } from "src/interfaces/admin.interface";
 
+export enum DoctorStatusEnum {
+  WAITING = 'WAITING',
+  ANSWERED = 'ANSWERED',
+  CANCEL = 'CANCEL'
+}
+
 export interface IDoctor {
   seq: number;
   userCode: string;
@@ -7,7 +13,7 @@ export interface IDoctor {
   userPhone: string;
   note: string;
   noteAnswered: string;
-  status: string;
+  status: DoctorStatusEnum;
   uniqueId: string;
   isActive: YnEnum;
   createdAt: Date;

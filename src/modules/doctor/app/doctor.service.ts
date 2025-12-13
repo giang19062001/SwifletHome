@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
-import { IDoctorFileStr } from '../doctor.interface';
+import { DoctorStatusEnum, IDoctorFileStr } from '../doctor.interface';
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
-import { KEYWORDS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class DoctorAppService {
@@ -26,7 +25,7 @@ export class DoctorAppService {
 
       if (filesUploaded.length) {
         // mặc định là chờ
-        const seq = await this.doctorAppRepository.create(userCode, dto, KEYWORDS.DOCTOR_STATUS.WAITING);
+        const seq = await this.doctorAppRepository.create(userCode, dto, DoctorStatusEnum.WAITING);
         for (const file of filesUploaded) {
           // cập nhập doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created
           await this.doctorAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId);

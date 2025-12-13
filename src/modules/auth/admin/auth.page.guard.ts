@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthAdminService } from './auth.service';
+import { AUTH_CONFIG } from 'src/helpers/const.helper';
 
 @Injectable()
 export class PageAuthAdminGuard implements CanActivate {
@@ -9,7 +10,7 @@ export class PageAuthAdminGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest();
     const res: Response = context.switchToHttp().getResponse();
-    const token = req.cookies['swf-token'];
+    const token = req.cookies[AUTH_CONFIG.TOKEN_NAME];
 
     if (!token) {
       // no token
