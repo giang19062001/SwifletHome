@@ -8,21 +8,30 @@ import { NotificationAppRepository } from 'src/modules/notification/app/notifica
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { IUserNotificationTopic, NotificationStatusEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { ConfigService } from '@nestjs/config';
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
 export class FirebaseService implements OnModuleInit {
   private readonly SERVICE_NAME = 'FirebaseService';
-  private readonly IMAGE = {
-    LOGO: 'https://3fam.ai/images/favicon.ico', // ảnh nhỏ logo
-    DETAIL: 'https://3fam.ai/images/favicon.ico', // ảnh nội dung mở rộng
+  private readonly IMAGE: {
+    LOGO: string;
+    DETAIL: string;
   };
+
   private messaging: admin.messaging.Messaging;
 
   constructor(
+    private readonly configService: ConfigService,
     private readonly notificationAppRepository: NotificationAppRepository,
     private readonly logger: LoggingService,
-  ) {}
+  ) {
+    const currentUrl = this.configService.get<string>('CURRENT_URL');
+    this.IMAGE = {
+      LOGO: `${currentUrl}/images/favicon.ico`, // ảnh nhỏ logo
+      DETAIL: `${currentUrl}/images/favicon.ico`, // ảnh nội dung mở rộng
+    };
+  } 
   onModuleInit() {
     if (!admin.apps.length) {
       admin.initializeApp({
@@ -40,6 +49,7 @@ export class FirebaseService implements OnModuleInit {
     // lấy số lượng các notify chưa được đọc của user hiện tại
     const count = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode);
 
+    console.log( this.IMAGE);
     const dataPayload: PushDataPayload = {
       notificationId: notificationId,
       title,
