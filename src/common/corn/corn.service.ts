@@ -79,7 +79,8 @@ export class CornService implements OnModuleInit {
     if (taskAlarmList.length) {
       for (const task of taskAlarmList) {
         // insert thông và đẩy thông báo
-        await this.firebaseService.sendNotification(task.userCode, task.deviceToken, task.taskName, task.taskNote, { taskAlarmCode: task.taskAlarmCode }, NotificationTypeEnum.TODO);
+        // await this.firebaseService.sendNotification(task.userCode, task.deviceToken, task.taskName, task.taskNote, { taskAlarmCode: task.taskAlarmCode }, NotificationTypeEnum.TODO);
+        await this.firebaseService.sendNotification(task.userCode, task.deviceToken, task.taskName, task.taskNote, null, NotificationTypeEnum.TODO);
       }
     }
   }

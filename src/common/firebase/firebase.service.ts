@@ -30,8 +30,10 @@ export class FirebaseService implements OnModuleInit {
     this.IMAGE = {
       LOGO: `${currentUrl}/images/favicon.ico`, // ảnh nhỏ logo
       DETAIL: `${currentUrl}/images/favicon.ico`, // ảnh nội dung mở rộng
+      // LOGO: `https://3fam.ai/images/favicon.ico`,
+      // DETAIL: `https://3fam.ai/images/favicon.ico`,
     };
-  } 
+  }
   onModuleInit() {
     if (!admin.apps.length) {
       admin.initializeApp({
@@ -49,7 +51,6 @@ export class FirebaseService implements OnModuleInit {
     // lấy số lượng các notify chưa được đọc của user hiện tại
     const count = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode);
 
-    console.log( this.IMAGE);
     const dataPayload: PushDataPayload = {
       notificationId: notificationId,
       title,
