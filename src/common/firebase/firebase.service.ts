@@ -1,7 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import admin from 'firebase-admin';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
-import { MulticastMessage } from 'firebase-admin/messaging';
 import { LoggingService } from '../logger/logger.service';
 import { PushDataPayload } from './firebase.interface';
 import { NotificationAppRepository } from 'src/modules/notification/app/notification.repository';
@@ -10,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { IUserNotificationTopic, NotificationStatusEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { ConfigService } from '@nestjs/config';
 import { APP_SCREENS } from 'src/helpers/const.helper';
+import { NotificationAppService } from 'src/modules/notification/app/notification.service';
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
@@ -25,6 +25,8 @@ export class FirebaseService implements OnModuleInit {
   constructor(
     private readonly configService: ConfigService,
     private readonly notificationAppRepository: NotificationAppRepository,
+    private readonly notificationAppService: NotificationAppService,
+
     private readonly logger: LoggingService,
   ) {
     const currentUrl = this.configService.get<string>('CURRENT_URL');
@@ -58,7 +60,7 @@ export class FirebaseService implements OnModuleInit {
     const notificationId = uuidv4();
 
     // lấy số lượng các notify chưa được đọc của user hiện tại
-    const count = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode);
+    const count = await this.notificationAppService.getCntNotifyNotReadByUser(userCode);
 
     const dataPayload: PushDataPayload = {
       notificationId: notificationId,

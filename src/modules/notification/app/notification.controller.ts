@@ -6,7 +6,7 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { NotificationAppService } from './notification.service';
-import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetNotificationResDto } from './notification.response';
@@ -39,6 +39,21 @@ export class NotificationAppController {
     const result = await this.notificationAppService.getAll(dto, user.userCode);
     return result;
   }
+  
+  @Get('getCntNotifyNotReadByUser')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async getCntNotifyNotReadByUser(@GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
+    const result =  await this.notificationAppService.getCntNotifyNotReadByUser(user.userCode);
+    if (!result) {
+      throw new BadRequestException({
+        data: 0
+      });
+    }
+    return result;
+  }
+
 
   @Get('getDetail/:notificationId')
   @HttpCode(HttpStatus.OK)

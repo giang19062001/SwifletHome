@@ -28,11 +28,18 @@ export class NotificationAppService {
     // lấy mã code của topic thông báo chung
     const topicCommon = await this.notificationAppRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
 
-    const total = await this.notificationAppRepository.getTotal(userCode, topicCommon?.topicCode ?? "");
-    const list = await this.notificationAppRepository.getAll(dto, userCode, topicCommon?.topicCode ?? "");
+    const total = await this.notificationAppRepository.getTotal(userCode, topicCommon?.topicCode ?? '');
+    const list = await this.notificationAppRepository.getAll(dto, userCode, topicCommon?.topicCode ?? '');
     this.logger.log(logbase, `total(${total})`);
 
     return { total, list };
+  }
+  async getCntNotifyNotReadByUser(userCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/getCntNotifyNotReadByUser`;
+    // lấy mã code của topic thông báo chung
+    const topicCommon = await this.notificationAppRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
+    const result = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode, topicCommon?.topicCode ?? '');
+    return result;
   }
   async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail`;

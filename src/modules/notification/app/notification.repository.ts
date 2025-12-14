@@ -11,12 +11,14 @@ export class NotificationAppRepository {
   private readonly table = 'tbl_notifications';
   private readonly tableTopic = 'tbl_notification_topics';
   private readonly tableUserTopic = 'tbl_user_notification_topics';
-
+  private readonly theQueryCountCommon = '(A.userCode = ? OR JSON_CONTAINS(A.userCodesMuticast, JSON_QUOTE(?)) OR A.topicCode = ?)'
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-
   async getTotal(userCode: string, topicCode: string): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} 
-      WHERE (userCode = ? OR JSON_CONTAINS(userCodesMuticast, JSON_QUOTE(?)) OR topicCode = ?) `, [userCode, userCode, topicCode]);
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A
+      WHERE ${this.theQueryCountCommon} `,
+      [userCode, userCode, topicCode],
+    );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto, userCode: string, topicCode: string): Promise<INotification[]> {
@@ -26,7 +28,7 @@ export class NotificationAppRepository {
            A.notificationType, A.notificationStatus, A.isActive, 
            A.createdAt, A.createdId
     FROM ${this.table} A
-    WHERE (A.userCode = ? OR JSON_CONTAINS(A.userCodesMuticast, JSON_QUOTE(?)) OR A.topicCode = ?)
+    WHERE ${this.theQueryCountCommon}
   `;
 
     const params: any[] = [userCode, userCode, topicCode];
@@ -40,6 +42,17 @@ export class NotificationAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as INotification[];
   }
+  async getCntNotifyNotReadByUser(userCode: string, topicCode: string): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT COUNT(A.seq)  AS TOTAL
+        FROM ${this.table} A
+        WHERE ${this.theQueryCountCommon} 
+        AND A.notificationStatus = ?;
+        `,
+      [userCode, userCode, topicCode, NotificationStatusEnum.SENT],
+    );
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
 
   async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
@@ -52,16 +65,6 @@ export class NotificationAppRepository {
       [notificationId, userCode],
     );
     return rows ? (rows[0] as INotification) : null;
-  }
-  async getCntNotifyNotReadByUser(userCode: string): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(seq)  AS TOTAL
-        FROM ${this.table} 
-        WHERE userCode = ? AND notificationStatus = ?;
-        `,
-      [userCode, NotificationStatusEnum.SENT],
-    );
-    return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 
   async createNotification(dto: CreateNotificationDto): Promise<number> {
