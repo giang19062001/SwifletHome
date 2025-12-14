@@ -53,4 +53,5 @@ export const Msg = {
   CannotNull: (filedName: string) => `${filedName} không thể trống`,
   InvalidValue: (filedName: string) => `${filedName} sai giá trị cho phép`,
   InvalidRange: (filedName: string, range: string) => `${filedName} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
+  MustBeGreaterThanNow: (filedName: string) => `${filedName} phải lớn hơn ngày hiện tại`,
 };

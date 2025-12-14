@@ -79,8 +79,20 @@ export default class TodoAppValidate {
         error = Msg.CannotNull('specificValue');
         return error;
       }
+      const specificDate = new Date(dto.specificValue);
+      const now = new Date();
 
-      dto.specificValue = new Date(dto.specificValue);
+      // validate ngày hợp lệ
+      if (isNaN(specificDate.getTime())) {
+        return Msg.InvalidValue('specificValue');
+      }
+
+      // specificValue phải lớn hơn ngày hiện tại
+      if (specificDate <= now) {
+        return Msg.MustBeGreaterThanNow('specificValue');
+      }
+
+      dto.specificValue = specificDate
     }
     return error;
   }
