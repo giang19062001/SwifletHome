@@ -23,7 +23,7 @@ export class GetNotificationResDto {
   @ApiProperty({ example: null })
   data: any | null;
 
-  @ApiProperty({ example: APP_SCREENS.SCHEDULE_SCREEN })
+  @ApiProperty({ example: APP_SCREENS.REMINDER_SCREEN })
   targetScreen: string;
   
   // @ApiProperty({ example: '' })

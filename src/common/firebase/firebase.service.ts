@@ -46,7 +46,7 @@ export class FirebaseService implements OnModuleInit {
 
   getAppScreen(notificationType: NotificationTypeEnum): string {
     if (notificationType === 'TODO') {
-      return APP_SCREENS.SCHEDULE_SCREEN;
+      return APP_SCREENS.REMINDER_SCREEN;
     } else if (notificationType === 'ADMIN') {
       return APP_SCREENS.NOTIFICATION_SCREEN;
     }
