@@ -17,6 +17,7 @@ export interface INotification {
   title: string;
   body: Text;
   data: string | any;
+  targetScreen: string;
   userCode?: string;
   userCodesMuticast?: string[];
   topicCode?: string;

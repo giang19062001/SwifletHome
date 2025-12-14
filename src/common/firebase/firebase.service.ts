@@ -9,6 +9,7 @@ import { CreateNotificationDto } from 'src/modules/notification/app/notification
 import { v4 as uuidv4 } from 'uuid';
 import { IUserNotificationTopic, NotificationStatusEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { ConfigService } from '@nestjs/config';
+import { APP_SCREENS } from 'src/helpers/const.helper';
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
@@ -43,6 +44,14 @@ export class FirebaseService implements OnModuleInit {
     this.messaging = admin.messaging();
   }
 
+  getAppScreen(notificationType: NotificationTypeEnum): string {
+    if (notificationType === 'TODO') {
+      return APP_SCREENS.SCHEDULE_SCREEN;
+    } else if (notificationType === 'ADMIN') {
+      return APP_SCREENS.NOTIFICATION_SCREEN;
+    }
+    return APP_SCREENS.NOTIFICATION_SCREEN;
+  }
   // Single device token (của bạn)
   async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
@@ -55,6 +64,7 @@ export class FirebaseService implements OnModuleInit {
       notificationId: notificationId,
       title,
       body,
+      targetScreen: this.getAppScreen(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
       count: String(count),
@@ -77,6 +87,7 @@ export class FirebaseService implements OnModuleInit {
           messageId: messageId,
           title: title,
           body: title,
+          targetScreen: this.getAppScreen(notificationType),
           data: data ?? null,
           userCode: userCode,
           userCodesMuticast: [],
@@ -117,6 +128,7 @@ export class FirebaseService implements OnModuleInit {
       notificationId,
       title,
       body,
+      targetScreen: this.getAppScreen(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
       count: '0',
@@ -139,6 +151,7 @@ export class FirebaseService implements OnModuleInit {
         messageId: response.includes('/messages/') ? response.split('/messages/')[1] : response,
         title,
         body,
+        targetScreen: this.getAppScreen(notificationType),
         data: data ?? null,
         userCode: null, // null vì gửi theo topic
         userCodesMuticast: [],
@@ -185,6 +198,7 @@ export class FirebaseService implements OnModuleInit {
       notificationId,
       title,
       body,
+      targetScreen: this.getAppScreen(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
       count: '0',
@@ -221,6 +235,7 @@ export class FirebaseService implements OnModuleInit {
           messageId: 'mutilcast',
           title,
           body,
+          targetScreen: this.getAppScreen(notificationType),
           data: data ?? null,
           userCode: null, // null vì gửi theo multicast
           userCodesMuticast: userCodes,

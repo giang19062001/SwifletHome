@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { NotificationStatusEnum, NotificationTypeEnum } from '../notification.interface';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { IsArray } from 'class-validator';
+import { APP_SCREENS } from 'src/helpers/const.helper';
 
 export class GetNotificationResDto {
   @ApiProperty({ example: 1 })
@@ -22,6 +23,9 @@ export class GetNotificationResDto {
   @ApiProperty({ example: null })
   data: any | null;
 
+  @ApiProperty({ example: APP_SCREENS.SCHEDULE_SCREEN })
+  targetScreen: string;
+  
   // @ApiProperty({ example: '' })
   // userCode: string;
 

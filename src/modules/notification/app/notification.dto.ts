@@ -39,6 +39,14 @@ export class CreateNotificationDto {
   @IsOptional()
   data: any | null;
 
+   @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  targetScreen: string;
+
+
   @ApiProperty({
     example: '',
     required: false,
