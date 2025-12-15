@@ -23,11 +23,7 @@ export class FirebaseService implements OnModuleInit {
   private fcmConfig(title: string, body: string) {
     return {
       android: {
-        priority: 'high',
-        notification: {
-          title,
-          body,
-        },
+        priority: 'high' as const,
       },
       apns: {
         payload: {
@@ -36,11 +32,11 @@ export class FirebaseService implements OnModuleInit {
               title,
               body,
             },
-            sound: 'default',
+            sound: 'default' as const,
           },
         },
       },
-    };
+    } as const;
   }
   private messaging: admin.messaging.Messaging;
 
@@ -96,10 +92,9 @@ export class FirebaseService implements OnModuleInit {
     // gửi bằng token
     const message: admin.messaging.Message = {
       token: deviceToken,
-      // notification: { title, body },
-      notification: {},
+      notification: { title, body },
       data: dataPayload,
-      // ...this.fcmConfig(title, body),
+      ...this.fcmConfig(title, body),
     };
 
     try {
@@ -161,11 +156,9 @@ export class FirebaseService implements OnModuleInit {
 
     const message: admin.messaging.Message = {
       topic,
-      // notification: { title, body },
-      notification: {},
-
+      notification: { title, body },
       data: dataPayload,
-      // ...this.fcmConfig(title, body),
+      ...this.fcmConfig(title, body),
     };
     console.log('message -->', message);
 
@@ -235,11 +228,9 @@ export class FirebaseService implements OnModuleInit {
 
     const message: admin.messaging.MulticastMessage = {
       tokens,
-      // notification: { title, body },
-      notification: {},
-
+      notification: { title, body },
       data: dataPayload,
-      // ...this.fcmConfig(title, body),
+      ...this.fcmConfig(title, body),
     };
 
     console.log('message -->', message);
