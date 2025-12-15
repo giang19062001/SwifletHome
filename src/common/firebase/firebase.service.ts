@@ -75,7 +75,7 @@ export class FirebaseService implements OnModuleInit {
     // gửi bằng token
     const message: admin.messaging.Message = {
       token: deviceToken,
-      notification: { title, body },
+      // notification: { title, body },
       data: dataPayload,
     };
 
@@ -138,7 +138,7 @@ export class FirebaseService implements OnModuleInit {
 
     const message: admin.messaging.Message = {
       topic,
-      notification: { title, body },
+      // notification: { title, body },
       data: dataPayload,
     };
     console.log("message -->", message);
@@ -209,7 +209,7 @@ export class FirebaseService implements OnModuleInit {
 
     const message: admin.messaging.MulticastMessage = {
       tokens,
-      notification: { title, body },
+      // notification: { title, body },
       data: dataPayload,
     };
 
