@@ -94,7 +94,7 @@ export class FirebaseService implements OnModuleInit {
       token: deviceToken,
       notification: { title, body },
       data: dataPayload,
-      ...this.fcmConfig(title, body),
+      // ...this.fcmConfig(title, body),
     };
 
     try {
@@ -158,7 +158,7 @@ export class FirebaseService implements OnModuleInit {
       topic,
       notification: { title, body },
       data: dataPayload,
-      ...this.fcmConfig(title, body),
+      // ...this.fcmConfig(title, body),
     };
     console.log('message -->', message);
 
@@ -230,7 +230,7 @@ export class FirebaseService implements OnModuleInit {
       tokens,
       notification: { title, body },
       data: dataPayload,
-      ...this.fcmConfig(title, body),
+      // ...this.fcmConfig(title, body),
     };
 
     console.log('message -->', message);
