@@ -141,6 +141,7 @@ export class FirebaseService implements OnModuleInit {
       notification: { title, body },
       data: dataPayload,
     };
+    console.log("message -->", message);
 
     try {
       const response = await this.messaging.send(message);
@@ -211,6 +212,8 @@ export class FirebaseService implements OnModuleInit {
       notification: { title, body },
       data: dataPayload,
     };
+
+    console.log("message -->", message);
 
     try {
       const batchResponse = await this.messaging.sendEachForMulticast(message);

@@ -1,5 +1,4 @@
-let fileList = [];
-
+let fileMediaAudioList = [];
 // Audio
 const audioInputBox = document.querySelector('.audio-input-box');
 const audioInputFree = document.getElementById('audioInputFree');
@@ -12,6 +11,12 @@ const videoInputBox = document.querySelector('.video-input-box');
 const videoInputName = document.getElementById('videoInputName');
 const videoInputUrl = document.getElementById('videoInputUrl');
 const videoCancelBtn = document.getElementById('videoCancelBtn');
+// TODO: FUNC
+document.getElementById('isUpgradePreview').addEventListener('change', (event) => {
+  const objElement = document.querySelector(`#file-audio-box`);
+
+  renderAllFile(fileMediaAudioList, objElement);
+});
 
 const resetInputs = (...inputs) => inputs.forEach((el) => (el.value = ''));
 
@@ -90,8 +95,6 @@ function convertToEmbedUrl(youtubeUrl) {
 
 // TODO: RENDER
 const renderAllFile = (data, objElement) => {
-  fileList = data; // set global
-
   const getFileIcon = (mimetype) => {
     const icons = {
       image: `
@@ -137,7 +140,6 @@ const renderAllFile = (data, objElement) => {
   };
 
   objElement.innerHTML = '';
-
   // card for each file
   data.forEach((file) => {
     if (file.mimetype === 'video/youtube' && file.urlLink) {
@@ -154,15 +156,31 @@ const renderAllFile = (data, objElement) => {
         mimetype: file.mimetype,
       });
     } else {
-      const iconSvg = getFileIcon(file.mimetype);
-      createFileCard(objElement, {
-        icon: iconSvg,
-        seq: file.seq,
-        name: file.originalname,
-        filename: file.filename,
-        mimetype: file.mimetype,
-        date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
-      });
+      // audio
+      const isUpgradePreview = document.getElementById('isUpgradePreview').checked ? 'UPGRADE' : 'NOT_UPGRADE';
+
+      if (isUpgradePreview === 'UPGRADE' && file.isFree == 'N') {
+        const iconSvg = getFileIcon(file.mimetype);
+        createFileCard(objElement, {
+          icon: iconSvg,
+          seq: file.seq,
+          name: file.originalname,
+          filename: file.filename,
+          mimetype: file.mimetype,
+          date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
+        });
+      }
+      if (isUpgradePreview === 'NOT_UPGRADE' && file.isFree == 'Y') {
+        const iconSvg = getFileIcon(file.mimetype);
+        createFileCard(objElement, {
+          icon: iconSvg,
+          seq: file.seq,
+          name: file.originalname,
+          filename: file.filename,
+          mimetype: file.mimetype,
+          date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
+        });
+      }
     }
   });
 };
@@ -277,7 +295,8 @@ async function getAllMediaAudioFile() {
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
-        renderAllFile(response.data, objElement);
+        fileMediaAudioList = response.data; // set biến global
+        renderAllFile(fileMediaAudioList, objElement);
       }
     })
     .catch(function (error) {

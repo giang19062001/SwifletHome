@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IAudioFreePay, IFileMedia, IFileUpload } from '../upload.interface';
 import { GetAllMediaDto, MediaTypeEnum } from './upload.dto';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class UploadAppRepository {
@@ -24,21 +25,21 @@ export class UploadAppRepository {
     return rows as IFileUpload[];
   }
   //* media
-  async getTotalMedia(mediaType: MediaTypeEnum): Promise<number> {
+  async getTotalMedia(mediaType: MediaTypeEnum, isFree: YnEnum): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT COUNT(A.seq) AS TOTAL FROM ${mediaType === 'AUDIO' ? this.tableMediaAudio : this.tableMediaVideo} A
-      WHERE A.isActive = 'Y' `,
-      [],
+      WHERE A.isActive = 'Y' ${mediaType === 'AUDIO' ? ' AND A.isFree = ? ': ''} `,
+      mediaType === 'AUDIO' ? [isFree] : [],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllMediaAudio(dto: GetAllMediaDto): Promise<IFileMedia[]> {
-    let query = ` SELECT A.seq,  A.filename, A.originalname, A.size, A.mimetype, A.createdAt, '' as urlLink, A.isFree
+  async getAllMediaAudio(dto: GetAllMediaDto, isFree: YnEnum): Promise<IFileMedia[]> {
+    let query = ` SELECT A.seq,  A.filename, A.originalname, A.size, A.mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, '' as urlLink, A.isFree
         FROM ${this.tableMediaAudio} A
-        WHERE A.isActive = 'Y'
+        WHERE A.isActive = 'Y' AND isFree = ?
    `;
 
-    let params: any[] = [];
+    let params: any[] = [isFree];
 
     // paging
     if (dto.limit > 0 && dto.page > 0) {
@@ -51,7 +52,7 @@ export class UploadAppRepository {
   }
 
   async getAllMediaVideo(dto: GetAllMediaDto): Promise<IFileMedia[]> {
-    let query = ` SELECT A.seq, '' as filename,  A.originalname, 0 as size, 'video/youtube' as mimetype,  A.createdAt, A.urlLink, 'Y' as isFree
+    let query = ` SELECT A.seq, '' as filename,  A.originalname, 0 as size, 'video/youtube' as mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, A.urlLink, 'Y' as isFree
         FROM ${this.tableMediaVideo} A
         WHERE A.isActive = 'Y'
          `;

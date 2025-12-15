@@ -45,7 +45,7 @@ export class UploadAdminRepository {
   // }
   async getAllMediaAudioFile(): Promise<IFileUpload[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
+      ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink, A.isFree
         FROM ${this.tableMediaAudio} A 
         WHERE A.isActive = 'Y' 
          `,
@@ -63,7 +63,7 @@ export class UploadAdminRepository {
   }
   async getAllMediaVideoLink(): Promise<IFileUpload[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, '' as filenamePay, '' as filename, A.originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink
+      ` SELECT A.seq, '' as filenamePay, '' as filename, A.originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink, 'Y' as isFree
         FROM  ${this.tableMediaVideo} A 
         WHERE isActive = 'Y' `,
     );

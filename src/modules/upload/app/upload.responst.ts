@@ -5,18 +5,26 @@ export class GetAllMediaResDto {
   seq: number;
 
   @ApiProperty({ example: '' })
-  notificationId: string;
+  filename: string;
 
   @ApiProperty({ example: '' })
-  messageId: string;
+  originalname: string;
+
+  @ApiProperty({ example: 0 })
+  size: number;
 
   @ApiProperty({ example: '' })
-  title: string;
+  mimetype: string;
+
+  @ApiProperty({ example: '2025-12-15 14:23:56' })
+  createdAt: string;
 
   @ApiProperty({ example: '' })
-  body: string;
+  urlLink: string;
 
-  @ApiProperty({ example: null })
-  data: any | null;
+  @ApiProperty({ example: 'Y' })
+  isFree: string;
 
+  @ApiProperty({ example: 'N' })
+  isCanBeDownload: string;
 }
