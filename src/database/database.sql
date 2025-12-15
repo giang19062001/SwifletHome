@@ -212,14 +212,14 @@ CREATE TABLE
 CREATE TABLE
   `tbl_uploads_video` (
     `seq` int NOT NULL AUTO_INCREMENT,
+    `originalname` text NULL,
     `urlLink` varchar(255) NOT NULL,
     `isActive` char(1) DEFAULT 'Y',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
     `updatedId` varchar(45) DEFAULT NULL,
-    PRIMARY KEY (`seq`),
-    UNIQUE KEY `videoUrl_UNIQUE` (`urlLink`)
+    PRIMARY KEY (`seq`)
   );
 
 
@@ -682,6 +682,42 @@ CREATE TABLE
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
     updatedId VARCHAR(45) DEFAULT NULL
   )
+
+
+-- media
+CREATE TABLE
+  `tbl_media_video` (
+    `seq` int NOT NULL AUTO_INCREMENT,
+    `originalname` text NULL,
+    `urlLink` varchar(255) NOT NULL,
+    `isActive` char(1) DEFAULT 'Y',
+    `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt` datetime DEFAULT NULL,
+    `createdId` varchar(45) DEFAULT 'SYSTEM',
+    `updatedId` varchar(45) DEFAULT NULL,
+    PRIMARY KEY (`seq`)
+  );
+
+
+
+CREATE TABLE
+  `tbl_media_audio` (
+    `seq` int NOT NULL AUTO_INCREMENT,
+    `seqPay` int,
+    `filename` varchar(255) NOT NULL,
+    `originalname` text NOT NULL,
+    `size` int NOT NULL,
+    `mimetype` varchar(45) NOT NULL,
+    `isActive` char(1) DEFAULT 'Y',
+    `isFree` char(1) DEFAULT 'Y',
+    `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt` datetime DEFAULT NULL,
+    `createdId` varchar(45) DEFAULT 'SYSTEM',
+    `updatedId` varchar(45) DEFAULT NULL,
+    PRIMARY KEY (`seq`),
+    UNIQUE KEY `filename_UNIQUE` (`filename`)
+  );
+
   -- INSERT
 INSERT INTO
   `tbl_user_admin` (

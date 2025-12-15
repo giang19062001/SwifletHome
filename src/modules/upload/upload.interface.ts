@@ -1,3 +1,5 @@
+import { YnEnum } from "src/interfaces/admin.interface";
+
 export interface IFileUpload {
   seq: number;
   filename: string;
@@ -18,4 +20,15 @@ export interface IAudioFreePay {
   mimetypeFree: string;
   filenamePay: string;
   mimetypePay: string;
+}
+
+export interface IFileMedia {
+  seq: number;
+  filename: string;
+  originalname: string;
+  size: number;
+  mimetype: string;
+  urlLink: string;
+  isFree: YnEnum;
+  createdAt: Date;
 }

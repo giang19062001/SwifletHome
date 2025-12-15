@@ -1,7 +1,4 @@
 let fileList = [];
-// Elements
-const imgInput = document.getElementById('imgInput');
-const fileBox = document.querySelector('.file-box');
 
 // Audio
 const audioInputBox = document.querySelector('.audio-input-box');
@@ -12,38 +9,20 @@ const audioAddBtn = document.getElementById('audioAddBtn');
 
 // Video
 const videoInputBox = document.querySelector('.video-input-box');
-const videoInput = document.getElementById('videoInput');
+const videoInputName = document.getElementById('videoInputName');
+const videoInputUrl = document.getElementById('videoInputUrl');
 const videoCancelBtn = document.getElementById('videoCancelBtn');
-
-// Buttons
-const btnImage = document.getElementById('btnImage');
-const btnAudio = document.getElementById('btnAudio');
-const btnVideo = document.getElementById('btnVideo');
-
-// Helper functions
-const showBox = (boxToShow) => {
-  [fileBox, audioInputBox, videoInputBox].forEach((box) => {
-    box.style.display = box === boxToShow ? 'flex' : 'none';
-  });
-};
 
 const resetInputs = (...inputs) => inputs.forEach((el) => (el.value = ''));
 
-// Event: image
-btnImage.addEventListener('click', () => imgInput.click());
-
 // Event: audio
-btnAudio.addEventListener('click', () => showBox(audioInputBox));
 audioCancelBtn.addEventListener('click', () => {
   resetInputs(audioInputFree, audioInputPay);
-  showBox(fileBox);
 });
 
 // Event: video
-btnVideo.addEventListener('click', () => showBox(videoInputBox));
 videoCancelBtn.addEventListener('click', () => {
-  resetInputs(videoInput);
-  showBox(fileBox);
+  resetInputs(videoInputName, videoInputUrl);
 });
 
 // Push: audio
@@ -55,46 +34,37 @@ audioAddBtn.addEventListener('click', async () => {
     toastErr('Vui lòng chọn cả hai file audio!');
     return;
   }
-  await uploadAudios(freeFile, payFile);
+  await uploadMediaAudios(freeFile, payFile);
 
-  resetInputs(videoInput);
-  showBox(fileBox);
+  //reset
+  resetInputs(audioInputFree, audioInputPay);
 });
 
 // Push: video
 videoAddBtn.addEventListener('click', async () => {
-  const url = videoInput.value.trim();
+  const url = videoInputUrl.value.trim();
+  const name = videoInputName.value.trim();
+  if (!name) {
+    toastErr('Vui lòng nhập tên video!');
+    return;
+  }
   if (!url) {
     toastErr('Vui lòng nhập link video!');
     return;
   }
 
-  await uploadVideoLink(url);
+  await uploadMediaVideoLink(name, url);
 
-  resetInputs(videoInput);
-  showBox(fileBox);
-});
-
-// Push: image
-imgInput.addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    await uploadImg(file);
-  }
-  resetInputs(imgInput);
-  showBox(fileBox);
+  //reset
+  resetInputs(videoInputName, videoInputUrl);
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-  getAllFile();
+  getAllMediaAudioFile();
+  getAllMediaVideoLink();
 });
 
 // TODO: FUNC
-/// Hàm hiển thị/ẩn nút [[payment]] theo radio isFree
-function togglePaymentButton() {
-  const isFree = document.querySelector('input[name="isFree"]:checked')?.value;
-  document.querySelector('button.payment').style.display = isFree === 'Y' ? 'none' : 'block';
-}
 // convert embed sang watch của youtube
 function convertToEmbedUrl(youtubeUrl) {
   function extractVideoId(url) {
@@ -116,55 +86,6 @@ function convertToEmbedUrl(youtubeUrl) {
   }
 
   return `https://www.youtube.com/embed/${videoId}?showinfo=0`;
-}
-
-// copy data để paste vào editors
-function copyData(filename, mimetype) {
-  console.log('filename', filename);
-  console.log('mimetype', mimetype);
-
-  let copiedName = '';
-  if (mimetype.startsWith('audio/')) {
-    if (filename.includes('editorAudio')) {
-      copiedName = `[[audio-data=${CURRENT_URL}/${filename}]]`;
-    }
-  } else if (mimetype.startsWith('image/')) {
-    if (filename.includes('editorImg')) {
-      copiedName = `[[image-data=${CURRENT_URL}/${filename}]]`;
-    }
-  } else if (mimetype.startsWith('video/')) {
-    copiedName = `[[video-data=${convertToEmbedUrl(filename)}]]`;
-  } else if (mimetype.startsWith('payment/')) {
-    copiedName = `[[payment]]`;
-  }
-
-  if (!copiedName) {
-    console.warn('Không có dữ liệu để copy');
-    return;
-  }
-
-  // localhost, https
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard
-      .writeText(copiedName)
-      .then(() => console.log('Copied:', copiedName))
-      .catch((err) => console.error('Clipboard error:', err));
-  } else {
-    // http
-    const textArea = document.createElement('textarea');
-    textArea.value = copiedName;
-    textArea.style.position = 'fixed'; // tránh scroll
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-      document.execCommand('copy');
-      console.log('Copied (fallback):', copiedName);
-    } catch (err) {
-      console.error('Fallback copy failed:', err);
-    }
-    document.body.removeChild(textArea);
-  }
 }
 
 // TODO: RENDER
@@ -206,48 +127,16 @@ const renderAllFile = (data, objElement) => {
       ${fileData.date ? `<div class="file-meta"><span class="file-date">${fileData.date}</span></div>` : ``}
     </div>
     <div class="file-button">
-         ${
-           fileData.filename == 'payment'
-             ? `<button style="display:none" class="copy-btn btn-info-out payment" 
-        onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
-        Sao chép
-      </button>`
-             : `<button class="copy-btn btn-info-out" 
-        onclick="copyData('${fileData.filename}','${fileData.mimetype}')">
-        Sao chép
-      </button>`
-         }
-      ${
-        fileData.filename !== 'payment'
-          ? ` <button class="btn-error-out" 
+      <button class="btn-error-out" 
         onclick="deleteFile('${fileData.seq}','${fileData.mimetype}')">
         Xóa
-      </button>`
-          : ''
-      }
-     
-    </div>
-  `;
+      </button>   
+    </div>`;
 
     container.appendChild(card);
   };
 
   objElement.innerHTML = '';
-
-  // payment card
-
-  createFileCard(objElement, {
-    icon: `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFC50F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-      <circle cx="12" cy="12" r="2"></circle>
-      <path d="M6 12h.01M18 12h.01"></path>
-    </svg>
-    `,
-    name: 'Trả phí',
-    filename: 'payment',
-    mimetype: 'payment/',
-  });
 
   // card for each file
   data.forEach((file) => {
@@ -260,7 +149,7 @@ const renderAllFile = (data, objElement) => {
       </svg>
     `,
         seq: file.seq,
-        name: file.urlLink,
+        name: file.originalname,
         filename: file.urlLink,
         mimetype: file.mimetype,
       });
@@ -277,46 +166,17 @@ const renderAllFile = (data, objElement) => {
     }
   });
 };
-
 // TODO:API
-async function uploadImg(file) {
-  if (!file) return;
 
-  const formData = new FormData();
-  formData.append('editorImg', file);
-
-  try {
-    const response = await axios.post(
-      '/api/admin/upload/uploadImg',
-      formData,
-      axiosAuth({
-        'Content-Type': 'multipart/form-data',
-      }),
-    );
-
-    if (response.data) {
-      // reload file list
-      toastOk('Thêm file thành công');
-      getAllFile();
-    } else {
-      toastErr('Thêm file thất bại');
-    }
-  } catch (error) {
-    console.error('Upload error:', error);
-    if (error.response.data) {
-      toastErr(error.response.data.message);
-    }
-  }
-}
-async function uploadAudios(freeFile, payFile) {
+async function uploadMediaAudios(freeFile, payFile) {
   // Tạo FormData
   const formData = new FormData();
-  formData.append('editorAudioFree', freeFile);
-  formData.append('editorAudioPay', payFile);
+  formData.append('mediaAudioFree', freeFile);
+  formData.append('mediaAudioPay', payFile);
 
   try {
     const response = await axios.post(
-      '/api/admin/upload/uploadAudios',
+      '/api/admin/upload/uploadMediaAudios',
       formData,
       axiosAuth({
         'Content-Type': 'multipart/form-data',
@@ -326,7 +186,10 @@ async function uploadAudios(freeFile, payFile) {
     if (response.data) {
       // reload file list
       toastOk('Thêm file thành công');
-      getAllFile();
+      getAllMediaAudioFile();
+
+      // clear input
+      resetInputs(audioInputFree, audioInputPay);
     } else {
       toastErr('Thêm file thất bại');
     }
@@ -337,21 +200,27 @@ async function uploadAudios(freeFile, payFile) {
     }
   }
 }
-async function uploadVideoLink(urlLink) {
+async function uploadMediaVideoLink(name, url) {
   try {
     await axios
       .post(
-        CURRENT_URL + '/api/admin/upload/uploadVideoLink',
+        CURRENT_URL + '/api/admin/upload/uploadMediaVideoLink',
         {
-          urlLink: urlLink,
+          originalname: name,
+          urlLink: url,
         },
         axiosAuth(),
       )
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
+          // reload file list
+
           toastOk('Thêm thành công');
-          getAllFile();
+          getAllMediaVideoLink();
+
+          // clear input
+          resetInputs(videoInputUrl);
         } else {
           toastErr('Thêm thất bại');
         }
@@ -368,12 +237,12 @@ async function deleteFile(seq, mimetype) {
   if (mimetype.startsWith('video/')) {
     // video youyube
     await axios
-      .delete(CURRENT_URL + '/api/admin/upload/deleteVideoLink/' + seq, axiosAuth())
+      .delete(CURRENT_URL + '/api/admin/upload/deleteMediaVideoLink/' + seq, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Xóa thành công');
-          getAllFile();
+          getAllMediaVideoLink();
         } else {
           toastErr('Xóa thất bại');
         }
@@ -384,28 +253,12 @@ async function deleteFile(seq, mimetype) {
   } else if (mimetype.startsWith('audio/')) {
     // audio
     await axios
-      .delete(CURRENT_URL + '/api/admin/upload/deleteAudio/' + seq, axiosAuth())
+      .delete(CURRENT_URL + '/api/admin/upload/deleteMediaAudio/' + seq, axiosAuth())
       .then(function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
           toastOk('Xóa thành công');
-          getAllFile();
-        } else {
-          toastErr('Xóa thất bại');
-        }
-      })
-      .catch(function (error) {
-        console.log('error', error);
-      });
-  } else if (mimetype.startsWith('image/')) {
-    // audio
-    await axios
-      .delete(CURRENT_URL + '/api/admin/upload/deleteImg/' + seq, axiosAuth())
-      .then(function (response) {
-        console.log('response', response);
-        if (response.status === 200 && response.data) {
-          toastOk('Xóa thành công');
-          getAllFile();
+          getAllMediaAudioFile();
         } else {
           toastErr('Xóa thất bại');
         }
@@ -416,11 +269,27 @@ async function deleteFile(seq, mimetype) {
   }
 }
 
-async function getAllFile() {
-  const objElement = document.querySelector(`.file-box`);
+async function getAllMediaAudioFile() {
+  const objElement = document.querySelector(`#file-audio-box`);
 
   await axios
-    .get(CURRENT_URL + '/api/admin/upload/getAllFile', axiosAuth())
+    .get(CURRENT_URL + '/api/admin/upload/getAllMediaAudioFile', axiosAuth())
+    .then(function (response) {
+      console.log('response', response);
+      if (response.status === 200 && response.data) {
+        renderAllFile(response.data, objElement);
+      }
+    })
+    .catch(function (error) {
+      console.log('error', error);
+    });
+}
+
+async function getAllMediaVideoLink() {
+  const objElement = document.querySelector(`#file-video-box`);
+
+  await axios
+    .get(CURRENT_URL + '/api/admin/upload/getAllMediaVideoLink', axiosAuth())
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {

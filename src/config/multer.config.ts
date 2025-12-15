@@ -54,6 +54,11 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'audios/editors';
     }
   }
+   if (mimetype.startsWith('audio/')) {
+    if (fieldname === 'mediaAudio' || fieldname.includes('mediaAudio')) {
+      result = 'audios/medias';
+    }
+  }
 
   return "uploads/" + result
 };

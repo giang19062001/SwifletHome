@@ -14,7 +14,7 @@ document.getElementById('isUpgradePreview').addEventListener('change', (event) =
 // Theo dõi radio isFree thay đổi
 document.querySelectorAll('input[name="isFree"]').forEach((radio) => {
   radio.addEventListener('change', () => {
-    // set chế độ xem là FREE
+    // set chế độ xem là 'NOT_UPGRADE'
     document.getElementById('isUpgradePreview').checked = false;
     //re-render
     getThenRenderEditorContent(); // getThenRenderEditorContent() -> renderContentHtml()
@@ -60,7 +60,7 @@ function togglePreview() {
 // TODO:RENDER
 function renderContentHtml() {
   const isFree = document.querySelector('input[name="isFree"]:checked').value; // Y | N
-  const isUpgradePreview = document.getElementById('isUpgradePreview').checked ? 'UPGRADE' : 'FREE';
+  const isUpgradePreview = document.getElementById('isUpgradePreview').checked ? 'UPGRADE' : 'NOT_UPGRADE';
 
   // lấy content từ bong bóng message html
   const bot = document.getElementById('content-message');
@@ -78,7 +78,7 @@ function renderContentHtml() {
   }
 
   // Replace [[payment]]
-  if (isUpgradePreview == 'FREE') {
+  if (isUpgradePreview == 'NOT_UPGRADE') {
     // chưa trả phí → hiển nút thanh toán
     if (contentHtml.includes('[[payment]]')) {
       // Lấy phần trước [[payment]]
@@ -105,7 +105,7 @@ function renderContentHtml() {
     const fileInfo = fileList?.find((ele) => ele.filename === filename);
     const audioPay = fileInfo?.filenamePay || filename;
 
-    const audioSrc = isUpgradePreview === 'FREE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
+    const audioSrc = isUpgradePreview === 'NOT_UPGRADE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
     return `  <audio controls style="width:100%; margin:8px 0;">
               <source src="${audioSrc}" type="audio/mpeg">
             </audio>`;

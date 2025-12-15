@@ -1,4 +1,15 @@
-.component-upload {
+#page-media {
+  .media-preview {
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 15px;
+    background-color: white;
+    padding: 15px;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .component-media-upload {
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
     border-radius: 15px;
     background-color: white;
@@ -110,7 +121,7 @@
         flex-direction: column;
         justify-content: center;
         gap: 4px;
-        width: 200px;
+        width: 300px;
         .file-name {
           font-weight: 600;
           font-size: 14px;
@@ -119,7 +130,7 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          width: 200px;
+          width: 300px;
         }
 
         .file-date {
@@ -137,3 +148,4 @@
       transform: translateY(-4px);
     }
   }
+}

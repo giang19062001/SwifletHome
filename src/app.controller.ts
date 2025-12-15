@@ -176,6 +176,17 @@ export class AppController {
       values: values,
     };
   }
+  // media
+   @Get('/dashboard/media')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/media')
+  renderMedia(@Req() req: Request) {
+    return {
+      title: 'Danh sách audio - video',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   //blog
   @Get('/dashboard/blog')
   @UseGuards(PageAuthAdminGuard)

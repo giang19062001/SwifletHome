@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SearchService } from './search.service';
-import { UploadAdminModule } from 'src/modules/upload/upload.module';
 import { UserAppModule } from 'src/modules/user/app/user.module';
+import { UploadAppModule } from 'src/modules/upload/app/upload.module';
 
 @Module({
-  imports:[UploadAdminModule, UserAppModule],
+  imports:[UploadAppModule, UserAppModule],
   providers: [SearchService],
   exports:[SearchService]
 })

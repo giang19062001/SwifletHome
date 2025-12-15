@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
 import { Msg } from 'src/helpers/message.helper';
-import { UploadService } from 'src/modules/upload/upload.service';
 import { LoggingService } from '../logger/logger.service';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
 import { ISearchItem } from './search.interface';
+import { UploadAppService } from 'src/modules/upload/app/upload.service';
 
 @Injectable()
 export class SearchService {
@@ -18,7 +18,7 @@ export class SearchService {
   private readonly SERVICE_NAME = 'SearchService';
 
   constructor(
-    private readonly uploadService: UploadService,
+    private readonly uploadAppService: UploadAppService,
     private readonly userAppRepository: UserAppRepository,
     private readonly logger: LoggingService,
   ) {}
@@ -40,7 +40,7 @@ export class SearchService {
     // this.logger.log(logbase, `Dữ liệu là miễn phí: ${isFree}; Số ngày hiệu lực còn lại của gói user:${remainDay}`);
 
     // LẤY DANH SÁCH AUDIO LIST
-    const fileList = await this.uploadService.getAllAudioFile();
+    const fileList = await this.uploadAppService.getAllAudioFile();
     // HANDLE
     let content = contentHtml;
     if (isFree === 'Y') {
@@ -48,7 +48,7 @@ export class SearchService {
       content = content.replace(/\[\[payment\]\]/g, ``);
     } else if (isFree === 'N') {
       // dữ liệu tính phí
-      // TODO: [PAYMENT]
+      // TODO: [[payment]]
       if (remainDay > 0) {
         // người dùng đang xài gói nâng cấp và còn hạn → ẩn nút thanh toán
         content = content.replace(/\[\[payment\]\]/g, ``);

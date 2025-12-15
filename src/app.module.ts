@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { QuestionAdminModule } from './modules/question/admin/question.module';
 import { AnswerAdminModule } from './modules/answer/admin/answer.module';
-import { UploadAdminModule } from './modules/upload/upload.module';
+import { UploadAdminModule } from './modules/upload/admin/upload.module';
 import { AuthAdminModule } from './modules/auth/admin/auth.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { HomeSaleAdminModule } from './modules/homeSale/admin/homeSale.module';

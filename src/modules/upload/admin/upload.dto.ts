@@ -10,6 +10,22 @@ export class UploadVideoLinkDto {
   urlLink: string;
 }
 
+export class UploadMediaVideoLinkDto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  originalname: string;
+
+  @ApiProperty({
+    example: 'https://www.youtube.com/watch?v=...',
+  })
+  @IsString()
+  @IsNotEmpty()
+  urlLink: string;
+}
+
 export class UploadImgFileDto {
   @ApiProperty({
     type: 'string',
@@ -30,4 +46,18 @@ export class UploadAudioFilesDto {
     format: 'binary',
   })
   editorAudioPay: any;
+}
+
+export class UploadMediaAudioFilesDto {
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+  })
+  mediaAudioFree: any;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+  })
+  mediaAudioPay: any;
 }
