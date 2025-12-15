@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Body } from '@nestjs/common';
 import admin from 'firebase-admin';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { LoggingService } from '../logger/logger.service';
@@ -20,13 +20,30 @@ export class FirebaseService implements OnModuleInit {
     DETAIL: string;
   };
 
+  private fcmConfig(title: string, body: string) {
+    return {
+      android: {
+        priority: 'high' as const,
+      },
+      apns: {
+        payload: {
+          aps: {
+            alert: {
+              title,
+              body,
+            },
+            sound: 'default',
+          },
+        },
+      },
+    };
+  }
   private messaging: admin.messaging.Messaging;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly notificationAppRepository: NotificationAppRepository,
     private readonly notificationAppService: NotificationAppService,
-
     private readonly logger: LoggingService,
   ) {
     const currentUrl = this.configService.get<string>('CURRENT_URL');
@@ -75,8 +92,9 @@ export class FirebaseService implements OnModuleInit {
     // gửi bằng token
     const message: admin.messaging.Message = {
       token: deviceToken,
-      // notification: { title, body },
+      notification: { title, body },
       data: dataPayload,
+      ...this.fcmConfig(title, body),
     };
 
     try {
@@ -138,10 +156,11 @@ export class FirebaseService implements OnModuleInit {
 
     const message: admin.messaging.Message = {
       topic,
-      // notification: { title, body },
+      notification: { title, body },
       data: dataPayload,
+      ...this.fcmConfig(title, body),
     };
-    console.log("message -->", message);
+    console.log('message -->', message);
 
     try {
       const response = await this.messaging.send(message);
@@ -209,11 +228,12 @@ export class FirebaseService implements OnModuleInit {
 
     const message: admin.messaging.MulticastMessage = {
       tokens,
-      // notification: { title, body },
+      notification: { title, body },
       data: dataPayload,
+      ...this.fcmConfig(title, body),
     };
 
-    console.log("message -->", message);
+    console.log('message -->', message);
 
     try {
       const batchResponse = await this.messaging.sendEachForMulticast(message);
