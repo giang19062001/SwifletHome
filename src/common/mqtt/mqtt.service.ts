@@ -10,6 +10,8 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
   private brokerUrl: string;
   private readonly topic = 'sensor/+/data'; // Dùng wildcard + để nhận từ nhiều sensor khác nhau
   private readonly SERVICE_NAME = 'MqttService';
+  private readonly TIMEOUT_SENSOR_VALUE = 10 * 60 * 1000; // 10 PHÚT
+
   private latestSensorData = new Map<string, ISensor>(); // lưu tạm giá trị mới nhất
   constructor(
     private readonly logger: LoggingService,
@@ -49,6 +51,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
             temperature: payload.temperature ?? 0,
             humidity: payload.humidity ?? 0,
             current: payload.current ?? 0,
+            timestamp: Date.now(), // lưu thời gian cập nhật
           };
 
           this.latestSensorData.set(key, sensorData);
@@ -68,14 +71,32 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
       this.client.end();
     }
   }
-  // Phương thức lấy dữ liệu mới nhất theo key
+  //  lấy dữ liệu mới nhất theo key
   getLatestSensorData(key: string): ISensor {
-    return (
-      this.latestSensorData.get(key) || {
+    const data = this.latestSensorData.get(key);
+
+    if (!data) {
+      return {
         temperature: 0,
         humidity: 0,
         current: 0,
-      }
-    );
+        timestamp: 0,
+      };
+    }
+
+    // Nếu quá 10 phút kể từ lần update cuối -> cho là 0
+    const now = Date.now();
+    const lastTime = data.timestamp ?? 0;
+
+    if (now - lastTime > this.TIMEOUT_SENSOR_VALUE) {
+      return {
+        temperature: 0,
+        humidity: 0,
+        current: 0,
+        timestamp: 0,
+      };
+    }
+
+    return data;
   }
 }
