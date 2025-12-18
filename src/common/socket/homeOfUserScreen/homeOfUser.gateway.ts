@@ -1,3 +1,4 @@
+import { MqttService } from './../../mqtt/mqtt.service';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ISensor } from '../socket.interface';
@@ -14,10 +15,13 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
   server: Server;
 
   private readonly SERVICE_NAME = 'SocketGateway/homeOfUser';
-  private readonly INTERVALS_TIME = 5000;
+  private readonly INTERVALS_TIME = 6000;
   private socketIntervals = new Map<string, NodeJS.Timeout>();
 
-  constructor(private readonly logger: LoggingService) {}
+  constructor(
+    private readonly mqttService: MqttService,
+    private readonly logger: LoggingService,
+  ) {}
 
   handleConnection(client: Socket) {
     this.logger.log(this.SERVICE_NAME, `Mở kết nối: ${client.id}`);
@@ -78,7 +82,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
   // khởi tạo internal khi chưa có
   private startSensorDataInterval(intervalName: string, userHomeCode: string, room: string) {
     const interval = setInterval(() => {
-      const sensorData = this.generateMockSensorData();
+      const sensorData = this.mqttService.getLatestSensorData(`MAC-${intervalName}`);
       this.sendSensorData(room, sensorData);
     }, this.INTERVALS_TIME);
 
@@ -86,14 +90,6 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
     this.logger.log(this.SERVICE_NAME, `Đã khởi tạo interval cho với tên: ${intervalName}`);
   }
 
-  // lấy dữ liệu fake
-  private generateMockSensorData(): ISensor {
-    return {
-      temperature: Math.floor(Math.random() * 8) + 24,
-      humidity: Math.floor(Math.random() * 15) + 55,
-      current: Number((Math.random() * 4 + 1).toFixed(2)),
-    };
-  }
 
   // gửi mảng rỗng khi khởi tạo
   private sendInitialData(client: Socket) {

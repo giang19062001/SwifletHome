@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, OnApplicationShutdown } from '@nestjs/common'
 import * as mqtt from 'mqtt';
 import { LoggingService } from '../logger/logger.service';
 import { ConfigService } from '@nestjs/config';
+import { ISensor } from '../socket/socket.interface';
 
 @Injectable()
 export class MqttService implements OnModuleInit, OnApplicationShutdown {
@@ -9,7 +10,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
   private brokerUrl: string;
   private readonly topic = 'sensor/+/data'; // Dùng wildcard + để nhận từ nhiều sensor khác nhau
   private readonly SERVICE_NAME = 'MqttService';
-
+  private latestSensorData = new Map<string, ISensor>(); // lưu tạm giá trị mới nhất
   constructor(
     private readonly logger: LoggingService,
     private readonly configService: ConfigService,
@@ -37,20 +38,26 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     });
 
     this.client.on('message', (topic, message) => {
-      const payload = message.toString();
+      // VD: sensor/MAC-USR000001-HOM000003/data
+      const match = topic.match(/^sensor\/(.+)\/data$/);
+      if (match) {
+        const key = match[1]; //VD: MAC-USR000001-HOM000003
 
-      try {
-        const data = JSON.parse(payload);
-        console.log('Dữ liệu:', topic, {
-          temperature: data.temperature,
-          humidity: data.humidity,
-          current: data.current,
-        });
-      } catch (e) {
-        console.error('Invalid JSON:', payload);
+        try {
+          const payload = JSON.parse(message.toString());
+          const sensorData: ISensor = {
+            temperature: payload.temperature ?? 0,
+            humidity: payload.humidity ?? 0,
+            current: payload.current ?? 0,
+          };
+
+          this.latestSensorData.set(key, sensorData);
+          // console.log(`MQTT Updated [${key}]:`, sensorData);
+        } catch (error) {
+          console.error('Invalid MQTT payload:', message.toString());
+        }
       }
     });
-
     this.client.on('reconnect', () => this.logger.warn('MQTT reconnecting...'));
     this.client.on('offline', () => this.logger.error('MQTT broker offline'));
     this.client.on('error', (err) => this.logger.error('MQTT error', err));
@@ -60,5 +67,15 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     if (this.client) {
       this.client.end();
     }
+  }
+  // Phương thức lấy dữ liệu mới nhất theo key
+  getLatestSensorData(key: string): ISensor {
+    return (
+      this.latestSensorData.get(key) || {
+        temperature: 0,
+        humidity: 0,
+        current: 0,
+      }
+    );
   }
 }

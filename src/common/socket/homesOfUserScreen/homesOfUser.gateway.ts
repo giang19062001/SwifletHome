@@ -3,6 +3,7 @@ import { Server, Socket } from 'socket.io';
 import { ISensorHome } from '../socket.interface';
 import { LoggingService } from '../../logger/logger.service';
 import { JoinRoomDto, LeaveRoomDto } from './homesOfUser.dto';
+import { MqttService } from 'src/common/mqtt/mqtt.service';
 
 @WebSocketGateway({
   namespace: 'socket/homesOfUser',
@@ -14,10 +15,13 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   server: Server;
 
   private readonly SERVICE_NAME = 'SocketGateway/homesOfUser';
-  private readonly INTERVALS_TIME = 5000;
+  private readonly INTERVALS_TIME = 6000;
   private socketIntervals = new Map<string, NodeJS.Timeout>();
 
-  constructor(private readonly logger: LoggingService) {}
+  constructor(
+    private readonly mqttService: MqttService,
+    private readonly logger: LoggingService,
+  ) {}
 
   handleConnection(client: Socket) {
     this.logger.log(this.SERVICE_NAME, `Mở kết nối: ${client.id}`);
@@ -40,7 +44,7 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
     const intervalName = `${userCode}`;
     client.data.intervalName = intervalName;
 
-    const room = `USER--${intervalName}-ROOM`;
+    const room = `USER-${intervalName}-ROOM`;
     client.join(room);
 
     this.logger.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
@@ -67,7 +71,7 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
     const { userCode } = data;
     if (!userCode) return;
 
-    const room = `USER--${userCode}-ROOM`;
+    const room = `USER-${userCode}-ROOM`;
     client.leave(room);
     this.cleanupUserInterval(client);
     this.logger.log(this.SERVICE_NAME, `${client.id} đã rời phòng: ${room}`);
@@ -76,7 +80,8 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   // khởi tạo internal khi chưa có
   private startSensorDataInterval(intervalName: string, userHomeCodes: string[], room: string) {
     const interval = setInterval(() => {
-      const sensorData = this.generateMockSensorData(userHomeCodes);
+      console.log("userHomeCodes", userHomeCodes, intervalName);
+      const sensorData = this.generateListSensorData(userHomeCodes, intervalName);
       this.sendSensorData(room, sensorData);
     }, this.INTERVALS_TIME);
 
@@ -85,12 +90,10 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
   }
 
   // lấy dữ liệu fake
-  private generateMockSensorData(userHomeCodes: string[]): ISensorHome[] {
+  private generateListSensorData(userHomeCodes: string[], userCode: string): ISensorHome[] {
     return userHomeCodes.map((homeCode) => ({
       userHomeCode: homeCode,
-      temperature: Math.floor(Math.random() * 8) + 24,
-      humidity: Math.floor(Math.random() * 15) + 55,
-      current: Number((Math.random() * 4 + 1).toFixed(2)),
+      ...this.mqttService.getLatestSensorData(`MAC-${userCode}-${homeCode}`)
     }));
   }
 
@@ -104,7 +107,7 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
     const intervalName = client.data?.intervalName as string;
     if (!intervalName) return;
 
-    const room = `USER--${intervalName}-ROOM`;
+    const room = `USER-${intervalName}-ROOM`;
     const roomClients = this.server.sockets.adapter?.rooms?.get(room);
 
     if (!roomClients || roomClients.size === 0) {
