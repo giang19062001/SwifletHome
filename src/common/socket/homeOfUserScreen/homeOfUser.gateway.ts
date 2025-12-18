@@ -15,7 +15,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
   server: Server;
 
   private readonly SERVICE_NAME = 'SocketGateway/homeOfUser';
-  private readonly INTERVALS_TIME = 6000;
+  private readonly INTERVALS_TIME = 5000;
   private socketIntervals = new Map<string, NodeJS.Timeout>();
 
   constructor(

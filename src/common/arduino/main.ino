@@ -11,8 +11,8 @@ char ssid[] = "Dreamplex";
 char pass[] = "Dreamchaser";
 
 // ====== MQTT ======
-// const char* mqttServer = "103.77.160.68";
-const char* mqttServer = "172.16.20.134"; // localhost
+const char* mqttServer = "103.77.160.68";
+// const char* mqttServer = "172.16.20.134"; // localhost
 const char* mqttClientId = "MAC-USR000001-HOM000003";
 const int mqttPort = 1883;
 String mqttTopic = String("sensor/") + mqttClientId + "/data";
@@ -38,7 +38,7 @@ float zeroOffset = 0;
 
 // ====== Timer ======
 unsigned long previousMillis = 0;
-const long interval = 3000;  // 3 giây
+const long interval = 5000;  // 5 giây
 
 // ====== CALIBRATE ======
 void calibrateZeroCurrent() {
