@@ -14,10 +14,9 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     private readonly logger: LoggingService,
     private readonly configService: ConfigService,
   ) {
-    const MQTT_HOST = this.configService.get<string>('MQTT_HOST');
+    const MQTT_HOST = 'localhost';
     const MQTT_PORT = this.configService.get<string>('MQTT_PORT');
     this.brokerUrl = `mqtt://${MQTT_HOST}:${MQTT_PORT}`;
-    this.logger.log(`MQTT Broker URL: ${this.brokerUrl}`);
   }
 
   onModuleInit() {
@@ -29,7 +28,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     });
 
     this.client.on('connect', () => {
-      this.logger.log(this.SERVICE_NAME, 'Kết nỗi MQTT thành công!');
+      this.logger.log(this.SERVICE_NAME, `Kết nỗi MQTT ${this.brokerUrl} thành công!`);
       this.client.subscribe(this.topic, (err) => {
         if (!err) {
           this.logger.log(this.SERVICE_NAME, `đăng kí chủ đề chung: ${this.topic}`);
