@@ -112,7 +112,7 @@
         const config = {
             homesOfUser: {
                 namespace: '/socket/homesOfUser',
-                roomPrefix: 'user-',
+                roomPrefix: 'USER-',
                 roomKey: ["userCode"],
                 joinEvent: 'joinRoom',
                 leaveEvent: 'leaveRoom',
@@ -124,7 +124,7 @@
             },
             homeOfUser: {
                 namespace: '/socket/homeOfUser',
-                roomPrefix: 'home-',
+                roomPrefix: 'HOME-',
                 roomKey: ["userCode", "userHomeCode"],
                 joinEvent: 'joinRoom',
                 leaveEvent: 'leaveRoom',
@@ -235,7 +235,7 @@
             socket.emit(cfg.joinEvent, payload);
             // Lấy key đầu tiên để hiển thị room -> room name đồng nhất phía backend
             const roomKeyValues = cfg.roomKey.map(k => cfg.defaultPayload[k]);
-            roomEl.textContent = `${cfg.roomPrefix}${roomKeyValues.join("-")}-room`;
+            roomEl.textContent = `${cfg.roomPrefix}${roomKeyValues.join("-")}-ROOM`;
 
             addLog('warn', cfg.joinEvent, payload);
         };

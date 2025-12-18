@@ -41,7 +41,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
     const intervalName = `${userCode}-${userHomeCode}`;
     client.data.intervalName = intervalName;
 
-    const room = `home-${intervalName}-room`;
+    const room = `HOME-${intervalName}-ROOM`;
     client.join(room);
 
     this.logger.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
@@ -69,7 +69,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
     if (!userCode) return;
     if (!userHomeCode) return;
 
-    const room = `home-${userCode}-${userHomeCode}-room`;
+    const room = `HOME-${userCode}-${userHomeCode}-ROOM`;
     client.leave(room);
     this.cleanupUserInterval(client);
     this.logger.log(this.SERVICE_NAME, `${client.id} đã rời phòng: ${room}`);
@@ -109,7 +109,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
     const intervalName = client.data?.intervalName as string;
     if (!intervalName) return;
 
-    const room = `home-${intervalName}-room`;
+    const room = `HOME-${intervalName}-ROOM`;
     const roomClients = this.server.sockets.adapter?.rooms?.get(room);
 
     if (!roomClients || roomClients.size === 0) {

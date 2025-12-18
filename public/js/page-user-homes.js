@@ -90,6 +90,7 @@ async function openModal(userCode, userHomeCode, type, data = null) {
     });
 
     // gán value
+    modalForm.querySelector('#macId').value = `MAC-${userCode}-${userHomeCode}`;
     modalForm.querySelector('#userCode').value = userCode;
     modalForm.querySelector('#userHomeCode').value = userHomeCode;
   }
