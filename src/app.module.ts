@@ -37,6 +37,7 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
 import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
 import { NotificationAdminModule } from './modules/notification/admin/notification.module';
+import { MqttModule } from './common/mqtt/mqtt.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { NotificationAdminModule } from './modules/notification/admin/notificati
     LoggerModule,
     SocketModule,
     FirebaseModule,
+    MqttModule,
     // commmon
     OptionModule,
     ProvinceModule,
