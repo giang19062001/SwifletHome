@@ -10,7 +10,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
   private brokerUrl: string;
   private readonly topic = 'sensor/+/data'; // Dùng wildcard + để nhận từ nhiều sensor khác nhau
   private readonly SERVICE_NAME = 'MqttService';
-  private readonly TIMEOUT_SENSOR_VALUE = 10 * 60 * 1000; // 10 PHÚT
+  private readonly TIMEOUT_SENSOR_VALUE = 10 * 1000; // 10 giây
 
   private latestSensorData = new Map<string, ISensor>(); // lưu tạm giá trị mới nhất
   constructor(
