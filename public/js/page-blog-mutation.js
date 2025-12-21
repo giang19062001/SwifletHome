@@ -103,9 +103,10 @@ function renderContentHtml() {
     const filename = String(url.split(CURRENT_URL)[1]).replace(/^\//, '');
 
     const fileInfo = fileList?.find((ele) => ele.filename === filename);
-    const audioPay = fileInfo?.filenamePay || filename;
+    const audioPay = fileInfo?.filenamePay || undefined;
 
-    const audioSrc = isUpgradePreview === 'NOT_UPGRADE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
+    // const audioSrc = isUpgradePreview === 'NOT_UPGRADE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
+    const audioSrc = isFree == 'Y' ? `${CURRENT_URL}/${audioPay}` : isFree == 'N' && isUpgradePreview === 'NOT_UPGRADE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
     return `  <audio controls style="width:100%; margin:8px 0;">
               <source src="${audioSrc}" type="audio/mpeg">
             </audio>`;

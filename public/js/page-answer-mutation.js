@@ -96,8 +96,8 @@ function renderContentHtml() {
 
     const fileInfo = fileList?.find((ele) => ele.filename === filename);
     const audioPay = fileInfo?.filenamePay || filename;
-
-    const audioSrc = isUpgradePreview === 'NOT_UPGRADE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
+    // const audioSrc = isUpgradePreview === 'NOT_UPGRADE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
+    const audioSrc = isFree == 'Y' ? `${CURRENT_URL}/${audioPay}` : isFree == 'N' && isUpgradePreview === 'NOT_UPGRADE' ? `${url}` : `${CURRENT_URL}/${audioPay}`;
     return `  <audio controls style="width:100%; margin:8px 0;">
               <source src="${audioSrc}" type="audio/mpeg">
             </audio>`;

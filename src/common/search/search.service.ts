@@ -5,6 +5,7 @@ import { LoggingService } from '../logger/logger.service';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
 import { ISearchItem } from './search.interface';
 import { UploadAppService } from 'src/modules/upload/app/upload.service';
+import { IFileUpload } from 'src/modules/upload/upload.interface';
 
 @Injectable()
 export class SearchService {
@@ -31,6 +32,34 @@ export class SearchService {
       .replace(/[^a-z0-9\s]/g, '') // xóa ký tự đặc biệt
       .trim();
   }
+  handleAudio(content: string, remainDay: number, isFree: string, fileList: IFileUpload[]) {
+    // TODO: [AUDIO]
+    return content.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
+      // console.log('fileList', fileList);
+      console.log('remainDay', remainDay);
+
+      const lastSlashIndex = url.lastIndexOf('/');
+      const fileUrl = url.substring(0, lastSlashIndex);
+      const filename = url.substring(lastSlashIndex + 1); // free
+      console.log('filename', filename);
+
+      const fileInfo = fileList?.find((ele) => ele.filename.includes(filename));
+      console.log('fileInfo', fileInfo);
+
+      const audioPay = fileInfo?.filenamePay || undefined; // pay
+      console.log('audioPay', audioPay);
+
+      // nếu file dạng miễn phí -> nghe file ( pay )
+      // nếu file dạng tính phí && user còn hạn gói nâng cấp -> ghe file ( pay )
+      // nếu file dạng tính phí && user hết hạn gói nâng cấp -> ghe file ( free )
+      const audioSrc = isFree == 'Y' ? `${fileUrl}/${audioPay}` : isFree == 'N' && remainDay <= 0 ? `${url}` : `${fileUrl}/${audioPay}`;
+      //  const audioSrc = remainDay <= 0 ? `${url}` : `${fileUrl}/${audioPay}`;
+
+      console.log('audioSrc', audioSrc);
+
+      return `[[audio-data=${audioSrc}]]`;
+    });
+  }
   async replyBaseOnUserPackage(contentHtml: string, isFree: string, userCode: string): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/replyBaseOnUserPackage`;
     // lấy thông tin gói của user
@@ -46,9 +75,12 @@ export class SearchService {
     if (isFree === 'Y') {
       // dữ liệu miễn phí → XÓA nút thanh toán
       content = content.replace(/\[\[payment\]\]/g, ``);
+      // TODO: [AUDIO]
+      content = this.handleAudio(content, remainDay, isFree, fileList);
     } else if (isFree === 'N') {
       // dữ liệu tính phí
       // TODO: [[payment]]
+
       if (remainDay > 0) {
         // người dùng đang xài gói nâng cấp và còn hạn → ẩn nút thanh toán
         content = content.replace(/\[\[payment\]\]/g, ``);
@@ -65,18 +97,7 @@ export class SearchService {
         }
       }
       // TODO: [AUDIO]
-      content = content.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
-        const lastSlashIndex = url.lastIndexOf('/');
-        const fileUrl = url.substring(0, lastSlashIndex);
-        const filename = url.substring(lastSlashIndex + 1);
-
-        const fileInfo = fileList?.find((ele) => ele.filename === filename);
-        const audioPay = fileInfo?.filenamePay || filename;
-
-        const audioSrc = remainDay <= 0 ? `${url}` : `${fileUrl}/${audioPay}`;
-
-        return `[[audio-data=${audioSrc}]]`;
-      });
+      content = this.handleAudio(content, remainDay, isFree, fileList);
     }
     return content;
   }
