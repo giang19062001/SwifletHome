@@ -1,5 +1,11 @@
 import { YnEnum } from "src/interfaces/admin.interface";
 
+export enum MediaBadgeEnum {
+  NORMAL = 'NORMAL',
+  NEW = 'NEW',
+}
+
+
 export interface IFileUpload {
   seq: number;
   filename: string;
@@ -29,6 +35,8 @@ export interface IFileMedia {
   size: number;
   mimetype: string;
   urlLink: string;
-  isFree: YnEnum;
+  isFree?: YnEnum;
+  isCoupleFree?: YnEnum;
+  badge:  MediaBadgeEnum;
   createdAt: Date;
 }

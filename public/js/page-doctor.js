@@ -88,7 +88,7 @@ async function openModal(doctorData) {
   const selectStatus = modalEl.querySelector('#status');
   selectStatus.innerHTML = '';
 
-  VARIABLE_ENUM.DOCTOR_STATUS.forEach((ele) => {
+  LIST_ENUM.DOCTOR_STATUS.forEach((ele) => {
     const option = document.createElement('option');
     option.value = ele.value;
     option.textContent = ele.text;
@@ -125,7 +125,7 @@ function renderAllDoctor(data, objElement) {
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td class="note"><p>${ele.note}</p></td>
-            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${VARIABLE_ENUM.DOCTOR_STATUS.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
+            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${LIST_ENUM.DOCTOR_STATUS.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-edit"  onclick="getDetailDoctor('${ele.seq}')">Chỉnh sửa</button>

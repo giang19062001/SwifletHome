@@ -1,111 +1,134 @@
 <!-- html -->
 <div id="page-media">
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <p class="title-page">
-                        <%= title %>
-                    </p>
-                </div>
-            </div>
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <p class="title-page"><%= title %></p>
         </div>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-4">
-            <div class="media-preview component-media-upload">
-                <p class="title">Danh sách Audio</p>
-                <div class="preview-box d-flex align-items-center justify-content-center gap-3">
-                    <label for="isUpgradePreview" class="form-check-label mb-0">
-                        Chế độ xem gói miễn phí
-                    </label>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      <div class="media-preview component-media-upload">
+        <p class="title">Danh sách Audio</p>
+        <div class="preview-box d-flex align-items-center justify-content-center gap-3">
+          <label for="isUpgradePreview" class="form-check-label mb-0"> Chế độ xem gói miễn phí </label>
 
-                    <div class="form-check form-switch m-0">
-                        <input class="form-check-input" type="checkbox" role="switch" id="isUpgradePreview">
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="isUpgradePreview" />
+          </div>
+
+          <label for="isUpgradePreview" class="form-check-label mb-0"> Chế độ xem gói nâng cấp </label>
+        </div>
+
+        <div class="file-box pt-2" id="file-audio-box"></div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="media-preview component-media-upload">
+        <p class="title">Danh sách Video</p>
+
+        <div class="file-box" id="file-video-box"></div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="media-preview component-media-upload">
+        <div class="space-box">
+          <div class="tab-content">
+            <ul class="nav nav-tabs justify-content-center mb-3" id="uploadTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="audio-tab" data-bs-toggle="tab" data-bs-target="#audio-tab-pane" type="button" role="tab">Tải audio</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video-tab-pane" type="button" role="tab">Thêm video</button>
+              </li>
+            </ul>
+
+            <!-- AUDIO TAB -->
+            <div class="tab-pane fade show active" id="audio-tab-pane" role="tabpanel">
+              <div class="audio-input-box d-flex">
+                <div class="container mt-3 mb-3">
+                  <div class="row align-items-center">
+                    <label class="col-auto form-label mb-0">Loại</label>
+
+                    <div class="col-auto">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="audioInputIsCoupleFree" id="free" value="Y" checked />
+                        <label class="form-check-label" for="free">Miễn phí</label>
+                      </div>
+
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="audioInputIsCoupleFree" id="pay" value="N" />
+                        <label class="form-check-label" for="pay">Tính phí</label>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+
+
+                  <div class="container mt-3">
+                    <div class="mb-3">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="audioInputbadge" />
+                        <label class="form-check-label" for="audioInputbadge"> Đánh dấu là <b class="txt-error">'Mới'</b></label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="container mt-3">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold">Tải audio demo</label>
+                      <input type="file" class="form-control" id="audioInputFree" accept=".mp3, audio/mpeg" />
                     </div>
 
-                    <label for="isUpgradePreview" class="form-check-label mb-0">
-                        Chế độ xem gói nâng cấp
-                    </label>
-                </div>
-
-
-                <div class="file-box" id="file-audio-box"></div>
-            </div>
-        </div>
-        <div class="col-4">
-            <div class="media-preview component-media-upload">
-                <p class="title">Danh sách Video</p>
-
-                <div class="file-box" id="file-video-box"></div>
-            </div>
-        </div>
-
-        <div class="col-4">
-            <div class="media-preview component-media-upload">
-                <div class="space-box">
-                    <div class="tab-content">
-                        <ul class="nav nav-tabs justify-content-center mb-3" id="uploadTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="audio-tab" data-bs-toggle="tab"
-                                    data-bs-target="#audio-tab-pane" type="button" role="tab">Tải audio</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="video-tab" data-bs-toggle="tab"
-                                    data-bs-target="#video-tab-pane" type="button" role="tab">Thêm video</button>
-                            </li>
-                        </ul>
-
-                        <!-- AUDIO TAB -->
-                        <div class="tab-pane fade show active" id="audio-tab-pane" role="tabpanel">
-                            <div class="audio-input-box d-flex">
-                                <div class="container mt-3">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">Tải audio demo</label>
-                                        <input type="file" class="form-control" id="audioInputFree"
-                                            accept=".mp3, audio/mpeg" />
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">Tải audio đầy đủ</label>
-                                        <input type="file" class="form-control" id="audioInputPay"
-                                            accept=".mp3, audio/mpeg" />
-                                    </div>
-                                </div>
-
-                                <div class="audio-btn-box">
-                                    <button id="audioAddBtn" class="btn-info">Xác nhận</button>
-                                    <button id="audioCancelBtn" class="btn-error">Hủy</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- VIDEO TAB -->
-                        <div class="tab-pane fade" id="video-tab-pane" role="tabpanel">
-                            <div class="video-input-box">
-                                <div class="container mt-3">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">Tên video</label>
-                                        <input type="text" class="form-control" id="videoInputName"
-                                            placeholder="Nhập tên video" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">YouTube</label>
-                                        <input type="text" class="form-control" id="videoInputUrl"
-                                            placeholder="Nhập link video (YouTube)" />
-                                    </div>
-
-                                    <div class="video-btn-box">
-                                        <button id="videoAddBtn" class="btn-info">Xác nhận</button>
-                                        <button id="videoCancelBtn" class="btn-error">Hủy</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold">Tải audio đầy đủ</label>
+                      <input type="file" class="form-control" id="audioInputPay" accept=".mp3, audio/mpeg" />
                     </div>
+                  </div>
+
+                  <div class="audio-btn-box">
+                    <button id="audioAddBtn" class="btn-info">Xác nhận</button>
+                    <button id="audioCancelBtn" class="btn-error">Hủy</button>
+                  </div>
                 </div>
+              </div>
+
+              <!-- VIDEO TAB -->
+              <div class="tab-pane fade" id="video-tab-pane" role="tabpanel">
+                <div class="video-input-box">
+                  <div class="container mt-3">
+                    <div class="mb-3">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="videoInputbadge" />
+                        <label class="form-check-label" for="videoInputbadge"> Đánh dấu là <b class="txt-error">'Mới'</b></label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="container mt-3">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold">Tên video</label>
+                      <input type="text" class="form-control" id="videoInputName" placeholder="Nhập tên video" />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold">YouTube</label>
+                      <input type="text" class="form-control" id="videoInputUrl" placeholder="Nhập link video (YouTube)" />
+                    </div>
+
+                    <div class="video-btn-box">
+                      <button id="videoAddBtn" class="btn-info">Xác nhận</button>
+                      <button id="videoCancelBtn" class="btn-error">Hủy</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+  <script src="/js/page-media.js"></script>
 </div>
-<script src="/js/page-media.js"></script>

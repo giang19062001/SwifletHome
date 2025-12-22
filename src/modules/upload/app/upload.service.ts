@@ -21,28 +21,50 @@ export class UploadAppService {
   async getAllMedia(dto: GetAllMediaDto, userCode: string): Promise<IListApp<IFileMedia>> {
     let list: IFileMedia[] = [];
     const userPackageInfo = await this.authAppService.getInfo(userCode);
-    // nếu đã nâng cấp gói hoặc chưa hết hạn -> có thể xem được audio ko miễn phí
-    // nếu chưa nâng cấp gói hoặc hết hạn -> chỉ xem được ~ audio miễn phí
 
-    const isFree = userPackageInfo?.packageCode && userPackageInfo.packageRemainDay > 0 ? YnEnum.N : YnEnum.Y;
-    // nếu đã nâng cấp gói hoặc chưa hết hạn -> có thể download audio
-    // nếu chưa nâng cấp gói hoặc hết hạn -> ko  thể download audio
-    const isCanBeDownload = userPackageInfo?.packageCode && userPackageInfo.packageRemainDay > 0 ? YnEnum.Y : YnEnum.N;
+    const isUpgrade = userPackageInfo?.packageCode && userPackageInfo.packageRemainDay > 0 ? 'UPGRADE' : 'NOT_UPGRADE';
+    console.log("isUpgrade --->", isUpgrade);
     if (dto.mediaType == 'AUDIO') {
-      list = await this.uploadAppRepository.getAllMediaAudio(dto, isFree);
-      list = list.map((ele) => {
-        return { ...ele, isCanBeDownload: isCanBeDownload };
-      });
+      const audioList = await this.uploadAppRepository.getAllMediaAudio(dto);
+      for (const file of audioList) {
+        // user đã cập nhập gói
+        if (isUpgrade === 'UPGRADE') {
+          // -> hiện file full
+          if (file.isFree === 'Y') {
+            list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "Y"})); // BỎ  isCoupleFree
+          }
+        }
+        // user chưa  cập nhập gói
+        else if (isUpgrade === 'NOT_UPGRADE') {
+          //  files là miễn phí
+          if (file.isCoupleFree == 'Y') {
+            if (file.isFree == 'N') {
+              // -> hiện file full
+              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "Y"}));  // BỎ  isCoupleFree
+            }
+          }
+          //  files là tính phí
+          else if (file.isCoupleFree == 'N') {
+            if (file.isFree == 'Y') {
+              // -> hiện file demo
+              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "N"}));  // BỎ  isCoupleFree
+            }
+          }
+        }
+      }
     }
     if (dto.mediaType == 'VIDEO') {
       list = await this.uploadAppRepository.getAllMediaVideo(dto);
-      list = list.map((ele) => {
-        return { ...ele, isCanBeDownload: 'N' }; // chỉ audio có chức năng download
+      list = list.map((file) => {
+        return { ...file, isCanBeDownload: 'N' }; // chỉ audio có chức năng download
       });
     }
-    const total = await this.uploadAppRepository.getTotalMedia(dto.mediaType, isFree);
+    const total = await this.uploadAppRepository.getTotalMedia(dto.mediaType);
 
-    return { total, list };
+    return {
+      total: total > 0 && dto.mediaType === 'AUDIO' ? total / 2 : total,
+      list,
+    };
   }
   //*upload-editor
   async getAllAudioFile(): Promise<IFileUpload[]> {

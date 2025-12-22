@@ -101,7 +101,8 @@
       gap: 14px;
       transition: transform 0.2s;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
+      z-index: 1;
       .file-icon {
         flex-shrink: 0;
         width: 48px;
@@ -116,6 +117,37 @@
           stroke-width: 1.5;
         }
       }
+      .file-badges {
+        position: absolute;
+        top: -5px;
+        left: 0px;
+        z-index: 10;
+        display: flex;
+        gap: 6px;
+        .file-badge {
+          color: #fff;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 3px 8px;
+          border-radius: 999px;
+          line-height: 1;
+          text-transform: uppercase;
+          white-space: nowrap;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        .badge-new {
+          background: #fa8c16;
+        }
+
+        .badge-free {
+          background: #52c41a;
+        }
+
+        .badge-pay {
+          background: #ff4d4f;
+        }
+      }
+
       .file-info {
         display: flex;
         flex-direction: column;

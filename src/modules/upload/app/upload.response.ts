@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MediaBadgeEnum } from '../upload.interface';
 
 export class GetAllMediaResDto {
   @ApiProperty({ example: 1 })
@@ -22,8 +23,11 @@ export class GetAllMediaResDto {
   @ApiProperty({ example: '' })
   urlLink: string;
 
-  @ApiProperty({ example: 'Y' })
-  isFree: string;
+  // @ApiProperty({ example: 'Y' })
+  // isFree: string;
+
+  @ApiProperty({ example: MediaBadgeEnum.NORMAL })
+  badge: MediaBadgeEnum;
 
   @ApiProperty({ example: 'N' })
   isCanBeDownload: string;

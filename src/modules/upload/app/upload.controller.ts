@@ -7,11 +7,11 @@ import { UploadAppService } from './upload.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto } from 'src/dto/common.dto';
-import { GetAllMediaResDto } from './upload.responst';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { IListApp } from 'src/interfaces/app.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { GetAllMediaDto } from './upload.dto';
+import { GetAllMediaResDto } from './upload.response';
 
 
 @ApiTags('app/upload')
@@ -30,7 +30,8 @@ export class UploadAppController {
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetAllMediaResDto)),
        description: `
-**MediaType: enum('AUDIO','VIDEO')**` })
+**MediaType: enum('AUDIO','VIDEO')**\n
+**badge: enum('NEW','NORMAL')**` })
     async getAllMedia(@Body() dto: GetAllMediaDto, @GetUserApp() user: authInterface.ITokenUserApp,): Promise<IListApp<IFileMedia>> {
       const result = await this.uploadAppService.getAllMedia(dto, user.userCode);
       return result;

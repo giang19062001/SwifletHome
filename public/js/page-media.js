@@ -3,6 +3,8 @@ let fileMediaAudioList = [];
 const audioInputBox = document.querySelector('.audio-input-box');
 const audioInputFree = document.getElementById('audioInputFree');
 const audioInputPay = document.getElementById('audioInputPay');
+const audioInputIsCoupleFree = document.querySelectorAll('input[name="audioInputIsCoupleFree"]'); // array nodes radio
+const audioInputBadge = document.getElementById('audioInputbadge');
 const audioCancelBtn = document.getElementById('audioCancelBtn');
 const audioAddBtn = document.getElementById('audioAddBtn');
 
@@ -10,6 +12,7 @@ const audioAddBtn = document.getElementById('audioAddBtn');
 const videoInputBox = document.querySelector('.video-input-box');
 const videoInputName = document.getElementById('videoInputName');
 const videoInputUrl = document.getElementById('videoInputUrl');
+const videoInputbadge = document.getElementById('videoInputbadge');
 const videoCancelBtn = document.getElementById('videoCancelBtn');
 // TODO: FUNC
 document.getElementById('isUpgradePreview').addEventListener('change', (event) => {
@@ -17,38 +20,77 @@ document.getElementById('isUpgradePreview').addEventListener('change', (event) =
 
   renderAllFile(fileMediaAudioList, objElement);
 });
+const resetInputs = (...inputs) => {
+  inputs.forEach((item) => {
+    if (!item) return;
 
-const resetInputs = (...inputs) => inputs.forEach((el) => (el.value = ''));
+    // Nếu là NodeList hoặc Array - > duyệt từng element
+    if (item instanceof NodeList || Array.isArray(item)) {
+      item.forEach((el) => resetInputs(el));
+      return;
+    }
+
+    const el = item;
+
+    // RADIO
+    if (el.type === 'radio') {
+      if (el.name === 'audioInputIsCoupleFree') {
+        el.checked = el.value === 'Y'; // xứ lí riêng cho audioInputIsCoupleFree
+      } else {
+        el.checked = false;
+      }
+      return;
+    }
+
+    // CHECKBOX
+    if (el.type === 'checkbox') {
+      el.checked = false;
+      return;
+    }
+
+    // SELECT
+    if (el.type === 'select-one' || el.type === 'select-multiple') {
+      el.selectedIndex = 0;
+      return;
+    }
+
+    // INPUT THƯỜNG
+    el.value = '';
+  });
+};
 
 // Event: audio
 audioCancelBtn.addEventListener('click', () => {
-  resetInputs(audioInputFree, audioInputPay);
+  resetInputs(audioInputFree, audioInputPay, audioInputBadge, audioInputIsCoupleFree);
 });
 
 // Event: video
 videoCancelBtn.addEventListener('click', () => {
-  resetInputs(videoInputName, videoInputUrl);
+  resetInputs(videoInputName, videoInputUrl, videoInputbadge);
 });
 
 // Push: audio
 audioAddBtn.addEventListener('click', async () => {
   const freeFile = audioInputFree.files[0];
   const payFile = audioInputPay.files[0];
-
+  const badge = audioInputBadge.checked ? VARIABLE_ENUM.MEDIA_BADGE.NEW : VARIABLE_ENUM.MEDIA_BADGE.NORMAL;
+  const isCoupleFree = document.querySelector('input[name="audioInputIsCoupleFree"]:checked')?.value;
   if (!freeFile || !payFile) {
     toastErr('Vui lòng chọn cả hai file audio!');
     return;
   }
-  await uploadMediaAudios(freeFile, payFile);
+  await uploadMediaAudios(freeFile, payFile, isCoupleFree, badge);
 
   //reset
-  resetInputs(audioInputFree, audioInputPay);
+  resetInputs(audioInputFree, audioInputPay, audioInputBadge, audioInputIsCoupleFree);
 });
 
 // Push: video
 videoAddBtn.addEventListener('click', async () => {
   const url = videoInputUrl.value.trim();
   const name = videoInputName.value.trim();
+  const badge = videoInputbadge.checked ? VARIABLE_ENUM.MEDIA_BADGE.NEW : VARIABLE_ENUM.MEDIA_BADGE.NORMAL;
+
   if (!name) {
     toastErr('Vui lòng nhập tên video!');
     return;
@@ -58,10 +100,10 @@ videoAddBtn.addEventListener('click', async () => {
     return;
   }
 
-  await uploadMediaVideoLink(name, url);
+  await uploadMediaVideoLink(name, url, badge);
 
   //reset
-  resetInputs(videoInputName, videoInputUrl);
+  resetInputs(videoInputName, videoInputUrl, videoInputbadge);
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -120,11 +162,25 @@ const renderAllFile = (data, objElement) => {
   };
 
   const createFileCard = (container, fileData) => {
+    console.log('fileData', fileData);
     const card = document.createElement('div');
     card.className = `file-card`;
 
     card.innerHTML = `
     <div class="file-icon">${fileData.icon}</div>
+    <div class="file-badges">
+      ${fileData.badge === VARIABLE_ENUM.MEDIA_BADGE.NEW ? `<div class="file-badge badge-new">Mới</div>` : ''}
+
+      ${
+        fileData.mimetype !== 'video/youtube'
+          ? `    <div class="file-badge ${fileData.isCoupleFree === 'Y' ? 'badge-free' : 'badge-pay'}">
+        ${fileData.isCoupleFree === 'Y' ? 'Miễn phí' : 'Tính phí'}
+      </div>`
+          : ''
+      }
+  
+    </div>
+
     <div class="file-info">
       <div class="file-name">${fileData.name}</div>
       ${fileData.date ? `<div class="file-meta"><span class="file-date">${fileData.date}</span></div>` : ``}
@@ -143,6 +199,7 @@ const renderAllFile = (data, objElement) => {
   // card for each file
   data.forEach((file) => {
     if (file.mimetype === 'video/youtube' && file.urlLink) {
+      // video
       createFileCard(objElement, {
         icon: `
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f75270" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -154,41 +211,73 @@ const renderAllFile = (data, objElement) => {
         name: file.originalname,
         filename: file.urlLink,
         mimetype: file.mimetype,
+        badge: file.badge,
       });
     } else {
       // audio
       const isUpgradePreview = document.getElementById('isUpgradePreview').checked ? 'UPGRADE' : 'NOT_UPGRADE';
 
-      if (isUpgradePreview === 'UPGRADE' && file.isFree == 'N') {
-        const iconSvg = getFileIcon(file.mimetype);
-        createFileCard(objElement, {
-          icon: iconSvg,
-          seq: file.seq,
-          name: file.originalname,
-          filename: file.filename,
-          mimetype: file.mimetype,
-          date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
-        });
-      }
-      if (isUpgradePreview === 'NOT_UPGRADE' && file.isFree == 'Y') {
-        const iconSvg = getFileIcon(file.mimetype);
-        createFileCard(objElement, {
-          icon: iconSvg,
-          seq: file.seq,
-          name: file.originalname,
-          filename: file.filename,
-          mimetype: file.mimetype,
-          date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
-        });
+      // user đã cập nhập gói
+      if (isUpgradePreview === 'UPGRADE') {
+        if (file.isFree == 'N') {
+          // -> hiện file full
+          const iconSvg = getFileIcon(file.mimetype);
+          createFileCard(objElement, {
+            icon: iconSvg,
+            seq: file.seq,
+            name: file.originalname,
+            filename: file.filename,
+            mimetype: file.mimetype,
+            badge: file.badge,
+            isCoupleFree: file.isCoupleFree,
+            date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
+          });
+        }
+        // user chưa  cập nhập gói
+      } else if (isUpgradePreview === 'NOT_UPGRADE') {
+        //  files là miễn phí
+        if (file.isCoupleFree == 'Y') {
+          if (file.isFree == 'N') {
+            // -> hiện file full
+            const iconSvg = getFileIcon(file.mimetype);
+            createFileCard(objElement, {
+              icon: iconSvg,
+              seq: file.seq,
+              name: file.originalname,
+              filename: file.filename,
+              mimetype: file.mimetype,
+              badge: file.badge,
+              isCoupleFree: file.isCoupleFree,
+              date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
+            });
+          }
+          //  files là tính phí
+        } else if (file.isCoupleFree == 'N') {
+          if (file.isFree == 'Y') {
+            // -> hiện file demo
+            const iconSvg = getFileIcon(file.mimetype);
+            createFileCard(objElement, {
+              icon: iconSvg,
+              seq: file.seq,
+              name: file.originalname,
+              filename: file.filename,
+              mimetype: file.mimetype,
+              badge: file.badge,
+              isCoupleFree: file.isCoupleFree,
+              date: new Date(file.createdAt).toLocaleDateString('vi-VN'),
+            });
+          }
+        }
       }
     }
   });
 };
 // TODO:API
 
-async function uploadMediaAudios(freeFile, payFile) {
-  // Tạo FormData
+async function uploadMediaAudios(freeFile, payFile, isCoupleFree, badge) {
   const formData = new FormData();
+  formData.append('isCoupleFree', isCoupleFree);
+  formData.append('badge', badge);
   formData.append('mediaAudioFree', freeFile);
   formData.append('mediaAudioPay', payFile);
 
@@ -207,7 +296,7 @@ async function uploadMediaAudios(freeFile, payFile) {
       getAllMediaAudioFile();
 
       // clear input
-      resetInputs(audioInputFree, audioInputPay);
+      resetInputs(audioInputFree, audioInputPay, audioInputBadge, audioInputIsCoupleFree);
     } else {
       toastErr('Thêm file thất bại');
     }
@@ -218,7 +307,7 @@ async function uploadMediaAudios(freeFile, payFile) {
     }
   }
 }
-async function uploadMediaVideoLink(name, url) {
+async function uploadMediaVideoLink(name, url, badge) {
   try {
     await axios
       .post(
@@ -226,6 +315,7 @@ async function uploadMediaVideoLink(name, url) {
         {
           originalname: name,
           urlLink: url,
+          badge: badge,
         },
         axiosAuth(),
       )
@@ -238,7 +328,7 @@ async function uploadMediaVideoLink(name, url) {
           getAllMediaVideoLink();
 
           // clear input
-          resetInputs(videoInputUrl);
+          resetInputs(videoInputName, videoInputUrl, videoInputbadge);
         } else {
           toastErr('Thêm thất bại');
         }

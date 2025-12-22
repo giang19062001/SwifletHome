@@ -25,21 +25,22 @@ export class UploadAppRepository {
     return rows as IFileUpload[];
   }
   //* media
-  async getTotalMedia(mediaType: MediaTypeEnum, isFree: YnEnum): Promise<number> {
+  async getTotalMedia(mediaType: MediaTypeEnum): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT COUNT(A.seq) AS TOTAL FROM ${mediaType === 'AUDIO' ? this.tableMediaAudio : this.tableMediaVideo} A
-      WHERE A.isActive = 'Y' ${mediaType === 'AUDIO' ? ' AND A.isFree = ? ': ''} `,
-      mediaType === 'AUDIO' ? [isFree] : [],
+      WHERE A.isActive = 'Y'`,
+       [],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllMediaAudio(dto: GetAllMediaDto, isFree: YnEnum): Promise<IFileMedia[]> {
-    let query = ` SELECT A.seq,  A.filename, A.originalname, A.size, A.mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, '' as urlLink, A.isFree
+  async getAllMediaAudio(dto: GetAllMediaDto): Promise<IFileMedia[]> {
+    let query = ` SELECT A.seq,  A.filename, A.originalname, A.size, A.mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, '' as urlLink, A.isFree,
+    A.isCoupleFree, A.badge
         FROM ${this.tableMediaAudio} A
-        WHERE A.isActive = 'Y' AND isFree = ?
+        WHERE A.isActive = 'Y'
    `;
 
-    let params: any[] = [isFree];
+    let params: any[] = [];
 
     // paging
     if (dto.limit > 0 && dto.page > 0) {
@@ -52,7 +53,7 @@ export class UploadAppRepository {
   }
 
   async getAllMediaVideo(dto: GetAllMediaDto): Promise<IFileMedia[]> {
-    let query = ` SELECT A.seq, '' as filename,  A.originalname, 0 as size, 'video/youtube' as mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, A.urlLink, 'Y' as isFree
+    let query = ` SELECT A.seq, '' as filename,  A.originalname, 0 as size, 'video/youtube' as mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, A.urlLink, A.badge
         FROM ${this.tableMediaVideo} A
         WHERE A.isActive = 'Y'
          `;

@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { MediaBadgeEnum } from '../upload.interface';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class UploadVideoLinkDto {
   @ApiProperty({
@@ -24,6 +26,15 @@ export class UploadMediaVideoLinkDto {
   @IsString()
   @IsNotEmpty()
   urlLink: string;
+
+  @ApiProperty({
+    example: MediaBadgeEnum.NORMAL,
+    enum: MediaBadgeEnum,
+    nullable: true,
+    required: false,
+  })
+  @IsEnum(MediaBadgeEnum)
+  badge: MediaBadgeEnum;
 }
 
 export class UploadImgFileDto {
@@ -60,4 +71,22 @@ export class UploadMediaAudioFilesDto {
     format: 'binary',
   })
   mediaAudioPay: any;
+
+  @ApiProperty({
+    example: MediaBadgeEnum.NORMAL,
+    enum: MediaBadgeEnum,
+    nullable: true,
+    required: false,
+  })
+  @IsEnum(MediaBadgeEnum)
+  badge: MediaBadgeEnum;
+
+  @ApiProperty({
+    example: YnEnum.Y,
+    enum: YnEnum,
+    nullable: true,
+    required: false,
+  })
+  @IsEnum(YnEnum)
+  isCoupleFree: YnEnum;
 }

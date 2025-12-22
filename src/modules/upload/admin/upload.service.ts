@@ -2,9 +2,9 @@ import { Injectable, BadRequestException, InternalServerErrorException, NotFound
 import { existsSync, mkdirSync, unlinkSync } from 'fs';
 import { promises as fs } from 'fs';
 import { UploadAdminRepository } from './upload.repository';
-import { IAudioFreePay, IFileUpload } from '../upload.interface';
+import { IAudioFreePay, IFileMedia, IFileUpload } from '../upload.interface';
 import * as path from 'path';
-import { UploadAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
+import { UploadAudioFilesDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
 import { sortByDate } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
@@ -60,10 +60,10 @@ export class UploadAdminService {
     }
   }
 
-  async uploadMediaAudioPay(file: Express.Multer.File, createdId: string): Promise<number> {
+  async uploadMediaAudioPay(file: Express.Multer.File, createdId: string, dto: UploadMediaAudioFilesDto): Promise<number> {
     try {
       const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
-      const result = await this.uploadAdminRepository.uploadMediaAudioPay(file, filenamePath, createdId);
+      const result = await this.uploadAdminRepository.uploadMediaAudioPay(file, filenamePath, createdId, dto);
       return result;
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -72,10 +72,10 @@ export class UploadAdminService {
       throw new InternalServerErrorException(Msg.FileUploadFail);
     }
   }
-  async uploadMediaAudioFree(file: Express.Multer.File, createdId: string, seqPay: number): Promise<number> {
+  async uploadMediaAudioFree(file: Express.Multer.File, createdId: string, dto: UploadMediaAudioFilesDto, seqPay: number): Promise<number> {
     try {
       const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
-      const result = await this.uploadAdminRepository.uploadMediaAudioFree(file, filenamePath, createdId, seqPay);
+      const result = await this.uploadAdminRepository.uploadMediaAudioFree(file, filenamePath, createdId, dto, seqPay);
       return result;
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -105,12 +105,12 @@ export class UploadAdminService {
     const videos = await this.uploadAdminRepository.getAllVideoLink();
     return sortByDate('createdAt', [...files, ...audios, ...videos]);
   }
-  async getAllMediaAudioFile(): Promise<IFileUpload[]> {
+  async getAllMediaAudioFile(): Promise<IFileMedia[]> {
     const audios = await this.uploadAdminRepository.getAllMediaAudioFile();
     return sortByDate('createdAt', [...audios]);
   }
 
-  async getAllMediaVideoLink(): Promise<IFileUpload[]> {
+  async getAllMediaVideoLink(): Promise<IFileMedia[]> {
     const videos = await this.uploadAdminRepository.getAllMediaVideoLink();
     return sortByDate('createdAt', [...videos]);
   }

@@ -2,7 +2,7 @@ import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException, G
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UploadAudioFilesDto, UploadImgFileDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
-import { IAudioFreePay, IFileUpload } from '../upload.interface';
+import { IAudioFreePay, IFileMedia, IFileUpload } from '../upload.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { multerAudioConfig, multerImgConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
@@ -91,11 +91,10 @@ export class UploadAdminController {
     if (!files.mediaAudioFree || !files.mediaAudioPay) {
       throw new BadRequestException(Msg.FileAudioRequire);
     }
-
     try {
-      const seqPay = await this.uploadAdminService.uploadMediaAudioPay(files.mediaAudioPay[0], admin.userId);
+      const seqPay = await this.uploadAdminService.uploadMediaAudioPay(files.mediaAudioPay[0], admin.userId, dto);
       if (seqPay) {
-        await this.uploadAdminService.uploadMediaAudioFree(files.mediaAudioFree[0], admin.userId, seqPay);
+        await this.uploadAdminService.uploadMediaAudioFree(files.mediaAudioFree[0], admin.userId, dto, seqPay);
       }
       return 1;
     } catch (error) {
@@ -134,14 +133,14 @@ export class UploadAdminController {
 
   @Get('getAllMediaAudioFile')
   @HttpCode(HttpStatus.OK)
-  async getAllMediaAudioFile(): Promise<IFileUpload[]> {
+  async getAllMediaAudioFile(): Promise<IFileMedia[]> {
     const result = await this.uploadAdminService.getAllMediaAudioFile();
     return result;
   }
 
   @Get('getAllMediaVideoLink')
   @HttpCode(HttpStatus.OK)
-  async getAllMediaVideoLink(): Promise<IFileUpload[]> {
+  async getAllMediaVideoLink(): Promise<IFileMedia[]> {
     const result = await this.uploadAdminService.getAllMediaVideoLink();
     return result;
   }

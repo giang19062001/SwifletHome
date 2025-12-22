@@ -691,6 +691,7 @@ CREATE TABLE
     `originalname` text NULL,
     `urlLink` varchar(255) NOT NULL,
     `isActive` char(1) DEFAULT 'Y',
+    `badge` ENUM('NEW') DEFAULT 'NORMAL'
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
@@ -710,6 +711,8 @@ CREATE TABLE
     `mimetype` varchar(45) NOT NULL,
     `isActive` char(1) DEFAULT 'Y',
     `isFree` char(1) DEFAULT 'Y',
+    `isCoupleFree` char(1) DEFAULT 'Y',
+    `badge` ENUM('NEW') DEFAULT 'NORMAL',
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` datetime DEFAULT NULL,
     `createdId` varchar(45) DEFAULT 'SYSTEM',
