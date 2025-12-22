@@ -18,6 +18,10 @@ function getShortTextFromHtml(html) {
   const text = tempDiv.textContent || tempDiv.innerText || '';
   return text.slice(0, 50);
 }
+function getShortText(text) {
+  return text.slice(0, 50);
+}
+
 
 async function ChangeUrlToFile(filename) {
   try {

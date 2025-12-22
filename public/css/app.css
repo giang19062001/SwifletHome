@@ -18817,6 +18817,10 @@ select {
   border-radius: 15px;
 }
 
+#page-question .question-content {
+  max-width: 400px;
+}
+
 #page-home-sale .home-img {
   width: 150px;
   height: 120px;
@@ -19079,6 +19083,10 @@ select {
   width: 250px;
   height: 150px;
   border-radius: 5px;
+}
+
+#page-doctor .note {
+  max-width: 400px;
 }
 
 .page-main .content-area {

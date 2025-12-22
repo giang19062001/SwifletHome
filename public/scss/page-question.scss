@@ -1,5 +1,10 @@
 .question-update-modal {
-    #answerDetailLink{
-        border-radius: 15px;
-    }
+  #answerDetailLink {
+    border-radius: 15px;
+  }
+}
+#page-question {
+  .question-content {
+    max-width: 400px;
+  }
 }

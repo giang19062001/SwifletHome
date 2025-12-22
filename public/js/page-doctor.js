@@ -124,7 +124,7 @@ function renderAllDoctor(data, objElement) {
             <td><p>${page * i++}</p></td>
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
-            <td><p>${ele.note}</p></td>
+            <td class="note"><p>${ele.note}</p></td>
             <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${VARIABLE_ENUM.DOCTOR_STATUS.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
