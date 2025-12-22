@@ -281,32 +281,33 @@ async function uploadMediaAudios(freeFile, payFile, isCoupleFree, badge) {
   formData.append('mediaAudioFree', freeFile);
   formData.append('mediaAudioPay', payFile);
 
-  try {
-    const response = await axios.post(
-      '/api/admin/upload/uploadMediaAudios',
-      formData,
-      axiosAuth({
-        'Content-Type': 'multipart/form-data',
+  await loaderApiCall(
+    axios
+      .post(
+        '/api/admin/upload/uploadMediaAudios',
+        formData,
+        axiosAuth({
+          'Content-Type': 'multipart/form-data',
+        }),
+      )
+      .then(function (response) {
+        if (response.data) {
+          toastOk('Thêm file thành công');
+          getAllMediaAudioFile();
+
+          // clear input
+          resetInputs(audioInputFree, audioInputPay, audioInputBadge, audioInputIsCoupleFree);
+        } else {
+          toastErr('Thêm file thất bại');
+        }
+      })
+      .catch(function (error) {
+        console.error('Upload error:', error?.response);
+        toastErr(error?.response?.data?.message || 'Upload thất bại');
       }),
-    );
-
-    if (response.data) {
-      // reload file list
-      toastOk('Thêm file thành công');
-      getAllMediaAudioFile();
-
-      // clear input
-      resetInputs(audioInputFree, audioInputPay, audioInputBadge, audioInputIsCoupleFree);
-    } else {
-      toastErr('Thêm file thất bại');
-    }
-  } catch (error) {
-    console.error('Upload error:', error.response.data);
-    if (error.response.data) {
-      toastErr(error.response.data.message);
-    }
-  }
+  );
 }
+
 async function uploadMediaVideoLink(name, url, badge) {
   try {
     await axios
