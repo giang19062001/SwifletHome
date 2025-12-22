@@ -209,6 +209,7 @@ export class FirebaseService implements OnModuleInit {
     const userCodes = userDeviceTokens.map((ele) => ele.userCode);
 
     console.log('tokens --> ', tokens);
+    console.log('userCodes --> ', userCodes);
 
     if (tokens.length === 0) return 0;
 

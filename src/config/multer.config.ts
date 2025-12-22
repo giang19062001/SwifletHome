@@ -65,7 +65,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
 
 export const createMulterConfig = (allowedExts: string[], customLimits?: MulterLimits) => {
   const defaultLimits: MulterLimits = {
-    fileSize: 10 * 1024 * 1024, // 10MB mặc định
+    fileSize: 50 * 1024 * 1024, // 50MB mặc định
     files: undefined, // không giới hạn nếu không truyền
   };
 
@@ -100,11 +100,11 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
 };
 
 export const multerImgConfig = createMulterConfig(IMG_TYPES, {
-  fileSize: 5 * 1024 * 1024, // 5MB cho ảnh
+  fileSize: 50 * 1024 * 1024, // 50MB cho ảnh
 });
 
 export const multerAudioConfig = createMulterConfig(AUDIO_TYPES, {
-  fileSize: 15 * 1024 * 1024, // 15MB cho audio
+  fileSize: 50 * 1024 * 1024, // 50MB cho audio
 });
 
 export const multerVideoConfig = createMulterConfig(VIDEO_TYPES, {
