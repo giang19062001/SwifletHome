@@ -26,3 +26,7 @@ export function sortByDate<T>(
     return dateA - dateB;
   });
 }
+
+export function formatPrice(price: string | number){
+  return Number(price).toLocaleString('vi-VN')
+}

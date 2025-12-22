@@ -34,7 +34,7 @@ export class ScreenAppService {
             let packages: string[] = [];
             if (packageList.length) {
               for (const pack of packageList) {
-                const text = `Gói trả phí ${pack.packageDescription} ${pack.packageName}: ${pack.packagePrice}đ ${pack.packageItemSamePrice ? '/ ' + pack.packageItemSamePrice : ''} `;
+                const text = `${pack.packageName}: ${pack.packagePrice}đ ${pack.packageItemSamePrice ? '/ ' + pack.packageItemSamePrice : ''} `;
                 packages.push(text);
               }
             }

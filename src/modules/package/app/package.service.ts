@@ -4,6 +4,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { PackageAppRepository } from './package.repository';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IPackage } from '../package.interface';
+import { formatPrice } from 'src/helpers/func.helper';
 
 @Injectable()
 export class PackageAppService {
@@ -15,6 +16,13 @@ export class PackageAppService {
   ) {}
 
   async getAll(dto: PagingDto): Promise<IPackage[]> {
-    return await this.packageAppRepository.getAll(dto);
+    const list = await this.packageAppRepository.getAll(dto);
+
+    const result = list.map((item) => ({
+      ...item,
+      packagePrice: formatPrice(item.packagePrice), // chuyên sang tiền việt
+    }));
+
+    return result;
   }
 }
