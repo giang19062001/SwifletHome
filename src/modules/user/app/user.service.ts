@@ -5,6 +5,7 @@ import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
+import { TEXTS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class UserAppService {
@@ -20,7 +21,13 @@ export class UserAppService {
   }
 
   async getInfo(userCode: string): Promise<IUserApp | null> {
-    return await this.userAppRepository.getInfo(userCode);
+    const info = await this.userAppRepository.getInfo(userCode);
+    if (info?.packageCode && info.packageRemainDay <= 0) {
+      // gói hết hạn -> cho 'packageCode' là null
+      return { ...info, packageCode: null, packageName: TEXTS.PACKAGE_FREE, packageDescription:"", startDate: null, endDate: null };
+    } else {
+      return info;
+    }
   }
 
   async register(dto: RegisterUserAppDto): Promise<ITokenUserApp | null> {

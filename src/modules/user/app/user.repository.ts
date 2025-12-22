@@ -6,7 +6,7 @@ import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserPackageApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
-import { CODES } from 'src/helpers/const.helper';
+import { CODES, TEXTS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class UserAppRepository {
@@ -28,7 +28,7 @@ export class UserAppRepository {
   }
   async getUserPackageInfo(userCode: string): Promise<IUserPackageApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
+      ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
       FROM ${this.table} A 
       LEFT JOIN ${this.tablePackage} B
@@ -44,7 +44,7 @@ export class UserAppRepository {
   async getInfo(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
-      B.packageCode, IFNULL(C.packageName,'Gói dùng thử') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
+      B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,  B.startDate, B.endDate,  
       COUNT(D.seq) AS homesTotal
       FROM ${this.table} A 

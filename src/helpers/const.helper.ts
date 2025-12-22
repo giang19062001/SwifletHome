@@ -1,6 +1,9 @@
 import { CookieOptions } from 'express';
 import { IPackage } from 'src/modules/package/package.interface';
 
+export const TEXTS = {
+  PACKAGE_FREE : "Gói dùng thử"
+}
 export const AUTH_CONFIG = {
   TOKEN_NAME: 'swf-token',
   EXPIRED_ADMIN: '1d' as const,
