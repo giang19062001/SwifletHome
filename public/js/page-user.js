@@ -2,19 +2,54 @@ let page = 1;
 let limit = 10;
 const pageElement = 'page-user';
 let packages = [];
-
+let filterValueDefault = {
+  userName: '',
+  userPhone: '',
+  userPackageFilter: 'ALL',
+};
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllPackage(0, 0);
-  getAllUser(page, limit);
+  //refresh
+  refreshPage(filterValueDefault);
 });
 
+// FILTER
+document.getElementById('btn-filter-reset').addEventListener('click', () => {
+  document.getElementById('userName').value = '';
+  document.getElementById('userPhone').value = '';
+  document.querySelector('input[name="userPackageFilter"][value="ALL"]').checked = true;
+
+  //refresh
+  refreshPage(filterValueDefault);
+});
+
+document.getElementById('btn-filter-apply').addEventListener('click', () => {
+  const filterValue = getFilterValue();
+
+  //refresh
+  refreshPage(filterValue);
+});
 // TODO: FUNC
+function refreshPage(filterValue) {
+  //refresh
+  page = 1;
+  getAllUser(page, limit, filterValue);
+}
+
+function getFilterValue() {
+  const userName = document.getElementById('userName').value;
+  const userPhone = document.getElementById('userPhone').value;
+  const userPackageFilter = document.querySelector('input[name="userPackageFilter"]:checked').value;
+  return { userName, userPhone, userPackageFilter };
+}
 
 function changePage(p) {
   page = p;
   document.getElementById('privacy-main-pager').innerHTML = '';
-  getAllUser(page, limit);
+  //refresh
+  const filterValue = getFilterValue();
+  getAllUser(page, limit, filterValue);
 }
 
 function closeModal(type) {
@@ -87,7 +122,7 @@ function renderAllUser(data, objElement) {
             <td><p>${ele.startDate ? formatDateTime(ele.startDate) : ''}</p></td>
             <td><p>${ele.endDate ? formatDateTime(ele.endDate) : ''}</p></td>
             <td>
-              <p class="txt-not-ok">${ele.packageRemainDay ?  ele.packageRemainDay + ' ngày' : ""}</p>
+              <p class="txt-not-ok">${ele.packageRemainDay ? ele.packageRemainDay + ' ngày' : ''}</p>
             </td>
             <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
@@ -154,7 +189,7 @@ async function getHomesOfUser(userCode) {
     });
 }
 
-async function getAllUser(currentPage, limit) {
+async function getAllUser(currentPage, limit, filterValue) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
   showSkeleton(objElement, limit, 8);
@@ -166,6 +201,7 @@ async function getAllUser(currentPage, limit) {
         page: currentPage,
         limit: limit,
         type: 'APP',
+        ...filterValue,
       },
       axiosAuth(),
     )
@@ -229,9 +265,10 @@ async function updatePackage(btn, userInfo) {
           toastOk('Chỉnh sửa thành công');
           // đóng modal
           closeModal('update');
-          // refresh list
-          page = 1;
-          getAllUser(page, limit);
+
+          // refresh data
+          const filterValue = getFilterValue();
+          refreshPage(filterValue);
         } else {
           toastErr('Chỉnh sửa thất bại');
         }

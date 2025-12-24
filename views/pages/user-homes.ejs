@@ -8,12 +8,10 @@
                      <p class="title-page mb-0">
                         <%= title %>
                      </p>
-
-                     <!-- Nút mở filter -->
-                     <button id="btnFilterToggle" class="btn btn-outline-primary btn-sm" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                     <button id="btn-filter-toggle" class="btn btn-outline-primary btn-sm" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#filter-collapse">
                         <span id="filterIcon">
-                           <i class="fa fa-chevron-down"></i>
+                           <i class="fa fa-chevron-up"></i>
                         </span>
                      </button>
 
@@ -24,7 +22,7 @@
       </div>
 
       <!-- COLLAPSE -->
-      <div class="collapse mb-3" id="filterCollapse">
+      <div class="collapse show  mb-3" id="filter-collapse">
          <div class="card py-3">
             <div class="card-body">
                <div class="row g-3 align-items-end">
@@ -50,8 +48,8 @@
                      </select>
                   </div>
                   <div class="col-md-3 d-flex align-items-end justify-content-end gap-2">
-                     <button class="btn btn-secondary " id="btnFilterReset">Làm mới</button>
-                     <button class="btn btn-primary" id="btnFilterApply">Lọc dữ liệu</button>
+                     <button class="btn-sub" id="btn-filter-reset">Làm mới</button>
+                     <button class="btn-info" id="btn-filter-apply">Tìm kiếm</button>
                   </div>
 
                </div>

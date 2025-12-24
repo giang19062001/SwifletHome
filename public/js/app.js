@@ -1,10 +1,11 @@
 let pathParts = CURRENT_PATH.split('/').filter(Boolean);
 let partType = pathParts[1] || '';
+
+// filter
 document.addEventListener('DOMContentLoaded', () => {
     initMenu();
 
-    // xử lí filter chung
-    const collapseEl = document.getElementById('filterCollapse');
+    const collapseEl = document.getElementById('filter-collapse');
     const iconEl = document.getElementById('filterIcon');
 
     if (collapseEl && iconEl) {

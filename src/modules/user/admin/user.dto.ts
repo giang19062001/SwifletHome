@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString, ValidateIf } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 
 export enum UserTypeEnum {
@@ -7,11 +7,34 @@ export enum UserTypeEnum {
   ADMIN = 'ADMIN',
 }
 
+export enum UserPackageFilterEnum {
+  FREE = 'FREE',
+  PAY = 'PAY',
+  ALL = 'ALL',
+}
+
 export class GetAllUserDto extends PagingDto {
   @ApiProperty({ example: 'APP', enum: UserTypeEnum })
   @IsEnum(UserTypeEnum)
   @IsNotEmpty()
   type: UserTypeEnum;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsOptional()
+  userName: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsOptional()
+  userPhone: string;
+
+  @ApiProperty({ example: 'ALL', enum: UserPackageFilterEnum })
+  @IsEnum(UserPackageFilterEnum)
+  @IsNotEmpty()
+  userPackageFilter: UserPackageFilterEnum;
 }
 
 export class GetDetailDto {
@@ -30,5 +53,4 @@ export class UpdateUserPackageAdminDto {
   @ValidateIf((_, value) => value !== null) // bỏ qua validate khi value string === null
   @IsString()
   packageCode: string | null;
-
 }

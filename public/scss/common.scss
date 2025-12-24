@@ -69,7 +69,15 @@
   }
 }
 
-
+.btn-sub {
+  @extend #btn;
+  background-color: #5C636A;
+  border-color: #5C636A;
+  color: #ffffff;
+  &:hover {
+    background-color: #484e53;
+  }
+}
 .btn-info {
   @extend #btn;
   background-color: $main-color;

@@ -4,7 +4,7 @@ import { RowDataPacket } from 'mysql2/promise';
 import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserApp } from '../app/user.interface';
-import { UpdateUserPackageAdminDto } from './user.dto';
+import { GetAllUserDto, UpdateUserPackageAdminDto, UserPackageFilterEnum } from './user.dto';
 import { TEXTS } from 'src/helpers/const.helper';
 
 @Injectable()
@@ -50,8 +50,9 @@ export class UserAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 
-  async getAllUserApp(dto: PagingDto): Promise<IUserApp[]> {
-    let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone,  A.deviceToken, A.createdAt, A.updatedAt,
+  async getAllUserApp(dto: GetAllUserDto): Promise<IUserApp[]> {
+    try {
+      let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone,  A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
      IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
      FROM ${this.tableApp} A 
@@ -60,15 +61,37 @@ export class UserAdminRepository {
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
      WHERE A.isActive = 'Y' 
-     ORDER BY A.createdAt DESC `;
-    const params: any[] = [];
-    if (dto.limit > 0 && dto.page > 0) {
-      query += ` LIMIT ? OFFSET ?`;
-      params.push(dto.limit, (dto.page - 1) * dto.limit);
-    }
+     `;
+      const params: any[] = [];
+      if (dto.userName) {
+        query += ` AND A.userName LIKE ?`;
+        params.push(`%${dto.userName}%`);
+      }
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IUserApp[];
+      if (dto.userPhone) {
+        query += ` AND A.userPhone LIKE ?`;
+        params.push(`%${dto.userPhone}%`);
+      }
+
+      if (dto.userPackageFilter == UserPackageFilterEnum.FREE) {
+        query += ` AND B.packageCode IS NULL `;
+      } else if (dto.userPackageFilter == UserPackageFilterEnum.PAY) {
+        query += ` AND B.packageCode IS NOT NULL `;
+      }
+
+      query += `  ORDER BY A.createdAt DESC `;
+
+      if (dto.limit > 0 && dto.page > 0) {
+        query += ` LIMIT ? OFFSET ?`;
+        params.push(dto.limit, (dto.page - 1) * dto.limit);
+      }
+
+      const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+      return rows as IUserApp[];
+    } catch (error) {
+      console.log('error', error);
+      return [];
+    }
   }
   async getDetailUserApp(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(

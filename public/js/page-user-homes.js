@@ -20,28 +20,32 @@ const TriggerHomeConstraints = {
 
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
-  getAllUserHomes(page, limit, filterValueDefault);
+  //refresh
+  refreshPage(filterValueDefault);
 });
 
-// FILTER
-document.getElementById('btnFilterReset').addEventListener('click', () => {
+document.getElementById('btn-filter-reset').addEventListener('click', () => {
   document.getElementById('userName').value = '';
   document.getElementById('userPhone').value = '';
   document.getElementById('provinceCode').value = '';
 
   //refresh
-  page = 1;
-  getAllUserHomes(page, limit, filterValueDefault);
+  refreshPage(filterValueDefault);
 });
 
-document.getElementById('btnFilterApply').addEventListener('click', () => {
+document.getElementById('btn-filter-apply').addEventListener('click', () => {
   const filterValue = getFilterValue();
 
   //refresh
+  refreshPage(filterValue);
+});
+
+// TODO: FUNC
+function refreshPage(filterValue) {
+  //refresh
   page = 1;
   getAllUserHomes(page, limit, filterValue);
-});
-// TODO: FUNC
+}
 function getFilterValue() {
   const userName = document.getElementById('userName').value;
   const userPhone = document.getElementById('userPhone').value;
@@ -244,10 +248,10 @@ async function triggerHome(modalForm) {
 
           // close modal
           closeModal('trigger');
-          // refresh data
 
-          page = 1;
-          getAllUserHomes(page, limit);
+          // refresh data
+          const filterValue = getFilterValue();
+          refreshPage(filterValue);
         } else {
           toastErr('Chỉnh sửa thất bại');
         }
@@ -287,10 +291,10 @@ async function resetTriggeringHome(modalForm) {
 
           // close modal
           closeModal('reset');
+          
           // refresh data
-
-          page = 1;
-          getAllUserHomes(page, limit);
+          const filterValue = getFilterValue();
+          refreshPage(filterValue);
         } else {
           toastErr('Chỉnh sửa thất bại');
         }
