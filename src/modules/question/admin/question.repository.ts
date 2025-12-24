@@ -23,7 +23,8 @@ export class QuestionAdminRepository {
         LEFT JOIN tbl_category B
         ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
-        ON A.questionObject = C.objectKeyword `;
+        ON A.questionObject = C.objectKeyword
+        ORDER BY A.createdAt DESC  `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

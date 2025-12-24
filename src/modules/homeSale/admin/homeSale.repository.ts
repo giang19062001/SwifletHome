@@ -21,7 +21,8 @@ export class HomeSaleAdminRepository {
   async getAll(dto: PagingDto): Promise<IHomeSale[]> {
     let query = `   SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A  
-        WHERE A.isActive = 'Y' `;
+        WHERE A.isActive = 'Y'
+        ORDER BY A.createdAt DESC `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -138,7 +139,8 @@ export class HomeSaleAdminRepository {
           LEFT JOIN tbl_home_sale B
           ON A.homeCode = B.homeCode
           LEFT JOIN tbl_option_common C
-          ON A.numberAttendCode = C.code `;
+          ON A.numberAttendCode = C.code 
+          ORDER BY createdAt DESC`;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

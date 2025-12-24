@@ -17,7 +17,8 @@ export class DoctorAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<IDoctor[]> {
     let query = `  SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
-        FROM ${this.table} A  `;
+        FROM ${this.table} A  
+        ORDER BY A.createdAt DESC `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

@@ -18,7 +18,7 @@ export class ScreenAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<IScreen[]> {
     let query = `  SELECT seq, screenKeyword, screenName, screenContent, screenDescription, isActive, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table} `;
+        FROM ${this.table} ORDER BY createdAt DESC`;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

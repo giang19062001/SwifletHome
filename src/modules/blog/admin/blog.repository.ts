@@ -59,6 +59,7 @@ export class BlogAdminRepository {
       LEFT JOIN tbl_category B ON A.blogCategory = B.categoryCode
       LEFT JOIN tbl_object C ON A.blogObject = C.objectKeyword
       ${whereClause}
+      ORDER BY A.createdAt DESC
       ${limitClause}`,
       params,
     );

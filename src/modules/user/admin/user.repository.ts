@@ -59,7 +59,8 @@ export class UserAdminRepository {
      ON A.userCode = B.userCode
      LEFT JOIN tbl_package C
      ON B.packageCode = C.packageCode
-     WHERE A.isActive = 'Y' `;
+     WHERE A.isActive = 'Y' 
+     ORDER BY A.createdAt DESC `;
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;

@@ -59,6 +59,7 @@ export class AnswerAdminRepository {
       LEFT JOIN tbl_category B ON A.answerCategory = B.categoryCode
       LEFT JOIN tbl_object C ON A.answerObject = C.objectKeyword
       ${whereClause}
+      ORDER BY A.createdAt DESC
       ${limitClause}`,
       params,
     );
