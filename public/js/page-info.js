@@ -20,7 +20,7 @@ const InfoBankConstraints = {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên chủ tài khoản.' },
   },
   accountNumber: {
-    presence: { allowEmpty: false, message: '^Vui lòng nhập mã tài khoản.' },
+    presence: { allowEmpty: false, message: '^Vui lòng nhập số tài khoản.' },
   },
   bankBranch: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên chi nhánh ngân hàng.' },
@@ -54,7 +54,7 @@ function showNameOfKey(key) {
       name = 'Tên chủ tài khoản';
       break;
     case 'accountNumber':
-      name = 'Mã tài khoản';
+      name = 'Số tài khoản';
       break;
     case 'bankBranch':
       name = 'Tên chi nhánh ngân hàng';

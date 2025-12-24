@@ -39,12 +39,12 @@ export class ScreenAppService {
               }
             }
             const bankInfo = await this.infoAppService.getDetail('BANK');
-
+            const infoContent : IInfoBank  = bankInfo ? bankInfo.infoContent : null
             result = {
               contentStart: screen.screenContent.contentStart,
               contentCenter: {
                 packages: packages,
-                bankInfo: bankInfo ? (bankInfo.infoContent as IInfoBank) : null,
+                bankInfo: infoContent ? {...infoContent, accountName: `${infoContent.accountNumber} - ${infoContent.accountName}`} : null,
               },
               contentEnd: screen.screenContent.contentEnd,
             } as IScreenSignupService;
