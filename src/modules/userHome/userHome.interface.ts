@@ -23,6 +23,7 @@ export interface IUserHome {
 }
 
 export interface IUserHomeImageStr {
+  seq: number;
   filename: string;
 }
 

@@ -24,6 +24,7 @@ export interface IDoctor {
 }
 
 export interface IDoctorFileStr {
+  seq: number;
   filename: string;
 }
 

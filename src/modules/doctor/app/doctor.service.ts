@@ -28,7 +28,7 @@ export class DoctorAppService {
         const seq = await this.doctorAppRepository.create(userCode, dto, DoctorStatusEnum.WAITING);
         for (const file of filesUploaded) {
           // cập nhập doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created
-          await this.doctorAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId);
+          await this.doctorAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId, userCode);
         }
       } else {
         // không có file ảnh nào được upload của đơn khám bệnh này -> báo lỗi
@@ -54,9 +54,12 @@ export class DoctorAppService {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);
 
           const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
-          const result = await this.doctorAppRepository.uploadFile(0, dto.uniqueId, userCode, filenamePath, file);
-          if (result > 0) {
-            res.push({ filename: filenamePath });
+          const insertId = await this.doctorAppRepository.uploadFile(0, dto.uniqueId, userCode, filenamePath, file);
+          if (insertId > 0) {
+            res.push({
+              seq: insertId,
+              filename: filenamePath,
+            });
           }
         }
       }
@@ -66,5 +69,9 @@ export class DoctorAppService {
       this.logger.error(logbase, `Upload file thất bại: ${JSON.stringify(error)}`);
       return [];
     }
+  }
+  async deleteRequestFile(seq: number, updatedId: string): Promise<number> {
+    const result = await this.doctorAppRepository.deleteSeqFile(seq, updatedId);
+    return result;
   }
 }

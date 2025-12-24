@@ -91,7 +91,7 @@ export class UserHomeAppService {
             await this.userHomeAppRepository.updateHome(userCode, userHomeCode, dto, userHomeImagePath);
 
             // cập nhập userHomeSEQ của file mới đã cùng uniqueId với nhà yến vừa updated
-            await this.userHomeAppRepository.updateSeqFiles(home.seq, filesUploaded.seq, dto.uniqueId);
+            await this.userHomeAppRepository.updateSeqFiles(home.seq, filesUploaded.seq, dto.uniqueId, userCode);
           } else {
             throw new BadRequestException({
               message: Msg.UpdateErr,
@@ -144,7 +144,7 @@ export class UserHomeAppService {
         }
         const seq = await this.userHomeAppRepository.createHome(userCode, dto, isMain, userHomeImagePath);
         // cập nhập userHomeSEQ của file đã tìm cùng uniqueId với nhà yến vừa created
-        await this.userHomeAppRepository.updateSeqFiles(seq, filesUploaded.seq, dto.uniqueId);
+        await this.userHomeAppRepository.updateSeqFiles(seq, filesUploaded.seq, dto.uniqueId, userCode);
       } else {
         // không có file ảnh nào được upload của nhà yến này -> báo lỗi
         result = -1;
@@ -163,18 +163,21 @@ export class UserHomeAppService {
   async uploadHomeImage(userCode: string, dto: UploadUserHomeImageDto, userHomeImageFile: Express.Multer.File): Promise<IUserHomeImageStr> {
     const logbase = `${this.SERVICE_NAME}/uploadHomeImage:`;
     try {
-      let res: IUserHomeImageStr = { filename: '' };
+      let res: IUserHomeImageStr = {seq: 0, filename: '' };
       if (userHomeImageFile) {
+        this.logger.log(logbase, JSON.stringify(userHomeImageFile));
+
         const filenamePath = `${getFileLocation(userHomeImageFile.mimetype, userHomeImageFile.fieldname)}/${userHomeImageFile.filename}`;
-        const result = await this.userHomeAppRepository.uploadHomeImage(0, dto.uniqueId, userCode, filenamePath, userHomeImageFile);
-        if (result > 0) {
+        const insertId = await this.userHomeAppRepository.uploadHomeImage(0, dto.uniqueId, userCode, filenamePath, userHomeImageFile);
+        if (insertId > 0) {
+          res.seq = insertId;
           res.filename = filenamePath;
         }
       }
       return res;
     } catch (error) {
       this.logger.error(logbase, JSON.stringify(error));
-      return { filename: '' };
+      return { seq: 0, filename: '' };
     }
   }
 }

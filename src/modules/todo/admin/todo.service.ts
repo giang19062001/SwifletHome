@@ -25,6 +25,7 @@ export class TodoAdminService {
       }
       return 1;
     } catch (error) {
+      console.log('updateBoxTask',error);
       return 0;
     }
   }

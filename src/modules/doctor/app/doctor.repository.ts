@@ -13,7 +13,7 @@ export class DoctorAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async uploadFile(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | IDoctorFile): Promise<number> {
     const sql = `
-      INSERT INTO tbl_doctor_file (filename, originalname, size, mimetype, uniqueId, doctorSeq, userCode, createdId)
+      INSERT INTO ${this.tableFile} (filename, originalname, size, mimetype, uniqueId, doctorSeq, userCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -42,18 +42,18 @@ export class DoctorAppRepository {
   }
   async findFilesByUniqueId(uniqueId: string): Promise<{ seq: number }[]> {
     const sql = `
-      SELECT seq FROM tbl_doctor_file WHERE doctorSeq = 0 AND uniqueId = ?
+      SELECT seq FROM  ${this.tableFile} WHERE doctorSeq = 0 AND uniqueId = ?
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
 
     return rows as { seq: number }[];
   }
-  async updateSeqFiles(doctorSeq: number, seq: number, uniqueId: string): Promise<number> {
+  async updateSeqFiles(doctorSeq: number, seq: number, uniqueId: string, updatedId: string): Promise<number> {
     const sql = `
-      UPDATE tbl_doctor_file SET doctorSeq = ? 
+      UPDATE  ${this.tableFile} SET doctorSeq = ? , updatedId = ? , updatedAt = NOW()
       WHERE seq = ? AND uniqueId = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [doctorSeq, seq, uniqueId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [doctorSeq, updatedId, seq, uniqueId]);
 
     return result.affectedRows;
   }
@@ -61,10 +61,19 @@ export class DoctorAppRepository {
   async getFilesNotUse(): Promise<IDoctorFile[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.doctorSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A
-      WHERE A.doctorSeq = 0 AND A.uniqueId NOT IN (SELECT uniqueId FROM tbl_doctor)
+      WHERE A.doctorSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM tbl_doctor)
       `,
     );
     return rows as IDoctorFile[];
+  }
+  async deleteSeqFile(seq: number, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE  ${this.tableFile} SET doctorSeq = 0, updatedId = ? , updatedAt = NOW()
+      WHERE seq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [updatedId, seq]);
+
+    return result.affectedRows;
   }
 
   async deleteFile(seq: number): Promise<number> {

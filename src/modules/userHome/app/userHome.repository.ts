@@ -161,19 +161,19 @@ export class UserHomeAppRepository {
 
     return rows ? (rows[0] as { seq: number; filename: string; mimetype: string }) : null;
   }
-  async updateSeqFiles(userHomeSeq: number, seq: number, uniqueId: string): Promise<number> {
+  async updateSeqFiles(userHomeSeq: number, seq: number, uniqueId: string , updatedId: string): Promise<number> {
     const sql = `
-      UPDATE ${this.tableImg} SET userHomeSeq = ? 
+      UPDATE ${this.tableImg} SET userHomeSeq = ? , updatedId = ? , updatedAt = NOW()
       WHERE seq = ? AND uniqueId = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userHomeSeq, seq, uniqueId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userHomeSeq, updatedId, seq, uniqueId]);
 
     return result.affectedRows;
   }
   async getFilesNotUse(): Promise<IUserHomeImageFile[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userHomeSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableImg} A
-        WHERE A.userHomeSeq = 0 AND A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table})
+        WHERE A.userHomeSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table})
         `,
     );
     return rows as IUserHomeImageFile[];

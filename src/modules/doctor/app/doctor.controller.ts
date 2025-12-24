@@ -1,6 +1,6 @@
 import { getDoctorMulterConfig } from './../../../config/multer.config';
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters, Delete, Param } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppService } from './doctor.service';
@@ -60,8 +60,23 @@ export class DoctorAppController {
   async uploadRequestFile(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {
     const result = await this.doctorAppService.uploadRequestFile(user.userCode, dto, doctorFiles);
     return {
-      message: result.length ?  Msg.UploadOk : Msg.UploadErr,
+      message: result.length ? Msg.UploadOk : Msg.UploadErr,
       data: result,
     };
+  }
+  @Delete('deleteRequestFile/:seq')
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({ name: 'seq', type: Number })
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  async deleteRequestFile(@Param('seq') seq: number, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
+    const result = await this.doctorAppService.deleteRequestFile(seq, user.userCode);
+    if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.DeleteErr,
+        data: 0,
+      });
+    }
+
+    return result;
   }
 }

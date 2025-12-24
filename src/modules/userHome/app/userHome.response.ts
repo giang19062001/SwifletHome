@@ -1,7 +1,10 @@
-import { ApiProperty, OmitType } from "@nestjs/swagger";
-import { YnEnum } from "src/interfaces/admin.interface";
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class UserHomeImageResDto {
+  @ApiProperty({ example: 0 })
+  seq: number;
+
   @ApiProperty({ example: '' })
   filename: string;
 }
@@ -46,7 +49,4 @@ export class GetHomeUserResDto {
   @ApiProperty({ example: '' })
   uniqueId: string;
 }
-export class GetHomesUserResDto extends OmitType(
-  GetHomeUserResDto,
-  ['uniqueId'] as const,
-) {}
+export class GetHomesUserResDto extends OmitType(GetHomeUserResDto, ['uniqueId'] as const) {}
