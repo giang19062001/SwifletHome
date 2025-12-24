@@ -71,43 +71,52 @@ async function openModal(type = 'update', userInfo) {
   const submitBtn = modalEl.querySelector('.modal-footer button');
 
   if (type == 'update') {
-    // render form cập nhập gói
     const packageOptions = [
       `
-    <option value="" ${!userInfo.packageCode ? 'selected' : ''}>
-      Gói dùng thử
-    </option>
-  `,
+        <option value="" ${!userInfo.packageCode ? 'selected' : ''}>
+          Gói dùng thử
+        </option>
+      `,
       ...packages.map(
         (pak) => `
-      <option value="${pak.packageCode}" 
-        ${userInfo.packageCode === pak.packageCode ? 'selected' : ''}>
-        ${pak.packageName} (${pak.packageDescription})
-      </option>
-    `,
+          <option value="${pak.packageCode}" 
+            ${userInfo.packageCode === pak.packageCode ? 'selected' : ''}>
+            ${pak.packageName} (${pak.packageDescription})
+          </option>
+        `,
       ),
     ].join('');
 
-    // Fill form
     modalBody.querySelector('#userCode').value = userInfo.userCode || '';
     modalBody.querySelector('#userName').value = userInfo.userName || '';
     modalBody.querySelector('#userPhone').value = userInfo.userPhone || '';
     modalBody.querySelector('#packageCode').innerHTML = packageOptions;
   }
 
+  //   disable nút nếu gói hiện tại là miễn phí
+  const packageSelect = modalBody.querySelector('#packageCode');
+  submitBtn.disabled = !packageSelect.value;
+
+  //  bỏ disable nút nếu gói chọn là trả phí
+  packageSelect.addEventListener('change', () => {
+    submitBtn.disabled = !packageSelect.value;
+  });
+
   // MỞ MODAL
   const modal = new bootstrap.Modal(modalEl);
   modalEl.addEventListener('hidden.bs.modal', () => {
     closeModal(type);
   });
+
   modal.show();
-  // Gắn sự kiện submit
+
   submitBtn.onclick = () => {
     if (type === 'update') {
       updatePackage(submitBtn, userInfo);
     }
   };
 }
+
 function renderAllUser(data, objElement) {
   let HTML = '';
   if (data?.list?.length) {

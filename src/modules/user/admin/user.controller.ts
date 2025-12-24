@@ -40,6 +40,10 @@ export class UserAdminController {
     @Put('updatePackage/:userCode')
     @HttpCode(HttpStatus.OK)
     async update(@Body() dto: UpdateUserPackageAdminDto,  @Param('userCode') userCode: string,  @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+      // cập nhâp gói miễn phí -> bỏ qua
+      if(dto.packageCode == ''){
+      return 1
+     }
       const result = await this.userAdminService.updatePackage(dto, admin.userId, userCode);
       if (result === 0) {
         throw new BadRequestException();
