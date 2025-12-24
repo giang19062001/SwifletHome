@@ -14,6 +14,7 @@ import moment from 'moment';
 import { PeriodTypeEnum } from 'src/modules/todo/todo.interface';
 import { FirebaseService } from '../firebase/firebase.service';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NOTIFICATIONS } from 'src/helpers/text.helper';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -61,7 +62,7 @@ export class CornService implements OnModuleInit {
     this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
     jobDailyAt8AM.start();
     // ! DEV
-    // await this.pushNotificationsByTaskAlarms();
+    await this.pushNotificationsByTaskAlarms();
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
   }
@@ -69,7 +70,7 @@ export class CornService implements OnModuleInit {
   async pushNotificationsByTaskAlarms() {
     const logbase = `${this.SERVICE_NAME}/pushNotificationsByTaskAlarms`;
 
-    // const todayStr = '2025-12-12'; // ! DEV
+    // const todayStr = '2025-12-24'; // ! DEV
     const todayStr = moment().format('YYYY-MM-DD'); // !PROD
 
     this.logger.log(logbase, `Chuẩn bị tìm các lịch nhắc hôm nay để gửi thông báo...`);
@@ -78,9 +79,14 @@ export class CornService implements OnModuleInit {
     this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskAlarmList.length}`);
     if (taskAlarmList.length) {
       for (const task of taskAlarmList) {
-        // insert thông và đẩy thông báo
-        // await this.firebaseService.sendNotification(task.userCode, task.deviceToken, task.taskName, task.taskNote, { taskAlarmCode: task.taskAlarmCode }, NotificationTypeEnum.TODO);
-        await this.firebaseService.sendNotification(task.userCode, task.deviceToken, task.taskName, task.taskNote, null, NotificationTypeEnum.TODO);
+        // insert thông và đẩy thông báo 
+        const taskDay = moment(task.taskDate, 'YYYY-MM-DD');
+        const daysLeft = taskDay.diff(todayStr, 'days');
+
+        const notify = NOTIFICATIONS.sendNotifyDaily(task.taskName, daysLeft);  
+        this.logger.log(logbase, `thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode})`);
+
+        await this.firebaseService.sendNotification(task.userCode, task.deviceToken,  notify.TITLE,notify.BODY, null, NotificationTypeEnum.TODO);
       }
     }
   }

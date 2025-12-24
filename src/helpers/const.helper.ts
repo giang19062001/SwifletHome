@@ -1,9 +1,5 @@
 import { CookieOptions } from 'express';
-import { IPackage } from 'src/modules/package/package.interface';
 
-export const TEXTS = {
-  PACKAGE_FREE : "Gói dùng thử"
-}
 export const AUTH_CONFIG = {
   TOKEN_NAME: 'swf-token',
   EXPIRED_ADMIN: '1d' as const,
@@ -23,12 +19,6 @@ export const APP_SCREENS = {
   NOTIFICATION_SCREEN: 'NOTIFICATION_SCREEN',
   SIGNUP_SERVICE: 'SIGNUP_SERVICE',
   REQUEST_DOCTOR: 'REQUEST_DOCTOR'
-};
-export const NOTIFICATIONS = {
-  updatePackage: (packageData?: IPackage | null) => ({
-    TITLE: 'Thông báo cập nhập gói',
-    BODY: `Gói ${!packageData ? 'Miễn phí' : packageData.packageName} đã được cập nhập thành công`,
-  }),
 };
 
 export const KEYWORDS = {

@@ -9,7 +9,7 @@ import { IPackage } from 'src/modules/package/package.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { PackageAdminService } from 'src/modules/package/admin/package.service';
 import moment from 'moment';
-import { APP_SCREENS, NOTIFICATIONS } from 'src/helpers/const.helper';
+import { NOTIFICATIONS } from 'src/helpers/text.helper';
 
 @Injectable()
 export class UserAdminService {

@@ -99,14 +99,14 @@ export class FirebaseService implements OnModuleInit {
 
     try {
       const response = await this.messaging.send(message);
-      console.log(response);
+      console.log("response --> ", response);
       if (response) {
         const messageId = response.split('/messages/')[1]; // VD: projects/fam-b055e/messages/0:1765439199615028%3bad3e4c3bad3e4c --> 1765439199615028%3bad3e4c3bad3e4c
         const notificationDto: CreateNotificationDto = {
           notificationId: notificationId,
           messageId: messageId,
           title: title,
-          body: title,
+          body: body,
           targetScreen: this.getAppScreen(notificationType),
           data: data ?? null,
           userCode: userCode,

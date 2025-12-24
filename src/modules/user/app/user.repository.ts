@@ -6,7 +6,8 @@ import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserPackageApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
-import { CODES, TEXTS } from 'src/helpers/const.helper';
+import { CODES } from 'src/helpers/const.helper';
+import { TEXTS } from 'src/helpers/text.helper';
 
 @Injectable()
 export class UserAppRepository {

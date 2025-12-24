@@ -5,7 +5,7 @@ import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserApp } from '../app/user.interface';
 import { GetAllUserDto, UpdateUserPackageAdminDto, UserPackageFilterEnum } from './user.dto';
-import { TEXTS } from 'src/helpers/const.helper';
+import { TEXTS } from 'src/helpers/text.helper';
 
 @Injectable()
 export class UserAdminRepository {

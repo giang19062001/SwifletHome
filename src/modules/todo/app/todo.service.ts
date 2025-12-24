@@ -181,7 +181,7 @@ export class TodoAppService {
       return -1;
     }
 
-    // insert lịh nhắc theo ngày tùy chỉnh
+    // insert lịch nhắc theo ngày tùy chỉnh
     if (dto.isPeriod == 'N' && dto.specificValue != null) {
       alramDto.taskPeriodCode = null; // taskPeriodCode sẽ null
       const result = await this.todoAppRepository.insertTaskAlarm(userCode, alramDto);
