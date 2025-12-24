@@ -17,7 +17,8 @@ export class ObjectAdminRepository   {
   async getAll(dto: PagingDto): Promise<IObject[]> {
     let query = `  SELECT seq, objectKeyword, objectName, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} 
-         WHERE isActive = 'Y' `;
+         WHERE isActive = 'Y'
+         ORDER BY createdAt DESC `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

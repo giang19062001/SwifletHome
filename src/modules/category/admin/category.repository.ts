@@ -15,7 +15,8 @@ export class CategoryAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<ICategory[]> {
     let query = `  SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table} WHERE isActive = 'Y' `;
+        FROM ${this.table} WHERE isActive = 'Y'
+        ORDER BY createdAt DESC `;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

@@ -18,7 +18,8 @@ export class TodoAdminRepository {
   async getAllTasks(dto: PagingDto): Promise<ITodoTask[]> {
     let query = `  SELECT seq, taskCode, taskName, createdId, createdAt
         FROM ${this.tableTask} 
-        WHERE isActive = 'Y'`;
+        WHERE isActive = 'Y'
+        ORDER BY createdAt DESC`;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

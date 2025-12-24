@@ -16,7 +16,8 @@ export class PackageAdminRepository {
   async getAll(dto: PagingDto): Promise<IPackage[]> {
     let query = `  SELECT seq, packageCode, packageName, packagePrice, packageItemSamePrice, packageExpireDay, packageDescription, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table}
-         WHERE isActive = 'Y' `;
+         WHERE isActive = 'Y' 
+         ORDER BY createdAt DESC`;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {

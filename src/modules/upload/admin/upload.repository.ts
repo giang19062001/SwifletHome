@@ -16,7 +16,8 @@ export class UploadAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
         FROM ${this.tableImg} A 
-        WHERE isActive = 'Y' `,
+        WHERE isActive = 'Y' 
+        ORDER BY A.createdAt DESC`,
     );
     return rows as IFileUpload[];
   }
@@ -28,6 +29,7 @@ export class UploadAdminRepository {
         LEFT JOIN  ${this.tableAudio} B
         ON A.seqPay = B.seq
         WHERE A.isActive = 'Y' AND A.isFree = 'Y'
+         ORDER BY A.createdAt DESC
          `,
     );
     return rows as IFileUpload[];
@@ -48,6 +50,7 @@ export class UploadAdminRepository {
       ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink, A.isFree, A.isCoupleFree, A.badge
         FROM ${this.tableMediaAudio} A 
         WHERE A.isActive = 'Y' 
+       ORDER BY A.createdAt DESC
          `,
     );
     return rows as IFileMedia[];
@@ -57,7 +60,8 @@ export class UploadAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, '' as filename, '' as originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink
         FROM ${this.tableVideo} A 
-        WHERE isActive = 'Y' `,
+        WHERE isActive = 'Y' 
+         ORDER BY A.createdAt DESC `,
     );
     return rows as IFileUpload[];
   }
@@ -66,7 +70,8 @@ export class UploadAdminRepository {
       ` SELECT A.seq, '' as filenamePay, '' as filename, A.originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink, 'Y' as isFree,
        'Y' as isCoupleFree,  A.badge
         FROM  ${this.tableMediaVideo} A 
-        WHERE isActive = 'Y' `,
+        WHERE isActive = 'Y' 
+         ORDER BY A.createdAt DESC `,
     );
     return rows as IFileMedia[];
   }
