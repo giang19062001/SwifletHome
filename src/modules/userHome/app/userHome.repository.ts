@@ -23,7 +23,8 @@ export class UserHomeAppRepository {
     FROM ${this.table} A 
     LEFT JOIN  tbl_provinces B
     ON A.userHomeProvince = B.provinceCode
-    WHERE A.userCode = ? AND A.isActive = 'Y' `;
+    WHERE A.userCode = ? AND A.isActive = 'Y'
+    ORDER BY isMain DESC `;
 
     const params: any[] = [];
     params.push(userCode);

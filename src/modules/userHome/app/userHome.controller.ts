@@ -32,7 +32,7 @@ export class UserHomeAppController {
   @Post('getHomes')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetHomesUserResDto)) })
-  async getSwtHousgetHomeses(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<IList<IUserHome>> {
+  async getHomes(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<IList<IUserHome>> {
     const result = await this.userHomeAppService.getAll(dto, user.userCode);
     return result;
   }
