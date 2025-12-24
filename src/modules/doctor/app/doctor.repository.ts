@@ -42,7 +42,7 @@ export class DoctorAppRepository {
   }
   async findFilesByUniqueId(uniqueId: string): Promise<{ seq: number }[]> {
     const sql = `
-      SELECT seq FROM  ${this.tableFile} WHERE doctorSeq = 0 AND uniqueId = ?
+      SELECT seq FROM  ${this.tableFile} WHERE doctorSeq = 0 AND isActive = 'Y' AND uniqueId = ? 
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
 
@@ -51,7 +51,7 @@ export class DoctorAppRepository {
   async updateSeqFiles(doctorSeq: number, seq: number, uniqueId: string, updatedId: string): Promise<number> {
     const sql = `
       UPDATE  ${this.tableFile} SET doctorSeq = ? , updatedId = ? , updatedAt = NOW()
-      WHERE seq = ? AND uniqueId = ?
+      WHERE seq = ? AND uniqueId = ? AND isActive = 'Y'
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [doctorSeq, updatedId, seq, uniqueId]);
 
@@ -61,14 +61,14 @@ export class DoctorAppRepository {
   async getFilesNotUse(): Promise<IDoctorFile[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.doctorSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A
-      WHERE A.doctorSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM tbl_doctor)
+      WHERE A.doctorSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM tbl_doctor) OR A.isActive = 'N'
       `,
     );
     return rows as IDoctorFile[];
   }
   async deleteSeqFile(seq: number, updatedId: string): Promise<number> {
     const sql = `
-      UPDATE  ${this.tableFile} SET doctorSeq = 0, updatedId = ? , updatedAt = NOW()
+      UPDATE  ${this.tableFile} SET isActive = 'N', doctorSeq = 0, updatedId = ? , updatedAt = NOW()
       WHERE seq = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [updatedId, seq]);

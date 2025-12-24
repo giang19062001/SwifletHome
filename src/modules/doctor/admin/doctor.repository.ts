@@ -56,7 +56,7 @@ export class DoctorAdminRepository {
         FROM ${this.table} A 
         LEFT JOIN ${this.tableFile} B
         ON A.seq = B.doctorSeq
-        WHERE A.seq = ? AND B.doctorSeq != 0
+        WHERE A.seq = ? AND B.doctorSeq != 0 AND B.isActive = 'Y'
       `,
       [seq],
     );
