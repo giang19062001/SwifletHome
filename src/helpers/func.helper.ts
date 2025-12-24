@@ -30,3 +30,8 @@ export function sortByDate<T>(
 export function formatPrice(price: string | number){
   return Number(price).toLocaleString('vi-VN')
 }
+
+export function replaceNbspToSpace(str) {
+  if (typeof str !== "string") return str;
+  return str.replace(/&nbsp;/g, " ");
+}

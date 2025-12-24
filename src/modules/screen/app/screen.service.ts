@@ -7,6 +7,7 @@ import { IInfoBank } from 'src/modules/info/info.interface';
 import { IScreenSignupService } from '../screen.interface';
 import { ScreenAppRepository } from './screen.repository';
 import { APP_SCREENS } from 'src/helpers/const.helper';
+import { replaceNbspToSpace } from 'src/helpers/func.helper';
 
 @Injectable()
 export class ScreenAppService {
@@ -41,21 +42,21 @@ export class ScreenAppService {
             const bankInfo = await this.infoAppService.getDetail('BANK');
             const infoContent : IInfoBank  = bankInfo ? bankInfo.infoContent : null
             result = {
-              contentStart: screen.screenContent.contentStart,
+              contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
               contentCenter: {
                 packages: packages,
                 bankInfo: infoContent ? {...infoContent, accountName: `${infoContent.accountNumber} - ${infoContent.accountName}`} : null,
               },
-              contentEnd: screen.screenContent.contentEnd,
+              contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
             } as IScreenSignupService;
           }
           break;
         case APP_SCREENS.REQUEST_DOCTOR:
           if (screen.screenContent) {
             result = {
-              contentStart: screen.screenContent.contentStart,
+              contentStart:  replaceNbspToSpace(screen.screenContent.contentStart),
               contentCenter: {},
-              contentEnd: screen.screenContent.contentEnd,
+              contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
             } as IScreenSignupService;
           }
           break;
