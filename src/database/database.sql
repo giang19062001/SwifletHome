@@ -545,7 +545,7 @@ CREATE TABLE
 CREATE TABLE
   `tbl_screen_config` (
     `seq` int NOT NULL AUTO_INCREMENT,
-    `screenKeyword` enum ('SIGNUP_SERVICE') NOT NULL DEFAULT 'SIGNUP_SERVICE',
+    `screenKeyword` enum ('SIGNUP_SERVICE','REQUEST_DOCTOR') NOT NULL DEFAULT 'SIGNUP_SERVICE',
     `screenName` varchar(45) NOT NULL,
     `screenContent` JSON NOT NULL,
     `screenDescription` varchar(255) NOT NULL,

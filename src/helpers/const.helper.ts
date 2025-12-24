@@ -22,6 +22,7 @@ export const APP_SCREENS = {
   REMINDER_SCREEN: 'REMINDER_SCREEN',
   NOTIFICATION_SCREEN: 'NOTIFICATION_SCREEN',
   SIGNUP_SERVICE: 'SIGNUP_SERVICE',
+  REQUEST_DOCTOR: 'REQUEST_DOCTOR'
 };
 export const NOTIFICATIONS = {
   updatePackage: (packageData?: IPackage | null) => ({

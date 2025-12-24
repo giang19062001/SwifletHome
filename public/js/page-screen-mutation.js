@@ -57,6 +57,12 @@ function mapContentFileds(data) {
         contentEnd: data.contentEnd ?? '',
       };
       break;
+    case 'REQUEST_DOCTOR':
+      screenContent = {
+        contentStart: data.contentStart ?? '',
+        contentEnd: data.contentEnd ?? '',
+      };
+      break;
     default:
       screenContent = {};
   }

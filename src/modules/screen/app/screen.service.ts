@@ -50,6 +50,15 @@ export class ScreenAppService {
             } as IScreenSignupService;
           }
           break;
+        case APP_SCREENS.REQUEST_DOCTOR:
+          if (screen.screenContent) {
+            result = {
+              contentStart: screen.screenContent.contentStart,
+              contentCenter: {},
+              contentEnd: screen.screenContent.contentEnd,
+            } as IScreenSignupService;
+          }
+          break;
 
         default:
           break;

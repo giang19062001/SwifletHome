@@ -188,16 +188,17 @@ async function getDetailDoctor(seq) {
 }
 
 async function updateDoctor() {
+  console.log("sss");
   try {
     const modalBody = document.querySelector('.doctor-update-modal .modal-body form');
     const seq = modalBody.querySelector('#seq').value;
     const noteAnswered = modalBody.querySelector('#noteAnswered').value;
     const status = modalBody.querySelector('#status').value;
 
-    if (String(noteAnswered).trim() == '') {
-      modalBody.querySelector('.err-noteAnswered').style.display = 'block';
-      return;
-    }
+    // if (String(noteAnswered).trim() == '') {
+    //   modalBody.querySelector('.err-noteAnswered').style.display = 'block';
+    //   return;
+    // }
     await axios
       .put(
         CURRENT_URL + '/api/admin/doctor/update/' + seq,

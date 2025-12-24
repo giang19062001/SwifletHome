@@ -18,7 +18,9 @@ export class ScreenAppController {
     summary: 'Màn hình đăng kí dịch vụ,..',
   })
   @ApiParam({
-    description: '`SIGNUP_SERVICE`: Màn hình đăng kí dịch vụ\n',
+    description: `
+**SIGNUP_SERVICE**: Màn hình đăng kí dịch vụ,\n
+**REQUEST_DOCTOR**: Màn hình khám bệnh nhà yến`,
     name: 'keyword',
     type: String,
   })
