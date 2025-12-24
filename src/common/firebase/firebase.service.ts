@@ -272,7 +272,7 @@ export class FirebaseService implements OnModuleInit {
 
         await this.notificationAppRepository.createNotification(notificationDto);
       }
-      return 1;
+      return batchResponse.successCount;
     } catch (error) {
       this.logger.log(logbase, `Gửi thông báo multicast thất bại: (${JSON.stringify(error)}) `);
 

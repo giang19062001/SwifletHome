@@ -4,9 +4,10 @@ import { NotificationAdminService } from './notification.service';
 import { NotificationAdminController } from './notification.controller';
 import { NotificationAdminRepository } from './notification.repository';
 import { UserAdminModule } from 'src/modules/user/admin/user.module';
+import { UserHomeAdminModule } from 'src/modules/userHome/admin/userHome.module';
 
 @Module({
-  imports: [AuthAdminModule, UserAdminModule],
+  imports: [AuthAdminModule, UserAdminModule, UserHomeAdminModule],
   controllers: [NotificationAdminController],
   providers: [NotificationAdminService, NotificationAdminRepository],
   exports: [],

@@ -12,25 +12,64 @@ const notificationConstraints = {
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
   getAllUser(0, 0);
-  initSendEvent();
+  initSendTypeEvent();
   initSubmitForm();
 });
 
 // TODO: FUNC
-function initSendEvent() {
-  document.querySelectorAll('input[name="isSendAll"]').forEach((radio) => {
-    radio.addEventListener('change', () => {
-      const isEach = document.getElementById('sendEach').checked;
-      const box = document.getElementById('userCodesMuticastBox');
+function resetForm() {
+  // Clear text inputs
+  const titleEl = document.getElementById('title');
+  const bodyEl = document.getElementById('body');
 
-      if (isEach) {
-        box.classList.remove('d-none');
+  if (titleEl) titleEl.value = '';
+  if (bodyEl) bodyEl.value = '';
+
+  // Set radio sendType = ALL
+  const sendTypeAll = document.querySelector('input[name="sendType"][value="ALL"]');
+  if (sendTypeAll) sendTypeAll.checked = true;
+
+  // Uncheck all provinceCode checkboxes
+  document.querySelectorAll('input[name="provinceCode"]').forEach((cb) => {
+    cb.checked = false;
+  });
+
+  // Uncheck all userCode checkboxes
+  document.querySelectorAll('input[name="userCode"]').forEach((cb) => {
+    cb.checked = false;
+  });
+
+  // ẩn user, province box
+  const userBox = document.getElementById('user-box');
+  const provinceBox = document.getElementById('province-box');
+  provinceBox.classList.add('d-none');
+  userBox.classList.add('d-none');
+}
+
+function initSendTypeEvent() {
+  document.querySelectorAll('input[name="sendType"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      const sendType = document.querySelector('input[name="sendType"]:checked').value;
+      const userBox = document.getElementById('user-box');
+      const provinceBox = document.getElementById('province-box');
+
+      // GỬI TẤT CẢ
+      if (sendType == 'ALL') {
+        userBox.classList.add('d-none');
+      }
+      // GỬI 1 VÀI USER
+      if (sendType == 'USER') {
+        provinceBox.classList.add('d-none');
+        userBox.classList.remove('d-none');
 
         if (userList.length) {
           renderUserCheckbox();
         }
-      } else {
-        box.classList.add('d-none');
+      }
+      // GỬI THEO TỈNH
+      if (sendType == 'PROVINCE') {
+        userBox.classList.add('d-none');
+        provinceBox.classList.remove('d-none');
       }
     });
   });
@@ -38,11 +77,11 @@ function initSendEvent() {
 
 // TODO: RENDER
 function renderUserCheckbox() {
-  const box = document.getElementById('userCodesMuticastList');
-  box.innerHTML = '';
+  const list = document.getElementById('user-codes-list');
+  list.innerHTML = '';
 
   if (!userList.length) {
-    box.innerHTML = '<div class="text-muted">Không có người dùng</div>';
+    list.innerHTML = '<div class="text-muted">Không có người dùng</div>';
     return;
   }
 
@@ -63,8 +102,7 @@ function renderUserCheckbox() {
         </label>
       `;
 
-    console.log(div);
-    box.appendChild(div);
+    list.appendChild(div);
   });
 }
 
@@ -101,26 +139,32 @@ function initSubmitForm() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const isSendAll = form.querySelector('input[name="isSendAll"]:checked').value;
+    const sendType = form.querySelector('input[name="sendType"]:checked').value;
     const userCodesMuticast = [...form.querySelectorAll('input[name="userCode"]:checked')].map((cb) => cb.value);
+    const provinceCodesMuticast = [...form.querySelectorAll('input[name="provinceCode"]:checked')].map((cb) => cb.value);
 
     const formData = {
       title: form.title.value,
       body: form.body.value,
-      isSendAll,
+      sendType,
       userCodesMuticast,
+      provinceCodesMuticast,
     };
 
     // kiêm lỗi
     const errors = validate(formData, notificationConstraints);
     if (errors) return displayErrors(errors);
 
-    if (isSendAll === 'N' && !userCodesMuticast.length) return toastErr('Vui lòng chọn ít nhất 1 người dùng');
+    if (sendType === 'USER' && !userCodesMuticast.length) return toastErr('Vui lòng chọn ít nhất 1 người dùng');
+    if (sendType === 'PROVINCE' && !provinceCodesMuticast.length) return toastErr('Vui lòng chọn ít nhất 1 tỉnh thành');
 
     const payload = {
       ...formData,
-      userCodesMuticast: isSendAll === 'N' ? userCodesMuticast : [],
+      userCodesMuticast: sendType === 'USER' ? userCodesMuticast : [],
+      provinceCodesMuticast: sendType === 'PROVINCE' ? provinceCodesMuticast : [],
     };
+
+    console.log(payload);
 
     // disable nút summit
     let btn = form.querySelector('button');
@@ -129,8 +173,10 @@ function initSubmitForm() {
     // gửi thông báo
     try {
       const response = await axios.post(CURRENT_URL + '/api/admin/notification/pushNotifycationByAdmin', payload, axiosAuth());
-      if (response.data) {
-        toastOk('Gửi thông báo thành công');
+      if (response.data && response.data.success) {
+        toastOk(response.data.message);
+      } else {
+        toastErr(response.data.message);
       }
     } catch (error) {
       console.error(`error:`, error);
@@ -140,6 +186,9 @@ function initSubmitForm() {
     } finally {
       // bật lại nút
       btn.disabled = false;
+
+      // reset form
+      resetForm();
     }
   });
 }

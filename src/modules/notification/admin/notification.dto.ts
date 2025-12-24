@@ -2,6 +2,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
+export enum SentTypeEnum {
+  PROVINCE = 'PROVINCE',
+  USER = 'USER',
+  ALL = 'ALL',
+}
 export class PushNotifycationByAdminDto {
   @ApiProperty({
     example: '',
@@ -26,10 +31,18 @@ export class PushNotifycationByAdminDto {
   userCodesMuticast: string[];
 
   @ApiProperty({
+    example: [],
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  provinceCodesMuticast: string[];
+
+  @ApiProperty({
     example: 'N',
-    enum: YnEnum,
+    enum: SentTypeEnum,
   })
   @IsNotEmpty()
-  @IsEnum(YnEnum)
-  isSendAll: YnEnum;
+  @IsEnum(SentTypeEnum)
+  sendType: SentTypeEnum;
 }

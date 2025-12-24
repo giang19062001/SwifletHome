@@ -13,3 +13,8 @@ export enum YnEnum {
   Y = 'Y',
   N = 'N',
 }
+
+export interface ApiMutationResponse {
+  success: boolean;
+  message: string;
+}

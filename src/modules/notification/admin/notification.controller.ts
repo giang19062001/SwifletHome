@@ -5,6 +5,7 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import * as authInterface from 'src/modules/auth/admin/auth.interface';
 import { PushNotifycationByAdminDto } from './notification.dto';
 import { NotificationAdminService } from './notification.service';
+import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/notification')
@@ -16,11 +17,8 @@ export class NotificationAdminController {
   @ApiBody({ type: PushNotifycationByAdminDto })
   @Post('pushNotifycationByAdmin')
   @HttpCode(HttpStatus.OK)
-  async pushNotifycationByAdmin(@Body() dto: PushNotifycationByAdminDto, @GetUserAdmin() admin: authInterface.ITokenUserAdmin): Promise<number> {
+  async pushNotifycationByAdmin(@Body() dto: PushNotifycationByAdminDto, @GetUserAdmin() admin: authInterface.ITokenUserAdmin): Promise<ApiMutationResponse> {
     const result = await this.notificationAdminService.pushNotifycationByAdmin(dto, admin.userId);
-    if (result === 0) {
-      throw new BadRequestException();
-    }
     return result;
   }
 }

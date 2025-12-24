@@ -11,8 +11,8 @@ export const Msg = {
   UpdateErr: 'Cập nhập thông tin thất bại',
   DeleteOk: 'Xóa thông tin thành công',
   DeleteErr: 'Xóa thông tin thất bại',
-  SetTaskOk:"Thiết lập lịch nhắc thành công",
-  SetTaskErr:"Thiết lập lịch nhắc thất bại",
+  SetTaskOk: 'Thiết lập lịch nhắc thành công',
+  SetTaskErr: 'Thiết lập lịch nhắc thất bại',
   CodeInvalid: 'Mã code không hợp lệ',
   TokenMissing: 'Vui lòng xác thực token',
   TokenInvalid: 'Token không hợp lệ',
@@ -48,10 +48,16 @@ export const Msg = {
   OtpOvertake: 'Đã vượt quá số lần nhập OTP cho phép',
   OtpRemainAttempt: (num: number) => `Mã OTP không đúng. Còn ${num} lần thử.`,
   InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
-  DuplicateTaskAlram:"Lịch nhắc này đã tồn tại",
-  DuplicateTaskPeriod:"Chu kỳ lịch nhắc này đã tồn tại",
+  DuplicateTaskAlram: 'Lịch nhắc này đã tồn tại',
+  DuplicateTaskPeriod: 'Chu kỳ lịch nhắc này đã tồn tại',
   CannotNull: (filedName: string) => `${filedName} không thể trống`,
   InvalidValue: (filedName: string) => `${filedName} sai giá trị cho phép`,
   InvalidRange: (filedName: string, range: string) => `${filedName} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
   MustBeGreaterThanNow: (filedName: string) => `${filedName} phải lớn hơn ngày hiện tại`,
+};
+
+export const MsgAdmin = {
+  pushNotifyOk: 'Gửi thông báo thành công',
+  pushNotifyErr: 'Gửi thông báo thất bại',
+  pushNotifyProvinceEmpty:"Không có người dùng nào có nhà yến thuộc những tỉnh thành này"
 };

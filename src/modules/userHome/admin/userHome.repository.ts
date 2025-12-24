@@ -4,6 +4,7 @@ import { IUserHome } from '../userHome.interface';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { IUserHomeSensor } from './userhome.interface';
+import { IUserHomeProvinceForPush } from 'src/modules/notification/notification.interface';
 @Injectable()
 export class UserHomeAdminRepository {
   private readonly table = 'tbl_user_home';
@@ -77,6 +78,29 @@ export class UserHomeAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IUserHome[];
   }
+
+async getUserHomesByProvinces(provinceCodes: string[]): Promise<IUserHomeProvinceForPush[]> {
+  try {
+    if (!provinceCodes.length) return [];
+
+    const placeholders = provinceCodes.map(() => '?').join(', ');
+
+    const query = `
+      SELECT B.userCode, B.deviceToken, A.userHomeCode, C.provinceName AS userHomeProvince
+      FROM ${this.table} A
+      LEFT JOIN ${this.tableUser} B ON A.userCode = B.userCode
+      LEFT JOIN tbl_provinces C ON A.userHomeProvince = C.provinceCode
+      WHERE A.isActive = 'Y'
+        AND A.userHomeProvince IN (${placeholders})
+    `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, provinceCodes);
+    return rows as IUserHomeProvinceForPush[];
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
 
   async getDetail(userHomeCode: string): Promise<IUserHomeSensor | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
