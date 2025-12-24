@@ -177,7 +177,7 @@ export class AppController {
     };
   }
   // media
-   @Get('/dashboard/media')
+  @Get('/dashboard/media')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/media')
   renderMedia(@Req() req: Request) {
@@ -306,11 +306,14 @@ export class AppController {
   @Get('/dashboard/notification')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/notification')
-  renderNotification(@Req() req: Request) {
+  async renderNotification(@Req() req: Request) {
+    const values = await this.appService.renderNotification();
+
     return {
       title: 'Gửi thông báo',
       isLayout: true,
       user: req.session.user,
+      values: values,
     };
   }
   // 404

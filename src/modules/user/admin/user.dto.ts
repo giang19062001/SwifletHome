@@ -33,8 +33,8 @@ export class GetAllUserDto extends PagingDto {
 
   @ApiProperty({ example: 'ALL', enum: UserPackageFilterEnum })
   @IsEnum(UserPackageFilterEnum)
-  @IsNotEmpty()
-  userPackageFilter: UserPackageFilterEnum;
+  @IsOptional()
+  userPackageFilter?: UserPackageFilterEnum;
 }
 
 export class GetDetailDto {

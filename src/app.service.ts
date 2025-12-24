@@ -116,4 +116,12 @@ export class AppService {
       provinces: provinces,
     };
   }
+  // notification
+   // user home
+  async renderNotification(): Promise<any> {
+    const provinces = await this.provinceService.getAll();
+    return {
+      provinces: provinces,
+    };
+  }
 }
