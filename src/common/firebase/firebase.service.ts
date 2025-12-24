@@ -205,7 +205,7 @@ export class FirebaseService implements OnModuleInit {
     data?: any,
     notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN,
   ): Promise<number> {
-    const tokens = userDeviceTokens.map((ele) => ele.deviceToken);
+    const tokens = [...new Set(userDeviceTokens.map((ele) => ele.deviceToken))]; // BỎ TRÙNG LẶP
     const userCodes = userDeviceTokens.map((ele) => ele.userCode);
 
     console.log('tokens --> ', tokens);
