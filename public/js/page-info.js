@@ -202,7 +202,7 @@ async function openModal(type, infoData) {
       input.className = 'form-control';
 
       const preview = document.createElement('img');
-      preview.src = infoContent[key];
+      preview.src = `${CURRENT_URL}/${infoContent[key]}`;
       preview.alt = key;
       preview.style.maxWidth = '150px';
       preview.className = 'mt-2 d-block';
