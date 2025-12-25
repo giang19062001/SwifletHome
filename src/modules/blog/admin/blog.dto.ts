@@ -18,7 +18,7 @@ export class GetAllBlogDto extends PagingDto {
 }
 
 export class UpdateBlogDto {
-   @ApiProperty({
+  @ApiProperty({
     example: '',
   })
   @IsString()
@@ -43,13 +43,23 @@ export class UpdateBlogDto {
   @IsNotEmpty()
   blogCategory: string;
 
-   @ApiProperty({
+  @ApiProperty({
     example: YnEnum.Y,
     enum: YnEnum,
   })
   @IsEnum(YnEnum)
   @IsNotEmpty()
   isFree: YnEnum;
+}
+
+export class ChangToMainBlogDto {
+  @ApiProperty({
+    example: YnEnum.Y,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  @IsNotEmpty()
+  isMain: YnEnum;
 }
 
 export class CreateBlogDto extends UpdateBlogDto {}

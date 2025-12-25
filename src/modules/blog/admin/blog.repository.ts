@@ -116,6 +116,29 @@ export class BlogAdminRepository {
     return result.affectedRows;
   }
 
+  async changeToMain(updatedId: string, blogCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET isMain = 'Y', 
+      updatedId = ?, updatedAt = ?
+      WHERE blogCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [updatedId, new Date(), blogCode]);
+
+    return result.affectedRows;
+  }
+
+  
+  async changeToNotMain(updatedId: string, blogCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET isMain = 'N', 
+      updatedId = ?, updatedAt = ?
+      WHERE blogCode != ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [updatedId, new Date(), blogCode]);
+
+    return result.affectedRows;
+  }
+
   async delete(blogCode: string): Promise<number> {
     const sql = `
       UPDATE  ${this.table}

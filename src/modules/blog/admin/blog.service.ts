@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
-import { CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
+import { ChangToMainBlogDto, CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { BlogAdminRepository } from './blog.repository';
 import { IBlog } from '../blog.interface';
 
@@ -29,6 +29,13 @@ export class BlogAdminService {
   }
   async update(dto: UpdateBlogDto, updatedId: string, blogCode: string): Promise<number> {
     const result = await this.blogAdminRepository.update(dto, updatedId, blogCode);
+    return result;
+  }
+  async changeToMain(dto: ChangToMainBlogDto, updatedId: string, blogCode: string): Promise<number> {
+    // biến các blog khác với isMain thành 'N'
+    await this.blogAdminRepository.changeToNotMain(updatedId, blogCode);
+    // cập nhập blog hiện tại với isMain thành 'Y'
+    const result = await this.blogAdminRepository.changeToMain(updatedId, blogCode);
     return result;
   }
   async delete(blogCode: string): Promise<number> {

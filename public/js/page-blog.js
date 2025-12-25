@@ -17,6 +17,8 @@ function gotoBlogCreate() {
 function gotoBlogUpdate(blogCode) {
   gotoPage('/dashboard/blog/update/' + blogCode);
 }
+
+
 // RENDER
 const renderAllBlog = (data, objElement) => {
   let HTML = '';
@@ -30,6 +32,16 @@ const renderAllBlog = (data, objElement) => {
             <td><p>${ele.objectName}</p></td>
             <td><p>${ele.blogName}</p></td>
             <td><b class="${ele.isFree == 'Y' ? 'txt-free' : 'txt-pay'}">${ele.isFree == 'Y' ? 'Miễn phí' : 'Tính phí'}</b></td>
+           <td class="text-center align-middle">
+            <div class="form-check form-switch d-flex justify-content-center align-items-center">
+              <input class="form-check-input"
+                type="checkbox"
+                role="switch"
+                data-blog-code="${ele.blogCode}"
+                onChange="changeToMain(this)"
+                  ${ele.isMain === 'Y' ? 'checked disabled' : ''}>
+            </div>
+          </td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>
@@ -57,7 +69,7 @@ async function getAllBlog(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
   showSkeleton(objElement, limit, 7);
-  
+
   await axios
     .post(
       CURRENT_URL + '/api/admin/blog/getAll',
@@ -73,6 +85,25 @@ async function getAllBlog(currentPage, limit) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
         renderAllBlog(response.data, objElement);
+      }
+    })
+    .catch(function (error) {
+      console.log('error', error);
+    });
+}
+
+async function changeToMain(el) {
+  const blogCode = el.dataset.blogCode;
+  if(el.checked == false){
+    return
+  }
+  await axios
+    .put(CURRENT_URL + `/api/admin/blog/changeToMain/${blogCode}`, { isMain : 'Y'}, axiosAuth())
+    .then(function (response) {
+      console.log('response', response);
+      if (response.status === 200 && response.data) {
+        page = 1;
+        getAllBlog(page, limit);
       }
     })
     .catch(function (error) {
