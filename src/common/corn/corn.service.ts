@@ -62,7 +62,9 @@ export class CornService implements OnModuleInit {
     this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
     jobDailyAt8AM.start();
     // ! DEV
-    // await this.pushNotificationsByTaskAlarms();
+    //  await this.deleteDoctorFilesNotUse();
+    // await this.deleteUserHomeFilesNotUse();
+    // await this.pushNotificationsByTaskAlarms(); 
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
     // await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
   }
@@ -131,9 +133,8 @@ export class CornService implements OnModuleInit {
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
           await this.doctorAppRepository.deleteFile(file.seq);
-          const location = getFileLocation(file.mimetype, file.filename);
-          await this.fileLocalService.deleteLocalFile(`${path.join(location, file.filename)}`);
-        }
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        } 
         this.logger.log(logbase, `Các file khám bệnh không dùng đã được xóa theo lịch trình thành công`);
       } else {
         this.logger.log(logbase, `Không có file khám bệnh nào cần được xóa`);
@@ -150,8 +151,7 @@ export class CornService implements OnModuleInit {
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
           await this.userHomeAppRepository.deleteFile(file.seq);
-          const location = getFileLocation(file.mimetype, file.filename);
-          await this.fileLocalService.deleteLocalFile(`${path.join(location, file.filename)}`);
+          await this.fileLocalService.deleteLocalFile(file.filename);
         }
         this.logger.log(logbase, `Các file ảnh nhà yến của khách hàng  không dùng đã được xóa theo lịch trình thành công`);
       } else {
