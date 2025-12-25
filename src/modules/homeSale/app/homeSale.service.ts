@@ -8,6 +8,7 @@ import { Msg } from 'src/helpers/message.helper';
 import { OptionService } from 'src/modules/options/option.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { replaceNbspToSpace } from 'src/helpers/func.helper';
 
 @Injectable()
 export class HomeSaleAppService {
@@ -50,7 +51,7 @@ export class HomeSaleAppService {
     }
     this.logger.log(logbase, `homeName(${result.homeName})`);
 
-    return result;
+    return {...result, homeDescription: replaceNbspToSpace(result.homeDescription)};
   }
   // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string): Promise<number> {

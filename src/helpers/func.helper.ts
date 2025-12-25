@@ -31,7 +31,7 @@ export function formatPrice(price: string | number){
   return Number(price).toLocaleString('vi-VN')
 }
 
-export function replaceNbspToSpace(str) {
+export function replaceNbspToSpace(str: string) {
   if (typeof str !== "string") return str;
   return str.replace(/&nbsp;/g, " ");
 }
