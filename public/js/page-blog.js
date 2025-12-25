@@ -102,6 +102,8 @@ async function changeToMain(el) {
     .then(function (response) {
       console.log('response', response);
       if (response.status === 200 && response.data) {
+        toastOk("Cập nhập bài viết thành công")
+        // refresh
         page = 1;
         getAllBlog(page, limit);
       }
