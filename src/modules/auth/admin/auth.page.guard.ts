@@ -6,7 +6,7 @@ import { AUTH_CONFIG, PUBLIC_ROUTERS } from 'src/helpers/const.helper';
 @Injectable()
 export class PageAuthAdminGuard implements CanActivate {
   LOGIN_ROUTER: string = '/';
-  MAIN_ROUTER: string = "'/dashboard/main'";
+  MAIN_ROUTER: string = "/dashboard/main";
 
   constructor(private readonly authAdminService: AuthAdminService) {}
 

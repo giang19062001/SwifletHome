@@ -7,15 +7,19 @@
 #include <PubSubClient.h>
 
 // ====== WIFI ======
-char ssid[] = "Dreamplex";
-char pass[] = "Dreamchaser";
+const char* ssid = "Dreamplex";
+const char* pass = "Dreamchaser";
 
 // ====== MQTT ======
-// const char* mqttServer = "103.77.160.68";
-const char* mqttServer = "172.16.20.134"; // localhost
-const char* mqttClientId = "MAC-USR000001-HOM000003";
+const char* mqttServer = "103.77.160.68"; // PROD
+// const char* mqttServer = "172.16.20.134";  // LOCALHOST
 const int mqttPort = 1883;
-String mqttTopic = String("sensor/") + mqttClientId + "/data";
+const char* mqttClientId = "MAC-USR000001-HOM000003";
+
+// Topic dữ liệu cảm biến
+String dataTopic = String("sensor/") + mqttClientId + "/data";
+// Topic trạng thái online/offline
+String statusTopic = String("sensor/") + mqttClientId + "/status";
 
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
@@ -38,14 +42,14 @@ float zeroOffset = 0;
 
 // ====== Timer ======
 unsigned long previousMillis = 0;
-const long interval = 5000;  // 5 giây
+const long interval = 5000;  // Gửi dữ liệu mỗi 5 giây
 
-// ====== CALIBRATE ======
+// ====== CALIBRATE ZERO CURRENT ======
 void calibrateZeroCurrent() {
   const int N = 1000;
   float sum = 0;
 
-  Serial.println("Calibrating...");
+  Serial.println("Calibrating zero current...");
 
   for (int i = 0; i < N; i++) {
     sum += ACS.mA_DC();
@@ -69,42 +73,56 @@ float readCurrent() {
 
   float current = (sum / N) - zeroOffset;
 
+  // Ngưỡng nhỏ coi như 0 để tránh nhiễu
   if (current < 50) current = 0;
 
   return current;
 }
 
-// ====== MQTT CONNECT ======
+// ====== MQTT RECONNECT & LWT ======
 void connectMQTT() {
   while (!mqttClient.connected()) {
-    Serial.print("Connecting MQTT...");
-    if (mqttClient.connect(mqttClientId)) {
+    Serial.print("Connecting to MQTT broker... ");
+
+    // === THIẾT LẬP LAST WILL AND TESTAMENT ===
+    // Nếu mất kết nối đột ngột → broker sẽ tự publish "offline"
+    if (mqttClient.connect(mqttClientId,
+                            statusTopic.c_str(),  // topic
+                            1,                    // QoS
+                            true,                 // retain = true
+                            "offline")) {         // payload khi mất kết nối
       Serial.println("OK");
+
+      // === SAU KHI KẾT NỐI THÀNH CÔNG: BÁO ONLINE ===
+      mqttClient.publish(statusTopic.c_str(), "online", true); // retain = true
+      Serial.println("Published online status (retained)");
     } else {
       Serial.print("Failed, rc=");
       Serial.println(mqttClient.state());
+      Serial.println("Retry in 3 seconds...");
       delay(3000);
     }
   }
 }
 
-// ====== SEND DATA ======
+// ====== SEND SENSOR DATA ======
 void sendSensorData() {
-  // DHT11
+  // Đọc DHT11
   float h = dht.readHumidity();
   float t = dht.readTemperature();
+
   if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
     h = 0;
     t = 0;
   }
 
-  // Current
+  // Đọc dòng điện
   float current = readCurrent();
 
-  // OLED
+  // Hiển thị OLED
   display.clearDisplay();
   display.setTextSize(2);
-
   display.setCursor(0, 0);
   display.printf("T: %.1fC\n", t);
 
@@ -116,16 +134,19 @@ void sendSensorData() {
 
   display.display();
 
-  // MQTT JSON
+  // Tạo JSON payload
   char payload[128];
   snprintf(payload, sizeof(payload),
            "{\"temperature\":%.1f,\"humidity\":%.0f,\"current\":%.0f}",
            t, h, current);
 
-  mqttClient.publish(mqttTopic.c_str(), payload);
+  // Publish dữ liệu cảm biến
+  bool published = mqttClient.publish(dataTopic.c_str(), payload);
 
-  Serial.print("MQTT sent: ");
-  Serial.println(payload);
+  Serial.print("MQTT sent to ");
+  Serial.print(dataTopic);
+  Serial.print(": ");
+  Serial.println(published ? payload : "FAILED");
 }
 
 // ====== SETUP ======
@@ -133,38 +154,51 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
+  // Khởi động I2C cho OLED
   Wire.begin(SDA_PIN, SCL_PIN);
 
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;);
+  }
+  display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
+  display.display();
 
+  // Khởi động cảm biến
   dht.begin();
   calibrateZeroCurrent();
 
-  // WiFi
+  // Kết nối WiFi
   WiFi.begin(ssid, pass);
+  Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-
-  Serial.println("\nWiFi connected");
+  Serial.println("\nWiFi connected!");
+  Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
-  // MQTT
+  // Cấu hình MQTT
   mqttClient.setServer(mqttServer, mqttPort);
+
+  // Kết nối MQTT lần đầu (có LWT)
   connectMQTT();
 
+  // Gửi dữ liệu lần đầu tiên
   sendSensorData();
 }
 
 // ====== LOOP ======
 void loop() {
+  // Đảm bảo kết nối MQTT luôn sống
   if (!mqttClient.connected()) {
     connectMQTT();
   }
-  mqttClient.loop();
+  mqttClient.loop(); // Xử lý keep-alive, reconnect tự động
 
+  // Gửi dữ liệu định kỳ
   unsigned long now = millis();
   if (now - previousMillis >= interval) {
     previousMillis = now;
