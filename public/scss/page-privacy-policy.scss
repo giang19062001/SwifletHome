@@ -1,0 +1,22 @@
+#page-privacy-policy {
+  padding: 5em 0em;
+  [class*='policy-'] {
+    margin-bottom: 2em;
+  }
+
+  p,
+  b,
+  span,
+  li {
+    font-size: 18px !important;
+  }
+  h5,
+  h3 {
+    font-family: 'Pretendard' !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+  }
+  li {
+    margin-bottom: 8px;
+  }
+}

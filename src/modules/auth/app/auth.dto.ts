@@ -23,7 +23,7 @@ export class UpdatePasswordDto {
 
 export class UpdateDeviceTokenDto {
   @ApiProperty({
-    example: 'c7MkjIGhQsayyKMRmlwlh-:APA91bG5je2rIYLXGmji70lflu8auuyE3CMP0t2fByBs8vohBMDHdMBp3zvd_NihqAXYRVJ8JbrxTaR7bfr4sxaCGV588_RrHEah-j_X14uFJ58slLW4C1Q',
+    example: 'ABCXYZ123',
   })
   @IsString()
   @IsNotEmpty()
@@ -46,7 +46,7 @@ export class LoginAppDto {
   userPassword: string;
 
   @ApiProperty({
-    example: 'c7MkjIGhQsayyKMRmlwlh-:APA91bG5je2rIYLXGmji70lflu8auuyE3CMP0t2fByBs8vohBMDHdMBp3zvd_NihqAXYRVJ8JbrxTaR7bfr4sxaCGV588_RrHEah-j_X14uFJ58slLW4C1Q',
+    example: 'ABCXYZ123',
   })
   @IsString()
   @IsNotEmpty()

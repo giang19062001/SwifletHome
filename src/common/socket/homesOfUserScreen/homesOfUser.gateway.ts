@@ -1,71 +1,86 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ISensorHome } from '../socket.interface';
+import { ISensor, ISensorHome } from '../socket.interface';
 import { LoggingService } from '../../logger/logger.service';
 import { JoinRoomDto, LeaveRoomDto } from './homesOfUser.dto';
-import { MqttService } from 'src/common/mqtt/mqtt.service';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @WebSocketGateway({
   namespace: 'socket/homesOfUser',
   transports: ['websocket'],
   cors: { origin: '*' },
 })
-export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class HomesOfUserGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   @WebSocketServer()
   server: Server;
 
   private readonly SERVICE_NAME = 'SocketGateway/homesOfUser';
-  private readonly INTERVALS_TIME = 5000;
-  private socketIntervals = new Map<string, NodeJS.Timeout>();
 
-  constructor(
-    private readonly mqttService: MqttService,
-    private readonly logger: LoggingService,
-  ) {}
+  // Theo dõi homes mà user đang xem
+  private watchingHomes = new Map<string, Set<string>>(); // userCode → Set<homeCode>
+
+  // Cache dữ liệu mới nhất 
+  private latestSensorDataOfHomes = new Map<string, ISensorHome>(); // key: MAC-userCode-homeCode
+
+  // Trạng thái online/offline 
+  private sensorOnline = new Map<string, boolean>(); // key: MAC-userCode-homeCode → true/false
+
+  constructor(private readonly logger: LoggingService) {}
+
+  afterInit() {
+    this.logger.log(this.SERVICE_NAME, 'Gateway multiple homes đã khởi động');
+  }
 
   handleConnection(client: Socket) {
-    this.logger.log(this.SERVICE_NAME, `Mở kết nối: ${client.id}`);
+    this.logger.log(this.SERVICE_NAME, `Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(this.SERVICE_NAME, `Đóng kết nối: ${client.id}`);
-
-    // Dọn dẹp interval khi client disconnect bất ngờ ( mất internet,... )
-    this.cleanupUserInterval(client);
+    this.logger.log(this.SERVICE_NAME, `Client disconnected: ${client.id}`);
   }
 
-  // tham gia nhóm
   @SubscribeMessage('joinRoom')
   joinRoom(@MessageBody() data: JoinRoomDto, @ConnectedSocket() client: Socket) {
     const { userCode, userHomeCodes } = data;
-    if (!userCode) return;
 
-    // lưu tạm dữ liệu cho biến socket
-    const intervalName = `${userCode}`;
-    client.data.intervalName = intervalName;
-
-    const room = `USER-${intervalName}-ROOM`;
-    client.join(room);
-
-    this.logger.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
-
-    // Khởi tạo interval nếu chưa có
-    if (!this.socketIntervals.has(intervalName)) {
-      this.startSensorDataInterval(intervalName, userHomeCodes, room);
+    if (!userCode || !Array.isArray(userHomeCodes) || userHomeCodes.length === 0) {
+      return;
     }
 
-    // Gửi dữ liệu rỗng lần đầu
-    this.sendInitialData(client);
+    const room = `USER-${userCode}-ROOM`;
+    client.join(room);
+    this.watchingHomes.set(userCode, new Set(userHomeCodes));
+
+    // Khởi tạo trạng thái offline cho tất cả homes khi mới join
+    userHomeCodes.forEach((homeCode) => {
+      const key = `MAC-${userCode}-${homeCode}`;
+      this.sensorOnline.set(key, false); // mặc định offline khi chưa có dữ liệu
+    });
+
+    this.logger.log(this.SERVICE_NAME, `User ${userCode} theo dõi ${userHomeCodes.length} homes`);
+
+    // Gửi dữ liệu ban đầu: tất cả là 0
+    const initialSnapshot = userHomeCodes.map((homeCode) => ({
+      userHomeCode: homeCode,
+      temperature: 0,
+      humidity: 0,
+      current: 0,
+    }));
+
+    client.emit('streamSensorData', initialSnapshot);
   }
 
-  // gửi sensor data cho client
-  private sendSensorData(room: string, payload: ISensorHome[]) {
-    // this.logger.log(this.SERVICE_NAME, `streamSensorData: ${JSON.stringify(payload)}`);
-    console.log(this.SERVICE_NAME, `streamSensorData: ${JSON.stringify(payload)}`);
-    this.server.to(room).emit('streamSensorData', payload);
-  }
-
-  // rời phòng -> xóa interval
   @SubscribeMessage('leaveRoom')
   leaveRoom(@MessageBody() data: LeaveRoomDto, @ConnectedSocket() client: Socket) {
     const { userCode } = data;
@@ -73,50 +88,115 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
 
     const room = `USER-${userCode}-ROOM`;
     client.leave(room);
-    this.cleanupUserInterval(client);
-    this.logger.log(this.SERVICE_NAME, `${client.id} đã rời phòng: ${room}`);
-  }
 
-  // khởi tạo internal khi chưa có
-  private startSensorDataInterval(intervalName: string, userHomeCodes: string[], room: string) {
-    const interval = setInterval(() => {
-      console.log("userHomeCodes", userHomeCodes, intervalName);
-      const sensorData = this.generateListSensorData(userHomeCodes, intervalName);
-      this.sendSensorData(room, sensorData);
-    }, this.INTERVALS_TIME);
-
-    this.socketIntervals.set(intervalName, interval);
-    this.logger.log(this.SERVICE_NAME, `Đã khởi tạo interval cho tên: ${intervalName}`);
-  }
-
-  // lấy dữ liệu fake
-  private generateListSensorData(userHomeCodes: string[], userCode: string): ISensorHome[] {
-    return userHomeCodes.map((homeCode) => ({
-      userHomeCode: homeCode,
-      ...this.mqttService.getLatestSensorData(`MAC-${userCode}-${homeCode}`)
-    }));
-  }
-
-  // gửi mảng rỗng khi khởi tạo
-  private sendInitialData(client: Socket) {
-    client.emit('streamSensorData', []);
-  }
-
-  // xóa interval
-  private cleanupUserInterval(client: Socket) {
-    const intervalName = client.data?.intervalName as string;
-    if (!intervalName) return;
-
-    const room = `USER-${intervalName}-ROOM`;
-    const roomClients = this.server.sockets.adapter?.rooms?.get(room);
-
-    if (!roomClients || roomClients.size === 0) {
-      const interval = this.socketIntervals.get(intervalName);
-      if (interval) {
-        clearInterval(interval);
-        this.socketIntervals.delete(intervalName);
-        this.logger.log(this.SERVICE_NAME, `Đã xóa interval của tên: ${intervalName}`);
-      }
+    // Dọn dẹp homes mà user đang xem
+    const homes = this.watchingHomes.get(userCode);
+    if (homes) {
+      homes.forEach((homeCode) => {
+        const key = `MAC-${userCode}-${homeCode}`;
+        this.latestSensorDataOfHomes.delete(key);
+        this.sensorOnline.delete(key);
+      });
     }
+    this.watchingHomes.delete(userCode);
+
+    this.logger.log(this.SERVICE_NAME, `User ${userCode} đã rời phòng`);
+  }
+
+  // Xây dựng dữ liệu của toàn bộ sensor của từng home của user đó
+  private buildFullSnapshot(userCode: string): ISensorHome[] {
+    const homes = this.watchingHomes.get(userCode);
+    if (!homes) return [];
+
+    return Array.from(homes).map((homeCode) => {
+      const key = `MAC-${userCode}-${homeCode}`;
+      const isOnline = this.sensorOnline.get(key) ?? false;
+
+      if (isOnline) {
+        // Có dữ liệu thật → dùng cache 
+        return this.latestSensorDataOfHomes.get(key)!;
+      } else {
+        // Offline hoặc chưa có dữ liệu → trả về 0
+        return {
+          userHomeCode: homeCode,
+          temperature: 0,
+          humidity: 0,
+          current: 0,
+        };
+      }
+    });
+  }
+
+  // Gửi toàn bộ dữ liệu sensor của mỗi home cho user
+  private sendFullSnapshot(userCode: string) {
+    const snapshot = this.buildFullSnapshot(userCode);
+    const room = `USER-${userCode}-ROOM`;
+
+    console.log(
+      this.SERVICE_NAME,
+      `toàn bộ dữ liệu sensor của homes cho user ${userCode}: ${snapshot.length} homes`,
+      snapshot.map(s => `${s.userHomeCode}: ${s.temperature}°C, ${s.humidity}%, ${s.current}mA`).join(' | '),
+    );
+
+    this.server.to(room).emit('streamSensorData', snapshot);
+  }
+
+  // Khi nhận dữ liệu từ sensor
+  @OnEvent('sensor.data.updated')
+  handleSensorDataUpdated(payload: { key: string; data: ISensor }) {
+    const { key, data } = payload;
+
+    const parts = key.split('-');
+    if (parts.length !== 3 || parts[0] !== 'MAC') return;
+
+    const userCode = parts[1];
+    const homeCode = parts[2];
+
+    const watchedHomes = this.watchingHomes.get(userCode);
+    if (!watchedHomes || !watchedHomes.has(homeCode)) return;
+
+    const cacheKey = `MAC-${userCode}-${homeCode}`;
+
+    // Cập nhật cache dữ liệu 
+    const homeData: ISensorHome = {
+      userHomeCode: homeCode,
+      temperature: data.temperature,
+      humidity: data.humidity,
+      current: data.current,
+    };
+    this.latestSensorDataOfHomes.set(cacheKey, homeData);
+
+    // Đánh dấu là online
+    this.sensorOnline.set(cacheKey, true);
+
+    // Gửi toàn bộ dữ liệu sensor
+    this.sendFullSnapshot(userCode);
+  }
+
+  // Khi sensor offline
+  @OnEvent('sensor.status.changed')
+  handleSensorStatusChanged(payload: { key: string; status: 'online' | 'offline' }) {
+    const { key, status } = payload;
+
+    const parts = key.split('-');
+    if (parts.length !== 3 || parts[0] !== 'MAC') return;
+
+    const userCode = parts[1];
+    const homeCode = parts[2];
+
+    const watchedHomes = this.watchingHomes.get(userCode);
+    if (!watchedHomes || !watchedHomes.has(homeCode)) return;
+
+    const cacheKey = `MAC-${userCode}-${homeCode}`;
+
+    if (status === 'offline') {
+      // Đánh dấu offline  → gí trị sẽ trả về 0
+      this.sensorOnline.set(cacheKey, false);
+
+      this.logger.log(this.SERVICE_NAME, `Home ${homeCode} offline → gửi dữ liệu với giá trị về 0`);
+
+      this.sendFullSnapshot(userCode);
+    }
+    // Nếu online → chờ dữ liệu từ data.updated
   }
 }

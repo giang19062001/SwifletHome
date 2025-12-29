@@ -19508,6 +19508,29 @@ select {
   transform: translateY(-4px);
 }
 
+#page-privacy-policy {
+  padding: 5em 0em;
+}
+#page-privacy-policy [class*=policy-] {
+  margin-bottom: 2em;
+}
+#page-privacy-policy p,
+#page-privacy-policy b,
+#page-privacy-policy span,
+#page-privacy-policy li {
+  font-size: 18px !important;
+}
+#page-privacy-policy h5, #page-privacy-policy .h5,
+#page-privacy-policy h3,
+#page-privacy-policy .h3 {
+  font-family: "Pretendard" !important;
+  font-weight: 700 !important;
+  margin-bottom: 0 !important;
+}
+#page-privacy-policy li {
+  margin-bottom: 8px;
+}
+
 .component-upload {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
   border-radius: 15px;

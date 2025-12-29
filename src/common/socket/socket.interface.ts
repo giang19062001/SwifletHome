@@ -5,6 +5,13 @@ export interface ISensor {
   timestamp?: number;
 }
 
+export interface ISensorStatus {
+  key: string;
+  status: 'online' | 'offline';
+  timestamp?: number;
+}
+
+
 export interface ISensorHome {
   userHomeCode: string;
   temperature: number;

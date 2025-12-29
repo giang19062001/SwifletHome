@@ -1,5 +1,6 @@
 import { CookieOptions } from 'express';
 
+export const PUBLIC_ROUTERS = ['/privacy-policy']
 export const AUTH_CONFIG = {
   TOKEN_NAME: 'swf-token',
   EXPIRED_ADMIN: '1d' as const,

@@ -17,7 +17,7 @@ export class GetScheduledTasksResDto {
   @ApiProperty({ example: 'Thu hoạch' })
   label: string;
 
-  @ApiProperty({ example: 'NaN' })
+  @ApiProperty({ example: '_ / _' })
   value: string;
 
   @ApiProperty({ example: '2025-12-12' })

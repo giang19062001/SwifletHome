@@ -24,8 +24,8 @@ export class TodoAppService {
     const logbase = `${this.SERVICE_NAME}/getScheduledTasks:`;
 
     const defaultData = Array.from({ length: 3 }, () => ({
-      label: 'NaN',
-      value: 'NaN',
+      label: '_ / _',
+      value: '_ / _',
       date: '',
       unit: '',
     }));
@@ -48,7 +48,7 @@ export class TodoAppService {
         if (!data?.taskDate) {
           return {
             label: ele.taskName,
-            value: 'NaN',
+            value: '_ / _',
             date: '',
             unit: '',
           };

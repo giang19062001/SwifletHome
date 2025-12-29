@@ -1,10 +1,13 @@
 import { CanActivate, ExecutionContext, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthAdminService } from './auth.service';
-import { AUTH_CONFIG } from 'src/helpers/const.helper';
+import { AUTH_CONFIG, PUBLIC_ROUTERS } from 'src/helpers/const.helper';
 
 @Injectable()
 export class PageAuthAdminGuard implements CanActivate {
+  LOGIN_ROUTER: string = '/';
+  MAIN_ROUTER: string = "'/dashboard/main'";
+
   constructor(private readonly authAdminService: AuthAdminService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -13,32 +16,32 @@ export class PageAuthAdminGuard implements CanActivate {
     const token = req.cookies[AUTH_CONFIG.TOKEN_NAME];
 
     if (!token) {
-      // no token
-      if (req.originalUrl === '/') {
-        // in login page
+      // ko có token
+      if (req.originalUrl === this.LOGIN_ROUTER || PUBLIC_ROUTERS.includes(req.originalUrl)) {
+        // đang ở trang đăng nhập
         return true;
       } else {
-        // in another page => redirect to login page
-        res.redirect('/');
+        //ở trang khác => redirect to về lại trang đăng nhập
+        res.redirect(this.LOGIN_ROUTER);
         return false;
       }
     } else {
       // have token
       try {
         const payload = await this.authAdminService.verifyToken(token);
-        req.session.user = payload; // save user into session server to EJS render
+        req.session.user = payload; // lưu user vào session server để EJS render
 
-        if (req.originalUrl === '/') {
-          // in login page
-          res.redirect('/dashboard/main');
+        if (req.originalUrl === this.LOGIN_ROUTER) {
+          //đang ở trang đăng nhập
+          res.redirect(this.MAIN_ROUTER);
           return false;
         } else {
-          // in another page => next()
+          //ở trang khác => => next()
           return true;
         }
       } catch (err) {
-        // token invalid => login page
-        res.redirect('/');
+        // token invalid => về lại trang đăng nhập
+        res.redirect(this.LOGIN_ROUTER);
         return false;
       }
     }

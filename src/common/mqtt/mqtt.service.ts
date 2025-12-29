@@ -2,23 +2,28 @@ import { Injectable, OnModuleInit, OnApplicationShutdown } from '@nestjs/common'
 import * as mqtt from 'mqtt';
 import { LoggingService } from '../logger/logger.service';
 import { ConfigService } from '@nestjs/config';
-import { ISensor } from '../socket/socket.interface';
+import { ISensor, ISensorStatus } from '../socket/socket.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class MqttService implements OnModuleInit, OnApplicationShutdown {
   private client: mqtt.MqttClient;
   private brokerUrl: string;
-  private readonly topic = 'sensor/+/data'; // Dùng wildcard + để nhận từ nhiều sensor khác nhau
-  private readonly SERVICE_NAME = 'MqttService';
-  private readonly TIMEOUT_SENSOR_VALUE = 10 * 1000; // 10 giây
 
-  private latestSensorData = new Map<string, ISensor>(); // lưu tạm giá trị mới nhất
+  // Topic cho dữ liệu cảm biến
+  private readonly dataTopic = 'sensor/+/data';
+  // Topic cho trạng thái online/offline
+  private readonly statusTopic = 'sensor/+/status';
+
+  private readonly SERVICE_NAME = 'MqttService';
+
   constructor(
     private readonly logger: LoggingService,
     private readonly configService: ConfigService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     const MQTT_HOST = 'localhost';
-    const MQTT_PORT = this.configService.get<string>('MQTT_PORT');
+    const MQTT_PORT = this.configService.get<string>('MQTT_PORT') || '1883';
     this.brokerUrl = `mqtt://${MQTT_HOST}:${MQTT_PORT}`;
   }
 
@@ -31,19 +36,23 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     });
 
     this.client.on('connect', () => {
-      this.logger.log(this.SERVICE_NAME, `Kết nỗi MQTT ${this.brokerUrl} thành công!`);
-      this.client.subscribe(this.topic, (err) => {
+      this.logger.log(this.SERVICE_NAME, `Kết nối MQTT ${this.brokerUrl} thành công!`);
+
+      // Đăng ký cả 2 topic
+      this.client.subscribe([this.dataTopic, this.statusTopic], (err) => {
         if (!err) {
-          this.logger.log(this.SERVICE_NAME, `đăng kí chủ đề chung: ${this.topic}`);
+          this.logger.log(this.SERVICE_NAME, `Đã đăng ký: ${this.dataTopic} và ${this.statusTopic}`);
+        } else {
+          this.logger.error(this.SERVICE_NAME, `Lỗi subscribe topic: ${err}`);
         }
       });
     });
 
     this.client.on('message', (topic, message) => {
-      // VD: sensor/MAC-USR000001-HOM000003/data
-      const match = topic.match(/^sensor\/(.+)\/data$/);
-      if (match) {
-        const key = match[1]; //VD: MAC-USR000001-HOM000003
+      // Xử lý topic data: sensor/MAC-xxx-xxx/data
+      const dataMatch = topic.match(/^sensor\/(.+)\/data$/);
+      if (dataMatch) {
+        const key = dataMatch[1]; // MAC-USR000001-HOM000003
 
         try {
           const payload = JSON.parse(message.toString());
@@ -51,52 +60,49 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
             temperature: payload.temperature ?? 0,
             humidity: payload.humidity ?? 0,
             current: payload.current ?? 0,
-            timestamp: Date.now(), // lưu thời gian cập nhật
+            timestamp: Date.now(),
           };
 
-          this.latestSensorData.set(key, sensorData);
-          // console.log(`MQTT Updated [${key}]:`, sensorData);
+          this.eventEmitter.emit('sensor.data.updated', {
+            key,
+            data: sensorData,
+          });
         } catch (error) {
-          console.error('Invalid MQTT payload:', message.toString());
+          this.logger.error(this.SERVICE_NAME, `Invalid MQTT payload: JSON.stringify(error)`);
         }
+        return;
+      }
+
+      // Xử lý topic status: sensor/MAC-xxx-xxx/status
+      const statusMatch = topic.match(/^sensor\/(.+)\/status$/);
+      if (statusMatch) {
+        const key = statusMatch[1];
+        const status = message.toString().trim();
+
+        if (status === 'online' || status === 'offline') {
+          this.logger.log(this.SERVICE_NAME, `Thiết bị ${key} chuyển trạng thái: ${status.toUpperCase()}`);
+
+          const payload: ISensorStatus = {
+            key,
+            status, // 'online' | 'offline'
+            timestamp: Date.now(),
+          };
+
+          this.eventEmitter.emit('sensor.status.changed', payload);
+        }
+        return;
       }
     });
-    this.client.on('reconnect', () => this.logger.warn('MQTT reconnecting...'));
-    this.client.on('offline', () => this.logger.error('MQTT broker offline'));
-    this.client.on('error', (err) => this.logger.error('MQTT error', err));
+
+    this.client.on('reconnect', () => this.logger.warn(this.SERVICE_NAME, 'MQTT đang kết nối lại...'));
+    this.client.on('offline', () => this.logger.error(this.SERVICE_NAME, 'MQTT broker offline'));
+    this.client.on('error', (err) => this.logger.error(this.SERVICE_NAME, `MQTT error ${JSON.stringify(err)}`));
   }
 
   onApplicationShutdown() {
     if (this.client) {
       this.client.end();
+      this.logger.log(this.SERVICE_NAME, 'Đã đóng kết nối MQTT');
     }
-  }
-  //  lấy dữ liệu mới nhất theo key
-  getLatestSensorData(key: string): ISensor {
-    const data = this.latestSensorData.get(key);
-
-    if (!data) {
-      return {
-        temperature: 0,
-        humidity: 0,
-        current: 0,
-        timestamp: 0,
-      };
-    }
-
-    // Nếu quá 10 phút kể từ lần update cuối -> cho là 0
-    const now = Date.now();
-    const lastTime = data.timestamp ?? 0;
-
-    if (now - lastTime > this.TIMEOUT_SENSOR_VALUE) {
-      return {
-        temperature: 0,
-        humidity: 0,
-        current: 0,
-        timestamp: 0,
-      };
-    }
-
-    return data;
   }
 }

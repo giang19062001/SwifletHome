@@ -79,7 +79,6 @@
                 </div>
 
                 <div class="text-sm text-gray-400 space-y-1 bg-gray-900/50 p-4 rounded-lg font-mono">
-                    <p>Interval: <span class="font-semibold text-white-400">5 seconds</span></p>
                     <p>Status: <span id="status" class="font-semibold text-orange-400">Disconnected</span></p>
                     <p>clientId: <span id="clientId" class="font-bold text-white">-</span></p>
                     <p>Room: <span id="room" class="font-bold text-white">-</span></p>
@@ -158,6 +157,7 @@
         const roomEl = $('room');
 
         const addLog = (type, title, data) => {
+            console.log("data", data);
             count++;
             counter.textContent = `${count} messages`;
             const time = moment().format('HH:mm:ss');
@@ -234,7 +234,7 @@
 
             socket.emit(cfg.joinEvent, payload);
             // Lấy key đầu tiên để hiển thị room -> room name đồng nhất phía backend
-            const roomKeyValues = cfg.roomKey.map(k => cfg.defaultPayload[k]);
+            const roomKeyValues = cfg.roomKey.map(k => payload[k]);
             roomEl.textContent = `${cfg.roomPrefix}${roomKeyValues.join("-")}-ROOM`;
 
             addLog('warn', cfg.joinEvent, payload);

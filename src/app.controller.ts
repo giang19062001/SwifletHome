@@ -16,6 +16,13 @@ export class AppController {
   renderLogin() {
     return { title: 'Đăng nhập', isLayout: false };
   }
+  
+  @Get('/privacy-policy')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/privacy-policy')
+  renderPrivacyPolicy() {
+    return { title: 'Chính sách bảo mật', isLayout: false };
+  }
 
   // dashboard
   @Get('/dashboard/main')

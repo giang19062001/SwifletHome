@@ -35,27 +35,27 @@ export class SearchService {
   handleAudio(content: string, remainDay: number, isFree: string, fileList: IFileUpload[]) {
     // TODO: [AUDIO]
     return content.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
-      // console.log('fileList', fileList);
-      console.log('remainDay', remainDay);
+      const baseUrl = url.split('/').slice(0, 3).join('/');
 
+      // console.log('baseUrl', baseUrl);
+      console.log('remainDay --->', remainDay);
       const lastSlashIndex = url.lastIndexOf('/');
-      const fileUrl = url.substring(0, lastSlashIndex);
       const filename = url.substring(lastSlashIndex + 1); // free
-      console.log('filename', filename);
+      console.log('filename --->', filename);
 
       const fileInfo = fileList?.find((ele) => ele.filename.includes(filename));
-      console.log('fileInfo', fileInfo);
+      // console.log('fileInfo', fileInfo);
 
       const audioPay = fileInfo?.filenamePay || undefined; // pay
-      console.log('audioPay', audioPay);
+      console.log('audioPay --->', audioPay);
 
       // nếu file dạng miễn phí -> nghe file ( pay )
       // nếu file dạng tính phí && user còn hạn gói nâng cấp -> ghe file ( pay )
       // nếu file dạng tính phí && user hết hạn gói nâng cấp -> ghe file ( free )
-      const audioSrc = isFree == 'Y' ? `${fileUrl}/${audioPay}` : isFree == 'N' && remainDay <= 0 ? `${url}` : `${fileUrl}/${audioPay}`;
+      const audioSrc = isFree == 'Y' ? `${baseUrl}/${audioPay}` : isFree == 'N' && remainDay <= 0 ? `${url}` : `${baseUrl}/${audioPay}`;
       //  const audioSrc = remainDay <= 0 ? `${url}` : `${fileUrl}/${audioPay}`;
 
-      console.log('audioSrc', audioSrc);
+      console.log('audioSrc --->', audioSrc);
 
       return `[[audio-data=${audioSrc}]]`;
     });
