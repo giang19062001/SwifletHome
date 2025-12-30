@@ -82,6 +82,10 @@ export default class TodoAppValidate {
       const specificDate = new Date(dto.specificValue);
       const now = new Date();
 
+      // reset cả 2 về đầu ngày
+      specificDate.setHours(0, 0, 0, 0);
+      now.setHours(0, 0, 0, 0);
+
       // validate ngày hợp lệ
       if (isNaN(specificDate.getTime())) {
         return Msg.InvalidValue('specificValue');
