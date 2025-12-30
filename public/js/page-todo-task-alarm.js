@@ -25,18 +25,17 @@ function initDate() {
   const input = document.getElementById('specificValue');
 
   const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
 
-  const yyyy = tomorrow.getFullYear();
-  const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
-  const dd = String(tomorrow.getDate()).padStart(2, '0');
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
 
-  const tomorrowStr = `${yyyy}-${mm}-${dd}`;
+  const todayStr = `${yyyy}-${mm}-${dd}`;
 
-  input.value = tomorrowStr; // set value = ngày mai
-  input.min = tomorrowStr;
+  input.value = todayStr; // set value = hôm nay
+  input.min = todayStr;   // set min = hôm nay
 }
+
 function resetForm() {
   // Clear text inputs
   const titleEl = document.getElementById('title');
@@ -166,8 +165,8 @@ function initSubmitForm() {
     const formData = {
       title: form.title.value,
       body: form.body.value,
-            taskCode: form.taskCode.value,
-specificValue: form.specificValue.value,
+      taskCode: form.taskCode.value,
+      specificValue: form.specificValue.value,
       sendType,
       userCodesMuticast,
       provinceCodesMuticast,

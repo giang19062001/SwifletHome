@@ -87,9 +87,9 @@ export default class TodoAppValidate {
         return Msg.InvalidValue('specificValue');
       }
 
-      // specificValue phải lớn hơn ngày hiện tại
-      if (specificDate <= now) {
-        return Msg.MustBeGreaterThanNow('specificValue');
+      // specificValue phải lớn hơn và bằng ngày hiện tại
+      if (specificDate < now) {
+        return Msg.MustBeGreaterThanAndEqualNow('specificValue');
       }
 
       dto.specificValue = specificDate

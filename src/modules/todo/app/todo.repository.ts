@@ -61,7 +61,6 @@ export class TodoAppRepository {
              AND A.taskStatus = '${TaskStatusEnum.WAITING}'
              ORDER BY A.taskDate ASC
              LIMIT 1`;
-             console.log(query);
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [
       userCode,
