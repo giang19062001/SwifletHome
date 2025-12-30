@@ -29,6 +29,7 @@ export class NotificationAppRepository {
            A.createdAt, A.createdId
     FROM ${this.table} A
     WHERE ${this.theQueryCountCommon}
+    ORDER BY A.createdAt DESC
   `;
 
     const params: any[] = [userCode, userCode, topicCode];
