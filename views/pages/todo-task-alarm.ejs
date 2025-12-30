@@ -1,0 +1,113 @@
+<div class="common-table-container row" id="page-notification">
+    <div class="col-xl-12">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <p class="title-page">
+                                <%= title %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <form id="push-notification-form" class="card shadow-sm p-4 rounded-3">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Tiêu đề</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Nhập tiêu đề" maxlength="200"/>
+                        <div class="error-message mt-2" data-error="title"></div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="body" class="form-label">Nội dung</label>
+                        <textarea class="form-control" id="body" name="body" rows="4"
+                            placeholder="Nhập nội dung thông báo" maxlength="1000"></textarea>
+                        <div class="error-message mt-2" data-error="body"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label d-block">Tên công việc</label>
+                            <select class="form-select" id="taskCode" name="taskCode">
+                                <option selected>-- Chọn công việc --</option>
+                                <% values.tasks.forEach(function(task) { %>
+                                    <option value="<%= task.taskCode %>"><%= task.taskName %></option>
+                                <% }); %>
+                            </select>
+                            <div class="error-message mt-2" data-error="taskCode"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="specificValue" class="form-label">Ngày của lịch nhắc</label>
+                            <input class="form-control" type="date" id="specificValue" name="specificValue" />
+                            <div class="error-message mt-2" data-error="specificValue"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label d-block">Hình thức gửi</label>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sendType" id="sendType-all" value="ALL"
+                                checked />
+                            <label class="form-check-label" for="sendType-all">
+                                Gửi tất cả người dùng
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sendType" id="sendType-user" value="USER" />
+                            <label class="form-check-label" for="sendType-user">
+                                Gửi người dùng cụ thể
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sendType" id="sendType-province" value="PROVINCE" />
+                            <label class="form-check-label" for="sendType-province">
+                                Gửi theo khu vực
+                            </label>
+                        </div>
+                    </div>
+                    <!-- User checkbox list -->
+                    <div class="mb-3 d-none" id="user-box">
+                        <label class="form-label">Chọn người dùng</label>
+
+                        <div id="user-codes-list" class="border rounded p-2 d-flex flex-wrap gap-3"
+                            style="max-height: 220px; overflow-y: auto;"></div>
+                    </div>
+                      <!-- Area checkbox list -->
+                    <div class="mb-3 d-none" id="province-box">
+                        <label class="form-label">Chọn khu vực</label>
+
+                        <div id="province-codes-list" class="border rounded p-2 d-flex flex-wrap gap-3"
+                            style="max-height: 220px; overflow-y: auto;">
+                           <% values.provinces.forEach(function(pro) { %>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="provinceCode" value="<%= pro.provinceCode %>" id="province-<%= pro.provinceCode %>">
+                                <label class="form-check-label" for="province-<%= pro.provinceCode %>">
+                                <%= pro.provinceName %>
+                                </label>
+                            </div>
+                           <% }); %>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn-submit px-4">
+                            Gửi thông báo
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/common-validate.js"></script>
+<script src="/js/page-todo-task-alarm.js"></script>

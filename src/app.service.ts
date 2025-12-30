@@ -7,6 +7,7 @@ import { CategoryAdminService } from './modules/category/admin/category.service'
 import { ObjectAdminService } from './modules/object/admin/object.service';
 import { ScreenAdminService } from './modules/screen/admin/screen.service';
 import { ProvinceService } from './modules/province/province.service';
+import { TodoAdminService } from './modules/todo/admin/todo.service';
 
 @Injectable()
 export class AppService {
@@ -18,6 +19,7 @@ export class AppService {
     private readonly objectAdminService: ObjectAdminService,
     private readonly provinceService: ProvinceService,
     private readonly screenAdminService: ScreenAdminService,
+    private readonly todoAdminService: TodoAdminService,
   ) {}
 
   async renderAnswerCreate(): Promise<any> {
@@ -117,11 +119,20 @@ export class AppService {
     };
   }
   // notification
-   // user home
   async renderNotification(): Promise<any> {
     const provinces = await this.provinceService.getAll();
     return {
       provinces: provinces,
+    };
+  }
+  // TaskAlarm
+  async renderTaskAlarm(): Promise<any> {
+    const provinces = await this.provinceService.getAll();
+    const { total, list } = await this.todoAdminService.getAllTasks({ limit: 0, page: 0 });
+
+    return {
+      provinces: provinces,
+      tasks: list,
     };
   }
 }

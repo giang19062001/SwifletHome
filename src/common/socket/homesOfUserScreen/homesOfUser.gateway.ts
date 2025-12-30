@@ -28,13 +28,13 @@ export class HomesOfUserGateway
   private readonly SERVICE_NAME = 'SocketGateway/homesOfUser';
 
   // Theo dõi homes mà user đang xem
-  private watchingHomes = new Map<string, Set<string>>(); // userCode → Set<homeCode>
+  private watchingHomes = new Map<string, Set<string>>(); // userCode -> Set<homeCode>
 
   // Cache dữ liệu mới nhất 
   private latestSensorDataOfHomes = new Map<string, ISensorHome>(); // key: MAC-userCode-homeCode
 
   // Trạng thái online/offline 
-  private sensorOnline = new Map<string, boolean>(); // key: MAC-userCode-homeCode → true/false
+  private sensorOnline = new Map<string, boolean>(); // key: MAC-userCode-homeCode -> true/false
 
   constructor(private readonly logger: LoggingService) {}
 
@@ -113,10 +113,10 @@ export class HomesOfUserGateway
       const isOnline = this.sensorOnline.get(key) ?? false;
 
       if (isOnline) {
-        // Có dữ liệu thật → dùng cache 
+        // Có dữ liệu thật -> dùng cache 
         return this.latestSensorDataOfHomes.get(key)!;
       } else {
-        // Offline hoặc chưa có dữ liệu → trả về 0
+        // Offline hoặc chưa có dữ liệu -> trả về 0
         return {
           userHomeCode: homeCode,
           temperature: 0,
@@ -190,13 +190,13 @@ export class HomesOfUserGateway
     const cacheKey = `MAC-${userCode}-${homeCode}`;
 
     if (status === 'offline') {
-      // Đánh dấu offline  → gí trị sẽ trả về 0
+      // Đánh dấu offline  -> gí trị sẽ trả về 0
       this.sensorOnline.set(cacheKey, false);
 
-      this.logger.log(this.SERVICE_NAME, `Home ${homeCode} offline → gửi dữ liệu với giá trị về 0`);
+      this.logger.log(this.SERVICE_NAME, `Home ${homeCode} offline -> gửi dữ liệu với giá trị về 0`);
 
       this.sendFullSnapshot(userCode);
     }
-    // Nếu online → chờ dữ liệu từ data.updated
+    // Nếu online -> chờ dữ liệu từ data.updated
   }
 }

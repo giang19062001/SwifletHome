@@ -8,6 +8,6 @@ import { TodoAdminRepository } from "./todo.repository";
   imports: [AuthAdminModule],
   controllers: [TodoAdminController],
   providers: [TodoAdminService, TodoAdminRepository],
-  exports:[]
+  exports:[TodoAdminService]
 })
 export class TodoAdminModule{}

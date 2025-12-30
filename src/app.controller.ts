@@ -16,7 +16,7 @@ export class AppController {
   renderLogin() {
     return { title: 'Đăng nhập', isLayout: false };
   }
-  
+
   @Get('/privacy-policy')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/privacy-policy')
@@ -297,6 +297,19 @@ export class AppController {
       title: 'Danh sách công việc',
       isLayout: true,
       user: req.session.user,
+    };
+  }
+  @Get('/dashboard/todo/task-alarm')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/todo-task-alarm')
+  async renderTodoTaskAlarm(@Req() req: Request) {
+    const values = await this.appService.renderTaskAlarm();
+
+    return {
+      title: 'Tạo lịch nhắc',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
     };
   }
   @Get('/dashboard/todo/box-tasks')

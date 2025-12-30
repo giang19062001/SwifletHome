@@ -56,6 +56,7 @@ export class UploadAppRepository {
     let query = ` SELECT A.seq, '' as filename,  A.originalname, 0 as size, 'video/youtube' as mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, A.urlLink, A.badge
         FROM ${this.tableMediaVideo} A
         WHERE A.isActive = 'Y'
+        ORDER BY A.createdAt DESC
          `;
 
     let params: any[] = [];

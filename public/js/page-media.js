@@ -162,7 +162,6 @@ const renderAllFile = (data, objElement) => {
   };
 
   const createFileCard = (container, fileData) => {
-    console.log('fileData', fileData);
     const card = document.createElement('div');
     card.className = `file-card`;
 
@@ -214,6 +213,8 @@ const renderAllFile = (data, objElement) => {
         badge: file.badge,
       });
     } else {
+          console.log("FILE", file.originalname);
+
       // audio
       const isUpgradePreview = document.getElementById('isUpgradePreview').checked ? 'UPGRADE' : 'NOT_UPGRADE';
 

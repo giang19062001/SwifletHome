@@ -7,14 +7,14 @@
 #include <PubSubClient.h>
 
 // ====== WIFI ======
-const char* ssid = "Dreamplex";
-const char* pass = "Dreamchaser";
+char ssid[] = "Dreamplex";
+char pass[] = "Dreamchaser";
 
 // ====== MQTT ======
-const char* mqttServer = "103.77.160.68"; // PROD
-// const char* mqttServer = "172.16.20.134";  // LOCALHOST
-const int mqttPort = 1883;
+const char* mqttServer = "103.77.160.68";
+// const char* mqttServer = "172.16.20.134"; // localhost
 const char* mqttClientId = "MAC-USR000001-HOM000003";
+const int mqttPort = 1883;
 
 // Topic dữ liệu cảm biến
 String dataTopic = String("sensor/") + mqttClientId + "/data";
@@ -42,14 +42,14 @@ float zeroOffset = 0;
 
 // ====== Timer ======
 unsigned long previousMillis = 0;
-const long interval = 5000;  // Gửi dữ liệu mỗi 5 giây
+const long interval = 3000;  // 3 giây
 
-// ====== CALIBRATE ZERO CURRENT ======
+// ====== CALIBRATE ======
 void calibrateZeroCurrent() {
   const int N = 1000;
   float sum = 0;
 
-  Serial.println("Calibrating zero current...");
+  Serial.println("Calibrating...");
 
   for (int i = 0; i < N; i++) {
     sum += ACS.mA_DC();
@@ -73,8 +73,7 @@ float readCurrent() {
 
   float current = (sum / N) - zeroOffset;
 
-  // Ngưỡng nhỏ coi như 0 để tránh nhiễu
-  if (current < 50) current = 0;
+  if (current < 100) current = 0;
 
   return current;
 }
@@ -84,16 +83,16 @@ void connectMQTT() {
   while (!mqttClient.connected()) {
     Serial.print("Connecting to MQTT broker... ");
 
-    // === THIẾT LẬP LAST WILL AND TESTAMENT ===
-    // Nếu mất kết nối đột ngột → broker sẽ tự publish "offline"
+    // === LAST WILL AND TESTAMENT ===
+    // Nếu mất kết nối đột ngột -> broker sẽ tự publish "offline"
     if (mqttClient.connect(mqttClientId,
                             statusTopic.c_str(),  // topic
-                            1,                    // QoS
-                            true,                 // retain = true
+                            1,                    // Đảm bảo broker NHẤT ĐỊNH nhận được tin "offline" này khi sensor thật sự offine dù cho bất kì lỗi nào xảy ra ( lỗi mạng,...)
+                            true,                 // retain = true -> Broker LUÔN GIỮ dữ liệu mới nhất trên topic đó
                             "offline")) {         // payload khi mất kết nối
       Serial.println("OK");
 
-      // === SAU KHI KẾT NỐI THÀNH CÔNG: BÁO ONLINE ===
+      // kết nối thành công báo -> 'ONLINE'
       mqttClient.publish(statusTopic.c_str(), "online", true); // retain = true
       Serial.println("Published online status (retained)");
     } else {
@@ -189,6 +188,7 @@ void setup() {
   // Gửi dữ liệu lần đầu tiên
   sendSensorData();
 }
+
 
 // ====== LOOP ======
 void loop() {

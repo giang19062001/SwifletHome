@@ -87,11 +87,19 @@ export class UploadAdminRepository {
   //*get audio
   async getFileAudio(seq: number): Promise<IAudioFreePay | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.filename as filenameFree, A.mimetype as mimetypeFree, B.filename as filenamePay, B.mimetype as mimetypePay
-        FROM ${this.tableAudio} A 
-         LEFT JOIN  ${this.tableAudio} B
-        ON A.seqPay = B.seq
-        WHERE A.seq = ? 
+      ` 
+        SELECT 
+            A.seq,
+            A.filename AS filenameFree,
+            B.seq AS seqPay,
+            B.filename AS filenamePay
+        FROM ${this.tableAudio} A
+        LEFT JOIN ${this.tableAudio} B 
+            ON (
+                (A.isFree = 'N' AND B.seqPay = A.seq) OR
+                (A.isFree = 'Y' AND A.seqPay = B.seq)
+            )
+        WHERE A.seq = ?;
          `,
       [seq],
     );
@@ -99,11 +107,19 @@ export class UploadAdminRepository {
   }
   async getFileMediaAudio(seq: number): Promise<IAudioFreePay | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.filename as filenameFree, A.mimetype as mimetypeFree, B.filename as filenamePay, B.mimetype as mimetypePay
-        FROM ${this.tableMediaAudio} A 
-         LEFT JOIN  ${this.tableMediaAudio} B
-        ON A.seqPay = B.seq
-        WHERE A.seq = ? 
+      ` SELECT 
+            A.seq,
+            A.filename AS filenameFree,
+            B.seq AS seqPay,
+            B.filename AS filenamePay
+        FROM ${this.tableMediaAudio} A
+        LEFT JOIN ${this.tableMediaAudio} B 
+            ON (
+                (A.isFree = 'N' AND B.seqPay = A.seq) OR
+                (A.isFree = 'Y' AND A.seqPay = B.seq)
+            )
+        WHERE A.seq = ?;
+
          `,
       [seq],
     );
