@@ -3,6 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CreateNotificationDto } from './notification.dto';
 import { INotification, INotificationTopic, IUserNotificationTopic, NotificationStatusEnum } from '../notification.interface';
+import { handleTimezoneQuery } from 'src/helpers/func.helper';
 
 @Injectable()
 export class NotificationAppRepository {
@@ -26,7 +27,7 @@ export class NotificationAppRepository {
     SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.targetScreen, A.data, 
            -- A.userCode, A.userCodesMuticast, A.topicCode,
            A.notificationType, A.notificationStatus, A.isActive, 
-           A.createdAt, A.createdId
+           ${handleTimezoneQuery('A.createdAt')}, A.createdId
     FROM ${this.table} A
     WHERE ${this.theQueryCountCommon}
     ORDER BY A.createdAt DESC

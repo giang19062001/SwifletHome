@@ -1,3 +1,8 @@
+export const handleTimezoneQuery = (field: string) => {
+  const alias = field.includes('.') ? field.split('.').pop() : field;
+  return `CONVERT_TZ(${field}, '+00:00', '+07:00') AS ${alias}`;
+};
+
 export const generateCode = (code: string, keyword: string, lengthNum: number) => {
   const lastCode = code;
 
@@ -14,10 +19,7 @@ export function diffByTwoArr(arr1: any[], arr2: any[], field: string) {
   return arr2.filter((item) => !arrCompare.has(item[field]));
 }
 
-export function sortByDate<T>(
-  field: keyof T,
-  ...arrays: T[][]
-): T[] {
+export function sortByDate<T>(field: keyof T, ...arrays: T[][]): T[] {
   const merged = arrays.flat();
 
   return merged.sort((a, b) => {
@@ -27,11 +29,11 @@ export function sortByDate<T>(
   });
 }
 
-export function formatPrice(price: string | number){
-  return Number(price).toLocaleString('vi-VN')
+export function formatPrice(price: string | number) {
+  return Number(price).toLocaleString('vi-VN');
 }
 
 export function replaceNbspToSpace(str: string) {
-  if (typeof str !== "string") return str;
-  return str.replace(/&nbsp;/g, " ");
+  if (typeof str !== 'string') return str;
+  return str.replace(/&nbsp;/g, ' ');
 }
