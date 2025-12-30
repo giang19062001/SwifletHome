@@ -14,7 +14,8 @@ export const databaseProviders = {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
-      timezone: '+07:00', // VN
+      // timezone: '+07:00', // VN
+      // timezone: 'Z',
       charset: 'utf8mb4',
     });
     return pool;
