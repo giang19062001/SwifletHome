@@ -57,7 +57,9 @@ export const Msg = {
 };
 
 export const MsgAdmin = {
+  pushAlarmOk: 'Tạo lịch nhắc và gửi thông báo thành công',
+  pushAlarmErr: 'Tạo lịch nhắc thành công nhưng gửi thông báo thất bại',
   pushNotifyOk: 'Gửi thông báo thành công',
   pushNotifyErr: 'Gửi thông báo thất bại',
-  pushNotifyProvinceEmpty:"Không có người dùng nào có nhà yến thuộc những tỉnh thành này"
+  pushProvinceEmpty:"Không có người dùng nào có nhà yến thuộc những tỉnh thành này"
 };

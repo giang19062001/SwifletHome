@@ -55,10 +55,15 @@ export interface IUserNotificationTopic {
   updatedId: string;
 }
 
-
 export interface IUserHomeProvinceForPush {
   userCode: string;
   deviceToken: string;
   userHomeCode: string;
   userHomeProvince: string;
+}
+
+export interface IUserHomeForPush {
+  userCode: string;
+  deviceToken: string;
+  userHomeCode: string;
 }

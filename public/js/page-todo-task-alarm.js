@@ -1,13 +1,13 @@
-const pageElement = 'page-notification';
+const pageElement = 'page-task-alarm';
 let userList = [];
-const notificationConstraints = {
+const taskAlarmConstraints = {
   title: {
     presence: { allowEmpty: false, message: '^Vui lòng tiêu đề thông báo.' },
   },
   body: {
     presence: { allowEmpty: false, message: '^Vui lòng nội dung thông báo.' },
   },
-  taskCode: {
+  taskName: {
     presence: { allowEmpty: false, message: '^Vui lòng chọn công việc.' },
   },
 };
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // TODO: FUNC
 function initDate() {
-  const input = document.getElementById('specificValue');
+  const input = document.getElementById('taskDate');
 
   const today = new Date();
 
@@ -40,9 +40,11 @@ function resetForm() {
   // Clear text inputs
   const titleEl = document.getElementById('title');
   const bodyEl = document.getElementById('body');
+  const taskNameEl = document.getElementById('taskName');
 
   if (titleEl) titleEl.value = '';
   if (bodyEl) bodyEl.value = '';
+  if (taskNameEl) taskNameEl.value = '';
 
   // Set radio sendType = ALL
   const sendTypeAll = document.querySelector('input[name="sendType"][value="ALL"]');
@@ -150,10 +152,10 @@ async function getAllUser(page, limit) {
 }
 
 function initSubmitForm() {
-  const form = document.getElementById('push-notification-form');
+  const form = document.getElementById('push-task-alarm-form');
 
   // validate realtime
-  form.querySelectorAll('input, textarea, select').forEach((el) => el.addEventListener('input', () => validateField(notificationConstraints, el)));
+  form.querySelectorAll('input, textarea, select').forEach((el) => el.addEventListener('input', () => validateField(taskAlarmConstraints, el)));
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -165,15 +167,15 @@ function initSubmitForm() {
     const formData = {
       title: form.title.value,
       body: form.body.value,
-      taskCode: form.taskCode.value,
-      specificValue: form.specificValue.value,
+      taskName: form.taskName.value,
+      taskDate: form.taskDate.value,
       sendType,
       userCodesMuticast,
       provinceCodesMuticast,
     };
 
     // kiêm lỗi
-    const errors = validate(formData, notificationConstraints);
+    const errors = validate(formData, taskAlarmConstraints);
     if (errors) return displayErrors(errors);
 
     if (sendType === 'USER' && !userCodesMuticast.length) return toastErr('Vui lòng chọn ít nhất 1 người dùng');
@@ -185,31 +187,31 @@ function initSubmitForm() {
       provinceCodesMuticast: sendType === 'PROVINCE' ? provinceCodesMuticast : [],
     };
 
-    console.log(payload);
+    console.log("payload", payload);
 
     // disable nút summit
-    // let btn = form.querySelector('button');
-    // btn.disabled = true;
+    let btn = form.querySelector('button');
+    btn.disabled = true;
 
-    // // gửi thông báo
-    // try {
-    //   const response = await axios.post(CURRENT_URL + '/api/admin/notification/pushNotifycationByAdmin', payload, axiosAuth());
-    //   if (response.data && response.data.success) {
-    //     toastOk(response.data.message);
-    //   } else {
-    //     toastErr(response.data.message);
-    //   }
-    // } catch (error) {
-    //   console.error(`error:`, error);
-    //   if (error.response.data) {
-    //     toastErr(error.response.data.message);
-    //   }
-    // } finally {
-    //   // bật lại nút
-    //   btn.disabled = false;
+    // gửi thông báo
+    try {
+      const response = await axios.post(CURRENT_URL + '/api/admin/todo/setTaskAlarmByAdmin', payload, axiosAuth());
+      if (response.data && response.data.success) {
+        toastOk(response.data.message);
+      } else {
+        toastErr(response.data.message);
+      }
+    } catch (error) {
+      console.error(`error:`, error);
+      if (error.response.data) {
+        toastErr(error.response.data.message);
+      }
+    } finally {
+      // bật lại nút
+      btn.disabled = false;
 
-    //   // reset form
-    //   resetForm();
-    // }
+      // reset form
+      resetForm();
+    }
   });
 }

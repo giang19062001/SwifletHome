@@ -1,4 +1,4 @@
-<div class="common-table-container row" id="page-notification">
+<div class="common-table-container row" id="page-task-alarm">
     <div class="col-xl-12">
         <div class="row mb-3">
             <div class="col-12">
@@ -16,7 +16,7 @@
     </div>
         <div class="row mb-3">
             <div class="col-12">
-                <form id="push-notification-form" class="card shadow-sm p-4 rounded-3">
+                <form id="push-task-alarm-form" class="card shadow-sm p-4 rounded-3">
                     <div class="mb-3">
                         <label for="title" class="form-label">Tiêu đề</label>
                         <input type="text" class="form-control" id="title" name="title" placeholder="Nhập tiêu đề" maxlength="200"/>
@@ -34,18 +34,18 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label d-block">Tên công việc</label>
-                            <select class="form-select" id="taskCode" name="taskCode">
-                                <option selected>-- Chọn công việc --</option>
+                            <select class="form-select" id="taskName" name="taskName" value="">
+                                <option value="">-- Chọn công việc --</option>
                                 <% values.tasks.forEach(function(task) { %>
-                                    <option value="<%= task.taskCode %>"><%= task.taskName %></option>
+                                    <option value="<%= task.taskName %>"><%= task.taskName %></option>
                                 <% }); %>
                             </select>
-                            <div class="error-message mt-2" data-error="taskCode"></div>
+                            <div class="error-message mt-2" data-error="taskName"></div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="specificValue" class="form-label">Ngày của lịch nhắc</label>
-                            <input class="form-control" type="date" id="specificValue" name="specificValue" />
-                            <div class="error-message mt-2" data-error="specificValue"></div>
+                            <label for="taskDate" class="form-label">Ngày của lịch nhắc</label>
+                            <input class="form-control" type="date" id="taskDate" name="taskDate" />
+                            <div class="error-message mt-2" data-error="taskDate"></div>
                         </div>
                     </div>
 

@@ -54,7 +54,7 @@ export class NotificationAdminService {
             return { success: false, message: MsgAdmin.pushNotifyErr };
           }
         } else {
-          return { success: false, message: MsgAdmin.pushNotifyProvinceEmpty };
+          return { success: false, message: MsgAdmin.pushProvinceEmpty };
         }
       }
       return { success: true, message: MsgAdmin.pushNotifyOk };
