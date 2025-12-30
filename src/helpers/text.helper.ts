@@ -10,7 +10,7 @@ export const NOTIFICATIONS = {
     BODY: !packageData ? 'Gói Miễn phí được gia hạn thành công' : `${packageData.packageName} đã được gia hạn thành công, có hiệu lực từ ${startDate} đến ${endDate}`,
   }),
    sendNotifyTodoTaskDaily: (userHomeName: string, taskName: string, daysLeft: number) => ({
-    TITLE: `${taskName} (${userHomeName})`,
+    TITLE: `${userHomeName} - ${taskName}`,
     BODY:  daysLeft > 0 ? `Còn ${daysLeft} ngày nữa` : `Đã đến ngày thực hiện tác vụ`,
   }),
 };

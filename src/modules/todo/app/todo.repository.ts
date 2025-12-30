@@ -44,24 +44,23 @@ export class TodoAppRepository {
 
   // TODO: ALARM
   async getOneTaskAlarmsNearly(userCode: string, userHomeCode: string, taskCode: string, taskName: string, today: string): Promise<ITodoHomeTaskAlram | null> {
-    let query = `
-             SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskName,
-             DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
-             FROM ${this.tableHomeTaskAlarm} A
-             LEFT JOIN ${this.tableHomeTaskPeriod} B
-             ON A.taskPeriodCode = B.taskPeriodCode
-             WHERE A.isActive = 'Y'
-             AND A.userCode = ? AND A.userHomeCode = ?
-             -- AND (
-             --    (A.taskPeriodCode IS NOT NULL AND B.taskCode = ?)
-             --    OR
-             --    (A.taskPeriodCode IS NULL AND A.taskName = ?)
-             -- )
-              AND ( B.taskCode = ? OR A.taskName = ? )
-             AND A.taskDate >= ? AND A.taskDate <= ? + INTERVAL ${this.maxDayToGetList} DAY
-             AND A.taskStatus = '${TaskStatusEnum.WAITING}'
-             ORDER BY A.taskDate ASC
-             LIMIT 1`;
+        let query = `
+        SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskName,
+              DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
+        FROM ${this.tableHomeTaskAlarm} A
+        LEFT JOIN ${this.tableHomeTaskPeriod} B
+          ON A.taskPeriodCode = B.taskPeriodCode
+        WHERE A.isActive = 'Y'
+          AND A.userCode = ?
+          AND A.userHomeCode = ?
+          AND ( B.taskCode = ? OR A.taskName = ? )
+          AND A.taskDate >= ?
+          AND A.taskDate <= DATE_ADD(?, INTERVAL ${this.maxDayToGetList} DAY)
+          AND A.taskStatus = '${TaskStatusEnum.WAITING}'
+        ORDER BY A.taskDate ASC
+        LIMIT 1`;
+
+             
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [
       userCode,
