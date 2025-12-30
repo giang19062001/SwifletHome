@@ -58,7 +58,7 @@ export class TodoAppRepository {
                  (A.taskPeriodCode IS NULL AND A.taskName = ?)
              )
              AND A.taskDate >= ? AND A.taskDate <= ? + INTERVAL ${this.maxDayToGetList} DAY
-             AND A.taskStatus = ${TaskStatusEnum.WAITING}
+             AND A.taskStatus = '${TaskStatusEnum.WAITING}'
              ORDER BY A.taskDate ASC
              LIMIT 1`;
              console.log(query);
