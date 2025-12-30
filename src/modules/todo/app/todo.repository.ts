@@ -52,11 +52,12 @@ export class TodoAppRepository {
              ON A.taskPeriodCode = B.taskPeriodCode
              WHERE A.isActive = 'Y'
              AND A.userCode = ? AND A.userHomeCode = ?
-             AND (
-                 (A.taskPeriodCode IS NOT NULL AND B.taskCode = ?)
-                 OR
-                 (A.taskPeriodCode IS NULL AND A.taskName = ?)
-             )
+             -- AND (
+             --    (A.taskPeriodCode IS NOT NULL AND B.taskCode = ?)
+             --    OR
+             --    (A.taskPeriodCode IS NULL AND A.taskName = ?)
+             -- )
+              AND ( B.taskCode = ? OR A.taskName = ? )
              AND A.taskDate >= ? AND A.taskDate <= ? + INTERVAL ${this.maxDayToGetList} DAY
              AND A.taskStatus = '${TaskStatusEnum.WAITING}'
              ORDER BY A.taskDate ASC
@@ -115,6 +116,7 @@ export class TodoAppRepository {
     WHERE A.isActive = 'Y'
      AND A.taskDate >= ?
       AND A.taskDate <= DATE_ADD(?, INTERVAL ${this.maxDayToSendNotify} DAY)
+    AND A.taskStatus = '${TaskStatusEnum.WAITING}'
     ORDER BY A.taskDate DESC
 
   `;

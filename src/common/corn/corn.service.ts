@@ -85,7 +85,9 @@ export class CornService implements OnModuleInit {
         const taskDay = moment(task.taskDate, 'YYYY-MM-DD');
         const daysLeft = taskDay.diff(todayStr, 'days');
 
-        const notify = NOTIFICATIONS.sendNotifyDaily(task.taskName, daysLeft);  
+        // lấy thông tin nhà
+        const home = await this.userHomeAppRepository.getDetailHome(task.userHomeCode)
+        const notify = NOTIFICATIONS.sendNotifyTodoTaskDaily(home?.userHomeName ?? "", task.taskName, daysLeft);  
         this.logger.log(logbase, `thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode})`);
 
         await this.firebaseService.sendNotification(task.userCode, task.deviceToken,  notify.TITLE,notify.BODY, null, NotificationTypeEnum.TODO);

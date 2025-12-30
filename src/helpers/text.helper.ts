@@ -1,12 +1,16 @@
 import { IPackage } from "src/modules/package/package.interface";
 
 export const NOTIFICATIONS = {
-  updatePackage: (packageData?: IPackage | null) => ({
-    TITLE: 'Thông báo cập nhập gói',
-    BODY: `Gói ${!packageData ? 'Miễn phí' : packageData.packageName} đã được cập nhập thành công`,
+   updatePackageFristTime: (packageData?: IPackage | null, startDate?: string, endDate?: string) => ({
+    TITLE: 'Thông báo kích hoạt gói',
+    BODY: !packageData ? 'Gói Miễn phí được kích hoạt thành công' : `${packageData.packageName} đã được kích hoạt thành công, có hiệu lực từ ${startDate} đến ${endDate}`,
   }),
-   sendNotifyDaily: (taskName: string, daysLeft: number) => ({
-    TITLE: taskName,
+  updatePackageTimes: (packageData?: IPackage | null, startDate?: string, endDate?: string) => ({
+    TITLE: 'Thông báo gia hạn gói',
+    BODY: !packageData ? 'Gói Miễn phí được gia hạn thành công' : `${packageData.packageName} đã được gia hạn thành công, có hiệu lực từ ${startDate} đến ${endDate}`,
+  }),
+   sendNotifyTodoTaskDaily: (userHomeName: string, taskName: string, daysLeft: number) => ({
+    TITLE: `${taskName} (${userHomeName})`,
     BODY:  daysLeft > 0 ? `Còn ${daysLeft} ngày nữa` : `Đã đến ngày thực hiện tác vụ`,
   }),
 };

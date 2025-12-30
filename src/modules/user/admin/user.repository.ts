@@ -120,6 +120,15 @@ export class UserAdminRepository {
 
     return result.insertId;
   }
+   async isFristTimesUpdatePackage(userCode: string): Promise<Boolean> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` 
+      SELECT seq FROM ${this.tablePackage} 
+      WHERE userCode = ? AND updatedAt IS NOT NULL
+      AND  updatedId IS NOT NULL
+      LIMIT 1`, [userCode]);
+    return rows[0] == null ? true : false; // NẾU NULL -> LẦN ĐẦU, NẾU CÓ -> ĐÃ UPDATE NHIEU LẦN
+  }
+
   async updatePackage(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, updatedId: string, updatedAt: Date): Promise<number> {
     const sql = `
         UPDATE  ${this.tablePackage} SET packageCode = ?, startDate = ?, endDate = ?, updatedId = ?, updatedAt = ?

@@ -75,14 +75,18 @@ export class UserAdminService {
       endDate = datetime.clone().add(packageData.packageExpireDay, 'days').endOf('day').format('YYYY-MM-DD HH:mm:ss');
       this.logger.log(logbase, `${userCode} -> cập nhập gói ${packageData?.packageName}(${packageData?.packageDescription})`);
     }
-
+    //gửi nofity
+    const isFristTimeUpgrage = await this.userAdminRepository.isFristTimesUpdatePackage(userCode);
+    // đổi nội dung thông báo theo số lần cập nhập gói
+    const notify = isFristTimeUpgrage
+      ? NOTIFICATIONS.updatePackageFristTime(packageData, startDate ?? '', endDate ?? '')
+      : NOTIFICATIONS.updatePackageTimes(packageData, startDate ?? '', endDate ?? '');
+    // cập nhập và ghi lịch sử
     await this.userAdminRepository.writePackageHistory(dto, userCode, startDate, endDate, updatedAt);
     const result = await this.userAdminRepository.updatePackage(dto, userCode, startDate, endDate, updatedId, updatedAt);
     if (result) {
       const user = await this.userAdminRepository.getDetailUserApp(userCode);
       if (user) {
-        //gửi nofity
-        const notify = NOTIFICATIONS.updatePackage(packageData);
         this.firebaseService.sendNotification(user.userCode, user.deviceToken, notify.TITLE, notify.BODY);
       }
     }
