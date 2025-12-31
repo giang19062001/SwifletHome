@@ -10,12 +10,17 @@ import { IFileUpload } from 'src/modules/upload/upload.interface';
 @Injectable()
 export class SearchService {
   private readonly fuseOptions: IFuseOptions<ISearchItem> = {
-    keys: ['questions'],
-    threshold: 0.3, // Nhỏ hơn → kết quả chính xác hơn
+    keys: [{ name: 'questions', weight: 1 }],
+    threshold: 0.25,
+    distance: 10,  // cho phép lệch vị trí
+    minMatchCharLength: 5, // tránh match quá ngắn
     includeScore: true,
     ignoreLocation: true,
-    ignoreFieldNorm: true,
+    ignoreFieldNorm: false,
+    shouldSort: true,
+    useExtendedSearch: false,
   };
+
   private readonly SERVICE_NAME = 'SearchService';
 
   constructor(
@@ -27,11 +32,13 @@ export class SearchService {
   private normalizeText(text: string): string {
     return text
       .toLowerCase()
-      // .normalize('NFD') // tách dấu với ký tự
-      // .replace(/[\u0300-\u036f]/g, '') // xóa dấu tiếng Việt sau khi tách dấu
-      // .replace(/[^a-z0-9\s]/g, '') // xóa ký tự đặc biệt
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // bỏ dấu
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
       .trim();
   }
+
   handleAudio(content: string, remainDay: number, isFree: string, fileList: IFileUpload[]) {
     // TODO: [AUDIO]
     return content.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
