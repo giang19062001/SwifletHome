@@ -11,7 +11,7 @@ import { IFileUpload } from 'src/modules/upload/upload.interface';
 export class SearchService {
   private readonly fuseOptions: IFuseOptions<ISearchItem> = {
     keys: [{ name: 'questions', weight: 1 }],
-    threshold: 0.25,
+    threshold: 0.15,
     distance: 10,  // cho phép lệch vị trí
     minMatchCharLength: 5, // tránh match quá ngắn
     includeScore: true,
