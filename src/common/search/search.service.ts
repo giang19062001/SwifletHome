@@ -27,9 +27,9 @@ export class SearchService {
   private normalizeText(text: string): string {
     return text
       .toLowerCase()
-      .normalize('NFD') // tách dấu với ký tự
-      .replace(/[\u0300-\u036f]/g, '') // xóa dấu tiếng Việt sau khi tách dấu
-      .replace(/[^a-z0-9\s]/g, '') // xóa ký tự đặc biệt
+      // .normalize('NFD') // tách dấu với ký tự
+      // .replace(/[\u0300-\u036f]/g, '') // xóa dấu tiếng Việt sau khi tách dấu
+      // .replace(/[^a-z0-9\s]/g, '') // xóa ký tự đặc biệt
       .trim();
   }
   handleAudio(content: string, remainDay: number, isFree: string, fileList: IFileUpload[]) {
