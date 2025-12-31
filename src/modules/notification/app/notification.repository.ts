@@ -4,6 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CreateNotificationDto } from './notification.dto';
 import { INotification, INotificationTopic, IUserNotificationTopic, NotificationStatusEnum } from '../notification.interface';
 import { handleTimezoneQuery } from 'src/helpers/func.helper';
+import { TEXTS } from 'src/helpers/text.helper';
 
 @Injectable()
 export class NotificationAppRepository {
@@ -26,7 +27,8 @@ export class NotificationAppRepository {
     let query = `
     SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.targetScreen, A.data, 
            -- A.userCode, A.userCodesMuticast, A.topicCode,
-           A.notificationType, A.notificationStatus, A.isActive, 
+            IF(A.notificationType = 'TODO', '${TEXTS.NOTIFICATION_TYPE_TODO}', A.notificationType) AS notificationType,
+            A.notificationStatus, A.isActive, 
            ${handleTimezoneQuery('A.createdAt')}, A.createdId
     FROM ${this.table} A
     WHERE ${this.theQueryCountCommon}
