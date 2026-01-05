@@ -1,0 +1,150 @@
+#page-support-center {
+  .faq-section {
+    margin-top: 5rem;
+  }
+
+  .section-title {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 15px;
+    font-weight: 500;
+  }
+
+  .section-title i {
+    margin-right: 10px;
+  }
+
+  /* Ẩn checkbox input */
+  .faq-input {
+    display: none;
+  }
+
+  .faq-item {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .faq-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.1);
+  }
+
+  .faq-question {
+    padding: 18px 20px;
+    background-color: var(--secondary-color);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: background-color 0.3s;
+  }
+
+  .faq-question:hover {
+    background-color: rgba(228, 237, 243, 0.507);
+  }
+
+  .faq-question i {
+    transition: transform 0.3s ease;
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: white;
+  }
+
+  .faq-answer-content {
+    padding: 10px 20px;
+  }
+
+  /* Khi accordion mở */
+  .faq-input:checked ~ .faq-answer {
+    max-height: 1000px;
+  }
+
+  .faq-input:checked ~ .faq-question {
+    background-color: rgba(228, 237, 243, 0.507);
+    color: var(--primary-color);
+  }
+
+  .faq-input:checked ~ .faq-question i {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer p {
+    margin-top: 15px;
+    margin-bottom: 10px;
+  }
+
+  .faq-answer ul {
+    padding-left: 20px;
+    margin-bottom: 15px;
+  }
+
+  .faq-answer li {
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 5px;
+  }
+
+  .faq-answer li:before {
+    content: '•';
+    color: var(--primary-color);
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+  }
+
+  .highlight {
+    font-weight: 700;
+    color: var(--highlight-color);
+  }
+
+  @media (max-width: 768px) {
+    .faq-section {
+      padding: 20px;
+    }
+
+    .faq-question {
+      padding: 15px;
+      font-size: 1rem;
+    }
+
+    .faq-answer-content {
+      padding: 0 15px;
+    }
+  }
+
+  /* hiệu ứng cho khi mở FAQ */
+  .faq-input:checked ~ .faq-answer .faq-answer-content {
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Footer styling */
+  .footer-note {
+    text-align: center;
+    margin-top: 30px;
+    color: #666;
+    font-size: 0.9rem;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+  }
+}

@@ -17,12 +17,21 @@ export class AppController {
     return { title: 'Đăng nhập', isLayout: false };
   }
 
+
   @Get('/privacy-policy')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/privacy-policy')
   renderPrivacyPolicy() {
     return { title: 'Chính sách bảo mật', isLayout: false };
   }
+
+    @Get('/support-center')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/support-center')
+  renderSupportCenter() {
+    return { title: 'Trung tâm hỗ trợ', isLayout: false };
+  }
+
 
   // dashboard
   @Get('/dashboard/main')
