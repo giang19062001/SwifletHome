@@ -68,19 +68,19 @@ export class MutationUserHomeDto {
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
-  userHomeHeight: number;
+  userHomeHeight: number = 0; // mặc định 0
 
   @ApiProperty({ example: 120.5, description: 'Chiều rộng nhà (m)' })
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
-  userHomeWeight: number;
+  userHomeWeight: number = 0; // mặc định 0
 
   @ApiProperty({ example: 3, description: 'Số tầng' })
   @Type(() => Number)
   @IsInt()
   @Min(0)
-  userHomeFloor: number;
+  userHomeFloor: number = 0; // mặc định 0
 
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
