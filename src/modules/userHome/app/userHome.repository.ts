@@ -16,8 +16,8 @@ export class UserHomeAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotalHomes(userCode: string): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A  
-    INNER JOIN  ${this.tableUserApp} B
-    ON A.userCode = B.userCode
+    INNER JOIN  ${this.tableUserApp} AU
+    ON A.userCode = AU.userCode
     WHERE A.userCode = ?`, [userCode]);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
@@ -25,8 +25,8 @@ export class UserHomeAppRepository {
     let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, B.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
      A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain
     FROM ${this.table} A 
-    INNER JOIN  ${this.tableUserApp} B
-    ON A.userCode = B.userCode
+    INNER JOIN  ${this.tableUserApp} AU
+    ON A.userCode = AU.userCode
     LEFT JOIN  tbl_provinces B
     ON A.userHomeProvince = B.provinceCode
     WHERE A.userCode = ? AND A.isActive = 'Y'

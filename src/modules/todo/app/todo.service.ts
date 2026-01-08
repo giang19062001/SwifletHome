@@ -23,19 +23,18 @@ export class TodoAppService {
   async getScheduledTasks(userCode: string, userHomeCode: string): Promise<{ [key: string]: string }[]> {
     const logbase = `${this.SERVICE_NAME}/getScheduledTasks:`;
 
-    const defaultData = Array.from({ length: 3 }, () => ({
-      label: '_ / _',
-      value: '_ / _',
-      date: '',
-      unit: '',
-    }));
-
     // userHomeCode -> main home
     const home = await this.userHomeAppService.getDetail(userHomeCode);
     const boxTasks = await this.todoAppRepository.getBoxTasks();
-
     if (!home || !boxTasks.length) {
-      return defaultData;
+      return boxTasks.map((ele) => {
+        return {
+          label: ele.taskName,
+          value: '_ / _',
+          date: '',
+          unit: '',
+        };
+      });
     }
 
     const today = moment().startOf('day');
