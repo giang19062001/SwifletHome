@@ -1,5 +1,22 @@
 import { YnEnum } from 'src/interfaces/admin.interface';
 
+export const TODO_CONST = {
+  TASK_STATUS: {
+    WAITING: {
+      value: 'WAITING',
+      text: 'Đang chờ',
+    },
+    COMPLETE: {
+      value: 'COMPLETE',
+      text: 'Đã hoàn thành',
+    },
+    CANCEL: {
+      value: 'CANCEL',
+      text: 'Bị huỷ',
+    },
+  },
+};
+
 export enum PeriodTypeEnum {
   WEEK = 'WEEK',
   MONTH = 'MONTH',
@@ -10,7 +27,6 @@ export enum TaskStatusEnum {
   COMPLETE = 'COMPLETE',
   CANCEL = 'CANCEL',
 }
-
 
 export interface ITodoBoxTask {
   seq: number;
@@ -24,6 +40,7 @@ export interface ITodoTask {
   seq: number;
   taskCode: string;
   taskName: string;
+  taskKeyword: string;
   isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;

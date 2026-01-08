@@ -57,6 +57,9 @@ export class GetListTaskAlarmsResDto {
   })
   taskStatus: TaskStatusEnum;
 
+  @ApiProperty({ example: 'Đang chờ' })
+  taskStatusTxt: string;
+
   @ApiProperty({ example: '' })
   taskNote: string;
 

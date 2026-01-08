@@ -3,11 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { PushNotifycationByAdminDto, SentTypeEnum } from './notification.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { KEYWORDS } from 'src/helpers/const.helper';
 import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
 import { UserHomeAdminRepository } from 'src/modules/userHome/admin/userHome.repository';
 import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 import { MsgAdmin } from 'src/helpers/message.helper';
+import { NOTIFICATION_CONST } from '../notification.interface';
 
 @Injectable()
 export class NotificationAdminService {
@@ -22,7 +22,7 @@ export class NotificationAdminService {
     try {
       if (dto.sendType == SentTypeEnum.ALL) {
         // lấy danh sách topic dùng cho tất cả user
-        const topicCommon = await this.notificationAdminRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
+        const topicCommon = await this.notificationAdminRepository.getDetailTopic(NOTIFICATION_CONST.TOPIC.COMMON);
         // gửi thông báo chung
         await this.firebaseService.sendNotificationToTopic(topicCommon?.topicCode ?? '', dto.title, dto.body);
       } else if (dto.sendType == SentTypeEnum.USER) {

@@ -1,5 +1,11 @@
 import { YnEnum } from 'src/interfaces/admin.interface';
 
+export const NOTIFICATION_CONST = {
+  TOPIC: {
+    COMMON: 'COMMON',
+  },
+};
+
 export enum NotificationStatusEnum {
   SENT = 'SENT',
   READ = 'READ',
@@ -33,7 +39,7 @@ export interface INotification {
 export interface INotificationTopic {
   seq: number;
   topicCode: string;
-  topicKeyword:string;
+  topicKeyword: string;
   topicName: string;
   topicDescription: string;
   isActive: YnEnum;

@@ -34,6 +34,15 @@ export class GetHomeUserResDto {
   @ApiProperty({ example: '' })
   userHomeImage: string;
 
+  @ApiProperty({ example: 0 })
+  userHomeHeight: number;
+
+  @ApiProperty({ example: 0 })
+  userHomeWeight: number;
+
+  @ApiProperty({ example: 0 })
+  userHomeFloor: number;
+
   @ApiProperty({ example: YnEnum.N })
   isIntegateTempHum: YnEnum;
 

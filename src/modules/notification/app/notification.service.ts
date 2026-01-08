@@ -4,8 +4,7 @@ import { IList } from 'src/interfaces/admin.interface';
 import { NotificationAppRepository } from './notification.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { IListApp } from 'src/interfaces/app.interface';
-import { INotification, INotificationTopic } from '../notification.interface';
-import { KEYWORDS } from 'src/helpers/const.helper';
+import { INotification, INotificationTopic, NOTIFICATION_CONST } from '../notification.interface';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
 
 @Injectable()
@@ -31,7 +30,7 @@ export class NotificationAppService {
     const checkUserHas = await this.userAppRepository.findByCode(userCode);
     if (checkUserHas) {
       // lấy mã code của topic thông báo chung
-      const topicCommon = await this.notificationAppRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
+      const topicCommon = await this.notificationAppRepository.getDetailTopic(NOTIFICATION_CONST.TOPIC.COMMON);
 
       const total = await this.notificationAppRepository.getTotal(userCode, topicCommon?.topicCode ?? '');
       const list = await this.notificationAppRepository.getAll(dto, userCode, topicCommon?.topicCode ?? '');
@@ -48,7 +47,7 @@ export class NotificationAppService {
     const checkUserHas = await this.userAppRepository.findByCode(userCode);
     if (checkUserHas) {
       // lấy mã code của topic thông báo chung
-      const topicCommon = await this.notificationAppRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
+      const topicCommon = await this.notificationAppRepository.getDetailTopic(NOTIFICATION_CONST.TOPIC.COMMON);
       const result = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode, topicCommon?.topicCode ?? '');
       return result;
     } else {

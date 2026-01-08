@@ -7,56 +7,7 @@ CREATE TABLE
     `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`seq`),
     UNIQUE KEY `provinceCode_UNIQUE` (`provinceCode`)
-  );
-
-
-
-
-INSERT INTO
-  `swiftlet`.`tbl_provinces` (
-    `seq`,
-    `provinceCode`,
-    `provinceName`,
-    `createdAt`
-  )
-VALUES
-  (1, 91, 'An Giang', CURRENT_TIMESTAMP),
-  (2, 24, 'Bắc Ninh', CURRENT_TIMESTAMP),
-  (3, 04, 'Cao Bằng', CURRENT_TIMESTAMP),
-  (4, 96, 'Cà Mau', CURRENT_TIMESTAMP),
-  (5, 52, 'Gia Lai', CURRENT_TIMESTAMP),
-  (6, 42, 'Hà Tĩnh', CURRENT_TIMESTAMP),
-  (7, 33, 'Hưng Yên', CURRENT_TIMESTAMP),
-  (8, 56, 'Khánh Hòa', CURRENT_TIMESTAMP),
-  (9, 12, 'Lai Châu', CURRENT_TIMESTAMP),
-  (10, 15, 'Lào Cai', CURRENT_TIMESTAMP),
-  (11, 68, 'Lâm Đồng', CURRENT_TIMESTAMP),
-  (12, 20, 'Lạng Sơn', CURRENT_TIMESTAMP),
-  (13, 40, 'Nghệ An', CURRENT_TIMESTAMP),
-  (14, 37, 'Ninh Bình', CURRENT_TIMESTAMP),
-  (15, 25, 'Phú Thọ', CURRENT_TIMESTAMP),
-  (16, 51, 'Quảng Ngãi', CURRENT_TIMESTAMP),
-  (17, 22, 'Quảng Ninh', CURRENT_TIMESTAMP),
-  (18, 44, 'Quảng Trị', CURRENT_TIMESTAMP),
-  (19, 14, 'Sơn La', CURRENT_TIMESTAMP),
-  (20, 38, 'Thanh Hóa', CURRENT_TIMESTAMP),
-  (21, 92, 'Cần Thơ', CURRENT_TIMESTAMP),
-  (22, 46, 'Huế', CURRENT_TIMESTAMP),
-  (23, 01, 'Hà Nội', CURRENT_TIMESTAMP),
-  (24, 31, 'Hải Phòng', CURRENT_TIMESTAMP),
-  (25, 79, 'Hồ Chí Minh', CURRENT_TIMESTAMP),
-  (26, 48, 'Đà Nẵng', CURRENT_TIMESTAMP),
-  (27, 19, 'Thái Nguyên', CURRENT_TIMESTAMP),
-  (28, 08, 'Tuyên Quang', CURRENT_TIMESTAMP),
-  (29, 80, 'Tây Ninh', CURRENT_TIMESTAMP),
-  (30, 86, 'Vĩnh Long', CURRENT_TIMESTAMP),
-  (31, 11, 'Điện Biên', CURRENT_TIMESTAMP),
-  (32, 66, 'Đắk Lắk', CURRENT_TIMESTAMP),
-  (33, 75, 'Đồng Nai', CURRENT_TIMESTAMP),
-  (34, 82, 'Đồng Tháp', CURRENT_TIMESTAMP);
-
-
-
+  ); 
 
 --  admin
 CREATE TABLE
@@ -72,9 +23,6 @@ CREATE TABLE
     UNIQUE KEY `userId_UNIQUE` (`userId`)
   );
 
-
-
-
 CREATE TABLE
   `tbl_category` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -89,9 +37,6 @@ CREATE TABLE
     UNIQUE KEY `categoryCode_UNIQUE` (`categoryCode`)
   );
 
-
-
-
 CREATE TABLE
   `tbl_object` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -105,9 +50,6 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `objectCharacter_UNIQUE` (`objectKeyword`)
   );
-
-
-
 
 CREATE TABLE
   `tbl_question` (
@@ -126,9 +68,6 @@ CREATE TABLE
     UNIQUE KEY `questionCode_UNIQUE` (`questionCode`)
   );
 
-
-
-
 CREATE TABLE
   `tbl_answer` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -145,9 +84,6 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `answerCode_UNIQUE` (`answerCode`)
   );
-
-
-
 
 CREATE TABLE
   `tbl_blog` (
@@ -168,6 +104,7 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `blogCode_UNIQUE` (`blogCode`)
   )
+
 CREATE TABLE
   `tbl_uploads_image` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -184,9 +121,6 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `filename_UNIQUE` (`filename`)
   );
-
-
-
 
 CREATE TABLE
   `tbl_uploads_audio` (
@@ -206,9 +140,6 @@ CREATE TABLE
     UNIQUE KEY `filename_UNIQUE` (`filename`)
   );
 
-
-
-
 CREATE TABLE
   `tbl_uploads_video` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -221,9 +152,6 @@ CREATE TABLE
     `updatedId` varchar(45) DEFAULT NULL,
     PRIMARY KEY (`seq`)
   );
-
-
-
 
 -- nhà yến SCT
 CREATE TABLE
@@ -247,8 +175,6 @@ CREATE TABLE
   );
 
 
-
-
 CREATE TABLE
   `tbl_home_sale_img` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -265,9 +191,6 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `filename_UNIQUE` (`filename`)
   );
-
-
-
 
 -- đăng ký tham quan nha yến
 CREATE TABLE
@@ -287,9 +210,6 @@ CREATE TABLE
     `updatedId` varchar(45) DEFAULT NULL,
     PRIMARY KEY (`seq`)
   );
-
-
-
 
 -- nhàn yến của khách hàng
 CREATE TABLE
@@ -311,6 +231,8 @@ CREATE TABLE
     UNIQUE KEY `filename_UNIQUE` (`filename`),
     UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
   )
+
+-- NHÀ YẾN CỦA USER
 CREATE TABLE
   `tbl_user_home` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -335,9 +257,12 @@ CREATE TABLE
     UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
   );
 
+ALTER TABLE `swiftlet`.`tbl_user_home` 
+ADD COLUMN `userHomeHeight` FLOAT NULL DEFAULT 0 AFTER `userHomeImage`,
+ADD COLUMN `userHomeWeight` FLOAT NULL DEFAULT 0 AFTER `userHomeHeight`,
+ADD COLUMN `userHomeFloor` INT NULL DEFAULT 0 AFTER `userHomeWeight`;
 
-
-
+-- IOT cảm biến với nhà yến
 CREATE TABLE
   `tbl_user_home_sensor` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -656,12 +581,14 @@ CREATE TABLE
     seq INT AUTO_INCREMENT PRIMARY KEY,
     taskCode VARCHAR(45) UNIQUE NOT NULL,
     taskName VARCHAR(255) NOT NULL,
+    taskKeyword CHAR(255) NOT NULL DEFAULT '',
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
     updatedId VARCHAR(45) DEFAULT NULL
   )
+
 CREATE TABLE
   tbl_todo_home_task_period (
     seq INT AUTO_INCREMENT PRIMARY KEY,
@@ -761,3 +688,51 @@ VALUES
     '2025-10-20 10:39:20',
     NULL
   ),
+
+
+INSERT INTO
+  `swiftlet`.`tbl_provinces` (
+    `seq`,
+    `provinceCode`,
+    `provinceName`,
+    `createdAt`
+  )
+VALUES
+  (1, 91, 'An Giang', CURRENT_TIMESTAMP),
+  (2, 24, 'Bắc Ninh', CURRENT_TIMESTAMP),
+  (3, 04, 'Cao Bằng', CURRENT_TIMESTAMP),
+  (4, 96, 'Cà Mau', CURRENT_TIMESTAMP),
+  (5, 52, 'Gia Lai', CURRENT_TIMESTAMP),
+  (6, 42, 'Hà Tĩnh', CURRENT_TIMESTAMP),
+  (7, 33, 'Hưng Yên', CURRENT_TIMESTAMP),
+  (8, 56, 'Khánh Hòa', CURRENT_TIMESTAMP),
+  (9, 12, 'Lai Châu', CURRENT_TIMESTAMP),
+  (10, 15, 'Lào Cai', CURRENT_TIMESTAMP),
+  (11, 68, 'Lâm Đồng', CURRENT_TIMESTAMP),
+  (12, 20, 'Lạng Sơn', CURRENT_TIMESTAMP),
+  (13, 40, 'Nghệ An', CURRENT_TIMESTAMP),
+  (14, 37, 'Ninh Bình', CURRENT_TIMESTAMP),
+  (15, 25, 'Phú Thọ', CURRENT_TIMESTAMP),
+  (16, 51, 'Quảng Ngãi', CURRENT_TIMESTAMP),
+  (17, 22, 'Quảng Ninh', CURRENT_TIMESTAMP),
+  (18, 44, 'Quảng Trị', CURRENT_TIMESTAMP),
+  (19, 14, 'Sơn La', CURRENT_TIMESTAMP),
+  (20, 38, 'Thanh Hóa', CURRENT_TIMESTAMP),
+  (21, 92, 'Cần Thơ', CURRENT_TIMESTAMP),
+  (22, 46, 'Huế', CURRENT_TIMESTAMP),
+  (23, 01, 'Hà Nội', CURRENT_TIMESTAMP),
+  (24, 31, 'Hải Phòng', CURRENT_TIMESTAMP),
+  (25, 79, 'Hồ Chí Minh', CURRENT_TIMESTAMP),
+  (26, 48, 'Đà Nẵng', CURRENT_TIMESTAMP),
+  (27, 19, 'Thái Nguyên', CURRENT_TIMESTAMP),
+  (28, 08, 'Tuyên Quang', CURRENT_TIMESTAMP),
+  (29, 80, 'Tây Ninh', CURRENT_TIMESTAMP),
+  (30, 86, 'Vĩnh Long', CURRENT_TIMESTAMP),
+  (31, 11, 'Điện Biên', CURRENT_TIMESTAMP),
+  (32, 66, 'Đắk Lắk', CURRENT_TIMESTAMP),
+  (33, 75, 'Đồng Nai', CURRENT_TIMESTAMP),
+  (34, 82, 'Đồng Tháp', CURRENT_TIMESTAMP);
+
+
+
+

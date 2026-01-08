@@ -135,10 +135,18 @@ const renderAllUserHomes = (data, objElement) => {
         <tr class="text-center">
         <td class="py-3" style="min-width: 75px;"><p>${page * i++}</p></td>
         <td class="py-3"><img src="${CURRENT_URL}/${ele.userHomeImage}" alt="${ele.userHomeName}"></td>
-        <td class="py-3"><p>${ele.userName} (${ele.userPhone})</p></td>
+        <td class="py-3">
+            <p>${ele.userName}</p> 
+            <p class="mt-2">${ele.userPhone}</p> 
+        </td>
         <td class="py-3">
             <p>${ele.userHomeName} ${ele.isMain === 'Y' ? `<b>(Chính)</b>` : ''}</p>
-            <p>${ele.userHomeAddress}, ${ele.userHomeProvince}</p>
+            <p class="mt-2">${ele.userHomeAddress}, ${ele.userHomeProvince}</p>
+        </td>
+        <td class="py-3">
+            <p class="mt-2">Chiều cao: ${ele.userHomeHeight} (m)</p>
+            <p class="mt-2">Chiều rộng: ${ele.userHomeWeight} (m)</p>
+            <p class="mt-2">Số tầng: ${ele.userHomeFloor}</p>
         </td>
         <td class="py-3"><p>${ele.isIntegateTempHum == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
         <td class="py-3"><p>${ele.isIntegateCurrent == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
@@ -146,14 +154,16 @@ const renderAllUserHomes = (data, objElement) => {
         <td class="py-3" style="max-width: 125px;"><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
         <td class="py-3" style="max-width: 125px;"><p>${ele.updatedAt ? formatDateTime(ele.updatedAt) : ''}</p></td>
         <td class="py-3">
+          <div class="d-grid gap-2">
             ${
               ele.isIntegateTempHum == 'Y' || ele.isIntegateCurrent == 'Y'
                 ? ele.isTriggered == 'N'
                   ? `<button class="btn-edit" onclick="openModal('${ele.userCode}', '${ele.userHomeCode}', 'trigger')">Kích hoạt</button>`
-                  : `<button class="btn-info" onclick="getDetailHome('${ele.userCode}', '${ele.userHomeCode}', 'detail')">Chi tiết</button>
+                  : `<button class="btn-info" onclick="getDetailHome('${ele.userCode}', '${ele.userHomeCode}', 'detail')">Thông tin cảm biến</button>
                     <button class="btn-edit" onclick="getDetailHome('${ele.userCode}', '${ele.userHomeCode}', 'reset')">Thiết lập lại</button>`
                 : ''
             }
+            </div>
         </td>
     </tr>
     `;

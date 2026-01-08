@@ -111,6 +111,7 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
 
       // Bắt tất cả lỗi (throw Exception)-> format lại
       catchError((err) => {
+        console.log("ResponseAppInterceptor ----> catchError ---> ", err);
         const statusCode = err?.status || err?.response?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
 
         const message = err?.response?.message || err?.message || getErrDefaultMessage(request.method, request.url);

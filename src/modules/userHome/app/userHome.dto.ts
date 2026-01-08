@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class UploadUserHomeImageDto {
@@ -63,6 +63,24 @@ export class MutationUserHomeDto {
   @IsEnum(YnEnum)
   @IsNotEmpty()
   isIntegateCurrent: YnEnum;
+  
+  @ApiProperty({ example: 25.75, description: 'Chiều cao nhà (m)' })
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  userHomeHeight: number;
+
+  @ApiProperty({ example: 120.5, description: 'Chiều rộng nhà (m)' })
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  userHomeWeight: number;
+
+  @ApiProperty({ example: 3, description: 'Số tầng' })
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  userHomeFloor: number;
 
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
@@ -72,4 +90,3 @@ export class MutationUserHomeDto {
   @IsNotEmpty()
   uniqueId: string;
 }
-

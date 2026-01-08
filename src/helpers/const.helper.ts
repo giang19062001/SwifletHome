@@ -1,17 +1,12 @@
 export const IMG_TYPES = ['.png', '.jpg', '.jpeg', '.heic'];
 export const AUDIO_TYPES = ['.mp3'];
 export const VIDEO_TYPES = ['.mp4', '.mov', '.hevc'];
+
 export const APP_SCREENS = {
   REMINDER_SCREEN: 'REMINDER_SCREEN',
   NOTIFICATION_SCREEN: 'NOTIFICATION_SCREEN',
   SIGNUP_SERVICE: 'SIGNUP_SERVICE',
-  REQUEST_DOCTOR: 'REQUEST_DOCTOR'
-};
-
-export const KEYWORDS = {
-  NOTIFICATION_TOPIC: {
-    COMMON: 'COMMON',
-  },
+  REQUEST_DOCTOR: 'REQUEST_DOCTOR',
 };
 
 export const CODES = {

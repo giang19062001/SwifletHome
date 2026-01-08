@@ -1,6 +1,6 @@
 import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
+import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, PeriodTypeEnum, TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -98,7 +98,14 @@ export class TodoAppRepository {
     }
     let query = `
             SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskName,
-            DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
+            DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus,
+            CASE
+                  WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.WAITING.value}' THEN '${TODO_CONST.TASK_STATUS.WAITING.text}'
+                  WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.COMPLETE.value}' THEN '${TODO_CONST.TASK_STATUS.COMPLETE.text}'
+                  WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.CANCEL.value}' THEN '${TODO_CONST.TASK_STATUS.CANCEL.text}'
+                  ELSE ''
+              END AS taskStatusTxt,
+             A.taskNote, A.isActive
             FROM ${this.tableHomeTaskAlarm} A
             INNER JOIN ${this.tableUserApp} B
             ON A.userCode = B.userCode

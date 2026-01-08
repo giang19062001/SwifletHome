@@ -11,7 +11,7 @@ import { NotificationAdminRepository } from 'src/modules/notification/admin/noti
 import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
 import { UserHomeAdminRepository } from 'src/modules/userHome/admin/userHome.repository';
 import { MsgAdmin } from 'src/helpers/message.helper';
-import { KEYWORDS } from 'src/helpers/const.helper';
+import { NOTIFICATION_CONST } from 'src/modules/notification/notification.interface';
 
 @Injectable()
 export class TodoAdminService {
@@ -62,7 +62,7 @@ export class TodoAdminService {
           }
         }
         // lấy danh sách topic dùng cho tất cả user
-        const topicCommon = await this.notificationAdminRepository.getDetailTopic(KEYWORDS.NOTIFICATION_TOPIC.COMMON);
+        const topicCommon = await this.notificationAdminRepository.getDetailTopic(NOTIFICATION_CONST.TOPIC.COMMON);
         // gửi thông báo chung
         await this.firebaseService.sendNotificationToTopic(topicCommon?.topicCode ?? '', dto.title, dto.body);
       } else if (dto.sendType == SentTypeEnum.USER) {
