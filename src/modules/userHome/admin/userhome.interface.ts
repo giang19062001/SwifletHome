@@ -1,4 +1,4 @@
-import { YnEnum } from "src/interfaces/admin.interface";
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export interface IUserHomeSensor {
   seq: number;
@@ -11,6 +11,9 @@ export interface IUserHomeSensor {
   userHomeProvince: string;
   userHomeDescription: string;
   userHomeImage: string;
+  userHomeHeight: number;
+  userHomeWeight: number;
+  userHomeFloor: number;
   uniqueId: string;
   isIntegateTempHum: YnEnum;
   isIntegateCurrent: YnEnum;
@@ -22,5 +25,5 @@ export interface IUserHomeSensor {
   updatedId: string;
   macId: string;
   wifiId: string;
-  wifiPassword: string
+  wifiPassword: string;
 }

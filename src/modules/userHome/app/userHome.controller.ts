@@ -12,7 +12,7 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { UserHomeAppService } from './userHome.service';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IUserHome } from '../userHome.interface';
+import { IUserHome } from './userHome.interface';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { IList } from 'src/interfaces/admin.interface';
 import { GetHomeUserResDto, UserHomeImageResDto, GetHomesUserResDto } from './userHome.response';

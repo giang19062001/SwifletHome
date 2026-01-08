@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IUserHome, IUserHomeImageStr } from '../userHome.interface';
+import { IUserHome, IUserHomeImageStr } from '../app/userHome.interface';
 import { IList, YnEnum } from 'src/interfaces/admin.interface';
 import { UserHomeAdminRepository } from './userHome.repository';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';

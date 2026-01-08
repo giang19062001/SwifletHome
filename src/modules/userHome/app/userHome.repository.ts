@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IUserHome, IUserHomeImageFile } from '../userHome.interface';
+import { IUserHome, IUserHomeImageFile } from './userHome.interface';
 import { MutationUserHomeDto } from './userHome.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { PagingDto } from 'src/dto/admin.dto';

@@ -1,7 +1,7 @@
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IUserHome } from '../userHome.interface';
+import { IUserHome } from '../app/userHome.interface';
 import { IList } from 'src/interfaces/admin.interface';
 import { UserHomeAdminService } from './userHome.service';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';

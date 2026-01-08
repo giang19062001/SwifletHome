@@ -11,6 +11,9 @@ export interface IUserHome {
   userHomeProvince: string;
   userHomeDescription: string;
   userHomeImage: string;
+  userHomeHeight: number;
+  userHomeWeight: number;
+  userHomeFloor: number;
   uniqueId: string;
   isIntegateTempHum: YnEnum;
   isIntegateCurrent: YnEnum;

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IUserHome, IUserHomeImageStr } from '../userHome.interface';
+import { IUserHome, IUserHomeImageStr } from './userHome.interface';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { UserHomeAppRepository } from './userHome.repository';
 import { PagingDto } from 'src/dto/admin.dto';

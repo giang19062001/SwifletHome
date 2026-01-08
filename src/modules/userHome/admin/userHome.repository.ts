@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IUserHome } from '../userHome.interface';
+import { IUserHome } from '../app/userHome.interface';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { IUserHomeSensor } from './userhome.interface';
