@@ -13,6 +13,7 @@ export class TodoAppRepository {
   private readonly tableHomeTaskAlarm = 'tbl_todo_home_task_alarm';
   private readonly tableHomeTaskPeriod = 'tbl_todo_home_task_period';
   private readonly tableBoxTask = 'tbl_todo_box_tasks';
+  private readonly tableUserApp = 'tbl_user_app';
   private readonly maxDayToGetList = 5;
   private readonly maxDayToSendNotify = 3;
 
@@ -74,17 +75,19 @@ export class TodoAppRepository {
     return rows.length ? (rows[0] as ITodoHomeTaskAlram) : null;
   }
   async getTotalTaskAlarm(userCode: string, userHomeCode: string): Promise<number> {
-    let whereQuery = ` AND userCode = ? AND userHomeCode = ? AND taskDate <= CURDATE() + INTERVAL ${this.maxDayToGetList} DAY`;
+    let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${this.maxDayToGetList} DAY`;
 
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(seq) AS TOTAL FROM ${this.tableHomeTaskAlarm}
-      WHERE isActive = 'Y' ${whereQuery} `,
+      ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableHomeTaskAlarm} A
+      INNER JOIN ${this.tableUserApp} B
+      ON A.userCode = B.userCode
+      WHERE A.isActive = 'Y' ${whereQuery} `,
       [userCode, userHomeCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<ITodoHomeTaskAlram[]> {
-    let whereQuery = ` AND userCode = ? AND userHomeCode = ? AND taskDate <= CURDATE() + INTERVAL ${this.maxDayToGetList} DAY`;
+    let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${this.maxDayToGetList} DAY`;
     let offsetQuery = ` `;
 
     let params: (string | number)[] = [userCode, userHomeCode];
@@ -94,10 +97,14 @@ export class TodoAppRepository {
       params.push((dto.page - 1) * dto.limit);
     }
     let query = `
-             SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, taskStatus, taskNote, isActive
-            FROM ${this.tableHomeTaskAlarm} WHERE isActive = 'Y'
+            SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskName,
+            DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
+            FROM ${this.tableHomeTaskAlarm} A
+            INNER JOIN ${this.tableUserApp} B
+            ON A.userCode = B.userCode
+            WHERE A.isActive = 'Y'
               ${whereQuery} 
-            ORDER BY taskDate DESC
+            ORDER BY A.taskDate DESC
               ${offsetQuery}`;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);

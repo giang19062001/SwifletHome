@@ -24,6 +24,7 @@ export class UserHomeAppService {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.userHomeAppRepository.getTotalHomes(userCode);
     const list = await this.userHomeAppRepository.getAllHomes(dto, userCode);
+    this.logger.log(logbase, `total(${total})`);
     return { total, list };
   }
 
