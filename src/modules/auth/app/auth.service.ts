@@ -216,6 +216,11 @@ export class AuthAppService extends AbAuthService {
     return 1;
   }
 
+    async findUser(userCode: string): Promise<ITokenUserApp | null> {
+    const logbase = `${this.SERVICE_NAME}/findUser`;
+    const result = await this.userAppService.findByCode(userCode);
+    return result;
+  }
   async getInfo(userCode: string): Promise<IUserApp | null> {
     const logbase = `${this.SERVICE_NAME}/getInfo`;
 

@@ -15,6 +15,9 @@ export class UserAppService {
     private readonly userAppRepository: UserAppRepository,
     private readonly logger: LoggingService,
   ) {}
+  async findByCode(userCode: string): Promise<ITokenUserApp | null> {
+    return await this.userAppRepository.findByCode(userCode);
+  }
 
   async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
     return await this.userAppRepository.findByPhone(userPhone);
