@@ -46,11 +46,6 @@ export class NotificationAppController {
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async getCntNotifyNotReadByUser(@GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
     const result =  await this.notificationAppService.getCntNotifyNotReadByUser(user.userCode);
-    if (!result) {
-      throw new BadRequestException({
-        data: 0
-      });
-    }
     return result;
   }
 
