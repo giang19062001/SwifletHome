@@ -39,15 +39,15 @@ export class HomesOfUserGateway
   constructor(private readonly logger: LoggingService) {}
 
   afterInit() {
-    this.logger.log(this.SERVICE_NAME, 'Gateway multiple homes đã khởi động');
+    console.log(this.SERVICE_NAME, 'Gateway multiple homes đã khởi động');
   }
 
   handleConnection(client: Socket) {
-    this.logger.log(this.SERVICE_NAME, `Client connected: ${client.id}`);
+    console.log(this.SERVICE_NAME, `Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(this.SERVICE_NAME, `Client disconnected: ${client.id}`);
+    console.log(this.SERVICE_NAME, `Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('joinRoom')
@@ -68,7 +68,7 @@ export class HomesOfUserGateway
       this.sensorOnline.set(key, false); // mặc định offline khi chưa có dữ liệu
     });
 
-    this.logger.log(this.SERVICE_NAME, `User ${userCode} theo dõi ${userHomeCodes.length} homes`);
+    console.log(this.SERVICE_NAME, `User ${userCode} theo dõi ${userHomeCodes.length} homes`);
 
     // Gửi dữ liệu ban đầu: tất cả là 0
     const initialSnapshot = userHomeCodes.map((homeCode) => ({
@@ -100,7 +100,7 @@ export class HomesOfUserGateway
     }
     this.watchingHomes.delete(userCode);
 
-    this.logger.log(this.SERVICE_NAME, `User ${userCode} đã rời phòng`);
+    console.log(this.SERVICE_NAME, `User ${userCode} đã rời phòng`);
   }
 
   // Xây dựng dữ liệu của toàn bộ sensor của từng home của user đó
@@ -193,7 +193,7 @@ export class HomesOfUserGateway
       // Đánh dấu offline  -> gí trị sẽ trả về 0
       this.sensorOnline.set(cacheKey, false);
 
-      this.logger.log(this.SERVICE_NAME, `Home ${homeCode} offline -> gửi dữ liệu với giá trị về 0`);
+      console.log(this.SERVICE_NAME, `Home ${homeCode} offline -> gửi dữ liệu với giá trị về 0`);
 
       this.sendFullSnapshot(userCode);
     }

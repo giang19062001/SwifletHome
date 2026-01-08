@@ -60,6 +60,8 @@ export class UserHomeAppRepository {
       ` SELECT A.seq, A.userCode,  A.userHomeCode,  A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
+          INNER JOIN  ${this.tableUserApp} B
+          ON A.userCode = B.userCode
           WHERE A.userCode = ? AND A.isActive = 'Y' AND A.isMain = 'Y'
           LIMIT 1 `,
       [userCode],

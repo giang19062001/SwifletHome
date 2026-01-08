@@ -34,15 +34,15 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
   ) {}
 
   afterInit() {
-    this.logger.log(this.SERVICE_NAME, 'Gateway đã thiết lập');
+    console.log(this.SERVICE_NAME, 'Gateway đã thiết lập');
   }
 
   handleConnection(client: Socket) {
-    this.logger.log(this.SERVICE_NAME, `Mở kết nối: ${client.id}`);
+    console.log(this.SERVICE_NAME, `Mở kết nối: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(this.SERVICE_NAME, `Đóng kết nối: ${client.id}`);
+    console.log(this.SERVICE_NAME, `Đóng kết nối: ${client.id}`);
   }
 
   @SubscribeMessage('joinRoom')
@@ -55,7 +55,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
 
     this.watchingHome.set(userCode, userHomeCode);
 
-    this.logger.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
+    console.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
 
     // Gửi dữ liệu khởi tạo ( là 0 )
     this.sendInitialData(client);
@@ -71,7 +71,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
 
     this.watchingHome.delete(userCode);
 
-    this.logger.log(this.SERVICE_NAME, `${client.id} đã rời phòng: ${room}`);
+    console.log(this.SERVICE_NAME, `${client.id} đã rời phòng: ${room}`);
   }
 
   private sendSensorData(room: string, payload: ISensor) {
@@ -137,7 +137,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
       };
 
       this.sendSensorData(room, offlineData);
-      this.logger.log(this.SERVICE_NAME, `Thiết bị offline  ${key}`);
+      console.log(this.SERVICE_NAME, `Thiết bị offline  ${key}`);
     }
   }
 }

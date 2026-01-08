@@ -36,12 +36,12 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     });
 
     this.client.on('connect', () => {
-      this.logger.log(this.SERVICE_NAME, `Kết nối MQTT ${this.brokerUrl} thành công!`);
+      console.log(this.SERVICE_NAME, `Kết nối MQTT ${this.brokerUrl} thành công!`);
 
       // Đăng ký cả 2 topic
       this.client.subscribe([this.dataTopic, this.statusTopic], (err) => {
         if (!err) {
-          this.logger.log(this.SERVICE_NAME, `Đã đăng ký: ${this.dataTopic} và ${this.statusTopic}`);
+          console.log(this.SERVICE_NAME, `Đã đăng ký: ${this.dataTopic} và ${this.statusTopic}`);
         } else {
           this.logger.error(this.SERVICE_NAME, `Lỗi subscribe topic: ${err}`);
         }
@@ -80,7 +80,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
         const status = message.toString().trim();
 
         if (status === 'online' || status === 'offline') {
-          this.logger.log(this.SERVICE_NAME, `Thiết bị ${key} chuyển trạng thái: ${status.toUpperCase()}`);
+          console.log(this.SERVICE_NAME, `Thiết bị ${key} chuyển trạng thái: ${status.toUpperCase()}`);
 
           const payload: ISensorStatus = {
             key,
@@ -102,7 +102,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
   onApplicationShutdown() {
     if (this.client) {
       this.client.end();
-      this.logger.log(this.SERVICE_NAME, 'Đã đóng kết nối MQTT');
+      console.log(this.SERVICE_NAME, 'Đã đóng kết nối MQTT');
     }
   }
 }
