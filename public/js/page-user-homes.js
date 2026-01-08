@@ -143,9 +143,9 @@ const renderAllUserHomes = (data, objElement) => {
             <p>${ele.userHomeName} ${ele.isMain === 'Y' ? `<b>(Chính)</b>` : ''}</p>
             <p class="mt-2">${ele.userHomeAddress}, ${ele.userHomeProvince}</p>
         </td>
-        <td class="py-3">
-            <p class="mt-2">Cao: ${ele.userHomeHeight} (m)</p>
-            <p class="mt-2">Rộng: ${ele.userHomeWeight} (m)</p>
+        <td class="py-3" style="min-width: 150px;">
+            <p class="mt-2">Chiều cao: ${ele.userHomeHeight} (m)</p>
+            <p class="mt-2">Chiều rộng: ${ele.userHomeWeight} (m)</p>
             <p class="mt-2">Số tầng: ${ele.userHomeFloor}</p>
         </td>
         <td class="py-3"><p>${ele.isIntegateTempHum == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
