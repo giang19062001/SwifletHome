@@ -30,6 +30,7 @@ export class TodoAppService {
       unit: '',
     }));
 
+    // userHomeCode -> main home
     const home = await this.userHomeAppService.getDetail(userHomeCode);
     const boxTasks = await this.todoAppRepository.getBoxTasks();
 

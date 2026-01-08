@@ -10,17 +10,23 @@ import { CODES } from 'src/helpers/const.helper';
 export class UserHomeAppRepository {
   private readonly table = 'tbl_user_home';
   private readonly tableImg = 'tbl_user_home_img';
+  private readonly tableUserApp = 'tbl_user_app';
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotalHomes(userCode: string): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE userCode = ?`, [userCode]);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A  
+    INNER JOIN  ${this.tableUserApp} B
+    ON A.userCode = B.userCode
+    WHERE A.userCode = ?`, [userCode]);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllHomes(dto: PagingDto, userCode: string): Promise<IUserHome[]> {
     let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, B.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
      A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain
     FROM ${this.table} A 
+    INNER JOIN  ${this.tableUserApp} B
+    ON A.userCode = B.userCode
     LEFT JOIN  tbl_provinces B
     ON A.userHomeProvince = B.provinceCode
     WHERE A.userCode = ? AND A.isActive = 'Y'
@@ -41,6 +47,8 @@ export class UserHomeAppRepository {
       ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
+          INNER JOIN  ${this.tableUserApp} B
+          ON A.userCode = B.userCode
           WHERE A.userHomeCode = ? AND A.isActive = 'Y'
           LIMIT 1 `,
       [userHomeCode],
