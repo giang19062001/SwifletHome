@@ -27,6 +27,22 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as ITokenUserApp) : null;
   }
+  async findBySeq(seq: number): Promise<ITokenUserApp | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
+     FROM ${this.table} WHERE seq = ? LIMIT 1`,
+      [seq],
+    );
+    return rows.length ? (rows[0] as ITokenUserApp) : null;
+  }
+  async findByCode(userCode: string): Promise<ITokenUserApp | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
+     FROM ${this.table} WHERE userCode = ? LIMIT 1`,
+      [userCode],
+    );
+    return rows.length ? (rows[0] as ITokenUserApp) : null;
+  }
   async getUserPackageInfo(userCode: string): Promise<IUserPackageApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
@@ -65,14 +81,7 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as IUserApp) : null;
   }
-  async findBySeq(seq: number): Promise<ITokenUserApp | null> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
-     FROM ${this.table} WHERE seq = ? LIMIT 1`,
-      [seq],
-    );
-    return rows.length ? (rows[0] as ITokenUserApp) : null;
-  }
+
   async create(dto: RegisterUserAppDto): Promise<number> {
     const sqlLast = ` SELECT userCode FROM ${this.table} ORDER BY userCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
@@ -136,6 +145,4 @@ export class UserAppRepository {
 
     return result.insertId;
   }
-
-
 }

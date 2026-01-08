@@ -11,6 +11,7 @@ export class HomeSaleAdminRepository {
   private readonly table = 'tbl_home_sale';
   private readonly tableImg = 'tbl_home_sale_img';
   private readonly tableSightseeing = 'tbl_home_sale_sightseeing';
+  private readonly tableUserApp = 'tbl_user_app';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -129,13 +130,17 @@ export class HomeSaleAdminRepository {
   }
   // TODO: SIGHTSEEING
   async getTotalSightseeing(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableSightseeing}`);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableSightseeing} A  
+          INNER JOIN ${this.tableUserApp} AU
+          ON A.userCode = AU.userCode`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllSightseeing(dto: PagingDto): Promise<IHomeSaleSightSeeing[]> {
     let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.status, A.note, A.cancelReason, A.createdAt,
           B.homeName, B.homeImage, C.valueOption AS numberAttend
           FROM ${this.tableSightseeing} A 
+          INNER JOIN ${this.tableUserApp} AU
+          ON A.userCode = AU.userCode
           LEFT JOIN tbl_home_sale B
           ON A.homeCode = B.homeCode
           LEFT JOIN tbl_option_common C

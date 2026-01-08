@@ -110,7 +110,7 @@ export class TodoAppRepository {
       A.taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, 
       A.taskStatus, A.taskNote, A.isActive, B.deviceToken
     FROM ${this.tableHomeTaskAlarm} A
-    JOIN tbl_user_app B
+    INNER JOIN tbl_user_app B
     ON A.userCode = B.userCode
     WHERE A.isActive = 'Y'
      AND A.taskDate >= ?

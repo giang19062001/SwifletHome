@@ -15,6 +15,7 @@ import { PeriodTypeEnum } from 'src/modules/todo/todo.interface';
 import { FirebaseService } from '../firebase/firebase.service';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
+import { UserAppRepository } from 'src/modules/user/app/user.repository';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -22,6 +23,7 @@ export class CornService implements OnModuleInit {
 
   constructor(
     private readonly doctorAppRepository: DoctorAppRepository,
+    private readonly userAppRepository: UserAppRepository,
     private readonly userHomeAppRepository: UserHomeAppRepository,
     private readonly todoAppService: TodoAppService,
     private readonly todoAppRepository: TodoAppRepository,
@@ -42,14 +44,14 @@ export class CornService implements OnModuleInit {
 
     // MONTHLY – ngày 01 mỗi tháng lúc 01:00
     const jobMonthly = new CronJob('0 1 1 * *', async () => {
-      await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
+      await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.MONTH);
     });
     this.schedulerRegistry.addCronJob('monthlyTask', jobMonthly);
     jobMonthly.start();
 
     // WEEKLY – Thứ Hai mỗi tuần lúc 01:00
     const jobWeekly = new CronJob('0 1 * * 1', async () => {
-      await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
+      await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
     });
     this.schedulerRegistry.addCronJob('weeklyTask', jobWeekly);
     jobWeekly.start();
@@ -64,9 +66,9 @@ export class CornService implements OnModuleInit {
     // ! DEV
     //  await this.deleteDoctorFilesNotUse();
     // await this.deleteUserHomeFilesNotUse();
-    // await this.pushNotificationsByTaskAlarms(); 
-    // await this.insertTodoTaskAlarm(PeriodTypeEnum.MONTH);
-    // await this.insertTodoTaskAlarm(PeriodTypeEnum.WEEK);
+    // await this.pushNotificationsByTaskAlarms();
+    // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.MONTH);
+    // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
   }
 
   async pushNotificationsByTaskAlarms() {
@@ -81,22 +83,22 @@ export class CornService implements OnModuleInit {
     this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskAlarmList.length}`);
     if (taskAlarmList.length) {
       for (const task of taskAlarmList) {
-        // insert thông và đẩy thông báo 
+        // insert thông và đẩy thông báo
         const taskDay = moment(task.taskDate, 'YYYY-MM-DD');
         const daysLeft = taskDay.diff(todayStr, 'days');
 
         // lấy thông tin nhà
-        const home = await this.userHomeAppRepository.getDetailHome(task.userHomeCode)
-        const notify = NOTIFICATIONS.sendNotifyTodoTaskDaily(home?.userHomeName ?? "", task.taskName, daysLeft);  
-        this.logger.log(logbase, `thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode})`);
-
-        await this.firebaseService.sendNotification(task.userCode, task.deviceToken,  notify.TITLE,notify.BODY, null, NotificationTypeEnum.TODO);
+        const home = await this.userHomeAppRepository.getDetailHome(task.userHomeCode);
+        const notify = NOTIFICATIONS.sendNotifyTodoTaskDaily(home?.userHomeName ?? '', task.taskName, daysLeft);
+        this.logger.log(logbase, `sẽ gửi thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode}) cho user(${task.userCode})`);
+ 
+        await this.firebaseService.sendNotification(task.userCode, task.deviceToken, notify.TITLE, notify.BODY, null, NotificationTypeEnum.TODO);
       }
     }
   }
 
-  async insertTodoTaskAlarm(periodType: PeriodTypeEnum) {
-    const logbase = `${this.SERVICE_NAME}/insertTodoTaskAlarm`;
+  async insertTodoTaskAlarmByPeriod(periodType: PeriodTypeEnum) {
+    const logbase = `${this.SERVICE_NAME}/insertTodoTaskAlarmByPeriod`;
     this.logger.log(logbase, `Chuẩn bị tạo các lịch nhắc tự động dựa vào các thiết lập của chu kỳ ${periodType}...`);
 
     const taskPeriodList = await this.todoAppRepository.getListTaskPeriodType(periodType);
@@ -123,8 +125,14 @@ export class CornService implements OnModuleInit {
 
     // insert các alarm đã được lọc trùng lặp
     for (const alramDto of taskAlarmCanInsert) {
-      await this.todoAppRepository.insertTaskAlarm(alramDto.userCode ? alramDto.userCode : '', alramDto);
-      this.logger.log(logbase, `Thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến (${alramDto.userHomeCode}) thành công`);
+      const checkUserHas = await this.userAppRepository.findByCode(alramDto.userCode as string);
+      // đảm bảo rằng user của alarm này ko bị xóa
+      if (checkUserHas) {
+        await this.todoAppRepository.insertTaskAlarm(alramDto.userCode as string, alramDto);
+        this.logger.log(logbase, `Thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến (${alramDto.userHomeCode}) thành công`);
+      } else {
+        this.logger.log(logbase, `User(${alramDto.userCode as string}) đã bị xóa -> không thể thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến (${alramDto.userHomeCode})`);
+      }
     }
   }
   async deleteDoctorFilesNotUse() {
@@ -136,7 +144,7 @@ export class CornService implements OnModuleInit {
         for (const file of filesNotUse) {
           await this.doctorAppRepository.deleteFile(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
-        } 
+        }
         this.logger.log(logbase, `Các file khám bệnh không dùng đã được xóa theo lịch trình thành công`);
       } else {
         this.logger.log(logbase, `Không có file khám bệnh nào cần được xóa`);

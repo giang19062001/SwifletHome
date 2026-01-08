@@ -17,7 +17,7 @@ export class UserHomeAdminRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotal(dto: GetHomesAdminDto): Promise<number> {
     let query = ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A
-      LEFT JOIN ${this.tableUser} B
+      INNER JOIN ${this.tableUser} B
         ON A.userCode = B.userCode
       LEFT JOIN tbl_provinces C
         ON A.userHomeProvince = C.provinceCode
@@ -46,11 +46,11 @@ export class UserHomeAdminRepository {
     C.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
     A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain, A.createdAt, A.updatedAt
     FROM ${this.table} A 
-    LEFT JOIN ${this.tableUser} B
+    INNER JOIN ${this.tableUser} B
       ON A.userCode = B.userCode
     LEFT JOIN tbl_provinces C
       ON A.userHomeProvince = C.provinceCode
-    WHERE A.isActive = 'Y' `;
+    WHERE A.isActive = 'Y' `;  
 
     const params: any[] = [];
 
@@ -83,7 +83,7 @@ async getUserHomesByUser(userCode?: string | string[]): Promise<IUserHomeForPush
     let query = `
       SELECT B.userCode, B.deviceToken, A.userHomeCode
       FROM ${this.table} A
-      LEFT JOIN ${this.tableUser} B ON A.userCode = B.userCode
+      INNER JOIN ${this.tableUser} B ON A.userCode = B.userCode
       WHERE A.isActive = 'Y'
         AND A.userCode IS NOT NULL
         AND B.deviceToken IS NOT NULL
@@ -120,7 +120,7 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<IUserHomeProvinc
     const query = `
       SELECT B.userCode, B.deviceToken, A.userHomeCode, C.provinceName AS userHomeProvince
       FROM ${this.table} A
-      LEFT JOIN ${this.tableUser} B ON A.userCode = B.userCode
+      INNER JOIN ${this.tableUser} B ON A.userCode = B.userCode
       LEFT JOIN tbl_provinces C ON A.userHomeProvince = C.provinceCode
       WHERE A.isActive = 'Y'
         AND A.userHomeProvince IN (${placeholders})
