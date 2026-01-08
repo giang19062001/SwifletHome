@@ -1,5 +1,5 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AUTH_CONFIG } from 'src/helpers/const.helper';
+import { AUTH_CONFIG } from 'src/modules/auth/auth.config';
 
 export const initSwagger = (app) => {
   const config = new DocumentBuilder()

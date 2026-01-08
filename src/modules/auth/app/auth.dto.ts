@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, Matches, IsEnum } from 'class-validator';
 import { Msg } from 'src/helpers/message.helper';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -10,7 +11,6 @@ export class UpdateUserDto {
   @IsNotEmpty()
   userName: string;
 }
-
 
 export class UpdatePasswordDto {
   @ApiProperty({
@@ -51,6 +51,14 @@ export class LoginAppDto {
   @IsString()
   @IsNotEmpty()
   deviceToken: string;
+
+ @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+    default: YnEnum.N,
+  })
+  @IsEnum(YnEnum)
+  isSave: YnEnum = YnEnum.N; // mặc định N
 }
 
 export class RegisterUserAppDto {
@@ -76,7 +84,7 @@ export class RegisterUserAppDto {
   userPassword: string;
 
   @ApiProperty({
-    example: 'fIMHPAUfTYKpTPVcTvtux8:APA91bFQ52ugkIGF5wq04L3ALYNamDTcHvFQWAvP7mWLSi5d6DXXqKhDEadgOIorK7Zk-loIstEvo-HwydCzFaJannJfCkWrgc1zb86lu8Z6rf3qtZoTahk',
+    example: 'ABCXYZ123',
   })
   @IsString()
   @IsNotEmpty()

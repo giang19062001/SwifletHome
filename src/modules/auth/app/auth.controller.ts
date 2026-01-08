@@ -1,5 +1,5 @@
 import { ApiAppResponse } from '../../../interfaces/app.interface';
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param, UseGuards, Delete, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
@@ -44,16 +44,35 @@ export class AuthAppController {
   @ApiOkResponse({ type: NumberOkResponseDto })
   async register(@Body() dto: RegisterUserAppDto) {
     const result = await this.authAppService.register(dto);
+    if (result === 0) {
+      throw new BadRequestException({ message: Msg.RegisterAccountErr, data: 0 });
+    }
     return {
-      message: result ? Msg.RegisterAccountOk : Msg.RegisterAccountErr,
+      message: Msg.RegisterAccountOk,
       data: result,
     };
+  }
+
+  @Delete('deleteAccount')
+  @UseGuards(ApiAuthAppGuard)
+  @ApiOperation({
+    summary: 'Cần đăng nhập',
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  async delete(@GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
+    const result = await this.authAppService.deleteAccount(user.userCode);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+
+    return result;
   }
 
   @Get('getInfo')
   @UseGuards(ApiAuthAppGuard)
   @ApiOperation({
-    summary: 'Cần xác thực',
+    summary: 'Cần đăng nhập',
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetInfoUserAppResDto) })
@@ -70,7 +89,7 @@ export class AuthAppController {
   @Put('update/:userPhone')
   @UseGuards(ApiAuthAppGuard)
   @ApiOperation({
-    summary: 'Cần xác thực',
+    summary: 'Cần đăng nhập',
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })

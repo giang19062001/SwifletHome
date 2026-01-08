@@ -4,7 +4,7 @@ import { AuthAdminService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserAdminModule } from 'src/modules/user/admin/user.module';
-import { AUTH_CONFIG } from 'src/helpers/const.helper';
+import { AUTH_CONFIG } from '../auth.config';
 
 @Module({
   imports: [

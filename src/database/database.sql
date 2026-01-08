@@ -464,6 +464,16 @@ CREATE TABLE
     UNIQUE KEY `userCode_UNIQUE` (`userCode`)
   ) ENGINE = InnoDB;
 
+CREATE TABLE
+  `tbl_user_app_delete` (
+    `seq` int NOT NULL AUTO_INCREMENT,
+    `userCode` varchar(45) NOT NULL,
+    `userName` varchar(45) NOT NULL,
+    `userPassword` varchar(255) NOT NULL,
+    `userPhone` varchar(15) NOT NULL,
+    `deviceToken` text NOT NULL,
+    PRIMARY KEY (`seq`)
+  ) ENGINE = InnoDB;
 
 
 
@@ -482,6 +492,17 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `userCode_UNIQUE` (`userCode`)
   ) ENGINE = InnoDB;
+
+CREATE TABLE
+  `tbl_user_package_delete` (
+    `seq` int NOT NULL AUTO_INCREMENT,
+    `userCode` varchar(45) NOT NULL,
+    `packageCode` varchar(45) DEFAULT NULL,
+    `startDate` datetime DEFAULT NULL,
+    `endDate` datetime DEFAULT NULL,
+    PRIMARY KEY (`seq`)
+  ) ENGINE = InnoDB;
+
 
 
 

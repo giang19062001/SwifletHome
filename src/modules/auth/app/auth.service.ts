@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message.helper';
 import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { OtpService } from 'src/modules/otp/otp.service';
@@ -11,6 +11,8 @@ import { AbAuthService } from '../auth.abstract';
 import { ITokenUserApp } from './auth.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { IUserApp } from 'src/modules/user/app/user.interface';
+import { AUTH_CONFIG } from '../auth.config';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -82,7 +84,7 @@ export class AuthAppService extends AbAuthService {
       await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
       // unscribe topic cho token cũ
       await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
-      // kiểm tra va đăng ký thêm ~ topic mới nếu có và subcribe lại topic cũ với devicetoken mới 
+      // kiểm tra va đăng ký thêm ~ topic mới nếu có và subcribe lại topic cũ với devicetoken mới
       const isNewOrChange = true;
       await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken, isNewOrChange);
     } else {
@@ -99,7 +101,9 @@ export class AuthAppService extends AbAuthService {
       ...userWithoutPassword,
       deviceToken: dto.deviceToken,
     };
-    const accessToken = this.jwtService.sign(payload);
+    // const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.signToken(payload, dto.isSave);
+
     return {
       ...userWithoutPassword,
       accessToken,
@@ -216,7 +220,7 @@ export class AuthAppService extends AbAuthService {
     return 1;
   }
 
-    async findUser(userCode: string): Promise<ITokenUserApp | null> {
+  async findUser(userCode: string): Promise<ITokenUserApp | null> {
     const logbase = `${this.SERVICE_NAME}/findUser`;
     const result = await this.userAppService.findByCode(userCode);
     return result;
@@ -228,6 +232,31 @@ export class AuthAppService extends AbAuthService {
     this.logger.log(logbase, `Thông tin người dùng: ${result && JSON.stringify({ userName: result.userName, packageName: result.packageName, packageRemainDay: result.packageRemainDay })}`);
 
     return result;
+  }
+
+  async deleteAccount(userCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/deleteAccount`;
+    try {
+      const user = await this.userAppService.findByCode(userCode);
+      let result = 0;
+      if (user) {
+        // unscribe topic cho user chuẩn bị xóa
+        this.logger.log(logbase, `Hủy topic cho người dùng: ${user.userCode}...`);
+        await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
+
+        // reset thông tin OTP
+        await this.otpService.resetOtp(user.userPhone, '0000', new Date(), PurposeEnum.REGISTER);
+
+        // xóa user ở bảng chính, insert user đó vào bảng xóa
+        this.logger.log(logbase, `Xóa thông tin người dùng: ${JSON.stringify(user)}`);
+        result = await this.userAppService.deleteAccount(user.userCode, user);
+      }
+
+      return result;
+    } catch (error) {
+      console.log(error);
+      return 0;
+    }
   }
 
   async requestOtp(dto: RequestOtpDto): Promise<string> {
@@ -245,6 +274,19 @@ export class AuthAppService extends AbAuthService {
     return await this.otpService.verifyOtp(dto);
   }
 
+  signToken(payload: any, isSave: YnEnum) {
+    let expiresIn: JwtSignOptions['expiresIn'];
+
+    if (isSave === YnEnum.Y) {
+      expiresIn = AUTH_CONFIG.EXPIRED_APP_SAVE; // '365d'
+    } else if (isSave === YnEnum.N) {
+      expiresIn = AUTH_CONFIG.EXPIRED_APP_NONE_SAVE; // '7d'
+    } else {
+      expiresIn = AUTH_CONFIG.EXPIRED_APP_NONE_SAVE; // '7d'
+    }
+
+    return this.jwtService.sign(payload, { expiresIn });
+  }
   verifyToken(token: string) {
     try {
       const payload = this.jwtService.verify(token);

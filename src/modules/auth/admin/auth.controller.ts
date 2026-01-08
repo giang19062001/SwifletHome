@@ -12,7 +12,7 @@ import { AuthAdminService } from './auth.service';
 import { LoginAdminDto } from './auth.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { AUTH_CONFIG } from 'src/helpers/const.helper';
+import { AUTH_CONFIG } from '../auth.config';
 
 @ApiTags('admin/auth')
 @Controller('/api/admin/auth')
@@ -33,7 +33,7 @@ export class AuthAdminController {
     const user = await this.authAdminService.login(dto);
 
     // save token into cookie
-    res.cookie(AUTH_CONFIG.TOKEN_NAME, user.accessToken, AUTH_CONFIG.COOKIE_CONFIG);
+    res.cookie(AUTH_CONFIG.TOKEN_NAME, user.accessToken, AUTH_CONFIG.COOKIE_ADMIN_CONFIG);
     // hide token
     const { accessToken, ...userWithoutToken } = user;
     // save user into session server to EJS render

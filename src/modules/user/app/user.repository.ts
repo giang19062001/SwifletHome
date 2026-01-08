@@ -12,7 +12,9 @@ import { TEXTS } from 'src/helpers/text.helper';
 @Injectable()
 export class UserAppRepository {
   private readonly table = 'tbl_user_app';
+  private readonly tableDel = 'tbl_user_app_delete';
   private readonly tablePackage = 'tbl_user_package';
+
   private readonly tablePackageHistory = 'tbl_user_package_history';
   private readonly tableHome = 'tbl_user_home';
   private readonly updator = 'SYSTEM';
@@ -83,19 +85,36 @@ export class UserAppRepository {
   }
 
   async create(dto: RegisterUserAppDto): Promise<number> {
-    const sqlLast = ` SELECT userCode FROM ${this.table} ORDER BY userCode DESC LIMIT 1`;
-    const [rows] = await this.db.execute<any[]>(sqlLast);
-    let userCode = CODES.userCode.FRIST_CODE;
-    if (rows.length > 0) {
-      userCode = generateCode(rows[0].userCode, CODES.userCode.PRE, 6);
-    }
-    const sql = `
-      INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, deviceToken, isActive, createdId) 
+    try {
+      const sqlLastMain = ` SELECT userCode FROM ${this.table} ORDER BY userCode DESC LIMIT 1`;
+      const sqlLastDel = ` SELECT userCode FROM ${this.tableDel} ORDER BY userCode DESC LIMIT 1`;
+
+      const [[lastMain]] = await this.db.execute<any[]>(sqlLastMain);
+      const [[lastDel]] = await this.db.execute<any[]>(sqlLastDel);
+
+      let baseCode = CODES.userCode.FRIST_CODE;
+
+      if (lastMain && lastDel) {
+        baseCode = lastMain.userCode > lastDel.userCode ? lastMain.userCode : lastDel.userCode;
+      } else if (lastMain) {
+        baseCode = lastMain.userCode;
+      } else if (lastDel) {
+        baseCode = lastDel.userCode;
+      }
+
+      const userCode = generateCode(baseCode, CODES.userCode.PRE, 6);
+
+      const sql = `
+      INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, deviceToken, isActive, createdId)
       VALUES(?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.deviceToken, 'Y', this.updator]);
+      const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.deviceToken, 'Y', this.updator]);
 
-    return result.insertId;
+      return result.insertId;
+    } catch (error) {
+      console.log('create --', error);
+      return 0;
+    }
   }
   async update(userName: string, userPhone: string, userCode: string): Promise<number> {
     const sql = `
@@ -124,6 +143,34 @@ export class UserAppRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [deviceToken, this.updator, userPhone]);
 
     return result.affectedRows;
+  }
+
+  async deleteAccount(userCode: string, user: ITokenUserApp): Promise<number> {
+    const conn = await this.db.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // Insert vào bảng delete
+      await conn.query(
+        ` INSERT INTO ${this.tableDel} (userCode, userName, userPassword, userPhone, deviceToken)
+          VALUES (?, ?, ?, ?, ?) `,
+        [user.userCode, user.userName, user.userPassword, user.userPhone, user.deviceToken],
+      );
+      // Delete khỏi bảng chính
+      const [deleteResult]: any = await conn.query(` DELETE FROM ${this.table} WHERE userCode = ? LIMIT 1`, [userCode]);
+      if (deleteResult.affectedRows !== 1) {
+        return 0;
+      }
+
+      await conn.commit();
+      return 1;
+    } catch (err) {
+      console.log('deleteAccount --- err: ', err);
+      await conn.rollback();
+      return 0;
+    } finally {
+      conn.release();
+    }
   }
 
   // TODO: PACKAGE

@@ -32,7 +32,7 @@ export const Msg = {
   UserNotFound: 'Người dùng không tồn tại',
   HomeNotFound: 'Thông tin nhà yến không tồn tại',
   HomeIsMainCannotDelete: 'Không thể xóa nhà yến đang được chọn là chính',
-  CannotReply: 'Hệ thống chưa có thông tin về câu trả lời của câu hỏi này',
+  CannotReply: 'Những vấn đề kỹ thuật chuyên sâu cần độ chính xác cao. Vui lòng liên hệ qua Zalo hoặc Số điện thoại : 0966222612',
   UuidNotFound: 'Chưa từng có file nào được upload cùng với uuid này',
   FileEmpty: 'Không có file nào được upload',
   FileAudioRequire: 'Bắt buộc nhập 2 file audio',

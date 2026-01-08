@@ -22,7 +22,13 @@ export class UserAppService {
   async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
     return await this.userAppRepository.findByPhone(userPhone);
   }
-
+  async deleteAccount(userCode: string, user: ITokenUserApp): Promise<number> {
+    try {
+      return await this.userAppRepository.deleteAccount(userCode, user);
+    } catch (error) {
+      return 0
+    }
+  }
   async getInfo(userCode: string): Promise<IUserApp | null> {
     const info = await this.userAppRepository.getInfo(userCode);
     if (info?.packageCode && info.packageRemainDay <= 0) {

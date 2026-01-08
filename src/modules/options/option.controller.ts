@@ -24,7 +24,7 @@ export default class OptionController {
     type: GetOptionDto,
   })
   @ApiOperation({
-    summary: 'Không cần xác thực',
+    summary: 'Không cần đăng nhập',
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)

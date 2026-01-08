@@ -14,7 +14,7 @@ export default class ProvinceController {
 
 
   @ApiOperation({
-    summary: 'Không cần xác thực',
+    summary: 'Không cần đăng nhập',
   })
   @Get('getAll')
   @HttpCode(HttpStatus.OK)

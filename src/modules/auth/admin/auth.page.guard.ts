@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthAdminService } from './auth.service';
-import { AUTH_CONFIG, PUBLIC_ROUTERS } from 'src/helpers/const.helper';
+import { AUTH_CONFIG, PUBLIC_ROUTERS } from '../auth.config';
 
 @Injectable()
 export class PageAuthAdminGuard implements CanActivate {
