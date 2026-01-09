@@ -80,7 +80,7 @@ export class ScreenAppService {
           if (screen.screenContent) {
             result = {
               contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
-              contentCenter: {},
+              contentCenter: screen.screenContent.contentCenter,
               contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
             } as IScreenSignupService;
           }

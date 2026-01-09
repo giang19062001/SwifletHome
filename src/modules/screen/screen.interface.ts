@@ -14,6 +14,12 @@ export interface IScreen {
   updatedId?: string;
 }
 
+export interface IScreenRequestDoctor {
+  contentEnd: string;
+  contentStart: string;
+  contentCenter: { symptom : string };
+}
+
 export interface IScreenSignupService {
   contentEnd: string;
   contentStart: string;

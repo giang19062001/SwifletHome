@@ -43,6 +43,9 @@ function showNameOfKey(key) {
     case 'contentStart':
       name = 'Nội dung đầu';
       break;
+    case 'contentCenter':
+      name = 'Nội dung giữa';
+      break;
     default:
       name = '';
   }
@@ -60,7 +63,8 @@ function mapContentFileds(data) {
     case 'REQUEST_DOCTOR':
       screenContent = {
         contentStart: data.contentStart ?? '',
-        contentEnd: data.contentEnd ?? '',
+        contentCenter: data.contentCenter ?? '',
+        // contentEnd: data.contentEnd ?? '',
       };
       break;
     default:
@@ -171,7 +175,6 @@ async function updateScreen() {
       screenName: document.querySelector('#screenName').value,
       screenDescription: document.querySelector('#screenDescription').value,
     };
-
 
     const errors = validate(formData, screenMutationConstraints);
     if (errors) {
