@@ -35,7 +35,7 @@ export class GetHomeUserResDto {
   userHomeImage: string;
 
   @ApiProperty({ example: 0 })
-  userHomeHeight: number;
+  userHomeLength: number;
 
   @ApiProperty({ example: 0 })
   userHomeWidth: number;

@@ -44,7 +44,7 @@ export class UserHomeAdminRepository {
   async getAll(dto: GetHomesAdminDto): Promise<IUserHome[]> {
     let query = ` SELECT A.seq, A.userCode, B.userName, B.userPhone, A.userHomeCode, A.userHomeName, A.userHomeAddress, 
     C.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
-    A.userHomeHeight, A.userHomeWidth, A.userHomeFloor,
+    A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
     A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain, A.createdAt, A.updatedAt
     FROM ${this.table} A 
     INNER JOIN ${this.tableUser} B
@@ -139,7 +139,7 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<IUserHomeProvinc
     const [rows] = await this.db.query<RowDataPacket[]>(
       `
        SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
-       A.userHomeHeight, A.userHomeWidth, A.userHomeFloor,
+       A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId, B.macId, B.wifiId, B.wifiPassword
           FROM  ${this.table} A 
           LEFT JOIN ${this.tableSensor} B

@@ -258,8 +258,8 @@ CREATE TABLE
   );
 
 ALTER TABLE `swiftlet`.`tbl_user_home` 
-ADD COLUMN `userHomeHeight` FLOAT NULL DEFAULT 0 AFTER `userHomeImage`,
-ADD COLUMN `userHomeWidth` FLOAT NULL DEFAULT 0 AFTER `userHomeHeight`,
+ADD COLUMN `userHomeLength` FLOAT NULL DEFAULT 0 AFTER `userHomeImage`,
+ADD COLUMN `userHomeWidth` FLOAT NULL DEFAULT 0 AFTER `userHomeLength`,
 ADD COLUMN `userHomeFloor` INT NULL DEFAULT 0 AFTER `userHomeWidth`;
 
 -- IOT cảm biến với nhà yến

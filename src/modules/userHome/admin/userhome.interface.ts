@@ -11,7 +11,7 @@ export interface IUserHomeSensor {
   userHomeProvince: string;
   userHomeDescription: string;
   userHomeImage: string;
-  userHomeHeight: number;
+  userHomeLength: number;
   userHomeWidth: number;
   userHomeFloor: number;
   uniqueId: string;
