@@ -39,7 +39,7 @@ export class ScreenAppService {
               let packageTxt = '';
               if (packageActive.packageOptionType == PackageOptionTypeEnum.ITEM) {
                 // chỉ hiện tên vật phẩm
-                packageTxt = packageActive.packageItemSamePrice ? '/ ' + packageActive.packageItemSamePrice : '';
+                packageTxt = packageActive.packageItemSamePrice
               } else if (packageActive.packageOptionType == PackageOptionTypeEnum.MONEY) {
                 // chỉ hiện giá
                 packageTxt = `${packageActive.packagePrice}đ`;
