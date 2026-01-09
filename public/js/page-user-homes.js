@@ -145,7 +145,7 @@ const renderAllUserHomes = (data, objElement) => {
         </td>
         <td class="py-3" style="min-width: 180px;">
             <p class="mt-2">Chiều cao: ${ele.userHomeHeight} (m)</p>
-            <p class="mt-2">Chiều rộng: ${ele.userHomeWeight} (m)</p>
+            <p class="mt-2">Chiều rộng: ${ele.userHomeWidth} (m)</p>
             <p class="mt-2">Số tầng: ${ele.userHomeFloor}</p>
         </td>
         <td class="py-3"><p>${ele.isIntegateTempHum == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>

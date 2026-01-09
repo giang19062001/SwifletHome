@@ -74,7 +74,7 @@ export class MutationUserHomeDto {
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  userHomeWeight: number = 0;
+  userHomeWidth: number = 0;
 
   @ApiProperty({ example: 3, description: 'Số tầng' })
   @Type(() => Number)

@@ -12,7 +12,7 @@ export interface IUserHome {
   userHomeDescription: string;
   userHomeImage: string;
   userHomeHeight: number;
-  userHomeWeight: number;
+  userHomeWidth: number;
   userHomeFloor: number;
   uniqueId: string;
   isIntegateTempHum: YnEnum;

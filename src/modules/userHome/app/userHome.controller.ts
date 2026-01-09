@@ -99,7 +99,7 @@ export class UserHomeAppController {
 Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uuid** được generate phía app\n
 **userHomeProvince** là **provinceCode** lấy từ */api/app/province/getAll*\n
 **userHomeHeight** là **Float** có thể có dấu chấm\n
-**userHomeWeight** là **Float** có thể có dấu chấm\n
+**userHomeWidth** là **Float** có thể có dấu chấm\n
 **userHomeFloor** là **Int**`,
   })
   @ApiParam({ name: 'userHomeCode', type: String })
@@ -123,7 +123,7 @@ Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uui
 **uniqueId** sẽ là giá trị **uuid** được generate phía app\n
 **userHomeProvince** là **provinceCode** lấy từ */api/app/province/getAll*\n
 **userHomeHeight** là **Float** có thể có dấu chấm\n
-**userHomeWeight** là **Float** có thể có dấu chấm\n
+**userHomeWidth** là **Float** có thể có dấu chấm\n
 **userHomeFloor** là **Int**
   `,
   })
