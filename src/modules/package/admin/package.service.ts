@@ -4,6 +4,7 @@ import { IList } from 'src/interfaces/admin.interface';
 import { PackageAdminRepository } from './package.repository';
 import { IPackage } from '../package.interface';
 import { formatPrice } from 'src/helpers/func.helper';
+import { UpdatePackageDto } from './package.dto';
 
 @Injectable()
 export class PackageAdminService {
@@ -21,6 +22,11 @@ export class PackageAdminService {
   }
   async getDetail(packageCode: string): Promise<IPackage | null> {
     const result = await this.packageAdminRepository.getDetail(packageCode);
+    return result ? { ...result, packagePrice: formatPrice(result.packagePrice) } : null;
+  }
+
+  async update(dto: UpdatePackageDto, updatedId: string, packageCode: string): Promise<number> {
+    const result = await this.packageAdminRepository.update(dto, updatedId, packageCode);
     return result;
   }
 }

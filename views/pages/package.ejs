@@ -30,8 +30,11 @@
                               <th>
                                  <p>Gía</p>
                               </th>
-                               <th>
+                              <th>
                                  <p>Vật phẩm đồng giá</p>
+                              </th>
+                               <th>
+                                 <p>Cách thanh toán</p>
                               </th>
                               <th>
                                  <p>Ngày tạo</p>
@@ -39,6 +42,7 @@
                               <th>
                                  <p>Người tạo</p>
                               </th>
+                              <th></th>
                            </tr>
                         </thead>
                         <tbody class="body-table"></tbody>
@@ -52,5 +56,93 @@
          </div>
       </div>
    </div>
+   </div>
+      <!-- modal update-->
+   <div class="modal common-modal package-update-modal" tabindex="-1" role="dialog" 
+      aria-hidden="true">
+      <div class="modal-dialog  modal-lg modal-dialog-centered" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <p class="modal-header-title">Chỉnh sửa góii</p>
+               <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                     <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                  </svg>
+               </button>
+            </div>
+            <div class="modal-body">
+               <form class="p-2">
+                  <input type="hidden" id="packageCode" value="">
+                  <div class="row mb-3">
+                     <div class="col-md-6">
+                        <div class="form-group mb-3">
+                           <label for="packageName" class="form-label">Tên gói</label>
+                           <input class="form-control" id="packageName"></input>
+                           <div class="err-packageName">Vui lòng nhập tên gói.</div>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                     <label for="packageOptionType" class="form-label">Cách thanh toán</label>
+                     <div class="d-flex gap-2 mt-1">
+                        <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="packageOptionType" id="MONEY" value="MONEY">
+                        <label class="form-check-label" for="MONEY">Tiền</label>
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="packageOptionType" id="ITEM" value="ITEM">
+                        <label class="form-check-label" for="ITEM">Vật phẩm</label>
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="packageOptionType" id="BOTH" value="BOTH">
+                        <label class="form-check-label" for="BOTH">Cả hai</label>
+                        </div>
+                     </div>
+                  </div>
+                  </div>
+                    <div class="row mb-3">
+                     <div class="col-md-6">
+                        <div class="form-group mb-3">
+                           <label for="packagePrice" class="form-label">Gía</label>
+                           <input class="form-control" type="text" id="packagePrice"  oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                           <div class="err-packagePrice">Vui lòng nhập giá.</div>
+                           <div class="err-packagePrice-invalid">Gía tiền không hợp lệ.</div>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                         <div class="form-group mb-3">
+                           <label for="packageItemSamePrice" class="form-label">Vật phẩm đồng giá</label>
+                           <input class="form-control" id="packageItemSamePrice"></input>
+                           <div class="err-packageItemSamePrice">Vui lòng nhập vật phẩm.</div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row">
+                  <div class="col-md-6">
+                     <div class="form-group mb-3">
+                        <label for="packageExpireDay" class="form-label">Thời hạn gói (Ngày)</label>
+                        <input class="form-control" id="packageExpireDay" type="number" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        <div class="err-packageExpireDay">Vui lòng nhập thời hạn.</div>
+                     </div>
+                  </div>
+                  <div class="col-md-6">
+                         <div class="form-group mb-3">
+                           <label for="packageDescription" class="form-label">Mô tả gói</label>
+                           <input class="form-control" id="packageDescription"></input>
+                           <div class="err-packageDescription">Vui lòng nhập mô tả.</div>
+                        </div>
+                     </div>
+                  
+                  </div>
+
+               </form>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn-submit"></button>
+            </div>
+         </div>
+      </div>
    </div>
       <script src="/js/page-package.js"></script>

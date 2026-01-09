@@ -22,7 +22,6 @@ function getShortText(text) {
   return text.slice(0, 50);
 }
 
-
 async function ChangeUrlToFile(filename) {
   try {
     const response = await fetch(`${CURRENT_URL}/${filename}`);
@@ -162,8 +161,26 @@ function hidePageLoader() {
 }
 
 // time
-function formatDateTime(dateTime){
-   return moment(dateTime).format('YYYY-MM-DD HH:mm:ss')
+function formatDateTime(dateTime) {
+  return moment(dateTime).format('YYYY-MM-DD HH:mm:ss');
+}
+
+function isValidMoneyInput(value) {
+  if (!value || value.trim() === '') return false;
+
+  // Chỉ được chứa số và dấu chấm
+  if (!/^[0-9.]+$/.test(value)) return false;
+
+  // ko được bắt đầu bằng dấu chấm
+  if (value.startsWith('.')) return false;
+
+  // ko được kết thúc bằng dấu chấm
+  if (value.endsWith('.')) return false;
+
+  // ko được có 2 dấu chấm liên tiếp
+  if (value.includes('..')) return false;
+
+  return true;
 }
 
 async function loaderApiCall(promise) {

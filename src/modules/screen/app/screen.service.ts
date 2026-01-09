@@ -8,6 +8,7 @@ import { IScreenSignupService } from '../screen.interface';
 import { ScreenAppRepository } from './screen.repository';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
+import { PackageOptionTypeEnum } from 'src/modules/package/package.interface';
 
 @Injectable()
 export class ScreenAppService {
@@ -31,30 +32,54 @@ export class ScreenAppService {
       switch (keyword) {
         case APP_SCREENS.SIGNUP_SERVICE:
           if (screen.screenContent) {
-            const packageList = await this.packageAppService.getAll({ limit: 0, page: 0 });
+            // gói
+            const packageActive = await this.packageAppService.getOne();
             let packages: string[] = [];
-            if (packageList.length) {
-              for (const pack of packageList) {
-                const text = `${pack.packageName}: ${pack.packagePrice}đ ${pack.packageItemSamePrice ? '/ ' + pack.packageItemSamePrice : ''} `;
-                packages.push(text);
+            if (packageActive) {
+              let packageTxt = '';
+              if (packageActive.packageOptionType == PackageOptionTypeEnum.ITEM) {
+                // chỉ hiện tên vật phẩm
+                packageTxt = packageActive.packageItemSamePrice ? '/ ' + packageActive.packageItemSamePrice : '';
+              } else if (packageActive.packageOptionType == PackageOptionTypeEnum.MONEY) {
+                // chỉ hiện giá
+                packageTxt = `${packageActive.packagePrice}đ`;
+              } else if (packageActive.packageOptionType == PackageOptionTypeEnum.BOTH) {
+                // hiện giá và vật phẩm
+                packageTxt = `${packageActive.packagePrice}đ / ${packageActive.packageItemSamePrice}`;
               }
+              const text = `${packageActive.packageName}: ${packageTxt}`;
+              // luôn để gói là dữ liệu mảng
+              packages.push(text);
             }
-            const bankInfo = await this.infoAppService.getDetail('BANK');
-            const infoContent : IInfoBank  = bankInfo ? bankInfo.infoContent : null
-            result = {
-              contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
-              contentCenter: {
-                packages: packages,
-                bankInfo: infoContent ? {...infoContent, accountName: `${infoContent.accountNumber} - ${infoContent.accountName}`} : null,
-              },
-              contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
-            } as IScreenSignupService;
+            // là vật phẩm -> ko hiện thông tin chuyển khoản
+            if (packageActive.packageOptionType == PackageOptionTypeEnum.ITEM) {
+              result = {
+                contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
+                contentCenter: {
+                  packages: packages,
+                  bankInfo: null,
+                },
+                contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
+              };
+            } else {
+              // thông tin chuyển khoản
+              const bankInfo = await this.infoAppService.getDetail('BANK');
+              const infoContent: IInfoBank = bankInfo ? bankInfo.infoContent : null;
+              result = {
+                contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
+                contentCenter: {
+                  packages: packages,
+                  bankInfo: infoContent ? { ...infoContent, accountName: `${infoContent.accountNumber} - ${infoContent.accountName}` } : null,
+                },
+                contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
+              } as IScreenSignupService;
+            }
           }
           break;
         case APP_SCREENS.REQUEST_DOCTOR:
           if (screen.screenContent) {
             result = {
-              contentStart:  replaceNbspToSpace(screen.screenContent.contentStart),
+              contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
               contentCenter: {},
               contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
             } as IScreenSignupService;

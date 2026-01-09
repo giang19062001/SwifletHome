@@ -3,14 +3,19 @@ const CURRENT_PATH = window.location.pathname;
 const CURRENT_URL = window.location.origin;
 const CURRENT_PARAMS = window.location.search;
 
-console.log("CURRENT_PATH", CURRENT_PATH);
-console.log("CURRENT_URL", CURRENT_URL);
-console.log("CURRENT_PARAMS", CURRENT_PARAMS);
+console.log('CURRENT_PATH', CURRENT_PATH);
+console.log('CURRENT_URL', CURRENT_URL);
+console.log('CURRENT_PARAMS', CURRENT_PARAMS);
 
 const VARIABLE_ENUM = {
   MEDIA_BADGE: {
     NEW: 'NEW',
     NORMAL: 'NORMAL',
+  },
+  PACKAGE_OPTIONS_TYPE: {
+    MONEY: 'Tiền',
+    ITEM: 'Vật phẩm',
+    BOTH: 'Tiền/Vật phẩm',
   },
 };
 const LIST_ENUM = {

@@ -401,7 +401,7 @@ CREATE TABLE
   ) ENGINE = InnoDB;
 
 
-
+-- GÓI
 CREATE TABLE
   `tbl_user_package` (
     `seq` int NOT NULL AUTO_INCREMENT,
@@ -417,6 +417,11 @@ CREATE TABLE
     PRIMARY KEY (`seq`),
     UNIQUE KEY `userCode_UNIQUE` (`userCode`)
   ) ENGINE = InnoDB;
+
+ALTER TABLE `swiftlet`.`tbl_package` 
+ADD COLUMN `packageOptionType` ENUM('MONEY', 'ITEM', 'BOTH') NULL DEFAULT 'MONEY' AFTER `packageExpireDay`;
+-- GÓI
+
 
 CREATE TABLE
   `tbl_user_package_delete` (
@@ -561,9 +566,6 @@ CREATE TABLE
     updatedId VARCHAR(45) DEFAULT NULL
   ) ENGINE = InnoDB;
 
-
-
-
 -- to do list
 CREATE TABLE
   tbl_todo_box_tasks (
@@ -610,9 +612,6 @@ CREATE TABLE
     updatedId VARCHAR(45) DEFAULT NULL
   );
 
-
-
-
 CREATE TABLE
   tbl_todo_home_task_alarm (
     seq INT AUTO_INCREMENT PRIMARY KEY,
@@ -630,6 +629,7 @@ CREATE TABLE
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
     updatedId VARCHAR(45) DEFAULT NULL
   )
+
 
 
 -- media

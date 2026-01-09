@@ -33,6 +33,18 @@ export function formatPrice(price: string | number) {
   return Number(price).toLocaleString('vi-VN');
 }
 
+export function formatDecimal(val: any): number {
+  if (!val) return 0;
+
+  let s = String(val).trim();
+
+  s = s.replace(/[.,\s]/g, '');
+
+  const num = Number(s);
+  if (isNaN(num)) return 0;
+
+  return Number(num.toFixed(3)); // decimal(10,3)
+}
 export function replaceNbspToSpace(str: string) {
   if (typeof str !== 'string') return str;
   return str.replace(/&nbsp;/g, ' ');

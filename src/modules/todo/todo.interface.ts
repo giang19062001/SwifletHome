@@ -15,6 +15,20 @@ export const TODO_CONST = {
       text: 'Bị huỷ',
     },
   },
+  TASK_EVENT: {
+    COMPLETE: {
+      value: 'COMPLETE',
+      text: 'Hoàn thành',
+    },
+    HARVEST: {
+      value: 'HARVEST',
+      text: 'Nhập dữ liệu',
+    },
+    MEDICINE: {
+      value: 'MEDICINE',
+      text: 'Ghi chú',
+    },
+  },
 };
 
 export enum PeriodTypeEnum {

@@ -13,4 +13,11 @@ export interface IPackage {
   updatedAt: Date;
   createdId: string;
   updatedId: string;
+  packageOptionType:  PackageOptionTypeEnum
+}
+
+export enum PackageOptionTypeEnum {
+  MONEY = 'MONEY',
+  ITEM = 'ITEM',
+  BOTH = 'BOTH',
 }

@@ -9,18 +9,16 @@ export class PackageAppRepository {
   private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async getAll(dto: PagingDto): Promise<IPackage[]> {
-    let query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageItemSamePrice, A.packageExpireDay, A.packageDescription
+  async getOne(): Promise<IPackage> {
+    let query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageItemSamePrice,
+              A.packageOptionType, A.packageExpireDay, A.packageDescription
                FROM ${this.table} A
-               WHERE A.isActive = 'Y' `;
+               WHERE A.isActive = 'Y' 
+               LIMIT 1 `;
 
     const params: any[] = [];
-    if (dto.limit > 0 && dto.page > 0) {
-      query += ` LIMIT ? OFFSET ?`;
-      params.push(dto.limit, (dto.page - 1) * dto.limit);
-    }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IPackage[];
+    return rows[0] as IPackage;
   }
 }

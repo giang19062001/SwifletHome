@@ -15,14 +15,12 @@ export class PackageAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async getAll(dto: PagingDto): Promise<IPackage[]> {
-    const list = await this.packageAppRepository.getAll(dto);
+  async getOne(): Promise<IPackage> {
+    const result = await this.packageAppRepository.getOne();
 
-    const result = list.map((item) => ({
-      ...item,
-      packagePrice: formatPrice(item.packagePrice), // chuyên sang tiền việt
-    }));
-
-    return result;
+    return {
+      ...result,
+      packagePrice: formatPrice(result.packagePrice), // chuyên sang tiền việt};
+    };
   }
 }
