@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { CreateNotificationDto } from './notification.dto';
+import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusEnum } from './notification.dto';
 import { INotification, INotificationTopic, IUserNotificationTopic, NotificationStatusEnum } from '../notification.interface';
 import { handleTimezoneQuery } from 'src/helpers/func.helper';
 import { TEXTS } from 'src/helpers/text.helper';
@@ -10,31 +10,36 @@ import { UPDATOR } from 'src/helpers/const.helper';
 @Injectable()
 export class NotificationAppRepository {
   private readonly table = 'tbl_notifications';
+  private readonly tableUser = 'tbl_notifications_user';
   private readonly tableTopic = 'tbl_notification_topics';
   private readonly tableUserTopic = 'tbl_user_notification_topics';
-  private readonly theQueryCountCommon = `(A.userCode = ? OR JSON_CONTAINS(A.userCodesMuticast, JSON_QUOTE(?)) OR A.topicCode = ?)  AND A.isActive = 'Y'`
+  // private readonly theQueryCountCommon = `(A.userCode = ? OR JSON_CONTAINS(A.userCodesMuticast, JSON_QUOTE(?)) OR A.topicCode = ?)  AND A.isActive = 'Y'`;
+
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async getTotal(userCode: string, topicCode: string): Promise<number> {
+
+  // TODO: USER
+  async getTotal(userCode: string): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A
-      WHERE ${this.theQueryCountCommon} `,
-      [userCode, userCode, topicCode],
+      ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableUser} A
+      WHERE A.userCode = ? AND A.isActive = 'Y' `,
+      [userCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto, userCode: string, topicCode: string): Promise<INotification[]> {
+  async getAll(dto: PagingDto, userCode: string): Promise<INotification[]> {
     let query = `
-    SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.targetScreen, A.data, 
-           -- A.userCode, A.userCodesMuticast, A.topicCode,
-            IF(A.notificationType = 'TODO', '${TEXTS.NOTIFICATION_TYPE_TODO}', A.notificationType) AS notificationType,
+    SELECT B.seq, B.notificationId, B.messageId, B.title, B.body, B.targetScreen, B.data, 
+            IF(B.notificationType = 'TODO', '${TEXTS.NOTIFICATION_TYPE_TODO}', B.notificationType) AS notificationType,
             A.notificationStatus, A.isActive, 
            ${handleTimezoneQuery('A.createdAt')}, A.createdId
-    FROM ${this.table} A
-    WHERE ${this.theQueryCountCommon}
+    FROM ${this.tableUser} A
+    LEFT JOIN  ${this.table} B
+    ON A.notificationId = B.notificationId
+    WHERE  A.userCode = ? AND A.isActive = 'Y'
     ORDER BY A.createdAt DESC
   `;
 
-    const params: any[] = [userCode, userCode, topicCode];
+    const params: any[] = [userCode];
 
     // paging
     if (dto.limit > 0 && dto.page > 0) {
@@ -45,35 +50,83 @@ export class NotificationAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as INotification[];
   }
-  async getCntNotifyNotReadByUser(userCode: string, topicCode: string): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(A.seq)  AS TOTAL
-        FROM ${this.table} A
-        WHERE ${this.theQueryCountCommon} 
-        AND A.notificationStatus = ?
-        `,
-      [userCode, userCode, topicCode, NotificationStatusEnum.SENT],
-    );
-    return rows.length ? (rows[0].TOTAL as number) : 0;
-  }
 
   async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.notificationId, A.messageId, A.title, A.body, A.targetScreen, A.data, 
-      -- A.userCode, A.userCodesMuticast, A.topicCode,
-      A.notificationType, A.notificationStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt
-        FROM ${this.table} A 
-        WHERE A.notificationId = ? AND A.isActive = 'Y'
+      `   SELECT B.seq, B.notificationId, B.messageId, B.title, B.body, B.targetScreen, B.data, 
+            IF(B.notificationType = 'TODO', '${TEXTS.NOTIFICATION_TYPE_TODO}', B.notificationType) AS notificationType,
+            A.notificationStatus, A.isActive, 
+           ${handleTimezoneQuery('A.createdAt')}, A.createdId
+        FROM ${this.tableUser} A
+        LEFT JOIN  ${this.table} B
+        ON A.notificationId = B.notificationId
+        WHERE A.notificationId = ? AND A.userCode = ? AND A.isActive = 'Y'
         LIMIT 1`,
       [notificationId, userCode],
     );
     return rows ? (rows[0] as INotification) : null;
   }
 
-  async createNotification(dto: CreateNotificationDto): Promise<number> {
+  async getCntNotifyNotReadByUser(userCode: string): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT COUNT(A.seq)  AS TOTAL
+        FROM ${this.tableUser} A
+        WHERE A.userCode = ? AND A.isActive = 'Y'
+        AND A.notificationStatus = ?
+        `,
+      [userCode, NotificationStatusEnum.SENT],
+    );
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+
+  async maskAsRead(notificationId: string, userCode: string): Promise<number> {
     const sql = `
-        INSERT INTO ${this.table}  (notificationId, messageId, title, body, targetScreen, data, userCode, userCodesMuticast, topicCode, notificationType, notificationStatus, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      UPDATE ${this.tableUser} SET notificationStatus = ? , updatedId = ?, updatedAt = NOW()
+      WHERE notificationId = ? AND userCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [NotificationStatusEnum.READ, userCode, notificationId, userCode]);
+
+    return result.affectedRows;
+  }
+
+  async deteteNotification(notificationId: string, userCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableUser} SET isActive = 'N' , updatedId = ?, updatedAt = NOW()
+      WHERE notificationId = ? AND userCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, notificationId, userCode]);
+
+    return result.affectedRows;
+  }
+
+  async deteteNotificationByStatus(notificationStatus: DeleteNotificationByStatusEnum, userCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableUser} SET isActive = 'N' , updatedId = ?, updatedAt = NOW()
+      WHERE userCode = ? AND isActive = 'Y' ${notificationStatus !== DeleteNotificationByStatusEnum.ALL ? ' AND notificationStatus = ? ' : ''}
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, notificationStatus !== DeleteNotificationByStatusEnum.ALL 
+      ? [userCode, userCode, notificationStatus] 
+      : [userCode, userCode]);
+
+    return result.affectedRows;
+  }
+
+  async insertNotificationOfUser(dto: CreateNotificationOfUserDto): Promise<number> {
+    const sql = `
+        INSERT INTO ${this.tableUser}  (notificationId, userCode, notificationStatus, createdId) 
+        VALUES(?, ?, ?, ?)
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.notificationId, dto.userCode, dto.notificationStatus, UPDATOR]);
+    return result.insertId;
+  }
+
+  // TODO: NOTI
+
+  async insertNotification(dto: CreateNotificationDto): Promise<number> {
+    const sql = `
+        INSERT INTO ${this.table}  (notificationId, messageId, title, body, targetScreen, data, userCode, userCodesMuticast, topicCode,
+        notificationType, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       dto.notificationId,
@@ -86,33 +139,11 @@ export class NotificationAppRepository {
       dto.userCodesMuticast,
       dto.topicCode,
       dto.notificationType,
-      dto.notificationStatus,
       UPDATOR,
     ]);
 
     return result.insertId;
   }
-
-  async maskAsRead(notificationId: string, userCode: string): Promise<number> {
-    const sql = `
-      UPDATE ${this.table} SET notificationStatus = ? , updatedId = ?, updatedAt = NOW()
-      WHERE notificationId = ?
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [NotificationStatusEnum.READ, userCode, notificationId]);
-
-    return result.affectedRows;
-  }
-
-  async deteteNotification(notificationId: string, userCode: string): Promise<number> {
-    const sql = `
-      UPDATE ${this.table} SET isActive = 'N' , updatedId = ?, updatedAt = NOW()
-      WHERE notificationId = ?
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, notificationId]);
-
-    return result.affectedRows;
-  }
-
   // TODO: TOPIC
   async getTotalTopic(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableTopic}`);

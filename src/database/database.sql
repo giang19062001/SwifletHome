@@ -539,9 +539,7 @@ CREATE TABLE
     UNIQUE KEY uniq_user_topic (userCode, topicCode) -- chống trùng
   ) ENGINE = InnoDB;
 
-
-
-
+-- thông tin thông báo
 CREATE TABLE
   tbl_notifications (
     seq INT AUTO_INCREMENT PRIMARY KEY,
@@ -555,12 +553,26 @@ CREATE TABLE
     userCodesMuticast JSON DEFAULT NULL, -- mảng user code nếu gửi multicase
     topicCode VARCHAR(45) DEFAULT NULL, -- có thể null
     notificationType ENUM ('ADMIN', 'TODO') DEFAULT 'ADMIN',
-    notificationStatus ENUM ('SENT', 'READ') DEFAULT 'SENT',
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
     updatedId VARCHAR(45) DEFAULT NULL
+  ) ENGINE = InnoDB;
+
+-- thông tin thông báo cho user
+CREATE TABLE
+  tbl_notifications_user (
+    seq INT AUTO_INCREMENT PRIMARY KEY,
+    notificationId CHAR(36) NOT NULL, -- UUID v4 lưu dạng string
+    userCode VARCHAR(45) DEFAULT NULL, -- có thể null nếu notifications gửi bằng topic thay vì riêng user,
+    notificationStatus ENUM ('SENT', 'READ') DEFAULT 'SENT',
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT NULL,
+    createdId VARCHAR(45) DEFAULT 'SYSTEM',
+    updatedId VARCHAR(45) DEFAULT NULL,
+    UNIQUE KEY uk_notification_user (notificationId, userCode)
   ) ENGINE = InnoDB;
 
 -- to do list

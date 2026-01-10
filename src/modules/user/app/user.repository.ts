@@ -20,6 +20,11 @@ export class UserAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
+  async getAllUserCode(): Promise<ITokenUserApp[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT seq, userCode FROM ${this.table} WHERE isActive = 'Y' `, []);
+
+    return rows as ITokenUserApp[];
+  }
   async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
@@ -178,7 +183,7 @@ export class UserAppRepository {
           INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
           VALUES(?, ?, ?, ?, ?, ?)
         `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate,  UPDATOR, createdAt]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, UPDATOR, createdAt]);
 
     return result.insertId;
   }

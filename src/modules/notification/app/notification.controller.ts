@@ -13,6 +13,7 @@ import { GetNotificationResDto } from './notification.response';
 import { INotification } from '../notification.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
+import { DeleteNotificationByStatusDto, DeleteNotificationByStatusEnum } from './notification.dto';
 
 @ApiTags('app/notification')
 @Controller('/api/app/notification')
@@ -99,12 +100,38 @@ export class NotificationAppController {
     const result = await this.notificationAppService.deteteNotification(notificationId, user.userCode);
     if (result === 0) {
       throw new BadRequestException({
-        message: Msg.UpdateErr,
+        message: Msg.DeleteErr,
         data: 0,
       });
     }
     return {
-      message: Msg.UpdateOk,
+      message: Msg.DeleteOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Xóa thông báo theo trạng thái',
+  })
+  @Delete('deteteNotificationByStatus')
+  @ApiBody({
+    type: DeleteNotificationByStatusDto,
+    description: `
+**notificationStatus**: ENUM('ALL','SENT','READ')
+ `,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  async deteteNotificationByStatus(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: DeleteNotificationByStatusDto) {
+    const result = await this.notificationAppService.deteteNotificationByStatus(dto, user.userCode);
+    if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.DeleteErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.DeleteOk,
       data: result,
     };
   }

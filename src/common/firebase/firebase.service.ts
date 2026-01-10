@@ -113,9 +113,8 @@ export class FirebaseService implements OnModuleInit {
           userCodesMuticast: [],
           topicCode: null,
           notificationType: notificationType,
-          notificationStatus: NotificationStatusEnum.SENT,
         };
-        await this.notificationAppRepository.createNotification(notificationDto);
+        await this.notificationAppService.createNotification(notificationDto);
         this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
       } else {
         this.logger.log(logbase, `Gửi thông báo  ${JSON.stringify(message)} cho ${deviceToken} thất bại : ${JSON.stringify(response)}`);
@@ -179,10 +178,9 @@ export class FirebaseService implements OnModuleInit {
         userCodesMuticast: [],
         topicCode: topic, // lưu lại topic để trace
         notificationType,
-        notificationStatus: NotificationStatusEnum.SENT,
       };
 
-      await this.notificationAppRepository.createNotification(notificationDto);
+      await this.notificationAppService.createNotification(notificationDto);
 
       return 1;
     } catch (error: any) {
@@ -267,10 +265,9 @@ export class FirebaseService implements OnModuleInit {
           userCodesMuticast: userCodes,
           topicCode: null, // ko gửi bằng topic
           notificationType,
-          notificationStatus: NotificationStatusEnum.SENT,
         };
 
-        await this.notificationAppRepository.createNotification(notificationDto);
+        await this.notificationAppService.createNotification(notificationDto);
       }
       return batchResponse.successCount;
     } catch (error) {

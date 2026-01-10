@@ -2,6 +2,22 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { NotificationStatusEnum, NotificationTypeEnum } from '../notification.interface';
 
+export enum DeleteNotificationByStatusEnum {
+  SENT = 'SENT',
+  READ = 'READ',
+  ALL = 'ALL',
+}
+export class DeleteNotificationByStatusDto {
+   @ApiProperty({
+    example: 'SENT',
+    enum: DeleteNotificationByStatusEnum,
+  })
+  @IsNotEmpty()
+  @IsEnum(DeleteNotificationByStatusEnum)
+  notificationStatus: DeleteNotificationByStatusEnum;
+}
+
+
 export class CreateNotificationDto {
   @ApiProperty({
     example: '',
@@ -39,13 +55,12 @@ export class CreateNotificationDto {
   @IsOptional()
   data: any | null;
 
-   @ApiProperty({
+  @ApiProperty({
     example: '',
   })
   @IsString()
   @IsNotEmpty()
   targetScreen: string;
-
 
   @ApiProperty({
     example: '',
@@ -80,6 +95,24 @@ export class CreateNotificationDto {
   @IsNotEmpty()
   @IsEnum(NotificationTypeEnum)
   notificationType: NotificationTypeEnum;
+
+}
+
+
+export class CreateNotificationOfUserDto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  notificationId: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userCode: string;
 
   @ApiProperty({
     example: 'SENT',
