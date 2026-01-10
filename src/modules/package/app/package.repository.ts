@@ -6,7 +6,6 @@ import { IPackage } from '../package.interface';
 @Injectable()
 export class PackageAppRepository {
   private readonly table = 'tbl_package';
-  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getOne(): Promise<IPackage> {

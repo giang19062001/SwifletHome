@@ -8,7 +8,6 @@ import { UpdateScreenDto } from './screen.dto';
 @Injectable()
 export class ScreenAdminRepository {
   private readonly table = 'tbl_screen_config';
-  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 

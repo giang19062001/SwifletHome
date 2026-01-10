@@ -163,3 +163,19 @@ export class SetTaskPeriodDto {
   @IsOptional()
   taskNote: string;
 }
+
+export class CompleteMedicineTaskDto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  taskAlarmCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsOptional()
+  medicineNote: string;
+}

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, TaskStatusEnum } from '../todo.interface';
+import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
+import { CompleteMedicineTaskDto, SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
@@ -149,5 +149,28 @@ export class TodoAppService {
       }
     }
     return 0;
+  }
+
+  async completeMedicineTask(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
+    return 0
+    const logbase = `${this.SERVICE_NAME}/completeMedicineTask:`;
+    const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode)
+    console.log("alramDetail -----> ", alramDetail);
+    if(!alramDetail?.taskKeyword){
+      // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
+      return -1
+    }
+     if(alramDetail?.taskKeyword !== TODO_CONST.TASK_EVENT.MEDICINE.value){
+      // taskAlarmCode này không phải lắn thuốc
+      return -2
+    }
+    const checkDuplicate = await this.todoAppRepository.getTaskCompleteMedicine(dto.taskAlarmCode)
+    if(checkDuplicate){
+      // taskAlarmCode này đã được insert dữ liệu lăn thuôc rồi
+      return -3
+    }
+    const result = await this.todoAppRepository.insertTaskCompleteMedicine(userCode, dto);
+
+    return result;
   }
 }

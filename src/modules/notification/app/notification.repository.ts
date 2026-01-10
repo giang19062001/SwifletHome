@@ -5,11 +5,10 @@ import { CreateNotificationDto } from './notification.dto';
 import { INotification, INotificationTopic, IUserNotificationTopic, NotificationStatusEnum } from '../notification.interface';
 import { handleTimezoneQuery } from 'src/helpers/func.helper';
 import { TEXTS } from 'src/helpers/text.helper';
+import { UPDATOR } from 'src/helpers/const.helper';
 
 @Injectable()
 export class NotificationAppRepository {
-  private readonly updator = 'SYSTEM';
-
   private readonly table = 'tbl_notifications';
   private readonly tableTopic = 'tbl_notification_topics';
   private readonly tableUserTopic = 'tbl_user_notification_topics';
@@ -88,7 +87,7 @@ export class NotificationAppRepository {
       dto.topicCode,
       dto.notificationType,
       dto.notificationStatus,
-      this.updator,
+      UPDATOR,
     ]);
 
     return result.insertId;

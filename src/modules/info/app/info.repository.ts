@@ -6,7 +6,6 @@ import { IInfo } from '../info.interface';
 @Injectable()
 export class InfoAppRepository {
   private readonly table = 'tbl_info_config';
-  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 

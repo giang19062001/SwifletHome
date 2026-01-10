@@ -3,10 +3,9 @@ import { OtpRepository } from './otp.repository';
 import { Msg } from 'src/helpers/message.helper';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from './otp.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { QUERY_HELPER } from 'src/helpers/const.helper';
 @Injectable()
 export class OtpService {
-  private readonly OTP_EXPIRY_MINUTES = 1;
-  private readonly MAX_ATTEMPTS = 5;
   private readonly SERVICE_NAME = 'OtpService';
 
   constructor(
@@ -36,7 +35,7 @@ export class OtpService {
     const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
 
     // Thời gian hết hạn: 1 phút
-    const expiresAt = new Date(Date.now() + this.OTP_EXPIRY_MINUTES * 60 * 1000);
+    const expiresAt = new Date(Date.now() + QUERY_HELPER.OTP_EXPIRY_MINUTES * 60 * 1000);
 
     // nếu otp của sdt này đã có -> update ( ko xóa )
     if (otpExist) {
@@ -67,7 +66,7 @@ export class OtpService {
     }
 
     // Kiểm tra số lần nhập
-    if (otp.attemptCount >= this.MAX_ATTEMPTS) {
+    if (otp.attemptCount >= QUERY_HELPER.OTP_MAX_ATTEMPTS) {
       this.logger.error(logbase, `OTP for ${dto.userPhone}: ${Msg.OtpOvertake}`);
        throw new ForbiddenException({
         message: Msg.OtpOvertake,
@@ -80,7 +79,7 @@ export class OtpService {
 
     // kiểm tra otp có khớp với otp lưu trong db => không khớp
     if (otp.otpCode !== dto.otpCode) {
-      const remainingAttempts = this.MAX_ATTEMPTS - (otp.attemptCount + 1);
+      const remainingAttempts = QUERY_HELPER.OTP_MAX_ATTEMPTS - (otp.attemptCount + 1);
       this.logger.error(logbase, `OTP for ${dto.userPhone}: ${Msg.OtpRemainAttempt(remainingAttempts)}`);
        throw new BadRequestException({
         message: Msg.OtpRemainAttempt(remainingAttempts),

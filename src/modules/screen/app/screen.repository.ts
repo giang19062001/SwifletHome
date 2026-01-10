@@ -5,7 +5,6 @@ import { IScreen } from '../screen.interface';
 @Injectable()
 export class ScreenAppRepository {
   private readonly table = 'tbl_screen_config';
-  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 

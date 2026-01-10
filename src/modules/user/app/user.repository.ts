@@ -6,7 +6,7 @@ import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserPackageApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
-import { CODES } from 'src/helpers/const.helper';
+import { CODES, UPDATOR } from 'src/helpers/const.helper';
 import { TEXTS } from 'src/helpers/text.helper';
 
 @Injectable()
@@ -17,7 +17,6 @@ export class UserAppRepository {
 
   private readonly tablePackageHistory = 'tbl_user_package_history';
   private readonly tableHome = 'tbl_user_home';
-  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -108,7 +107,7 @@ export class UserAppRepository {
       INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, deviceToken, isActive, createdId)
       VALUES(?, ?, ?, ?, ?, ?, ?)
     `;
-      const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.deviceToken, 'Y', this.updator]);
+      const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.deviceToken, 'Y', UPDATOR]);
 
       return result.insertId;
     } catch (error) {
@@ -131,7 +130,7 @@ export class UserAppRepository {
         UPDATE ${this.table} SET userPassword = ?, updatedAt = NOW(), updatedId = ?
         WHERE userPhone = ?
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [newPassword, this.updator, userPhone]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [newPassword, UPDATOR, userPhone]);
 
     return result.affectedRows;
   }
@@ -140,7 +139,7 @@ export class UserAppRepository {
         UPDATE ${this.table} SET deviceToken = ?, updatedAt = NOW(), updatedId = ?
         WHERE userPhone = ?
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [deviceToken, this.updator, userPhone]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [deviceToken, UPDATOR, userPhone]);
 
     return result.affectedRows;
   }
@@ -179,7 +178,7 @@ export class UserAppRepository {
           INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
           VALUES(?, ?, ?, ?, ?, ?)
         `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, this.updator, createdAt]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate,  UPDATOR, createdAt]);
 
     return result.insertId;
   }
@@ -188,7 +187,7 @@ export class UserAppRepository {
           INSERT INTO ${this.tablePackage} (userCode, packageCode, startDate, endDate, isActive, createdId, createdAt) 
           VALUES(?, ?, ?, ?, ?, ?, ?)
         `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, 'Y', this.updator, createdAt]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, 'Y', UPDATOR, createdAt]);
 
     return result.insertId;
   }

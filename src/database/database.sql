@@ -233,34 +233,31 @@ CREATE TABLE
   )
 
 -- NHÀ YẾN CỦA USER
-CREATE TABLE
-  `tbl_user_home` (
-    `seq` int NOT NULL AUTO_INCREMENT,
-    `userHomeCode` varchar(45) NOT NULL,
-    `userCode` varchar(45) NOT NULL,
-    `userHomeName` varchar(255) NOT NULL,
-    `userHomeAddress` text NOT NULL,
-    `userHomeProvince` char(15) NOT NULL,
-    `userHomeDescription` text NULL,
-    `userHomeImage` varchar(255) NOT NULL,
-    `uniqueId` char(255) NOT NULL,
-    `isIntegateTempHum` char(1) DEFAULT 'N',
-    `isIntegateCurrent` char(1) DEFAULT 'N',
-    `isTriggered` char(1) DEFAULT 'N',
-    `isMain` char(1) DEFAULT 'N',
-    `isActive` char(1) DEFAULT 'Y',
-    `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
-    `updatedAt` datetime DEFAULT NULL,
-    `createdId` varchar(45) DEFAULT 'SYSTEM',
-    `updatedId` varchar(45) DEFAULT NULL,
-    PRIMARY KEY (`seq`),
-    UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
-  );
-
-ALTER TABLE `swiftlet`.`tbl_user_home` 
-ADD COLUMN `userHomeLength` FLOAT NULL DEFAULT 0 AFTER `userHomeImage`,
-ADD COLUMN `userHomeWidth` FLOAT NULL DEFAULT 0 AFTER `userHomeLength`,
-ADD COLUMN `userHomeFloor` INT NULL DEFAULT 0 AFTER `userHomeWidth`;
+CREATE TABLE `tbl_user_home` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `userHomeCode` varchar(45)  NOT NULL,
+  `userCode` varchar(45)  NOT NULL,
+  `userHomeName` varchar(255)  NOT NULL,
+  `userHomeAddress` text  NOT NULL,
+  `userHomeProvince` char(15)  NOT NULL,
+  `userHomeDescription` text ,
+  `userHomeImage` varchar(255)  NOT NULL,
+  `userHomeLength` float DEFAULT '0',
+  `userHomeWidth` float DEFAULT '0',
+  `userHomeFloor` int DEFAULT '0',
+  `uniqueId` char(255)  NOT NULL,
+  `isIntegateTempHum` char(1)  DEFAULT 'N',
+  `isIntegateCurrent` char(1)  DEFAULT 'N',
+  `isTriggered` char(1)  DEFAULT 'N',
+  `isMain` char(1)  DEFAULT 'N',
+  `isActive` char(1)  DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45)  DEFAULT 'SYSTEM',
+  `updatedId` varchar(45)  DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `uniqueId_UNIQUE` (`uniqueId`)
+) 
 
 -- IOT cảm biến với nhà yến
 CREATE TABLE
@@ -402,24 +399,24 @@ CREATE TABLE
 
 
 -- GÓI
-CREATE TABLE
-  `tbl_user_package` (
-    `seq` int NOT NULL AUTO_INCREMENT,
-    `userCode` varchar(45) NOT NULL,
-    `packageCode` varchar(45) DEFAULT NULL,
-    `startDate` datetime DEFAULT NULL,
-    `endDate` datetime DEFAULT NULL,
-    `isActive` char(1) NOT NULL DEFAULT 'Y',
-    `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
-    `updatedAt` datetime DEFAULT NULL,
-    `createdId` varchar(45) DEFAULT 'SYSTEM',
-    `updatedId` varchar(45) DEFAULT NULL,
-    PRIMARY KEY (`seq`),
-    UNIQUE KEY `userCode_UNIQUE` (`userCode`)
-  ) ENGINE = InnoDB;
+CREATE TABLE `tbl_package` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `packageCode` varchar(45)  NOT NULL,
+  `packageName` varchar(45)  NOT NULL,
+  `packagePrice` decimal(10,3) NOT NULL,
+  `packageItemSamePrice` varchar(255)  DEFAULT NULL,
+  `packageExpireDay` int NOT NULL,
+  `packageOptionType` enum('MONEY','ITEM','BOTH')  DEFAULT 'MONEY',
+  `packageDescription` varchar(255)  NOT NULL,
+  `isActive` char(1)  DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45)  DEFAULT 'SYSTEM',
+  `updatedId` varchar(45)  DEFAULT NULL,
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `packageCode_UNIQUE` (`packageCode`)
+)
 
-ALTER TABLE `swiftlet`.`tbl_package` 
-ADD COLUMN `packageOptionType` ENUM('MONEY', 'ITEM', 'BOTH') NULL DEFAULT 'MONEY' AFTER `packageExpireDay`;
 -- GÓI
 
 
@@ -617,6 +614,7 @@ CREATE TABLE
     seq INT AUTO_INCREMENT PRIMARY KEY,
     taskAlarmCode VARCHAR(45) NOT NULL UNIQUE,
     taskPeriodCode VARCHAR(45) DEFAULT NULL, -- có thể null nếu ko phải là periodType
+    taskCode VARCHAR(45) NULL DEFAULT NULL,
     taskName VARCHAR(45) NOT NULL, -- taskCode hoặc taskCustomName
     taskDate DATE NOT NULL, -- render từ periodValue Hoặc specificValue của tbl_todo_home_task_period
     taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL') DEFAULT 'WAITING',
@@ -630,10 +628,19 @@ CREATE TABLE
     updatedId VARCHAR(45) DEFAULT NULL
   )
   
-ALTER TABLE `swiftlet`.`tbl_todo_home_task_alarm` 
-ADD COLUMN `taskCode` VARCHAR(45) NULL DEFAULT NULL AFTER `taskPeriodCode`;
-
-
+  -- talbe hoàn thành task lăn thuốc
+  CREATE TABLE
+  tbl_todo_home_task_complete_medicine (
+    seq INT AUTO_INCREMENT PRIMARY KEY,
+    taskAlarmCode VARCHAR(45) NOT NULL UNIQUE,
+    -- taskCode VARCHAR(45) NULL DEFAULT NULL,  ------------> TAS000003
+    medicineNote VARCHAR(255) NOT NULL,
+    isActive CHAR(1) NOT NULL DEFAULT 'Y',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT NULL,
+    createdId VARCHAR(45) DEFAULT 'SYSTEM',
+    updatedId VARCHAR(45) DEFAULT NULL
+  )
 
 
 -- media

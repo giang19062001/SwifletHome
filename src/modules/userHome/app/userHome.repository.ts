@@ -11,7 +11,6 @@ export class UserHomeAppRepository {
   private readonly table = 'tbl_user_home';
   private readonly tableImg = 'tbl_user_home_img';
   private readonly tableUserApp = 'tbl_user_app';
-  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotalHomes(userCode: string): Promise<number> {

@@ -9,6 +9,15 @@ export const APP_SCREENS = {
   REQUEST_DOCTOR: 'REQUEST_DOCTOR',
 };
 
+export const QUERY_HELPER = {
+  MAX_DAY_GET_LIST_ALARM: 5,
+  MAX_DAY_SEND_NOTIFY: 3,
+  OTP_EXPIRY_MINUTES: 1,
+  OTP_MAX_ATTEMPTS: 5,
+};
+
+export const UPDATOR = 'SYSTEM';
+
 export const CODES = {
   answerCode: {
     PRE: 'ANS',

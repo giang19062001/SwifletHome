@@ -10,7 +10,7 @@ import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { ChangeTaskAlarmStatusDto, GetListTaskAlarmsDTO, SetTaskPeriodDto } from './todo.dto';
+import { ChangeTaskAlarmStatusDto, CompleteMedicineTaskDto, GetListTaskAlarmsDTO, SetTaskPeriodDto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
 import { IListApp } from 'src/interfaces/app.interface';
 
@@ -40,8 +40,8 @@ export default class TodoAppController {
   @ApiBadRequestResponse({ type: EmptyArrayResponseDto })
   async getScheduledTasks(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.todoAppService.getScheduledTasks(user.userCode, userHomeCode);
-    if(!result.length){
-       throw new BadRequestException({
+    if (!result.length) {
+      throw new BadRequestException({
         data: [],
       });
     }
@@ -162,6 +162,33 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     }
     return {
       message: Msg.SetTaskOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Đánh dấu hoàn thành task ghi chú lăn thuốc',
+  })
+  @Post('completeMedicineTask')
+  @ApiBody({
+    type: CompleteMedicineTaskDto,
+    description: `
+**taskAlarmCode**: Mã code của lịch nhắc\n
+**medicineNote**: Tên thuốc `,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async completeMedicineTask(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteMedicineTaskDto) {
+    const result = await this.todoAppService.completeMedicineTask(user.userCode, dto);
+    if (result == 0) {
+      throw new BadRequestException({
+        message: Msg.CreateErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.CreateOk,
       data: result,
     };
   }

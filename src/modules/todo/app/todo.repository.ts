@@ -1,8 +1,8 @@
 import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, PeriodTypeEnum, TaskStatusEnum, TODO_CONST } from '../todo.interface';
-import { SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
-import { CODES } from 'src/helpers/const.helper';
+import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, ITodoTaskCompleteMedicine, PeriodTypeEnum, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { CompleteMedicineTaskDto, SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
+import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import moment from 'moment';
@@ -14,8 +14,7 @@ export class TodoAppRepository {
   private readonly tableHomeTaskPeriod = 'tbl_todo_home_task_period';
   private readonly tableBoxTask = 'tbl_todo_box_tasks';
   private readonly tableUserApp = 'tbl_user_app';
-  private readonly maxDayToGetList = 5;
-  private readonly maxDayToSendNotify = 3;
+  private readonly tableHomeTaskCompleteMedicine = 'tbl_todo_home_task_complete_medicine';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -44,8 +43,21 @@ export class TodoAppRepository {
   }
 
   // TODO: ALARM
+  async getOneTaskAlarm(taskAlarmCode: string): Promise<ITodoHomeTaskAlram | null> {
+    let query = ` SELECT A.seq, A.taskAlarmCode, A.taskPeriodCode, A.taskCode, B.taskKeyword, A.taskName, A.taskDate, A.taskStatus,
+    A.userCode, A.userHomeCode, A.taskNote
+    FROM ${this.tableHomeTaskAlarm}  A
+    LEFT ${this.tableBoxTask} B
+    ON A.taskCode = B.taskCode
+    WHERE A.taskAlarmCode  = ? 
+    LIMIT 1 `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
+    return rows.length ? (rows[0] as ITodoHomeTaskAlram) : null;
+  }
+
   async getOneTaskAlarmsNearly(userCode: string, userHomeCode: string, taskCode: string, taskName: string, today: string): Promise<ITodoHomeTaskAlram | null> {
-        let query = `
+    let query = `
         SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskCode, A.taskName,
               DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
         FROM ${this.tableHomeTaskAlarm} A
@@ -56,12 +68,10 @@ export class TodoAppRepository {
           AND A.userHomeCode = ?
           AND A.taskCode = ?
           AND A.taskDate >= ?
-          AND A.taskDate <= DATE_ADD(?, INTERVAL ${this.maxDayToGetList} DAY)
+          AND A.taskDate <= DATE_ADD(?, INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY)
           AND A.taskStatus = '${TaskStatusEnum.WAITING}'
         ORDER BY A.taskDate ASC
         LIMIT 1`;
-
-             
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [
       userCode,
@@ -75,7 +85,7 @@ export class TodoAppRepository {
     return rows.length ? (rows[0] as ITodoHomeTaskAlram) : null;
   }
   async getTotalTaskAlarm(userCode: string, userHomeCode: string): Promise<number> {
-    let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${this.maxDayToGetList} DAY`;
+    let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
 
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableHomeTaskAlarm} A
@@ -87,7 +97,7 @@ export class TodoAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<ITodoHomeTaskAlram[]> {
-    let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${this.maxDayToGetList} DAY`;
+    let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
     let offsetQuery = ` `;
 
     let params: (string | number)[] = [userCode, userHomeCode];
@@ -141,7 +151,7 @@ export class TodoAppRepository {
     ON A.userCode = B.userCode
     WHERE A.isActive = 'Y'
      AND A.taskDate >= ?
-      AND A.taskDate <= DATE_ADD(?, INTERVAL ${this.maxDayToSendNotify} DAY)
+      AND A.taskDate <= DATE_ADD(?, INTERVAL ${QUERY_HELPER.MAX_DAY_SEND_NOTIFY} DAY)
     AND A.taskStatus = '${TaskStatusEnum.WAITING}'
     ORDER BY A.taskDate DESC
 
@@ -177,8 +187,18 @@ export class TodoAppRepository {
        taskName, taskDate, taskStatus, taskNote, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userHomeCode, taskAlarmCode, dto.taskPeriodCode, dto.taskCode,
-       dto.taskName, dto.taskDate, dto.taskStatus, dto.taskNote, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      userCode,
+      dto.userHomeCode,
+      taskAlarmCode,
+      dto.taskPeriodCode,
+      dto.taskCode,
+      dto.taskName,
+      dto.taskDate,
+      dto.taskStatus,
+      dto.taskNote,
+      userCode,
+    ]);
 
     return result.insertId;
   }
@@ -269,5 +289,23 @@ export class TodoAppRepository {
     ]);
 
     return { taskPeriodCode: taskPeriodCode, insertId: result.insertId };
+  }
+  // TODO: COMPLETE-MEDICINE
+  async getTaskCompleteMedicine(taskAlarmCode: string): Promise<ITodoTaskCompleteMedicine | null> {
+    let query = `  SELECT seq, taskAlarmCode, medicineNote FROM ${this.tableHomeTaskCompleteMedicine} 
+    WHERE taskAlarmCode  = ? LIMIT 1 `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
+    return rows.length ? (rows[0] as ITodoTaskCompleteMedicine) : null;
+  }
+
+  async insertTaskCompleteMedicine(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableHomeTaskCompleteMedicine}  (taskAlarmCode, medicineNote, createdId) 
+      VALUES(?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.taskAlarmCode, dto.medicineNote, userCode]);
+
+    return result.insertId;
   }
 }

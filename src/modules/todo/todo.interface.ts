@@ -96,6 +96,7 @@ export interface ITodoHomeTaskAlram {
   taskAlarmCode: string;
   taskPeriodCode: string;
   taskCode: string;
+  taskKeyword?: string;
   userCode: string;
   userHomeCode: string;
   taskName: string;
@@ -103,4 +104,12 @@ export interface ITodoHomeTaskAlram {
   taskStatus: TaskStatusEnum;
   taskNote: string;
   isActive: YnEnum;
+}
+
+
+
+export interface ITodoTaskCompleteMedicine {
+  seq: number;
+  taskAlarmCode: string;
+  medicineNote: string;
 }

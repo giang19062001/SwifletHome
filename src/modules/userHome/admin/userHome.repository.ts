@@ -12,8 +12,6 @@ export class UserHomeAdminRepository {
   private readonly tableImg = 'tbl_user_home_img';
   private readonly tableSensor = 'tbl_user_home_sensor';
 
-  private readonly updator = 'SYSTEM';
-
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotal(dto: GetHomesAdminDto): Promise<number> {
     let query = ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A

@@ -8,8 +8,6 @@ export class DoctorAppRepository {
   private readonly table = 'tbl_doctor';
   private readonly tableFile = 'tbl_doctor_file';
 
-  private readonly updator = 'SYSTEM';
-
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async uploadFile(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | IDoctorFile): Promise<number> {
     const sql = `

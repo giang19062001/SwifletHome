@@ -4,8 +4,6 @@ import { INotification, INotificationTopic, IUserNotificationTopic, Notification
 
 @Injectable()
 export class NotificationAdminRepository {
-  private readonly updator = 'SYSTEM';
-
   private readonly table = 'tbl_notifications';
   private readonly tableTopic = 'tbl_notification_topics';
   private readonly tableUserTopic = 'tbl_user_notification_topics';

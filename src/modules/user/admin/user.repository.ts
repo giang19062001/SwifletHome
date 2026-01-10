@@ -6,6 +6,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IUserApp } from '../app/user.interface';
 import { GetAllUserDto, UpdateUserPackageAdminDto, UserPackageFilterEnum } from './user.dto';
 import { TEXTS } from 'src/helpers/text.helper';
+import { UPDATOR } from 'src/helpers/const.helper';
 
 @Injectable()
 export class UserAdminRepository {
@@ -13,7 +14,6 @@ export class UserAdminRepository {
   private readonly tableApp = 'tbl_user_app';
   private readonly tablePackage = 'tbl_user_package';
   private readonly tablePackageHistory = 'tbl_user_package_history';
-  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -116,7 +116,7 @@ export class UserAdminRepository {
         INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
         VALUES(?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, this.updator, createdAt]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, UPDATOR, createdAt]);
 
     return result.insertId;
   }

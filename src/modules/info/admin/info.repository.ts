@@ -7,7 +7,6 @@ import { UpdateInfoDto } from './info.dto';
 @Injectable()
 export class InfoAdminRepository {
   private readonly table = 'tbl_info_config';
-  private readonly updator = 'SYSTEM';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
