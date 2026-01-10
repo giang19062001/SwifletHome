@@ -8,6 +8,7 @@ import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
 import moment from 'moment';
+import TodoAppValidate from './todo.validate';
 
 @Injectable()
 export class TodoAppService {
@@ -15,6 +16,7 @@ export class TodoAppService {
 
   constructor(
     private readonly todoAppRepository: TodoAppRepository,
+    private readonly todoAppValidate: TodoAppValidate,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly logger: LoggingService,
   ) {}
@@ -96,72 +98,6 @@ export class TodoAppService {
   }
   // TODO: PERIOD
 
-  // TODO: PERIOD + ALARM
-  async handleAlarmDataByPeriodData(dto: SetTaskPeriodDto, taskPeriodCode: string): Promise<SetTaskAlarmDto> {
-    const logbase = `${this.SERVICE_NAME}/handleAlarmDataByPeriodData:`;
-
-    let alramDto: SetTaskAlarmDto = {
-      taskPeriodCode: taskPeriodCode,
-      userHomeCode: dto.userHomeCode,
-      taskName: '',
-      taskNote: dto.taskNote,
-      taskDate: new Date(),
-      taskStatus: TaskStatusEnum.WAITING,
-    };
-
-    // gán giá trị taskName vào alarm DTO
-    if (dto.isCustomTask == 'Y') {
-      alramDto.taskName = dto.taskCustomName;
-    }
-    if (dto.isCustomTask == 'N' && dto.taskCode != null) {
-      {
-        // lấy taskName từ CSDL dựa vào taskCode
-        const task = await this.todoAppRepository.getDetailTask(dto.taskCode);
-        if (task) {
-          alramDto.taskName = task.taskName;
-        }
-      }
-    }
-    // gán giá trị taskDate vào alarm DTO cho ngày cụ thể
-    if (dto.isPeriod == 'N' && dto.specificValue != null) {
-      alramDto.taskDate = dto.specificValue;
-    }
-
-    // const today = moment('2026-02-02'); // ! DEV
-    const today = moment(); // ! PROD
-
-    // gán giá trị taskDate vào alarm DTO cho chu kỳ ngày trong tháng
-    if (dto.isPeriod == 'Y' && dto.periodType === 'MONTH' && dto.periodValue != null) {
-      // dto.periodValue (1 - 31)
-      const date = today.clone().date(dto.periodValue); // set ngày cho tháng/năm hiện tại
-
-      this.logger.log(logbase, `MONTH ----> ${today.format('DD/MM/YYYY')}----> date(${dto.periodValue}),  ----> ${date.toDate().toLocaleDateString()}`);
-
-      // Nếu tháng bị thay đổi → nghĩa là ngày không tồn tại
-      if (date.month() !== today.month()) {
-        alramDto.taskDate = null;
-      } else {
-        alramDto.taskDate = date.toDate(); // YYYY-MM-DD
-      }
-    }
-
-    // gán giá trị taskDate vào alarm DTO cho chu kỳ thứ trong tuần
-    if (dto.isPeriod == 'Y' && dto.periodType === 'WEEK' && dto.periodValue != null) {
-      const isoDay = dto.periodValue; // 1 = Thứ 2 -> 7 = Chủ nhật
-
-      const date = today.clone().isoWeekday(isoDay);
-      this.logger.log(logbase, `WEEK ----> ${today.format('DD/MM/YYYY')}----> date(${dto.periodValue}),  ----> ${date.toDate().toLocaleDateString()}`);
-
-      // Kiểm tra có bị nhảy sang tuần khác không
-      if (date.isoWeek() !== today.isoWeek()) {
-        alramDto.taskDate = null;
-      } else {
-        alramDto.taskDate = date.toDate();
-      }
-    }
-    return alramDto;
-  }
-
   async setTaskAlarmPeriod(userCode: string, dto: SetTaskPeriodDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskAlarmPeriod:`;
 
@@ -173,12 +109,15 @@ export class TodoAppService {
     }
 
     // kiểm tra duplicate lịch nhắc
-    let alramDto = await this.handleAlarmDataByPeriodData(dto, '');
+    let alramDto = await this.todoAppValidate.handleAlarmDataByPeriodData(dto, '');
 
-    const isDuplicateAlarm = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, alramDto);
-    if (isDuplicateAlarm) {
-      this.logger.log(logbase, Msg.DuplicateTaskAlram + `(${dto.userHomeCode})`);
-      return -1;
+    // taskDate khác null mới kiểm tra
+    if (alramDto.taskDate != null) {
+      const isDuplicateAlarm = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, alramDto);
+      if (isDuplicateAlarm) {
+        this.logger.log(logbase, Msg.DuplicateTaskAlram + `(${dto.userHomeCode})`);
+        return -1;
+      }
     }
 
     // insert lịch nhắc theo ngày tùy chỉnh
@@ -193,6 +132,7 @@ export class TodoAppService {
     // insert lịch nhắc theo chu kỳ
     if (dto.isPeriod == 'Y' && dto.periodType != null && dto.periodValue != null) {
       const { taskPeriodCode, insertId } = await this.todoAppRepository.insertTaskPeriod(userCode, dto);
+
       if (alramDto.taskDate == null) {
         //* VD:  2025-02-31 - KO  HỢP LỆ,  2025-03-31 - HỢP LỆ
         this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ nhưng có thể hợp lệ vào thời điểm khác -> không thể thêm lịch nhắc, chỉ có thể thêm cấu hình chu kỳ, không thêm dữ liệu lịch nhắc`);

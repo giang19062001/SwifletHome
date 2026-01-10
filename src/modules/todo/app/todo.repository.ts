@@ -54,7 +54,7 @@ export class TodoAppRepository {
         WHERE A.isActive = 'Y'
           AND A.userCode = ?
           AND A.userHomeCode = ?
-          AND ( B.taskCode = ? OR A.taskName = ? )
+          AND A.taskCode = ?
           AND A.taskDate >= ?
           AND A.taskDate <= DATE_ADD(?, INTERVAL ${this.maxDayToGetList} DAY)
           AND A.taskStatus = '${TaskStatusEnum.WAITING}'
@@ -67,7 +67,7 @@ export class TodoAppRepository {
       userCode,
       userHomeCode,
       taskCode,
-      taskName,
+      // taskName,
       today, // CURDATE()
       today, // o CURDATE()
     ]);
@@ -104,7 +104,7 @@ export class TodoAppRepository {
                   WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.COMPLETE.value}' THEN '${TODO_CONST.TASK_STATUS.COMPLETE.text}'
                   WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.CANCEL.value}' THEN '${TODO_CONST.TASK_STATUS.CANCEL.text}'
                   ELSE ''
-              END AS taskStatusTxt,
+              END AS taskStatusLabel,
              A.taskNote, A.isActive
             FROM ${this.tableHomeTaskAlarm} A
             INNER JOIN ${this.tableUserApp} B
@@ -124,7 +124,7 @@ export class TodoAppRepository {
       A.taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, 
       A.taskStatus, A.taskNote, A.isActive, B.deviceToken
     FROM ${this.tableHomeTaskAlarm} A
-    INNER JOIN tbl_user_app B
+    INNER JOIN ${this.tableUserApp} B
     ON A.userCode = B.userCode
     WHERE A.isActive = 'Y'
      AND A.taskDate >= ?
@@ -160,10 +160,12 @@ export class TodoAppRepository {
       taskAlarmCode = generateCode(rows[0].taskAlarmCode, CODES.taskAlarmCode.PRE, 6);
     }
     const sql = `
-      INSERT INTO ${this.tableHomeTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, taskDate, taskStatus, taskNote, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.tableHomeTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskCode,
+       taskName, taskDate, taskStatus, taskNote, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userHomeCode, taskAlarmCode, dto.taskPeriodCode, dto.taskName, dto.taskDate, dto.taskStatus, dto.taskNote, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userHomeCode, taskAlarmCode, dto.taskPeriodCode, dto.taskCode,
+       dto.taskName, dto.taskDate, dto.taskStatus, dto.taskNote, userCode]);
 
     return result.insertId;
   }

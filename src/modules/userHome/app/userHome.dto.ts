@@ -64,7 +64,7 @@ export class MutationUserHomeDto {
   @IsNotEmpty()
   isIntegateCurrent: YnEnum;
   
-  @ApiProperty({ example: 25.75, description: 'Chiều cao nhà (m)' })
+  @ApiProperty({ example: 25.75, description: 'Chiều dài nhà (m)' })
   @Type(() => Number)
   @IsNumber()
   @Min(0)

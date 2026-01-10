@@ -47,9 +47,16 @@ export class SetTaskAlarmByAdminDto {
   })
   @IsString()
   @IsNotEmpty()
+  taskCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
   taskName: string;
 
- @ApiProperty({
+  @ApiProperty({
     example: '2025-12-30',
   })
   @IsString()

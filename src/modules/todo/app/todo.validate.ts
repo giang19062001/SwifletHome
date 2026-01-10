@@ -1,7 +1,19 @@
-import { PeriodTypeEnum } from '../todo.interface';
-import { SetTaskPeriodDto } from './todo.dto';
+import { Injectable } from '@nestjs/common';
+import { PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
+import { SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
+import { LoggingService } from 'src/common/logger/logger.service';
+import { TodoAppRepository } from './todo.repository';
+import moment from 'moment';
+
+@Injectable()
 export default class TodoAppValidate {
+  private readonly SERVICE_NAME = 'TodoAppValidate';
+
+  constructor(
+    private readonly todoAppRepository: TodoAppRepository,
+    private readonly logger: LoggingService,
+  ) {}
   static SetTaskPeriodValidate(dto: SetTaskPeriodDto): string {
     let error = '';
 
@@ -96,8 +108,80 @@ export default class TodoAppValidate {
         return Msg.MustBeGreaterThanAndEqualNow('specificValue');
       }
 
-      dto.specificValue = specificDate
+      dto.specificValue = specificDate;
     }
     return error;
+  }
+  // TODO: PERIOD + ALARM
+  async handleAlarmDataByPeriodData(dto: SetTaskPeriodDto, taskPeriodCode: string): Promise<SetTaskAlarmDto> {
+    const logbase = `${this.SERVICE_NAME}/handleAlarmDataByPeriodData:`;
+
+    let alramDto: SetTaskAlarmDto = {
+      taskPeriodCode: taskPeriodCode,
+      userHomeCode: dto.userHomeCode,
+      taskCode: dto.taskCode,
+      taskName: '',
+      taskNote: dto.taskNote,
+      taskDate: new Date(),
+      taskStatus: TaskStatusEnum.WAITING,
+    };
+
+    // gán giá trị taskName vào alarm DTO
+    if (dto.isCustomTask == 'Y') {
+      alramDto.taskName = dto.taskCustomName;
+    }
+    if (dto.isCustomTask == 'N' && dto.taskCode != null) {
+      {
+        // lấy taskName từ CSDL dựa vào taskCode
+        const task = await this.todoAppRepository.getDetailTask(dto.taskCode);
+        if (task) {
+          alramDto.taskName = task.taskName;
+        }
+      }
+    }
+    // gán giá trị taskDate vào alarm DTO cho ngày cụ thể
+    if (dto.isPeriod == 'N' && dto.specificValue != null) {
+      alramDto.taskDate = dto.specificValue;
+    }
+
+    // const today = moment('2026-02-15'); // ! DEV
+    const today = moment(); // ! PROD
+
+    // gán giá trị taskDate vào alarm DTO cho chu kỳ ngày trong tháng
+    if (dto.isPeriod == 'Y' && dto.periodType === 'MONTH' && dto.periodValue != null) {
+      // dto.periodValue (1 - 31)
+      let date = today.clone().date(dto.periodValue); // set ngày cho tháng/năm hiện tại
+
+      // Nếu tháng bị thay đổi → nghĩa là ngày không tồn tại
+      if (date.month() !== today.month()) {
+        alramDto.taskDate = null;
+      } else {
+        // Nếu ngày đã qua -> chỉ tạo chu kỳ, ko tạo lịch nhắc -> để null
+        if (date.isBefore(today, 'day')) {
+          alramDto.taskDate = null;
+        } else {
+          // ngày chưa qu
+          alramDto.taskDate = date.toDate(); // YYYY-MM-DD
+        }
+      }
+      this.logger.log(logbase, `MONTH ----> ${today.format('DD/MM/YYYY')}----> date(${dto.periodValue}),  ----> ${date.toDate().toLocaleDateString()}`);
+    }
+
+    // gán giá trị taskDate vào alarm DTO cho chu kỳ thứ trong tuần
+    if (dto.isPeriod == 'Y' && dto.periodType === 'WEEK' && dto.periodValue != null) {
+      const isoDay = dto.periodValue; // 1 = Thứ 2 -> 7 = Chủ nhật
+
+      let date = today.clone().isoWeekday(isoDay);
+
+      // Nếu ngày đã qua -> lấy ngày của tuần sau (đang là chủ nhật -> chọn thứ 3 -> lấy thứ 3 tuần sau)
+      if (date.isBefore(today, 'day')) {
+        date = date.add(1, 'week');
+      }
+
+      alramDto.taskDate = date.toDate();
+
+      this.logger.log(logbase, `WEEK ----> ${today.format('DD/MM/YYYY')}----> date(${dto.periodValue}),  ----> ${date.toDate().toLocaleDateString()}`);
+    }
+    return alramDto;
   }
 }

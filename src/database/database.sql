@@ -629,6 +629,10 @@ CREATE TABLE
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
     updatedId VARCHAR(45) DEFAULT NULL
   )
+  
+ALTER TABLE `swiftlet`.`tbl_todo_home_task_alarm` 
+ADD COLUMN `taskCode` VARCHAR(45) NULL DEFAULT NULL AFTER `taskPeriodCode`;
+
 
 
 

@@ -50,16 +50,39 @@ export const Msg = {
   InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
   DuplicateTaskAlram: 'Lịch nhắc này đã tồn tại',
   DuplicateTaskPeriod: 'Chu kỳ lịch nhắc này đã tồn tại',
-  CannotNull: (filedName: string) => `${filedName} không thể trống`,
-  InvalidValue: (filedName: string) => `${filedName} sai giá trị cho phép`,
-  InvalidRange: (filedName: string, range: string) => `${filedName} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
-  MustBeGreaterThanAndEqualNow: (filedName: string) => `${filedName} phải lớn hơn ngày hiện tại`,
+  CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
+  InvalidValue: (filedName: string) => `${convertFiledName(filedName)} sai giá trị cho phép`,
+  InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
+  MustBeGreaterThanAndEqualNow: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
 };
 
+const convertFiledName = (filedName: string) => {
+  let txt = '';
+  switch (filedName) {
+    case "taskCustomName":
+      txt = "Tên lịch nhắc tùy chỉnh"
+      break;
+    case "taskCode":
+      txt = "Mã lịch nhắc"
+      break;
+    case "periodType":
+      txt = "Loại chu kỳ"
+      break;
+    case "specificValue":
+      txt = "Ngày nhắc lịch"
+      break;
+    case "periodValue":
+      txt = "Gía trị tháng hoặc tuần"
+      break;
+    default:
+      txt = filedName;
+  }
+  return txt;
+};
 export const MsgAdmin = {
   pushAlarmOk: 'Tạo lịch nhắc và gửi thông báo thành công',
   pushAlarmErr: 'Tạo lịch nhắc thành công nhưng gửi thông báo thất bại',
   pushNotifyOk: 'Gửi thông báo thành công',
   pushNotifyErr: 'Gửi thông báo thất bại',
-  pushProvinceEmpty:"Không có người dùng nào có nhà yến thuộc những tỉnh thành này"
+  pushProvinceEmpty: 'Không có người dùng nào có nhà yến thuộc những tỉnh thành này',
 };

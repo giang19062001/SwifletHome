@@ -62,10 +62,10 @@ export class TodoAdminRepository {
       taskAlarmCode = generateCode(rows[0].taskAlarmCode, CODES.taskAlarmCode.PRE, 6);
     }
     const sql = `
-        INSERT INTO ${this.tableHomeTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, taskDate, taskStatus, taskNote, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO ${this.tableHomeTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskCode, taskName, taskDate, taskStatus, taskNote, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, userHomeCode, taskAlarmCode, null, dto.taskName, dto.taskDate, TaskStatusEnum.WAITING, "", createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, userHomeCode, taskAlarmCode, null, dto.taskCode, dto.taskName, dto.taskDate, TaskStatusEnum.WAITING, "", createdId]);
 
     return result.insertId;
   }

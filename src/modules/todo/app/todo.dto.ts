@@ -23,10 +23,23 @@ export class ChangeTaskAlarmStatusDto {
   taskStatus: TaskStatusEnum;
 }
 export class SetTaskAlarmDto {
+  @ApiProperty({
+    example: '',
+  })
   @IsString()
   @IsOptional()
   userCode?: string;
 
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
   @IsString()
   @IsOptional()
   taskPeriodCode: string | null;
@@ -35,8 +48,8 @@ export class SetTaskAlarmDto {
     example: '',
   })
   @IsString()
-  @IsNotEmpty()
-  userHomeCode: string;
+  @IsOptional()
+  taskCode: string | null;
 
   @ApiProperty({
     example: '',
@@ -85,6 +98,7 @@ export class SetTaskPeriodDto {
     nullable: true,
     required: false,
   })
+  @IsString()
   @IsOptional()
   taskCode: string | null;
 
@@ -135,6 +149,7 @@ export class SetTaskPeriodDto {
     format: 'date',
     nullable: true,
     required: false,
+    
   })
   @IsOptional()
   @Transform(({ value }) => (value === null ? null : new Date(value + 'T00:00:00')))

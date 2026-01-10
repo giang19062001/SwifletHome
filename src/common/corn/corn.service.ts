@@ -16,6 +16,7 @@ import { FirebaseService } from '../firebase/firebase.service';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import TodoAppValidate from 'src/modules/todo/app/todo.validate';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -26,6 +27,7 @@ export class CornService implements OnModuleInit {
     private readonly userAppRepository: UserAppRepository,
     private readonly userHomeAppRepository: UserHomeAppRepository,
     private readonly todoAppService: TodoAppService,
+    private readonly todoAppValidate: TodoAppValidate,
     private readonly todoAppRepository: TodoAppRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly firebaseService: FirebaseService,
@@ -108,7 +110,7 @@ export class CornService implements OnModuleInit {
     // lọc các alarm dựa vào chu kỳ -> nếu đã tồn tại bỏ qua
     let taskAlarmCanInsert: SetTaskAlarmDto[] = [];
     for (const periodDto of taskPeriodList) {
-      const alramDto: SetTaskAlarmDto = await this.todoAppService.handleAlarmDataByPeriodData(periodDto, periodDto.taskPeriodCode);
+      const alramDto: SetTaskAlarmDto = await this.todoAppValidate.handleAlarmDataByPeriodData(periodDto, periodDto.taskPeriodCode);
       if (alramDto.taskDate == null) {
         this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ -> không thể thêm`);
       } else {

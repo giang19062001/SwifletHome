@@ -7,7 +7,7 @@ const taskAlarmConstraints = {
   body: {
     presence: { allowEmpty: false, message: '^Vui lòng nội dung thông báo.' },
   },
-  taskName: {
+  taskCode: {
     presence: { allowEmpty: false, message: '^Vui lòng chọn công việc.' },
   },
 };
@@ -40,11 +40,11 @@ function resetForm() {
   // Clear text inputs
   const titleEl = document.getElementById('title');
   const bodyEl = document.getElementById('body');
-  const taskNameEl = document.getElementById('taskName');
+  const taskCodeEl = document.getElementById('taskCode');
 
   if (titleEl) titleEl.value = '';
   if (bodyEl) bodyEl.value = '';
-  if (taskNameEl) taskNameEl.value = '';
+  if (taskCodeEl) taskCodeEl.value = '';
 
   // Set radio sendType = ALL
   const sendTypeAll = document.querySelector('input[name="sendType"][value="ALL"]');
@@ -167,7 +167,8 @@ function initSubmitForm() {
     const formData = {
       title: form.title.value,
       body: form.body.value,
-      taskName: form.taskName.value,
+      taskCode: form.taskCode.value,
+      taskName:  form.querySelector("#taskCode").selectedOptions[0].text,
       taskDate: form.taskDate.value,
       sendType,
       userCodesMuticast,

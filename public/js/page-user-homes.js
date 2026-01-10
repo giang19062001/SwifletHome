@@ -144,7 +144,7 @@ const renderAllUserHomes = (data, objElement) => {
             <p class="mt-2">${ele.userHomeAddress}, ${ele.userHomeProvince}</p>
         </td>
         <td class="py-3" style="min-width: 180px;">
-            <p class="mt-2">Chiều cao: ${ele.userHomeLength} (m)</p>
+            <p class="mt-2">Chiều dài: ${ele.userHomeLength} (m)</p>
             <p class="mt-2">Chiều rộng: ${ele.userHomeWidth} (m)</p>
             <p class="mt-2">Số tầng: ${ele.userHomeFloor}</p>
         </td>

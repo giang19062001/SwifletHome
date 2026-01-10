@@ -34,13 +34,13 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label d-block">Tên công việc</label>
-                            <select class="form-select" id="taskName" name="taskName" value="">
+                            <select class="form-select" id="taskCode" name="taskCode" value="">
                                 <option value="">-- Chọn công việc --</option>
                                 <% values.tasks.forEach(function(task) { %>
-                                    <option value="<%= task.taskName %>"><%= task.taskName %></option>
+                                    <option value="<%= task.taskCode %>"><%= task.taskName %></option>
                                 <% }); %>
                             </select>
-                            <div class="error-message mt-2" data-error="taskName"></div>
+                            <div class="error-message mt-2" data-error="taskCode"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="taskDate" class="form-label">Ngày của lịch nhắc</label>
