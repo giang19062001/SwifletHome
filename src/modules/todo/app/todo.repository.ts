@@ -178,7 +178,7 @@ export class TodoAppRepository {
         AND taskDate = ?
         AND userHomeCode = ?
         AND userCode = ?
-        AND A.taskStatus = '${TaskStatusEnum.WAITING}' 
+        AND taskStatus = '${TaskStatusEnum.WAITING}' 
       LIMIT 1
     `;
 
