@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters, Put, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters, Put, Param, Get, Delete } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
@@ -30,25 +30,29 @@ export class NotificationAppController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetNotificationResDto)),
-     description: `
+  @ApiOkResponse({
+    type: ApiAppResponseDto(ListResponseDto(GetNotificationResDto)),
+    description: `
 **notificationType: enum('ADMIN','TODO')**\n
 **notificationStatus**: enum('SENT','READ')\n
-**targetScreen**: 'REMINDER_SCREEN' | 'NOTIFICATION_SCREEN'` })
-  async getAll(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp,): Promise<IListApp<INotification>> {
+**targetScreen**: 'REMINDER_SCREEN' | 'NOTIFICATION_SCREEN'`,
+  })
+  async getAll(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<IListApp<INotification>> {
     const result = await this.notificationAppService.getAll(dto, user.userCode);
     return result;
   }
-  
+
+  @ApiOperation({
+    summary: 'Số lượng thông báo người dùng chưa đọc',
+  })
   @Get('getCntNotifyNotReadByUser')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async getCntNotifyNotReadByUser(@GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
-    const result =  await this.notificationAppService.getCntNotifyNotReadByUser(user.userCode);
+    const result = await this.notificationAppService.getCntNotifyNotReadByUser(user.userCode);
     return result;
   }
-
 
   @Get('getDetail/:notificationId')
   @HttpCode(HttpStatus.OK)
@@ -72,6 +76,27 @@ export class NotificationAppController {
   @ApiOkResponse({ type: NumberOkResponseDto })
   async maskAsRead(@GetUserApp() user: authInterface.ITokenUserApp, @Param('notificationId') notificationId: string) {
     const result = await this.notificationAppService.maskAsRead(notificationId, user.userCode);
+    if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.UpdateErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.UpdateOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Xóa thông báo',
+  })
+  @Delete('deteteNotification/:notificationId')
+  @ApiParam({ name: 'notificationId', type: String })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  async deteteNotification(@GetUserApp() user: authInterface.ITokenUserApp, @Param('notificationId') notificationId: string) {
+    const result = await this.notificationAppService.deteteNotification(notificationId, user.userCode);
     if (result === 0) {
       throw new BadRequestException({
         message: Msg.UpdateErr,

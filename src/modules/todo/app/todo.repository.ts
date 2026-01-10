@@ -46,7 +46,7 @@ export class TodoAppRepository {
   // TODO: ALARM
   async getOneTaskAlarmsNearly(userCode: string, userHomeCode: string, taskCode: string, taskName: string, today: string): Promise<ITodoHomeTaskAlram | null> {
         let query = `
-        SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskName,
+        SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskCode, A.taskName,
               DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
         FROM ${this.tableHomeTaskAlarm} A
         LEFT JOIN ${this.tableHomeTaskPeriod} B
@@ -97,18 +97,31 @@ export class TodoAppRepository {
       params.push((dto.page - 1) * dto.limit);
     }
     let query = `
-            SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskName,
-            DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus,
+            SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskCode, A.taskName,
+            DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskNote, A.isActive,  A.taskStatus, 
             CASE
                   WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.WAITING.value}' THEN '${TODO_CONST.TASK_STATUS.WAITING.text}'
                   WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.COMPLETE.value}' THEN '${TODO_CONST.TASK_STATUS.COMPLETE.text}'
                   WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.CANCEL.value}' THEN '${TODO_CONST.TASK_STATUS.CANCEL.text}'
                   ELSE ''
               END AS taskStatusLabel,
-             A.taskNote, A.isActive
+            '${TODO_CONST.TASK_EVENT.CANCEL.value}' AS leftEvent,
+            '${TODO_CONST.TASK_EVENT.CANCEL.text}' AS leftEventLabel,
+            CASE 
+                WHEN C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}' THEN '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+                WHEN C.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}' THEN '${TODO_CONST.TASK_EVENT.MEDICINE.value}'
+                ELSE '${TODO_CONST.TASK_EVENT.COMPLETE.value}'
+            END AS rightEvent,
+            CASE 
+                WHEN C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}' THEN '${TODO_CONST.TASK_EVENT.HARVEST.text}'
+                WHEN C.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}' THEN '${TODO_CONST.TASK_EVENT.MEDICINE.text}'
+                ELSE '${TODO_CONST.TASK_EVENT.COMPLETE.text}'
+            END AS rightEventLabel
             FROM ${this.tableHomeTaskAlarm} A
             INNER JOIN ${this.tableUserApp} B
             ON A.userCode = B.userCode
+            LEFT JOIN ${this.tableTask} C
+            ON A.taskCode = C.taskCode
             WHERE A.isActive = 'Y'
               ${whereQuery} 
             ORDER BY A.taskDate DESC
@@ -120,7 +133,7 @@ export class TodoAppRepository {
   async getListTaskAlarmsToday(dateStr: string): Promise<(ITodoHomeTaskAlram & { deviceToken: string })[]> {
     const query = `
     SELECT 
-      A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, 
+      A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskPeriodCode, A.taskCode,
       A.taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, 
       A.taskStatus, A.taskNote, A.isActive, B.deviceToken
     FROM ${this.tableHomeTaskAlarm} A
@@ -171,7 +184,7 @@ export class TodoAppRepository {
   }
   async checkDuplicateTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<ITodoHomeTaskAlram | null> {
     const query = `
-      SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskName, taskDate, taskNote, isActive
+      SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, A.taskCode, taskName, taskDate, taskNote, isActive
       FROM ${this.tableHomeTaskAlarm}
       WHERE isActive = 'Y'
         AND taskName = ?

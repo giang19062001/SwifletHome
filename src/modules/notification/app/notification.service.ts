@@ -65,4 +65,11 @@ export class NotificationAppService {
     const result = await this.notificationAppRepository.maskAsRead(notificationId, userCode);
     return result;
   }
+
+   async deteteNotification(notificationId: string, userCode: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/getDetail`;
+    this.logger.log(logbase, `Xóa thông báo ${notificationId}`);
+    const result = await this.notificationAppRepository.deteteNotification(notificationId, userCode);
+    return result;
+  }
 }

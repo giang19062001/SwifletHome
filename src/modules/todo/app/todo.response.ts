@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { TaskStatusEnum } from '../todo.interface';
+import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })
@@ -44,12 +44,24 @@ export class GetListTaskAlarmsResDto {
   taskPeriodCode: string;
 
   @ApiProperty({ example: '' })
+  taskCode: string;
+
+  @ApiProperty({ example: '' })
   taskName: string;
 
   @ApiProperty({
     example: '2025-12-01',
   })
   taskDate: Date;
+
+  @ApiProperty({ example: '' })
+  taskNote: string;
+
+  @ApiProperty({
+    example: YnEnum.Y,
+    enum: YnEnum,
+  })
+  isActive: YnEnum;
 
   @ApiProperty({
     example: TaskStatusEnum.WAITING,
@@ -60,12 +72,21 @@ export class GetListTaskAlarmsResDto {
   @ApiProperty({ example: 'Đang chờ' })
   taskStatusLabel: string;
 
-  @ApiProperty({ example: '' })
-  taskNote: string;
+  @ApiProperty({
+    example: TaskLeftEventEnum.CANCEL,
+    enum: TaskLeftEventEnum,
+  })
+  leftEvent: TaskLeftEventEnum;
+
+  @ApiProperty({ example: 'Hủy' })
+  leftEventLabel: string;
 
   @ApiProperty({
-    example: YnEnum.Y,
-    enum: YnEnum,
+    example: TaskRightEventEnum.COMPLETE,
+    enum: TaskRightEventEnum,
   })
-  isActive: YnEnum;
+  rightEvent: TaskRightEventEnum;
+
+  @ApiProperty({ example: 'Hoàn thành' })
+  rightEventLabel: string;
 }

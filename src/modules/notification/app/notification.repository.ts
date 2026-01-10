@@ -13,7 +13,7 @@ export class NotificationAppRepository {
   private readonly table = 'tbl_notifications';
   private readonly tableTopic = 'tbl_notification_topics';
   private readonly tableUserTopic = 'tbl_user_notification_topics';
-  private readonly theQueryCountCommon = '(A.userCode = ? OR JSON_CONTAINS(A.userCodesMuticast, JSON_QUOTE(?)) OR A.topicCode = ?)'
+  private readonly theQueryCountCommon = `(A.userCode = ? OR JSON_CONTAINS(A.userCodesMuticast, JSON_QUOTE(?)) OR A.topicCode = ?)  AND A.isActive = 'Y'`
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotal(userCode: string, topicCode: string): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(
@@ -51,7 +51,7 @@ export class NotificationAppRepository {
       ` SELECT COUNT(A.seq)  AS TOTAL
         FROM ${this.table} A
         WHERE ${this.theQueryCountCommon} 
-        AND A.notificationStatus = ?;
+        AND A.notificationStatus = ?
         `,
       [userCode, userCode, topicCode, NotificationStatusEnum.SENT],
     );
@@ -64,7 +64,7 @@ export class NotificationAppRepository {
       -- A.userCode, A.userCodesMuticast, A.topicCode,
       A.notificationType, A.notificationStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt
         FROM ${this.table} A 
-        WHERE A.notificationId = ?
+        WHERE A.notificationId = ? AND A.isActive = 'Y'
         LIMIT 1`,
       [notificationId, userCode],
     );
@@ -100,6 +100,16 @@ export class NotificationAppRepository {
       WHERE notificationId = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [NotificationStatusEnum.READ, userCode, notificationId]);
+
+    return result.affectedRows;
+  }
+
+  async deteteNotification(notificationId: string, userCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET isActive = 'N' , updatedId = ?, updatedAt = NOW()
+      WHERE notificationId = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, notificationId]);
 
     return result.affectedRows;
   }

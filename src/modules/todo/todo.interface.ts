@@ -16,6 +16,10 @@ export const TODO_CONST = {
     },
   },
   TASK_EVENT: {
+    CANCEL: {
+      value: 'CANCEL',
+      text: 'Hủy',
+    },
     COMPLETE: {
       value: 'COMPLETE',
       text: 'Hoàn thành',
@@ -40,6 +44,15 @@ export enum TaskStatusEnum {
   WAITING = 'WAITING',
   COMPLETE = 'COMPLETE',
   CANCEL = 'CANCEL',
+}
+
+export enum TaskLeftEventEnum {
+  CANCEL = 'CANCEL',
+}
+export enum TaskRightEventEnum {
+  HARVEST = 'HARVEST',
+  MEDICINE = 'MEDICINE',
+  COMPLETE = 'COMPLETE',
 }
 
 export interface ITodoBoxTask {
@@ -82,6 +95,7 @@ export interface ITodoHomeTaskAlram {
   seq: number;
   taskAlarmCode: string;
   taskPeriodCode: string;
+  taskCode: string;
   userCode: string;
   userHomeCode: string;
   taskName: string;
