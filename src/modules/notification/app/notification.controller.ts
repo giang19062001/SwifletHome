@@ -124,12 +124,12 @@ export class NotificationAppController {
   @ApiOkResponse({ type: NumberOkResponseDto })
   async deteteNotificationByStatus(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: DeleteNotificationByStatusDto) {
     const result = await this.notificationAppService.deteteNotificationByStatus(dto, user.userCode);
-    if (result === 0) {
-      throw new BadRequestException({
-        message: Msg.DeleteErr,
-        data: 0,
-      });
-    }
+    // if (result === 0) {
+    //   throw new BadRequestException({
+    //     message: Msg.DeleteErr,
+    //     data: 0,
+    //   });
+    // }
     return {
       message: Msg.DeleteOk,
       data: result,
