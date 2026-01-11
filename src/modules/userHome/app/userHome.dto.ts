@@ -67,19 +67,19 @@ export class MutationUserHomeDto {
   @ApiProperty({ example: 25.75, description: 'Chiều dài nhà (m)' })
   @Type(() => Number)
   @IsNumber()
-  @Min(0)
-  userHomeLength: number = 0;
+  @Min(1)
+  userHomeLength: number;
 
   @ApiProperty({ example: 120.5, description: 'Chiều rộng nhà (m)' })
   @Type(() => Number)
   @IsNumber()
-  @Min(0)
-  userHomeWidth: number = 0;
+  @Min(1)
+  userHomeWidth: number;
 
   @ApiProperty({ example: 3, description: 'Số tầng' })
   @Type(() => Number)
   @IsInt()
-  @Min(0)
+  @Min(1)
   userHomeFloor: number;
 
   @ApiProperty({

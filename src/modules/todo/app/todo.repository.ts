@@ -204,7 +204,7 @@ export class TodoAppRepository {
   }
   async checkDuplicateTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<ITodoHomeTaskAlram | null> {
     const query = `
-      SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, A.taskCode, taskName, taskDate, taskNote, isActive
+      SELECT seq, userCode, userHomeCode, taskAlarmCode, taskPeriodCode, taskCode, taskName, taskDate, taskNote, isActive
       FROM ${this.tableHomeTaskAlarm}
       WHERE isActive = 'Y'
         AND taskName = ?

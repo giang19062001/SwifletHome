@@ -151,9 +151,8 @@ export class TodoAppService {
     return 0;
   }
 
-  async completeMedicineTask(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
-    return 0
-    const logbase = `${this.SERVICE_NAME}/completeMedicineTask:`;
+  async setCompleteTaskMedicine(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setCompleteTaskMedicine:`;
     const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode)
     console.log("alramDetail -----> ", alramDetail);
     if(!alramDetail?.taskKeyword){

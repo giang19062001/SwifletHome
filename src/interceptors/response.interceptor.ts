@@ -1,11 +1,13 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpStatus } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponse } from 'src/interfaces/app.interface';
 
 @Injectable()
 export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppResponse<T>> {
+  constructor(private readonly logger: LoggingService) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<ApiAppResponse<T>> {
     const ctx = context.switchToHttp();
     const response = ctx.getResponse();
@@ -111,7 +113,7 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
 
       // Bắt tất cả lỗi (throw Exception)-> format lại
       catchError((err) => {
-        console.log("ResponseAppInterceptor ----> catchError ---> ", err);
+        this.logger.error("ResponseAppInterceptor", err)
         const statusCode = err?.status || err?.response?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
 
         const message = err?.response?.message || err?.message || getErrDefaultMessage(request.method, request.url);

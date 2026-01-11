@@ -169,7 +169,7 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
   @ApiOperation({
     summary: 'Đánh dấu hoàn thành task ghi chú lăn thuốc',
   })
-  @Post('completeMedicineTask')
+  @Post('setCompleteTaskMedicine')
   @ApiBody({
     type: CompleteMedicineTaskDto,
     description: `
@@ -179,8 +179,8 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async completeMedicineTask(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteMedicineTaskDto) {
-    const result = await this.todoAppService.completeMedicineTask(user.userCode, dto);
+  async setCompleteTaskMedicine(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteMedicineTaskDto) {
+    const result = await this.todoAppService.setCompleteTaskMedicine(user.userCode, dto);
     if (result == 0) {
       throw new BadRequestException({
         message: Msg.CreateErr,
