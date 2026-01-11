@@ -106,10 +106,11 @@ export interface ITodoHomeTaskAlram {
   isActive: YnEnum;
 }
 
-
-
 export interface ITodoTaskCompleteMedicine {
   seq: number;
+  seqNextTime: number;
   taskAlarmCode: string;
+  userCode: string;
+  userHomeCode: string;
   medicineNote: string;
 }

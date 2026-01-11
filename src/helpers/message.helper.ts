@@ -50,6 +50,8 @@ export const Msg = {
   InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
   DuplicateTaskAlram: 'Lịch nhắc này đã tồn tại',
   DuplicateTaskPeriod: 'Chu kỳ lịch nhắc này đã tồn tại',
+  OnlyMedicineTaskCanDo:`Chỉ có lịch nhắc 'Lăn thuốc' mới có thể thực hiện tác vụ này`,
+  MedicineTaskAlreadyAdded:`Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
   InvalidValue: (filedName: string) => `${convertFiledName(filedName)} sai giá trị cho phép`,
   InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,

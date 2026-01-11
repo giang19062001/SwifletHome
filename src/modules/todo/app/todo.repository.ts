@@ -47,8 +47,8 @@ export class TodoAppRepository {
     let query = ` SELECT A.seq, A.taskAlarmCode, A.taskPeriodCode, A.taskCode, B.taskKeyword, A.taskName, A.taskDate, A.taskStatus,
     A.userCode, A.userHomeCode, A.taskNote
     FROM ${this.tableHomeTaskAlarm}  A
-    LEFT ${this.tableBoxTask} B
-    ON A.taskCode = B.taskCode
+    LEFT JOIN ${this.tableTask} B
+    ON A.taskCode = B.taskCode  
     WHERE A.taskAlarmCode  = ? 
     LIMIT 1 `;
 
@@ -136,6 +136,7 @@ export class TodoAppRepository {
               ${whereQuery} 
             ORDER BY A.taskDate DESC
               ${offsetQuery}`;
+              console.log(query, params);
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as ITodoHomeTaskAlram[];
@@ -292,7 +293,7 @@ export class TodoAppRepository {
   }
   // TODO: COMPLETE-MEDICINE
   async getTaskCompleteMedicine(taskAlarmCode: string): Promise<ITodoTaskCompleteMedicine | null> {
-    let query = `  SELECT seq, taskAlarmCode, medicineNote FROM ${this.tableHomeTaskCompleteMedicine} 
+    let query = `  SELECT seq, seqNextTime, taskAlarmCode, userCode, userHomeCode, medicineNote FROM ${this.tableHomeTaskCompleteMedicine} 
     WHERE taskAlarmCode  = ? LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
@@ -301,11 +302,20 @@ export class TodoAppRepository {
 
   async insertTaskCompleteMedicine(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableHomeTaskCompleteMedicine}  (taskAlarmCode, medicineNote, createdId) 
-      VALUES(?, ?, ?)
+      INSERT INTO ${this.tableHomeTaskCompleteMedicine}  (seqNextTime, taskAlarmCode, userCode, userHomeCode, medicineNote, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.taskAlarmCode, dto.medicineNote, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [0, dto.taskAlarmCode,  userCode, dto.userHomeCode, dto.medicineNote, userCode]);
 
     return result.insertId;
+  }
+    async updateTaskCompleteMedicine(userCode: string, taskAlarmCode: string, seqNextTime: number): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableHomeTaskCompleteMedicine}  SET seqNextTime = ?, updatedId = ?, updatedAt = NOW()
+      WHERE taskAlarmCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, taskAlarmCode]);
+
+    return result.affectedRows;
   }
 }

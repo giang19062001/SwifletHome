@@ -181,6 +181,18 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async setCompleteTaskMedicine(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteMedicineTaskDto) {
     const result = await this.todoAppService.setCompleteTaskMedicine(user.userCode, dto);
+      if (result == -1) {
+      throw new BadRequestException({
+        message: Msg.OnlyMedicineTaskCanDo,
+        data: 0,
+      });
+    }
+       if (result == -2) {
+      throw new BadRequestException({
+        message: Msg.MedicineTaskAlreadyAdded,
+        data: 0,
+      });
+    }
     if (result == 0) {
       throw new BadRequestException({
         message: Msg.CreateErr,

@@ -149,7 +149,6 @@ export class SetTaskPeriodDto {
     format: 'date',
     nullable: true,
     required: false,
-    
   })
   @IsOptional()
   @Transform(({ value }) => (value === null ? null : new Date(value + 'T00:00:00')))
@@ -177,5 +176,12 @@ export class CompleteMedicineTaskDto {
   })
   @IsString()
   @IsOptional()
+  userHomeCode?: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
   medicineNote: string;
 }

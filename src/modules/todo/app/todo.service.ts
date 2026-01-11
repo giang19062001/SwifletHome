@@ -9,6 +9,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
 import moment from 'moment';
 import TodoAppValidate from './todo.validate';
+import { QUERY_HELPER } from 'src/helpers/const.helper';
 
 @Injectable()
 export class TodoAppService {
@@ -153,23 +154,53 @@ export class TodoAppService {
 
   async setCompleteTaskMedicine(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setCompleteTaskMedicine:`;
-    const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode)
-    console.log("alramDetail -----> ", alramDetail);
-    if(!alramDetail?.taskKeyword){
-      // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
-      return -1
-    }
-     if(alramDetail?.taskKeyword !== TODO_CONST.TASK_EVENT.MEDICINE.value){
-      // taskAlarmCode này không phải lắn thuốc
-      return -2
-    }
-    const checkDuplicate = await this.todoAppRepository.getTaskCompleteMedicine(dto.taskAlarmCode)
-    if(checkDuplicate){
-      // taskAlarmCode này đã được insert dữ liệu lăn thuôc rồi
-      return -3
-    }
-    const result = await this.todoAppRepository.insertTaskCompleteMedicine(userCode, dto);
+    const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
+    let result = 0
 
+    // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
+    if (!alramDetail?.taskKeyword) {
+      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyMedicineTaskCanDo}`);
+      return -1;
+    }
+
+    // taskAlarmCode này không phải lắn thuốc
+    if (alramDetail?.taskKeyword !== TODO_CONST.TASK_EVENT.MEDICINE.value) {
+      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyMedicineTaskCanDo}`);
+      return -1;
+    }
+
+    // taskAlarmCode này đã được insert dữ liệu lăn thuôc rồi
+    const checkDuplicate = await this.todoAppRepository.getTaskCompleteMedicine(dto.taskAlarmCode);
+    if (checkDuplicate) {
+      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.MedicineTaskAlreadyAdded}`);
+      return -2;
+    }
+    const insertId = await this.todoAppRepository.insertTaskCompleteMedicine(userCode, { ...dto, userHomeCode: alramDetail.userHomeCode });
+
+    // tự động tạo lịch nhác này cho 3 tháng sau
+    if (insertId) {
+      const taskDateCurrent = moment(alramDetail?.taskDate);
+      const taskDateNextTime = moment(taskDateCurrent).add(QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME, 'days').toDate();
+      this.logger.log(logbase, `Lịch nhắc(${dto.taskAlarmCode}) hiện tại (${taskDateCurrent.toDate().toLocaleDateString()}) --- Lần sau (${taskDateNextTime.toLocaleDateString()})`);
+
+      const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
+        userHomeCode: alramDetail.userHomeCode,
+        taskPeriodCode: null,
+        taskCode: alramDetail.taskCode,
+        taskName: alramDetail.taskName,
+        taskNote: alramDetail.taskNote,
+        taskStatus: TaskStatusEnum.WAITING,
+        taskDate: taskDateNextTime,
+      };
+      const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
+      if(seqNextTime){
+        const affectedRows = await this.todoAppRepository.updateTaskCompleteMedicine(userCode, dto.taskAlarmCode, seqNextTime)
+        if(affectedRows){
+          this.logger.log(logbase, `Tạo Lịch nhắc tự động cho(${QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME}) ngày sau thành công,hiện tại (${alramDetail.seq}) --- Lần sau (${seqNextTime})`);
+          result = 1 // thành công
+        }
+      }
+    }
     return result;
   }
 }

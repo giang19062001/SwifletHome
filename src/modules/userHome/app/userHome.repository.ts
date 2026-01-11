@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IUserHome, IUserHomeImageFile } from './userHome.interface';
+import { IUserHome, IUserHomeArea, IUserHomeImageFile } from './userHome.interface';
 import { MutationUserHomeDto } from './userHome.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -41,6 +41,18 @@ export class UserHomeAppRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IUserHome[];
+  }
+   async getAreaHome(userHomeCode: string): Promise<IUserHomeArea | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.userCode, A.userHomeCode,  A.userHomeLength, A.userHomeWidth, A.userHomeFloor
+          FROM ${this.table} A 
+          INNER JOIN  ${this.tableUserApp} B
+          ON A.userCode = B.userCode
+          WHERE A.userHomeCode = ? AND A.isActive = 'Y'
+          LIMIT 1 `,
+      [userHomeCode],
+    );
+    return rows ? (rows[0] as IUserHome) : null;
   }
   async getDetailHome(userHomeCode: string): Promise<IUserHome | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(

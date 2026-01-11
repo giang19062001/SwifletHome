@@ -644,8 +644,10 @@ CREATE TABLE
   CREATE TABLE
   tbl_todo_home_task_complete_medicine (
     seq INT AUTO_INCREMENT PRIMARY KEY,
+    seqNextTime INT,
     taskAlarmCode VARCHAR(45) NOT NULL UNIQUE,
-    -- taskCode VARCHAR(45) NULL DEFAULT NULL,  ------------> TAS000003
+    userCode VARCHAR(45) NOT NULL,
+    userHomeCode VARCHAR(45) NOT NULL,
     medicineNote VARCHAR(255) NOT NULL,
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -653,6 +655,7 @@ CREATE TABLE
     createdId VARCHAR(45) DEFAULT 'SYSTEM',
     updatedId VARCHAR(45) DEFAULT NULL
   )
+
 
 
 -- media

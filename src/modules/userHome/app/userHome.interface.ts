@@ -1,5 +1,14 @@
 import { YnEnum } from 'src/interfaces/admin.interface';
 
+export interface IUserHomeArea {
+  seq: number;
+  userHomeCode: string;
+  userCode: string;
+  userHomeLength: number;
+  userHomeWidth: number;
+  userHomeFloor: number;
+}
+
 export interface IUserHome {
   seq: number;
   userHomeCode: string;

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IUserHome, IUserHomeImageStr } from './userHome.interface';
+import { IUserHome, IUserHomeArea, IUserHomeImageStr } from './userHome.interface';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { UserHomeAppRepository } from './userHome.repository';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -31,6 +31,11 @@ export class UserHomeAppService {
   async getDetail(userHomeCode: string): Promise<IUserHome | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail:`;
     const result = await this.userHomeAppRepository.getDetailHome(userHomeCode);
+    return result;
+  }
+  async getAreaHome(userHomeCode: string): Promise<IUserHomeArea | null> {
+    const logbase = `${this.SERVICE_NAME}/getAreaHome:`;
+    const result = await this.userHomeAppRepository.getAreaHome(userHomeCode);
     return result;
   }
 
@@ -164,7 +169,7 @@ export class UserHomeAppService {
   async uploadHomeImage(userCode: string, dto: UploadUserHomeImageDto, userHomeImageFile: Express.Multer.File): Promise<IUserHomeImageStr> {
     const logbase = `${this.SERVICE_NAME}/uploadHomeImage:`;
     try {
-      let res: IUserHomeImageStr = {seq: 0, filename: '' };
+      let res: IUserHomeImageStr = { seq: 0, filename: '' };
       if (userHomeImageFile) {
         this.logger.log(logbase, JSON.stringify(userHomeImageFile));
 

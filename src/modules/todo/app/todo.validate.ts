@@ -152,7 +152,7 @@ export default class TodoAppValidate {
       // dto.periodValue (1 - 31)
       let date = today.clone().date(dto.periodValue); // set ngày cho tháng/năm hiện tại
 
-      // Nếu tháng bị thay đổi → nghĩa là ngày không tồn tại
+      // Nếu tháng bị thay đổi ->  ngày không tồn tại trong tháng này -> chỉ tạo chu kỳ, ko tạo lịch nhắc -> để null 
       if (date.month() !== today.month()) {
         alramDto.taskDate = null;
       } else {
@@ -160,7 +160,7 @@ export default class TodoAppValidate {
         if (date.isBefore(today, 'day')) {
           alramDto.taskDate = null;
         } else {
-          // ngày chưa qu
+          // ngày chưa qua -> gán ngày đó cho tháng hiện tại
           alramDto.taskDate = date.toDate(); // YYYY-MM-DD
         }
       }
@@ -169,15 +169,15 @@ export default class TodoAppValidate {
 
     // gán giá trị taskDate vào alarm DTO cho chu kỳ thứ trong tuần
     if (dto.isPeriod == 'Y' && dto.periodType === 'WEEK' && dto.periodValue != null) {
-      const isoDay = dto.periodValue; // 1 = Thứ 2 -> 7 = Chủ nhật
+      const isoDay = dto.periodValue; // 1 - 7 : thứ 2 - chủ nhật
 
       let date = today.clone().isoWeekday(isoDay);
 
-      // Nếu ngày đã qua -> lấy ngày của tuần sau (đang là chủ nhật -> chọn thứ 3 -> lấy thứ 3 tuần sau)
+      // Nếu ngày đã qua -> lấy ngày của tuần sau (đang là thứ sáu -> chọn thứ 3 -> lấy thứ 3 tuần sau)
       if (date.isBefore(today, 'day')) {
         date = date.add(1, 'week');
       }
-
+      // Nếu ngày chưa qua -> lấy ngày tuần này (đang là thứ sáu -> chọn thứ 7 -> lấy thứ 7 tuần này)
       alramDto.taskDate = date.toDate();
 
       this.logger.log(logbase, `WEEK ----> ${today.format('DD/MM/YYYY')}----> date(${dto.periodValue}),  ----> ${date.toDate().toLocaleDateString()}`);
