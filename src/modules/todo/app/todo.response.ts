@@ -105,5 +105,5 @@ export class GetCompleteTaskHarvestResDto {
   userHomeCode: string;
   
   @ApiProperty({ type: () => HarvestDataDto, isArray: true })
-  HarvestData: HarvestDataDto
+  harvestData: HarvestDataDto
 }
