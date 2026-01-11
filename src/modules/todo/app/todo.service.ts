@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { ICompleteHarvestTask, ICompleteHarvestTaskRow, ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { CompleteMedicineTaskDto, SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
+import { CompleteHarvestTaskDto, CompleteMedicineTaskDto, FloorDataDto, HarvestDataDto, HarvestDataRowDto, SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
 import moment from 'moment';
 import TodoAppValidate from './todo.validate';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class TodoAppService {
@@ -151,11 +152,12 @@ export class TodoAppService {
     }
     return 0;
   }
+  // TODO: COMPLETE-MEDICINE
 
   async setCompleteTaskMedicine(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setCompleteTaskMedicine:`;
     const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
-    let result = 0
+    let result = 0;
 
     // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
     if (!alramDetail?.taskKeyword) {
@@ -169,16 +171,25 @@ export class TodoAppService {
       return -1;
     }
 
+    // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
+    if (alramDetail?.taskStatus == TaskStatusEnum.COMPLETE) {
+      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
+      return -2;
+    }
+
     // taskAlarmCode này đã được insert dữ liệu lăn thuôc rồi
     const checkDuplicate = await this.todoAppRepository.getTaskCompleteMedicine(dto.taskAlarmCode);
     if (checkDuplicate) {
       this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.MedicineTaskAlreadyAdded}`);
-      return -2;
+      return -3;
     }
-    const insertId = await this.todoAppRepository.insertTaskCompleteMedicine(userCode, { ...dto, userHomeCode: alramDetail.userHomeCode });
+    const insertId = await this.todoAppRepository.insertTaskCompleteMedicine(userCode, alramDetail.userHomeCode, dto);
 
-    // tự động tạo lịch nhác này cho 3 tháng sau
     if (insertId) {
+      // cập nhập trạng thái cho lịch nhắc là HOÀN THÀNH
+      await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+      // tự động tạo lịch nhác này cho 3 tháng sau
+
       const taskDateCurrent = moment(alramDetail?.taskDate);
       const taskDateNextTime = moment(taskDateCurrent).add(QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME, 'days').toDate();
       this.logger.log(logbase, `Lịch nhắc(${dto.taskAlarmCode}) hiện tại (${taskDateCurrent.toDate().toLocaleDateString()}) --- Lần sau (${taskDateNextTime.toLocaleDateString()})`);
@@ -193,14 +204,206 @@ export class TodoAppService {
         taskDate: taskDateNextTime,
       };
       const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
-      if(seqNextTime){
-        const affectedRows = await this.todoAppRepository.updateTaskCompleteMedicine(userCode, dto.taskAlarmCode, seqNextTime)
-        if(affectedRows){
+      if (seqNextTime) {
+        const affectedRows = await this.todoAppRepository.updateTaskCompleteMedicine(userCode, dto.taskAlarmCode, seqNextTime);
+        if (affectedRows) {
           this.logger.log(logbase, `Tạo Lịch nhắc tự động cho(${QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME}) ngày sau thành công,hiện tại (${alramDetail.seq}) --- Lần sau (${seqNextTime})`);
-          result = 1 // thành công
+          result = 1; // thành công
         }
       }
     }
+    return result;
+  }
+  // TODO: COMPLETE-HARVER
+  async setCompleteTaskHarvest(userCode: string, dto: CompleteHarvestTaskDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setCompleteTaskHarvest:`;
+    const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
+
+    // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
+    if (!alramDetail?.taskKeyword) {
+      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
+      return -1;
+    }
+
+    // taskAlarmCode này không phải thu hoạch
+    if (alramDetail?.taskKeyword !== TODO_CONST.TASK_EVENT.HARVEST.value) {
+      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
+      return -1;
+    }
+    // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
+    if (alramDetail?.taskStatus == TaskStatusEnum.COMPLETE) {
+      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
+      return -2;
+    }
+
+    // kiểm tra và cập nhập trạng thái hoàn thành cho lịch nhắc
+    if (dto.isComplete == 'Y') {
+      await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+    }
+
+    // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
+    const isOnlyActive = false; // -> lấy luôn cả cell bị isActive = 'N'
+    const harvestCurrentDatas = await this.todoAppRepository.getTaskCompleteHarvests(dto.taskAlarmCode, isOnlyActive);
+    if (harvestCurrentDatas.length) {
+      // biến dữ liệu lồng từ request thành row
+      const requestRows: ICompleteHarvestTaskRow[] = [];
+      for (const flo of dto.harvestData) {
+        for (const cel of flo.floorData) {
+          requestRows.push({
+            taskAlarmCode: dto.taskAlarmCode,
+            userCode: userCode,
+            userHomeCode: alramDetail.userHomeCode,
+            floor: flo.floor,
+            cell: cel.cell,
+            cellData: cel.cellData,
+          });
+        }
+      }
+
+      // map từ request
+      const requestMap = new Map<string, ICompleteHarvestTaskRow>();
+      requestRows.forEach((r) => requestMap.set(`${r.floor}_${r.cell}`, r));
+
+      // map từ database
+      const dbMap = new Map<string, ICompleteHarvestTaskRow>();
+      harvestCurrentDatas.forEach((r) => dbMap.set(`${r.floor}_${r.cell}`, r));
+
+      const toInsert: ICompleteHarvestTaskRow[] = [];
+      const toUpdate: ICompleteHarvestTaskRow[] = [];
+      const toDelete: ICompleteHarvestTaskRow[] = [];
+
+      // so sánh
+      for (const [key, requestRow] of requestMap.entries()) {
+        if (dbMap.has(key)) {
+          toUpdate.push(requestRow); // row sẽ insert
+        } else {
+          toInsert.push(requestRow); // row sẽ update
+        }
+      }
+
+      for (const [key, dbRow] of dbMap.entries()) {
+        if (!requestMap.has(key)) {
+          toDelete.push(dbRow); // row sẽ xóa
+        }
+      }
+      // insert
+      for (const row of toInsert) {
+        await this.todoAppRepository.insertTaskCompleteHarvest(row);
+      }
+
+      //update
+      for (const row of toUpdate) {
+        await this.todoAppRepository.updateTaskCompleteHarvest(row);
+      }
+
+      // delete
+      for (const row of toDelete) {
+        await this.todoAppRepository.deleteTaskCompleteHarvest({
+          taskAlarmCode: row.taskAlarmCode,
+          floor: row.floor,
+          cell: row.cell,
+          userCode: userCode,
+          userHomeCode: alramDetail.userHomeCode,
+          cellData: 0,
+        });
+      }
+    } else {
+      // INSERT
+      if (dto.harvestData.length) {
+        let harvestDataRows: HarvestDataRowDto[] = [];
+        for (const flo of dto.harvestData) {
+          const floor = flo.floor;
+          if (flo.floorData.length) {
+            for (const cel of flo.floorData) {
+              const row: HarvestDataRowDto = {
+                taskAlarmCode: dto.taskAlarmCode,
+                userCode: userCode,
+                userHomeCode: alramDetail.userHomeCode,
+                floor: floor,
+                cell: cel.cell,
+                cellData: cel.cellData,
+              };
+              harvestDataRows.push(row);
+            }
+          }
+        }
+        console.log('harvestDataRows', harvestDataRows);
+        if (harvestDataRows.length) {
+          for (const row of harvestDataRows) {
+            await this.todoAppRepository.insertTaskCompleteHarvest(row);
+          }
+        }
+      }
+    }
+
+    return 1;
+  }
+  async getCompleteTaskHarvest(userCode: string, taskAlarmCode: string): Promise<ICompleteHarvestTask | number> {
+    const logbase = `${this.SERVICE_NAME}/getCompleteTaskHarvest:`;
+
+    // lấy thông tin alram
+    const alramDetail = await this.todoAppRepository.getOneTaskAlarm(taskAlarmCode);
+
+    // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
+    if (!alramDetail?.taskKeyword) {
+      this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
+      return -1;
+    }
+
+    // taskAlarmCode này không phải thu hoạch
+    if (alramDetail?.taskKeyword !== TODO_CONST.TASK_EVENT.HARVEST.value) {
+      this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
+      return -1;
+    }
+    // lấy floor của nhà yến của lịch nhắc này
+    const homeArea = await this.userHomeAppService.getAreaHome(alramDetail?.userHomeCode ?? '');
+
+    // nhà yến của lịch nhắc ko tồn tại
+    if (!homeArea) {
+      this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) - nhà yến(${alramDetail?.userHomeCode ?? ''}) ${Msg.HomeOfAlarmNotExist}`);
+      return -2;
+    }
+    // số tầng của nhà yến là 0
+    if (homeArea.userHomeFloor == 0) {
+      this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) - nhà yến(${alramDetail?.userHomeCode ?? ''}) ${Msg.FloorOfHomeIsZero}`);
+      return -3;
+    }
+    // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
+    let harvestData: HarvestDataDto[] = [];
+    const isOnlyActive = true; // -> chỉ lấy cell  isActive = 'Y'
+    const harvestCurrentDatas = await this.todoAppRepository.getTaskCompleteHarvests(taskAlarmCode, isOnlyActive);
+
+    if (!harvestCurrentDatas.length) {
+      // khởi tạo mặc định
+      for (let i = 1; i <= homeArea.userHomeFloor; i++) {
+        harvestData.push({
+          floor: i,
+          floorData: [
+            {
+              cell: 1,
+              cellData: 0,
+            },
+          ],
+        });
+      }
+    } else {
+      // lồng dữ liệu đã có
+      const floorMap = new Map<number, { floor: number; floorData: FloorDataDto[] }>();
+
+      for (const row of harvestCurrentDatas) {
+        if (!floorMap.has(row.floor)) {
+          floorMap.set(row.floor, { floor: row.floor, floorData: [] });
+        }
+
+        floorMap.get(row.floor)!.floorData.push({
+          cell: row.cell,
+          cellData: row.cellData,
+        });
+      }
+
+      harvestData = Array.from(floorMap.values()).sort((a, b) => a.floor - b.floor);
+    }
+    const result: ICompleteHarvestTask = { taskAlarmCode: taskAlarmCode, userCode: userCode, userHomeCode: alramDetail?.userHomeCode ?? '', harvestData: harvestData };
     return result;
   }
 }

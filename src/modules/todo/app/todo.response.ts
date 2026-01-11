@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
+import { HarvestDataDto } from './todo.dto';
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })
@@ -26,6 +27,7 @@ export class GetScheduledTasksResDto {
   @ApiProperty({ example: 'ngày' })
   unit: string;
 }
+
 
 export class GetListTaskAlarmsResDto {
   @ApiProperty({ example: 0 })
@@ -89,4 +91,19 @@ export class GetListTaskAlarmsResDto {
 
   @ApiProperty({ example: 'Hoàn thành' })
   rightEventLabel: string;
+}
+
+
+export class GetCompleteTaskHarvestResDto {
+  @ApiProperty({ example: '' })
+  taskAlarmCode: string;
+
+  @ApiProperty({ example: '' })
+  userCode: string;
+
+  @ApiProperty({ example: '' })
+  userHomeCode: string;
+  
+  @ApiProperty({ type: () => HarvestDataDto, isArray: true })
+  HarvestData: HarvestDataDto
 }

@@ -1,7 +1,7 @@
 import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, ITodoTaskCompleteMedicine, PeriodTypeEnum, TaskStatusEnum, TODO_CONST } from '../todo.interface';
-import { CompleteMedicineTaskDto, SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
+import { ICompleteHarvestTaskRow, ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, ITodoTaskCompleteMedicine, PeriodTypeEnum, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { CompleteMedicineTaskDto, SetTaskAlarmDto, SetTaskPeriodDto, HarvestDataRowDto } from './todo.dto';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode } from 'src/helpers/func.helper';
@@ -15,6 +15,7 @@ export class TodoAppRepository {
   private readonly tableBoxTask = 'tbl_todo_box_tasks';
   private readonly tableUserApp = 'tbl_user_app';
   private readonly tableHomeTaskCompleteMedicine = 'tbl_todo_home_task_complete_medicine';
+  private readonly tableHomeTaskCompleteHarvest = 'tbl_todo_home_task_complete_harvest';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -136,8 +137,6 @@ export class TodoAppRepository {
               ${whereQuery} 
             ORDER BY A.taskDate DESC
               ${offsetQuery}`;
-              console.log(query, params);
-
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as ITodoHomeTaskAlram[];
   }
@@ -300,21 +299,68 @@ export class TodoAppRepository {
     return rows.length ? (rows[0] as ITodoTaskCompleteMedicine) : null;
   }
 
-  async insertTaskCompleteMedicine(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
+  async insertTaskCompleteMedicine(userCode: string, userHomeCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableHomeTaskCompleteMedicine}  (seqNextTime, taskAlarmCode, userCode, userHomeCode, medicineNote, createdId) 
       VALUES(?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [0, dto.taskAlarmCode,  userCode, dto.userHomeCode, dto.medicineNote, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [0, dto.taskAlarmCode, userCode, userHomeCode, dto.medicineNote, userCode]);
 
     return result.insertId;
   }
-    async updateTaskCompleteMedicine(userCode: string, taskAlarmCode: string, seqNextTime: number): Promise<number> {
+  async updateTaskCompleteMedicine(userCode: string, taskAlarmCode: string, seqNextTime: number): Promise<number> {
     const sql = `
       UPDATE ${this.tableHomeTaskCompleteMedicine}  SET seqNextTime = ?, updatedId = ?, updatedAt = NOW()
       WHERE taskAlarmCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, taskAlarmCode]);
+
+    return result.affectedRows;
+  }
+
+  // TODO: COMPLETE-HARVER
+  async getTaskCompleteHarvests(taskAlarmCode: string, isOnlyActive: boolean): Promise<ICompleteHarvestTaskRow[]> {
+    let query = `  SELECT seq, taskAlarmCode, userCode, userHomeCode, floor, cell, cellData FROM ${this.tableHomeTaskCompleteHarvest} 
+    WHERE taskAlarmCode  = ?  ${isOnlyActive ? ` AND isActive = 'Y' `: ''} `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
+    return rows as ICompleteHarvestTaskRow[];
+  }
+
+  async insertTaskCompleteHarvest(dto: HarvestDataRowDto): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableHomeTaskCompleteHarvest}  (taskAlarmCode, userCode,  userHomeCode, floor, cell, cellData, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellData, dto.userCode]);
+
+    return result.insertId;
+  }
+  async updateTaskCompleteHarvest(dto: HarvestDataRowDto): Promise<number> {
+    const sql = `
+    UPDATE ${this.tableHomeTaskCompleteHarvest}
+    SET cellData = ?, updatedId = ?, updatedAt = NOW(), isActive = 'Y'
+    WHERE taskAlarmCode = ? AND  userCode = ? AND userHomeCode = ?
+      AND floor = ?
+      AND cell = ?
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.cellData, dto.userCode, dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell]);
+
+    return result.affectedRows;
+  }
+  async deleteTaskCompleteHarvest(dto: HarvestDataRowDto): Promise<number> {
+    const sql = `
+    UPDATE ${this.tableHomeTaskCompleteHarvest}
+    SET isActive = 'N', updatedId = ?, updatedAt = NOW()
+    WHERE taskAlarmCode = ? AND  userCode = ? AND userHomeCode = ?
+      AND floor = ?
+      AND cell = ?
+      AND isActive = 'Y'
+  `;
+
+    // xóa -> cellData = 0
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell]);
 
     return result.affectedRows;
   }

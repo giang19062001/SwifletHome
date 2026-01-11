@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from 'class-validator';
+import { IsArray, IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, ValidateNested } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
@@ -175,13 +175,84 @@ export class CompleteMedicineTaskDto {
     example: '',
   })
   @IsString()
-  @IsOptional()
-  userHomeCode?: string;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
   @IsNotEmpty()
   medicineNote: string;
+}
+
+export class CompleteHarvestTaskDto {
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
+  taskAlarmCode: string;
+
+  @ApiProperty({ type: () => HarvestDataDto, isArray: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => HarvestDataDto)
+  harvestData: HarvestDataDto[];
+
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  @IsNotEmpty()
+  isComplete: YnEnum;
+}
+
+export class HarvestDataDto {
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  floor: number;
+
+  @ApiProperty({ type: () => FloorDataDto, isArray: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FloorDataDto)
+  floorData: FloorDataDto[];
+}
+
+export class FloorDataDto {
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  cell: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  cellData: number;
+}
+
+export class HarvestDataRowDto {
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
+  taskAlarmCode: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
+  userCode: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  floor: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  cell: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  cellData: number;
 }

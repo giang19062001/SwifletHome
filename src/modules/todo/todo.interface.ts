@@ -114,3 +114,29 @@ export interface ITodoTaskCompleteMedicine {
   userHomeCode: string;
   medicineNote: string;
 }
+
+
+export interface ICompleteHarvestTaskRow {
+  taskAlarmCode: string;
+  userCode: string;
+  userHomeCode: string;
+  floor: number;
+  cell: number;
+  cellData: number;
+}
+
+export interface ICompleteHarvestTask {
+  taskAlarmCode: string;
+  userCode: string;
+  userHomeCode: string;
+  harvestData: IHarvestData[];
+}
+interface IHarvestData {
+  floor: number;
+  floorData: IFloorData[];
+}
+
+interface IFloorData {
+  cell: number;
+  cellData: number;
+}

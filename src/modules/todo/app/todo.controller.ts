@@ -2,7 +2,7 @@ import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards,
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto } from './todo.response';
+import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetCompleteTaskHarvestResDto } from './todo.response';
 import { ITodoHomeTaskAlram, ITodoTask } from '../todo.interface';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
@@ -10,7 +10,7 @@ import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { ChangeTaskAlarmStatusDto, CompleteMedicineTaskDto, GetListTaskAlarmsDTO, SetTaskPeriodDto } from './todo.dto';
+import { ChangeTaskAlarmStatusDto, CompleteHarvestTaskDto, CompleteMedicineTaskDto, GetListTaskAlarmsDTO, SetTaskPeriodDto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
 import { IListApp } from 'src/interfaces/app.interface';
 
@@ -166,6 +166,7 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     };
   }
 
+  // TODO: COMPLETE-MEDICINE
   @ApiOperation({
     summary: 'Đánh dấu hoàn thành task ghi chú lăn thuốc',
   })
@@ -181,13 +182,19 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async setCompleteTaskMedicine(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteMedicineTaskDto) {
     const result = await this.todoAppService.setCompleteTaskMedicine(user.userCode, dto);
-      if (result == -1) {
+    if (result == -1) {
       throw new BadRequestException({
         message: Msg.OnlyMedicineTaskCanDo,
         data: 0,
       });
     }
-       if (result == -2) {
+    if (result == -2) {
+      throw new BadRequestException({
+        message: Msg.AlreadyCompleteCannotDo,
+        data: 0,
+      });
+    }
+    if (result == -3) {
       throw new BadRequestException({
         message: Msg.MedicineTaskAlreadyAdded,
         data: 0,
@@ -195,13 +202,102 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     }
     if (result == 0) {
       throw new BadRequestException({
-        message: Msg.CreateErr,
+        message: Msg.UpdateErr,
         data: 0,
       });
     }
     return {
-      message: Msg.CreateOk,
+      message: Msg.UpdateOk,
       data: result,
     };
   }
+
+  // TODO: COMPLETE-HARVER
+    @ApiOperation({
+    summary: 'Đánh dấu hoàn thành task nhập dữ liệu thu hoạc',
+  })
+  @Post('setCompleteTaskHarvest')
+  @ApiBody({
+    type: CompleteHarvestTaskDto,
+    description: `
+<ul>
+  <li><b>taskAlarmCode</b>: Mã code của lịch nhắc</li>
+  </li>
+  <li><b>harvestData</b>: Danh sách dữ liệu thu hoạch
+    <ul>
+      <li><b>floor</b>: Số tầng</li>
+      <li><b>floorData</b>: Danh sách ô trong tầng
+        <ul>
+          <li><b>cell</b>: Số ô</li>
+          <li><b>cellData</b>: Giá trị dữ liệu thu hoạch của ô</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><b>isComplete</b>: ENUM('Y','N')
+</ul>
+`,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async setCompleteTaskHarvest(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteHarvestTaskDto) {
+    const result = await this.todoAppService.setCompleteTaskHarvest(user.userCode, dto);
+    if (result == -1) {
+      throw new BadRequestException({
+        message: Msg.OnlyHarvestTaskCanDo,
+        data: 0,
+      });
+    }
+      if (result == -2) {
+      throw new BadRequestException({
+        message: Msg.AlreadyCompleteCannotDo,
+        data: 0,
+      });
+    }
+
+    if (result == 0) {
+      throw new BadRequestException({
+        message: Msg.UpdateErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.UpdateOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Lấy thông tin dữ liệu thu hoạch của 1 lịch nhắc',
+  })
+  @ApiParam({ name: 'taskAlarmCode', type: String })
+  @Get('getCompleteTaskHarvest/:taskAlarmCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetCompleteTaskHarvestResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getCompleteTaskHarvest(@Param('taskAlarmCode') taskAlarmCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
+    const result = await this.todoAppService.getCompleteTaskHarvest(user.userCode, taskAlarmCode);
+    if (result == -1) {
+      throw new BadRequestException({
+        message: Msg.OnlyHarvestTaskCanDo,
+        data: 0,
+      });
+    }
+    if (result == -2) {
+      throw new BadRequestException({
+        message: Msg.HomeOfAlarmNotExist,
+        data: 0,
+      });
+    }
+    if (result == -3) {
+      throw new BadRequestException({
+        message: Msg.FloorOfHomeIsZero,
+        data: 0,
+      });
+    }
+    return result;
+  }
+
+
 }
