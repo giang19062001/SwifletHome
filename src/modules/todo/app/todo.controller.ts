@@ -22,6 +22,9 @@ import { IListApp } from 'src/interfaces/app.interface';
 export default class TodoAppController {
   constructor(private readonly todoAppService: TodoAppService) {}
 
+  @ApiOperation({
+    summary: 'Lấy danh sách các lịch nhắc có sẵn của hệ thống: Thu hoạch, lăn thuốc, dẫn dụ chim đêm,...',
+  })
   @Get('getTasks')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([GetTaskResDto]) })
@@ -213,8 +216,8 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
   }
 
   // TODO: COMPLETE-HARVER
-    @ApiOperation({
-    summary: 'Đánh dấu hoàn thành task nhập dữ liệu thu hoạc',
+  @ApiOperation({
+    summary: 'Đánh dấu hoàn thành task nhập dữ liệu thu hoạch',
   })
   @Post('setCompleteTaskHarvest')
   @ApiBody({
@@ -234,7 +237,7 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
       </li>
     </ul>
   </li>
-  <li><b>isComplete</b>: ENUM('Y','N')
+  <li><b>isComplete</b>: ENUM('Y','N') - đánh dấu hoàn thành tất cả
 </ul>
 `,
   })
@@ -249,7 +252,7 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
         data: 0,
       });
     }
-      if (result == -2) {
+    if (result == -2) {
       throw new BadRequestException({
         message: Msg.AlreadyCompleteCannotDo,
         data: 0,
@@ -270,6 +273,7 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
 
   @ApiOperation({
     summary: 'Lấy thông tin dữ liệu thu hoạch của 1 lịch nhắc',
+    description: `Luôn gọi API này khi bấm nút 'Nhập dữ liệu' để nhận dữ liệu khởi tạo ban đầu Hoặc dữ liệu đã có trong database để gắn vào Form nhập dữ liệu ( dựa theo số tầng của nhà yến thuộc lịch nhắc đó)`,
   })
   @ApiParam({ name: 'taskAlarmCode', type: String })
   @Get('getCompleteTaskHarvest/:taskAlarmCode')
@@ -298,6 +302,4 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     }
     return result;
   }
-
-
 }
