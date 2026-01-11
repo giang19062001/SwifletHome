@@ -190,9 +190,9 @@ export class TodoAppService {
       await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
       // tự động tạo lịch nhác này cho 3 tháng sau
 
-      const taskDateCurrent = moment(alramDetail?.taskDate);
-      const taskDateNextTime = moment(taskDateCurrent).add(QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME, 'days').toDate();
-      this.logger.log(logbase, `Lịch nhắc(${dto.taskAlarmCode}) hiện tại (${taskDateCurrent.toDate().toLocaleDateString()}) --- Lần sau (${taskDateNextTime.toLocaleDateString()})`);
+      const today = moment();
+      const taskDateNextTime = moment(today).add(QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME, 'days').toDate();
+      this.logger.log(logbase, `Lịch nhắc(${dto.taskAlarmCode}) hiện tại (${today.toDate().toLocaleDateString()}) --- Lần sau (${taskDateNextTime.toLocaleDateString()})`);
 
       const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
         userHomeCode: alramDetail.userHomeCode,
@@ -327,7 +327,6 @@ export class TodoAppService {
             }
           }
         }
-        console.log('harvestDataRows', harvestDataRows);
         if (harvestDataRows.length) {
           for (const row of harvestDataRows) {
             await this.todoAppRepository.insertTaskCompleteHarvest(row);
