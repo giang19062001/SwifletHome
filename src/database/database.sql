@@ -658,23 +658,22 @@ CREATE TABLE
 
 
   -- talbe hoàn thành task thu hoạch 
-  CREATE TABLE
-  tbl_todo_home_task_complete_harvest (
-    seq INT AUTO_INCREMENT PRIMARY KEY,
-    taskAlarmCode VARCHAR(45) NOT NULL,
-    userCode VARCHAR(45) NOT NULL,
-    userHomeCode VARCHAR(45) NOT NULL,
-    floor INT NOT NULL,
-    cell INT NOT NULL DEFAULT 0,
-    cellData INT NOT NULL DEFAULT 0,
-    isActive CHAR(1) NOT NULL DEFAULT 'Y',
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT NULL,
-    createdId VARCHAR(45) DEFAULT 'SYSTEM',
-    updatedId VARCHAR(45) DEFAULT NULL
-  );
-
-
+CREATE TABLE `tbl_todo_home_task_complete_harvest` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `taskAlarmCode` varchar(45) NOT NULL,
+  `userCode` varchar(45) NOT NULL,
+  `userHomeCode` varchar(45) NOT NULL,
+  `floor` int NOT NULL DEFAULT '0',
+  `cell` int NOT NULL DEFAULT '0',
+  `cellCollected` int NOT NULL DEFAULT '0',
+  `cellRemain` int NOT NULL DEFAULT '0',
+  `isActive` char(1) NOT NULL DEFAULT 'Y',
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT NULL,
+  `createdId` varchar(45) DEFAULT 'SYSTEM',
+  `updatedId` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`seq`)
+) 
 
 -- media
 CREATE TABLE

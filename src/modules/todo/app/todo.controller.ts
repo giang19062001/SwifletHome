@@ -232,7 +232,8 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
       <li><b>floorData</b>: Danh sách ô trong tầng
         <ul>
           <li><b>cell</b>: Số ô</li>
-          <li><b>cellData</b>: Giá trị dữ liệu thu hoạch của ô</li>
+          <li><b>cellCollected</b>: Giá trị dữ liệu thu hoạch của ô - đã thu </li>
+          <li><b>cellRemain</b>: Giá trị dữ liệu thu hoạch của ô - còn lại</li>
         </ul>
       </li>
     </ul>

@@ -255,7 +255,8 @@ export class TodoAppService {
             userHomeCode: alramDetail.userHomeCode,
             floor: flo.floor,
             cell: cel.cell,
-            cellData: cel.cellData,
+            cellCollected: cel.cellCollected,
+            cellRemain: cel.cellRemain,
           });
         }
       }
@@ -298,14 +299,7 @@ export class TodoAppService {
 
       // delete
       for (const row of toDelete) {
-        await this.todoAppRepository.deleteTaskCompleteHarvest({
-          taskAlarmCode: row.taskAlarmCode,
-          floor: row.floor,
-          cell: row.cell,
-          userCode: userCode,
-          userHomeCode: alramDetail.userHomeCode,
-          cellData: 0,
-        });
+        await this.todoAppRepository.deleteTaskCompleteHarvest(row.taskAlarmCode, row.floor, row.cell, userCode, alramDetail.userHomeCode);
       }
     } else {
       // INSERT
@@ -321,7 +315,8 @@ export class TodoAppService {
                 userHomeCode: alramDetail.userHomeCode,
                 floor: floor,
                 cell: cel.cell,
-                cellData: cel.cellData,
+                cellCollected: cel.cellCollected,
+                cellRemain: cel.cellRemain
               };
               harvestDataRows.push(row);
             }
@@ -380,7 +375,8 @@ export class TodoAppService {
           floorData: [
             {
               cell: 1,
-              cellData: 0,
+              cellCollected: 0,
+              cellRemain: 0
             },
           ],
         });
@@ -396,7 +392,8 @@ export class TodoAppService {
 
         floorMap.get(row.floor)!.floorData.push({
           cell: row.cell,
-          cellData: row.cellData,
+          cellCollected: row.cellCollected,
+          cellRemain: row.cellRemain
         });
       }
 

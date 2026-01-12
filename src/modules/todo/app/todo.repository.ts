@@ -320,8 +320,8 @@ export class TodoAppRepository {
 
   // TODO: COMPLETE-HARVER
   async getTaskCompleteHarvests(taskAlarmCode: string, isOnlyActive: boolean): Promise<ICompleteHarvestTaskRow[]> {
-    let query = `  SELECT seq, taskAlarmCode, userCode, userHomeCode, floor, cell, cellData FROM ${this.tableHomeTaskCompleteHarvest} 
-    WHERE taskAlarmCode  = ?  ${isOnlyActive ? ` AND isActive = 'Y' `: ''} `;
+    let query = `  SELECT seq, taskAlarmCode, userCode, userHomeCode, floor, cell, cellCollected, cellRemain FROM ${this.tableHomeTaskCompleteHarvest} 
+    WHERE taskAlarmCode  = ?  ${isOnlyActive ? ` AND isActive = 'Y' ` : ''} `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
     return rows as ICompleteHarvestTaskRow[];
@@ -329,27 +329,27 @@ export class TodoAppRepository {
 
   async insertTaskCompleteHarvest(dto: HarvestDataRowDto): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableHomeTaskCompleteHarvest}  (taskAlarmCode, userCode,  userHomeCode, floor, cell, cellData, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.tableHomeTaskCompleteHarvest}  (taskAlarmCode, userCode,  userHomeCode, floor, cell, cellCollected, cellRemain, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellData, dto.userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode]);
 
     return result.insertId;
   }
   async updateTaskCompleteHarvest(dto: HarvestDataRowDto): Promise<number> {
     const sql = `
     UPDATE ${this.tableHomeTaskCompleteHarvest}
-    SET cellData = ?, updatedId = ?, updatedAt = NOW(), isActive = 'Y'
+    SET cellCollected = ?, cellRemain = ?, updatedId = ?, updatedAt = NOW(), isActive = 'Y'
     WHERE taskAlarmCode = ? AND  userCode = ? AND userHomeCode = ?
       AND floor = ?
       AND cell = ?
   `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.cellData, dto.userCode, dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.cellCollected, dto.cellRemain, dto.userCode, dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell]);
 
     return result.affectedRows;
   }
-  async deleteTaskCompleteHarvest(dto: HarvestDataRowDto): Promise<number> {
+  async deleteTaskCompleteHarvest(taskAlarmCode: string, floor: number, cell: number, userCode: string, userHomeCode: string): Promise<number> {
     const sql = `
     UPDATE ${this.tableHomeTaskCompleteHarvest}
     SET isActive = 'N', updatedId = ?, updatedAt = NOW()
@@ -358,9 +358,7 @@ export class TodoAppRepository {
       AND cell = ?
       AND isActive = 'Y'
   `;
-
-    // xóa -> cellData = 0
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, taskAlarmCode, userCode, userHomeCode, floor, cell]);
 
     return result.affectedRows;
   }

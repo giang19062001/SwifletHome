@@ -122,7 +122,8 @@ export interface ICompleteHarvestTaskRow {
   userHomeCode: string;
   floor: number;
   cell: number;
-  cellData: number;
+  cellCollected: number;
+  cellRemain: number;
 }
 
 export interface ICompleteHarvestTask {
@@ -138,5 +139,6 @@ interface IHarvestData {
 
 interface IFloorData {
   cell: number;
-  cellData: number;
+  cellCollected: number;
+  cellRemain: number;
 }

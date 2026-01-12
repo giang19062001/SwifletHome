@@ -222,7 +222,12 @@ export class FloorDataDto {
   @ApiProperty({ example: 0 })
   @IsNumber()
   @IsNotEmpty()
-  cellData: number;
+  cellCollected: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  cellRemain: number;
 }
 
 export class HarvestDataRowDto {
@@ -254,5 +259,10 @@ export class HarvestDataRowDto {
   @ApiProperty({ example: 0 })
   @IsNumber()
   @IsNotEmpty()
-  cellData: number;
+  cellCollected: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  cellRemain: number;
 }
