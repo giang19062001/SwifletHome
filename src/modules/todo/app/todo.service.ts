@@ -11,6 +11,7 @@ import moment from 'moment';
 import TodoAppValidate from './todo.validate';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { ContractService } from 'src/common/contract/contract.service';
 
 @Injectable()
 export class TodoAppService {
@@ -20,6 +21,7 @@ export class TodoAppService {
     private readonly todoAppRepository: TodoAppRepository,
     private readonly todoAppValidate: TodoAppValidate,
     private readonly userHomeAppService: UserHomeAppService,
+    private readonly contractService: ContractService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -177,6 +179,11 @@ export class TodoAppService {
       return -2;
     }
 
+    //* ghi blockchain ( không đợi )
+    setImmediate(() => {
+      this.contractService.recordJson(dto).catch((err) => this.logger.error(logbase, `Blockchain error: ${err}`));
+    });
+
     // taskAlarmCode này đã được insert dữ liệu lăn thuôc rồi
     const checkDuplicate = await this.todoAppRepository.getTaskCompleteMedicine(dto.taskAlarmCode);
     if (checkDuplicate) {
@@ -238,6 +245,11 @@ export class TodoAppService {
 
     // kiểm tra và cập nhập trạng thái hoàn thành cho lịch nhắc
     if (dto.isComplete == 'Y') {
+      //* ghi blockchain ( không đợi )
+      setImmediate(() => {
+        this.contractService.recordJson(dto).catch((err) => this.logger.error(logbase, `Blockchain error: ${err}`));
+      });
+
       await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
     }
 
@@ -316,7 +328,7 @@ export class TodoAppService {
                 floor: floor,
                 cell: cel.cell,
                 cellCollected: cel.cellCollected,
-                cellRemain: cel.cellRemain
+                cellRemain: cel.cellRemain,
               };
               harvestDataRows.push(row);
             }
@@ -376,7 +388,7 @@ export class TodoAppService {
             {
               cell: 1,
               cellCollected: 0,
-              cellRemain: 0
+              cellRemain: 0,
             },
           ],
         });
@@ -393,7 +405,7 @@ export class TodoAppService {
         floorMap.get(row.floor)!.floorData.push({
           cell: row.cell,
           cellCollected: row.cellCollected,
-          cellRemain: row.cellRemain
+          cellRemain: row.cellRemain,
         });
       }
 
