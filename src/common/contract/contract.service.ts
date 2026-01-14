@@ -27,29 +27,34 @@ export class ContractService implements OnModuleInit {
   }
 
   async recordJson(data: any) {
-    const jsonData = JSON.stringify({
-      ...data,
-      timestamp: Date.now(),
-    });
+    try {
+      const jsonData = JSON.stringify({
+        ...data,
+        timestamp: Date.now(),
+      });
 
-    const tx = await this.contract.recordJson(jsonData);
-    this.logger.log(this.SERVICE_NAME, `Transaction Hash: ${tx.hash}`);
+      const tx = await this.contract.recordJson(jsonData);
+      this.logger.log(this.SERVICE_NAME, `Transaction Hash: ${tx.hash}`);
 
-    const receipt = await tx.wait();
+      const receipt = await tx.wait();
 
-    this.logger.log(this.SERVICE_NAME, `Transaction mined in block: ${receipt.blockNumber}`);
-    this.logger.log(this.SERVICE_NAME, `Gas used:: ${receipt.gasUsed.toString()}`);
+      this.logger.log(this.SERVICE_NAME, `Transaction mined in block: ${receipt.blockNumber}`);
+      this.logger.log(this.SERVICE_NAME, `Gas used:: ${receipt.gasUsed.toString()}`);
 
-    const gasPrice = tx.gasPrice || (await this.provider.getFeeData()).gasPrice;
+      const gasPrice = tx.gasPrice || (await this.provider.getFeeData()).gasPrice;
 
-    if (gasPrice) {
-      const txFee = receipt.gasUsed * gasPrice;
-      this.logger.log(this.SERVICE_NAME, `Transaction fee: ${txFee.toString()}`);
+      if (gasPrice) {
+        const txFee = receipt.gasUsed * gasPrice;
+        this.logger.log(this.SERVICE_NAME, `Transaction fee: ${txFee.toString()}`);
+      }
+
+      return {
+        hash: tx.hash,
+        blockNumber: receipt.blockNumber,
+      };
+    } catch (error) {
+      this.logger.log(this.SERVICE_NAME, `error: ${error.toString()}`);
+      throw error;
     }
-
-    return {
-      hash: tx.hash,
-      blockNumber: receipt.blockNumber,
-    };
   }
 }
