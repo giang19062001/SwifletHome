@@ -9,6 +9,7 @@ import { ScreenAppRepository } from './screen.repository';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
 import { PackageOptionTypeEnum } from 'src/modules/package/package.interface';
+import { UserAppRepository } from 'src/modules/user/app/user.repository';
 
 @Injectable()
 export class ScreenAppService {
@@ -17,11 +18,12 @@ export class ScreenAppService {
   constructor(
     private readonly screenAppRepository: ScreenAppRepository,
     private readonly packageAppService: PackageAppService,
+    private readonly userAppRepository: UserAppRepository,
     private readonly infoAppService: InfoAppService,
     private readonly logger: LoggingService,
   ) {}
 
-  async getContent(keyword: string): Promise<any> {
+  async getContent(userCode: string, keyword: string): Promise<any> {
     const logbase = `${this.SERVICE_NAME}/getContent:`;
     this.logger.log(logbase, `keyword(${keyword})`);
 
@@ -39,7 +41,7 @@ export class ScreenAppService {
               let packageTxt = '';
               if (packageActive.packageOptionType == PackageOptionTypeEnum.ITEM) {
                 // chỉ hiện tên vật phẩm
-                packageTxt = packageActive.packageItemSamePrice
+                packageTxt = packageActive.packageItemSamePrice;
               } else if (packageActive.packageOptionType == PackageOptionTypeEnum.MONEY) {
                 // chỉ hiện giá
                 packageTxt = `${packageActive.packagePrice}đ`;
@@ -78,8 +80,17 @@ export class ScreenAppService {
           break;
         case APP_SCREENS.REQUEST_DOCTOR:
           if (screen.screenContent) {
+            // lấy thông tin gói của user
+            const userPackage = await this.userAppRepository.getUserPackageInfo(userCode);
+            const remainDay = userPackage?.packageRemainDay ?? 0;
+            let contentStart = replaceNbspToSpace(screen.screenContent.contentStart);
+            if (remainDay > 0) {
+              // người dùng đang xài gói nâng cấp và còn hạn → ẩn nút thanh toán
+              contentStart = contentStart.replace(/\[\[payment\]\]/g, ``);
+            }
+
             result = {
-              contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
+              contentStart: contentStart,
               contentCenter: screen.screenContent.contentCenter,
               contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
             } as IScreenSignupService;

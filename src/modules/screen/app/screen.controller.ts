@@ -5,6 +5,8 @@ import { ScreenAppService } from './screen.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetContentScreenResDto } from './screen.response';
+import * as authInterface from 'src/modules/auth/app/auth.interface';
+import { GetUserApp } from 'src/decorator/auth.decorator';
 
 @ApiTags('app/screen')
 @Controller('/api/app/screen')
@@ -27,8 +29,8 @@ export class ScreenAppController {
   @Get('getContent/:keyword')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetContentScreenResDto) })
-  async getContent(@Param('keyword') keyword: string) {
-    const result = await this.screenAppService.getContent(keyword);
+  async getContent(@GetUserApp() user: authInterface.ITokenUserApp, @Param('keyword') keyword: string) {
+    const result = await this.screenAppService.getContent(user.userCode, keyword);
     return result;
   }
 }
