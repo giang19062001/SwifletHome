@@ -19810,19 +19810,63 @@ select {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
   border-radius: 15px;
 }
+.component-editor .ql-container {
+  border-bottom-left-radius: 15px !important;
+  border-bottom-right-radius: 15px !important;
+}
+.component-editor .ql-toolbar {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+.component-editor .ql-lineheight-1 {
+  line-height: 1;
+}
+.component-editor .ql-lineheight-15 {
+  line-height: 1.5;
+}
+.component-editor .ql-lineheight-18 {
+  line-height: 2;
+}
+.component-editor .ql-lineheight-2 {
+  line-height: 2.5;
+}
+.component-editor .ql-lineheight-25 {
+  line-height: 3;
+}
+.component-editor .ql-picker.ql-lineheight .ql-picker-item[data-value="1"]::before {
+  content: "1x";
+}
+.component-editor .ql-picker.ql-lineheight .ql-picker-item[data-value="1.5"]::before {
+  content: "1.5x";
+}
+.component-editor .ql-picker.ql-lineheight .ql-picker-item[data-value="2"]::before {
+  content: "2x";
+}
+.component-editor .ql-picker.ql-lineheight .ql-picker-item[data-value="2.5"]::before {
+  content: "2.5x";
+}
+.component-editor .ql-picker.ql-lineheight .ql-picker-item[data-value="3"]::before {
+  content: "3x";
+}
 .component-editor #editor {
   height: 85%;
   margin-bottom: 10px;
 }
-
-.ql-container {
+.component-editor .ql-insertHTML {
+  margin-top: -10px;
+}
+.component-editor .html-editor {
+  width: 100%;
+  height: 85%;
+  font-family: monospace;
+  font-size: 14px;
+  padding: 12px;
+  border-top-left-radius: 0px !important;
+  border-top-right-radius: 0px !important;
   border-bottom-left-radius: 15px !important;
   border-bottom-right-radius: 15px !important;
-}
-
-.ql-toolbar {
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+  resize: vertical;
+  margin-bottom: 5px;
 }
 
 /*# sourceMappingURL=app.css.map */
