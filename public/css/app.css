@@ -19818,6 +19818,9 @@ select {
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
 }
+.component-editor .ql-formats {
+  margin-right: 10px !important;
+}
 .component-editor .ql-lineheight-1 {
   line-height: 1;
 }
