@@ -58,3 +58,9 @@ export class ContractService implements OnModuleInit {
     }
   }
 }
+
+
+  //* ghi blockchain ( không đợi )
+  // setImmediate(() => {
+  //   this.contractService.recordJson(dto).catch((err) => this.logger.error(logbase, `Blockchain error: ${err}`));
+  // });

@@ -86,19 +86,24 @@ export class TodoAppRepository {
     return rows.length ? (rows[0] as ITodoHomeTaskAlram) : null;
   }
   async getTotalTaskAlarm(userCode: string, userHomeCode: string): Promise<number> {
-    let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
+   // let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
+    let whereQueryV2 = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskPeriodCode IS NULL AND A.taskCode IS NULL  
+    AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
 
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableHomeTaskAlarm} A
       INNER JOIN ${this.tableUserApp} B
       ON A.userCode = B.userCode
-      WHERE A.isActive = 'Y' ${whereQuery} `,
+      WHERE A.isActive = 'Y' ${whereQueryV2} `,
       [userCode, userHomeCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<ITodoHomeTaskAlram[]> {
-    let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
+   // let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
+    let whereQueryV2 = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskPeriodCode IS NULL AND A.taskCode IS NULL  
+    AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
+
     let offsetQuery = ` `;
 
     let params: (string | number)[] = [userCode, userHomeCode];
@@ -134,7 +139,7 @@ export class TodoAppRepository {
             LEFT JOIN ${this.tableTask} C
             ON A.taskCode = C.taskCode
             WHERE A.isActive = 'Y'
-              ${whereQuery} 
+              ${whereQueryV2} 
             ORDER BY A.taskDate DESC
               ${offsetQuery}`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
@@ -150,7 +155,8 @@ export class TodoAppRepository {
     INNER JOIN ${this.tableUserApp} B
     ON A.userCode = B.userCode
     WHERE A.isActive = 'Y'
-     AND A.taskDate >= ?
+      AND A.taskDate >= ?
+      AND A.taskPeriodCode IS NULL AND A.taskCode IS NULL  
       AND A.taskDate <= DATE_ADD(?, INTERVAL ${QUERY_HELPER.MAX_DAY_SEND_NOTIFY} DAY)
     AND A.taskStatus = '${TaskStatusEnum.WAITING}'
     ORDER BY A.taskDate DESC

@@ -3,15 +3,13 @@ import { ICompleteHarvestTask, ICompleteHarvestTaskRow, ITodoHomeTaskAlram, ITod
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { CompleteHarvestTaskDto, CompleteMedicineTaskDto, FloorDataDto, HarvestDataDto, HarvestDataRowDto, SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
+import { CompleteHarvestTaskDto, CompleteMedicineTaskDto, FloorDataDto, HarvestDataDto, HarvestDataRowDto, SetTaskAlarmDto, SetTaskPeriodDto, SetTaskPeriodV2Dto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
 import moment from 'moment';
 import TodoAppValidate from './todo.validate';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
-import { YnEnum } from 'src/interfaces/admin.interface';
-import { ContractService } from 'src/common/contract/contract.service';
 
 @Injectable()
 export class TodoAppService {
@@ -21,7 +19,6 @@ export class TodoAppService {
     private readonly todoAppRepository: TodoAppRepository,
     private readonly todoAppValidate: TodoAppValidate,
     private readonly userHomeAppService: UserHomeAppService,
-    private readonly contractService: ContractService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -47,7 +44,10 @@ export class TodoAppService {
 
     const result = await Promise.all(
       boxTasks.map(async (ele) => {
-        const data = await this.todoAppRepository.getOneTaskAlarmsNearly(userCode, userHomeCode, ele.taskCode, ele.taskName, today.format('YYYY-MM-DD'));
+        // const data = await this.todoAppRepository.getOneTaskAlarmsNearly(userCode, userHomeCode, ele.taskCode, ele.taskName, today.format('YYYY-MM-DD'));
+        const data: { taskDate: null } = {
+          taskDate: null,
+        };
 
         this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate}`);
 
@@ -58,17 +58,17 @@ export class TodoAppService {
             date: '',
             unit: '',
           };
+        } else {
+          const taskDate = moment(data.taskDate);
+          const diff = taskDate.diff(today, 'days');
+
+          return {
+            label: ele.taskName,
+            value: diff.toString(),
+            date: taskDate.format('YYYY-MM-DD'),
+            unit: 'ngày',
+          };
         }
-
-        const taskDate = moment(data.taskDate);
-        const diff = taskDate.diff(today, 'days');
-
-        return {
-          label: ele.taskName,
-          value: diff.toString(),
-          date: taskDate.format('YYYY-MM-DD'),
-          unit: 'ngày',
-        };
       }),
     );
 
@@ -154,6 +154,30 @@ export class TodoAppService {
     }
     return 0;
   }
+  async setTaskAlarmPeriodV2(userCode: string, dto: SetTaskPeriodV2Dto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setTaskAlarmPeriodV2:`;
+
+    // kiểm tra duplicate lịch nhắc
+    let alramDto = await this.todoAppValidate.handleAlarmDataByPeriodDataV2(dto, '');
+
+    // taskDate khác null mới kiểm tra
+    if (alramDto.taskDate != null) {
+      const isDuplicateAlarm = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, alramDto);
+      if (isDuplicateAlarm) {
+        this.logger.log(logbase, Msg.DuplicateTaskAlram + `(${dto.userHomeCode})`);
+        return -1;
+      }
+    }
+
+    // insert lịch nhắc theo ngày tùy chỉnh
+    if (dto.specificValue != null) {
+      const result = await this.todoAppRepository.insertTaskAlarm(userCode, alramDto);
+      this.logger.log(logbase, `Đã thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến ${dto.userHomeCode}`);
+
+      return result;
+    }
+    return 0;
+  }
   // TODO: COMPLETE-MEDICINE
 
   async setCompleteTaskMedicine(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
@@ -178,11 +202,6 @@ export class TodoAppService {
       this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
       return -2;
     }
-
-    //* ghi blockchain ( không đợi )
-    setImmediate(() => {
-      this.contractService.recordJson(dto).catch((err) => this.logger.error(logbase, `Blockchain error: ${err}`));
-    });
 
     // taskAlarmCode này đã được insert dữ liệu lăn thuôc rồi
     const checkDuplicate = await this.todoAppRepository.getTaskCompleteMedicine(dto.taskAlarmCode);
@@ -245,11 +264,6 @@ export class TodoAppService {
 
     // kiểm tra và cập nhập trạng thái hoàn thành cho lịch nhắc
     if (dto.isComplete == 'Y') {
-      //* ghi blockchain ( không đợi )
-      setImmediate(() => {
-        this.contractService.recordJson(dto).catch((err) => this.logger.error(logbase, `Blockchain error: ${err}`));
-      });
-
       await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
     }
 

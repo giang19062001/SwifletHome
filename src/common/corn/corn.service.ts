@@ -44,19 +44,19 @@ export class CornService implements OnModuleInit {
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();
 
-    // MONTHLY – ngày 01 mỗi tháng lúc 01:00
-    const jobMonthly = new CronJob('0 1 1 * *', async () => {
-      await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.MONTH);
-    });
-    this.schedulerRegistry.addCronJob('monthlyTask', jobMonthly);
-    jobMonthly.start();
+   // MONTHLY – ngày 01 mỗi tháng lúc 01:00
+    // const jobMonthly = new CronJob('0 1 1 * *', async () => {
+    //   await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.MONTH);
+    // });
+    // this.schedulerRegistry.addCronJob('monthlyTask', jobMonthly);
+    // jobMonthly.start();
 
-    // WEEKLY – Thứ Hai mỗi tuần lúc 01:00
-    const jobWeekly = new CronJob('0 1 * * 1', async () => {
-      await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
-    });
-    this.schedulerRegistry.addCronJob('weeklyTask', jobWeekly);
-    jobWeekly.start();
+   // WEEKLY – Thứ Hai mỗi tuần lúc 01:00
+    // const jobWeekly = new CronJob('0 1 * * 1', async () => {
+    //   await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
+    // });
+    // this.schedulerRegistry.addCronJob('weeklyTask', jobWeekly);
+    // jobWeekly.start();
 
     // DAILY: MỖI NGÀY LÚC 8H SÁNG
     const jobDailyAt8AM = new CronJob('0 8 * * *', async () => {

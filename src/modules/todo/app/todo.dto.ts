@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, ValidateNested } from 'class-validator';
+import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, ValidateNested } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
@@ -154,6 +154,41 @@ export class SetTaskPeriodDto {
   @Transform(({ value }) => (value === null ? null : new Date(value + 'T00:00:00')))
   @IsDate()
   specificValue: Date | null;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsOptional()
+  taskNote: string;
+}
+
+export class SetTaskPeriodV2Dto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+
+  @ApiProperty({
+    example: 'Kiểm tra camera',
+  })
+  @IsString()
+  @IsNotEmpty()
+  taskCustomName: string;
+  
+  @ApiProperty({
+    example: '2025-12-01',
+    type: String,
+    format: 'date',
+    required: true,
+  })
+  @IsDefined({ message: 'specificValue is required' }) 
+  @IsNotEmpty({ message: 'specificValue cannot be null or empty' })
+  @Transform(({ value }) => new Date(value + 'T00:00:00'))
+  @IsDate({ message: 'specificValue must be a valid date' })
+  specificValue: Date;
 
   @ApiProperty({
     example: '',

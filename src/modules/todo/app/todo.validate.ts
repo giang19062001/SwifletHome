@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
-import { SetTaskAlarmDto, SetTaskPeriodDto } from './todo.dto';
+import { SetTaskAlarmDto, SetTaskPeriodDto, SetTaskPeriodV2Dto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { TodoAppRepository } from './todo.repository';
@@ -112,6 +112,35 @@ export default class TodoAppValidate {
     }
     return error;
   }
+  static SetTaskPeriodValidateV2(dto: SetTaskPeriodV2Dto): string {
+    let error = '';
+
+    //specificValue bắt buộc phải có
+    if (dto.specificValue == null) {
+      error = Msg.CannotNull('specificValue');
+      return error;
+    }
+    const specificDate = new Date(dto.specificValue);
+    const now = new Date();
+
+    // reset cả 2 về đầu ngày
+    specificDate.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+
+    // validate ngày hợp lệ
+    if (isNaN(specificDate.getTime())) {
+      return Msg.InvalidValue('specificValue');
+    }
+
+    // specificValue phải lớn hơn và bằng ngày hiện tại
+    if (specificDate < now) {
+      return Msg.MustBeGreaterThanAndEqualNow('specificValue');
+    }
+
+    dto.specificValue = specificDate;
+
+    return error;
+  }
   // TODO: PERIOD + ALARM
   async handleAlarmDataByPeriodData(dto: SetTaskPeriodDto, taskPeriodCode: string): Promise<SetTaskAlarmDto> {
     const logbase = `${this.SERVICE_NAME}/handleAlarmDataByPeriodData:`;
@@ -152,7 +181,7 @@ export default class TodoAppValidate {
       // dto.periodValue (1 - 31)
       let date = today.clone().date(dto.periodValue); // set ngày cho tháng/năm hiện tại
 
-      // Nếu tháng bị thay đổi ->  ngày không tồn tại trong tháng này -> chỉ tạo chu kỳ, ko tạo lịch nhắc -> để null 
+      // Nếu tháng bị thay đổi ->  ngày không tồn tại trong tháng này -> chỉ tạo chu kỳ, ko tạo lịch nhắc -> để null
       if (date.month() !== today.month()) {
         alramDto.taskDate = null;
       } else {
@@ -182,6 +211,31 @@ export default class TodoAppValidate {
 
       this.logger.log(logbase, `WEEK ----> ${today.format('DD/MM/YYYY')}----> date(${dto.periodValue}),  ----> ${date.toDate().toLocaleDateString()}`);
     }
+    return alramDto;
+  }
+   async handleAlarmDataByPeriodDataV2(dto: SetTaskPeriodV2Dto, taskPeriodCode: string): Promise<SetTaskAlarmDto> {
+    const logbase = `${this.SERVICE_NAME}/handleAlarmDataByPeriodDataV2:`;
+
+    let alramDto: SetTaskAlarmDto = {
+      taskPeriodCode: null,
+      userHomeCode: dto.userHomeCode,
+      taskCode: null,
+      taskName: '',
+      taskNote: dto.taskNote,
+      taskDate: new Date(),
+      taskStatus: TaskStatusEnum.WAITING,
+    };
+
+    // gán giá trị taskName vào alarm DTO
+    if (dto.taskCustomName) {
+      alramDto.taskName = dto.taskCustomName;
+    }
+   
+    // gán giá trị taskDate vào alarm DTO cho ngày cụ thể
+    if (dto.specificValue != null) {
+      alramDto.taskDate = dto.specificValue;
+    }
+
     return alramDto;
   }
 }

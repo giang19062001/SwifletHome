@@ -117,7 +117,7 @@ export default class TodoAppController {
   }
 
   @ApiOperation({
-    summary: 'Thiết lập lịch nhắc cho 1 nhà yến nào đó',
+    summary: 'Thiết lập lịch nhắc cho 1 nhà yến nào đó  ⚠️ **API này sẽ bị xóa trong version tiếp theo**',
   })
   @Post('setTaskAlarm')
   @ApiBody({
