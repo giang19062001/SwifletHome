@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors, Query } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetCompleteTaskHarvestResDto } from './todo.response';
+import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetTasksMedicineResDto, GetTaskHarvestResDto } from './todo.response';
 import { ITodoHomeTaskAlram, ITodoTask } from '../todo.interface';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
@@ -10,7 +10,7 @@ import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { ChangeTaskAlarmStatusDto, CompleteHarvestTaskDto, CompleteMedicineTaskDto, GetListTaskAlarmsDTO, SetTaskPeriodDto } from './todo.dto';
+import { ChangeTaskAlarmStatusDto, CompleteHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto, SetTaskPeriodDto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
 import { IListApp } from 'src/interfaces/app.interface';
 
@@ -30,24 +30,6 @@ export default class TodoAppController {
   @ApiOkResponse({ type: ApiAppResponseDto([GetTaskResDto]) })
   async getTasks(): Promise<ITodoTask[]> {
     const result = await this.todoAppService.getTasks();
-    return result;
-  }
-
-  @ApiOperation({
-    summary: 'Thông tin todo của 1 nhà yến (thu hoạch, lăn thuốc,...)',
-  })
-  @ApiParam({ name: 'userHomeCode', type: String })
-  @Get('getScheduledTasks/:userHomeCode')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([GetScheduledTasksResDto]) })
-  @ApiBadRequestResponse({ type: EmptyArrayResponseDto })
-  async getScheduledTasks(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
-    const result = await this.todoAppService.getScheduledTasks(user.userCode, userHomeCode);
-    if (!result.length) {
-      throw new BadRequestException({
-        data: [],
-      });
-    }
     return result;
   }
 
@@ -169,22 +151,53 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     };
   }
 
+  @ApiOperation({
+    summary: 'Thông tin todo của 1 nhà yến chính (thu hoạch, lăn thuốc,...)',
+  })
+  @Get('getScheduledTasks')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto([GetScheduledTasksResDto]) })
+  @ApiBadRequestResponse({ type: EmptyArrayResponseDto })
+  async getScheduledTasks(@GetUserApp() user: authInterface.ITokenUserApp) {
+    const result = await this.todoAppService.getScheduledTasks(user.userCode);
+    if (!result.length) {
+      throw new BadRequestException({
+        data: [],
+      });
+    }
+    return result;
+  }
+
   // TODO: COMPLETE-MEDICINE
   @ApiOperation({
-    summary: 'Đánh dấu hoàn thành task ghi chú lăn thuốc',
+    summary: '⚠️ **API này sẽ bị xóa trong version tiếp theo**',
   })
   @Post('setCompleteTaskMedicine')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async setCompleteTaskMedicine(@GetUserApp() user: authInterface.ITokenUserApp) {
+    return 0;
+  }
+
+  @ApiOperation({
+    summary: 'Ghi chú và tạo lịch nhắc lăn thuốc lần kế tiếp',
+  })
+  @Post('setTaskMedicine')
   @ApiBody({
-    type: CompleteMedicineTaskDto,
+    type: SetTaskMedicineDto,
     description: `
-**taskAlarmCode**: Mã code của lịch nhắc\n
-**medicineNote**: Tên thuốc `,
+**taskAlarmCode**: (String) Mã code của lịch nhắc hiện tại lấy từ API <i>/api/app/todo/getScheduledTasks/{userHomeCode}</i> để render ra 4 Box (Lăn thuốc, Thu hoạch, Chim đêm, Độ ẩm),
+nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn hình chính vào Props của màn hình chứa Form Ghi chú lăn thuốc để tự động nhập **taskAlarmCode** vào body bên dưới, giá trị có thể là rỗng ""\n
+**medicineOptionCode**: (String) Mã code thuốc lấy từ API <i>/api/app/options/getAll</i> với body là { "mainOption": "TODO_TASK", "subOption": "MEDICINE", "keyOption": ""} \n
+**medicineNote**: (String) Tên thuốc - được phép rỗng nếu **medicineOptionCode** != 'COD000007' (OTHER), không được phép rỗng nếu **medicineOptionCode** = 'COD000007'\n
+**medicineDate** (date), giá trị sẽ có định dạng **YYYY-MM-DD** ( mặc định là ngày hiện tại) \n `,
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setCompleteTaskMedicine(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteMedicineTaskDto) {
-    const result = await this.todoAppService.setCompleteTaskMedicine(user.userCode, dto);
+  async setTaskMedicine(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskMedicineDto) {
+    const result = await this.todoAppService.setTaskMedicine(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.OnlyMedicineTaskCanDo,
@@ -197,12 +210,7 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
         data: 0,
       });
     }
-    if (result == -3) {
-      throw new BadRequestException({
-        message: Msg.MedicineTaskAlreadyAdded,
-        data: 0,
-      });
-    }
+
     if (result == 0) {
       throw new BadRequestException({
         message: Msg.UpdateErr,
@@ -215,11 +223,54 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     };
   }
 
+  @ApiOperation({
+    summary: 'Lấy thông tin dữ liệu lăn thuốc có sẵn cho Form ghi chú lăn thuốc',
+    description: `Luôn gọi API này khi vào màn hình 'Form ghi chú lăn thuốc' để nhận dữ liệu khởi tạo ban đầu Hoặc dữ liệu đã sẵn để gắn vào Form ghi chú lăn thuốc`,
+  })
+  @ApiQuery({
+    name: 'taskAlarmCode',
+    type: String,
+    required: false,
+    description: `Mã lịch nhắc (taskAlarmCode) lấy từ API <i>/api/app/todo/getScheduledTasks/{userHomeCode}</i> cái API render ra 4 Box (Lăn thuốc, Thu hoạch, Chim đêm, Độ ẩm),
+nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn hình chính vào Props của màn hình chứa Form Ghi chú lăn thuốc để tự động gọi API này, giá trị  **taskAlarmCode** có thể là rỗng ""\n`,
+  })
+  @Get('getTaskMedicine')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetTasksMedicineResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getTaskMedicine(@Query('taskAlarmCode') taskAlarmCode?: string) {
+    // có thể rỗng -> init data, ko rỗng -> data từ db
+    const result = await this.todoAppService.getTaskMedicine(taskAlarmCode ?? '');
+    return result;
+  }
   // TODO: COMPLETE-HARVER
+  @ApiOperation({
+    summary: 'Đánh dấu hoàn thành task nhập dữ liệu thu hoạch ⚠️ **API này sẽ bị xóa trong version tiếp theo**',
+  })
+  @Post('setCompleteTaskHarvest')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async setCompleteTaskHarvest() {
+    return null;
+  }
+
+  @ApiOperation({
+    summary: '⚠️ **API này sẽ bị xóa trong version tiếp theo**',
+  })
+  @ApiParam({ name: 'taskAlarmCode', type: String })
+  @Get('getCompleteTaskHarvest/:taskAlarmCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetTaskHarvestResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getCompleteTaskHarvest(@Param('taskAlarmCode') taskAlarmCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
+    return 0;
+  }
+
   @ApiOperation({
     summary: 'Đánh dấu hoàn thành task nhập dữ liệu thu hoạch',
   })
-  @Post('setCompleteTaskHarvest')
+  @Post('setTaskHarvest')
   @ApiBody({
     type: CompleteHarvestTaskDto,
     description: `
@@ -239,14 +290,15 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
     </ul>
   </li>
   <li><b>isComplete</b>: ENUM('Y','N') - đánh dấu hoàn thành tất cả
+  <li><b>harvestDate</b>: Date - YYYY-MM-DD ( mặc định là ngày hiện tại)
 </ul>
 `,
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setCompleteTaskHarvest(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteHarvestTaskDto) {
-    const result = await this.todoAppService.setCompleteTaskHarvest(user.userCode, dto);
+  async setTaskHarvest(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: CompleteHarvestTaskDto) {
+    const result = await this.todoAppService.setTaskHarvest(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.OnlyHarvestTaskCanDo,
@@ -273,16 +325,22 @@ nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
   }
 
   @ApiOperation({
-    summary: 'Lấy thông tin dữ liệu thu hoạch của 1 lịch nhắc',
-    description: `Luôn gọi API này khi bấm nút 'Nhập dữ liệu' để nhận dữ liệu khởi tạo ban đầu Hoặc dữ liệu đã có trong database để gắn vào Form nhập dữ liệu ( dựa theo số tầng của nhà yến thuộc lịch nhắc đó)`,
+    summary: 'Lấy thông tin dữ liệu thu hoạch có sẵn cho Form nhập dữ liệu thu hoạch',
+    description: `Luôn gọi API này khi vào màn hình 'Form nhập dữ liệu thu hoạch' để nhận dữ liệu khởi tạo ban đầu Hoặc dữ liệu đã sẵn để gắn vào 'Form nhập dữ liệu thu hoạch'`,
   })
-  @ApiParam({ name: 'taskAlarmCode', type: String })
-  @Get('getCompleteTaskHarvest/:taskAlarmCode')
+  @ApiQuery({
+    name: 'taskAlarmCode',
+    type: String,
+    required: false,
+    description: `Mã lịch nhắc (taskAlarmCode) lấy từ API <i>/api/app/todo/getScheduledTasks/{userHomeCode}</i> cái API render ra 4 Box (Lăn thuốc, Thu hoạch, Chim đêm, Độ ẩm),
+nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn hình chính vào Props của màn hình chứa Form nhập dữ liệu thu hoạch để tự động gọi API này, giá trị  **taskAlarmCode** có thể là rỗng ""\n`,
+  })
+  @Get('getTaskHarvest')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetCompleteTaskHarvestResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetTaskHarvestResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getCompleteTaskHarvest(@Param('taskAlarmCode') taskAlarmCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
-    const result = await this.todoAppService.getCompleteTaskHarvest(user.userCode, taskAlarmCode);
+  async getTaskHarvest(@GetUserApp() user: authInterface.ITokenUserApp, @Query('taskAlarmCode') taskAlarmCode?: string) {
+    const result = await this.todoAppService.getTaskHarvest(user.userCode, taskAlarmCode ?? '');
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.OnlyHarvestTaskCanDo,

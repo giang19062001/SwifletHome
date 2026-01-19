@@ -15,6 +15,9 @@ export class GetTaskResDto {
 }
 
 export class GetScheduledTasksResDto {
+  @ApiProperty({ example: '' })
+  taskAlarmCode: string;
+
   @ApiProperty({ example: 'Thu hoạch' })
   label: string;
 
@@ -27,7 +30,6 @@ export class GetScheduledTasksResDto {
   @ApiProperty({ example: 'ngày' })
   unit: string;
 }
-
 
 export class GetListTaskAlarmsResDto {
   @ApiProperty({ example: 0 })
@@ -94,7 +96,7 @@ export class GetListTaskAlarmsResDto {
 }
 
 
-export class GetCompleteTaskHarvestResDto {
+export class GetTaskHarvestResDto {
   @ApiProperty({ example: '' })
   taskAlarmCode: string;
 
@@ -103,7 +105,23 @@ export class GetCompleteTaskHarvestResDto {
 
   @ApiProperty({ example: '' })
   userHomeCode: string;
-  
+
   @ApiProperty({ type: () => HarvestDataDto, isArray: true })
-  harvestData: HarvestDataDto
+  harvestData: HarvestDataDto;
+}
+
+
+
+export class GetTasksMedicineResDto {
+  @ApiProperty({ example: '' })
+  taskAlarmCode: string;
+
+  @ApiProperty({ example: 'COD000005' })
+  medicineOptionCode: string;
+
+  @ApiProperty({ example: '' })
+  medicineOther: string;
+
+  @ApiProperty({ example: '2026-01-01' })
+  medicineDate: string;
 }

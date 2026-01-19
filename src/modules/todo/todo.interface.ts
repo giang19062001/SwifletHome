@@ -15,6 +15,22 @@ export const TODO_CONST = {
       text: 'Bị huỷ',
     },
   },
+  TASK_OPTION_MEDICINE: {
+    OTHER: {
+      value: 'OTHER',
+      text: 'Khác',
+    },
+  },
+  TASK_BOX: {
+    HARVEST: {
+      value: 'HARVEST',
+      text: 'Nhập dữ liệu',
+    },
+    MEDICINE: {
+      value: 'MEDICINE',
+      text: 'Ghi chú',
+    },
+  },
   TASK_EVENT: {
     CANCEL: {
       value: 'CANCEL',
@@ -106,17 +122,18 @@ export interface ITodoHomeTaskAlram {
   isActive: YnEnum;
 }
 
-export interface ITodoTaskCompleteMedicine {
+
+export interface ITodoTaskMedicine {
   seq: number;
   seqNextTime: number;
-  taskAlarmCode: string;
   userCode: string;
   userHomeCode: string;
-  medicineNote: string;
+  medicineOptionCode: string;
+  medicineOther: string;
+  medicineDate: string;
 }
 
-
-export interface ICompleteHarvestTaskRow {
+export interface IHarvestTaskRow {
   taskAlarmCode: string;
   userCode: string;
   userHomeCode: string;
@@ -131,6 +148,8 @@ export interface ICompleteHarvestTask {
   userCode: string;
   userHomeCode: string;
   harvestData: IHarvestData[];
+  harvestDate: string
+
 }
 interface IHarvestData {
   floor: number;

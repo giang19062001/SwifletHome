@@ -7,7 +7,7 @@ import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { ChangeTaskAlarmStatusDto, CompleteHarvestTaskDto, CompleteMedicineTaskDto, GetListTaskAlarmsDTO, SetTaskPeriodDto, SetTaskPeriodV2Dto } from './todo.dto';
+import { SetTaskPeriodV2Dto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
 import { IListApp } from 'src/interfaces/app.interface';
 
@@ -66,4 +66,5 @@ export default class TodoAppControllerV2 {
       data: result,
     };
   }
+  
 }

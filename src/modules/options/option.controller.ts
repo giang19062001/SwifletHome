@@ -16,10 +16,13 @@ export default class OptionController {
   @ApiBody({
     description: `
 **mainOption:**
-- **SIGHTSEEING**: đăng ký tham quan nhà yến  
+- **SIGHTSEEING**: đăng ký tham quan nhà yến\n
+- **TODO_TASK**: tạo lịch nhắc lăn thuốc
+
 
 **subOption:**
-  - **NUMBER_ATTEND**: số lượng người đăng ký tham quan nhà yến
+  - **NUMBER_ATTEND**: số lượng người đăng ký tham quan nhà yến\n
+  - **MEDICINE**: Danh sách thuốc
 `,
     type: GetOptionDto,
   })

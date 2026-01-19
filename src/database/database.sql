@@ -641,14 +641,15 @@ CREATE TABLE
   )
   
   -- talbe hoàn thành task lăn thuốc
-  CREATE TABLE
-  tbl_todo_home_task_complete_medicine (
+    CREATE TABLE
+  tbl_todo_home_task_medicine (
     seq INT AUTO_INCREMENT PRIMARY KEY,
     seqNextTime INT,
-    taskAlarmCode VARCHAR(45) NOT NULL UNIQUE,
     userCode VARCHAR(45) NOT NULL,
     userHomeCode VARCHAR(45) NOT NULL,
-    medicineNote VARCHAR(255) NOT NULL,
+    medicineOptionCode VARCHAR(15) NOT NULL,
+    medicineOrther VARCHAR(255) NOT NULL,
+    medicineDate  DATE DEFAULT NUlL,
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
@@ -656,9 +657,32 @@ CREATE TABLE
     updatedId VARCHAR(45) DEFAULT NULL
   )
 
+  -- CREATE TABLE
+  -- tbl_todo_home_task_complete_medicine (
+  --   seq INT AUTO_INCREMENT PRIMARY KEY,
+  --   seqNextTime INT,
+  --   taskAlarmCode VARCHAR(45) NOT NULL UNIQUE,
+  --   userCode VARCHAR(45) NOT NULL,
+  --   userHomeCode VARCHAR(45) NOT NULL,
+  --   medicineNote VARCHAR(255) NOT NULL,
+  --   isActive CHAR(1) NOT NULL DEFAULT 'Y',
+  --   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  --   updatedAt DATETIME DEFAULT NULL,
+  --   createdId VARCHAR(45) DEFAULT 'SYSTEM',
+  --   updatedId VARCHAR(45) DEFAULT NULL
+  -- )
+
 
   -- talbe hoàn thành task thu hoạch 
-CREATE TABLE `tbl_todo_home_task_complete_harvest` (
+CREATE TABLE `tbl_todo_home_task_harvest_alram` (
+  `seq` int NOT NULL AUTO_INCREMENT,
+  `taskAlarmCode` varchar(45) NOT NULL,
+    `seqNextTime` INT,
+  PRIMARY KEY (`seq`)
+) 
+
+  -- talbe hoàn thành task thu hoạch 
+CREATE TABLE `tbl_todo_home_task_harvest` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `taskAlarmCode` varchar(45) NOT NULL,
   `userCode` varchar(45) NOT NULL,
@@ -674,6 +698,22 @@ CREATE TABLE `tbl_todo_home_task_complete_harvest` (
   `updatedId` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`seq`)
 ) 
+-- CREATE TABLE `tbl_todo_home_task_complete_harvest` (
+--   `seq` int NOT NULL AUTO_INCREMENT,
+--   `taskAlarmCode` varchar(45) NOT NULL,
+--   `userCode` varchar(45) NOT NULL,
+--   `userHomeCode` varchar(45) NOT NULL,
+--   `floor` int NOT NULL DEFAULT '0',
+--   `cell` int NOT NULL DEFAULT '0',
+--   `cellCollected` int NOT NULL DEFAULT '0',
+--   `cellRemain` int NOT NULL DEFAULT '0',
+--   `isActive` char(1) NOT NULL DEFAULT 'Y',
+--   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+--   `updatedAt` datetime DEFAULT NULL,
+--   `createdId` varchar(45) DEFAULT 'SYSTEM',
+--   `updatedId` varchar(45) DEFAULT NULL,
+--   PRIMARY KEY (`seq`)
+-- ) 
 
 -- media
 CREATE TABLE

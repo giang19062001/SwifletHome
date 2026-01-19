@@ -59,7 +59,7 @@ export class SetTaskAlarmDto {
   taskName: string;
 
   @ApiProperty({
-    example: '2025-12-01',
+    example: '2026-01-01',
     type: String,
     format: 'date',
     nullable: true,
@@ -144,7 +144,7 @@ export class SetTaskPeriodDto {
   periodValue: number | null;
 
   @ApiProperty({
-    example: '2025-12-01',
+    example: '2026-01-01',
     type: String,
     format: 'date',
     nullable: true,
@@ -177,14 +177,14 @@ export class SetTaskPeriodV2Dto {
   @IsString()
   @IsNotEmpty()
   taskCustomName: string;
-  
+
   @ApiProperty({
-    example: '2025-12-01',
+    example: '2026-01-01',
     type: String,
     format: 'date',
     required: true,
   })
-  @IsDefined({ message: 'specificValue is required' }) 
+  @IsDefined({ message: 'specificValue is required' })
   @IsNotEmpty({ message: 'specificValue cannot be null or empty' })
   @Transform(({ value }) => new Date(value + 'T00:00:00'))
   @IsDate({ message: 'specificValue must be a valid date' })
@@ -196,22 +196,6 @@ export class SetTaskPeriodV2Dto {
   @IsString()
   @IsOptional()
   taskNote: string;
-}
-
-export class CompleteMedicineTaskDto {
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  taskAlarmCode: string;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  medicineNote: string;
 }
 
 export class CompleteHarvestTaskDto {
@@ -233,6 +217,18 @@ export class CompleteHarvestTaskDto {
   @IsEnum(YnEnum)
   @IsNotEmpty()
   isComplete: YnEnum;
+
+  @ApiProperty({
+    example: '2026-01-01',
+    type: String,
+    format: 'date',
+    required: true,
+  })
+  @IsDefined({ message: 'havestDate is required' })
+  @IsNotEmpty({ message: 'havestDate cannot be null or empty' })
+  @Transform(({ value }) => new Date(value + 'T00:00:00'))
+  @IsDate({ message: 'havestDate must be a valid date' })
+  harvestDate: Date;
 }
 
 export class HarvestDataDto {
@@ -300,4 +296,39 @@ export class HarvestDataRowDto {
   @IsNumber()
   @IsNotEmpty()
   cellRemain: number;
+}
+
+export class SetTaskMedicineDto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsOptional()
+  taskAlarmCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  medicineOptionCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsOptional()
+  medicineOther: string;
+
+  @ApiProperty({
+    example: '2026-01-01',
+    type: String,
+    format: 'date',
+    required: true,
+  })
+  @IsDefined({ message: 'medicineDate is required' })
+  @IsNotEmpty({ message: 'medicineDate cannot be null or empty' })
+  @Transform(({ value }) => new Date(value + 'T00:00:00'))
+  @IsDate({ message: 'medicineDate must be a valid date' })
+  medicineDate: Date;
 }

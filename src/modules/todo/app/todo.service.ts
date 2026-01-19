@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { ICompleteHarvestTask, ICompleteHarvestTaskRow, ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ICompleteHarvestTask, IHarvestTaskRow, ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, ITodoTaskMedicine, TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { CompleteHarvestTaskDto, CompleteMedicineTaskDto, FloorDataDto, HarvestDataDto, HarvestDataRowDto, SetTaskAlarmDto, SetTaskPeriodDto, SetTaskPeriodV2Dto } from './todo.dto';
+import { CompleteHarvestTaskDto, FloorDataDto, HarvestDataDto, HarvestDataRowDto, SetTaskAlarmDto, SetTaskMedicineDto, SetTaskPeriodDto, SetTaskPeriodV2Dto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
 import moment from 'moment';
 import TodoAppValidate from './todo.validate';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
+import { OptionService } from 'src/modules/options/option.service';
+import { IOpition } from 'src/modules/options/option.interface';
+import { GetTasksMedicineResDto } from './todo.response';
 
 @Injectable()
 export class TodoAppService {
@@ -19,19 +22,21 @@ export class TodoAppService {
     private readonly todoAppRepository: TodoAppRepository,
     private readonly todoAppValidate: TodoAppValidate,
     private readonly userHomeAppService: UserHomeAppService,
+    private readonly optionService: OptionService,
     private readonly logger: LoggingService,
   ) {}
 
   // TODO: BOX-TASK
-  async getScheduledTasks(userCode: string, userHomeCode: string): Promise<{ [key: string]: string }[]> {
+  async getScheduledTasks(userCode: string): Promise<{ [key: string]: string }[]> {
     const logbase = `${this.SERVICE_NAME}/getScheduledTasks:`;
 
     // userHomeCode -> main home
-    const home = await this.userHomeAppService.getDetail(userHomeCode);
+    const home = await this.userHomeAppService.getMainHomeByUser(userCode);
     const boxTasks = await this.todoAppRepository.getBoxTasks();
     if (!home || !boxTasks.length) {
       return boxTasks.map((ele) => {
         return {
+          taskAlarmCode: '',
           label: ele.taskName,
           value: '_ / _',
           date: '',
@@ -44,25 +49,26 @@ export class TodoAppService {
 
     const result = await Promise.all(
       boxTasks.map(async (ele) => {
-        // const data = await this.todoAppRepository.getOneTaskAlarmsNearly(userCode, userHomeCode, ele.taskCode, ele.taskName, today.format('YYYY-MM-DD'));
-        const data: { taskDate: null } = {
-          taskDate: null,
-        };
+        const data = await this.todoAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, ele.taskCode, ele.taskName, today.format('YYYY-MM-DD'));
 
-        this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate}`);
+        this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${home.userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate}`);
 
+        const taskAlarmCode = data?.taskAlarmCode ?? '';
         if (!data?.taskDate) {
           return {
+            taskAlarmCode: taskAlarmCode,
             label: ele.taskName,
             value: '_ / _',
             date: '',
             unit: '',
           };
         } else {
-          const taskDate = moment(data.taskDate);
+          const today = moment().startOf('day');
+          const taskDate = moment(data.taskDate).startOf('day');
           const diff = taskDate.diff(today, 'days');
 
           return {
+            taskAlarmCode: taskAlarmCode,
             label: ele.taskName,
             value: diff.toString(),
             date: taskDate.format('YYYY-MM-DD'),
@@ -179,178 +185,324 @@ export class TodoAppService {
     return 0;
   }
   // TODO: COMPLETE-MEDICINE
+  // hàm insert lịch nhắc 90 ngày sau
+  async insertTaskMedicineNextime(today: moment.Moment, userCode: string, userHomeCode: string, taskCode: string, taskName: string, dto: SetTaskMedicineDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setTaskMedicine:`;
 
-  async setCompleteTaskMedicine(userCode: string, dto: CompleteMedicineTaskDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setCompleteTaskMedicine:`;
-    const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
-    let result = 0;
-
-    // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
-    if (!alramDetail?.taskKeyword) {
-      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyMedicineTaskCanDo}`);
-      return -1;
-    }
-
-    // taskAlarmCode này không phải lắn thuốc
-    if (alramDetail?.taskKeyword !== TODO_CONST.TASK_EVENT.MEDICINE.value) {
-      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyMedicineTaskCanDo}`);
-      return -1;
-    }
-
-    // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
-    if (alramDetail?.taskStatus == TaskStatusEnum.COMPLETE) {
-      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
-      return -2;
-    }
-
-    // taskAlarmCode này đã được insert dữ liệu lăn thuôc rồi
-    const checkDuplicate = await this.todoAppRepository.getTaskCompleteMedicine(dto.taskAlarmCode);
-    if (checkDuplicate) {
-      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.MedicineTaskAlreadyAdded}`);
-      return -3;
-    }
-    const insertId = await this.todoAppRepository.insertTaskCompleteMedicine(userCode, alramDetail.userHomeCode, dto);
-
-    if (insertId) {
-      // cập nhập trạng thái cho lịch nhắc là HOÀN THÀNH
-      await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
-      // tự động tạo lịch nhác này cho 3 tháng sau
-
-      const today = moment();
-      const taskDateNextTime = moment(today).add(QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME, 'days').toDate();
-      this.logger.log(logbase, `Lịch nhắc(${dto.taskAlarmCode}) hiện tại (${today.toDate().toLocaleDateString()}) --- Lần sau (${taskDateNextTime.toLocaleDateString()})`);
+    const logbaseChild = `${logbase}::insertTaskMedicineNextime:`;
+    let resultChild = 0;
+    try {
+      const taskDateNextTime = today.clone().add(QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME, 'days').toDate();
 
       const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
-        userHomeCode: alramDetail.userHomeCode,
+        userHomeCode: userHomeCode,
         taskPeriodCode: null,
-        taskCode: alramDetail.taskCode,
-        taskName: alramDetail.taskName,
-        taskNote: alramDetail.taskNote,
+        taskCode: taskCode,
+        taskName: taskName,
+        taskNote: '',
         taskStatus: TaskStatusEnum.WAITING,
         taskDate: taskDateNextTime,
       };
+
+      // insert lịch nhắc alarm 90 ngày sau với taskCode của TODO_CONST.TASK_BOX.MEDICINE
       const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
+      this.logger.log(
+        logbaseChild,
+        `Tạo Lịch nhắc lăn thuốc cho(${QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME}) ngày sau thành công, hiện tại (${today.toDate().toLocaleDateString()}) 
+               --- (${taskDateNextTime.toLocaleDateString()})`,
+      );
       if (seqNextTime) {
-        const affectedRows = await this.todoAppRepository.updateTaskCompleteMedicine(userCode, dto.taskAlarmCode, seqNextTime);
+        // insert tbl_todo_home_task_medicine
+        const affectedRows = await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
         if (affectedRows) {
-          this.logger.log(logbase, `Tạo Lịch nhắc tự động cho(${QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME}) ngày sau thành công,hiện tại (${alramDetail.seq}) --- Lần sau (${seqNextTime})`);
+          this.logger.log(logbaseChild, `Lưu dữ liệu lăn lăn thuốc, SEQ Lần sau (${seqNextTime})`);
+          resultChild = 1;
+        } else {
+          resultChild = 0;
+        }
+      } else {
+        resultChild = 0;
+      }
+      return resultChild;
+    } catch (error) {
+      this.logger.error(logbaseChild, `${JSON.stringify(error)}`);
+      return 0;
+    }
+  }
+  async setTaskMedicine(userCode: string, dto: SetTaskMedicineDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setTaskMedicine:`;
+
+    let result = 0;
+    const today = moment().startOf('day');
+
+    // kiểm tra medicineOptionCode
+    const attendCodes = await this.optionService.getAll({
+      mainOption: 'TODO_TASK',
+      subOption: 'MEDICINE',
+    });
+
+    if (!attendCodes.map((c) => c.code).includes(dto.medicineOptionCode)) {
+      throw new BadRequestException({ message: Msg.CodeInvalid, data: 0 });
+    }
+    const medicineOption = attendCodes.find((ele) => ele.code === dto.medicineOptionCode);
+    if (!medicineOption) {
+      this.logger.error(logbase, `Medicine optione không có dữ liệu`);
+      throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
+    }
+    if (medicineOption.keyOption === TODO_CONST.TASK_OPTION_MEDICINE.OTHER.value && dto.medicineOther == '') {
+      this.logger.error(logbase, `Medicine other không thể trống khi mã code là 'OTHER'`);
+      throw new BadRequestException({ message: Msg.CannotNull('medicineOther'), data: 0 });
+    }
+
+    // kiểm tra ngày chọn có trùng ngày hôm nay
+    const isToday = today.isSame(moment(dto.medicineDate, 'YYYY-MM-DD'), 'day');
+    this.logger.log(logbase, isToday ? `Lịch chọn trùng ngày hôm này` : `Lịch chọn không trùng ngày hôm này`);
+
+    const task = await this.todoAppRepository.getTaskByKeyword(TODO_CONST.TASK_BOX.MEDICINE.value);
+    if (!task) {
+      this.logger.error(logbase, `Task không có dữ liệu`);
+      throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
+    }
+    // Tìm nhà chính của user
+    const mainHomeOfUser = await this.userHomeAppService.getMainHomeByUser(userCode);
+    if (!mainHomeOfUser) {
+      this.logger.error(logbase, `Main home của user này không có`);
+      throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
+    }
+    // lăn thuốc đang chưa có giá trị khởi tạo _/_
+    if (dto.taskAlarmCode == '') {
+      if (isToday) {
+        // insert lịch nhắc alarm 90 ngày sau với taskCode của TODO_CONST.TASK_BOX.MEDICINE
+        result = await this.insertTaskMedicineNextime(today, userCode, mainHomeOfUser.userHomeCode, task.taskCode, task.taskName, dto);
+      } else {
+        // chỉ insert tbl_todo_home_task_medicine
+        const affectedRows = await this.todoAppRepository.insertTaskMedicine(userCode, mainHomeOfUser.userHomeCode, 0, dto);
+        if (affectedRows) {
+          this.logger.log(logbase, `Chỉ lưu dữ liệu lăn lăn thuốc, SEQ Lần sau (${0})`);
+          result = 1; // thành công
+        }
+      }
+    } else {
+      // lấy thông tin lịch nhắc lăn thuốc có sẵn đang countdown
+      const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
+      if (!alramDetail) {
+        this.logger.error(logbase, `Lịch nhắc chi tiết (alramDetail) không có dữ liệu`);
+        throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
+      }
+      // taskAlarmCode này không phải lắn thuốc
+      if (alramDetail.taskKeyword !== TODO_CONST.TASK_BOX.MEDICINE.value) {
+        this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyMedicineTaskCanDo}`);
+        return -1;
+      }
+
+      // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
+      if (alramDetail.taskStatus == TaskStatusEnum.COMPLETE) {
+        this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
+        return -2;
+      }
+
+      // lăn thuốc đang có giá trị countdown: 89 NGÀY
+      if (isToday) {
+        // cập nhập status của taskAlarmCode hiện tại thành 'COMPLETE'
+        await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+        // insert lịch nhắc alarm 90 ngày sau với taskCode của TODO_CONST.TASK_BOX.MEDICINE
+        result = await this.insertTaskMedicineNextime(today, userCode, mainHomeOfUser.userHomeCode, task.taskCode, task.taskName, dto);
+      } else {
+        // cập nhập status của taskAlarmCode hiện tại thành 'COMPLETE'
+        await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+
+        // chỉ update tbl_todo_home_task_medicine
+        const affectedRows = await this.todoAppRepository.updateTaskMedicine(userCode, mainHomeOfUser.userHomeCode, dto.taskAlarmCode, dto);
+        if (affectedRows) {
+          this.logger.log(logbase, `Cập nhập dữ liệu lăn lăn thuốc, SEQ Lần sau (${0})`);
           result = 1; // thành công
         }
       }
     }
+
     return result;
   }
-  // TODO: COMPLETE-HARVER
-  async setCompleteTaskHarvest(userCode: string, dto: CompleteHarvestTaskDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setCompleteTaskHarvest:`;
-    const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
-
-    // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
-    if (!alramDetail?.taskKeyword) {
-      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
-      return -1;
-    }
-
-    // taskAlarmCode này không phải thu hoạch
-    if (alramDetail?.taskKeyword !== TODO_CONST.TASK_EVENT.HARVEST.value) {
-      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
-      return -1;
-    }
-    // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
-    if (alramDetail?.taskStatus == TaskStatusEnum.COMPLETE) {
-      this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
-      return -2;
-    }
-
-    // kiểm tra và cập nhập trạng thái hoàn thành cho lịch nhắc
-    if (dto.isComplete == 'Y') {
-      await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
-    }
-
-    // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
-    const isOnlyActive = false; // -> lấy luôn cả cell bị isActive = 'N'
-    const harvestCurrentDatas = await this.todoAppRepository.getTaskCompleteHarvests(dto.taskAlarmCode, isOnlyActive);
-    if (harvestCurrentDatas.length) {
-      // biến dữ liệu lồng từ request thành row
-      const requestRows: ICompleteHarvestTaskRow[] = [];
-      for (const flo of dto.harvestData) {
-        for (const cel of flo.floorData) {
-          requestRows.push({
-            taskAlarmCode: dto.taskAlarmCode,
-            userCode: userCode,
-            userHomeCode: alramDetail.userHomeCode,
-            floor: flo.floor,
-            cell: cel.cell,
-            cellCollected: cel.cellCollected,
-            cellRemain: cel.cellRemain,
-          });
-        }
-      }
-
-      // map từ request
-      const requestMap = new Map<string, ICompleteHarvestTaskRow>();
-      requestRows.forEach((r) => requestMap.set(`${r.floor}_${r.cell}`, r));
-
-      // map từ database
-      const dbMap = new Map<string, ICompleteHarvestTaskRow>();
-      harvestCurrentDatas.forEach((r) => dbMap.set(`${r.floor}_${r.cell}`, r));
-
-      const toInsert: ICompleteHarvestTaskRow[] = [];
-      const toUpdate: ICompleteHarvestTaskRow[] = [];
-      const toDelete: ICompleteHarvestTaskRow[] = [];
-
-      // so sánh
-      for (const [key, requestRow] of requestMap.entries()) {
-        if (dbMap.has(key)) {
-          toUpdate.push(requestRow); // row sẽ insert
-        } else {
-          toInsert.push(requestRow); // row sẽ update
-        }
-      }
-
-      for (const [key, dbRow] of dbMap.entries()) {
-        if (!requestMap.has(key)) {
-          toDelete.push(dbRow); // row sẽ xóa
-        }
-      }
-      // insert
-      for (const row of toInsert) {
-        await this.todoAppRepository.insertTaskCompleteHarvest(row);
-      }
-
-      //update
-      for (const row of toUpdate) {
-        await this.todoAppRepository.updateTaskCompleteHarvest(row);
-      }
-
-      // delete
-      for (const row of toDelete) {
-        await this.todoAppRepository.deleteTaskCompleteHarvest(row.taskAlarmCode, row.floor, row.cell, userCode, alramDetail.userHomeCode);
-      }
+  async getTaskMedicine(taskAlarmCode: string): Promise<GetTasksMedicineResDto | null> {
+    const logbase = `${this.SERVICE_NAME}/getTaskMedicine:`;
+    const DEFAULT_VALUE = {
+      taskAlarmCode: '',
+      medicineOptionCode: '',
+      medicineOther: '',
+      medicineDate: moment().format('YYYY-MM-DD'),
+    };
+    if (taskAlarmCode == '') {
+      return DEFAULT_VALUE;
     } else {
-      // INSERT
-      if (dto.harvestData.length) {
-        let harvestDataRows: HarvestDataRowDto[] = [];
+      // lấy thông tin alram
+      const result = await this.todoAppRepository.getTaskMedicine(taskAlarmCode);
+      if (result) {
+        // taskAlarmCode này không phải lăn thuốc
+        if (result.taskKeyword !== TODO_CONST.TASK_BOX.MEDICINE.value) {
+          this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) ${Msg.OnlyMedicineTaskCanDo}`);
+          throw new BadRequestException({ message: Msg.UpdateErr, data: null });
+        }
+
+        // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
+        if (result.taskStatus == TaskStatusEnum.COMPLETE) {
+          this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
+          throw new BadRequestException({ message: Msg.AlreadyCompleteCannotDo, data: null });
+        }
+        return {
+          taskAlarmCode: result.taskAlarmCode,
+          medicineOptionCode: result?.medicineOptionCode,
+          medicineOther: result?.medicineOther,
+          medicineDate: moment(result?.medicineDate).format('YYYY-MM-DD'),
+        };
+      } else {
+        return DEFAULT_VALUE;
+      }
+    }
+  }
+  // TODO: COMPLETE-HARVER
+  // hàm insert lịch nhắc thu hoạch
+  async insertTaskHarvestNextime(today: moment.Moment, harvestDate: Date, userCode: string, userHomeCode: string, taskCode: string, taskName: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/insertTaskHarvestNextime:`;
+
+    const logbaseChild = `${logbase}::insertTaskHarvestNextime:`;
+    try {
+      const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
+        userHomeCode: userHomeCode,
+        taskPeriodCode: null,
+        taskCode: taskCode,
+        taskName: taskName,
+        taskNote: '',
+        taskStatus: TaskStatusEnum.WAITING,
+        taskDate: harvestDate,
+      };
+
+      // insert lịch nhắc alarm với taskCode của TODO_CONST.TASK_BOX.HARVEST
+      const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
+      this.logger.log(
+        logbaseChild,
+        `Tạo Lịch nhắc thu hoạch cho(${QUERY_HELPER.DAY_CREATE_ALARM_NEXT_TIME}) ngày sau thành công, hiện tại (${today.toDate().toLocaleDateString()}) 
+               --- (${harvestDate.toLocaleDateString()})`,
+      );
+      return seqNextTime;
+    } catch (error) {
+      this.logger.error(logbaseChild, `${JSON.stringify(error)}`);
+      return 0;
+    }
+  }
+  async setTaskHarvest(userCode: string, dto: CompleteHarvestTaskDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setCompleteTaskHarvest:`;
+
+    if (dto.taskAlarmCode === '') {
+      // khởi tạo ban đầu
+    } else {
+      //dữ liệu có sẵn
+      const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
+
+      // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
+      if (!alramDetail?.taskKeyword) {
+        this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
+        return -1;
+      }
+
+      // taskAlarmCode này không phải thu hoạch
+      if (alramDetail?.taskKeyword !== TODO_CONST.TASK_BOX.HARVEST.value) {
+        this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
+        return -1;
+      }
+      // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
+      if (alramDetail?.taskStatus == TaskStatusEnum.COMPLETE) {
+        this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
+        return -2;
+      }
+
+      // kiểm tra và cập nhập trạng thái hoàn thành cho lịch nhắc
+      if (dto.isComplete == 'Y') {
+        await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+      }
+      // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
+      const isOnlyActive = false; // -> lấy luôn cả cell bị isActive = 'N'
+      const harvestCurrentDatas = await this.todoAppRepository.getTaskHarvests(dto.taskAlarmCode, isOnlyActive);
+      if (harvestCurrentDatas.length) {
+        // biến dữ liệu lồng từ request thành row
+        const requestRows: IHarvestTaskRow[] = [];
         for (const flo of dto.harvestData) {
-          const floor = flo.floor;
-          if (flo.floorData.length) {
-            for (const cel of flo.floorData) {
-              const row: HarvestDataRowDto = {
-                taskAlarmCode: dto.taskAlarmCode,
-                userCode: userCode,
-                userHomeCode: alramDetail.userHomeCode,
-                floor: floor,
-                cell: cel.cell,
-                cellCollected: cel.cellCollected,
-                cellRemain: cel.cellRemain,
-              };
-              harvestDataRows.push(row);
-            }
+          for (const cel of flo.floorData) {
+            requestRows.push({
+              taskAlarmCode: dto.taskAlarmCode,
+              userCode: userCode,
+              userHomeCode: alramDetail.userHomeCode,
+              floor: flo.floor,
+              cell: cel.cell,
+              cellCollected: cel.cellCollected,
+              cellRemain: cel.cellRemain,
+            });
           }
         }
-        if (harvestDataRows.length) {
-          for (const row of harvestDataRows) {
-            await this.todoAppRepository.insertTaskCompleteHarvest(row);
+
+        // map từ request
+        const requestMap = new Map<string, IHarvestTaskRow>();
+        requestRows.forEach((r) => requestMap.set(`${r.floor}_${r.cell}`, r));
+
+        // map từ database
+        const dbMap = new Map<string, IHarvestTaskRow>();
+        harvestCurrentDatas.forEach((r) => dbMap.set(`${r.floor}_${r.cell}`, r));
+
+        const toInsert: IHarvestTaskRow[] = [];
+        const toUpdate: IHarvestTaskRow[] = [];
+        const toDelete: IHarvestTaskRow[] = [];
+
+        // so sánh
+        for (const [key, requestRow] of requestMap.entries()) {
+          if (dbMap.has(key)) {
+            toUpdate.push(requestRow); // row sẽ insert
+          } else {
+            toInsert.push(requestRow); // row sẽ update
+          }
+        }
+
+        for (const [key, dbRow] of dbMap.entries()) {
+          if (!requestMap.has(key)) {
+            toDelete.push(dbRow); // row sẽ xóa
+          }
+        }
+        // insert
+        for (const row of toInsert) {
+          await this.todoAppRepository.insertTaskHarvest(row);
+        }
+
+        //update
+        for (const row of toUpdate) {
+          await this.todoAppRepository.updateTaskHarvest(row);
+        }
+
+        // delete
+        for (const row of toDelete) {
+          await this.todoAppRepository.deleteTaskCompleteHarvest(row.taskAlarmCode, row.floor, row.cell, userCode, alramDetail.userHomeCode);
+        }
+      } else {
+        // INSERT
+        if (dto.harvestData.length) {
+          let harvestDataRows: HarvestDataRowDto[] = [];
+          for (const flo of dto.harvestData) {
+            const floor = flo.floor;
+            if (flo.floorData.length) {
+              for (const cel of flo.floorData) {
+                const row: HarvestDataRowDto = {
+                  taskAlarmCode: dto.taskAlarmCode,
+                  userCode: userCode,
+                  userHomeCode: alramDetail.userHomeCode,
+                  floor: floor,
+                  cell: cel.cell,
+                  cellCollected: cel.cellCollected,
+                  cellRemain: cel.cellRemain,
+                };
+                harvestDataRows.push(row);
+              }
+            }
+          }
+          if (harvestDataRows.length) {
+            for (const row of harvestDataRows) {
+              await this.todoAppRepository.insertTaskHarvest(row);
+            }
           }
         }
       }
@@ -358,26 +510,27 @@ export class TodoAppService {
 
     return 1;
   }
-  async getCompleteTaskHarvest(userCode: string, taskAlarmCode: string): Promise<ICompleteHarvestTask | number> {
-    const logbase = `${this.SERVICE_NAME}/getCompleteTaskHarvest:`;
+  async getTaskHarvest(userCode: string, taskAlarmCode: string): Promise<ICompleteHarvestTask | number> {
+    const logbase = `${this.SERVICE_NAME}/getTaskHarvest:`;
 
     // lấy thông tin alram
     const alramDetail = await this.todoAppRepository.getOneTaskAlarm(taskAlarmCode);
 
-    // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
-    if (!alramDetail?.taskKeyword) {
-      this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
-      return -1;
-    }
-
     // taskAlarmCode này không phải thu hoạch
-    if (alramDetail?.taskKeyword !== TODO_CONST.TASK_EVENT.HARVEST.value) {
+    if (taskAlarmCode != '' && alramDetail?.taskKeyword !== TODO_CONST.TASK_BOX.HARVEST.value) {
       this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
       return -1;
     }
-    // lấy floor của nhà yến của lịch nhắc này
-    const homeArea = await this.userHomeAppService.getAreaHome(alramDetail?.userHomeCode ?? '');
 
+    // Tìm nhà chính của user
+    const mainHomeOfUser = await this.userHomeAppService.getMainHomeByUser(userCode);
+    if (!mainHomeOfUser) {
+      this.logger.error(logbase, `Main home của user này không có`);
+      throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
+    }
+
+    // lấy floor của nhà yến của lịch nhắc này
+    const homeArea = await this.userHomeAppService.getAreaHome(mainHomeOfUser?.userHomeCode ?? '');
     // nhà yến của lịch nhắc ko tồn tại
     if (!homeArea) {
       this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) - nhà yến(${alramDetail?.userHomeCode ?? ''}) ${Msg.HomeOfAlarmNotExist}`);
@@ -391,7 +544,7 @@ export class TodoAppService {
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
     let harvestData: HarvestDataDto[] = [];
     const isOnlyActive = true; // -> chỉ lấy cell  isActive = 'Y'
-    const harvestCurrentDatas = await this.todoAppRepository.getTaskCompleteHarvests(taskAlarmCode, isOnlyActive);
+    const harvestCurrentDatas = await this.todoAppRepository.getTaskHarvests(taskAlarmCode, isOnlyActive);
 
     if (!harvestCurrentDatas.length) {
       // khởi tạo mặc định
@@ -425,7 +578,13 @@ export class TodoAppService {
 
       harvestData = Array.from(floorMap.values()).sort((a, b) => a.floor - b.floor);
     }
-    const result: ICompleteHarvestTask = { taskAlarmCode: taskAlarmCode, userCode: userCode, userHomeCode: alramDetail?.userHomeCode ?? '', harvestData: harvestData };
+    const result: ICompleteHarvestTask = {
+      taskAlarmCode: taskAlarmCode,
+      userCode: userCode,
+      userHomeCode: taskAlarmCode !== '' ? (alramDetail?.userHomeCode ?? '') : mainHomeOfUser.userHomeCode,
+      harvestDate: taskAlarmCode !== '' ? (alramDetail?.taskDate instanceof Date ? moment(alramDetail.taskDate).format('YYYY-MM-DD') : (alramDetail?.taskDate ?? '')) : moment().format('YYYY-MM-DD'),
+      harvestData: harvestData,
+    };
     return result;
   }
 }
