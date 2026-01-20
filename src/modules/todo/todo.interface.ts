@@ -127,7 +127,6 @@ export interface ITodoHomeTaskAlram {
   isActive: YnEnum;
 }
 
-
 export interface ITodoTaskMedicine {
   seq: number;
   seqNextTime: number;
@@ -140,7 +139,7 @@ export interface ITodoTaskMedicine {
 }
 
 export interface IHarvestTask {
-  taskAlarmCode: string;
+  seqAlarm: number;
   userCode: string;
   userHomeCode: string;
   floor: number;
@@ -150,11 +149,10 @@ export interface IHarvestTask {
 }
 export interface IHarvestTaskPhase {
   seq: number;
-  taskAlarmCode: string;
-  harvestNextDate:  string | Date;
+  seqAlarm: string;
   harvestPhase: number;
   harvestYear: number;
-  isDone: string
+  isDone: string;
 }
 
 interface IHarvestData {

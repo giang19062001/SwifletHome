@@ -99,12 +99,6 @@ export class GetTaskHarvestResDto {
   @ApiProperty({ example: '' })
   taskAlarmCode: string;
 
-  @ApiProperty({ example: '' })
-  userCode: string;
-
-  @ApiProperty({ example: '' })
-  userHomeCode: string;
-
   @ApiProperty({ example: '2026-01-01' })
   harvestNextDate: string;
 

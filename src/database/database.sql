@@ -663,18 +663,23 @@ CREATE TABLE
   -- talbe task thu hoạch THEO ĐỢT
 CREATE TABLE `tbl_todo_home_task_harvest_phase` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `taskAlarmCode` varchar(45) NOT NULL,
-  `harvestNextDate`  DATE DEFAULT NUlL,
+  `seqAlarm` int NOT NULL  DEFAULT '0',
+  `userHomeCode` VARCHAR(45) NOT NULL, 
   `harvestPhase` INT DEFAULT 0,
   `harvestYear` INT NOT NULL,
   `isDone`  CHAR(1) NOT NULL DEFAULT 'Y',
+    `isActive` CHAR(1) NOT NULL DEFAULT 'Y',
+    `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt` DATETIME DEFAULT NULL,
+    `createdId` VARCHAR(45) DEFAULT 'SYSTEM',
+    `updatedId` VARCHAR(45) DEFAULT NULL,
   PRIMARY KEY (`seq`)
 ) 
 
   -- talbe task thu hoạch 
 CREATE TABLE `tbl_todo_home_task_harvest` (
   `seq` int NOT NULL AUTO_INCREMENT,
-  `taskAlarmCode` varchar(45) NOT NULL,
+  `seqAlarm` int NOT NULL  DEFAULT '0',
   `userCode` varchar(45) NOT NULL,
   `userHomeCode` varchar(45) NOT NULL,
   `floor` int NOT NULL DEFAULT '0',

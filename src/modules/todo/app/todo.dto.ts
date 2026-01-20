@@ -201,7 +201,7 @@ export class SetTaskPeriodV2Dto {
 export class SetHarvestTaskDto {
   @ApiProperty({ example: '' })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   taskAlarmCode: string;
 
   @ApiProperty({
@@ -216,7 +216,11 @@ export class SetHarvestTaskDto {
   @IsDate({ message: 'havestDate must be a valid date' })
   harvestNextDate: Date;
 
-  
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  harvestPhase: number;
+
   @ApiProperty({
     example: YnEnum.N,
     enum: YnEnum,
@@ -263,10 +267,10 @@ export class FloorDataDto {
 }
 
 export class HarvestDataRowDto {
-  @ApiProperty({ example: '' })
+  @ApiProperty({ example: 0 })
   @IsString()
   @IsNotEmpty()
-  taskAlarmCode: string;
+  seqAlarm: number;
 
   @ApiProperty({ example: '' })
   @IsString()

@@ -191,7 +191,9 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
     description: `
 <ul>
   <li><b>taskAlarmCode</b>: Mã code của lịch nhắc</li>
-  </li>
+  <li><b>harvestPhase</b>: Int - số đợt trong năm
+  <li><b>harvestNextDate</b>: Date - YYYY-MM-DD ( mặc định là ngày hiện tại)
+  <li><b>isComplete</b>: ENUM('Y','N') - đánh dấu hoàn thành tất cả
   <li><b>harvestData</b>: Danh sách dữ liệu thu hoạch
     <ul>
       <li><b>floor</b>: Số tầng</li>
@@ -204,8 +206,6 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
       </li>
     </ul>
   </li>
-  <li><b>isComplete</b>: ENUM('Y','N') - đánh dấu hoàn thành tất cả
-  <li><b>harvestNextDate</b>: Date - YYYY-MM-DD ( mặc định là ngày hiện tại)
 </ul>
 `,
   })
@@ -271,6 +271,12 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
     if (result == -3) {
       throw new BadRequestException({
         message: Msg.FloorOfHomeIsZero,
+        data: 0,
+      });
+    }
+     if (result == -4) {
+      throw new BadRequestException({
+        message: Msg.AlreadyCompleteCannotDo,
         data: 0,
       });
     }

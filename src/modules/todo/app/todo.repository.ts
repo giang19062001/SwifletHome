@@ -6,6 +6,7 @@ import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode, handleTimezoneQuery } from 'src/helpers/func.helper';
 import moment from 'moment';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class TodoAppRepository {
@@ -321,8 +322,7 @@ export class TodoAppRepository {
       INSERT INTO ${this.tableHomeTaskMedicine}  (seqNextTime, userCode, userHomeCode, medicineOptionCode, medicineOther, medicineUsage, medicineNextDate, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage,
-       dto.medicineNextDate, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, dto.medicineNextDate, userCode]);
 
     return result.insertId;
   }
@@ -347,40 +347,74 @@ export class TodoAppRepository {
   }
 
   // TODO: COMPLETE-HARVER
-  async getOneTaskHarvest(taskAlarmCode: string): Promise<(ITodoHomeTaskAlram & IHarvestTaskPhase) | null> {
+
+  async getTaskHarvestRows(seq: number, isOnlyActive: boolean): Promise<(ITodoHomeTaskAlram & IHarvestTask)[]> {
+    let query = `  SELECT A.seq, A.taskAlarmCode, A.taskCode, C.taskKeyword, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
+     B.seq, B.seqAlarm, B.userCode, B.userHomeCode, B.floor, B.cell, B.cellCollected, B.cellRemain
+    FROM ${this.tableHomeTaskAlarm} A
+    LEFT JOIN ${this.tableHomeTaskHarvest} B
+    ON A.seq = B.seqAlarm
+    LEFT JOIN ${this.tableTask} C
+    ON A.taskCode = C.taskCode
+    WHERE A.seq  = ?  ${isOnlyActive ? ` AND B.isActive = 'Y' ` : ''} `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [seq]);
+    return rows as (ITodoHomeTaskAlram & IHarvestTask)[];
+  }
+  async getOneTaskHarvest(taskAlarmCode: string): Promise<ITodoHomeTaskAlram | null> {
     let query = ` SELECT A.seq, A.taskAlarmCode, A.taskPeriodCode, A.taskCode, B.taskKeyword, A.taskName, A.taskDate, A.taskStatus,
-    A.userCode, A.userHomeCode, A.taskNote, C.harvestPhase, C.harvestNextDate
+    A.userCode, A.userHomeCode, A.taskNote
     FROM ${this.tableHomeTaskAlarm}  A
     LEFT JOIN ${this.tableTask} B
     ON A.taskCode = B.taskCode 
-    LEFT JOIN ${this.tableHomeTaskHarvestPhase} C
-    ON A.taskAlarmCode = C.taskAlarmCode 
-    WHERE A.taskAlarmCode  = ? 
+     WHERE A.taskAlarmCode  = ? 
     LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
-    return rows.length ? (rows[0] as (ITodoHomeTaskAlram & IHarvestTaskPhase)) : null;
+    return rows.length ? (rows[0] as ITodoHomeTaskAlram & IHarvestTaskPhase) : null;
   }
-  async getTaskHarvests(taskAlarmCode: string, isOnlyActive: boolean): Promise<(ITodoHomeTaskAlram & IHarvestTask)[]> {
-    let query = `  SELECT A.taskAlarmCode, A.taskCode, C.taskKeyword, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
-     B.seq, B.userCode, B.userHomeCode, B.floor, B.cell, B.cellCollected, B.cellRemain
-    FROM ${this.tableHomeTaskAlarm} A
-    LEFT JOIN ${this.tableHomeTaskHarvest} B
-    ON A.taskAlarmCode = B.taskAlarmCode
-    LEFT JOIN ${this.tableTask} C
-    ON A.taskCode = C.taskCode
-    WHERE A.taskAlarmCode  = ?  ${isOnlyActive ? ` AND B.isActive = 'Y' ` : ''} `;
+  async getMaxHarvestPhase(userHomeCode: string): Promise<IHarvestTaskPhase | null> {
+    const currentYear = moment().year(); // lấy năm hiện tại
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
-    return rows as (ITodoHomeTaskAlram & IHarvestTask & IHarvestTaskPhase)[];
+    const query = `
+    SELECT MAX(harvestPhase) AS harvestPhase
+    FROM ${this.tableHomeTaskHarvestPhase}
+    WHERE userHomeCode = ?
+      AND harvestYear = ? AND isDone = 'Y'
+  `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, currentYear]);
+    return rows.length ? (rows[0] as IHarvestTaskPhase) : null;
   }
-
-  async insertTaskHarvest(dto: HarvestDataRowDto): Promise<number> {
+  async insertTaskHarvestPhase(userCode: string, userHomeCode: string, seqAlarm: number, harvestPhase: number, isDone: YnEnum): Promise<number> {
+    const currentYear = moment().year(); // lấy năm hiện tại
     const sql = `
-      INSERT INTO ${this.tableHomeTaskHarvest}  (taskAlarmCode, userCode,  userHomeCode, floor, cell, cellCollected, cellRemain, createdId) 
+      INSERT INTO ${this.tableHomeTaskHarvestPhase}  (seqAlarm, userHomeCode, harvestPhase, isDone, harvestYear, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqAlarm, userHomeCode, harvestPhase, isDone, currentYear, userCode]);
+
+    return result.insertId;
+  }
+  async completeTaskHarvestPhase(userCode: string, userHomeCode: string, seqAlarm: number, harvestPhase: number): Promise<number> {
+    const currentYear = moment().year(); // lấy năm hiện tại
+
+    const sql = `
+    UPDATE ${this.tableHomeTaskHarvestPhase}
+    SET isDone = ?, updatedId = ?, updatedAt = NOW()
+    WHERE seqAlarm = ? AND harvestYear = ? AND harvestPhase = ? AND userHomeCode = ?
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [YnEnum.Y, userCode, seqAlarm, currentYear, harvestPhase, userHomeCode]);
+
+    return result.affectedRows;
+  }
+  async insertTaskHarvestRows(dto: HarvestDataRowDto): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableHomeTaskHarvest}  (seqAlarm, userCode,  userHomeCode, floor, cell, cellCollected, cellRemain, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.seqAlarm, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode]);
 
     return result.insertId;
   }
@@ -388,25 +422,25 @@ export class TodoAppRepository {
     const sql = `
     UPDATE ${this.tableHomeTaskHarvest}
     SET cellCollected = ?, cellRemain = ?, updatedId = ?, updatedAt = NOW(), isActive = 'Y'
-    WHERE taskAlarmCode = ? AND  userCode = ? AND userHomeCode = ?
+    WHERE seqAlarm = ? AND  userCode = ? AND userHomeCode = ?
       AND floor = ?
       AND cell = ?
   `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.cellCollected, dto.cellRemain, dto.userCode, dto.taskAlarmCode, dto.userCode, dto.userHomeCode, dto.floor, dto.cell]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.cellCollected, dto.cellRemain, dto.userCode, dto.seqAlarm, dto.userCode, dto.userHomeCode, dto.floor, dto.cell]);
 
     return result.affectedRows;
   }
-  async deleteTaskCompleteHarvest(taskAlarmCode: string, floor: number, cell: number, userCode: string, userHomeCode: string): Promise<number> {
+  async deleteTaskCompleteHarvest(seqAlarm: number, floor: number, cell: number, userCode: string, userHomeCode: string): Promise<number> {
     const sql = `
     UPDATE ${this.tableHomeTaskHarvest}
     SET isActive = 'N', updatedId = ?, updatedAt = NOW()
-    WHERE taskAlarmCode = ? AND  userCode = ? AND userHomeCode = ?
+    WHERE seqAlarm = ? AND  userCode = ? AND userHomeCode = ?
       AND floor = ?
       AND cell = ?
       AND isActive = 'Y'
   `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, taskAlarmCode, userCode, userHomeCode, floor, cell]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqAlarm, userCode, userHomeCode, floor, cell]);
 
     return result.affectedRows;
   }
