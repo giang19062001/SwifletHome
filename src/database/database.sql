@@ -629,7 +629,7 @@ CREATE TABLE
     taskCode VARCHAR(45) NULL DEFAULT NULL,
     taskName VARCHAR(45) NOT NULL, -- taskCode hoặc taskCustomName
     taskDate DATE NOT NULL, -- render từ periodValue Hoặc specificValue của tbl_todo_home_task_period
-    taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL') DEFAULT 'WAITING',
+    taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL', 'SKIP') DEFAULT 'WAITING',
     userCode VARCHAR(45) NOT NULL,
     userHomeCode VARCHAR(45) NOT NULL,
     taskNote VARCHAR(255) DEFAULT '',
@@ -649,7 +649,8 @@ CREATE TABLE
     userHomeCode VARCHAR(45) NOT NULL,
     medicineOptionCode VARCHAR(15) NOT NULL,
     medicineOrther VARCHAR(255) NOT NULL,
-    medicineDate  DATE DEFAULT NUlL,
+    medicineNextDate  DATE DEFAULT NUlL,
+    medicineUsage VARCHAR(45) NOT NULL,
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT NULL,
@@ -657,31 +658,20 @@ CREATE TABLE
     updatedId VARCHAR(45) DEFAULT NULL
   )
 
-  -- CREATE TABLE
-  -- tbl_todo_home_task_complete_medicine (
-  --   seq INT AUTO_INCREMENT PRIMARY KEY,
-  --   seqNextTime INT,
-  --   taskAlarmCode VARCHAR(45) NOT NULL UNIQUE,
-  --   userCode VARCHAR(45) NOT NULL,
-  --   userHomeCode VARCHAR(45) NOT NULL,
-  --   medicineNote VARCHAR(255) NOT NULL,
-  --   isActive CHAR(1) NOT NULL DEFAULT 'Y',
-  --   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-  --   updatedAt DATETIME DEFAULT NULL,
-  --   createdId VARCHAR(45) DEFAULT 'SYSTEM',
-  --   updatedId VARCHAR(45) DEFAULT NULL
-  -- )
 
 
-  -- talbe hoàn thành task thu hoạch 
-CREATE TABLE `tbl_todo_home_task_harvest_alram` (
+  -- talbe task thu hoạch THEO ĐỢT
+CREATE TABLE `tbl_todo_home_task_harvest_phase` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `taskAlarmCode` varchar(45) NOT NULL,
-    `seqNextTime` INT,
+  `harvestNextDate`  DATE DEFAULT NUlL,
+  `harvestPhase` INT DEFAULT 0,
+  `harvestYear` INT NOT NULL,
+  `isDone`  CHAR(1) NOT NULL DEFAULT 'Y',
   PRIMARY KEY (`seq`)
 ) 
 
-  -- talbe hoàn thành task thu hoạch 
+  -- talbe task thu hoạch 
 CREATE TABLE `tbl_todo_home_task_harvest` (
   `seq` int NOT NULL AUTO_INCREMENT,
   `taskAlarmCode` varchar(45) NOT NULL,

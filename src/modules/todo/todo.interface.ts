@@ -14,6 +14,10 @@ export const TODO_CONST = {
       value: 'CANCEL',
       text: 'Bị huỷ',
     },
+    SKIP: {
+      value: 'SKIP',
+      text: 'Bỏ qua',
+    },
   },
   TASK_OPTION_MEDICINE: {
     OTHER: {
@@ -60,6 +64,7 @@ export enum TaskStatusEnum {
   WAITING = 'WAITING',
   COMPLETE = 'COMPLETE',
   CANCEL = 'CANCEL',
+  SKIP = 'SKIP',
 }
 
 export enum TaskLeftEventEnum {
@@ -130,10 +135,11 @@ export interface ITodoTaskMedicine {
   userHomeCode: string;
   medicineOptionCode: string;
   medicineOther: string;
-  medicineDate: string;
+  medicineUsage: string;
+  medicineNextDate: string;
 }
 
-export interface IHarvestTaskRow {
+export interface IHarvestTask {
   taskAlarmCode: string;
   userCode: string;
   userHomeCode: string;
@@ -142,15 +148,15 @@ export interface IHarvestTaskRow {
   cellCollected: number;
   cellRemain: number;
 }
-
-export interface ICompleteHarvestTask {
+export interface IHarvestTaskPhase {
+  seq: number;
   taskAlarmCode: string;
-  userCode: string;
-  userHomeCode: string;
-  harvestData: IHarvestData[];
-  harvestDate: string
-
+  harvestNextDate:  string | Date;
+  harvestPhase: number;
+  harvestYear: number;
+  isDone: string
 }
+
 interface IHarvestData {
   floor: number;
   floorData: IFloorData[];

@@ -198,25 +198,11 @@ export class SetTaskPeriodV2Dto {
   taskNote: string;
 }
 
-export class CompleteHarvestTaskDto {
+export class SetHarvestTaskDto {
   @ApiProperty({ example: '' })
   @IsString()
   @IsNotEmpty()
   taskAlarmCode: string;
-
-  @ApiProperty({ type: () => HarvestDataDto, isArray: true })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HarvestDataDto)
-  harvestData: HarvestDataDto[];
-
-  @ApiProperty({
-    example: YnEnum.N,
-    enum: YnEnum,
-  })
-  @IsEnum(YnEnum)
-  @IsNotEmpty()
-  isComplete: YnEnum;
 
   @ApiProperty({
     example: '2026-01-01',
@@ -228,7 +214,22 @@ export class CompleteHarvestTaskDto {
   @IsNotEmpty({ message: 'havestDate cannot be null or empty' })
   @Transform(({ value }) => new Date(value + 'T00:00:00'))
   @IsDate({ message: 'havestDate must be a valid date' })
-  harvestDate: Date;
+  harvestNextDate: Date;
+
+  
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  @IsNotEmpty()
+  isComplete: YnEnum;
+
+  @ApiProperty({ type: () => HarvestDataDto, isArray: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => HarvestDataDto)
+  harvestData: HarvestDataDto[];
 }
 
 export class HarvestDataDto {
@@ -321,14 +322,21 @@ export class SetTaskMedicineDto {
   medicineOther: string;
 
   @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  medicineUsage: string;
+
+  @ApiProperty({
     example: '2026-01-01',
     type: String,
     format: 'date',
     required: true,
   })
-  @IsDefined({ message: 'medicineDate is required' })
-  @IsNotEmpty({ message: 'medicineDate cannot be null or empty' })
+  @IsDefined({ message: 'medicineNextDate is required' })
+  @IsNotEmpty({ message: 'medicineNextDate cannot be null or empty' })
   @Transform(({ value }) => new Date(value + 'T00:00:00'))
-  @IsDate({ message: 'medicineDate must be a valid date' })
-  medicineDate: Date;
+  @IsDate({ message: 'medicineNextDate must be a valid date' })
+  medicineNextDate: Date;
 }

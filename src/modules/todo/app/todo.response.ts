@@ -95,7 +95,6 @@ export class GetListTaskAlarmsResDto {
   rightEventLabel: string;
 }
 
-
 export class GetTaskHarvestResDto {
   @ApiProperty({ example: '' })
   taskAlarmCode: string;
@@ -106,11 +105,18 @@ export class GetTaskHarvestResDto {
   @ApiProperty({ example: '' })
   userHomeCode: string;
 
+  @ApiProperty({ example: '2026-01-01' })
+  harvestNextDate: string;
+
+  @ApiProperty({ example: 1 })
+  harvestPhase: number;
+
+  @ApiProperty({ example: 'N' })
+  isComplete: string
+
   @ApiProperty({ type: () => HarvestDataDto, isArray: true })
-  harvestData: HarvestDataDto;
+  harvestData: HarvestDataDto[];
 }
-
-
 
 export class GetTasksMedicineResDto {
   @ApiProperty({ example: '' })
@@ -122,6 +128,9 @@ export class GetTasksMedicineResDto {
   @ApiProperty({ example: '' })
   medicineOther: string;
 
+  @ApiProperty({ example: '' })
+  medicineUsage: string;
+
   @ApiProperty({ example: '2026-01-01' })
-  medicineDate: string;
+  medicineNextDate: string;
 }

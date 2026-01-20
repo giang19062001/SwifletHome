@@ -1,6 +1,6 @@
 import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IHarvestTaskRow, ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, ITodoTaskMedicine, PeriodTypeEnum, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { IHarvestTask, IHarvestTaskPhase, ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, ITodoTaskMedicine, PeriodTypeEnum, TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { SetTaskAlarmDto, SetTaskPeriodDto, HarvestDataRowDto, SetTaskMedicineDto } from './todo.dto';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -16,6 +16,7 @@ export class TodoAppRepository {
   private readonly tableUserApp = 'tbl_user_app';
   private readonly tableHomeTaskMedicine = 'tbl_todo_home_task_medicine';
   private readonly tableHomeTaskHarvest = 'tbl_todo_home_task_harvest';
+  private readonly tableHomeTaskHarvestPhase = 'tbl_todo_home_task_harvest_phase';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -303,7 +304,7 @@ export class TodoAppRepository {
   // TODO: COMPLETE-MEDICINE
   async getTaskMedicine(taskAlarmCode: string): Promise<(ITodoHomeTaskAlram & ITodoTaskMedicine) | null> {
     let query = `  SELECT A.taskAlarmCode, A.taskCode, C.taskKeyword, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
-    B.seq, B.seqNextTime, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineDate 
+    B.seq, B.seqNextTime, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineNextDate, B.medicineUsage
     FROM ${this.tableHomeTaskAlarm} A
     LEFT JOIN ${this.tableHomeTaskMedicine} B
     ON A.seq = B.seqNextTime
@@ -317,10 +318,11 @@ export class TodoAppRepository {
 
   async insertTaskMedicine(userCode: string, userHomeCode: string, seqNextTime: number, dto: SetTaskMedicineDto): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableHomeTaskMedicine}  (seqNextTime, userCode, userHomeCode, medicineOptionCode, medicineOther, medicineDate, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.tableHomeTaskMedicine}  (seqNextTime, userCode, userHomeCode, medicineOptionCode, medicineOther, medicineUsage, medicineNextDate, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineDate, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage,
+       dto.medicineNextDate, userCode]);
 
     return result.insertId;
   }
@@ -330,14 +332,14 @@ export class TodoAppRepository {
     LEFT JOIN ${this.tableHomeTaskAlarm} B
       ON A.seqNextTime = B.seq
     SET 
-      A.medicineOptionCode = ?, A.medicineOther = ?, A.medicineDate = ?, A.updatedId = ?, A.updatedAt = NOW()
+      A.medicineOptionCode = ?, A.medicineOther = ?, A.medicineNextDate = ?, medicineUsage = ?, A.updatedId = ?, A.updatedAt = NOW()
     WHERE 
       B.taskAlarmCode = ?
       AND A.userCode = ?
       AND A.userHomeCode = ?
   `;
 
-    const params = [dto.medicineOptionCode, dto.medicineOther, dto.medicineDate, userCode, taskAlarmCode, userCode, userHomeCode];
+    const params = [dto.medicineOptionCode, dto.medicineOther, dto.medicineNextDate, dto.medicineUsage, userCode, taskAlarmCode, userCode, userHomeCode];
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, params);
 
@@ -345,9 +347,23 @@ export class TodoAppRepository {
   }
 
   // TODO: COMPLETE-HARVER
-  async getTaskHarvests(taskAlarmCode: string, isOnlyActive: boolean): Promise<ITodoHomeTaskAlram & IHarvestTaskRow[]> {
+  async getOneTaskHarvest(taskAlarmCode: string): Promise<(ITodoHomeTaskAlram & IHarvestTaskPhase) | null> {
+    let query = ` SELECT A.seq, A.taskAlarmCode, A.taskPeriodCode, A.taskCode, B.taskKeyword, A.taskName, A.taskDate, A.taskStatus,
+    A.userCode, A.userHomeCode, A.taskNote, C.harvestPhase, C.harvestNextDate
+    FROM ${this.tableHomeTaskAlarm}  A
+    LEFT JOIN ${this.tableTask} B
+    ON A.taskCode = B.taskCode 
+    LEFT JOIN ${this.tableHomeTaskHarvestPhase} C
+    ON A.taskAlarmCode = C.taskAlarmCode 
+    WHERE A.taskAlarmCode  = ? 
+    LIMIT 1 `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
+    return rows.length ? (rows[0] as (ITodoHomeTaskAlram & IHarvestTaskPhase)) : null;
+  }
+  async getTaskHarvests(taskAlarmCode: string, isOnlyActive: boolean): Promise<(ITodoHomeTaskAlram & IHarvestTask)[]> {
     let query = `  SELECT A.taskAlarmCode, A.taskCode, C.taskKeyword, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
-     B.seq, B.userCode, B.userHomeCode, B.floor, B.cell, B.cellCollected, B.cellRemain 
+     B.seq, B.userCode, B.userHomeCode, B.floor, B.cell, B.cellCollected, B.cellRemain
     FROM ${this.tableHomeTaskAlarm} A
     LEFT JOIN ${this.tableHomeTaskHarvest} B
     ON A.taskAlarmCode = B.taskAlarmCode
@@ -356,7 +372,7 @@ export class TodoAppRepository {
     WHERE A.taskAlarmCode  = ?  ${isOnlyActive ? ` AND B.isActive = 'Y' ` : ''} `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
-    return rows as ITodoHomeTaskAlram & IHarvestTaskRow[];
+    return rows as (ITodoHomeTaskAlram & IHarvestTask & IHarvestTaskPhase)[];
   }
 
   async insertTaskHarvest(dto: HarvestDataRowDto): Promise<number> {

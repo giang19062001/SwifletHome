@@ -9,6 +9,7 @@ import { OptionService } from 'src/modules/options/option.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
+import { OPTION_CONST } from 'src/modules/options/option.interface';
 
 @Injectable()
 export class HomeSaleAppService {
@@ -65,8 +66,8 @@ export class HomeSaleAppService {
     }
     // kiểm tra attendCode
     const attendCodes = await this.optionService.getAll({
-      mainOption: 'SIGHTSEEING',
-      subOption: 'NUMBER_ATTEND',
+      mainOption: OPTION_CONST.SIGHTSEEING.mainOption,
+      subOption:  OPTION_CONST.SIGHTSEEING.subOption,
     });
 
     if (!attendCodes.map((c) => c.code).includes(dto.numberAttendCode)) {
