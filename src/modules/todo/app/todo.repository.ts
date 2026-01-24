@@ -7,6 +7,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode, handleTimezoneQuery } from 'src/helpers/func.helper';
 import moment from 'moment';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { TaskHarvestQrResDto, TaskMedicineQrResDto } from 'src/modules/qr/app/qr.dto';
 
 @Injectable()
 export class TodoAppRepository {
@@ -18,6 +19,7 @@ export class TodoAppRepository {
   private readonly tableHomeTaskMedicine = 'tbl_todo_home_task_medicine';
   private readonly tableHomeTaskHarvest = 'tbl_todo_home_task_harvest';
   private readonly tableHomeTaskHarvestPhase = 'tbl_todo_home_task_harvest_phase';
+  private readonly tableOption = 'tbl_option_common';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -311,21 +313,10 @@ export class TodoAppRepository {
     ON A.seq = B.seqNextTime
     LEFT JOIN ${this.tableTask} C
     ON A.taskCode = C.taskCode
-    WHERE taskAlarmCode  = ? LIMIT 1 `;
+    WHERE taskAlarmCode  = ?  AND C.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}'  LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
     return rows.length ? (rows[0] as ITodoHomeTaskAlram & ITodoTaskMedicine) : null;
-  }
-  async getTaskMedicineCompleteList(): Promise<[ITodoHomeTaskAlram & ITodoTaskMedicine]> {
-    let query = `  SELECT A.taskAlarmCode, A.taskCode, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
-    B.seq, B.seqNextTime, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineUsage
-    FROM ${this.tableHomeTaskAlarm} A
-    LEFT JOIN ${this.tableHomeTaskMedicine} B
-     ON A.seq = B.seqNextTime
-    WHERE A.taskStatus = 'COMPLETE'
-    `;
-    const [rows] = await this.db.query<RowDataPacket[]>(query, []);
-    return rows as [ITodoHomeTaskAlram & ITodoTaskMedicine];
   }
 
   async insertTaskMedicine(userCode: string, userHomeCode: string, seqNextTime: number, dto: SetTaskMedicineDto): Promise<number> {
@@ -367,7 +358,8 @@ export class TodoAppRepository {
     ON A.seq = B.seqAlarm
     LEFT JOIN ${this.tableTask} C
     ON A.taskCode = C.taskCode
-    WHERE A.seq  = ?  ${isOnlyActive ? ` AND B.isActive = 'Y' ` : ''} `;
+    WHERE A.seq  = ?  AND C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}' 
+    ${isOnlyActive ? ` AND B.isActive = 'Y' ` : ''} `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [seq]);
     return rows as (ITodoHomeTaskAlram & IHarvestTask)[];
@@ -378,7 +370,7 @@ export class TodoAppRepository {
     FROM ${this.tableHomeTaskAlarm}  A
     LEFT JOIN ${this.tableTask} B
     ON A.taskCode = B.taskCode 
-     WHERE A.taskAlarmCode  = ? 
+     WHERE A.taskAlarmCode  = ? AND B.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
     LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
@@ -465,5 +457,43 @@ export class TodoAppRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqAlarm, userCode, userHomeCode, floor, cell]);
 
     return result.affectedRows;
+  }
+
+  // TODO -- QRCODE
+  async getTaskMedicineCompleteList(userHomeCode: string): Promise<TaskMedicineQrResDto[]> {
+    const query = `
+    SELECT 
+      A.taskAlarmCode AS taskAlarmCode,
+      B.medicineUsage,
+      CASE
+        WHEN C.keyOption != '${TODO_CONST.TASK_OPTION_MEDICINE.OTHER.value}' THEN C.valueOption
+        ELSE B.medicineOther
+      END AS medicineName,
+     COALESCE(A.updatedAt, A.createdAt) AS timestamp
+    FROM ${this.tableHomeTaskAlarm} A
+    LEFT JOIN ${this.tableHomeTaskMedicine} B
+      ON A.seq = B.seqNextTime
+    LEFT JOIN ${this.tableOption} C
+      ON B.medicineOptionCode = C.code
+    LEFT JOIN ${this.tableTask} D
+      ON A.taskCode = D.taskCode
+    WHERE A.userHomeCode = ? AND A.taskStatus = 'COMPLETE' AND D.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}'
+  `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode]);
+    return rows as TaskMedicineQrResDto[];
+  }
+
+  async getTaskHarvestCompleteList(userHomeCode: string): Promise<(TaskHarvestQrResDto & { seq: number })[]> {
+    let query = ` SELECT  A.seq, A.taskAlarmCode AS harvestTaskAlarmCode, B.harvestPhase, B.harvestYear
+    FROM ${this.tableHomeTaskAlarm}  A
+    LEFT JOIN ${this.tableHomeTaskHarvestPhase} B
+    ON A.seq = B.seqAlarm 
+      LEFT JOIN ${this.tableTask} C
+      ON A.taskCode = C.taskCode
+     WHERE A.userHomeCode  = ?  AND A.taskStatus = 'COMPLETE' AND B.isDone = 'Y' AND C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+    LIMIT 1 `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode]);
+    return rows as (TaskHarvestQrResDto & { seq: number })[];
   }
 }

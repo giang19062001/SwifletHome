@@ -248,13 +248,8 @@ export class TodoAppService {
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành'`);
         } else {
           // chưa tới ngày lăn thuốc
-          // this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
+          this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
           // return -3;
-          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
-          this.logger.error(
-            logbase,
-            `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate} -- cập nhập trạng thái hoàn thành sớm`,
-          );
         }
 
         // update lăn thuốc hiện tại
@@ -443,19 +438,11 @@ export class TodoAppService {
         }
       }
       // insert
-      for (const row of toInsert) {
-        await this.todoAppRepository.insertTaskHarvestRows(row);
-      }
-
-      //update
-      for (const row of toUpdate) {
-        await this.todoAppRepository.updateTaskHarvestRows(row);
-      }
-
+      await Promise.all(toInsert.map((row) => this.todoAppRepository.insertTaskHarvestRows(row)));
+      // update
+      await Promise.all(toUpdate.map((row) => this.todoAppRepository.updateTaskHarvestRows(row)));
       // delete
-      for (const row of toDelete) {
-        await this.todoAppRepository.deleteTaskHarvestRows(row.seqAlarm, row.floor, row.cell, userCode, userHomeCode);
-      }
+      await Promise.all(toDelete.map((row) => this.todoAppRepository.deleteTaskHarvestRows(row.seqAlarm, row.floor, row.cell, userCode, userHomeCode)));
     } else {
       // insert mới toàn bộ dữ liệu tầng ô
       if (harvestData.length) {
@@ -478,9 +465,7 @@ export class TodoAppService {
           }
         }
         if (harvestDataRows.length) {
-          for (const row of harvestDataRows) {
-            await this.todoAppRepository.insertTaskHarvestRows(row);
-          }
+          await Promise.all(harvestDataRows.map((row) => this.todoAppRepository.insertTaskHarvestRows(row)));
         }
       }
     }
@@ -610,11 +595,34 @@ export class TodoAppService {
       return -3;
     }
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
+    const harvestData: HarvestDataDto[] = await this.arrangeHarvestRows(alramHarvestDetail?.seq ?? 0, homeArea.userHomeFloor);
+
+    // lấy thông tin 'đợt' theo năm
+    const harvestPhase = await this.todoAppRepository.getMaxHarvestPhase(mainHomeOfUser?.userHomeCode);
+    const result: GetTaskHarvestResDto = {
+      userHomeName: mainHomeOfUser.userHomeName,
+      taskAlarmCode: String(taskAlarmCode).trim() !== '' && alramHarvestDetail != null ? taskAlarmCode : '',
+      harvestNextDate:
+        String(taskAlarmCode).trim() !== '' && alramHarvestDetail?.taskDate
+          ? moment(alramHarvestDetail.taskDate).isValid()
+            ? moment(alramHarvestDetail.taskDate).format('YYYY-MM-DD')
+            : moment().format('YYYY-MM-DD')
+          : moment().format('YYYY-MM-DD'),
+      harvestPhase: harvestPhase, // mặc định là đợt 1 nếu ko có
+      isComplete: 'N', // hoàn thành tất cả mặc định là 'N'
+      harvestData: harvestData, // dữ liệu tầng / ô
+    };
+    return result;
+  }
+
+  // sắp xếp dữ liệu tầng ô lồng nhau
+  async arrangeHarvestRows(seq: number, userHomeFloor: number): Promise<HarvestDataDto[]> {
+    // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
     let harvestData: HarvestDataDto[] = [];
-    const harvestRows = await this.todoAppRepository.getTaskHarvestRows(alramHarvestDetail?.seq ?? 0, true); // true -> chỉ lấy cell  isActive = 'Y'
+    const harvestRows = await this.todoAppRepository.getTaskHarvestRows(seq, true); // true -> chỉ lấy cell  isActive = 'Y'
     if (!harvestRows.length) {
       // khởi tạo Rows mặc định
-      for (let i = 1; i <= homeArea.userHomeFloor; i++) {
+      for (let i = 1; i <= userHomeFloor; i++) {
         harvestData.push({
           floor: i,
           floorData: [
@@ -644,22 +652,6 @@ export class TodoAppService {
 
       harvestData = Array.from(floorMap.values()).sort((a, b) => a.floor - b.floor);
     }
-
-    // lấy thông tin 'đợt' theo năm
-    const harvestPhase = await this.todoAppRepository.getMaxHarvestPhase(mainHomeOfUser?.userHomeCode);
-    const result: GetTaskHarvestResDto = {
-      userHomeName: mainHomeOfUser.userHomeName,
-      taskAlarmCode: String(taskAlarmCode).trim() !== '' && alramHarvestDetail != null ? taskAlarmCode : '',
-      harvestNextDate:
-        String(taskAlarmCode).trim() !== '' && alramHarvestDetail?.taskDate
-          ? moment(alramHarvestDetail.taskDate).isValid()
-            ? moment(alramHarvestDetail.taskDate).format('YYYY-MM-DD')
-            : moment().format('YYYY-MM-DD')
-          : moment().format('YYYY-MM-DD'),
-      harvestPhase: harvestPhase, // mặc định là đợt 1 nếu ko có
-      isComplete: 'N', // hoàn thành tất cả mặc định là 'N'
-      harvestData: harvestData, // dữ liệu tầng / ô
-    };
-    return result;
+    return harvestData;
   }
 }

@@ -21,12 +21,12 @@ export default class QrAppController {
     summary: 'Lấy thông tin để yêu cầu tạo mã Qrcode',
     description: ``,
   })
-  @Get('getInfoToRequestQrcode')
+  @Get('getInfoToRequestQrcode/:userHomeCode')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetInfoToRequestQrcodeResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getInfoToRequestQrcode(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
-    const result = await this.qrAppService.getInfoToRequestQrcode(userHomeCode,user)
-    return result
+    const result = await this.qrAppService.getInfoToRequestQrcode(userHomeCode, user);
+    return result;
   }
 }

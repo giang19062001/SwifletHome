@@ -44,7 +44,7 @@ export class TaskMedicineQrResDto {
   medicineName: string; // medicineOptionCode or  medicineOther
 
   @ApiProperty({ example: '' })
-  medicineOther: string;
+  medicineUsage: string;
 
   @ApiProperty({ example: '20-11-2025' })
   timestamp: string;
