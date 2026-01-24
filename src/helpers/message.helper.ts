@@ -56,15 +56,16 @@ export const Msg = {
   HomeOfAlarmNotExist:"Nhà yến của lịch nhắc này không tồn tại",
   FloorOfHomeIsZero:"Số tầng của nhà yến hiện tại là 0 - không thể khởi tạo dữ liệu thu hoạch",
   MedicineTaskAlreadyAdded:`Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
+  MedicineInvalidDateExecute:"Chưa đến ngày lăn thuốc",
   HarvestTaskAlreadyAdded:`Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
-  InvalidValue: (filedName: string) => `${convertFiledName(filedName)} sai giá trị cho phép`,
+  InvalidValue: (filedName: string) => `Gía trị của ${convertFiledName(filedName)} không hợp lệ`,
   InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
   MustBeGreaterThanAndEqualNow: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
 };
 
 const convertFiledName = (filedName: string) => {
-  let txt = '';
+  let txt = filedName ;
   switch (filedName) {
     case "taskCustomName":
       txt = "Tên lịch nhắc tùy chỉnh"

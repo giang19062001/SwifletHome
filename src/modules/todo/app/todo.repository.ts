@@ -305,7 +305,7 @@ export class TodoAppRepository {
   // TODO: COMPLETE-MEDICINE
   async getTaskMedicine(taskAlarmCode: string): Promise<(ITodoHomeTaskAlram & ITodoTaskMedicine) | null> {
     let query = `  SELECT A.taskAlarmCode, A.taskCode, C.taskKeyword, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
-    B.seq, B.seqNextTime, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineNextDate, B.medicineUsage
+    B.seq, B.seqNextTime, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineUsage
     FROM ${this.tableHomeTaskAlarm} A
     LEFT JOIN ${this.tableHomeTaskMedicine} B
     ON A.seq = B.seqNextTime
@@ -319,10 +319,10 @@ export class TodoAppRepository {
 
   async insertTaskMedicine(userCode: string, userHomeCode: string, seqNextTime: number, dto: SetTaskMedicineDto): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableHomeTaskMedicine}  (seqNextTime, userCode, userHomeCode, medicineOptionCode, medicineOther, medicineUsage, medicineNextDate, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.tableHomeTaskMedicine}  (seqNextTime, userCode, userHomeCode, medicineOptionCode, medicineOther, medicineUsage, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, dto.medicineNextDate, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, userCode]);
 
     return result.insertId;
   }
@@ -332,14 +332,14 @@ export class TodoAppRepository {
     LEFT JOIN ${this.tableHomeTaskAlarm} B
       ON A.seqNextTime = B.seq
     SET 
-      A.medicineOptionCode = ?, A.medicineOther = ?, A.medicineNextDate = ?, medicineUsage = ?, A.updatedId = ?, A.updatedAt = NOW()
+      A.medicineOptionCode = ?, A.medicineOther = ?, medicineUsage = ?, A.updatedId = ?, A.updatedAt = NOW()
     WHERE 
       B.taskAlarmCode = ?
       AND A.userCode = ?
       AND A.userHomeCode = ?
   `;
 
-    const params = [dto.medicineOptionCode, dto.medicineOther, dto.medicineNextDate, dto.medicineUsage, userCode, taskAlarmCode, userCode, userHomeCode];
+    const params = [dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, userCode, taskAlarmCode, userCode, userHomeCode];
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, params);
 

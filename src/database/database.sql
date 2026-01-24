@@ -649,7 +649,6 @@ CREATE TABLE
     userHomeCode VARCHAR(45) NOT NULL,
     medicineOptionCode VARCHAR(15) NOT NULL,
     medicineOrther VARCHAR(255) NOT NULL,
-    medicineNextDate  DATE DEFAULT NUlL,
     medicineUsage VARCHAR(45) NOT NULL,
     isActive CHAR(1) NOT NULL DEFAULT 'Y',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -187,44 +187,96 @@ export class TodoAppService {
   }
   // TODO: COMPLETE-MEDICINE
   // hàm insert lịch nhắc lăn thuốc
-  async insertTaskMedicineNextime(today: moment.Moment, isToday: boolean, userCode: string, userHomeCode: string, task: ITodoTask, dto: SetTaskMedicineDto): Promise<number> {
+  async handleTaskMedicineCurrentAndNextime(userCode: string, userHomeCode: string, taskDate: Date | null, task: ITodoTask, dto: SetTaskMedicineDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskMedicine:`;
 
-    const logbaseChild = `${logbase}::insertTaskMedicineNextime:`;
-    let resultChild = 0;
+    const logbaseChild = `${logbase}::handleTaskMedicineCurrentAndNextime:`;
+    let result = 0;
     try {
-      const taskDateNextTime = moment(dto.medicineNextDate).toDate();
+      // kiểm tra ngày chọn có trùng ngày hôm nay
+      const today = moment().startOf('day');
+      // ! TEST
+      // const today = moment('2026-01-29').startOf('day');
 
-      const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
-        userHomeCode: userHomeCode,
-        taskPeriodCode: null,
-        taskCode: task.taskCode,
-        taskName: task.taskName,
-        taskNote: '',
-        taskStatus: isToday ? TaskStatusEnum.COMPLETE : TaskStatusEnum.WAITING,
-        taskDate: taskDateNextTime,
-      };
+      // dữ liệu alarm chưa có
+      if (String(dto.taskAlarmCode).trim() == '') {
+        // kiểm tra trùng ngày hoặc không
+        const isToday = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
+        this.logger.log(logbase, isToday ? `Ngày lăn thuốc đã thiết lập trước đó trùng ngày hôm nay -- OK` : `Lịch chọn không trùng hôm này`);
 
-      // insert lịch nhắc alarm sau với taskCode của LĂN THUỐC
-      const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
-      this.logger.log(
-        logbaseChild,
-        `Tạo Lịch nhắc lăn thuốc mới thành công, hiện tại (${today.toDate().toLocaleDateString()}) 
-               --- (${taskDateNextTime.toLocaleDateString()})`,
-      );
-      if (seqNextTime) {
-        // insert tbl_todo_home_task_medicine
-        const affectedRows = await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
-        if (affectedRows) {
-          this.logger.log(logbaseChild, `Lưu dữ liệu lăn lăn thuốc, SEQ Lần sau (${seqNextTime})`);
-          resultChild = 1;
+        // nếu ngày chọn lịch nhắc kế tiếp ko phải hôm nay -> insert lịch nhắc lần sau
+        if (!isToday) {
+          const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
+            userHomeCode: userHomeCode,
+            taskPeriodCode: null,
+            taskCode: task.taskCode,
+            taskName: task.taskName,
+            taskNote: '',
+            taskStatus: TaskStatusEnum.WAITING,
+            taskDate: moment(dto.medicineNextDate).toDate(), // ngày lăn kế tiếp
+          };
+          const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
+          this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc mới thành công, hiện tại (${today.toDate().toLocaleDateString()}) --- (${moment().toDate().toLocaleDateString()})`);
+          await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
+          this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc chO  lần sau SEQ(${seqNextTime})`);
         } else {
-          resultChild = 0;
+          // insert lịch nhắc cho hôm nay với trạng thái 'hoàn thành'
+          const newAlarmMedicionDto: SetTaskAlarmDto = {
+            userHomeCode: userHomeCode,
+            taskPeriodCode: null,
+            taskCode: task.taskCode,
+            taskName: task.taskName,
+            taskNote: '',
+            taskStatus: TaskStatusEnum.COMPLETE,
+            taskDate: moment().toDate(), // lăn trong ngày hôm nay
+          };
+
+          const seqNew = await this.todoAppRepository.insertTaskAlarm(userCode, newAlarmMedicionDto);
+          this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc mới thành công, hiện tại (${today.toDate().toLocaleDateString()}) --- (${moment().toDate().toLocaleDateString()})`);
+          await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNew, dto);
+          this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc chO  lần sau SEQ(${seqNew})`);
         }
+
+        result = 1;
       } else {
-        resultChild = 0;
+        // dữ liệu alarm có sẵn
+
+        // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành
+        const isTodayWithSetted = today.isSame(moment(taskDate, 'YYYY-MM-DD'), 'day');
+        if (isTodayWithSetted) {
+          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+          this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành'`);
+        } else {
+          // chưa tới ngày lăn thuốc
+          this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
+          return -3
+        }
+
+        // update lăn thuốc hiện tại
+        await this.todoAppRepository.updateTaskMedicine(userCode, userHomeCode, dto.taskAlarmCode, dto);
+        this.logger.log(logbase, `Cập nhập dữ liệu lăn thuốc hiện tại taskAlarmCode(${dto.taskAlarmCode})`);
+
+        // nếu hôm nay < ngày chọn lịch nhắc cho lần sau --> insert mới với trạng thái 'WAITING'
+        const isTodayWithDto = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
+        if (!isTodayWithDto) {
+          const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
+            userHomeCode: userHomeCode,
+            taskPeriodCode: null,
+            taskCode: task.taskCode,
+            taskName: task.taskName,
+            taskNote: '',
+            taskStatus: TaskStatusEnum.WAITING,
+            taskDate: moment(dto.medicineNextDate).toDate(), // ngày lăn kế tiếp
+          };
+          const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
+          this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc mới thành công, hiện tại (${today.toDate().toLocaleDateString()}) --- (${moment().toDate().toLocaleDateString()})`);
+          await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
+          this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc chO  lần sau SEQ(${seqNextTime})`);
+        }
+        result = 1
       }
-      return resultChild;
+
+      return result;
     } catch (error) {
       this.logger.error(logbaseChild, `${JSON.stringify(error)}`);
       return 0;
@@ -267,16 +319,9 @@ export class TodoAppService {
       throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
     }
 
-    // kiểm tra ngày chọn có trùng ngày hôm nay
-    // ! TEST
-    // const today = moment('2026-01-21').startOf('day');
-    const today = moment().startOf('day');
-    const isToday = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
-    this.logger.log(logbase, isToday ? `Lịch chọn trùng ngày hôm này` : `Lịch chọn không trùng ngày hôm này`);
-
-    // chưa có dữ liệu có sẵn
-    if (dto.taskAlarmCode == '') {
-      result = await this.insertTaskMedicineNextime(today, isToday, userCode, mainHomeOfUser.userHomeCode, task, dto);
+    // chưa có dữ liệu có sẵn --> insert dữ liệu lăn thuốc mới
+    if (String(dto.taskAlarmCode).trim() == '') {
+      result = await this.handleTaskMedicineCurrentAndNextime(userCode, mainHomeOfUser.userHomeCode, null, task, dto);
     } else {
       // lấy thông tin lịch nhắc lăn thuốc có sẵn đang countdown
       const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
@@ -296,41 +341,24 @@ export class TodoAppService {
         return -2;
       }
 
-      // update tbl_todo_home_task_medicine
-      const affectedRows = await this.todoAppRepository.updateTaskMedicine(userCode, mainHomeOfUser.userHomeCode, dto.taskAlarmCode, dto);
-      if (affectedRows) {
-        this.logger.log(logbase, `Cập nhập dữ liệu Medicin lăn thuốc`);
-        result = 1; // thành công
-      }
-
-      // nếu ngày chọn  != ngày hôm nay
-      if (!isToday) {
-        // cập nhập status của taskAlarmCode hiện tại thành 'SKIP'
-        await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.SKIP, userCode, dto.taskAlarmCode);
-        this.logger.log(logbase, `Cập nhập trạng thái Alram lăn thuốc hiện tài thành 'Bỏ qua'`);
-
-        // insert lịch nhắc alarm mới với taskCode của lăn thuốc
-        result = await this.insertTaskMedicineNextime(today, isToday, userCode, mainHomeOfUser.userHomeCode, task, dto);
-      } else {
-        // nếu ngày chọn  == ngày hôm nay
-        // cập nhập status của taskAlarmCode hiện tại thành 'COMPLETE'
-        await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
-        this.logger.log(logbase, `Cập nhập trạng thái Alram lăn thuốc hiện tài thành 'Hoàn thành'`);
-      }
+      //  có dữ liệu có sẵn xử lý  -- >thêm / cập nhập dự liệu lăn thuốc
+      result = await this.handleTaskMedicineCurrentAndNextime(userCode, mainHomeOfUser.userHomeCode, alramDetail.taskDate, task, dto);
     }
 
     return result;
   }
   async getTaskMedicine(taskAlarmCode: string): Promise<GetTasksMedicineResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getTaskMedicine:`;
-    const DEFAULT_VALUE = {
+    const DEFAULT_VALUE: GetTasksMedicineResDto = {
       taskAlarmCode: '',
       medicineOptionCode: '',
       medicineOther: '',
       medicineUsage: '',
       medicineNextDate: moment().format('YYYY-MM-DD'),
     };
-    if (taskAlarmCode == '') {
+
+    // nếu taskAlarmCode là "" -> trả giá trị default
+    if (String(taskAlarmCode).trim() == '') {
       return DEFAULT_VALUE;
     } else {
       // lấy thông tin alram
@@ -339,7 +367,7 @@ export class TodoAppService {
         // taskAlarmCode này không phải lăn thuốc
         if (result.taskKeyword !== TODO_CONST.TASK_BOX.MEDICINE.value) {
           this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) ${Msg.OnlyMedicineTaskCanDo}`);
-          throw new BadRequestException({ message: Msg.UpdateErr, data: null });
+          throw new BadRequestException({ message: Msg.OnlyMedicineTaskCanDo, data: null });
         }
 
         // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
@@ -352,10 +380,11 @@ export class TodoAppService {
           medicineOptionCode: result?.medicineOptionCode,
           medicineOther: result?.medicineOther,
           medicineUsage: result?.medicineUsage,
-          medicineNextDate: moment(result?.medicineNextDate).format('YYYY-MM-DD'),
+          medicineNextDate: moment(result?.taskDate).format('YYYY-MM-DD'),
         };
       } else {
-        return DEFAULT_VALUE;
+        this.logger.error(logbase, `Gía trị (${Msg.InvalidValue('taskAlarmCode')}) không hợp lệ`);
+        return null;
       }
     }
   }

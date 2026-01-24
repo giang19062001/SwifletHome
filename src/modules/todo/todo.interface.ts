@@ -135,7 +135,6 @@ export interface ITodoTaskMedicine {
   medicineOptionCode: string;
   medicineOther: string;
   medicineUsage: string;
-  medicineNextDate: string;
 }
 
 export interface IHarvestTask {

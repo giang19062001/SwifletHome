@@ -148,6 +148,12 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
         data: 0,
       });
     }
+     if (result == -3) {
+      throw new BadRequestException({
+        message: Msg.MedicineInvalidDateExecute,
+        data: 0,
+      });
+    }
 
     if (result == 0) {
       throw new BadRequestException({

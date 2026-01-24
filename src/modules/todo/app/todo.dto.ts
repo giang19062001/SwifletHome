@@ -4,6 +4,7 @@ import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, I
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
+import { IsTodayOrAfter } from 'src/decorator/validate.decorator';
 
 export class GetListTaskAlarmsDTO extends PagingDto {
   @ApiProperty({
@@ -342,5 +343,6 @@ export class SetTaskMedicineDto {
   @IsNotEmpty({ message: 'medicineNextDate cannot be null or empty' })
   @Transform(({ value }) => new Date(value + 'T00:00:00'))
   @IsDate({ message: 'medicineNextDate must be a valid date' })
+  @IsTodayOrAfter({ message: 'medicineNextDate must be today or later' })
   medicineNextDate: Date;
 }
