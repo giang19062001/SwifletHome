@@ -262,28 +262,34 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getTaskHarvest(@GetUserApp() user: authInterface.ITokenUserApp, @Query('taskAlarmCode') taskAlarmCode?: string) {
     const result = await this.todoAppService.getTaskHarvest(user.userCode, taskAlarmCode ?? '');
+    if (result == 0) {
+      throw new BadRequestException({
+        message: Msg.GetErr,
+        data: null,
+      });
+    }
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.OnlyHarvestTaskCanDo,
-        data: 0,
+        data: null,
       });
     }
     if (result == -2) {
       throw new BadRequestException({
         message: Msg.HomeOfAlarmNotExist,
-        data: 0,
+        data: null,
       });
     }
     if (result == -3) {
       throw new BadRequestException({
         message: Msg.FloorOfHomeIsZero,
-        data: 0,
+        data: null,
       });
     }
      if (result == -4) {
       throw new BadRequestException({
         message: Msg.AlreadyCompleteCannotDo,
-        data: 0,
+        data: null,
       });
     }
     return result;

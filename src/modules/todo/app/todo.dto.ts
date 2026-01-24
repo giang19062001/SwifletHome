@@ -211,10 +211,11 @@ export class SetHarvestTaskDto {
     format: 'date',
     required: true,
   })
-  @IsDefined({ message: 'havestDate is required' })
-  @IsNotEmpty({ message: 'havestDate cannot be null or empty' })
+  @IsDefined({ message: 'harvestNextDate is required' })
+  @IsNotEmpty({ message: 'harvestNextDate cannot be null or empty' })
   @Transform(({ value }) => new Date(value + 'T00:00:00'))
-  @IsDate({ message: 'havestDate must be a valid date' })
+  @IsDate({ message: 'harvestNextDate must be a valid date' })
+  @IsTodayOrAfter({ message: 'harvestNextDate must be today or later' })
   harvestNextDate: Date;
 
   @ApiProperty({ example: 0 })

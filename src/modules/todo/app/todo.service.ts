@@ -249,14 +249,16 @@ export class TodoAppService {
         } else {
           // chưa tới ngày lăn thuốc
           this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
-          return -3
+          return -3;
+          // await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE_SOON, userCode, dto.taskAlarmCode);
+          // this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate} -- cập nhập trạng thái hoàn thành sớm`);
         }
 
         // update lăn thuốc hiện tại
         await this.todoAppRepository.updateTaskMedicine(userCode, userHomeCode, dto.taskAlarmCode, dto);
         this.logger.log(logbase, `Cập nhập dữ liệu lăn thuốc hiện tại taskAlarmCode(${dto.taskAlarmCode})`);
 
-        // nếu hôm nay < ngày chọn lịch nhắc cho lần sau --> insert mới với trạng thái 'WAITING'
+        // nếu hôm nay != ngày chọn lịch nhắc cho lần sau --> insert mới với trạng thái 'WAITING'
         const isTodayWithDto = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
         if (!isTodayWithDto) {
           const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
@@ -273,7 +275,7 @@ export class TodoAppService {
           await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
           this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc chO  lần sau SEQ(${seqNextTime})`);
         }
-        result = 1
+        result = 1;
       }
 
       return result;
@@ -391,8 +393,7 @@ export class TodoAppService {
   // TODO: COMPLETE-HARVER
   async InsUpDelHarvestRows(userCode: string, userHomeCode: string, seq: number, harvestData: HarvestDataDto[]) {
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
-    const isOnlyActive = false; // -> lấy luôn cả cell bị isActive = 'N'
-    const harvestCurrentDatas = await this.todoAppRepository.getTaskHarvestRows(seq, isOnlyActive);
+    const harvestCurrentDatas = await this.todoAppRepository.getTaskHarvestRows(seq, false); // false -> lấy luôn cả cell bị isActive = 'N'
 
     // insert / update/ detele dữ liệu tầng ô hiện có
     if (harvestCurrentDatas.length) {
@@ -501,10 +502,10 @@ export class TodoAppService {
       }
 
       // khởi tạo ban đầu
-      if (dto.taskAlarmCode === '') {
+      if (String(dto.taskAlarmCode).trim() === '') {
         const taskDateNextTime = moment(dto.harvestNextDate).toDate();
 
-        // nếu ngày chọn lịch  = ngày hôm này ---> Hoàn thành
+        // nếu checked 'hoàn thành tất cả' ---> Hoàn thành
         const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
           userHomeCode: mainHomeOfUser.userHomeCode,
           taskPeriodCode: null,
@@ -520,7 +521,8 @@ export class TodoAppService {
 
         // insert đợt cho thu hoạch
         await this.todoAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestPhase, dto.isComplete == 'Y' ? YnEnum.Y : YnEnum.N);
-        // insert / update/ detele dữ liệu tầng ô
+
+        // insert / update/ detele dữ liệu tầng ô mới
         await this.InsUpDelHarvestRows(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestData);
       } else {
         //dữ liệu có sẵn
@@ -550,7 +552,7 @@ export class TodoAppService {
         if (dto.isComplete == 'Y') {
           // cập nhập alarm là hoàn thành
           await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
-          // cập nhập alarm là hoàn thành
+          // cập nhập đợt của alarm là Done
           await this.todoAppRepository.completeTaskHarvestPhase(userCode, alramDetail?.userHomeCode ?? '', alramDetail?.seq ?? 0, dto.harvestPhase);
         }
       }
@@ -566,6 +568,10 @@ export class TodoAppService {
 
     // lấy thông tin alram
     const alramHarvestDetail = await this.todoAppRepository.getOneTaskHarvest(taskAlarmCode);
+    if (String(taskAlarmCode).trim() !== '' && alramHarvestDetail == null) {
+      this.logger.error(logbase, `Không có thông tin thu hoạch của mã code taskAlarmCode(${taskAlarmCode})`);
+      return 0;
+    }
     // taskAlarmCode này đã HOÀN THÀNH -> ko thể update
     if (alramHarvestDetail && alramHarvestDetail.taskStatus == TaskStatusEnum.COMPLETE) {
       this.logger.error(logbase, `Lịch nhắc(${alramHarvestDetail.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
@@ -573,12 +579,12 @@ export class TodoAppService {
     }
 
     // taskAlarmCode này không phải thu hoạch
-    if (taskAlarmCode != '' && alramHarvestDetail && alramHarvestDetail.taskKeyword !== TODO_CONST.TASK_BOX.HARVEST.value) {
+    if (String(taskAlarmCode).trim() !== '' && alramHarvestDetail && alramHarvestDetail.taskKeyword !== TODO_CONST.TASK_BOX.HARVEST.value) {
       this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) ${Msg.OnlyHarvestTaskCanDo}`);
       return -1;
     }
 
-    // Tìm nhà chính của user
+    // lấy nhà chính của user
     const mainHomeOfUser = await this.userHomeAppService.getMainHomeByUser(userCode);
     if (!mainHomeOfUser) {
       this.logger.error(logbase, `Main home của user này không có`);
@@ -587,7 +593,6 @@ export class TodoAppService {
 
     // lấy floor của nhà yến của lịch nhắc này
     const homeArea = await this.userHomeAppService.getAreaHome(mainHomeOfUser?.userHomeCode ?? '');
-    // nhà yến của lịch nhắc ko tồn tại
     if (!homeArea) {
       this.logger.error(logbase, `Lịch nhắc(${taskAlarmCode}) - nhà yến(${alramHarvestDetail?.userHomeCode ?? ''}) ${Msg.HomeOfAlarmNotExist}`);
       return -2;
@@ -599,10 +604,9 @@ export class TodoAppService {
     }
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
     let harvestData: HarvestDataDto[] = [];
-    const isOnlyActive = true; // -> chỉ lấy cell  isActive = 'Y'
-    const harvestsCurrent = await this.todoAppRepository.getTaskHarvestRows(alramHarvestDetail?.seq ?? 0, isOnlyActive);
-    if (!harvestsCurrent.length) {
-      // khởi tạo mặc định
+    const harvestRows = await this.todoAppRepository.getTaskHarvestRows(alramHarvestDetail?.seq ?? 0, true); // true -> chỉ lấy cell  isActive = 'Y'
+    if (!harvestRows.length) {
+      // khởi tạo Rows mặc định
       for (let i = 1; i <= homeArea.userHomeFloor; i++) {
         harvestData.push({
           floor: i,
@@ -619,7 +623,7 @@ export class TodoAppService {
       // lồng dữ liệu đã có
       const floorMap = new Map<number, { floor: number; floorData: FloorDataDto[] }>();
 
-      for (const row of harvestsCurrent) {
+      for (const row of harvestRows) {
         if (!floorMap.has(row.floor)) {
           floorMap.set(row.floor, { floor: row.floor, floorData: [] });
         }
@@ -634,18 +638,19 @@ export class TodoAppService {
       harvestData = Array.from(floorMap.values()).sort((a, b) => a.floor - b.floor);
     }
 
-    const dataPhase = await this.todoAppRepository.getMaxHarvestPhase(mainHomeOfUser?.userHomeCode);
+    // lấy thông tin 'đợt' theo năm
+    const harvestPhase = await this.todoAppRepository.getMaxHarvestPhase(mainHomeOfUser?.userHomeCode);
     const result: GetTaskHarvestResDto = {
-      taskAlarmCode: taskAlarmCode !== '' && alramHarvestDetail != null ? taskAlarmCode : '',
+      taskAlarmCode: String(taskAlarmCode).trim() !== '' && alramHarvestDetail != null ? taskAlarmCode : '',
       harvestNextDate:
-        taskAlarmCode !== '' && alramHarvestDetail != null
-          ? alramHarvestDetail?.taskDate instanceof Date
-            ? moment(alramHarvestDetail?.taskDate).format('YYYY-MM-DD')
-            : (alramHarvestDetail?.taskDate ?? '')
+        String(taskAlarmCode).trim() !== '' && alramHarvestDetail?.taskDate
+          ? moment(alramHarvestDetail.taskDate).isValid()
+            ? moment(alramHarvestDetail.taskDate).format('YYYY-MM-DD')
+            : moment().format('YYYY-MM-DD')
           : moment().format('YYYY-MM-DD'),
-      harvestPhase: dataPhase ? dataPhase?.harvestPhase + 1 : 1,
-      isComplete: 'N',
-      harvestData: harvestData,
+      harvestPhase: harvestPhase, // mặc định là đợt 1 nếu ko có
+      isComplete: 'N', // hoàn thành tất cả mặc định là 'N'
+      harvestData: harvestData, // dữ liệu tầng / ô
     };
     return result;
   }

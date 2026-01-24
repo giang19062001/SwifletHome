@@ -629,7 +629,7 @@ CREATE TABLE
     taskCode VARCHAR(45) NULL DEFAULT NULL,
     taskName VARCHAR(45) NOT NULL, -- taskCode hoặc taskCustomName
     taskDate DATE NOT NULL, -- render từ periodValue Hoặc specificValue của tbl_todo_home_task_period
-    taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL', 'SKIP') DEFAULT 'WAITING',
+    taskStatus ENUM ('WAITING', 'COMPLETE', 'CANCEL', 'SKIP', 'COMPLETE_SOON') DEFAULT 'WAITING',
     userCode VARCHAR(45) NOT NULL,
     userHomeCode VARCHAR(45) NOT NULL,
     taskNote VARCHAR(255) DEFAULT '',

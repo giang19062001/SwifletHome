@@ -63,6 +63,7 @@ export enum PeriodTypeEnum {
 export enum TaskStatusEnum {
   WAITING = 'WAITING',
   COMPLETE = 'COMPLETE',
+  COMPLETE_SOON = 'COMPLETE_SOON',
   CANCEL = 'CANCEL',
   SKIP = 'SKIP',
 }

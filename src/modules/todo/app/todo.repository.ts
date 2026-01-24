@@ -373,18 +373,18 @@ export class TodoAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
     return rows.length ? (rows[0] as ITodoHomeTaskAlram & IHarvestTaskPhase) : null;
   }
-  async getMaxHarvestPhase(userHomeCode: string): Promise<IHarvestTaskPhase | null> {
+  async getMaxHarvestPhase(userHomeCode: string): Promise<number> {
     const currentYear = moment().year(); // lấy năm hiện tại
 
     const query = `
-    SELECT MAX(harvestPhase) AS harvestPhase
+    SELECT MAX(harvestPhase) AS PHASE
     FROM ${this.tableHomeTaskHarvestPhase}
     WHERE userHomeCode = ?
       AND harvestYear = ? AND isDone = 'Y'
   `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, currentYear]);
-    return rows.length ? (rows[0] as IHarvestTaskPhase) : null;
+    return rows.length ? Number(rows[0].PHASE + 1) : 1;
   }
   async insertTaskHarvestPhase(userCode: string, userHomeCode: string, seqAlarm: number, harvestPhase: number, isDone: YnEnum): Promise<number> {
     const currentYear = moment().year(); // lấy năm hiện tại
