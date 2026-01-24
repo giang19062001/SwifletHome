@@ -241,22 +241,31 @@ export class TodoAppService {
       } else {
         // dữ liệu alarm có sẵn
 
-        // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành
+        // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành 
         const isTodayWithSetted = today.isSame(moment(taskDate, 'YYYY-MM-DD'), 'day');
+        //? Trước đó Set ngày 25 và hôm nay là 25 ---> HOÀN THÀNH
         if (isTodayWithSetted) {
           await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành'`);
         } else {
+          //? Trước đó Set ngày 25 NHƯNG hôm nay là 23 ---> HOÀN THÀNH
           // chưa tới ngày lăn thuốc
           this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
           // return -3;
         }
+        
+        // cập nhập lại taskDate bằng  dto.medicineNextDate
+        // await this.todoAppRepository.updateDateOfTaskAlarm(moment(dto.medicineNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
+        // this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
+
 
         // update lăn thuốc hiện tại
         await this.todoAppRepository.updateTaskMedicine(userCode, userHomeCode, dto.taskAlarmCode, dto);
         this.logger.log(logbase, `Cập nhập dữ liệu lăn thuốc hiện tại taskAlarmCode(${dto.taskAlarmCode})`);
 
         // nếu hôm nay != ngày chọn lịch nhắc cho lần sau --> insert mới với trạng thái 'WAITING'
+        //? Chọn ngày 25 NHƯNG hôm nay cũng là 25 ---> KO INSERT CÁI MỚI
+        //? Chọn ngày 27 NHƯNG hôm nay là 25 --->  INSERT CÁI MỚI
         const isTodayWithDto = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
         if (!isTodayWithDto) {
           const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
@@ -534,7 +543,7 @@ export class TodoAppService {
         }
 
         // cập nhập lại taskDate bằng  dto.harvestNextDate
-        await this.todoAppRepository.updateDateOfTaskHarvest(moment(dto.harvestNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
+        await this.todoAppRepository.updateDateOfTaskAlarm(moment(dto.harvestNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
         this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
 
         // insert / update/ detele dữ liệu tầng ô

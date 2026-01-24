@@ -54,6 +54,17 @@ export class TodoAppRepository {
   }
 
   // TODO: ALARM
+    async updateDateOfTaskAlarm(taskDate: string, taskAlarmCode: string, userCode: string): Promise<number> {
+    const sql = `
+    UPDATE ${this.tableHomeTaskAlarm}
+    SET taskDate = ?, updatedId = ?, updatedAt = NOW()
+    WHERE taskAlarmCode = ?
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [taskDate, userCode, taskAlarmCode]);
+
+    return result.affectedRows;
+  }
   async getOneTaskAlarm(taskAlarmCode: string): Promise<ITodoHomeTaskAlram | null> {
     let query = ` SELECT A.seq, A.taskAlarmCode, A.taskPeriodCode, A.taskCode, B.taskKeyword, A.taskName, A.taskDate, A.taskStatus,
     A.userCode, A.userHomeCode, A.taskNote
@@ -412,17 +423,7 @@ export class TodoAppRepository {
 
     return result.affectedRows;
   }
-  async updateDateOfTaskHarvest(harvestNextDate: string, taskAlarmCode: string, userCode: string): Promise<number> {
-    const sql = `
-    UPDATE ${this.tableHomeTaskAlarm}
-    SET taskDate = ?, updatedId = ?, updatedAt = NOW()
-    WHERE taskAlarmCode = ?
-  `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [harvestNextDate, userCode, taskAlarmCode]);
-
-    return result.affectedRows;
-  }
   async insertTaskHarvestRows(dto: HarvestDataRowDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableHomeTaskHarvest}  (seqAlarm, userCode,  userHomeCode, floor, cell, cellCollected, cellRemain, createdId) 
