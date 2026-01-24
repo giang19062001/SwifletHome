@@ -409,6 +409,17 @@ export class TodoAppRepository {
 
     return result.affectedRows;
   }
+  async updateDateOfTaskHarvest(harvestNextDate: string, taskAlarmCode: string, userCode: string): Promise<number> {
+    const sql = `
+    UPDATE ${this.tableHomeTaskAlarm}
+    SET taskDate = ?, updatedId = ?, updatedAt = NOW()
+    WHERE taskAlarmCode = ?
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [harvestNextDate, userCode, taskAlarmCode]);
+
+    return result.affectedRows;
+  }
   async insertTaskHarvestRows(dto: HarvestDataRowDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableHomeTaskHarvest}  (seqAlarm, userCode,  userHomeCode, floor, cell, cellCollected, cellRemain, createdId) 
@@ -418,7 +429,7 @@ export class TodoAppRepository {
 
     return result.insertId;
   }
-  async updateTaskHarvest(dto: HarvestDataRowDto): Promise<number> {
+  async updateTaskHarvestRows(dto: HarvestDataRowDto): Promise<number> {
     const sql = `
     UPDATE ${this.tableHomeTaskHarvest}
     SET cellCollected = ?, cellRemain = ?, updatedId = ?, updatedAt = NOW(), isActive = 'Y'
@@ -431,7 +442,7 @@ export class TodoAppRepository {
 
     return result.affectedRows;
   }
-  async deleteTaskCompleteHarvest(seqAlarm: number, floor: number, cell: number, userCode: string, userHomeCode: string): Promise<number> {
+  async deleteTaskHarvestRows(seqAlarm: number, floor: number, cell: number, userCode: string, userHomeCode: string): Promise<number> {
     const sql = `
     UPDATE ${this.tableHomeTaskHarvest}
     SET isActive = 'N', updatedId = ?, updatedAt = NOW()

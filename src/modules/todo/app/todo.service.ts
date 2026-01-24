@@ -248,10 +248,10 @@ export class TodoAppService {
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành'`);
         } else {
           // chưa tới ngày lăn thuốc
-          this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
-          return -3;
-          // await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE_SOON, userCode, dto.taskAlarmCode);
-          // this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate} -- cập nhập trạng thái hoàn thành sớm`);
+          // this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
+          // return -3;
+          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+          this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate} -- cập nhập trạng thái hoàn thành sớm`);
         }
 
         // update lăn thuốc hiện tại
@@ -446,12 +446,12 @@ export class TodoAppService {
 
       //update
       for (const row of toUpdate) {
-        await this.todoAppRepository.updateTaskHarvest(row);
+        await this.todoAppRepository.updateTaskHarvestRows(row);
       }
 
       // delete
       for (const row of toDelete) {
-        await this.todoAppRepository.deleteTaskCompleteHarvest(row.seqAlarm, row.floor, row.cell, userCode, userHomeCode);
+        await this.todoAppRepository.deleteTaskHarvestRows(row.seqAlarm, row.floor, row.cell, userCode, userHomeCode);
       }
     } else {
       // insert mới toàn bộ dữ liệu tầng ô
@@ -544,6 +544,10 @@ export class TodoAppService {
           this.logger.error(logbase, `Lịch nhắc(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
           result = -2;
         }
+
+        // cập nhập lại taskDate bằng  dto.harvestNextDate
+        await this.todoAppRepository.updateDateOfTaskHarvest(moment(dto.harvestNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode)
+          this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
 
         // insert / update/ detele dữ liệu tầng ô
         await this.InsUpDelHarvestRows(userCode, alramDetail?.userHomeCode ?? '', alramDetail?.seq ?? 0, dto.harvestData);
