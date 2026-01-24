@@ -316,6 +316,17 @@ export class TodoAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
     return rows.length ? (rows[0] as ITodoHomeTaskAlram & ITodoTaskMedicine) : null;
   }
+  async getTaskMedicineCompleteList(): Promise<[ITodoHomeTaskAlram & ITodoTaskMedicine]> {
+    let query = `  SELECT A.taskAlarmCode, A.taskCode, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
+    B.seq, B.seqNextTime, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineUsage
+    FROM ${this.tableHomeTaskAlarm} A
+    LEFT JOIN ${this.tableHomeTaskMedicine} B
+     ON A.seq = B.seqNextTime
+    WHERE A.taskStatus = 'COMPLETE'
+    `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, []);
+    return rows as [ITodoHomeTaskAlram & ITodoTaskMedicine];
+  }
 
   async insertTaskMedicine(userCode: string, userHomeCode: string, seqNextTime: number, dto: SetTaskMedicineDto): Promise<number> {
     const sql = `

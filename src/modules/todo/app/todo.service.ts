@@ -251,7 +251,10 @@ export class TodoAppService {
           // this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
           // return -3;
           await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
-          this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate} -- cập nhập trạng thái hoàn thành sớm`);
+          this.logger.error(
+            logbase,
+            `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate} -- cập nhập trạng thái hoàn thành sớm`,
+          );
         }
 
         // update lăn thuốc hiện tại
@@ -546,8 +549,8 @@ export class TodoAppService {
         }
 
         // cập nhập lại taskDate bằng  dto.harvestNextDate
-        await this.todoAppRepository.updateDateOfTaskHarvest(moment(dto.harvestNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode)
-          this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
+        await this.todoAppRepository.updateDateOfTaskHarvest(moment(dto.harvestNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
+        this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
 
         // insert / update/ detele dữ liệu tầng ô
         await this.InsUpDelHarvestRows(userCode, alramDetail?.userHomeCode ?? '', alramDetail?.seq ?? 0, dto.harvestData);
@@ -645,6 +648,7 @@ export class TodoAppService {
     // lấy thông tin 'đợt' theo năm
     const harvestPhase = await this.todoAppRepository.getMaxHarvestPhase(mainHomeOfUser?.userHomeCode);
     const result: GetTaskHarvestResDto = {
+      userHomeName: mainHomeOfUser.userHomeName,
       taskAlarmCode: String(taskAlarmCode).trim() !== '' && alramHarvestDetail != null ? taskAlarmCode : '',
       harvestNextDate:
         String(taskAlarmCode).trim() !== '' && alramHarvestDetail?.taskDate

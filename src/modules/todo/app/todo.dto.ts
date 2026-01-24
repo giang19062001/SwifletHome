@@ -239,7 +239,7 @@ export class SetHarvestTaskDto {
 }
 
 export class HarvestDataDto {
-  @ApiProperty({ example: 0 })
+  @ApiProperty({ example: 1 })
   @IsNumber()
   @IsNotEmpty()
   floor: number;
@@ -252,17 +252,17 @@ export class HarvestDataDto {
 }
 
 export class FloorDataDto {
-  @ApiProperty({ example: 0 })
+  @ApiProperty({ example: 1 })
   @IsNumber()
   @IsNotEmpty()
   cell: number;
 
-  @ApiProperty({ example: 0 })
+  @ApiProperty({ example: 100 })
   @IsNumber()
   @IsNotEmpty()
   cellCollected: number;
 
-  @ApiProperty({ example: 0 })
+  @ApiProperty({ example: 50 })
   @IsNumber()
   @IsNotEmpty()
   cellRemain: number;

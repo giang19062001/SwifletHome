@@ -97,6 +97,9 @@ export class GetListTaskAlarmsResDto {
 
 export class GetTaskHarvestResDto {
   @ApiProperty({ example: '' })
+  userHomeName: string;
+
+  @ApiProperty({ example: '' })
   taskAlarmCode: string;
 
   @ApiProperty({ example: '2026-01-01' })
@@ -106,7 +109,7 @@ export class GetTaskHarvestResDto {
   harvestPhase: number;
 
   @ApiProperty({ example: 'N' })
-  isComplete: string
+  isComplete: string;
 
   @ApiProperty({ type: () => HarvestDataDto, isArray: true })
   harvestData: HarvestDataDto[];

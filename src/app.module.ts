@@ -38,6 +38,7 @@ import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
 import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
 import { NotificationAdminModule } from './modules/notification/admin/notification.module';
 import { MqttModule } from './common/mqtt/mqtt.module';
+import { QrAppModule } from './modules/qr/app/qr.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { MqttModule } from './common/mqtt/mqtt.module';
     UserHomeAppModule,
     BlogAppModule,
     TodoAppModule,
+    QrAppModule,
 
     //admin
     AuthAdminModule,
@@ -81,7 +83,8 @@ import { MqttModule } from './common/mqtt/mqtt.module';
     PackageAdminModule,
     UserHomeAdminModule,
     TodoAdminModule,
-    NotificationAdminModule
+    NotificationAdminModule,
+
   ],
   controllers: [AppController],
   providers: [
