@@ -8,7 +8,7 @@ import { GetApprovedRequestQrCodeResDto, InsertRequestSellDto, RequestQrCodeFrom
 @Injectable()
 export class QrAppRepository {
   private readonly table = 'tbl_qr_request';
-  private readonly tableFile = 'tbl_qr_request_img';
+  private readonly tableFile = 'tbl_qr_request_file';
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
   private readonly tableSell = 'tbl_qr_request_sell';
   private readonly tableUserApp = 'tbl_user_app';
