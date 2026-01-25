@@ -4,11 +4,11 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, InsertRequestSellDto, RequestQrCodeDto, TaskHarvestQrResDto, UploadRequestVideoDto, UploadRequestVideoResDto } from './qr.dto';
+import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, InsertRequestSellDto, RequestQrCodeDto, TaskHarvestQrResDto, UploadRequestVideoDto, UploadRequestVideoResDto } from '../qr.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { TodoAppService } from 'src/modules/todo/app/todo.service';
 import { getFileLocation } from 'src/config/multer.config';
-import { RequestStatusEnum } from './qr.interface';
+import { RequestStatusEnum } from '../qr.interface';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { OptionService } from 'src/modules/options/option.service';
 

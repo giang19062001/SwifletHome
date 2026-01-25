@@ -19,6 +19,20 @@ const VARIABLE_ENUM = {
   },
 };
 const LIST_ENUM = {
+  QR_REQUEST_STATUS: [
+    {
+      value: 'WAITING',
+      text: 'Đang chờ duyệt',
+    },
+    {
+      value: 'APPROVED',
+      text: 'Đã chấp thuận QrCode',
+    },
+    {
+      value: 'REFUST',
+      text: 'Từ chối duyệt',
+    },
+  ],
   HOME_SALE_SIGHTSEEING_STATUS: [
     {
       value: 'WAITING',

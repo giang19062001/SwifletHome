@@ -18485,6 +18485,7 @@ select {
 }
 
 .txt-status-cancel,
+.txt-status-refuse,
 .txt-pay,
 .txt-not-ok {
   color: #f75270;

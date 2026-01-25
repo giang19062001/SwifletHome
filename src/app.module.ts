@@ -39,6 +39,7 @@ import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
 import { NotificationAdminModule } from './modules/notification/admin/notification.module';
 import { MqttModule } from './common/mqtt/mqtt.module';
 import { QrAppModule } from './modules/qr/app/qr.module';
+import { QrAdminModule } from './modules/qr/admin/qr.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { QrAppModule } from './modules/qr/app/qr.module';
     UserHomeAdminModule,
     TodoAdminModule,
     NotificationAdminModule,
+    QrAdminModule
 
   ],
   controllers: [AppController],

@@ -17,7 +17,6 @@ export class AppController {
     return { title: 'Đăng nhập', isLayout: false };
   }
 
-
   @Get('/privacy-policy')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/privacy-policy')
@@ -25,13 +24,12 @@ export class AppController {
     return { title: 'Chính sách bảo mật', isLayout: false };
   }
 
-    @Get('/support-center')
+  @Get('/support-center')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/support-center')
   renderSupportCenter() {
     return { title: 'Trung tâm hỗ trợ', isLayout: false };
   }
-
 
   // dashboard
   @Get('/dashboard/main')
@@ -331,6 +329,19 @@ export class AppController {
       user: req.session.user,
     };
   }
+  //qrcode
+  @Get('/dashboard/qrcode')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/qrcode')
+  renderQrcode(@Req() req: Request) {
+
+    return {
+      title: 'Gửi thông báo',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+
   //notification
   @Get('/dashboard/notification')
   @UseGuards(PageAuthAdminGuard)

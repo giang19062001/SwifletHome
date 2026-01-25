@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from './qr.interface';
+import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
-import { GetApprovedRequestQrCodeResDto, InsertRequestSellDto, RequestQrCodeFromDbDto } from './qr.dto';
+import { GetApprovedRequestQrCodeResDto, InsertRequestSellDto, RequestQrCodeFromDbDto } from '../qr.dto';
 
 @Injectable()
 export class QrAppRepository {
