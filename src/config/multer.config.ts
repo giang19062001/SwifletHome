@@ -26,7 +26,8 @@ export const validateImgExt = (originalname) => {
 };
 
 export const getFileLocation = (mimetype: string, fieldname: string) => {
-  let result = ""
+  console.log('getFileLocation ---> ', mimetype, fieldname);
+  let result = '';
   if (mimetype.startsWith('image/')) {
     if (fieldname === 'editorImg' || fieldname.includes('editorImg')) {
       result = 'images/editors';
@@ -48,19 +49,22 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
       result = 'videos/doctors';
     }
+    if (fieldname === 'requestQrcodeVideo' || fieldname.includes('requestQrcodeVideo')) {
+      result = 'videos/requestQrcodes';
+    }
   }
   if (mimetype.startsWith('audio/')) {
     if (fieldname === 'editorAudio' || fieldname.includes('editorAudio')) {
       result = 'audios/editors';
     }
   }
-   if (mimetype.startsWith('audio/')) {
+  if (mimetype.startsWith('audio/')) {
     if (fieldname === 'mediaAudio' || fieldname.includes('mediaAudio')) {
       result = 'audios/medias';
     }
   }
 
-  return "uploads/" + result
+  return 'uploads/' + result;
 };
 
 export const createMulterConfig = (allowedExts: string[], customLimits?: MulterLimits) => {
@@ -88,7 +92,7 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
       },
     }),
     limits,
-    fileFilter: (req, file, cb) => {
+    fileFilter: (req: any, file: { originalname: string }, cb: (arg0: BadRequestException | null, arg1: boolean) => void) => {
       const ext = extname(file.originalname).toLowerCase();
       if (allowedExts.includes(ext)) {
         cb(null, true);

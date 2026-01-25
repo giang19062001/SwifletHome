@@ -18,11 +18,15 @@ export default class OptionController {
 **mainOption:**
 - **SIGHTSEEING**: đăng ký tham quan nhà yến\n
 - **TODO_TASK**: tạo lịch nhắc lăn thuốc
+- **REQUSET_SELL**: thông tin cho Modal cần bán sản lượng yến
 
 
 **subOption:**
   - **NUMBER_ATTEND**: số lượng người đăng ký tham quan nhà yến\n
   - **MEDICINE**: Danh sách thuốc
+  - **PRICE_OPTION**: Kiểu thiết lập giá
+  - **INGREDIENT_NEST**: Loại thanh làm tổ
+
 `,
     type: GetOptionDto,
   })

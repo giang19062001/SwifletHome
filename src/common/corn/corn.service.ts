@@ -17,6 +17,7 @@ import { NotificationTypeEnum } from 'src/modules/notification/notification.inte
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
 import TodoAppValidate from 'src/modules/todo/app/todo.validate';
+import { QrAppRepository } from 'src/modules/qr/app/qr.repository';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -26,9 +27,9 @@ export class CornService implements OnModuleInit {
     private readonly doctorAppRepository: DoctorAppRepository,
     private readonly userAppRepository: UserAppRepository,
     private readonly userHomeAppRepository: UserHomeAppRepository,
-    private readonly todoAppService: TodoAppService,
     private readonly todoAppValidate: TodoAppValidate,
     private readonly todoAppRepository: TodoAppRepository,
+    private readonly qrAppRepository: QrAppRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
@@ -40,18 +41,19 @@ export class CornService implements OnModuleInit {
     const jobDaily = new CronJob('0 1 * * *', async () => {
       await this.deleteDoctorFilesNotUse();
       await this.deleteUserHomeFilesNotUse();
+      await this.deleteQrRequestFilesNotUse()
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();
 
-   // MONTHLY – ngày 01 mỗi tháng lúc 01:00
+    // MONTHLY – ngày 01 mỗi tháng lúc 01:00
     // const jobMonthly = new CronJob('0 1 1 * *', async () => {
     //   await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.MONTH);
     // });
     // this.schedulerRegistry.addCronJob('monthlyTask', jobMonthly);
     // jobMonthly.start();
 
-   // WEEKLY – Thứ Hai mỗi tuần lúc 01:00
+    // WEEKLY – Thứ Hai mỗi tuần lúc 01:00
     // const jobWeekly = new CronJob('0 1 * * 1', async () => {
     //   await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
     // });
@@ -66,6 +68,8 @@ export class CornService implements OnModuleInit {
     this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
     jobDailyAt8AM.start();
     // ! DEV
+          await this.deleteQrRequestFilesNotUse()
+
     //  await this.deleteDoctorFilesNotUse();
     // await this.deleteUserHomeFilesNotUse();
     // await this.pushNotificationsByTaskAlarms();
@@ -93,7 +97,7 @@ export class CornService implements OnModuleInit {
         const home = await this.userHomeAppRepository.getDetailHome(task.userHomeCode);
         const notify = NOTIFICATIONS.sendNotifyTodoTaskDaily(home?.userHomeName ?? '', task.taskName, daysLeft);
         this.logger.log(logbase, `sẽ gửi thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode}) cho user(${task.userCode})`);
- 
+
         await this.firebaseService.sendNotification(task.userCode, task.deviceToken, notify.TITLE, notify.BODY, null, NotificationTypeEnum.TODO);
       }
     }
@@ -152,7 +156,7 @@ export class CornService implements OnModuleInit {
         this.logger.log(logbase, `Không có file khám bệnh nào cần được xóa`);
       }
     } catch (error) {
-      this.logger.error(logbase, 'Có lỗi khi xóa các file khám bệnh không dùng theo lịch trình');
+      this.logger.error(logbase, `Có lỗi khi xóa các file khám bệnh không dùng theo lịch trình : ${JSON.stringify(error)}`);
     }
   }
   async deleteUserHomeFilesNotUse() {
@@ -170,7 +174,25 @@ export class CornService implements OnModuleInit {
         this.logger.log(logbase, `Không có file ảnh nhà yến của khách hàng nào cần được xóa`);
       }
     } catch (error) {
-      this.logger.error(logbase, 'Có lỗi khi xóa các file  ảnh nhà yến của khách hàng không dùng theo lịch trình');
+      this.logger.error(logbase, `Có lỗi khi xóa các file  ảnh nhà yến của khách hàng không dùng theo lịch trình: ${JSON.stringify(error)}`);
+    }
+  }
+  async deleteQrRequestFilesNotUse() {
+    const logbase = `${this.SERVICE_NAME}/deleteQrRequestFilesNotUse`;
+    this.logger.log(logbase, `Chuẩn bị xóa các file video yêu cầu Qrcode dư thừa theo lịch trình....`);
+    try {
+      const filesNotUse = await this.qrAppRepository.getFilesNotUse();
+      if (filesNotUse.length) {
+        for (const file of filesNotUse) {
+          await this.qrAppRepository.deleteFile(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file video yêu cầu Qrcode dư thừa đã được xóa theo lịch trình thành công`);
+      } else {
+        this.logger.log(logbase, `Không có file video yêu cầu Qrcode dư thừa nào cần được xóa`);
+      }
+    } catch (error) {
+      this.logger.error(logbase, `Có lỗi khi xóa file video yêu cầu Qrcode dư thừa theo lịch trình: ${JSON.stringify(error)}`);
     }
   }
 }

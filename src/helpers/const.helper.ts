@@ -62,4 +62,9 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'USR000001',
   },
+  requestCode: {
+    PRE: 'RQC',
+    LEN: 6,
+    FRIST_CODE: 'RQC000001',
+  },
 };

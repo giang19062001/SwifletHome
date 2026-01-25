@@ -115,7 +115,7 @@ export default class TodoAppController {
     return result;
   }
 
-  // TODO: COMPLETE-MEDICINE
+  // TODO: MEDICINE
 
   @ApiOperation({
     summary: 'Ghi chú và tạo lịch nhắc lăn thuốc lần kế tiếp',
@@ -296,89 +296,53 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
   }
 
   // ! BỎ
-  @ApiOperation({
-    summary: '⚠️ **API này sẽ bị xóa trong version tiếp theo**',
-  })
-  @Post('setCompleteTaskMedicine')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: NumberOkResponseDto })
-  @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setCompleteTaskMedicine(@GetUserApp() user: authInterface.ITokenUserApp) {
-    return 0;
-  }
-  @ApiOperation({
-    summary: '⚠️ **API này sẽ bị xóa trong version tiếp theo**',
-  })
-  @Post('setCompleteTaskHarvest')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: NumberOkResponseDto })
-  @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setCompleteTaskHarvest() {
-    return null;
-  }
+//   @Post('setTaskAlarm')
+//   @ApiBody({
+//     type: SetTaskPeriodDto,
+//     description: `**isPeriod** enum('Y','N')\n
+// **periodType** enum('WEEK','MONTH'), nếu **isPeriod** của lịch nhắc là **Y** thì giá trị không được phép **null** và phải mang giá trị **WEEK** hoặc **MONTH**, nếu **isPeriod** là **N** thì giá trị được phép **null**\n
+// **periodValue** number | null, được phép **null** nếu **isPeriod** là **N** và **periodType** là **null** , không được phép **null** nếu **isPeriod** là **Y** và **periodType** là **WEEK** hoặc **MONTH**, nếu **periodType** là **WEEK** thì giá trị sẽ là (1 -> 7) (Thứ 2 -> Chủ nhật),
+// nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
+// **specificValue** date | null, được phép **null** nếu **isPeriod** là **Y**, không được phép **null** nếu **isPeriod** là **N**, giá trị sẽ có định dạng **YYYY-MM-DD**\n
+// **taskCode** là giá trị lấy từ api/app/todo/getTasks, giá trị được phép **null** nếu **isCustomTask** của lịch nhắc là **Y**, không được phép **null** nếu **isCustomTask** của lịch nhắc là **N** \n
+// **isCustomTask** enum('Y','N')\n
+// **taskCustomName** giá trị được phép rỗng ("") nếu **isCustomTask** của lịch nhắc là **N**, giá trị không được phép rỗng ("") nếu **isCustomTask** của lịch nhắc là **Y**\n 
+//        `,
+//   })
+//   @HttpCode(HttpStatus.OK)
+//   @ApiOkResponse({ type: NumberOkResponseDto })
+//   @ApiBadRequestResponse({ type: NumberErrResponseDto })
+//   async setTaskAlarm(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskPeriodDto) {
+//     const err: string = TodoAppValidate.SetTaskPeriodValidate(dto);
+//     if (err) {
+//       throw new BadRequestException({
+//         message: err,
+//         data: 0,
+//       });
+//     }
+//     const result = await this.todoAppService.setTaskAlarmPeriod(user.userCode, dto);
 
-  @ApiOperation({
-    summary: '⚠️ **API này sẽ bị xóa trong version tiếp theo**',
-  })
-  @ApiParam({ name: 'taskAlarmCode', type: String })
-  @Get('getCompleteTaskHarvest/:taskAlarmCode')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetTaskHarvestResDto) })
-  @ApiBadRequestResponse({ type: NullResponseDto })
-  async getCompleteTaskHarvest(@Param('taskAlarmCode') taskAlarmCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
-    return 0;
-  }
-
-  @ApiOperation({
-    summary: '⚠️ **API này sẽ bị xóa trong version tiếp theo**',
-  })
-  @Post('setTaskAlarm')
-  @ApiBody({
-    type: SetTaskPeriodDto,
-    description: `**isPeriod** enum('Y','N')\n
-**periodType** enum('WEEK','MONTH'), nếu **isPeriod** của lịch nhắc là **Y** thì giá trị không được phép **null** và phải mang giá trị **WEEK** hoặc **MONTH**, nếu **isPeriod** là **N** thì giá trị được phép **null**\n
-**periodValue** number | null, được phép **null** nếu **isPeriod** là **N** và **periodType** là **null** , không được phép **null** nếu **isPeriod** là **Y** và **periodType** là **WEEK** hoặc **MONTH**, nếu **periodType** là **WEEK** thì giá trị sẽ là (1 -> 7) (Thứ 2 -> Chủ nhật),
-nếu **periodType** là **MONTH** thì giá trị sẽ là (1 -> 31)\n
-**specificValue** date | null, được phép **null** nếu **isPeriod** là **Y**, không được phép **null** nếu **isPeriod** là **N**, giá trị sẽ có định dạng **YYYY-MM-DD**\n
-**taskCode** là giá trị lấy từ api/app/todo/getTasks, giá trị được phép **null** nếu **isCustomTask** của lịch nhắc là **Y**, không được phép **null** nếu **isCustomTask** của lịch nhắc là **N** \n
-**isCustomTask** enum('Y','N')\n
-**taskCustomName** giá trị được phép rỗng ("") nếu **isCustomTask** của lịch nhắc là **N**, giá trị không được phép rỗng ("") nếu **isCustomTask** của lịch nhắc là **Y**\n 
-       `,
-  })
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: NumberOkResponseDto })
-  @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setTaskAlarm(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskPeriodDto) {
-    const err: string = TodoAppValidate.SetTaskPeriodValidate(dto);
-    if (err) {
-      throw new BadRequestException({
-        message: err,
-        data: 0,
-      });
-    }
-    const result = await this.todoAppService.setTaskAlarmPeriod(user.userCode, dto);
-
-    if (result == -2) {
-      throw new BadRequestException({
-        message: Msg.DuplicateTaskPeriod,
-        data: 0,
-      });
-    }
-    if (result == -1) {
-      throw new BadRequestException({
-        message: Msg.DuplicateTaskAlram,
-        data: 0,
-      });
-    }
-    if (result == 0) {
-      throw new BadRequestException({
-        message: Msg.SetTaskErr,
-        data: 0,
-      });
-    }
-    return {
-      message: Msg.SetTaskOk,
-      data: result,
-    };
-  }
+//     if (result == -2) {
+//       throw new BadRequestException({
+//         message: Msg.DuplicateTaskPeriod,
+//         data: 0,
+//       });
+//     }
+//     if (result == -1) {
+//       throw new BadRequestException({
+//         message: Msg.DuplicateTaskAlram,
+//         data: 0,
+//       });
+//     }
+//     if (result == 0) {
+//       throw new BadRequestException({
+//         message: Msg.SetTaskErr,
+//         data: 0,
+//       });
+//     }
+//     return {
+//       message: Msg.SetTaskOk,
+//       data: result,
+//     };
+//   }
 }

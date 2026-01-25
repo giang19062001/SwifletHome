@@ -185,8 +185,29 @@ export class TodoAppService {
     }
     return 0;
   }
-  // TODO: COMPLETE-MEDICINE
-  // hàm insert lịch nhắc lăn thuốc
+  // TODO: MEDICINE
+  /* 
+    NẾU taskAlarmCode = ""
+
+      NẾU HÔM NAY = NGÀY CHỌN KẾ TIẾP
+        -> INSERT VỚI CHẾ ĐỘ HOÀN THÀNH
+
+      NẾU HÔM NÀY != NGÀY CHỌN KẾ TIẾP
+        -> INSERT VỚI CHẾ ĐỘ CHỜ
+
+    NẾU taskAlarmCode != ""
+      NẾU HÔM NÀY = NGÀY taskDate
+        -> CẬP NHẬP THUỐC, CẬP NHẬP HOÀN THÀNH
+
+      NẾU HÔM NÀY != NGÀY taskDate
+        -> CẬP NHẬP THUỐC (medicineOptionCode, medicineOther, medicineUsage)
+
+      NẾU HÔM NÀY != NGÀY CHỌN KẾ TIẾP
+        -> INSERT VỚI CHẾ ĐỘ CHỜ
+
+      NẾU HÔM NÀY = NGÀY CHỌN KẾ TIẾP
+        -> BỎ QUA
+ */
   async handleTaskMedicineCurrentAndNextime(userCode: string, userHomeCode: string, taskDate: Date | null, task: ITodoTask, dto: SetTaskMedicineDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskMedicine:`;
 
@@ -241,7 +262,7 @@ export class TodoAppService {
       } else {
         // dữ liệu alarm có sẵn
 
-        // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành 
+        // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành
         const isTodayWithSetted = today.isSame(moment(taskDate, 'YYYY-MM-DD'), 'day');
         //? Trước đó Set ngày 25 và hôm nay là 25 ---> HOÀN THÀNH
         if (isTodayWithSetted) {
@@ -253,11 +274,10 @@ export class TodoAppService {
           this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
           // return -3;
         }
-        
+
         // cập nhập lại taskDate bằng  dto.medicineNextDate
         // await this.todoAppRepository.updateDateOfTaskAlarm(moment(dto.medicineNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
         // this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
-
 
         // update lăn thuốc hiện tại
         await this.todoAppRepository.updateTaskMedicine(userCode, userHomeCode, dto.taskAlarmCode, dto);
@@ -397,8 +417,8 @@ export class TodoAppService {
       }
     }
   }
-  // TODO: COMPLETE-HARVER
-  async InsUpDelHarvestRows(userCode: string, userHomeCode: string, seq: number, harvestData: HarvestDataDto[]) {
+  // TODO: HARVER
+  async insUpDelHarvestRows(userCode: string, userHomeCode: string, seq: number, harvestData: HarvestDataDto[]) {
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
     const harvestCurrentDatas = await this.todoAppRepository.getTaskHarvestRows(seq, false); // false -> lấy luôn cả cell bị isActive = 'N'
 
@@ -479,6 +499,44 @@ export class TodoAppService {
       }
     }
   }
+  async arrangeHarvestRows(seq: number, userHomeFloor: number): Promise<HarvestDataDto[]> {
+    // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
+    let harvestData: HarvestDataDto[] = [];
+    const harvestRows = await this.todoAppRepository.getTaskHarvestRows(seq, true); // true -> chỉ lấy cell  isActive = 'Y'
+    if (!harvestRows.length) {
+      // khởi tạo Rows mặc định
+      for (let i = 1; i <= userHomeFloor; i++) {
+        harvestData.push({
+          floor: i,
+          floorData: [
+            {
+              cell: 1,
+              cellCollected: 0,
+              cellRemain: 0,
+            },
+          ],
+        });
+      }
+    } else {
+      // lồng dữ liệu đã có
+      const floorMap = new Map<number, { floor: number; floorData: FloorDataDto[] }>();
+
+      for (const row of harvestRows) {
+        if (!floorMap.has(row.floor)) {
+          floorMap.set(row.floor, { floor: row.floor, floorData: [] });
+        }
+
+        floorMap.get(row.floor)!.floorData.push({
+          cell: row.cell,
+          cellCollected: row.cellCollected,
+          cellRemain: row.cellRemain,
+        });
+      }
+
+      harvestData = Array.from(floorMap.values()).sort((a, b) => a.floor - b.floor);
+    }
+    return harvestData;
+  }
   async setTaskHarvest(userCode: string, dto: SetHarvestTaskDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setCompleteTaskHarvest:`;
     try {
@@ -520,7 +578,7 @@ export class TodoAppService {
         await this.todoAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestPhase, dto.isComplete == 'Y' ? YnEnum.Y : YnEnum.N);
 
         // insert / update/ detele dữ liệu tầng ô mới
-        await this.InsUpDelHarvestRows(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestData);
+        await this.insUpDelHarvestRows(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestData);
       } else {
         //dữ liệu có sẵn
         const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
@@ -547,7 +605,7 @@ export class TodoAppService {
         this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
 
         // insert / update/ detele dữ liệu tầng ô
-        await this.InsUpDelHarvestRows(userCode, alramDetail?.userHomeCode ?? '', alramDetail?.seq ?? 0, dto.harvestData);
+        await this.insUpDelHarvestRows(userCode, alramDetail?.userHomeCode ?? '', alramDetail?.seq ?? 0, dto.harvestData);
 
         // hoàn thành tất cả
         if (dto.isComplete == 'Y') {
@@ -622,45 +680,5 @@ export class TodoAppService {
       harvestData: harvestData, // dữ liệu tầng / ô
     };
     return result;
-  }
-
-  // sắp xếp dữ liệu tầng ô lồng nhau
-  async arrangeHarvestRows(seq: number, userHomeFloor: number): Promise<HarvestDataDto[]> {
-    // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
-    let harvestData: HarvestDataDto[] = [];
-    const harvestRows = await this.todoAppRepository.getTaskHarvestRows(seq, true); // true -> chỉ lấy cell  isActive = 'Y'
-    if (!harvestRows.length) {
-      // khởi tạo Rows mặc định
-      for (let i = 1; i <= userHomeFloor; i++) {
-        harvestData.push({
-          floor: i,
-          floorData: [
-            {
-              cell: 1,
-              cellCollected: 0,
-              cellRemain: 0,
-            },
-          ],
-        });
-      }
-    } else {
-      // lồng dữ liệu đã có
-      const floorMap = new Map<number, { floor: number; floorData: FloorDataDto[] }>();
-
-      for (const row of harvestRows) {
-        if (!floorMap.has(row.floor)) {
-          floorMap.set(row.floor, { floor: row.floor, floorData: [] });
-        }
-
-        floorMap.get(row.floor)!.floorData.push({
-          cell: row.cell,
-          cellCollected: row.cellCollected,
-          cellRemain: row.cellRemain,
-        });
-      }
-
-      harvestData = Array.from(floorMap.values()).sort((a, b) => a.floor - b.floor);
-    }
-    return harvestData;
   }
 }

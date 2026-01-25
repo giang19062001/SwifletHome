@@ -484,7 +484,7 @@ export class TodoAppRepository {
     return rows as TaskMedicineQrResDto[];
   }
 
-  async getTaskHarvestCompleteList(userHomeCode: string): Promise<(TaskHarvestQrResDto & { seq: number })[]> {
+  async getTaskHarvestCompleteList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number })[]> {
     let query = ` SELECT  A.seq, A.taskAlarmCode AS harvestTaskAlarmCode, B.harvestPhase, B.harvestYear
     FROM ${this.tableHomeTaskAlarm}  A
     LEFT JOIN ${this.tableHomeTaskHarvestPhase} B
@@ -492,9 +492,10 @@ export class TodoAppRepository {
       LEFT JOIN ${this.tableTask} C
       ON A.taskCode = C.taskCode
      WHERE A.userHomeCode  = ?  AND A.taskStatus = 'COMPLETE' AND B.isDone = 'Y' AND C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+     ${harvestPhase != 0 ? " AND B.harvestPhase  = ? " : ""}
     LIMIT 1 `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode]);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, harvestPhase != 0 ? [userHomeCode, harvestPhase] : [userHomeCode]);
     return rows as (TaskHarvestQrResDto & { seq: number })[];
   }
 }

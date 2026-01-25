@@ -9,6 +9,16 @@ export const OPTION_CONST = {
     mainOption: 'TODO_TASK',
     subOption: 'MEDICINE',
   },
+  REQUSET_SELL: {
+    PRICE_OPTION: {
+      mainOption: 'REQUSET_SELL',
+      subOption: 'PRICE_OPTION',
+    },
+    INGREDIENT_NEST: {
+      mainOption: 'REQUSET_SELL',
+      subOption: 'INGREDIENT_NEST',
+    },
+  },
 };
 
 export interface IOpition {

@@ -4,7 +4,7 @@
 /build
 /public/css/*
 /public/uploads/*
-note-work.txt
+/note/**
 # firebase
 firebase-adminsdk.json
 # Logs
