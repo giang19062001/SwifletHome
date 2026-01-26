@@ -68,8 +68,7 @@ export class CornService implements OnModuleInit {
     this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
     jobDailyAt8AM.start();
     // ! DEV
-          await this.deleteQrRequestFilesNotUse()
-
+    // await this.deleteQrRequestFilesNotUse()
     //  await this.deleteDoctorFilesNotUse();
     // await this.deleteUserHomeFilesNotUse();
     // await this.pushNotificationsByTaskAlarms();

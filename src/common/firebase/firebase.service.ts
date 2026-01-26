@@ -68,6 +68,8 @@ export class FirebaseService implements OnModuleInit {
       return APP_SCREENS.REMINDER_SCREEN;
     } else if (notificationType === 'ADMIN') {
       return APP_SCREENS.NOTIFICATION_SCREEN;
+    } else if (notificationType === 'ADMIN_QR') {
+      return APP_SCREENS.QR_SCREEN;
     }
     return APP_SCREENS.NOTIFICATION_SCREEN;
   }
@@ -86,6 +88,7 @@ export class FirebaseService implements OnModuleInit {
       targetScreen: this.getAppScreen(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
+      data: JSON.stringify(data) ?? "",
       count: String(count),
     };
 
@@ -99,7 +102,7 @@ export class FirebaseService implements OnModuleInit {
 
     try {
       const response = await this.messaging.send(message);
-      console.log("response --> ", response);
+      console.log('response --> ', response);
       if (response) {
         const messageId = response.split('/messages/')[1]; // VD: projects/fam-b055e/messages/0:1765439199615028%3bad3e4c3bad3e4c --> 1765439199615028%3bad3e4c3bad3e4c
         const notificationDto: CreateNotificationDto = {
@@ -150,6 +153,7 @@ export class FirebaseService implements OnModuleInit {
       targetScreen: this.getAppScreen(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
+      data: JSON.stringify(data) ?? "",
       count: '0',
     };
 
@@ -222,6 +226,7 @@ export class FirebaseService implements OnModuleInit {
       targetScreen: this.getAppScreen(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
+      data: JSON.stringify(data) ?? "",
       count: '0',
     };
 

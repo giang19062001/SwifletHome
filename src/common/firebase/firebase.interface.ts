@@ -7,5 +7,6 @@ export interface PushDataPayload {
   count: string; // iOS badge
   targetScreen: string; // custom
   notificationId: string; // custom
+  data: string; // custom (stringfy)
   [key: string]: string; 
 }

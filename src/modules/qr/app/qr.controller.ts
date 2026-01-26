@@ -5,7 +5,7 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { QrAppService } from './qr.service';
-import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, InsertRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto, UploadRequestVideoResDto } from '../qr.dto';
+import { GetAllInfoRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, InsertRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto, UploadRequestVideoResDto } from '../qr.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -27,7 +27,7 @@ export default class QrAppController {
   })
   @Get('getApprovedRequestQrCocde/:requestCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetApprovedRequestQrCodeResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetAllInfoRequestQrCodeResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getApprovedRequestQrCocde(@Param('requestCode') requestCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.qrAppService.getApprovedRequestQrCocde(requestCode, user);

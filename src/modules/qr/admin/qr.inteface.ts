@@ -1,6 +1,6 @@
 import { RequestStatusEnum } from "../qr.interface";
 
-export interface IAllQrRequest {
+export interface IQrRequest {
   seq: number,
   requestCode: string;
   userCode: string;
@@ -15,6 +15,6 @@ export interface IAllQrRequest {
   humidity: number;
   harvestPhase: number;
   requestStatus: RequestStatusEnum,
-  taskMedicineCount: number,
+  taskMedicineCount?: number,
   createdAt: Date
 }

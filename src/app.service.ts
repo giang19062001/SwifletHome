@@ -1,3 +1,4 @@
+import { QrAdminService } from './modules/qr/admin/qr.service';
 import { Injectable } from '@nestjs/common';
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
 import { IAnswer } from './modules/answer/answer.interface';
@@ -20,6 +21,7 @@ export class AppService {
     private readonly provinceService: ProvinceService,
     private readonly screenAdminService: ScreenAdminService,
     private readonly todoAdminService: TodoAdminService,
+    private readonly qrAdminService: QrAdminService,
   ) {}
 
   async renderAnswerCreate(): Promise<any> {
@@ -133,6 +135,14 @@ export class AppService {
     return {
       provinces: provinces,
       tasks: list,
+    };
+  }
+
+  // qrcode
+  async renderQrcodeUpdate(requestCode: string): Promise<any> {
+    const qrData = await this.qrAdminService.getDetail(requestCode);
+    return {
+      qrData: qrData,
     };
   }
 }

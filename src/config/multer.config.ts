@@ -44,6 +44,11 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     if (fieldname === 'configfiles' || fieldname.includes('configfiles')) {
       result = 'images/configs';
     }
+
+    // quan trọng
+    if (fieldname === 'qrcode' || fieldname.includes('qrcode')) {
+      result = 'images/qrcodes';
+    }
   }
   if (mimetype.startsWith('video/')) {
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {

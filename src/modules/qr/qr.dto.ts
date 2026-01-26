@@ -1,7 +1,7 @@
 import { HarvestDataDto } from 'src/modules/todo/app/todo.dto';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsDecimal, IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsDecimal, IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { RequestStatusEnum } from './qr.interface';
 
@@ -130,6 +130,10 @@ export class RequestQrCodeFromDbDto extends GetInfoToRequestQrcodeResDto {
   @IsNotEmpty()
   requestStatus: RequestStatusEnum;
 
+  @IsString()
+  @IsOptional()
+  requestStatusLabel?: string;
+
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     format: 'uuid',
@@ -139,7 +143,7 @@ export class RequestQrCodeFromDbDto extends GetInfoToRequestQrcodeResDto {
   uniqueId: string;
 }
 
-export class GetApprovedRequestQrCodeResDto extends OmitType(RequestQrCodeFromDbDto, ['uniqueId'] as const) {
+export class GetAllInfoRequestQrCodeResDto extends OmitType(RequestQrCodeFromDbDto, ['uniqueId'] as const) {
   @ApiProperty({ example: '' })
   @IsString()
   @IsNotEmpty()
@@ -149,6 +153,10 @@ export class GetApprovedRequestQrCodeResDto extends OmitType(RequestQrCodeFromDb
   @IsString()
   @IsNotEmpty()
   qrCodeUrl: string;
+
+  @IsString()
+  @IsOptional()
+  userCode?: string;
 }
 
 export class UploadRequestVideoResDto {
@@ -215,5 +223,4 @@ export class InsertRequestSellDto {
   @IsString()
   @IsNotEmpty()
   ingredientNestOptionCode: string;
-
 }

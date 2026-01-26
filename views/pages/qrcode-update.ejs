@@ -1,0 +1,37 @@
+<div class="page-qrcode-update">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                 <p class="title-page"><%= title %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                       <div class="card-body">
+                            <%- include('./qrcode-global.ejs') %>
+                            <div class="col-12 form-group d-flex justify-content-center mt-4">
+                                <% if (values.qrData.requestStatus === 'WAITING') { %>
+                                    <button type="button" class="btn-submit-lg me-3" id="btn-approved">Chấp thuận</button>
+                                    <button type="button" class="btn-error-lg" id="btn-refuse">Từ chối</button>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+  const qrData = <%- JSON.stringify(values.qrData) %>
+  console.log('qrData', qrData);
+</script>
+<script src="/js/page-qrcode-update.js"></script>

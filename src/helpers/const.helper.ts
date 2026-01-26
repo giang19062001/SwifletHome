@@ -3,6 +3,7 @@ export const AUDIO_TYPES = ['.mp3'];
 export const VIDEO_TYPES = ['.mp4', '.mov', '.hevc'];
 
 export const APP_SCREENS = {
+  QR_SCREEN: 'QR_SCREEN',
   REMINDER_SCREEN: 'REMINDER_SCREEN',
   NOTIFICATION_SCREEN: 'NOTIFICATION_SCREEN',
   SIGNUP_SERVICE: 'SIGNUP_SERVICE',

@@ -183,6 +183,19 @@
   }
 }
 
+.btn-error-lg {
+  @extend #btn;
+  font-size: medium;
+  min-width: 175px;
+  min-height: 40px;
+  background-color: $err-color;
+  border-color: $err-color;
+  color: #ffffff;
+  &:hover {
+    background-color: $err-color-hover;
+  }
+}
+
 .btn-error-out {
   @extend #btn;
   background-color: #ffffff;

@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
-import { GetApprovedRequestQrCodeResDto, InsertRequestSellDto, RequestQrCodeFromDbDto } from '../qr.dto';
+import { GetAllInfoRequestQrCodeResDto, InsertRequestSellDto, RequestQrCodeFromDbDto } from '../qr.dto';
 
 @Injectable()
 export class QrAppRepository {
@@ -16,7 +16,7 @@ export class QrAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   // TODO: REQUEST
-  async getApprovedRequestQrCocde(requestCode: string, userCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
+  async getApprovedRequestQrCocde(requestCode: string, userCode: string): Promise<GetAllInfoRequestQrCodeResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
       A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
        B.filename AS processingPackingVideoUrl, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl
@@ -33,7 +33,7 @@ export class QrAppRepository {
     // ! TEST
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, userCode, RequestStatusEnum.WAITING]);
 
-    return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
+    return rows.length ? (rows[0] as GetAllInfoRequestQrCodeResDto) : null;
   }
   async checkDuplicateReuqestQrCode(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     let query = ` SELECT A.seq

@@ -14,6 +14,7 @@ export enum NotificationStatusEnum {
 export enum NotificationTypeEnum {
   ADMIN = 'ADMIN',
   TODO = 'TODO',
+  ADMIN_QR = 'ADMIN_QR'
 }
 
 export interface INotification {

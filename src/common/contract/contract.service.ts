@@ -26,10 +26,10 @@ export class ContractService implements OnModuleInit {
     this.contract = new ethers.Contract(contractAddress, contractABI, this.wallet);
   }
 
-  async recordJson(data: any) {
+  async recordJson(qrTargetUrl: string) {
     try {
       const jsonData = JSON.stringify({
-        ...data,
+        qrTargetUrl: qrTargetUrl,
         timestamp: Date.now(),
       });
 
@@ -43,24 +43,30 @@ export class ContractService implements OnModuleInit {
 
       const gasPrice = tx.gasPrice || (await this.provider.getFeeData()).gasPrice;
 
+      let transactionFee = "0"
       if (gasPrice) {
         const txFee = receipt.gasUsed * gasPrice;
+        transactionFee = txFee.toString()
         this.logger.log(this.SERVICE_NAME, `Transaction fee: ${txFee.toString()}`);
       }
 
       return {
-        hash: tx.hash,
+        transactionHash: tx.hash,
         blockNumber: receipt.blockNumber,
+        transactionFee: transactionFee
       };
     } catch (error) {
       this.logger.log(this.SERVICE_NAME, `error: ${error.toString()}`);
-      throw error;
+      return {
+        transactionHash: '',
+        blockNumber: '',
+        transactionFee: '0',
+      };
     }
   }
 }
 
-
-  //* ghi blockchain ( không đợi )
-  // setImmediate(() => {
-  //   this.contractService.recordJson(dto).catch((err) => this.logger.error(logbase, `Blockchain error: ${err}`));
-  // });
+//* ghi blockchain ( không đợi )
+// setImmediate(() => {
+//   this.contractService.recordJson(dto).catch((err) => this.logger.error(logbase, `Blockchain error: ${err}`));
+// });

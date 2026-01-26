@@ -1,0 +1,193 @@
+<div class="page-qrcode-update">
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                       <div class="card-body">
+                            <div class="row g-4">
+                                <!-- Thông tin cơ bản -->
+                                <div class="col-lg-6">
+                                    <div class="card border shadow-sm h-100">
+                                        <div class="card-header bg-light fw-bold">Thông tin chung</div>
+                                        <div class="card-body">
+                                              <div class="row mb-2">
+                                                <div class="col-5 text-muted">Mã code:</div>
+                                                <div class="col-7"><%= values.qrData.requestCode %></div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-5 text-muted">Tên chủ:</div>
+                                                <div class="col-7"><%= values.qrData.userName %></div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-5 text-muted">Nhà yến:</div>
+                                                <div class="col-7"><%= values.qrData.userHomeName %></div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-5 text-muted">Địa chỉ:</div>
+                                                <div class="col-7"><%= values.qrData.userHomeAddress %></div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-5 text-muted">Kích thước:</div>
+                                                <div class="col-7">
+                                                    <%= values.qrData.userHomeLength %>m × <%= values.qrData.userHomeWidth %>m × <%= values.qrData.userHomeFloor %> tầng
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-5 text-muted">Nhiệt độ/độ ẩm:</div>
+                                                <div class="col-7"><%= values.qrData.temperature %>°C / <%= values.qrData.humidity %>%</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-5 text-muted">Thời gian yêu cầu:</div>
+                                                <div class="col-7">
+                                                    <%= new Date(values.qrData.createdAt).toLocaleString('vi-VN') %>
+                                                </div>
+                                            </div>
+                                             <div class="row mb-2 mt-2">
+                                                <div class="col-5 text-muted">Trạng thái:</div>
+                                                <div class="col-7">
+                                                    <span class="txt-status-<%= values.qrData.requestStatus.toLowerCase() %>">
+                                                    <%= values.qrData.requestStatusLabel %>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- video-->
+                                <div class="col-lg-6">
+                                    <div class="card border shadow-sm h-100">
+                                        <div class="card-header bg-light fw-bold">Sơ chế đóng gói</div>
+                                       <div class="card-body p-3" id="processing-packing-container">
+                                            <div class="loading-placeholder d-flex align-items-center justify-content-center h-100 text-muted">
+                                                <div class="text-center">
+                                                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                                                    <p class="mb-0 small">Đang tải video...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Danh sách thuốc -->
+                            <div class="mt-4">
+                                <h6 class="fw-bold mb-3">Thuốc đã sử dụng</h6>
+                                <% if (values.qrData.taskMedicineList && values.qrData.taskMedicineList.length > 0) { %>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover align-middle">
+                                            <thead class="table-light">
+                                                <tr class="text-center">
+                                                    <th>Mã nhắc nhở</th>
+                                                    <th>Tên thuốc</th>
+                                                    <th>Liều lượng</th>
+                                                    <th>Thời gian</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% values.qrData.taskMedicineList.forEach(item => { %>
+                                                    <tr class="text-center">
+                                                        <td><%= item.taskAlarmCode %></td>
+                                                        <td><%= item.medicineName %></td>
+                                                        <td><%= item.medicineUsage %></td>
+                                                        <td><%= new Date(item.timestamp).toLocaleString('vi-VN') %></td>
+                                                    </tr>
+                                                <% }) %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <% } else { %>
+                                    <div class="alert alert-info mb-0">Chưa có dữ liệu thuốc / chất sử dụng</div>
+                                <% } %>
+                            </div>
+
+                            <!-- Kết quả thu hoạch -->
+                            <div class="mt-4">
+                                <h6 class="fw-bold mb-3">Kết quả thu hoạch</h6>
+                                <% if (values.qrData.taskHarvestList && values.qrData.taskHarvestList.length > 0) { %>
+                                    <% values.qrData.taskHarvestList.forEach(harvest => { %>
+                                        <div class="card mb-3 shadow-sm">
+                                            <div class="card-header bg-gradient bg-opacity-10">
+                                                Đợt <%= harvest.harvestPhase %> - Năm <%= harvest.harvestYear %>
+                                                <small class="float-end text-muted">Mã: <%= harvest.harvestTaskAlarmCode %></small>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row g-3">
+                                                    <% harvest.harvestData.forEach(floor => { %>
+                                                        <div class="col-md-4">
+                                                            <div class="card border-primary h-100">
+                                                                <div class="card-header bg-primary text-white text-center fw-bold">
+                                                                    Tầng <%= floor.floor %>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <% floor.floorData.forEach(cell => { %>
+                                                                        <div class="d-flex justify-content-between mb-2">
+                                                                            <span>Ô <%= cell.cell %>:</span>
+                                                                            <span>
+                                                                                <strong class="text-success">Đã thu <%= cell.cellCollected %></strong> /
+                                                                                <strong class="text-danger">Còn lại <%= cell.cellRemain %></strong>
+                                                                            </span>
+                                                                        </div>
+                                                                    <% }) %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <% }) %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <div class="alert alert-info mb-0">Chưa có dữ liệu thu hoạch</div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+  const qrData = <%- JSON.stringify(values.qrData) %>
+  console.log('qrData', qrData);
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+  // RENDER VIDEO
+  const container = document.getElementById('processing-packing-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const videoUrl = qrData?.processingPackingVideoUrl;
+
+  if (videoUrl && typeof videoUrl === 'string' && videoUrl.trim() !== '') {
+    const fullUrl = `${CURRENT_URL}/${videoUrl}`;
+
+    const videoHTML = `
+                <div class="ratio ratio-16x9">
+                    <video 
+                        controls 
+                        preload="metadata"
+                        class="w-100 rounded-bottom object-fit-cover"
+                        style="max-height: 400px;"
+                    >
+                        <source src="${fullUrl}" type="video/mp4">
+                        Trình duyệt không hỗ trợ phát video.
+                    </video>
+                </div>
+            `;
+
+    container.innerHTML = videoHTML;
+  }
+  // ASSIGN NÚT TỪ CHỐI
+  const btnRefuse = document.querySelector('#btn-refuse'); 
+
+    if (btnRefuse) {
+        btnRefuse.addEventListener('click', async function () {
+            await refuseQrcode(qrData.requestCode)
+        });
+    }
+});
+</script>

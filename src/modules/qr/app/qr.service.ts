@@ -4,7 +4,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, InsertRequestSellDto, RequestQrCodeDto, TaskHarvestQrResDto, UploadRequestVideoDto, UploadRequestVideoResDto } from '../qr.dto';
+import { GetAllInfoRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, InsertRequestSellDto, RequestQrCodeDto, TaskHarvestQrResDto, UploadRequestVideoDto, UploadRequestVideoResDto } from '../qr.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { TodoAppService } from 'src/modules/todo/app/todo.service';
 import { getFileLocation } from 'src/config/multer.config';
@@ -23,7 +23,7 @@ export class QrAppService {
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
   ) {}
-  async getApprovedRequestQrCocde(requestCode: string, user: ITokenUserApp): Promise<GetApprovedRequestQrCodeResDto | null> {
+  async getApprovedRequestQrCocde(requestCode: string, user: ITokenUserApp): Promise<GetAllInfoRequestQrCodeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getApprovedRequestQrCocde:`;
     const result = await this.qrAppRepository.getApprovedRequestQrCocde(requestCode, user.userCode);
     return result;

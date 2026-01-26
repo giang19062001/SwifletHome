@@ -334,11 +334,36 @@ export class AppController {
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/qrcode')
   renderQrcode(@Req() req: Request) {
-
     return {
       title: 'Gửi thông báo',
       isLayout: true,
       user: req.session.user,
+    };
+  }
+  @Get('/dashboard/qrcode/update/:id')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/qrcode-update')
+  async renderQrcodeUpdate(@Req() req: Request) {
+    const values = await this.appService.renderQrcodeUpdate(req.params.id);
+    return {
+      title: 'Xem xét yêu cầu Qr Code',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
+  // cho user có thể xem ko cần đăng nhập
+  @Get('/qrcode-global/:id')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/qrcode-global')
+  async renderQrcodeGlobal(@Req() req: Request) {
+    const values = await this.appService.renderQrcodeUpdate(req.params.id);
+    return {
+      title: 'Thông tin Qr code',
+      isLayout: false,
+      user: req.session.user,
+      values: values,
     };
   }
 

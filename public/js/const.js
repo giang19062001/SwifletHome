@@ -29,7 +29,7 @@ const LIST_ENUM = {
       text: 'Đã chấp thuận QrCode',
     },
     {
-      value: 'REFUST',
+      value: 'REFUSE',
       text: 'Từ chối duyệt',
     },
   ],

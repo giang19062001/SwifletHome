@@ -15,7 +15,9 @@ function changePage(p) {
   document.getElementById('privacy-main-pager').innerHTML = '';
   getAllRequestQrcode(page, limit);
 }
-
+function gotoQrcodeDetail(answerCode) {
+  gotoPage('/dashboard/qrcode/update/' + answerCode);
+}
 
 // TODO: RENDER
 function renderRequestQrcode(data, objElement) {
@@ -33,7 +35,7 @@ function renderRequestQrcode(data, objElement) {
             <td><b class="txt-status-${String(ele.requestStatus).toLocaleLowerCase()}">${LIST_ENUM.QR_REQUEST_STATUS.find((fi) => fi.value == ele.requestStatus)?.text ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
-                <button class="btn-edit"  onclick="getDetailQuestion('${ele.questionCode}')">Chi tiết</button>
+                <button class="btn-edit"  onclick="gotoQrcodeDetail('${ele.requestCode}')">Chi tiết</button>
             </td>
          </tr>`;
       HTML += rowHtml;
