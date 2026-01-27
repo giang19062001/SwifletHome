@@ -51,12 +51,12 @@ export class QrAdminRepository {
             WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
             ELSE ''
         END AS requestStatusLabel,
-        A.taskMedicineList, A.taskHarvestList, c.filename AS processingPackingVideoUrl, A.createdAt
+        A.taskMedicineList, A.taskHarvestList, C.filename AS processingPackingVideoUrl, A.createdAt
         FROM ${this.table}  A
         LEFT JOIN ${this.tableUserHome} B
         ON A.userHomeCode = B.userHomeCode  
-          LEFT JOIN ${this.tableFile} c
-        ON A.seq = c.qrRequestSeq  
+          LEFT JOIN ${this.tableFile} C
+        ON A.seq = C.qrRequestSeq  
         WHERE A.requestCode = ? AND A.isActive = 'Y' AND C.isActive = 'Y'
         `;
 
