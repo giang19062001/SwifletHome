@@ -48,7 +48,7 @@ export class QrAdminService {
         if (!detail) return 0;
 
         // ghi blockchain
-        const blockchainData = await this.contractService.recordJson(qrCode.qrTargetUrl);
+        const blockchainData = await this.contractService.recordJson({ userCode: detail.userCode!!, userHomeCode: detail.userHomeCode, qrTargetUrl: qrCode.qrTargetUrl });
         const dto: WriteQrBlockchainDto = {
           userCode: detail.userCode!!,
           userHomeCode: detail.userHomeCode,

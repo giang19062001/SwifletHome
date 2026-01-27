@@ -26,12 +26,10 @@ export class ContractService implements OnModuleInit {
     this.contract = new ethers.Contract(contractAddress, contractABI, this.wallet);
   }
 
-  async recordJson(qrTargetUrl: string) {
+
+  async recordJson(data: any) {
     try {
-      const jsonData = JSON.stringify({
-        qrTargetUrl: qrTargetUrl,
-        timestamp: Date.now(),
-      });
+      const jsonData = JSON.stringify(data);
 
       const tx = await this.contract.recordJson(jsonData);
       this.logger.log(this.SERVICE_NAME, `Transaction Hash: ${tx.hash}`);
