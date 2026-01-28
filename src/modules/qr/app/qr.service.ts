@@ -11,6 +11,7 @@ import { getFileLocation } from 'src/config/multer.config';
 import { RequestStatusEnum } from '../qr.interface';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { OptionService } from 'src/modules/options/option.service';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class QrAppService {
@@ -151,6 +152,11 @@ export class QrAppService {
       if (!getRequestQrInfo) {
         this.logger.error(logbase, `${Msg.RequestQrcodeNotFound} ---- requestCode(${dto.requestCode})`);
         return -1;
+      }
+
+      if(getRequestQrInfo.isSold === YnEnum.Y){
+           this.logger.error(logbase, `${Msg.RequestInfoAlreadySold} ---- requestCode(${dto.requestCode})`);
+        return -3;
       }
 
       // kiểm tra priceOptionCode

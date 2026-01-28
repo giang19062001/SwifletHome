@@ -1,4 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { RequestQrCodeFromDbDto } from '../qr.dto';
+import { OmitType } from '@nestjs/swagger';
 
 export class WriteQrBlockchainDto {
   @IsString()
@@ -28,4 +30,22 @@ export class WriteQrBlockchainDto {
   @IsString()
   @IsNotEmpty()
   transactionFee: string;
+}
+
+export class GetAllInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeFromDbDto, ['uniqueId'] as const) {
+  @IsString()
+  @IsNotEmpty()
+  userCode: string;
+
+  @IsString()
+  @IsNotEmpty()
+  transactionHash: string;
+
+  @IsString()
+  @IsNotEmpty()
+  processingPackingVideoUrl: string;
+
+  @IsString()
+  @IsNotEmpty()
+  qrCodeUrl: string;
 }

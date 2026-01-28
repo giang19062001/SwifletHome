@@ -154,9 +154,13 @@ export class GetAllInfoRequestQrCodeResDto extends OmitType(RequestQrCodeFromDbD
   @IsNotEmpty()
   qrCodeUrl: string;
 
-  @IsString()
-  @IsOptional()
-  userCode?: string;
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  @IsNotEmpty()
+  isSold: YnEnum;
 }
 
 export class UploadRequestVideoResDto {

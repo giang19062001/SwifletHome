@@ -1,3 +1,4 @@
+<% if (values.qrData) { %>
 <div class="page-qrcode-update">
     <div class="row">
         <div class="col-12">
@@ -11,7 +12,11 @@
                                     <div class="card border shadow-sm h-100">
                                         <div class="card-header bg-light fw-bold">Thông tin chung</div>
                                         <div class="card-body">
-                                              <div class="row mb-2">
+                                             <div class="row mb-2" id="blockchain-box">
+                                                <div class="col-5 text-muted">Blockchain:</div>
+                                                <div class="col-7"><a href="<%= values.qrData.transactionHash %>">Link  </a></div>
+                                            </div>
+                                            <div class="row mb-2">
                                                 <div class="col-5 text-muted">Mã code:</div>
                                                 <div class="col-7"><%= values.qrData.requestCode %></div>
                                             </div>
@@ -79,7 +84,6 @@
                                         <table class="table table-bordered table-hover align-middle">
                                             <thead class="table-light">
                                                 <tr class="text-center">
-                                                    <th>Mã nhắc nhở</th>
                                                     <th>Tên thuốc</th>
                                                     <th>Liều lượng</th>
                                                     <th>Thời gian</th>
@@ -88,7 +92,6 @@
                                             <tbody>
                                                 <% values.qrData.taskMedicineList.forEach(item => { %>
                                                     <tr class="text-center">
-                                                        <td><%= item.taskAlarmCode %></td>
                                                         <td><%= item.medicineName %></td>
                                                         <td><%= item.medicineUsage %></td>
                                                         <td><%= new Date(item.timestamp).toLocaleString('vi-VN') %></td>
@@ -98,7 +101,7 @@
                                         </table>
                                     </div>
                                 <% } else { %>
-                                    <div class="alert alert-info mb-0">Chưa có dữ liệu thuốc / chất sử dụng</div>
+                                    <div class="alert alert-warning mb-0">Chưa có dữ liệu thuốc / chất sử dụng</div>
                                 <% } %>
                             </div>
 
@@ -110,7 +113,6 @@
                                         <div class="card mb-3 shadow-sm">
                                             <div class="card-header bg-gradient bg-opacity-10">
                                                 Đợt <%= harvest.harvestPhase %> - Năm <%= harvest.harvestYear %>
-                                                <small class="float-end text-muted">Mã: <%= harvest.harvestTaskAlarmCode %></small>
                                             </div>
                                             <div class="card-body">
                                                 <div class="row g-3">
@@ -139,7 +141,7 @@
                                         </div>
                                     <% }) %>
                                 <% } else { %>
-                                    <div class="alert alert-info mb-0">Chưa có dữ liệu thu hoạch</div>
+                                    <div class="alert alert-warning mb-0">Chưa có dữ liệu thu hoạch</div>
                                 <% } %>
                             </div>
                         </div>
@@ -149,45 +151,56 @@
         </div>
     </div>
 </div>
+<% } else { %>
+<div class="alert alert-warning">
+    Không tìm thấy dữ liệu QR
+</div>
+<% } %>
+
 <script>
   const qrData = <%- JSON.stringify(values.qrData) %>
   console.log('qrData', qrData);
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-  // RENDER VIDEO
-  const container = document.getElementById('processing-packing-container');
-  if (!container) return;
-  container.innerHTML = '';
+        // RENDER VIDEO
+        const container = document.getElementById('processing-packing-container');
+        if (!container) return;
+        container.innerHTML = '';
 
-  const videoUrl = qrData?.processingPackingVideoUrl;
+        const videoUrl = qrData?.processingPackingVideoUrl;
 
-  if (videoUrl && typeof videoUrl === 'string' && videoUrl.trim() !== '') {
-    const fullUrl = `${CURRENT_URL}/${videoUrl}`;
+        if (videoUrl && typeof videoUrl === 'string' && videoUrl.trim() !== '') {
+            const fullUrl = `${CURRENT_URL}/${videoUrl}`;
 
-    const videoHTML = `
-                <div class="ratio ratio-16x9">
-                    <video 
-                        controls 
-                        preload="metadata"
-                        class="w-100 rounded-bottom object-fit-cover"
-                        style="max-height: 400px;"
-                    >
-                        <source src="${fullUrl}" type="video/mp4">
-                        Trình duyệt không hỗ trợ phát video.
-                    </video>
-                </div>
-            `;
+            const videoHTML = `
+                        <div class="ratio ratio-16x9">
+                            <video 
+                                controls 
+                                preload="metadata"
+                                class="w-100 rounded-bottom object-fit-cover"
+                                style="max-height: 400px;"
+                            >
+                                <source src="${fullUrl}" type="video/mp4">
+                                Trình duyệt không hỗ trợ phát video.
+                            </video>
+                        </div>
+                    `;
 
-    container.innerHTML = videoHTML;
-  }
-  // ASSIGN NÚT TỪ CHỐI
-  const btnRefuse = document.querySelector('#btn-refuse'); 
+            container.innerHTML = videoHTML;
+        }
+        // ASSING BLOCKCHAIN LINK
+        const el = document.getElementById("blockchain-box")
+        if (el && (!window.location.href.includes("qrcode-global") || !qrData.transactionHash)) {
+            el.style.display = "none"
+        }
+        // ASSIGN NÚT TỪ CHỐI
+        const btnRefuse = document.querySelector('#btn-refuse'); 
 
-    if (btnRefuse) {
-        btnRefuse.addEventListener('click', async function () {
-            await refuseQrcode(qrData.requestCode)
-        });
-    }
+            if (btnRefuse) {
+                btnRefuse.addEventListener('click', async function () {
+                    await refuseQrcode(qrData.requestCode)
+                });
+            }
 });
 </script>

@@ -109,7 +109,6 @@ export default class QrAppController {
     };
   }
 
-
   // TODO: SELL
   @ApiOperation({
     summary: 'Tạo yêu cầu cần bán sản lượng yến ',
@@ -142,6 +141,12 @@ export default class QrAppController {
     if (result === -2) {
       throw new BadRequestException({
         message: Msg.CodeInvalid,
+        data: 0,
+      });
+    }
+    if (result === -3) {
+      throw new BadRequestException({
+        message: Msg.RequestInfoAlreadySold,
         data: 0,
       });
     }

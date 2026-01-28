@@ -33,7 +33,7 @@ export class FileLocalService {
       mkdirSync(dirPath, { recursive: true });
     }
 
-    const fileName = `qr-${requestCode}.png`;
+    const fileName = `${requestCode}.png`;
     const fullPath = path.join(dirPath, fileName);
 
     await QRCode.toFile(fullPath, targetUrl, {

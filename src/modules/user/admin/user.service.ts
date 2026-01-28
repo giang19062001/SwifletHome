@@ -79,8 +79,8 @@ export class UserAdminService {
     const isFristTimeUpgrage = await this.userAdminRepository.isFristTimesUpdatePackage(userCode);
     // đổi nội dung thông báo theo số lần cập nhập gói
     const notify = isFristTimeUpgrage
-      ? NOTIFICATIONS.updatePackageFristTime(packageData, startDate ?? '', endDate ?? '')
-      : NOTIFICATIONS.updatePackageTimes(packageData, startDate ?? '', endDate ?? '');
+      ? NOTIFICATIONS.UPDATE_PACKAGE_FRIST_TIME(packageData, startDate ?? '', endDate ?? '')
+      : NOTIFICATIONS.UPDATE_PACKAGE_TIMES(packageData, startDate ?? '', endDate ?? '');
     // cập nhập và ghi lịch sử
     await this.userAdminRepository.writePackageHistory(dto, userCode, startDate, endDate, updatedAt);
     const result = await this.userAdminRepository.updatePackage(dto, userCode, startDate, endDate, updatedId, updatedAt);

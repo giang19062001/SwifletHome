@@ -4,10 +4,9 @@ import { QrAdminRepository } from './qr.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Injectable } from '@nestjs/common';
 import { IQrRequest } from './qr.inteface';
-import { GetAllInfoRequestQrCodeResDto } from '../qr.dto';
 import { RequestStatusEnum } from '../qr.interface';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
-import { WriteQrBlockchainDto } from './qr.dto';
+import { GetAllInfoRequestQrCodeAdminResDto, WriteQrBlockchainDto } from './qr.dto';
 import { ContractService } from 'src/common/contract/contract.service';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
@@ -30,7 +29,7 @@ export class QrAdminService {
     const list = await this.qrAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(requestCode: string): Promise<GetAllInfoRequestQrCodeResDto | null> {
+  async getDetail(requestCode: string): Promise<GetAllInfoRequestQrCodeAdminResDto | null> {
     const result = await this.qrAdminRepository.getDetail(requestCode);
     return result;
   }
@@ -67,7 +66,7 @@ export class QrAdminService {
         const user = await this.userAdminRepository.getDetailUserApp(detail.userCode!!);
         if (!user) return 0;
 
-        const notify = NOTIFICATIONS.sendNotifyQrcodeApproved(requestCode);
+        const notify = NOTIFICATIONS.QR_CODE_APPROVED(requestCode);
         this.firebaseService.sendNotification(user.userCode, user.deviceToken, notify.TITLE, notify.BODY, { requestCode: requestCode }, NotificationTypeEnum.ADMIN_QR);
       }
       return 1;

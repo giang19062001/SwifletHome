@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { GetAllInfoRequestQrCodeResDto } from '../qr.dto';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IQrRequest } from './qr.inteface';
 import { QR_CODE_CONST, RequestStatusEnum } from '../qr.interface';
-import { WriteQrBlockchainDto } from './qr.dto';
+import { GetAllInfoRequestQrCodeAdminResDto, WriteQrBlockchainDto } from './qr.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
 
 @Injectable()
@@ -41,7 +40,7 @@ export class QrAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IQrRequest[];
   }
-  async getDetail(requestCode: string): Promise<GetAllInfoRequestQrCodeResDto | null> {
+  async getDetail(requestCode: string): Promise<GetAllInfoRequestQrCodeAdminResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.requestStatus,
         CASE
@@ -51,17 +50,24 @@ export class QrAdminRepository {
             WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
             ELSE ''
         END AS requestStatusLabel,
-        A.taskMedicineList, A.taskHarvestList, C.filename AS processingPackingVideoUrl, A.createdAt
+        A.taskMedicineList, A.taskHarvestList, C.filename AS processingPackingVideoUrl,
+        CASE
+          WHEN D.transactionHash IS NULL THEN ''
+          ELSE CONCAT('${process.env.BLOCKCHAIN_NET}/tx/', D.transactionHash)
+        END
+        AS transactionHash, A.createdAt
         FROM ${this.table}  A
         LEFT JOIN ${this.tableUserHome} B
         ON A.userHomeCode = B.userHomeCode  
           LEFT JOIN ${this.tableFile} C
         ON A.seq = C.qrRequestSeq  
+         LEFT JOIN ${this.tableBlockChain} D
+        ON A.requestCode = D.requestCode  
         WHERE A.requestCode = ? AND A.isActive = 'Y' AND C.isActive = 'Y'
         `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
-    return rows.length ? (rows[0] as GetAllInfoRequestQrCodeResDto) : null;
+    return rows.length ? (rows[0] as GetAllInfoRequestQrCodeAdminResDto) : null;
   }
   async updateRequsetStatus(requestCode: string, requestStatus: RequestStatusEnum, updatedId: string): Promise<number> {
     const sql = `
@@ -74,16 +80,33 @@ export class QrAdminRepository {
   }
 
   // TODO: BLOCKCHAIN
-  async writeQrBlockchain(dto: WriteQrBlockchainDto): Promise<number> {
-    const sql = `
-          INSERT INTO ${this.tableBlockChain}  (requestCode, userCode, userHomeCode, qrCodeUrl, transactionHash, blockNumber, transactionFee, createdId) 
-          VALUES(?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-    // prettier-ignore
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-        dto.requestCode, dto.userCode, dto.userHomeCode,  dto.qrCodeUrl, dto.transactionHash, dto.blockNumber, dto.transactionFee, UPDATOR,
-      ]);
+ async writeQrBlockchain(dto: WriteQrBlockchainDto): Promise<number> {
+  const sql = `
+    INSERT INTO ${this.tableBlockChain}
+      (requestCode, userCode, userHomeCode, qrCodeUrl, transactionHash, blockNumber, transactionFee, createdId)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+      userCode = VALUES(userCode),
+      userHomeCode = VALUES(userHomeCode),
+      qrCodeUrl = VALUES(qrCodeUrl),
+      transactionHash = VALUES(transactionHash),
+      blockNumber = VALUES(blockNumber),
+      transactionFee = VALUES(transactionFee),
+      updatedId = ?
+  `;
 
-    return result.insertId;
-  }
+  const [result] = await this.db.execute<ResultSetHeader>(sql, [
+    dto.requestCode,
+    dto.userCode,
+    dto.userHomeCode,
+    dto.qrCodeUrl,
+    dto.transactionHash,
+    dto.blockNumber,
+    dto.transactionFee,
+    UPDATOR,
+    UPDATOR  
+  ]);
+  return result.insertId;
+}
+
 }

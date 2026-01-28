@@ -60,6 +60,7 @@ export const Msg = {
   HarvestTaskAlreadyAdded:`Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
   RequestQrcodeAlreadyExsist: `Yêu cầu Qr code của nhà yến  với đợt thu hoạch này đã có rồi`,
   RequestQrcodeNotFound: `Không tìm thấy thông tin Qrcode của yêu cầu bán hiện tại`,
+  RequestInfoAlreadySold: `Thông tin của Qr code này đã được rao bán rồi`,
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
   InvalidValue: (filedName: string) => `Gía trị của ${convertFiledName(filedName)} không hợp lệ`,
   InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,

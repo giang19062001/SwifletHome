@@ -1,3 +1,4 @@
+import { QR_CODE_CONST } from './../qr.interface';
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
@@ -19,19 +20,32 @@ export class QrAppRepository {
   async getApprovedRequestQrCocde(requestCode: string, userCode: string): Promise<GetAllInfoRequestQrCodeResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
       A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
-       B.filename AS processingPackingVideoUrl, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl
+       CASE
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.WAITING.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.WAITING.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
+        ELSE ''
+    END AS requestStatusLabel,
+       B.filename AS processingPackingVideoUrl, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
+       CASE
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          ELSE 'N'
+      END AS isSold
       FROM ${this.table}  A
       LEFT JOIN ${this.tableFile} B
       ON A.seq = B.qrRequestSeq  
       LEFT JOIN ${this.tableBlockChain} C
       ON A.requestCode = C.requestCode  
+       LEFT JOIN ${this.tableSell} D
+      ON A.requestCode = D.requestCode  
       WHERE A.requestCode  = ? AND A.userCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y' AND A.requestStatus = ?
       LIMIT 1 `;
 
-    // const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, userCode, RequestStatusEnum.APPROVED]);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, userCode, RequestStatusEnum.APPROVED]);
 
     // ! TEST
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, userCode, RequestStatusEnum.WAITING]);
+    // const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, userCode, RequestStatusEnum.WAITING]);
 
     return rows.length ? (rows[0] as GetAllInfoRequestQrCodeResDto) : null;
   }
