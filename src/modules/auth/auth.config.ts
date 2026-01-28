@@ -8,7 +8,7 @@ export const AUTH_CONFIG = {
   EXPIRED_APP_NONE_SAVE: '7d' as const,
   COOKIE_ADMIN_CONFIG: {
     httpOnly: false, //  có thể truy cập bằng JavaScript
-    sameSite: 'strict', //  chỉ gửi khi request cùng site # login redirect từ domain khác → lỗi
+    sameSite: 'lax', //  chỉ gửi khi request cùng site # login redirect từ domain khác → lỗi
     secure: true, // HTTPS
     maxAge: 24 * 60 * 60 * 1000, // 1day
   } satisfies CookieOptions,
