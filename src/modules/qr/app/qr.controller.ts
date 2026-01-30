@@ -5,7 +5,16 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { QrAppService } from './qr.service';
-import { GetAllInfoRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, InsertRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto, UploadRequestVideoResDto } from '../qr.dto';
+import {
+  GetApprovedRequestQrCodeResDto,
+  GetInfoToRequestQrcodeResDto,
+  GetRequestQrCodeListResDto,
+  GetRequestSellListResDto,
+  InsertRequestSellDto,
+  RequestQrCodeDto,
+  UploadRequestVideoDto,
+  UploadRequestVideoResDto,
+} from '../qr.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -22,12 +31,25 @@ export default class QrAppController {
   constructor(private readonly qrAppService: QrAppService) {}
 
   @ApiOperation({
+    summary: 'Lấy danh sách đơn yêu cầu qrcode của user hiện tại',
+    description: ``,
+  })
+  @Get('getRequestQrCocdeList')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetRequestQrCodeListResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getRequestQrCocdeList(@GetUserApp() user: authInterface.ITokenUserApp) {
+    const result = await this.qrAppService.getRequestQrCocdeList(user);
+    return result;
+  }
+
+  @ApiOperation({
     summary: 'Lấy thông tin đã được ADMIN chấp thuận từ yêu cầu tạo mã Qrcode trước đó',
     description: ``,
   })
   @Get('getApprovedRequestQrCocde/:requestCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetAllInfoRequestQrCodeResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetApprovedRequestQrCodeResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getApprovedRequestQrCocde(@Param('requestCode') requestCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
     const result = await this.qrAppService.getApprovedRequestQrCocde(requestCode, user);
@@ -76,6 +98,12 @@ export default class QrAppController {
         data: 0,
       });
     }
+    if (result === -3) {
+      throw new BadRequestException({
+        message: Msg.RequestNotAllowHarvestEmpty,
+        data: 0,
+      });
+    }
     if (result === 0) {
       throw new BadRequestException({
         message: Msg.CreateErr,
@@ -86,6 +114,25 @@ export default class QrAppController {
       message: Msg.CreateOk,
       data: result,
     };
+  }
+
+  @ApiOperation({
+    summary: 'Hủy yêu cầu qrcode',
+  })
+  @Put('cancelRequest/:requestCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({ name: 'requestCode', type: String })
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  async cancelRequest(@Param('requestCode') requestCode: string, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
+    const result = await this.qrAppService.cancelRequest(requestCode, user.userCode);
+    if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.UpdateErr,
+        data: 0,
+      });
+    }
+
+    return result;
   }
 
   // TODO: FILE
@@ -110,6 +157,19 @@ export default class QrAppController {
   }
 
   // TODO: SELL
+    @ApiOperation({
+    summary: 'Lấy danh sách đơn yêu cầu bán tổ yến',
+    description: ``,
+  })
+  @Get('getRequestSellList')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetRequestSellListResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getRequestSellList(@GetUserApp() user: authInterface.ITokenUserApp) {
+    const result = await this.qrAppService.getRequestSellList();
+    return result;
+  }
+
   @ApiOperation({
     summary: 'Tạo yêu cầu cần bán sản lượng yến ',
   })

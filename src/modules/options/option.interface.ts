@@ -1,5 +1,12 @@
 import { YnEnum } from 'src/interfaces/admin.interface';
 
+
+export enum RequestSellPriceOptionEnum {
+  SELLER = 'SELLER',
+  NEGOTIATE = 'NEGOTIATE',
+}
+
+
 export const OPTION_CONST = {
   SIGHTSEEING: {
     mainOption: 'SIGHTSEEING',

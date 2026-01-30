@@ -269,7 +269,7 @@ export class TodoAppService {
           await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành'`);
         } else {
-          //? Trước đó Set ngày 25 NHƯNG hôm nay là 23 ---> HOÀN THÀNH
+          //? Trước đó Set ngày 25 NHƯNG hôm nay là 23 ---> SKIP
           // chưa tới ngày lăn thuốc
           this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
           // return -3;

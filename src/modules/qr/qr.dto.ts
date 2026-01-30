@@ -12,6 +12,9 @@ export class GetInfoToRequestQrcodeResDto {
   @ApiProperty({ example: '' })
   userHomeCode: string;
 
+  @ApiProperty({ example: '' })
+  userHomeName: string;
+
   @ApiProperty({ example: 10 })
   userHomeLength: number;
 
@@ -49,7 +52,7 @@ export class TaskMedicineQrResDto {
   @ApiProperty({ example: '' })
   medicineUsage: string;
 
-  @ApiProperty({ example: '20-11-2025' })
+  @ApiProperty({ example: '20-11-2025 20:09:04' })
   timestamp: string;
 }
 
@@ -118,16 +121,17 @@ export class RequestQrCodeDto {
 export class RequestQrCodeFromDbDto extends GetInfoToRequestQrcodeResDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
-  @IsNotEmpty()
-  @Min(1)
   harvestPhase: number;
+
+  @ApiProperty({ example: 2025 })
+  @IsNumber()
+  harvestYear: number;
 
   @ApiProperty({
     example: RequestStatusEnum.WAITING,
     enum: RequestStatusEnum,
   })
   @IsEnum(RequestStatusEnum)
-  @IsNotEmpty()
   requestStatus: RequestStatusEnum;
 
   @IsString()
@@ -139,19 +143,16 @@ export class RequestQrCodeFromDbDto extends GetInfoToRequestQrcodeResDto {
     format: 'uuid',
   })
   @IsUUID()
-  @IsNotEmpty()
   uniqueId: string;
 }
 
-export class GetAllInfoRequestQrCodeResDto extends OmitType(RequestQrCodeFromDbDto, ['uniqueId'] as const) {
+export class GetApprovedRequestQrCodeResDto extends OmitType(RequestQrCodeFromDbDto, ['uniqueId'] as const) {
   @ApiProperty({ example: '' })
   @IsString()
-  @IsNotEmpty()
   processingPackingVideoUrl: string;
 
   @ApiProperty({ example: '' })
   @IsString()
-  @IsNotEmpty()
   qrCodeUrl: string;
 
   @ApiProperty({
@@ -159,7 +160,6 @@ export class GetAllInfoRequestQrCodeResDto extends OmitType(RequestQrCodeFromDbD
     enum: YnEnum,
   })
   @IsEnum(YnEnum)
-  @IsNotEmpty()
   isSold: YnEnum;
 }
 
@@ -169,6 +169,43 @@ export class UploadRequestVideoResDto {
 
   @ApiProperty({ example: '' })
   filename: string;
+}
+
+export class GetRequestQrCodeListResDto {
+  @IsNumber()
+  seq: number;
+
+  @IsString()
+  requestCode: string;
+
+  @IsString()
+  userHomeName: string;
+
+  @IsNumber()
+  harvestPhase: number;
+
+  @IsNumber()
+  harvestYear: number;
+
+  @ApiProperty({
+    example: RequestStatusEnum.WAITING,
+    enum: RequestStatusEnum,
+  })
+  @IsEnum(RequestStatusEnum)
+  requestStatus: RequestStatusEnum;
+
+  @IsString()
+  requestStatusLabel: string;
+
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  isSold: YnEnum;
+
+  @IsNumber()
+  totalCellCollected: number;
 }
 
 // SELL
@@ -226,5 +263,65 @@ export class InsertRequestSellDto {
   })
   @IsString()
   @IsNotEmpty()
+  ingredientNestOptionCode: string;
+}
+
+export class GetRequestSellListResDto {
+  @ApiProperty({
+    example: 0,
+  })
+  @IsNumber()
+  seq: number;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  requestCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  userName: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  userPhone: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  userHomeName: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  priceOptionCode: string;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  pricePerKg: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  volumeForSell: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  nestQuantity: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  humidity: number;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
   ingredientNestOptionCode: string;
 }

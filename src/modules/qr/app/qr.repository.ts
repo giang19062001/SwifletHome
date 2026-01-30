@@ -4,7 +4,8 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
-import { GetAllInfoRequestQrCodeResDto, InsertRequestSellDto, RequestQrCodeFromDbDto } from '../qr.dto';
+import { GetApprovedRequestQrCodeResDto, GetRequestSellListResDto, InsertRequestSellDto, RequestQrCodeFromDbDto } from '../qr.dto';
+import moment from 'moment';
 
 @Injectable()
 export class QrAppRepository {
@@ -12,21 +13,93 @@ export class QrAppRepository {
   private readonly tableFile = 'tbl_qr_request_file';
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
   private readonly tableSell = 'tbl_qr_request_sell';
-  private readonly tableUserApp = 'tbl_user_app';
+  private readonly tableOption = 'tbl_option_common';
+  private readonly tableHome = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   // TODO: REQUEST
-  async getApprovedRequestQrCocde(requestCode: string, userCode: string): Promise<GetAllInfoRequestQrCodeResDto | null> {
-    let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-      A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
-       CASE
-        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.WAITING.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.WAITING.text}'
-        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
-        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.text}'
-        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}' THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
+  async getRequestQrCocdeList(userCode: string): Promise<GetApprovedRequestQrCodeResDto[]> {
+    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+      CASE
+        WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.WAITING.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.WAITING.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
         ELSE ''
-    END AS requestStatusLabel,
+      END AS requestStatusLabel,
+       CASE
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          ELSE 'N'
+      END AS isSold
+      FROM ${this.table}  A
+      LEFT JOIN ${this.tableFile} B
+      ON A.seq = B.qrRequestSeq  
+      LEFT JOIN ${this.tableBlockChain} C
+      ON A.requestCode = C.requestCode  
+       LEFT JOIN ${this.tableSell} D
+      ON A.requestCode = D.requestCode  
+      LEFT JOIN ${this.tableHome} E
+      ON A.userHomeCode = E.userHomeCode  
+      WHERE A.userCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y'
+     `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
+    return rows as GetApprovedRequestQrCodeResDto[];
+  }
+    async getRequestQrCocde(requestCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
+    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+      CASE
+        WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.WAITING.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.WAITING.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
+        ELSE ''
+      END AS requestStatusLabel,
+       CASE
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          ELSE 'N'
+      END AS isSold
+      FROM ${this.table}  A
+      LEFT JOIN ${this.tableFile} B
+      ON A.seq = B.qrRequestSeq  
+      LEFT JOIN ${this.tableBlockChain} C
+      ON A.requestCode = C.requestCode  
+       LEFT JOIN ${this.tableSell} D
+      ON A.requestCode = D.requestCode  
+      LEFT JOIN ${this.tableHome} E
+      ON A.userHomeCode = E.userHomeCode  
+      WHERE A.requestCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y' LIMIT 1
+     `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
+    return rows.length ? rows[0] as GetApprovedRequestQrCodeResDto : null
+  }
+  async getApprovedRequestQrCocde(requestCode: string, userCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
+    let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
+      A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+         CASE
+        WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.WAITING.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.WAITING.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
+        ELSE ''
+      END AS requestStatusLabel,
        B.filename AS processingPackingVideoUrl, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
        CASE
           WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
@@ -39,15 +112,13 @@ export class QrAppRepository {
       ON A.requestCode = C.requestCode  
        LEFT JOIN ${this.tableSell} D
       ON A.requestCode = D.requestCode  
+        LEFT JOIN ${this.tableHome} E
+      ON A.userHomeCode = E.userHomeCode 
       WHERE A.requestCode  = ? AND A.userCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y' AND A.requestStatus = ?
       LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, userCode, RequestStatusEnum.APPROVED]);
-
-    // ! TEST
-    // const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, userCode, RequestStatusEnum.WAITING]);
-
-    return rows.length ? (rows[0] as GetAllInfoRequestQrCodeResDto) : null;
+    return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
   async checkDuplicateReuqestQrCode(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     let query = ` SELECT A.seq
@@ -68,16 +139,27 @@ export class QrAppRepository {
 
     const sql = `
         INSERT INTO ${this.table}  (requestCode, userCode, userName, userHomeCode, userHomeLength, userHomeWidth, userHomeFloor,
-        userHomeAddress, temperature, humidity, harvestPhase, taskMedicineList, taskHarvestList, uniqueId, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        userHomeAddress, temperature, humidity, harvestPhase, harvestYear, taskMedicineList, taskHarvestList, uniqueId, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     // prettier-ignore
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       requestCode, userCode, dto.userName,  dto.userHomeCode, dto.userHomeLength, dto.userHomeWidth, dto.userHomeFloor,
-      dto.userHomeAddress,  dto.temperature,  dto.humidity, dto.harvestPhase, dto.taskMedicineList,  dto.taskHarvestList, dto.uniqueId, userCode,
+      dto.userHomeAddress,  dto.temperature,  dto.humidity, dto.harvestPhase, dto.harvestYear, dto.taskMedicineList,  dto.taskHarvestList, dto.uniqueId, userCode,
     ]);
 
     return result.insertId;
+  }
+
+
+  async cancelRequest(requestCode: string, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET requestStatus = ? , updatedId = ? , updatedAt = NOW()
+      WHERE requestCode = ? 
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [RequestStatusEnum.CANCEL, updatedId, requestCode]);
+
+    return result.affectedRows;
   }
 
   // TODO: FILE
@@ -127,10 +209,9 @@ export class QrAppRepository {
 
     return result.affectedRows;
   }
-  
 
   // TODO: SELL
-    async insertRequestSell(userCode: string, dto: InsertRequestSellDto): Promise<number> {
+  async insertRequestSell(userCode: string, dto: InsertRequestSellDto): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableSell}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, volumeForSell,
         nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 
@@ -143,5 +224,26 @@ export class QrAppRepository {
     ]);
 
     return result.insertId;
+  }
+   async getRequestSellList(): Promise<GetRequestSellListResDto[]> {
+    let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
+     CASE
+        WHEN D.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
+          THEN '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.text}'
+        ELSE  CONCAT(FORMAT(A.pricePerKg, 0), ' đ/ Kg')
+      END AS priceOptionLabel, A.pricePerKg, A.volumeForSell, A.nestQuantity,
+      A.ingredientNestOptionCode, A.humidity
+      FROM ${this.tableSell}  A
+        LEFT JOIN ${this.table} B
+       ON A.requestCode = B.requestCode  
+      LEFT JOIN ${this.tableHome} C
+       ON B.userHomeCode = C.userHomeCode  
+      LEFT JOIN ${this.tableOption} D
+       ON A.priceOptionCode = D.code
+      WHERE A.isActive = 'Y'
+     `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, []);
+    return rows as GetRequestSellListResDto[];
   }
 }

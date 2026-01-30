@@ -1,6 +1,12 @@
 import { YnEnum } from 'src/interfaces/admin.interface';
 
 export const QR_CODE_CONST = {
+  PRICE_OPTION: {
+    NEGOTIATE: {
+      value: 'NEGOTIATE',
+      text: 'Gía thương lượng',
+    },
+  },
   REQUEST_STATUS: {
     WAITING: {
       value: 'WAITING',
@@ -23,7 +29,7 @@ export const QR_CODE_CONST = {
       text: 'Đã bán',
     },
   },
-}
+};
 export interface IQrRequestFile {
   seq: number;
   qrRequestSeq: number;
@@ -41,7 +47,7 @@ export enum RequestStatusEnum {
   APPROVED = 'APPROVED',
   REFUSE = 'REFUSE',
   CANCEL = 'CANCEL',
-  SOLD = 'SOLD'
+  SOLD = 'SOLD',
 }
 
 export enum RequestSellStatusEnum {
@@ -49,4 +55,3 @@ export enum RequestSellStatusEnum {
   APPROVED = 'APPROVED',
   REFUSE = 'REFUSE',
 }
-

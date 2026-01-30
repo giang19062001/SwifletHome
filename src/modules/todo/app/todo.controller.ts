@@ -13,6 +13,7 @@ import { Msg } from 'src/helpers/message.helper';
 import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto, SetTaskPeriodDto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
 import { IListApp } from 'src/interfaces/app.interface';
+import { QUERY_HELPER } from 'src/helpers/const.helper';
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -34,7 +35,7 @@ export default class TodoAppController {
   }
 
   @ApiOperation({
-    summary: 'Danh sách lịch nhắc việc của 1 nhà yến ( chỉ hiển thị lịch nhắc quá khứ, lịch nhắc trong ngầy hiện tại nếu có, và 5 ngày sắp tới )',
+    summary: `Danh sách lịch nhắc việc của 1 nhà yến ( chỉ hiển thị lịch nhắc quá khứ, lịch nhắc trong ngầy hiện tại nếu có, và ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} ngày sắp tới )`,
   })
   @ApiBody({
     type: GetListTaskAlarmsDTO,

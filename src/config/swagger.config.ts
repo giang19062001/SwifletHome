@@ -28,9 +28,18 @@ export const initSwagger = (app) => {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  // custom sort tags
+  document.tags = document.tags?.sort((a, b) => {
+    const aIsApp = a.name.startsWith('app/');
+    const bIsApp = b.name.startsWith('app/');
+
+    if (aIsApp && !bIsApp) return -1;
+    if (!aIsApp && bIsApp) return 1;
+
+    return a.name.localeCompare(b.name);
+  });
   SwaggerModule.setup('api-docs', app, document, {
     swaggerOptions: {
-      tagsSorter: 'alpha',
       operationsSorter: 'alpha',
     },
     customCss: `

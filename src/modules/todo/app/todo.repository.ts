@@ -20,6 +20,7 @@ export class TodoAppRepository {
   private readonly tableHomeTaskHarvest = 'tbl_todo_home_task_harvest';
   private readonly tableHomeTaskHarvestPhase = 'tbl_todo_home_task_harvest_phase';
   private readonly tableOption = 'tbl_option_common';
+  private readonly tableQrRequest = 'tbl_qr_request';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -462,6 +463,8 @@ export class TodoAppRepository {
 
   // TODO -- QRCODE
   async getTaskMedicineCompleteList(userHomeCode: string): Promise<TaskMedicineQrResDto[]> {
+    const currentYear = moment().year(); // lấy năm hiện tại
+
     const query = `
     SELECT 
       A.taskAlarmCode AS taskAlarmCode,
@@ -470,7 +473,7 @@ export class TodoAppRepository {
         WHEN C.keyOption != '${TODO_CONST.TASK_OPTION_MEDICINE.OTHER.value}' THEN C.valueOption
         ELSE B.medicineOther
       END AS medicineName,
-     COALESCE(A.updatedAt, A.createdAt) AS timestamp
+       DATE_FORMAT(COALESCE(A.updatedAt, A.createdAt),'%Y-%m-%d %H:%i:%s') AS timestamp
     FROM ${this.tableHomeTaskAlarm} A
     LEFT JOIN ${this.tableHomeTaskMedicine} B
       ON A.seq = B.seqNextTime
@@ -478,24 +481,35 @@ export class TodoAppRepository {
       ON B.medicineOptionCode = C.code
     LEFT JOIN ${this.tableTask} D
       ON A.taskCode = D.taskCode
-    WHERE A.userHomeCode = ? AND A.taskStatus = 'COMPLETE' AND D.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}'
+    WHERE A.userHomeCode = ? AND A.taskStatus = 'COMPLETE' AND D.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}'  AND YEAR(B.createdAt) = ?
   `;
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode]);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, currentYear]);
     return rows as TaskMedicineQrResDto[];
   }
 
   async getTaskHarvestCompleteList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number })[]> {
+    const currentYear = moment().year(); // lấy năm hiện tại
+
     let query = ` SELECT  A.seq, A.taskAlarmCode AS harvestTaskAlarmCode, B.harvestPhase, B.harvestYear
     FROM ${this.tableHomeTaskAlarm}  A
     LEFT JOIN ${this.tableHomeTaskHarvestPhase} B
-    ON A.seq = B.seqAlarm 
-      LEFT JOIN ${this.tableTask} C
+      ON A.seq = B.seqAlarm 
+    LEFT JOIN ${this.tableTask} C
       ON A.taskCode = C.taskCode
      WHERE A.userHomeCode  = ?  AND A.taskStatus = 'COMPLETE' AND B.isDone = 'Y' AND C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+      AND harvestYear = ? 
+      AND NOT EXISTS (
+        SELECT 1
+        FROM tbl_qr_request Q
+        WHERE Q.userHomeCode = A.userHomeCode
+          AND Q.harvestYear = B.harvestYear
+          AND Q.harvestPhase = B.harvestPhase
+      )
      ${harvestPhase != 0 ? " AND B.harvestPhase  = ? " : ""}
-    LIMIT 1 `;
-
-    const [rows] = await this.db.query<RowDataPacket[]>(query, harvestPhase != 0 ? [userHomeCode, harvestPhase] : [userHomeCode]);
+    `;
+ 
+    console.log(query);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, harvestPhase != 0 ? [userHomeCode, currentYear, harvestPhase] : [userHomeCode, currentYear]);
     return rows as (TaskHarvestQrResDto & { seq: number })[];
   }
 }

@@ -32,6 +32,10 @@ const LIST_ENUM = {
       value: 'REFUSE',
       text: 'Từ chối duyệt',
     },
+     {
+      value: 'CANCEL',
+      text: 'Đã hủy',
+    },
   ],
   HOME_SALE_SIGHTSEEING_STATUS: [
     {

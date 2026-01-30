@@ -14,7 +14,7 @@ export class UserAppRepository {
   private readonly table = 'tbl_user_app';
   private readonly tableDel = 'tbl_user_app_delete';
   private readonly tablePackage = 'tbl_user_package';
-
+  private readonly tableType = 'tbl_user_type';
   private readonly tablePackageHistory = 'tbl_user_package_history';
   private readonly tableHome = 'tbl_user_home';
 

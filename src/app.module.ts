@@ -40,6 +40,7 @@ import { NotificationAdminModule } from './modules/notification/admin/notificati
 import { MqttModule } from './common/mqtt/mqtt.module';
 import { QrAppModule } from './modules/qr/app/qr.module';
 import { QrAdminModule } from './modules/qr/admin/qr.module';
+import { PhoneCodeModule } from './modules/phoneCode/phoneCode.module';
 
 @Module({
   imports: [
@@ -56,7 +57,7 @@ import { QrAdminModule } from './modules/qr/admin/qr.module';
     // commmon
     OptionModule,
     ProvinceModule,
-
+    PhoneCodeModule,
     //app
     AuthAppModule,
     AnswerAppModule,
@@ -85,13 +86,12 @@ import { QrAdminModule } from './modules/qr/admin/qr.module';
     UserHomeAdminModule,
     TodoAdminModule,
     NotificationAdminModule,
-    QrAdminModule
-
+    QrAdminModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-     {
+    {
       provide: APP_PIPE,
       useClass: ValidationPipe, // bật bắt lỗi tự động dựa vào cấu hình DTO
     },
@@ -102,7 +102,7 @@ import { QrAdminModule } from './modules/qr/admin/qr.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: RequestLoggerInterceptor, // log cho các request gửi đến server
-    }, 
+    },
   ],
 })
 export class AppModule implements NestModule {
