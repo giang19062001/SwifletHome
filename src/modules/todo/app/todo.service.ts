@@ -107,60 +107,6 @@ export class TodoAppService {
     this.logger.log(logbase, `cập nhập trạng thái của lịch nhắc thành (${taskStatus})`);
     return result;
   }
-  // TODO: PERIOD
-
-  async setTaskAlarmPeriod(userCode: string, dto: SetTaskPeriodDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setTaskAlarmPeriod:`;
-
-    // kiểm tra duplicate chu kỳ lịch nhắc
-    const isDuplicatePeriod = await this.todoAppRepository.checkDuplicateTaskPeriod(userCode, dto);
-    if (isDuplicatePeriod) {
-      this.logger.log(logbase, Msg.DuplicateTaskPeriod + `(${dto.userHomeCode})`);
-      return -2;
-    }
-
-    // kiểm tra duplicate lịch nhắc
-    let alramDto = await this.todoAppValidate.handleAlarmDataByPeriodData(dto, '');
-
-    // taskDate khác null mới kiểm tra
-    if (alramDto.taskDate != null) {
-      const isDuplicateAlarm = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, alramDto);
-      if (isDuplicateAlarm) {
-        this.logger.log(logbase, Msg.DuplicateTaskAlram + `(${dto.userHomeCode})`);
-        return -1;
-      }
-    }
-
-    // insert lịch nhắc theo ngày tùy chỉnh
-    if (dto.isPeriod == 'N' && dto.specificValue != null) {
-      alramDto.taskPeriodCode = null; // taskPeriodCode sẽ null
-      const result = await this.todoAppRepository.insertTaskAlarm(userCode, alramDto);
-      this.logger.log(logbase, `Đã thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến ${dto.userHomeCode}`);
-
-      return result;
-    }
-
-    // insert lịch nhắc theo chu kỳ
-    if (dto.isPeriod == 'Y' && dto.periodType != null && dto.periodValue != null) {
-      const { taskPeriodCode, insertId } = await this.todoAppRepository.insertTaskPeriod(userCode, dto);
-
-      if (alramDto.taskDate == null) {
-        //* VD:  2025-02-31 - KO  HỢP LỆ,  2025-03-31 - HỢP LỆ
-        this.logger.log(logbase, `Thời gian lịch nhắc không hợp lệ nhưng có thể hợp lệ vào thời điểm khác -> không thể thêm lịch nhắc, chỉ có thể thêm cấu hình chu kỳ, không thêm dữ liệu lịch nhắc`);
-        return 1;
-      }
-      if (insertId && alramDto.taskDate != null) {
-        this.logger.log(logbase, `Đã thiết lập cấu hình lịch nhắc theo chu kỳ cho nhà yến ${dto.userHomeCode}`);
-
-        alramDto.taskPeriodCode = taskPeriodCode; // taskPeriodCode bắt buộc có
-        const result = await this.todoAppRepository.insertTaskAlarm(userCode, alramDto);
-        this.logger.log(logbase, `Đã thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến ${dto.userHomeCode}`);
-
-        return result;
-      }
-    }
-    return 0;
-  }
   async setTaskAlarmPeriodV2(userCode: string, dto: SetTaskPeriodV2Dto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskAlarmPeriodV2:`;
 

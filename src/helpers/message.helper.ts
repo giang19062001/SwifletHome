@@ -25,6 +25,8 @@ export const Msg = {
   LoginErr: 'Đăng nhập thất bại',
   RegisterAccountOk: 'Đăng ký tài khoản thành công',
   RegisterAccountErr: 'Đăng ký tài khoản thất bại',
+  InvalidUserType:"Loại tài khoản người dùng không hợp lệ",
+  InvalidPhoneCode:"Mã vùng điện thoại người dùng không hợp lệ",
   PasswordChangeOk: 'Đổi mật khẩu thành công',
   PasswordChangeErr: 'Đổi mật khẩu thất bại',
   AccountLoginWrong: 'Tài khoản hoặc mật khẩu không hợp lệ',

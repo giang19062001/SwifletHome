@@ -7,6 +7,7 @@ import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UserTypeResDto } from './user.response';
+import { Msg } from 'src/helpers/message.helper';
 
 @Injectable()
 export class UserAppService {
@@ -20,21 +21,21 @@ export class UserAppService {
     return await this.userAppRepository.findByCode(userCode);
   }
 
-  async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
-    return await this.userAppRepository.findByPhone(userPhone);
+  async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserApp | null> {
+    return await this.userAppRepository.findByPhone(userPhone, countryCode);
   }
   async deleteAccount(userCode: string, user: ITokenUserApp): Promise<number> {
     try {
       return await this.userAppRepository.deleteAccount(userCode, user);
     } catch (error) {
-      return 0
+      return 0;
     }
   }
   async getInfo(userCode: string): Promise<IUserApp | null> {
     const info = await this.userAppRepository.getInfo(userCode);
     if (info?.packageCode && info.packageRemainDay <= 0) {
       // gói hết hạn -> cho 'packageCode' là null
-      return { ...info, packageCode: null, packageName: TEXTS.PACKAGE_FREE, packageDescription:"", startDate: null, endDate: null };
+      return { ...info, packageCode: null, packageName: TEXTS.PACKAGE_FREE, packageDescription: '', startDate: null, endDate: null };
     } else {
       return info;
     }
@@ -62,7 +63,6 @@ export class UserAppService {
     }
     return userInserted;
   }
-
   async update(userName: string, userPhone: string, userCode: string): Promise<number> {
     return await this.userAppRepository.update(userName, userPhone, userCode);
   }
@@ -86,5 +86,8 @@ export class UserAppService {
   // TODO: TYPE
   async getAllUserType(): Promise<UserTypeResDto[]> {
     return await this.userAppRepository.getAllUserType();
+  }
+   async getOneUserType(userTypeCode: string): Promise<UserTypeResDto | null> {
+    return await this.userAppRepository.getOneUserType(userTypeCode);
   }
 }

@@ -13,6 +13,7 @@ import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { IUserApp } from 'src/modules/user/app/user.interface';
 import { AUTH_CONFIG } from '../auth.config';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { PhoneCodeService } from 'src/modules/phoneCode/phoneCode.service';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -21,6 +22,7 @@ export class AuthAppService extends AbAuthService {
   constructor(
     private readonly userAppService: UserAppService,
     private readonly firebaseService: FirebaseService,
+    private readonly phoneCodeService: PhoneCodeService,
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
     private readonly logger: LoggingService,
@@ -28,12 +30,17 @@ export class AuthAppService extends AbAuthService {
     super();
   }
 
-  private async verifyPhoneBeforeOtp(userPhone: string, purpose: string) {
+  private async verifyPhoneBeforeOtp(userPhone: string, purpose: string, countryCode: string) {
     const logbase = `${this.SERVICE_NAME}/verifyPhoneBeforeOtp`;
-
+    // kiểm tra mã phone code hợp lệ hay ko
+    const isPhoneCodeValid = await this.phoneCodeService.getDetail(countryCode)
+    if(!isPhoneCodeValid){
+        this.logger.error(logbase, `${userPhone} -> ${Msg.InvalidPhoneCode}`);
+        throw new BadRequestException(Msg.InvalidPhoneCode);
+    }
     // nếu đăng ký mới cần kiểm tra số điện thoại đã được sử dụng hay chưa
     if (purpose == PurposeEnum.REGISTER) {
-      const phone = await this.userAppService.findByPhone(userPhone);
+      const phone = await this.userAppService.findByPhone(userPhone, countryCode);
 
       // lỗi -> số điện thoại đã tồn tại -> không thể tạo mới nữa -> ko phải gửi sms xác thực nữa
       if (phone) {
@@ -44,7 +51,7 @@ export class AuthAppService extends AbAuthService {
 
     // quên password
     if (purpose == PurposeEnum.FORGOT_PASSWORD) {
-      const phone = await this.userAppService.findByPhone(userPhone);
+      const phone = await this.userAppService.findByPhone(userPhone, countryCode);
 
       // lỗi -> số điện thoại không tồn tại -> không thể đổi mật khẩu -> ko phải gửi sms xác thực nữa
       if (!phone) {
@@ -56,7 +63,7 @@ export class AuthAppService extends AbAuthService {
   async login(dto: LoginAppDto): Promise<Omit<ITokenUserApp, 'userPassword'> & { accessToken: string }> {
     const logbase = `${this.SERVICE_NAME}/login`;
 
-    const user = await this.userAppService.findByPhone(dto.userPhone);
+    const user = await this.userAppService.findByPhone(dto.userPhone, dto.countryCode);
 
     // số điện không tồn tại | sai
     if (!user) {
@@ -112,7 +119,15 @@ export class AuthAppService extends AbAuthService {
 
   async register(dto: RegisterUserAppDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/register`;
-    const user = await this.userAppService.findByPhone(dto.userPhone);
+
+    // kiểm tra loại ng dùng
+    const isCountryValid = await this.userAppService.getOneUserType(dto.userTypeCode);
+    if (!isCountryValid) {
+      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.InvalidUserType}`);
+      throw new BadRequestException(Msg.InvalidUserType);
+    }
+    // kiểm số phone
+    const user = await this.userAppService.findByPhone(dto.userPhone, dto.countryCode);
 
     // lỗi -> số điện thoại đã tồn tại
     if (user) {
@@ -121,7 +136,7 @@ export class AuthAppService extends AbAuthService {
     }
 
     // kiểm tra xác thực otp chưa
-    const verified = await this.otpService.checkPhoneVarified(dto.userPhone, PurposeEnum.REGISTER);
+    const verified = await this.otpService.checkPhoneVarified(dto.userPhone, PurposeEnum.REGISTER, dto.countryCode);
 
     // lỗi -> chưa xác thực OTP
     if (!verified) {
@@ -146,10 +161,10 @@ export class AuthAppService extends AbAuthService {
     return userInserted ? 1 : 0;
   }
 
-  async update(dto: UpdateUserDto, userPhone: string, userCode: string): Promise<number> {
+  async update(dto: UpdateUserDto, userPhone: string, userCode: string, countryCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/update`;
 
-    const user = await this.userAppService.findByPhone(userPhone);
+    const user = await this.userAppService.findByPhone(userPhone, countryCode);
 
     // tài khoản của sđt không tồn tại -> không thể update
     if (!user) {
@@ -165,7 +180,7 @@ export class AuthAppService extends AbAuthService {
 
   async updatePassword(dto: UpdatePasswordDto, userPhone: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/updatePassword`;
-    const user = await this.userAppService.findByPhone(userPhone);
+    const user = await this.userAppService.findByPhone(userPhone, dto.countryCode);
 
     // tài khoản của sđt không tồn tại -> không thể update
     if (!user) {
@@ -174,7 +189,7 @@ export class AuthAppService extends AbAuthService {
     }
 
     // kiểm tra xác thực otp chưa
-    const verified = await this.otpService.checkPhoneVarified(userPhone, PurposeEnum.FORGOT_PASSWORD);
+    const verified = await this.otpService.checkPhoneVarified(userPhone, PurposeEnum.FORGOT_PASSWORD, dto.countryCode);
 
     // lỗi -> chưa xác thực OTP
     if (!verified) {
@@ -187,7 +202,7 @@ export class AuthAppService extends AbAuthService {
     const result = await this.userAppService.updatePassword(hashedNewPassword, userPhone);
 
     // reset thông tin OTP của password để lần tiếp theo muốn đổi password lần nữa phải xác thực lại OTP
-    await this.otpService.resetOtp(userPhone, '0000', new Date(), PurposeEnum.FORGOT_PASSWORD);
+    await this.otpService.resetOtp(userPhone, '0000', new Date(), PurposeEnum.FORGOT_PASSWORD, dto.countryCode);
 
     this.logger.log(logbase, `${userPhone} -> ${result ? Msg.PasswordChangeOk : Msg.PasswordChangeErr}`);
     return result;
@@ -196,7 +211,7 @@ export class AuthAppService extends AbAuthService {
   async updateDeviceToken(dto: UpdateDeviceTokenDto, userPhone: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/updateDeviceToken`;
 
-    const user = await this.userAppService.findByPhone(userPhone);
+    const user = await this.userAppService.findByPhone(userPhone, dto.countryCode);
 
     // tài khoản của sđt không tồn tại -> không thể update
     if (!user) {
@@ -208,9 +223,9 @@ export class AuthAppService extends AbAuthService {
     return result;
   }
 
-  async checkDuplicatePhone(userPhone: string): Promise<number> {
+  async checkDuplicatePhone(userPhone: string, countryCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/checkDuplicatePhone`;
-    const phone = await this.userAppService.findByPhone(userPhone);
+    const phone = await this.userAppService.findByPhone(userPhone, countryCode);
 
     // lỗi -> số điện thoại đã tồn tại
     if (phone) {
@@ -245,7 +260,7 @@ export class AuthAppService extends AbAuthService {
         await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
 
         // reset thông tin OTP
-        await this.otpService.resetOtp(user.userPhone, '0000', new Date(), PurposeEnum.REGISTER);
+        await this.otpService.resetOtp(user.userPhone, '0000', new Date(), PurposeEnum.REGISTER, user.countryCode);
 
         // xóa user ở bảng chính, insert user đó vào bảng xóa
         this.logger.log(logbase, `Xóa thông tin người dùng: ${JSON.stringify(user)}`);
@@ -263,14 +278,14 @@ export class AuthAppService extends AbAuthService {
     const logbase = `${this.SERVICE_NAME}/requestOtp`;
     this.logger.log(logbase, `${JSON.stringify(dto)}`);
 
-    await this.verifyPhoneBeforeOtp(dto.userPhone, dto.purpose);
+    await this.verifyPhoneBeforeOtp(dto.userPhone, dto.purpose, dto.countryCode);
     return await this.otpService.generateOtp(dto);
   }
 
   async verifyOtp(dto: VerifyOtpDto): Promise<boolean> {
     const logbase = `${this.SERVICE_NAME}/requestOtp`;
     this.logger.log(logbase, `${JSON.stringify(dto)}`);
-    await this.verifyPhoneBeforeOtp(dto.userPhone, dto.purpose);
+    await this.verifyPhoneBeforeOtp(dto.userPhone, dto.purpose, dto.countryCode);
     return await this.otpService.verifyOtp(dto);
   }
 

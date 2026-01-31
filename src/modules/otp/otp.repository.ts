@@ -8,39 +8,40 @@ export class OtpRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async createOtp(userPhone: string, otpCode: string, expiresAt: Date, purpose: string): Promise<void> {
+  async createOtp(userPhone: string, otpCode: string, expiresAt: Date, purpose: string, countryCode: string): Promise<void> {
     const sql = `
-      INSERT INTO ${this.table} (userPhone, otpCode, expiresAt, purpose)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO ${this.table} (userPhone, otpCode, expiresAt, purpose, countryCode)
+      VALUES (?, ?, ?, ?, ?)
     `;
 
-    await this.db.query(sql, [userPhone, otpCode, expiresAt, purpose]);
+    await this.db.query(sql, [userPhone, otpCode, expiresAt, purpose, countryCode]);
   }
 
-  async resetOtp(userPhone: string, otpCode: string, expiresAt: Date, purpose: string): Promise<void> {
+  async resetOtp(userPhone: string, otpCode: string, expiresAt: Date, purpose: string, countryCode: string): Promise<void> {
     const sql = `
       UPDATE ${this.table} SET purpose = ?, otpCode = ?, expiresAt = ?, createdAt = ?, attemptCount = 0, isUsed = FALSE 
-      WHERE userPhone = ?
+      WHERE userPhone = ? AND countryCode = ?
     `;
 
-    await this.db.query(sql, [purpose, otpCode, expiresAt, new Date(), userPhone]);
+    await this.db.query(sql, [purpose, otpCode, expiresAt, new Date(), userPhone, countryCode]);
   }
 
-  async findOtpExist(userPhone: string): Promise<IOtp | null> {
+  async findOtpExist(userPhone: string, countryCode: string): Promise<IOtp | null> {
     const sql = `
       SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed  FROM ${this.table} 
-      WHERE userPhone = ? 
+      WHERE userPhone = ? AND  countryCode = ?
       LIMIT 1
     `;
-    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone]);
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, countryCode]);
     return rows ? (rows[0] as IOtp) : null;
   }
 
-  async findValidOtp(userPhone: string, purpose: string): Promise<IOtp | null> {
+  async findValidOtp(userPhone: string, purpose: string, countryCode: string): Promise<IOtp | null> {
     const sql = `
       SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed FROM ${this.table} 
       WHERE userPhone = ? 
         AND purpose = ?
+        AND countryCode = ?
         AND expiresAt > NOW() 
         AND isUsed = FALSE
         AND otpCode != '0000'
@@ -48,22 +49,23 @@ export class OtpRepository {
       LIMIT 1
     `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, purpose]);
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, purpose, countryCode]);
     return rows ? (rows[0] as IOtp) : null;
   }
 
-  async checkPhoneVarified(userPhone: string, purpose: string): Promise<IOtp | null> {
+  async checkPhoneVarified(userPhone: string, purpose: string, countryCode: string): Promise<IOtp | null> {
     const sql = `
       SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed 
       FROM ${this.table} 
       WHERE userPhone = ? 
         AND purpose = ?
+        AND countryCode = ?
         AND isUsed = TRUE
       ORDER BY createdAt DESC 
       LIMIT 1
     `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, purpose]);
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, purpose, countryCode]);
     return rows ? (rows[0] as IOtp) : null;
   }
 

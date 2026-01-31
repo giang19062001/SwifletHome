@@ -7,6 +7,21 @@ export enum PurposeEnum {
   FORGOT_PASSWORD = 'FORGOT_PASSWORD',
 }
 
+export class CheckPhoneDto {
+  @ApiProperty({
+    example: '0334644324',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userPhone: string;
+
+  @ApiProperty({
+    example: '+84',
+  })
+  @IsString()
+  @IsNotEmpty()
+  countryCode: string;
+}
 export class RequestOtpDto {
   @ApiProperty({
     example: '0334644324',
@@ -22,6 +37,13 @@ export class RequestOtpDto {
   @IsNotEmpty()
   @IsEnum(PurposeEnum)
   purpose: PurposeEnum;
+
+  @ApiProperty({
+    example: '+84',
+  })
+  @IsString()
+  @IsNotEmpty()
+  countryCode: string;
 }
 
 export class VerifyOtpDto {
@@ -46,4 +68,11 @@ export class VerifyOtpDto {
   @IsNotEmpty()
   @IsEnum(PurposeEnum)
   purpose: PurposeEnum;
+
+  @ApiProperty({
+    example: '+84',
+  })
+  @IsString()
+  @IsNotEmpty()
+  countryCode: string;
 }

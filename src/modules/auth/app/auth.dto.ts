@@ -19,6 +19,14 @@ export class UpdatePasswordDto {
   @IsString()
   @IsNotEmpty()
   newPassword: string;
+
+  
+  @ApiProperty({
+    example: '+84',
+  })
+  @IsString()
+  @IsNotEmpty()
+  countryCode: string;
 }
 
 export class UpdateDeviceTokenDto {
@@ -28,7 +36,16 @@ export class UpdateDeviceTokenDto {
   @IsString()
   @IsNotEmpty()
   deviceToken: string;
+
+    @ApiProperty({
+    example: '+84',
+  })
+  @IsString()
+  @IsNotEmpty()
+  countryCode: string;
 }
+
+
 
 export class LoginAppDto {
   @ApiProperty({
@@ -51,6 +68,13 @@ export class LoginAppDto {
   @IsString()
   @IsNotEmpty()
   deviceToken: string;
+
+  @ApiProperty({
+    example: '+84',
+  })
+  @IsString()
+  @IsNotEmpty()
+  countryCode: string;
 
   @ApiProperty({
     example: YnEnum.N,
@@ -84,41 +108,18 @@ export class RegisterUserAppDto {
   userPassword: string;
 
   @ApiProperty({
-    example: 'ABCXYZ123',
-  })
-  @IsString()
-  @IsNotEmpty()
-  deviceToken: string;
-}
-
-export class RegisterUserAppV2Dto {
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userName: string;
-
-  @ApiProperty({
-    example: '0334644324',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userPhone: string;
-
-  @ApiProperty({
-    example: 'Giang19062001!',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userPassword: string;
-
-  @ApiProperty({
     example: 'UST000001',
   })
   @IsString()
   @IsNotEmpty()
   userTypeCode: string;
+
+  @ApiProperty({
+    example: '+84',
+  })
+  @IsString()
+  @IsNotEmpty()
+  countryCode: string;
 
   @ApiProperty({
     example: 'ABCXYZ123',

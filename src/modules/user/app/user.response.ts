@@ -16,6 +16,9 @@ export class UserAppResDto {
 
   @ApiProperty({ example: '' })
   deviceToken: string;
+
+  @ApiProperty({ example: '' })
+  countryCode: string
 }
 
 

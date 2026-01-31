@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OtpAppModule } from 'src/modules/otp/otp.module';
 import { UserAppModule } from 'src/modules/user/app/user.module';
 import { AUTH_CONFIG } from '../auth.config';
-import { AuthAppControllerV2 } from './auth.controller.v2';
+import { PhoneCodeModule } from 'src/modules/phoneCode/phoneCode.module';
 
 @Module({
   imports: [
@@ -19,9 +19,10 @@ import { AuthAppControllerV2 } from './auth.controller.v2';
       }),
     }),
     OtpAppModule,
-    UserAppModule
+    UserAppModule,
+    PhoneCodeModule
     ],
-  controllers: [AuthAppController, AuthAppControllerV2],
+  controllers: [AuthAppController],
   providers: [AuthAppService],
   exports: [AuthAppService],
 })

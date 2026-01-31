@@ -5,7 +5,7 @@ import type { Request, Response } from 'express';
 import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { AuthAppService } from './auth.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
+import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAppGuard } from './auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
@@ -94,7 +94,7 @@ export class AuthAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   async update(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UpdateUserDto, @Param('userPhone') userPhone: string, @Req() req: Request) {
-    const result = await this.authAppService.update(dto, userPhone, user.userCode);
+    const result = await this.authAppService.update(dto, userPhone, user.userCode, user.countryCode);
     return {
       message: result ? Msg.UpdateOk : Msg.UpdateErr,
       data: result,
@@ -127,15 +127,17 @@ export class AuthAppController {
     };
   }
 
-  @ApiParam({ name: 'userPhone', type: String })
   @ApiOperation({
     summary: 'Nên kiểm tra SĐT đã tồn tại hay chưa trước khi đăng ký',
   })
-  @Get('checkDuplicatePhone/:userPhone')
+  @ApiBody({
+    type: CheckPhoneDto,
+  })
+  @Post('checkDuplicatePhone')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async checkDuplicatePhone(@Param('userPhone') userPhone: string) {
-    const result = await this.authAppService.checkDuplicatePhone(userPhone);
+  async checkDuplicatePhone(@Body() dto: CheckPhoneDto) {
+    const result = await this.authAppService.checkDuplicatePhone(dto.userPhone, dto.countryCode);
     return {
       message: !result ? Msg.PhoneExist : Msg.PhoneOk,
       data: result,

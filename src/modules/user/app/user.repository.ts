@@ -25,17 +25,17 @@ export class UserAppRepository {
 
     return rows as ITokenUserApp[];
   }
-  async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
+  async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword
-     FROM ${this.table} WHERE userPhone = ? AND isActive = 'Y' LIMIT 1`,
-      [userPhone],
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword, countryCode
+     FROM ${this.table} WHERE userPhone = ? AND countryCode = ? AND isActive = 'Y' LIMIT 1`,
+      [userPhone, countryCode],
     );
     return rows.length ? (rows[0] as ITokenUserApp) : null;
   }
   async findBySeq(seq: number): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword, countryCode
      FROM ${this.table} WHERE seq = ? LIMIT 1`,
       [seq],
     );
@@ -43,7 +43,7 @@ export class UserAppRepository {
   }
   async findByCode(userCode: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword, countryCode
      FROM ${this.table} WHERE userCode = ? LIMIT 1`,
       [userCode],
     );
@@ -66,7 +66,7 @@ export class UserAppRepository {
   }
   async getInfo(userCode: string): Promise<IUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode,
       B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,  B.startDate, B.endDate,  
       COUNT(D.seq) AS homesTotal, E.userTypeCode, E.userTypeKeyWord, E.userTypeName
@@ -111,10 +111,10 @@ export class UserAppRepository {
       const userCode = generateCode(baseCode, CODES.userCode.PRE, 6);
 
       const sql = `
-      INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, deviceToken, isActive, createdId)
-      VALUES(?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, userTypeCode, countryCode, deviceToken, isActive, createdId)
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-      const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.deviceToken, 'Y', UPDATOR]);
+      const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.userTypeCode, dto.countryCode, dto.deviceToken, 'Y', UPDATOR]);
 
       return result.insertId;
     } catch (error) {
@@ -122,6 +122,7 @@ export class UserAppRepository {
       return 0;
     }
   }
+  
   async update(userName: string, userPhone: string, userCode: string): Promise<number> {
     const sql = `
         UPDATE ${this.table} SET userName = ?, updatedAt = NOW(), updatedId = ?
@@ -204,5 +205,10 @@ export class UserAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT userTypeCode, userTypeKeyWord, userTypeName
        FROM ${this.tableType} WHERE isActive = 'Y' `, []);
     return rows as UserTypeResDto[];
+  }
+    async getOneUserType(userTypeCode: string): Promise<UserTypeResDto | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT userTypeCode, userTypeKeyWord, userTypeName
+       FROM ${this.tableType} WHERE isActive = 'Y' AND  userTypeCode = ? `, [userTypeCode]);
+    return rows.length ? rows[0] as UserTypeResDto : null
   }
 }

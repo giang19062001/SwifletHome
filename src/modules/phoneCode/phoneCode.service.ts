@@ -19,4 +19,10 @@ export class PhoneCodeService {
 
     return list;
   }
+   async getDetail(countryCode: string): Promise<IPhoneCode | null> {
+    const logbase = `${this.SERVICE_NAME}/getDetail:`;
+
+    const result = await this.phoneCodeRepository.getDetail(countryCode);
+    return result;
+  }
 }

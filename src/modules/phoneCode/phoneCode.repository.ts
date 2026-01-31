@@ -13,4 +13,11 @@ export class PhoneCodeRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
     return rows as IPhoneCode[];
   }
+
+  async getDetail(countryCode: string): Promise<IPhoneCode | null> {
+    let query = `  SELECT seq, countryName, countryCode, isoCode FROM ${this.table} WHERE countryCode = ? `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [countryCode]);
+    return rows.length ? rows[0] as IPhoneCode : null;
+  }
 }
