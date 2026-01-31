@@ -17,6 +17,8 @@ import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/c
 import { IList } from 'src/interfaces/admin.interface';
 import { GetHomeUserResDto, UserHomeImageResDto, GetHomesUserResDto } from './userHome.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
+import { UserAppService } from 'src/modules/user/app/user.service';
+import { UserTypeResDto } from 'src/modules/user/app/user.response';
 
 @ApiTags('app/user')
 @Controller('/api/app/user')
@@ -24,8 +26,11 @@ import * as authInterface from 'src/modules/auth/app/auth.interface';
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class UserHomeAppController {
-  constructor(private readonly userHomeAppService: UserHomeAppService) {}
+  constructor(private readonly userHomeAppService: UserHomeAppService,
+    private readonly userAppService: UserAppService
+  ) {}
 
+  // TODO: USER-HOME
   @ApiBody({
     type: PagingDto,
   })
@@ -171,5 +176,17 @@ Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uui
       message: result.filename != '' ? Msg.UploadOk : Msg.UploadErr,
       data: result,
     };
+  }
+
+  //TODO: USER-TYPE
+  @ApiOperation({
+    summary: 'Lấy thông tin loại user ( chủ nhà yến, người thu mua, đội thi công, kỹ thuật...)',
+  })
+  @Get('getAllUserType')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto([UserTypeResDto]) })
+  async getAllUserType(): Promise<UserTypeResDto[]> {
+    const result = await this.userAppService.getAllUserType();
+    return result;
   }
 }

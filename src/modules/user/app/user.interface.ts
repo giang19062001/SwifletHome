@@ -14,7 +14,12 @@ export interface IUserPackageApp {
   endDate: string | null;
 }
 
-export interface IUserApp extends ITokenUserApp, IUserPackageApp {
+interface IuserTypeApp{
+  userTypeCode: string,
+  userTypeKeyWord: string,
+  userTypeName: string
+}
+export interface IUserApp extends ITokenUserApp, IuserTypeApp, IUserPackageApp {
   homesTotal: number;
 }
 

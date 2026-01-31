@@ -18,6 +18,19 @@ export class UserAppResDto {
   deviceToken: string;
 }
 
+
+export class UserTypeResDto {
+  @ApiProperty({ example: '' })
+  userTypeCode: string;
+
+  @ApiProperty({ example: '' })
+  userTypeKeyWord: string;
+
+  @ApiProperty({ example: '' })
+  userTypeName: string;
+
+}
+
 class UserPackageAppResDto {
   @ApiProperty({ example: '' })
   packageCode: Date | null;
@@ -38,7 +51,7 @@ class UserPackageAppResDto {
   endDate: Date | null;
 }
 
-export class GetInfoUserAppResDto extends IntersectionType(UserAppResDto, UserPackageAppResDto) {
+export class GetInfoUserAppResDto extends IntersectionType(UserAppResDto, UserTypeResDto, UserPackageAppResDto) {
   @ApiProperty({ example: 0 })
   homesTotal: number;
 }

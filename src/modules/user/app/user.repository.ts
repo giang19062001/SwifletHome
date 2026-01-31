@@ -8,6 +8,7 @@ import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 import { CODES, UPDATOR } from 'src/helpers/const.helper';
 import { TEXTS } from 'src/helpers/text.helper';
+import { UserTypeResDto } from './user.response';
 
 @Injectable()
 export class UserAppRepository {
@@ -19,7 +20,6 @@ export class UserAppRepository {
   private readonly tableHome = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-
   async getAllUserCode(): Promise<ITokenUserApp[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT seq, userCode FROM ${this.table} WHERE isActive = 'Y' `, []);
 
@@ -27,7 +27,7 @@ export class UserAppRepository {
   }
   async findByPhone(userPhone: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword
      FROM ${this.table} WHERE userPhone = ? AND isActive = 'Y' LIMIT 1`,
       [userPhone],
     );
@@ -35,7 +35,7 @@ export class UserAppRepository {
   }
   async findBySeq(seq: number): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword
      FROM ${this.table} WHERE seq = ? LIMIT 1`,
       [seq],
     );
@@ -43,7 +43,7 @@ export class UserAppRepository {
   }
   async findByCode(userCode: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userPassword
+      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword
      FROM ${this.table} WHERE userCode = ? LIMIT 1`,
       [userCode],
     );
@@ -69,7 +69,7 @@ export class UserAppRepository {
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
       B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,  B.startDate, B.endDate,  
-      COUNT(D.seq) AS homesTotal
+      COUNT(D.seq) AS homesTotal, E.userTypeCode, E.userTypeKeyWord, E.userTypeName
       FROM ${this.table} A 
       LEFT JOIN ${this.tablePackage} B
         ON A.userCode = B.userCode
@@ -77,6 +77,8 @@ export class UserAppRepository {
         ON B.packageCode = C.packageCode
       LEFT JOIN ${this.tableHome} D
         ON D.userCode = A.userCode AND D.isActive = 'Y' 
+      LEFT JOIN ${this.tableType} E
+        ON A.userTypeCode = E.userTypeCode
       WHERE A.userCode = ? AND A.isActive = 'Y' 
       GROUP BY 
       A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
@@ -195,5 +197,12 @@ export class UserAppRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, 'Y', UPDATOR, createdAt]);
 
     return result.insertId;
+  }
+
+  // TODO: TYPE
+   async getAllUserType(): Promise<UserTypeResDto[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT userTypeCode, userTypeKeyWord, userTypeName
+       FROM ${this.tableType} WHERE isActive = 'Y' `, []);
+    return rows as UserTypeResDto[];
   }
 }

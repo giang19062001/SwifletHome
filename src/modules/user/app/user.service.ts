@@ -6,6 +6,7 @@ import { IUserApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 import { TEXTS } from 'src/helpers/text.helper';
+import { UserTypeResDto } from './user.response';
 
 @Injectable()
 export class UserAppService {
@@ -80,5 +81,10 @@ export class UserAppService {
     const createdAt = new Date();
     await this.userAppRepository.writePackageHistory(dto, createdAt);
     return await this.userAppRepository.createPackage(dto, createdAt);
+  }
+
+  // TODO: TYPE
+  async getAllUserType(): Promise<UserTypeResDto[]> {
+    return await this.userAppRepository.getAllUserType();
   }
 }

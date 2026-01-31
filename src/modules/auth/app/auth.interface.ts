@@ -8,5 +8,6 @@ export interface ITokenUserApp {
   userPassword: string;
   userPhone: string;
   deviceToken: string;
+  userTypeCode: string;
   isActive: YnEnum;
 }
