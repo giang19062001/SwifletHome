@@ -66,7 +66,7 @@ export class TaskHarvestQrResDto {
   @ApiProperty({ example: 2026 })
   harvestYear: number;
 
-  @ApiProperty({ type: () => HarvestDataDto })
+  @ApiProperty({ type: () => [HarvestDataDto] })
   @IsArray()
   harvestData: HarvestDataDto[];
 }
