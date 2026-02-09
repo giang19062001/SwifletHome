@@ -6,7 +6,6 @@ import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import * as userInterface from 'src/modules/user/app/user.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { UserHomeAppService } from './userHome.service';
@@ -18,10 +17,9 @@ import { IList } from 'src/interfaces/admin.interface';
 import { GetHomeUserResDto, UserHomeImageResDto, GetHomesUserResDto } from './userHome.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { UserTypeResDto } from 'src/modules/user/app/user.response';
 
-@ApiTags('app/user')
-@Controller('/api/app/user')
+@ApiTags('app/userHome')
+@Controller('/api/app/userHome')
 @ApiBearerAuth('app-auth')
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
@@ -178,15 +176,4 @@ Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uui
     };
   }
 
-  //TODO: USER-TYPE
-  @ApiOperation({
-    summary: 'Lấy thông tin loại user ( chủ nhà yến, người thu mua, đội thi công, kỹ thuật...)',
-  })
-  @Get('getAllUserType')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([UserTypeResDto]) })
-  async getAllUserType(): Promise<UserTypeResDto[]> {
-    const result = await this.userAppService.getAllUserType();
-    return result;
-  }
 }

@@ -190,7 +190,7 @@ async function getAllUserHomes(currentPage, limit, filterValue) {
 
   await axios
     .post(
-      CURRENT_URL + '/api/admin/user/getHomes',
+      CURRENT_URL + '/api/admin/userHome/getHomes',
       {
         page: currentPage,
         limit: limit,
@@ -211,9 +211,9 @@ async function getAllUserHomes(currentPage, limit, filterValue) {
 
 async function getDetailHome(userCode, userHomeCode, type) {
   const data = await loaderApiCall(
-    // lấy thông tin user
+    // lấy thông tin nhà
     axios
-      .get(CURRENT_URL + '/api/admin/user/getDetailHome/' + userHomeCode, axiosAuth())
+      .get(CURRENT_URL + '/api/admin/userHome/getDetailHome/' + userHomeCode, axiosAuth())
       .then(function (response) {
         if (response.status === 200 && response.data) {
           return response;
@@ -250,7 +250,7 @@ async function triggerHome(modalForm) {
   const txtConfirm = 'Bạn có chắc rằng đã thiết lập giá trị này cho thiết bị cảm biến nhà yến rồi?';
   if (window.confirm(txtConfirm)) {
     await axios
-      .put(CURRENT_URL + '/api/admin/user/triggerHome/' + userHomeCode, formData, axiosAuth())
+      .put(CURRENT_URL + '/api/admin/userHome/triggerHome/' + userHomeCode, formData, axiosAuth())
       .then(async function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {
@@ -293,7 +293,7 @@ async function resetTriggeringHome(modalForm) {
   const txtConfirm = 'Bạn có chắc rằng đã thiết lập lại giá trị mới này cho thiết bị cảm biến nhà yến rồi?';
   if (window.confirm(txtConfirm)) {
     await axios
-      .put(CURRENT_URL + '/api/admin/user/resetTriggeringHome/' + userHomeCode, formData, axiosAuth())
+      .put(CURRENT_URL + '/api/admin/userHome/resetTriggeringHome/' + userHomeCode, formData, axiosAuth())
       .then(async function (response) {
         console.log('response', response);
         if (response.status === 200 && response.data) {

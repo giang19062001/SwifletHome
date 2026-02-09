@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthAppController } from './auth.controller';
 import { AuthAppService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
@@ -19,9 +19,9 @@ import { PhoneCodeModule } from 'src/modules/phoneCode/phoneCode.module';
       }),
     }),
     OtpAppModule,
-    UserAppModule,
-    PhoneCodeModule
-    ],
+    forwardRef(() => UserAppModule),
+    PhoneCodeModule,
+  ],
   controllers: [AuthAppController],
   providers: [AuthAppService],
   exports: [AuthAppService],

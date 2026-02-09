@@ -178,7 +178,7 @@ async function getAllPackage(currentPage, limit) {
 async function getHomesOfUser(userCode) {
   return await axios
     .post(
-      CURRENT_URL + '/api/admin/user/getHomes',
+      CURRENT_URL + '/api/admin/userHome/getHomes',
       {
         page: 0,
         limit: 0,

@@ -9,8 +9,8 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import * as userInterface_1 from 'src/modules/auth/admin/auth.interface';
 
-@ApiTags('admin/user')
-@Controller('/api/admin/user')
+@ApiTags('admin/userHome')
+@Controller('/api/admin/userHome')
 @ApiBearerAuth('admin-auth')
 @UseGuards(ApiAuthAdminGuard)
 export class UserHomeAdminController {
