@@ -9,13 +9,12 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 
 @ApiTags('app/user')
 @Controller('/api/app/user')
-@ApiBearerAuth('app-auth')
-@UseGuards(ApiAuthAppGuard)
+// @ApiBearerAuth('app-auth')
+// @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class UserAppController {
   constructor(private readonly userAppService: UserAppService) {}
 
-  //TODO: USER-TYPE
   @ApiOperation({
     summary: 'Lấy thông tin loại user ( chủ nhà yến, người thu mua, đội thi công, kỹ thuật...)',
   })
