@@ -6,7 +6,7 @@ import { AUTH_CONFIG, PUBLIC_ROUTERS } from '../auth.config';
 @Injectable()
 export class PageAuthAdminGuard implements CanActivate {
   LOGIN_ROUTER: string = '/';
-  MAIN_ROUTER: string = "/dashboard/main";
+  MAIN_ROUTER: string = '/dashboard/main';
 
   constructor(private readonly authAdminService: AuthAdminService) {}
 
@@ -17,7 +17,7 @@ export class PageAuthAdminGuard implements CanActivate {
 
     if (!token) {
       // ko có token
-      if (req.originalUrl === this.LOGIN_ROUTER || PUBLIC_ROUTERS.includes(req.originalUrl)) {
+      if (req.originalUrl === this.LOGIN_ROUTER || PUBLIC_ROUTERS.some((route) => req.originalUrl.startsWith(route))) {
         // đang ở trang đăng nhập
         return true;
       } else {
