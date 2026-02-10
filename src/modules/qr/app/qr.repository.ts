@@ -114,10 +114,10 @@ export class QrAppRepository {
       ON A.requestCode = D.requestCode  
         LEFT JOIN ${this.tableHome} E
       ON A.userHomeCode = E.userHomeCode 
-      WHERE A.requestCode  = ? AND A.userCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y' AND A.requestStatus = ?
+      WHERE A.requestCode  = ? AND A.isActive = 'Y' AND B.isActive = 'Y' AND A.requestStatus = ?
       LIMIT 1 `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, userCode, RequestStatusEnum.APPROVED]);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, RequestStatusEnum.APPROVED]);
     return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
   async checkDuplicateReuqestQrCode(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
