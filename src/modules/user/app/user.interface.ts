@@ -1,7 +1,26 @@
 
-import { ApiProperty } from '@nestjs/swagger';
-import { YnEnum } from 'src/interfaces/admin.interface';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
+
+export const USER_CONST = {
+  USER_TYPE: {
+    OWNER: {
+      value: 'OWNER',
+      text: 'Chủ nhà yến',
+    },
+    PURCHASER: {
+      value: 'PURCHASER',
+      text: 'Nhà thu mua',
+    },
+    FACTORY: {
+      value: 'FACTORY',
+      text: 'Xưởng gia công',
+    },
+    TECHNICAL: {
+      value: 'TECHNICAL',
+      text: 'Đội kỹ thuật',
+    },
+  },
+}
 
 
 export interface IUserPackageApp {

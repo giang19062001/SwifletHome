@@ -9,6 +9,7 @@ export interface ITokenUserApp {
   userPhone: string;
   deviceToken: string;
   userTypeCode: string;
+  userTypeKeyWord: string;
   countryCode: string;
   isActive: YnEnum;
 }

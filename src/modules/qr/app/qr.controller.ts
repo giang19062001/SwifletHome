@@ -23,7 +23,7 @@ export default class QrAppController {
   constructor(private readonly qrAppService: QrAppService) {}
 
   @ApiOperation({
-    summary: 'Lấy danh sách đơn yêu cầu qrcode của user hiện tại',
+    summary: 'Lấy danh sách  yêu cầu qrcode của user hiện tại',
     description: ``,
   })
   @Get('getRequestQrCocdeList')
@@ -36,7 +36,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Lấy thông tin đã được ADMIN chấp thuận từ yêu cầu tạo mã Qrcode trước đó',
+    summary: 'Lấy thông tin Qrcode đã được ADMIN chấp thuận từ yêu cầu tạo mã Qrcode trước đó',
     description: ``,
   })
   @Get('getApprovedRequestQrCocde/:requestCode')
@@ -150,7 +150,7 @@ export default class QrAppController {
 
   // TODO: SELL
   @ApiOperation({
-    summary: 'Lấy danh sách đơn yêu cầu bán tổ yến',
+    summary: 'Lấy danh sách  yêu cầu bán tổ yến',
     description: ``,
   })
   @Get('getRequestSellList')

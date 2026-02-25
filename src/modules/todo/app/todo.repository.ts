@@ -144,7 +144,7 @@ export class TodoAppRepository {
             '${TODO_CONST.TASK_EVENT.CANCEL.value}' AS leftEvent,
             '${TODO_CONST.TASK_EVENT.CANCEL.text}' AS leftEventLabel,
             '${TODO_CONST.TASK_EVENT.COMPLETE.value}' AS rightEvent,
-            '${TODO_CONST.TASK_EVENT.COMPLETE.text}' AS rightEventLabel,
+            '${TODO_CONST.TASK_EVENT.COMPLETE.text}' AS rightEventLabel
             FROM ${this.tableHomeTaskAlarm} A
             INNER JOIN ${this.tableUserApp} B
             ON A.userCode = B.userCode

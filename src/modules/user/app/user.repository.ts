@@ -27,24 +27,33 @@ export class UserAppRepository {
   }
   async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword, countryCode
-     FROM ${this.table} WHERE userPhone = ? AND countryCode = ? AND isActive = 'Y' LIMIT 1`,
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
+     FROM ${this.table} A
+     LEFT JOIN ${this.tableType} B
+     ON A.userTypeCode = B.userTypeCode
+     WHERE A.userPhone = ? AND A.countryCode = ? AND A.isActive = 'Y' LIMIT 1`,
       [userPhone, countryCode],
     );
     return rows.length ? (rows[0] as ITokenUserApp) : null;
   }
   async findBySeq(seq: number): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword, countryCode
-     FROM ${this.table} WHERE seq = ? LIMIT 1`,
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
+    FROM ${this.table} A
+    LEFT JOIN ${this.tableType} B
+    ON A.userTypeCode = B.userTypeCode
+      WHERE A.seq = ? LIMIT 1`,
       [seq],
     );
     return rows.length ? (rows[0] as ITokenUserApp) : null;
   }
   async findByCode(userCode: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT seq, userCode, userName, userPhone, deviceToken, userTypeCode, userPassword, countryCode
-     FROM ${this.table} WHERE userCode = ? LIMIT 1`,
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
+      FROM ${this.table} A
+      LEFT JOIN ${this.tableType} B
+      ON A.userTypeCode = B.userTypeCode
+        WHERE A.userCode = ? LIMIT 1`,
       [userCode],
     );
     return rows.length ? (rows[0] as ITokenUserApp) : null;
