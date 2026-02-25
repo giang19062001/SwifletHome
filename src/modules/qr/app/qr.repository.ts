@@ -1,11 +1,11 @@
-import { QR_CODE_CONST } from './../qr.interface';
+import { MarkTypeEnum, QR_CODE_CONST } from './../qr.interface';
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
-import { GetApprovedRequestQrCodeResDto, GetRequestSellListResDto, InsertRequestSellDto, RequestQrCodeFromDbDto } from '../qr.dto';
-import moment from 'moment';
+import { InsertRequestSellDto } from './qr.dto';
+import { GetApprovedRequestQrCodeResDto, GetRequestSellListResDto, RequestQrCodeResDto } from './qr.response';
 
 @Injectable()
 export class QrAppRepository {
@@ -15,6 +15,7 @@ export class QrAppRepository {
   private readonly tableSell = 'tbl_qr_request_sell';
   private readonly tableOption = 'tbl_option_common';
   private readonly tableHome = 'tbl_user_home';
+  private readonly tableInteract = 'tbl_qr_request_sell_interact';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -52,7 +53,7 @@ export class QrAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
     return rows as GetApprovedRequestQrCodeResDto[];
   }
-    async getRequestQrCocde(requestCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
+  async getRequestQrCocde(requestCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
       CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
@@ -83,7 +84,7 @@ export class QrAppRepository {
      `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
-    return rows.length ? rows[0] as GetApprovedRequestQrCodeResDto : null
+    return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
   async getApprovedRequestQrCocde(requestCode: string, userCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
@@ -129,7 +130,7 @@ export class QrAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, userCode, harvestPhase]);
     return rows.length ? true : false;
   }
-  async insertRequestQrCode(userCode: string, dto: RequestQrCodeFromDbDto): Promise<number> {
+  async insertRequestQrCode(userCode: string, dto: RequestQrCodeResDto): Promise<number> {
     const sqlLast = ` SELECT requestCode FROM ${this.table} ORDER BY requestCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let requestCode = CODES.requestCode.FRIST_CODE;
@@ -150,7 +151,6 @@ export class QrAppRepository {
 
     return result.insertId;
   }
-
 
   async cancelRequest(requestCode: string, updatedId: string): Promise<number> {
     const sql = `
@@ -225,7 +225,7 @@ export class QrAppRepository {
 
     return result.insertId;
   }
-   async getRequestSellList(): Promise<GetRequestSellListResDto[]> {
+  async getRequestSellList(): Promise<GetRequestSellListResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
      CASE
         WHEN D.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
@@ -245,5 +245,17 @@ export class QrAppRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
     return rows as GetRequestSellListResDto[];
+  }
+
+  // TODO: SELL-INTERACT
+  async maskRequestSell(requestCode: string, userCode: string, markType: MarkTypeEnum): Promise<number> {
+    const filed = markType == MarkTypeEnum.VIEW ? ` isView = 'Y' ` : ` isSave = 'Y' `;
+    const sql = `
+      UPDATE ${this.tableInteract} SET ${filed} , updatedId = ? , updatedAt = NOW()
+      WHERE requestCode = ? AND userCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [RequestStatusEnum.CANCEL, userCode, requestCode, userCode]);
+
+    return result.affectedRows;
   }
 }

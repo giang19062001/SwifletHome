@@ -23,6 +23,7 @@ export class ChangeTaskAlarmStatusDto {
   @IsEnum(TaskStatusEnum)
   taskStatus: TaskStatusEnum;
 }
+
 export class SetTaskAlarmDto {
   @ApiProperty({
     example: '',

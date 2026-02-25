@@ -15,6 +15,16 @@ const InfoConstraints = {
     presence: { allowEmpty: false, message: '^Vui lòng nhập thông tin mô tả' },
   },
 };
+
+const InfoOwnerConstraints = {
+  ownerName: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập tên.' },
+  },
+  ownerPhone: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập số điện thoại.' },
+  },
+};
+
 const InfoBankConstraints = {
   accountName: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên chủ tài khoản.' },
@@ -68,6 +78,12 @@ function showNameOfKey(key) {
     case 'qrcode':
       name = 'Mã Qr code';
       break;
+    case 'ownerName':
+      name = 'Họ tên';
+      break;
+    case 'ownerPhone':
+      name = 'Số điện thoại';
+      break;
     default:
       name = '';
   }
@@ -80,6 +96,9 @@ function mapConstraints(infoKeyword) {
   switch (infoKeyword) {
     case 'BANK':
       constraints = InfoBankConstraints;
+      break;
+    case 'OWNER':
+      constraints = InfoOwnerConstraints;
       break;
     default:
       constraints = null;
@@ -102,6 +121,12 @@ function mapContentFileds(infoKeyword, infoName, infoDescription, data) {
         accountNumber: data.accountNumber ?? '',
         paymentContent: data.paymentContent ?? '',
         qrcode: data.qrcode ?? '',
+      };
+      break;
+     case 'OWNER':
+      infoContent = {
+        ownerName: data.ownerName ?? '',
+        ownerPhone: data.ownerPhone ?? '',
       };
       break;
     default:

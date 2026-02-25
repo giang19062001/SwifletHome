@@ -1,36 +1,36 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ScreenAppService } from './screen.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetContentScreenResDto } from './screen.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
+import { InfoAppService } from './info.service';
+import { GetInfoResDto } from './info.response';
 
-@ApiTags('app/screen')
-@Controller('/api/app/screen')
+@ApiTags('app/info')
+@Controller('/api/app/info')
 @ApiBearerAuth('app-auth')
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
-export class ScreenAppController {
-  constructor(private readonly screenAppService: ScreenAppService) {}
+export class InfoAppController {
+  constructor(private readonly infoAppService: InfoAppService) {}
 
   @ApiOperation({
-    summary: 'Nội dung màn hình đăng kí dịch vụ, màn hình khám bệnh nhà yến..',
+    summary: 'Thông tin ngân hàng, chủ hệ thống..',
   })
   @ApiParam({
     description: `
-**SIGNUP_SERVICE**: Màn hình đăng kí dịch vụ,\n
-**REQUEST_DOCTOR**: Màn hình khám bệnh nhà yến`,
+**BANK**: Thông tin ngân hàng chủ hệ thống,\n
+**OWNER**: Thông tin liên lạc chủ hệ thống`,
     name: 'keyword',
     type: String,
   })
   @Get('getContent/:keyword')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetContentScreenResDto) })
-  async getContent(@GetUserApp() user: authInterface.ITokenUserApp, @Param('keyword') keyword: string) {
-    const result = await this.screenAppService.getContent(user.userCode, keyword);
+  @ApiOkResponse({ type: ApiAppResponseDto(GetInfoResDto) })
+  async getContent(@Param('keyword') keyword: string) {
+    const result = await this.infoAppService.getDetail(keyword);
     return result;
   }
 }

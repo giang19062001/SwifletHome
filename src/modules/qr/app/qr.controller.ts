@@ -5,16 +5,8 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { QrAppService } from './qr.service';
-import {
-  GetApprovedRequestQrCodeResDto,
-  GetInfoToRequestQrcodeResDto,
-  GetRequestQrCodeListResDto,
-  GetRequestSellListResDto,
-  InsertRequestSellDto,
-  RequestQrCodeDto,
-  UploadRequestVideoDto,
-  UploadRequestVideoResDto,
-} from '../qr.dto';
+import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, GetRequestSellListResDto, TaskHarvestQrResDto, UploadRequestVideoResDto } from './qr.response';
+import { InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -157,7 +149,7 @@ export default class QrAppController {
   }
 
   // TODO: SELL
-    @ApiOperation({
+  @ApiOperation({
     summary: 'Lấy danh sách đơn yêu cầu bán tổ yến',
     description: ``,
   })
@@ -220,5 +212,25 @@ export default class QrAppController {
       message: Msg.CreateOk,
       data: result,
     };
+  }
+
+  // TODO: SELL-INTERACT
+  @ApiOperation({
+    summary: `Đánh dấu 1 'yêu cầu bán' là đã xem hay là lưu `,
+   description: `
+  **markType**: enum('VIEW', 'SAVE')\n
+  *VIEW*: dùng khi click vào 1 'yêu cầu bán tổ yến' nào đó  \n
+  *SAVE*: dùng khi click nút lưu của 1 'yêu cầu bán tổ yến' nào đó \n
+  `
+  })
+  @Put('maskRequestSell/:requestCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({
+    type: MaskRequestSellDto,
+  })
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  async maskRequestSell(@GetUserApp() user: authInterface.ITokenUserApp,@Param('requestCode') requestCode: string,   @Body() dto: MaskRequestSellDto) {
+    const result = await this.qrAppService.maskRequestSell(requestCode, user.userCode, dto.markType);
+    return result;
   }
 }

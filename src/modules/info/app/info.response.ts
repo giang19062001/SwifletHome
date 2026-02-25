@@ -1,21 +1,22 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
-export class InfoBankResDto {
+export class GetInfoResDto {
   @ApiProperty()
-  qrcode: string;
-
-  @ApiProperty()
-  bankName: string;
+  seq: string;
 
   @ApiProperty()
-  bankBranch: string;
+  infoKeyword: string;
 
   @ApiProperty()
-  accountName: string;
+  infoName: string;
+  
+  @ApiProperty()
+  infoContent: Record<string, any>;
 
   @ApiProperty()
-  accountNumber: string;
+  infoDescription: string;
 
   @ApiProperty()
-  paymentContent: string;
+  isActive: YnEnum;
 }

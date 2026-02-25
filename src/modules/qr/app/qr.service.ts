@@ -1,20 +1,12 @@
+import { MarkTypeEnum } from './../qr.interface';
 import { QrAppRepository } from './qr.repository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import {
-  GetApprovedRequestQrCodeResDto,
-  GetInfoToRequestQrcodeResDto,
-  GetRequestQrCodeListResDto,
-  GetRequestSellListResDto,
-  InsertRequestSellDto,
-  RequestQrCodeDto,
-  TaskHarvestQrResDto,
-  UploadRequestVideoDto,
-  UploadRequestVideoResDto,
-} from '../qr.dto';
+import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, GetRequestSellListResDto, TaskHarvestQrResDto, UploadRequestVideoResDto } from './qr.response';
+import { InsertRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { TodoAppService } from 'src/modules/todo/app/todo.service';
 import { getFileLocation } from 'src/config/multer.config';
@@ -275,5 +267,11 @@ export class QrAppService {
       this.logger.error(logbase, JSON.stringify(error));
       return 0;
     }
+  }
+  // TODO: SELL-INTERACT
+  async maskRequestSell(requestCode: string, userCode: string, markType: MarkTypeEnum): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/maskRequestSell:`;
+    const result = await this.qrAppRepository.maskRequestSell(requestCode, userCode, markType);
+    return result;
   }
 }

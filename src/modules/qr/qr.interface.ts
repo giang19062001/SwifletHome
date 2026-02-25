@@ -42,6 +42,11 @@ export interface IQrRequestFile {
   isActive: YnEnum;
 }
 
+export enum MarkTypeEnum {
+  VIEW = 'VIEW',
+  SAVE = 'SAVE',
+}
+
 export enum RequestStatusEnum {
   WAITING = 'WAITING',
   APPROVED = 'APPROVED',

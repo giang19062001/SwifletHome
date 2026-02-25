@@ -7,7 +7,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode, handleTimezoneQuery } from 'src/helpers/func.helper';
 import moment from 'moment';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { TaskHarvestQrResDto, TaskMedicineQrResDto } from 'src/modules/qr/qr.dto';
+import { TaskHarvestQrResDto, TaskMedicineQrResDto } from 'src/modules/qr/app/qr.response';
 
 @Injectable()
 export class TodoAppRepository {
