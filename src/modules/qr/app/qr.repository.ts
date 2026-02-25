@@ -227,6 +227,7 @@ export class QrAppRepository {
   }
   async getRequestSellList(getType: GetTypeEnum, userCode: string): Promise<GetRequestSellListResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
+     IFNULL(E.isView,'N'), IFNULL(E.isSave,'N'),
      CASE
         WHEN D.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
           THEN '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.text}'

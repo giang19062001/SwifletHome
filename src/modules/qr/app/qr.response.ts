@@ -214,4 +214,17 @@ export class GetRequestSellListResDto {
   @IsString()
   ingredientNestOptionCode: string;
 
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  isView: YnEnum;
+
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  isSave: YnEnum;
 }
