@@ -3,7 +3,18 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsDecimal, IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { MarkTypeEnum } from '../qr.interface';
+import { GetTypeEnum, MarkTypeEnum } from '../qr.interface';
+import { PagingDto } from 'src/dto/admin.dto';
+
+export class GetRequestSellListDto extends PagingDto {
+  @ApiProperty({
+    example: GetTypeEnum.ALL,
+    enum: GetTypeEnum,
+  })
+  @IsEnum(GetTypeEnum)
+  @IsNotEmpty()
+  getType: GetTypeEnum;
+}
 
 export class UploadRequestVideoDto {
   @ApiProperty({

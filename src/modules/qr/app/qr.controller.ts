@@ -3,10 +3,17 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkRespon
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { QrAppService } from './qr.service';
-import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, GetRequestSellListResDto, UploadRequestVideoResDto } from './qr.response';
-import { InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
+import {
+  GetApprovedRequestQrCodeResDto,
+  GetInfoToRequestQrcodeResDto,
+  GetRequestQrCodeListResDto,
+  GetRequestSellDetailResDto,
+  GetRequestSellListResDto,
+  UploadRequestVideoResDto,
+} from './qr.response';
+import { GetRequestSellListDto, InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -15,6 +22,7 @@ import { multerVideoConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { GetTypeEnum } from '../qr.interface';
+import { PagingDto } from 'src/dto/admin.dto';
 
 @ApiTags('app/qr')
 @Controller('/api/app/qr')
@@ -28,12 +36,15 @@ export default class QrAppController {
     summary: 'Lấy danh sách  yêu cầu qrcode của user hiện tại',
     description: ``,
   })
-  @Get('getRequestQrCocdeList')
+  @Post('getRequestQrCocdeList')
+  @ApiBody({
+    type: PagingDto,
+  })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetRequestQrCodeListResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetRequestQrCodeListResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getRequestQrCocdeList(@GetUserApp() user: authInterface.ITokenUserApp) {
-    const result = await this.qrAppService.getRequestQrCocdeList(user);
+  async getRequestQrCocdeList(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp) {
+    const result = await this.qrAppService.getRequestQrCocdeList(user, dto);
     return result;
   }
 
@@ -152,30 +163,41 @@ export default class QrAppController {
 
   // TODO: SELL
   @ApiOperation({
-    summary: 'Lấy danh sách  yêu cầu bán tổ yến',
+    summary: `Lấy chi tiết 1 yêu cầu bán tổ yến`,
+    description: ``,
+  })
+  @Get('getRequestSellDetail/:requestCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetRequestSellDetailResDto) })
+  async getRequestSellDetail(@GetUserApp() user: authInterface.ITokenUserApp, @Param('requestCode') requestCode: string) {
+    const result = await this.qrAppService.getRequestSellDetail(requestCode);
+    return result;
+  }
+
+  @ApiOperation({
+    summary: 'Lấy danh sách yêu cầu bán tổ yến',
     description: `
-  **ALL** lấy tất cả \n
-  **VIEW** lấy các dữ liệu đã xem \n
-  **SAVE** lấy các dữ liệu đã lưu \n
+  **getType**: enum('ALL', 'VIEW', 'SAVE')\n
+  *ALL*: lấy tất cả \n
+  *VIEW*: lấy các dữ liệu đã xem \n
+  *SAVE*: lấy các dữ liệu đã lưu \n
     `,
   })
-  @Get('getRequestSellList')
+  @Post('getRequestSellList')
   @HttpCode(HttpStatus.OK)
-  @ApiQuery({
-    name: 'getType',
-    enum: GetTypeEnum,
-    required: true,
+  @ApiBody({
+    type: GetRequestSellListDto,
   })
-  @ApiOkResponse({ type: ApiAppResponseDto(GetRequestSellListResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetRequestSellListResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getRequestSellList(@GetUserApp() user: authInterface.ITokenUserApp, @Query('getType') getType: GetTypeEnum) {
+  async getRequestSellList(@Body() dto: GetRequestSellListDto, @GetUserApp() user: authInterface.ITokenUserApp) {
     if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
       throw new BadRequestException({
         message: Msg.OnlyPurcharseCanFetch,
         data: [],
       });
     }
-    const result = await this.qrAppService.getRequestSellList(getType, user.userCode);
+    const result = await this.qrAppService.getRequestSellList(dto, user.userCode);
     return result;
   }
 

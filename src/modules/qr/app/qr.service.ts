@@ -5,8 +5,16 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, GetRequestSellListResDto, TaskHarvestQrResDto, UploadRequestVideoResDto } from './qr.response';
-import { InsertRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
+import {
+  GetApprovedRequestQrCodeResDto,
+  GetInfoToRequestQrcodeResDto,
+  GetRequestQrCodeListResDto,
+  GetRequestSellDetailResDto,
+  GetRequestSellListResDto,
+  TaskHarvestQrResDto,
+  UploadRequestVideoResDto,
+} from './qr.response';
+import { GetRequestSellListDto, InsertRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { TodoAppService } from 'src/modules/todo/app/todo.service';
 import { getFileLocation } from 'src/config/multer.config';
@@ -15,6 +23,8 @@ import { OPTION_CONST, RequestSellPriceOptionEnum } from 'src/modules/options/op
 import { OptionService } from 'src/modules/options/option.service';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import moment from 'moment';
+import { IListApp } from 'src/interfaces/app.interface';
+import { PagingDto } from 'src/dto/admin.dto';
 
 @Injectable()
 export class QrAppService {
@@ -27,10 +37,10 @@ export class QrAppService {
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
   ) {}
-  async getRequestQrCocdeList(user: ITokenUserApp): Promise<GetRequestQrCodeListResDto[]> {
-    const result = await this.qrAppRepository.getRequestQrCocdeList(user.userCode);
-
-    return result.map((item: any) => {
+  async getRequestQrCocdeList(user: ITokenUserApp, dto: PagingDto): Promise<IListApp<GetRequestQrCodeListResDto>> {
+    const total = await this.qrAppRepository.getRequestQrCocdeTotal(user.userCode);
+    const rows = await this.qrAppRepository.getRequestQrCocdeList(user.userCode, dto);
+    const list = rows.map((item: any) => {
       let totalCellCollected = 0;
 
       // taskHarvestList TÍNH TỔNG Ô ĐÃ THU
@@ -63,6 +73,7 @@ export class QrAppService {
         totalCellCollected,
       };
     });
+    return { total: total, list: list };
   }
 
   async getApprovedRequestQrCocde(requestCode: string, user: ITokenUserApp): Promise<GetApprovedRequestQrCodeResDto | null> {
@@ -212,9 +223,15 @@ export class QrAppService {
     }
   }
   // TODO: SELL
-  async getRequestSellList(getType: GetTypeEnum, userCode: string): Promise<GetRequestSellListResDto[]> {
+  async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<IListApp<GetRequestSellListResDto>> {
     const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
-    const result = await this.qrAppRepository.getRequestSellList(getType, userCode);
+    const total = await this.qrAppRepository.getRequestSellTotal(dto, userCode)
+    const rows = await this.qrAppRepository.getRequestSellList(dto, userCode);
+    return { total: total, list: rows };
+  }
+  async getRequestSellDetail(requestCode: string): Promise<GetRequestSellDetailResDto | null> {
+    const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
+    const result = await this.qrAppRepository.getRequestSellDetail(requestCode);
     return result;
   }
   async requestSell(user: ITokenUserApp, dto: InsertRequestSellDto): Promise<number> {

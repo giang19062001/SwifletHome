@@ -4,8 +4,9 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
-import { InsertRequestSellDto } from './qr.dto';
-import { GetApprovedRequestQrCodeResDto, GetRequestSellListResDto, RequestQrCodeResDto } from './qr.response';
+import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
+import { GetApprovedRequestQrCodeResDto, GetRequestSellDetailResDto, GetRequestSellListResDto, RequestQrCodeResDto } from './qr.response';
+import { PagingDto } from 'src/dto/admin.dto';
 
 @Injectable()
 export class QrAppRepository {
@@ -20,7 +21,25 @@ export class QrAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   // TODO: REQUEST
-  async getRequestQrCocdeList(userCode: string): Promise<GetApprovedRequestQrCodeResDto[]> {
+  async getRequestQrCocdeTotal(userCode: string): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT COUNT(A.seq) AS TOTAL
+       FROM ${this.table}  A
+      LEFT JOIN ${this.tableFile} B
+      ON A.seq = B.qrRequestSeq  
+      LEFT JOIN ${this.tableBlockChain} C
+      ON A.requestCode = C.requestCode  
+       LEFT JOIN ${this.tableSell} D
+      ON A.requestCode = D.requestCode  
+      LEFT JOIN ${this.tableHome} E
+      ON A.userHomeCode = E.userHomeCode  
+      WHERE A.userCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y'`,
+      [userCode],
+    );
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+
+  async getRequestQrCocdeList(userCode: string, dto: PagingDto): Promise<GetApprovedRequestQrCodeResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
       CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
@@ -50,7 +69,14 @@ export class QrAppRepository {
       WHERE A.userCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y'
      `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
+    const params: any[] = [];
+    params.push(userCode);
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as GetApprovedRequestQrCodeResDto[];
   }
   async getRequestQrCocde(requestCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
@@ -225,7 +251,30 @@ export class QrAppRepository {
 
     return result.insertId;
   }
-  async getRequestSellList(getType: GetTypeEnum, userCode: string): Promise<GetRequestSellListResDto[]> {
+
+  async getRequestSellTotal(dto: GetRequestSellListDto, userCode: string): Promise<number> {
+    let query = ` SELECT COUNT(A.seq) AS TOTAL 
+      FROM ${this.tableSell}  A
+        LEFT JOIN ${this.table} B
+       ON A.requestCode = B.requestCode  
+      LEFT JOIN ${this.tableHome} C
+       ON B.userHomeCode = C.userHomeCode  
+      LEFT JOIN ${this.tableOption} D
+       ON A.priceOptionCode = D.code
+      LEFT JOIN ${this.tableInteract} E
+       ON A.requestCode = E.requestCode
+      WHERE A.isActive = 'Y' ${dto.getType !== GetTypeEnum.ALL ? ' AND E.userCode = ? ' : ''}
+     `;
+
+    const params: any[] = [];
+    if (dto.getType !== GetTypeEnum.ALL) {
+      params.push(userCode);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+  async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<GetRequestSellListResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
      IFNULL(E.isView,'N'), IFNULL(E.isSave,'N'),
      CASE
@@ -243,11 +292,54 @@ export class QrAppRepository {
        ON A.priceOptionCode = D.code
       LEFT JOIN ${this.tableInteract} E
        ON A.requestCode = E.requestCode
-      WHERE A.isActive = 'Y' ${getType !== GetTypeEnum.ALL ? ' AND A.userCode = ? ' : ''}
+      WHERE A.isActive = 'Y' ${dto.getType !== GetTypeEnum.ALL ? ' AND E.userCode = ? ' : ''}
      `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, getType !== GetTypeEnum.ALL ? [userCode] : []);
+    const params: any[] = [];
+    if (dto.getType !== GetTypeEnum.ALL) {
+      params.push(userCode);
+    }
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as GetRequestSellListResDto[];
+  }
+  async getRequestSellDetail(requestCode: string): Promise<GetRequestSellDetailResDto | null> {
+    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+      D.priceOptionCode, D.pricePerKg, D.volumeForSell, D.nestQuantity, D.humidity, D.ingredientNestOptionCode,
+      CASE
+        WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.WAITING.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.WAITING.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
+        ELSE ''
+      END AS requestStatusLabel,
+       CASE
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          ELSE 'N'
+      END AS isSold
+      FROM ${this.table}  A
+      LEFT JOIN ${this.tableFile} B
+      ON A.seq = B.qrRequestSeq  
+      LEFT JOIN ${this.tableBlockChain} C
+      ON A.requestCode = C.requestCode  
+       LEFT JOIN ${this.tableSell} D
+      ON A.requestCode = D.requestCode  
+      LEFT JOIN ${this.tableHome} E
+      ON A.userHomeCode = E.userHomeCode  
+      WHERE A.requestCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y'
+     `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
+    return rows[0] as GetRequestSellDetailResDto;
   }
 
   // TODO: SELL-INTERACT

@@ -117,6 +117,32 @@ export class GetApprovedRequestQrCodeResDto extends OmitType(RequestQrCodeResDto
   isSold: YnEnum;
 }
 
+export class GetRequestSellDetailResDto extends GetApprovedRequestQrCodeResDto {
+  @ApiProperty({ example: '' })
+  @IsString()
+  priceOptionCode: string;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  pricePerKg: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  volumeForSell: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  nestQuantity: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  humidity: number;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  ingredientNestOptionCode: string;
+}
+
 export class UploadRequestVideoResDto {
   @ApiProperty({ example: 0 })
   seq: number;
