@@ -143,16 +143,8 @@ export class TodoAppRepository {
               END AS taskStatusLabel,
             '${TODO_CONST.TASK_EVENT.CANCEL.value}' AS leftEvent,
             '${TODO_CONST.TASK_EVENT.CANCEL.text}' AS leftEventLabel,
-            CASE 
-                WHEN C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}' THEN '${TODO_CONST.TASK_EVENT.HARVEST.value}'
-                WHEN C.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}' THEN '${TODO_CONST.TASK_EVENT.MEDICINE.value}'
-                ELSE '${TODO_CONST.TASK_EVENT.COMPLETE.value}'
-            END AS rightEvent,
-            CASE 
-                WHEN C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}' THEN '${TODO_CONST.TASK_EVENT.HARVEST.text}'
-                WHEN C.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}' THEN '${TODO_CONST.TASK_EVENT.MEDICINE.text}'
-                ELSE '${TODO_CONST.TASK_EVENT.COMPLETE.text}'
-            END AS rightEventLabel
+            '${TODO_CONST.TASK_EVENT.COMPLETE.value}' AS rightEvent,
+            '${TODO_CONST.TASK_EVENT.COMPLETE.text}' AS rightEventLabel,
             FROM ${this.tableHomeTaskAlarm} A
             INNER JOIN ${this.tableUserApp} B
             ON A.userCode = B.userCode

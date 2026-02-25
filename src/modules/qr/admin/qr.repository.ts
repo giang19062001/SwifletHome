@@ -3,8 +3,9 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IQrRequest } from './qr.inteface';
 import { QR_CODE_CONST, RequestStatusEnum } from '../qr.interface';
-import { GetAllInfoRequestQrCodeAdminResDto, WriteQrBlockchainDto } from './qr.dto';
+import { WriteQrBlockchainDto } from './qr.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
+import { GetAllInfoRequestQrCodeAdminResDto } from './qr.response';
 
 @Injectable()
 export class QrAdminRepository {

@@ -6,12 +6,13 @@ import { Injectable } from '@nestjs/common';
 import { IQrRequest } from './qr.inteface';
 import { RequestStatusEnum } from '../qr.interface';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
-import { GetAllInfoRequestQrCodeAdminResDto, WriteQrBlockchainDto } from './qr.dto';
+import { WriteQrBlockchainDto } from './qr.dto';
 import { ContractService } from 'src/common/contract/contract.service';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { GetAllInfoRequestQrCodeAdminResDto } from './qr.response';
 
 @Injectable()
 export class QrAdminService {

@@ -3,7 +3,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { ApiMutationResponse, IList } from 'src/interfaces/admin.interface';
 import { TodoAdminRepository } from './todo.repository';
 import { ITodoBoxTask, ITodoTask } from '../todo.interface';
-import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto, UpdateBoxTaskDto } from './todo.dto';
+import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { SentTypeEnum } from 'src/modules/notification/admin/notification.dto';
 import { FirebaseService } from 'src/common/firebase/firebase.service';

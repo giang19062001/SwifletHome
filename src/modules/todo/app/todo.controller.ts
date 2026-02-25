@@ -51,13 +51,11 @@ export default class TodoAppController {
   <li> Nếu là 'CANCEL' thì gọi <u>/api/todo/app/changeTaskAlarmStatus</u> API như hiện tại</li>
 </ul>\n
 **leftEventLabel**: enum('Hủy')  --- Hiển thị text nút bên trái của lịch nhắc trên APP \n
-**rightEvent**:  enum('HARVEST','MEDICINE','COMPLETE')
+**rightEvent**:  enum('COMPLETE')
 <ul>
   <li>Nếu là 'COMPLETE' thì gọi <u>/api/todo/app/changeTaskAlarmStatus</u> API như hiện tại</li>
-  <li>Nếu là 'HARVEST' thì mở Modal nhập dữ liệu thu hoạch tổ yến</li>
-  <li>Nếu là 'MEDICINE' thì mở Modal nhập tên thuốc</li>
 </ul>\n
-**rightEventLabel**: enum('Hoàn thành','Nhập dữ liệu', 'Ghi chú')  --- Hiển thị text nút bên phải của lịch nhắc trên APP \n
+**rightEventLabel**: enum('Hoàn thành')  --- Hiển thị text nút bên phải của lịch nhắc trên APP \n
 `,
   })
   async getAll(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: GetListTaskAlarmsDTO): Promise<IListApp<ITodoTaskAlram>> {

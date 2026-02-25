@@ -1,8 +1,6 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, HttpStatus, HttpCode, UseInterceptors, Get, } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { UserTypeResDto } from 'src/modules/user/app/user.response';
 import { ApiAppResponseDto } from 'src/dto/app.dto';

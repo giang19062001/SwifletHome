@@ -71,7 +71,6 @@ export class TaskHarvestQrResDto {
   harvestData: HarvestDataDto[];
 }
 
-
 export class RequestQrCodeResDto extends GetInfoToRequestQrcodeResDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
@@ -88,6 +87,7 @@ export class RequestQrCodeResDto extends GetInfoToRequestQrcodeResDto {
   @IsEnum(RequestStatusEnum)
   requestStatus: RequestStatusEnum;
 
+  @ApiProperty({ example: '' })
   @IsString()
   @IsOptional()
   requestStatusLabel?: string;
@@ -126,18 +126,23 @@ export class UploadRequestVideoResDto {
 }
 
 export class GetRequestQrCodeListResDto {
+  @ApiProperty({ example: 0 })
   @IsNumber()
   seq: number;
 
+  @ApiProperty({ example: '' })
   @IsString()
   requestCode: string;
 
+  @ApiProperty({ example: '' })
   @IsString()
   userHomeName: string;
 
+  @ApiProperty({ example: 1 })
   @IsNumber()
   harvestPhase: number;
 
+  @ApiProperty({ example: 2025 })
   @IsNumber()
   harvestYear: number;
 
@@ -148,6 +153,7 @@ export class GetRequestQrCodeListResDto {
   @IsEnum(RequestStatusEnum)
   requestStatus: RequestStatusEnum;
 
+  @ApiProperty({ example: '' })
   @IsString()
   requestStatusLabel: string;
 
@@ -158,45 +164,33 @@ export class GetRequestQrCodeListResDto {
   @IsEnum(YnEnum)
   isSold: YnEnum;
 
+  @ApiProperty({ example: 0 })
   @IsNumber()
   totalCellCollected: number;
 }
 
-
 export class GetRequestSellListResDto {
-  @ApiProperty({
-    example: 0,
-  })
+  @ApiProperty({ example: 0 })
   @IsNumber()
   seq: number;
 
-  @ApiProperty({
-    example: '',
-  })
+  @ApiProperty({ example: '' })
   @IsString()
   requestCode: string;
 
-  @ApiProperty({
-    example: '',
-  })
+  @ApiProperty({ example: '' })
   @IsString()
   userName: string;
 
-  @ApiProperty({
-    example: '',
-  })
+  @ApiProperty({ example: '' })
   @IsString()
   userPhone: string;
 
-  @ApiProperty({
-    example: '',
-  })
+  @ApiProperty({ example: '' })
   @IsString()
   userHomeName: string;
 
-  @ApiProperty({
-    example: '',
-  })
+  @ApiProperty({ example: '' })
   @IsString()
   priceOptionCode: string;
 
@@ -216,9 +210,7 @@ export class GetRequestSellListResDto {
   @IsNumber()
   humidity: number;
 
-  @ApiProperty({
-    example: '',
-  })
+  @ApiProperty({ example: '' })
   @IsString()
   ingredientNestOptionCode: string;
 }

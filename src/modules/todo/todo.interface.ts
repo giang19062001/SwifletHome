@@ -72,8 +72,8 @@ export enum TaskLeftEventEnum {
   CANCEL = 'CANCEL',
 }
 export enum TaskRightEventEnum {
-  HARVEST = 'HARVEST',
-  MEDICINE = 'MEDICINE',
+  // HARVEST = 'HARVEST',
+  // MEDICINE = 'MEDICINE',
   COMPLETE = 'COMPLETE',
 }
 
