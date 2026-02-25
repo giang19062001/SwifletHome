@@ -359,7 +359,7 @@ export class TodoAppService {
       }
     }
   }
-  // TODO: HARVER
+  // TODO: HARVERT
   async insUpDelHarvestRows(userCode: string, userHomeCode: string, seq: number, harvestData: HarvestDataDto[]) {
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
     const harvestCurrentDatas = await this.todoAppRepository.getTaskHarvestRows(seq, false); // false -> lấy luôn cả cell bị isActive = 'N'
@@ -516,7 +516,7 @@ export class TodoAppService {
         const seq = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
 
         // insert đợt cho thu hoạch
-        await this.todoAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestPhase);
+        await this.todoAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestPhase, dto.isComplete == 'Y' ? YnEnum.Y : YnEnum.N);
 
         // insert / update/ detele dữ liệu tầng ô mới
         await this.insUpDelHarvestRows(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestData);
