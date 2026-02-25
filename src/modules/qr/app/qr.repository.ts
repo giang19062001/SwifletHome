@@ -253,6 +253,20 @@ export class QrAppRepository {
   }
 
   async getRequestSellTotal(dto: GetRequestSellListDto, userCode: string): Promise<number> {
+    let whereSql = '';
+    const params: any[] = [];
+
+    if (dto.getType !== GetTypeEnum.ALL) {
+      whereSql += ' AND E.userCode = ? ';
+      params.push(userCode);
+    }
+    if (dto.getType == GetTypeEnum.VIEW) {
+      whereSql += ` AND E.isView = 'Y' `;
+    }
+    if (dto.getType == GetTypeEnum.SAVE) {
+      whereSql += ` AND E.isSave = 'Y' `;
+    }
+
     let query = ` SELECT COUNT(A.seq) AS TOTAL 
       FROM ${this.tableSell}  A
         LEFT JOIN ${this.table} B
@@ -263,18 +277,27 @@ export class QrAppRepository {
        ON A.priceOptionCode = D.code
       LEFT JOIN ${this.tableInteract} E
        ON A.requestCode = E.requestCode
-      WHERE A.isActive = 'Y' ${dto.getType !== GetTypeEnum.ALL ? ' AND E.userCode = ? ' : ''}
+      WHERE A.isActive = 'Y' ${whereSql}
      `;
-
-    const params: any[] = [];
-    if (dto.getType !== GetTypeEnum.ALL) {
-      params.push(userCode);
-    }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<GetRequestSellListResDto[]> {
+    let whereSql = '';
+    const params: any[] = [];
+
+    if (dto.getType !== GetTypeEnum.ALL) {
+      whereSql += ' AND E.userCode = ? ';
+      params.push(userCode);
+    }
+    if (dto.getType == GetTypeEnum.VIEW) {
+      whereSql += ` AND E.isView = 'Y' `;
+    }
+    if (dto.getType == GetTypeEnum.SAVE) {
+      whereSql += ` AND E.isSave = 'Y' `;
+    }
+
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
      IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave,
      CASE
@@ -292,13 +315,9 @@ export class QrAppRepository {
        ON A.priceOptionCode = D.code
       LEFT JOIN ${this.tableInteract} E
        ON A.requestCode = E.requestCode
-      WHERE A.isActive = 'Y' ${dto.getType !== GetTypeEnum.ALL ? ' AND E.userCode = ? ' : ''}
+      WHERE A.isActive = 'Y'  ${whereSql}
      `;
 
-    const params: any[] = [];
-    if (dto.getType !== GetTypeEnum.ALL) {
-      params.push(userCode);
-    }
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
       params.push(dto.limit, (dto.page - 1) * dto.limit);
