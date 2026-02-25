@@ -1,5 +1,5 @@
-import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Param, BadRequestException, UseInterceptors, UseFilters, UploadedFile } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Param, BadRequestException, UseInterceptors, UseFilters, UploadedFile, Query } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
@@ -13,6 +13,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { multerVideoConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
+import { USER_CONST } from 'src/modules/user/app/user.interface';
+import { GetTypeEnum } from '../qr.interface';
 
 @ApiTags('app/qr')
 @Controller('/api/app/qr')
@@ -151,14 +153,29 @@ export default class QrAppController {
   // TODO: SELL
   @ApiOperation({
     summary: 'Lấy danh sách  yêu cầu bán tổ yến',
-    description: ``,
+    description: `
+  **ALL** lấy tất cả \n
+  **VIEW** lấy các dữ liệu đã xem \n
+  **SAVE** lấy các dữ liệu đã lưu \n
+    `,
   })
   @Get('getRequestSellList')
   @HttpCode(HttpStatus.OK)
+  @ApiQuery({
+    name: 'getType',
+    enum: GetTypeEnum,
+    required: true,
+  })
   @ApiOkResponse({ type: ApiAppResponseDto(GetRequestSellListResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getRequestSellList(@GetUserApp() user: authInterface.ITokenUserApp) {
-    const result = await this.qrAppService.getRequestSellList();
+  async getRequestSellList(@GetUserApp() user: authInterface.ITokenUserApp, @Query('getType') getType: GetTypeEnum) {
+    if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
+      throw new BadRequestException({
+        message: Msg.OnlyPurcharseCanFetch,
+        data: [],
+      });
+    }
+    const result = await this.qrAppService.getRequestSellList(getType, user.userCode);
     return result;
   }
 
@@ -217,11 +234,11 @@ export default class QrAppController {
   // TODO: SELL-INTERACT
   @ApiOperation({
     summary: `Đánh dấu 1 'yêu cầu bán' là đã xem hay là lưu `,
-   description: `
+    description: `
   **markType**: enum('VIEW', 'SAVE')\n
   *VIEW*: dùng khi click vào 1 'yêu cầu bán tổ yến' nào đó  \n
   *SAVE*: dùng khi click nút lưu của 1 'yêu cầu bán tổ yến' nào đó \n
-  `
+  `,
   })
   @Put('maskRequestSell/:requestCode')
   @HttpCode(HttpStatus.OK)
@@ -229,7 +246,7 @@ export default class QrAppController {
     type: MaskRequestSellDto,
   })
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async maskRequestSell(@GetUserApp() user: authInterface.ITokenUserApp,@Param('requestCode') requestCode: string,   @Body() dto: MaskRequestSellDto) {
+  async maskRequestSell(@GetUserApp() user: authInterface.ITokenUserApp, @Param('requestCode') requestCode: string, @Body() dto: MaskRequestSellDto) {
     const result = await this.qrAppService.maskRequestSell(requestCode, user.userCode, dto.markType);
     return result;
   }

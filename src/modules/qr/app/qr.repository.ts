@@ -1,4 +1,4 @@
-import { MarkTypeEnum, QR_CODE_CONST } from './../qr.interface';
+import { GetTypeEnum, MarkTypeEnum, QR_CODE_CONST } from './../qr.interface';
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
@@ -225,7 +225,7 @@ export class QrAppRepository {
 
     return result.insertId;
   }
-  async getRequestSellList(): Promise<GetRequestSellListResDto[]> {
+  async getRequestSellList(getType: GetTypeEnum, userCode: string): Promise<GetRequestSellListResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
      CASE
         WHEN D.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
@@ -240,10 +240,12 @@ export class QrAppRepository {
        ON B.userHomeCode = C.userHomeCode  
       LEFT JOIN ${this.tableOption} D
        ON A.priceOptionCode = D.code
-      WHERE A.isActive = 'Y'
+      LEFT JOIN ${this.tableInteract} E
+       ON A.requestCode = E.requestCode
+      WHERE A.isActive = 'Y' ${getType !== GetTypeEnum.ALL ? ' AND A.userCode = ? ' : ''}
      `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, []);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, getType !== GetTypeEnum.ALL ? [userCode] : []);
     return rows as GetRequestSellListResDto[];
   }
 

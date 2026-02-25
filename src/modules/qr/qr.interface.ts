@@ -42,6 +42,11 @@ export interface IQrRequestFile {
   isActive: YnEnum;
 }
 
+export enum GetTypeEnum {
+  ALL = 'ALL',
+  VIEW = 'VIEW',
+  SAVE = 'SAVE',
+}
 export enum MarkTypeEnum {
   VIEW = 'VIEW',
   SAVE = 'SAVE',

@@ -1,4 +1,4 @@
-import { MarkTypeEnum } from './../qr.interface';
+import { GetTypeEnum, MarkTypeEnum } from './../qr.interface';
 import { QrAppRepository } from './qr.repository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
@@ -212,9 +212,9 @@ export class QrAppService {
     }
   }
   // TODO: SELL
-  async getRequestSellList(): Promise<GetRequestSellListResDto[]> {
+  async getRequestSellList(getType: GetTypeEnum, userCode: string): Promise<GetRequestSellListResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
-    const result = await this.qrAppRepository.getRequestSellList();
+    const result = await this.qrAppRepository.getRequestSellList(getType, userCode);
     return result;
   }
   async requestSell(user: ITokenUserApp, dto: InsertRequestSellDto): Promise<number> {

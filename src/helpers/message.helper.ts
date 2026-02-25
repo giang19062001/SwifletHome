@@ -65,6 +65,7 @@ export const Msg = {
   RequestInfoAlreadySold: `Thông tin của Qr code này đã được rao bán rồi`,
   RequestNotAllowHarvestEmpty: `Nhà yến chưa có dữ liệu thu hoạch, không thể yêu cầu mã Qrcode`,
   RequestCannotCancelNotWaiting: `Chỉ có thể hủy các yêu cầu đang ở chế độ chờ`,
+  OnlyPurcharseCanFetch:`Chỉ có tài khoản người mua mới có thể lấy danh sách yến được bán`,
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
   InvalidValue: (filedName: string) => `Gía trị của ${convertFiledName(filedName)} không hợp lệ`,
   InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,

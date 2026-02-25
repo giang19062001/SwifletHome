@@ -213,4 +213,5 @@ export class GetRequestSellListResDto {
   @ApiProperty({ example: '' })
   @IsString()
   ingredientNestOptionCode: string;
+
 }
