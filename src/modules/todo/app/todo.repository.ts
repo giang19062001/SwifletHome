@@ -324,13 +324,13 @@ export class TodoAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, currentYear]);
     return rows.length ? Number(rows[0].PHASE + 1) : 1;
   }
-  async insertTaskHarvestPhase(userCode: string, userHomeCode: string, seqAlarm: number, harvestPhase: number, isDone: YnEnum): Promise<number> {
+  async insertTaskHarvestPhase(userCode: string, userHomeCode: string, seqAlarm: number, harvestPhase: number): Promise<number> {
     const currentYear = moment().year(); // lấy năm hiện tại
     const sql = `
       INSERT INTO ${this.tableHomeTaskHarvestPhase}  (seqAlarm, userHomeCode, harvestPhase, isDone, harvestYear, createdId) 
       VALUES(?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqAlarm, userHomeCode, harvestPhase, isDone, currentYear, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqAlarm, userHomeCode, harvestPhase, "N", currentYear, userCode]);
 
     return result.insertId;
   }

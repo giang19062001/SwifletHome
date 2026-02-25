@@ -114,7 +114,7 @@ export default class TodoAppController {
   // TODO: MEDICINE
 
   @ApiOperation({
-    summary: 'Ghi chú và tạo lịch nhắc lăn thuốc lần kế tiếp',
+    summary: 'Ghi chú lăn thuốc',
   })
   @Post('setTaskMedicine')
   @ApiBody({
@@ -183,9 +183,9 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
     const result = await this.todoAppService.getTaskMedicine(taskAlarmCode ?? '');
     return result;
   }
-  // TODO: COMPLETE-HARVER
+  // TODO: HARVERT
   @ApiOperation({
-    summary: 'Đánh dấu hoàn thành task nhập dữ liệu thu hoạch',
+    summary: 'Nhập dữ liệu thu hoạch',
   })
   @Post('setTaskHarvest')
   @ApiBody({

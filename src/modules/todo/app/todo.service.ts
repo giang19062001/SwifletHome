@@ -106,8 +106,8 @@ export class TodoAppService {
     this.logger.log(logbase, `cập nhập trạng thái của lịch nhắc thành (${taskStatus})`);
     return result;
   }
-  async setTaskAlarmPeriodV2(userCode: string, dto: SetTaskAlarmDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setTaskAlarmPeriodV2:`;
+  async setTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setTaskAlarm:`;
 
     // kiểm tra duplicate lịch nhắc
     let alramDto = await this.todoAppValidate.handleAlarmData(dto);
@@ -516,7 +516,7 @@ export class TodoAppService {
         const seq = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
 
         // insert đợt cho thu hoạch
-        await this.todoAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestPhase, dto.isComplete == 'Y' ? YnEnum.Y : YnEnum.N);
+        await this.todoAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestPhase);
 
         // insert / update/ detele dữ liệu tầng ô mới
         await this.insUpDelHarvestRows(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestData);

@@ -40,7 +40,7 @@ export default class TodoAppControllerV2 {
         data: 0,
       });
     }
-    const result = await this.todoAppService.setTaskAlarmPeriodV2(user.userCode, dto);
+    const result = await this.todoAppService.setTaskAlarm(user.userCode, dto);
 
     if (result == -2) {
       throw new BadRequestException({
