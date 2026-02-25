@@ -170,7 +170,7 @@ export default class QrAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetRequestSellDetailResDto) })
   async getRequestSellDetail(@GetUserApp() user: authInterface.ITokenUserApp, @Param('requestCode') requestCode: string) {
-    const result = await this.qrAppService.getRequestSellDetail(requestCode);
+    const result = await this.qrAppService.getRequestSellDetail(requestCode, user.userCode);
     return result;
   }
 

@@ -229,8 +229,10 @@ export class QrAppService {
     const rows = await this.qrAppRepository.getRequestSellList(dto, userCode);
     return { total: total, list: rows };
   }
-  async getRequestSellDetail(requestCode: string): Promise<GetRequestSellDetailResDto | null> {
+  async getRequestSellDetail(requestCode: string, userCode: string): Promise<GetRequestSellDetailResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
+    // đánh dầu đã xem
+    await this.maskRequestSell(requestCode, userCode, MarkTypeEnum.VIEW)
     const result = await this.qrAppRepository.getRequestSellDetail(requestCode);
     return result;
   }

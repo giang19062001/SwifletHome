@@ -276,7 +276,7 @@ export class QrAppRepository {
   }
   async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<GetRequestSellListResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
-     IFNULL(E.isView,'N'), IFNULL(E.isSave,'N'),
+     IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave,
      CASE
         WHEN D.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
           THEN '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.text}'
@@ -344,12 +344,19 @@ export class QrAppRepository {
 
   // TODO: SELL-INTERACT
   async maskRequestSell(requestCode: string, userCode: string, markType: MarkTypeEnum): Promise<number> {
-    const filed = markType == MarkTypeEnum.VIEW ? ` isView = 'Y' ` : ` isSave = 'Y' `;
+    const fieldName = markType === MarkTypeEnum.VIEW ? 'isView' : 'isSave';
+
     const sql = `
-      UPDATE ${this.tableInteract} SET ${filed} , updatedId = ? , updatedAt = NOW()
-      WHERE requestCode = ? AND userCode = ?
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [RequestStatusEnum.CANCEL, userCode, requestCode, userCode]);
+    INSERT INTO ${this.tableInteract}
+      (requestCode, userCode, ${fieldName}, createdId, createdAt, updatedId, updatedAt)
+    VALUES (?, ?, 'N', ?, NOW(), ?, NOW())
+    ON DUPLICATE KEY UPDATE
+      ${fieldName} = 'Y',
+      updatedId = VALUES(updatedId),
+      updatedAt = NOW()
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [requestCode, userCode, userCode, userCode]);
 
     return result.affectedRows;
   }
