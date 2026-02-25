@@ -1,17 +1,16 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors, Query } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Param, BadRequestException, UseInterceptors, Query } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetTasksMedicineResDto, GetTaskHarvestResDto } from './todo.response';
-import { ITodoHomeTaskAlram, ITodoTask } from '../todo.interface';
+import { ITodoTaskAlram, ITodoTask } from '../todo.interface';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto, SetTaskPeriodDto } from './todo.dto';
-import TodoAppValidate from './todo.validate';
+import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto } from './todo.dto';
 import { IListApp } from 'src/interfaces/app.interface';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
 
@@ -47,8 +46,6 @@ export default class TodoAppController {
     description: `
 **taskStatus**: enum('WAITING','COMPLETE','CANCEL')\n
 **taskStatusLabel**: enum('Đang chờ','Hoàn thành','Bị hủy')  --- Hiển thị text trạng thái trên APP \n
-**taskPeriodCode**: string | null\n
-**taskPeriodCode**: string | null\n
 **leftEvent**:  enum('CANCEL')
 <ul>
   <li> Nếu là 'CANCEL' thì gọi <u>/api/todo/app/changeTaskAlarmStatus</u> API như hiện tại</li>
@@ -63,7 +60,7 @@ export default class TodoAppController {
 **rightEventLabel**: enum('Hoàn thành','Nhập dữ liệu', 'Ghi chú')  --- Hiển thị text nút bên phải của lịch nhắc trên APP \n
 `,
   })
-  async getAll(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: GetListTaskAlarmsDTO): Promise<IListApp<ITodoHomeTaskAlram>> {
+  async getAll(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: GetListTaskAlarmsDTO): Promise<IListApp<ITodoTaskAlram>> {
     const result = await this.todoAppService.getListTaskAlarms(user.userCode, dto.userHomeCode, dto);
     return result;
   }

@@ -1,17 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { IHarvestTask, ITodoHomeTaskAlram, ITodoHomeTaskPeriod, ITodoTask, ITodoTaskMedicine, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { IHarvestTask, ITodoTaskAlram, ITodoTask, ITodoTaskMedicine, TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { SetHarvestTaskDto, FloorDataDto, HarvestDataDto, HarvestDataRowDto, SetTaskAlarmDto, SetTaskMedicineDto, SetTaskPeriodDto, SetTaskPeriodV2Dto } from './todo.dto';
+import { SetHarvestTaskDto, FloorDataDto, HarvestDataDto, HarvestDataRowDto, SetTaskAlarmDto, SetTaskMedicineDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
 import moment from 'moment';
 import TodoAppValidate from './todo.validate';
-import { QUERY_HELPER } from 'src/helpers/const.helper';
 import { OptionService } from 'src/modules/options/option.service';
-import { IOpition, OPTION_CONST } from 'src/modules/options/option.interface';
+import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { GetTaskHarvestResDto, GetTasksMedicineResDto } from './todo.response';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
@@ -92,7 +91,7 @@ export class TodoAppService {
   }
 
   // TODO: ALARM
-  async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<IListApp<ITodoHomeTaskAlram>> {
+  async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<IListApp<ITodoTaskAlram>> {
     const logbase = `${this.SERVICE_NAME}/getTaskAlarms:`;
 
     const total = await this.todoAppRepository.getTotalTaskAlarm(userCode, userHomeCode);
@@ -107,11 +106,11 @@ export class TodoAppService {
     this.logger.log(logbase, `cập nhập trạng thái của lịch nhắc thành (${taskStatus})`);
     return result;
   }
-  async setTaskAlarmPeriodV2(userCode: string, dto: SetTaskPeriodV2Dto): Promise<number> {
+  async setTaskAlarmPeriodV2(userCode: string, dto: SetTaskAlarmDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskAlarmPeriodV2:`;
 
     // kiểm tra duplicate lịch nhắc
-    let alramDto = await this.todoAppValidate.handleAlarmDataByPeriodDataV2(dto, '');
+    let alramDto = await this.todoAppValidate.handleAlarmData(dto);
 
     // taskDate khác null mới kiểm tra
     if (alramDto.taskDate != null) {
@@ -173,9 +172,8 @@ export class TodoAppService {
 
         // nếu ngày chọn lịch nhắc kế tiếp ko phải hôm nay -> insert lịch nhắc lần sau
         if (!isToday) {
-          const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
+          const alarmMedicionNextTimeDto: ITodoTaskAlram = {
             userHomeCode: userHomeCode,
-            taskPeriodCode: null,
             taskCode: task.taskCode,
             taskName: task.taskName,
             taskNote: '',
@@ -188,9 +186,8 @@ export class TodoAppService {
           this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc chO  lần sau SEQ(${seqNextTime})`);
         } else {
           // insert lịch nhắc cho hôm nay với trạng thái 'hoàn thành'
-          const newAlarmMedicionDto: SetTaskAlarmDto = {
+          const newAlarmMedicionDto: ITodoTaskAlram = {
             userHomeCode: userHomeCode,
-            taskPeriodCode: null,
             taskCode: task.taskCode,
             taskName: task.taskName,
             taskNote: '',
@@ -234,9 +231,8 @@ export class TodoAppService {
         //? Chọn ngày 27 NHƯNG hôm nay là 25 --->  INSERT CÁI MỚI
         const isTodayWithDto = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
         if (!isTodayWithDto) {
-          const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
+          const alarmMedicionNextTimeDto: ITodoTaskAlram = {
             userHomeCode: userHomeCode,
-            taskPeriodCode: null,
             taskCode: task.taskCode,
             taskName: task.taskName,
             taskNote: '',
@@ -507,9 +503,8 @@ export class TodoAppService {
         const taskDateNextTime = moment(dto.harvestNextDate).toDate();
 
         // nếu checked 'hoàn thành tất cả' ---> Hoàn thành
-        const alarmMedicionNextTimeDto: SetTaskAlarmDto = {
+        const alarmMedicionNextTimeDto: ITodoTaskAlram = {
           userHomeCode: mainHomeOfUser.userHomeCode,
-          taskPeriodCode: null,
           taskCode: task.taskCode,
           taskName: task.taskName,
           taskNote: '',

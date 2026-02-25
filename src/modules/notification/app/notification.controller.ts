@@ -1,5 +1,5 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters, Put, Param, Get, Delete } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, Put, Param, Get, Delete } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
@@ -13,7 +13,7 @@ import { GetNotificationResDto } from './notification.response';
 import { INotification } from '../notification.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
-import { DeleteNotificationByStatusDto, DeleteNotificationByStatusEnum } from './notification.dto';
+import { DeleteNotificationByStatusDto } from './notification.dto';
 
 @ApiTags('app/notification')
 @Controller('/api/app/notification')

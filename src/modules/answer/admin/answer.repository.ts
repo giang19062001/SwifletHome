@@ -2,9 +2,10 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IAnswer } from '../answer.interface';
-import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
+import { CreateAnswerDto, UpdateAnswerDto } from './answer.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
+import { GetAllAnswerResDto } from './answer.response';
 
 @Injectable()
 export class AnswerAdminRepository {
@@ -12,7 +13,7 @@ export class AnswerAdminRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getTotal(dto: GetAllAnswerDto): Promise<number> {
+  async getTotal(dto: GetAllAnswerResDto): Promise<number> {
     const params: any[] = [];
 
     let whereClause = 'WHERE 1 = 1';
@@ -30,7 +31,7 @@ export class AnswerAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: GetAllAnswerDto): Promise<IAnswer[]> {
+  async getAll(dto: GetAllAnswerResDto): Promise<IAnswer[]> {
     const params: any[] = [];
 
     let whereClause = 'WHERE 1 = 1';

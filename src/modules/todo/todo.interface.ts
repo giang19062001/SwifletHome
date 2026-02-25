@@ -97,35 +97,17 @@ export interface ITodoTask {
   updatedId: string;
 }
 
-export interface ITodoHomeTaskPeriod {
-  seq: number;
-  taskPeriodCode: string;
-  userCode: string;
-  userHomeCode: string;
-  taskCode: string | null;
-  isCustomTask: YnEnum;
-  taskCustomName: string;
-  isPeriod: YnEnum;
-  periodType: PeriodTypeEnum | null;
-  periodValue: number | null;
-  specificValue: Date | null;
-  taskNote: string;
-  isActive: YnEnum;
-}
 
-export interface ITodoHomeTaskAlram {
-  seq: number;
-  taskAlarmCode: string;
-  taskPeriodCode: string;
-  taskCode: string;
+export interface ITodoTaskAlram {
+  taskAlarmCode?: string;
+  taskCode: string | null;
   taskKeyword?: string;
-  userCode: string;
+  userCode?: string;
   userHomeCode: string;
   taskName: string;
   taskDate: Date;
   taskStatus: TaskStatusEnum;
   taskNote: string;
-  isActive: YnEnum;
 }
 
 export interface ITodoTaskMedicine {

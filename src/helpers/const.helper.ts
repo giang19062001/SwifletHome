@@ -53,11 +53,6 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'TAA000001',
   },
-  taskPeriodCode: {
-    PRE: 'TAP',
-    LEN: 6,
-    FRIST_CODE: 'TAP000001',
-  },
   userCode: {
     PRE: 'USR',
     LEN: 6,

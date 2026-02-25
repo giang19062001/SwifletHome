@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
 import { HarvestDataDto } from './todo.dto';
+import { IsEnum } from 'class-validator';
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })
@@ -12,6 +13,45 @@ export class GetTaskResDto {
 
   @ApiProperty({ example: '' })
   taskName: string;
+}
+
+export class GetTaskAlarmResDto {
+  @ApiProperty({ example: 0 })
+  seq: number;
+
+  @ApiProperty({ example: '' })
+  taskAlarmCode: string;
+
+  @ApiProperty({ example: '' })
+  taskCode: string | null;
+
+  @ApiProperty({ example: '' })
+  taskName: string;
+
+  @ApiProperty({ example: '' })
+  taskKeyword: string;
+
+  @ApiProperty({ example: '' })
+  userCode?: string;
+
+  @ApiProperty({ example: '' })
+  userHomeCode: string;
+
+  @ApiProperty({ example: '2026-01-01', type: String, format: 'date'})
+  taskDate: Date;
+
+  @ApiProperty({ example: TaskStatusEnum.WAITING, enum: TaskStatusEnum })
+  @IsEnum(TaskStatusEnum)
+  taskStatus: TaskStatusEnum;
+
+  @ApiProperty({ example: '' })
+  taskNote: string;
+
+  @ApiProperty({
+    example: YnEnum.Y,
+    enum: YnEnum,
+  })
+  isActive: YnEnum;
 }
 
 export class GetScheduledTasksResDto {
@@ -43,9 +83,6 @@ export class GetListTaskAlarmsResDto {
 
   @ApiProperty({ example: '' })
   taskAlarmCode: string;
-
-  @ApiProperty({ example: '' })
-  taskPeriodCode: string;
 
   @ApiProperty({ example: '' })
   taskCode: string;

@@ -1,15 +1,14 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, Res, HttpStatus,  HttpCode, UseGuards,  BadRequestException, UseInterceptors } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation,  ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import {NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { SetTaskPeriodV2Dto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
-import { IListApp } from 'src/interfaces/app.interface';
+import { SetTaskAlarmDto } from './todo.dto';
 
 @ApiTags('app/todo')
 @Controller('/api/app/v2/todo')
@@ -24,7 +23,7 @@ export default class TodoAppControllerV2 {
   })
   @Post('setTaskAlarm')
   @ApiBody({
-    type: SetTaskPeriodV2Dto,
+    type: SetTaskAlarmDto,
     description: `
 **specificValue** date, giá trị không được phép **null**, giá trị sẽ có định dạng **YYYY-MM-DD**\n
 **taskCustomName**: String giá trị không được phép rỗng\n 
@@ -33,8 +32,8 @@ export default class TodoAppControllerV2 {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setTaskAlarm(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskPeriodV2Dto) {
-    const err: string = TodoAppValidate.SetTaskPeriodValidateV2(dto);
+  async setTaskAlarm(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskAlarmDto) {
+    const err: string = TodoAppValidate.setTaskAlarmValidate(dto);
     if (err) {
       throw new BadRequestException({
         message: err,

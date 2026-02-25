@@ -1,25 +1,5 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Res,
-  HttpStatus,
-  Req,
-  Get,
-  HttpCode,
-  UseGuards,
-  UseInterceptors,
-  UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
-  UploadedFiles,
-  BadRequestException,
-  Delete,
-  Param,
-  Put,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, UseInterceptors, BadRequestException, Param } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IHomeSale } from '../homeSale.interface';
 import { HomeSaleAppService } from './homeSale.service';
@@ -29,7 +9,6 @@ import { IListApp } from 'src/interfaces/app.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { CreateHomeSightSeeingDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
-import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetHomeSaleDetailResDto, GetHomeSaleResDto } from './homesale.response';
 import * as authInterface from 'src/modules/auth/app/auth.interface';

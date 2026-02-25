@@ -9,7 +9,6 @@ import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAppGuard } from './auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import * as userInterface from 'src/modules/user/app/user.interface';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
 import { RequestOtpResDto } from 'src/modules/otp/otp.response';

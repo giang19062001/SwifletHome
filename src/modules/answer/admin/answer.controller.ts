@@ -4,9 +4,10 @@ import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { AnswerAdminService } from './answer.service';
 import { IAnswer } from '../answer.interface';
-import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
+import { CreateAnswerDto, UpdateAnswerDto } from './answer.dto';
 import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
+import { GetAllAnswerResDto } from './answer.response';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/answer')
@@ -16,11 +17,11 @@ export class AnswerAdminController {
   constructor(private readonly answerAdminService: AnswerAdminService) {}
 
   @ApiBody({
-    type: GetAllAnswerDto,
+    type: GetAllAnswerResDto,
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: GetAllAnswerDto): Promise<IList<IAnswer>> {
+  async getAll(@Body() dto: GetAllAnswerResDto): Promise<IList<IAnswer>> {
     const result = await this.answerAdminService.getAll(dto);
     return result;
   }

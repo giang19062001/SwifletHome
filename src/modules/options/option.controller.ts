@@ -1,5 +1,5 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpStatus, HttpCode, UseInterceptors } from '@nestjs/common';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetOptionDto } from './option.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { IOpition } from './option.interface';

@@ -3,8 +3,6 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
-import { GetUserApp } from 'src/decorator/auth.decorator';
 import { InfoAppService } from './info.service';
 import { GetInfoResDto } from './info.response';
 

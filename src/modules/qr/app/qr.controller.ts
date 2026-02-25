@@ -1,11 +1,11 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException, UseInterceptors, UseFilters, UploadedFile } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Param, BadRequestException, UseInterceptors, UseFilters, UploadedFile } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { QrAppService } from './qr.service';
-import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, GetRequestSellListResDto, TaskHarvestQrResDto, UploadRequestVideoResDto } from './qr.response';
+import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, GetRequestSellListResDto, UploadRequestVideoResDto } from './qr.response';
 import { InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
