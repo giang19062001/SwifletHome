@@ -431,7 +431,6 @@ export class TodoAppRepository {
      ${harvestPhase != 0 ? " AND B.harvestPhase  = ? " : ""}
     `;
 
-    console.log(query);
  
     const [rows] = await this.db.query<RowDataPacket[]>(query, harvestPhase != 0 ? [userHomeCode, currentYear, harvestPhase] : [userHomeCode, currentYear]);
     return rows as (TaskHarvestQrResDto & { seq: number })[];

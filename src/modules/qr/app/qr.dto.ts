@@ -123,7 +123,7 @@ export class InsertRequestSellDto {
 
 export class MaskRequestSellDto {
   @ApiProperty({
-    example: MarkTypeEnum.VIEW,
+    example: MarkTypeEnum.SAVE,
     enum: MarkTypeEnum,
   })
   @IsEnum(MarkTypeEnum)
