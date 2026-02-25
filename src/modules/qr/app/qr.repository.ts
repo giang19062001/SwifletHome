@@ -308,9 +308,10 @@ export class QrAppRepository {
     return rows as GetRequestSellListResDto[];
   }
   async getRequestSellDetail(requestCode: string): Promise<GetRequestSellDetailResDto | null> {
-    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
-      D.priceOptionCode, D.pricePerKg, D.volumeForSell, D.nestQuantity, D.humidity, D.ingredientNestOptionCode,
-      CASE
+    let query = `
+     SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
+      A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+         CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
           THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
@@ -322,6 +323,8 @@ export class QrAppRepository {
           THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
         ELSE ''
       END AS requestStatusLabel,
+       B.filename AS processingPackingVideoUrl, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
+      D.priceOptionCode, D.pricePerKg, D.volumeForSell, D.nestQuantity, D.humidity, D.ingredientNestOptionCode,
        CASE
           WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
           ELSE 'N'
