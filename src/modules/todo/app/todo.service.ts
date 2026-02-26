@@ -147,7 +147,7 @@ export class TodoAppService {
         // kiểm tra trùng ngày hoặc không
         const isToday = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
         this.logger.log(logbase, isToday ? `Lịch chọn và hôm nay giống nhau` : `Lịch chọn và hôm nay không giống nhau`
-          +`${today} - ${moment(dto.medicineNextDate, 'YYYY-MM-DD')}`
+          +` ${today} - ${moment(dto.medicineNextDate, 'YYYY-MM-DD')}`
         );
 
         // nếu ngày chọn lịch nhắc kế tiếp ko phải hôm nay -> insert lịch nhắc lần sau
@@ -192,7 +192,7 @@ export class TodoAppService {
         // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành
         //? Trước đó Set ngày 25 và hôm nay là 25 ---> HOÀN THÀNH
         const isTodayWithSetted = today.isSame(moment(taskDate, 'YYYY-MM-DD'), 'day');
-        this.logger.log(logbase, isTodayWithSetted ? `Lịch chọn trước đó và hôm nay giống nhau` : `Lịch chọn trước đó và hôm nay không giống nhau` +`${today} - ${moment(taskDate, 'YYYY-MM-DD')}`);
+        this.logger.log(logbase, isTodayWithSetted ? `Lịch chọn trước đó và hôm nay giống nhau` : `Lịch chọn trước đó và hôm nay không giống nhau` +` ${today} - ${moment(taskDate, 'YYYY-MM-DD')}`);
         if (isTodayWithSetted) {
           await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành' vì đến ngày đã thiết lập`);
@@ -201,7 +201,7 @@ export class TodoAppService {
         // nếu hôm nay = ngày chọn lịch nhắc cho lần sau --> hoàn thành
         //? Pick ngày 25 NHƯNG hôm nay cũng là 25 ---> HOÀN THÀNH
         const isTodayWithDto = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
-        this.logger.log(logbase, isTodayWithDto ? `Lịch chọn và hôm nay giống nhau` : `Lịch chọn và hôm nay không giống nhau` + `${today} - ${moment(dto.medicineNextDate, 'YYYY-MM-DD')}`);
+        this.logger.log(logbase, isTodayWithDto ? `Lịch chọn và hôm nay giống nhau` : ` Lịch chọn và hôm nay không giống nhau` + `${today} - ${moment(dto.medicineNextDate, 'YYYY-MM-DD')}`);
         if (isTodayWithDto) {
           await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành' vì cùng ngày thiết lập`);
@@ -210,15 +210,15 @@ export class TodoAppService {
           //? Pick ngày 25 NHƯNG hôm nay cũng là 25 ---> KO INSERT CÁI MỚI
           //? Pick ngày 27 NHƯNG hôm nay là 25 --->  INSERT CÁI MỚI
           //? Pick ngày 27 NHƯNG ngày trước đó set là 28 --->  UPDATE taskDate
-          const isBeforeWithSetted = moment(dto.medicineNextDate, 'YYYY-MM-DD').isBefore(moment(taskDate, 'YYYY-MM-DD'), 'day');
+          const isSameBeforeWithSetted = moment(dto.medicineNextDate, 'YYYY-MM-DD').isSameOrBefore(moment(taskDate, 'YYYY-MM-DD'), 'day');
           this.logger.log(
             logbase,
-            isBeforeWithSetted
-              ? `Lịch chọn nhỏ hơn lịch chọn trước đó `
-              : `Lịch chọn lớn hơn lịch chọn trước đó ` + `${moment(dto.medicineNextDate, 'YYYY-MM-DD')} - ${moment(taskDate, 'YYYY-MM-DD')}`,
+            isSameBeforeWithSetted
+              ? `Lịch chọn nhỏ hơn hoặc bằng lịch chọn trước đó `
+              : `Lịch chọn lớn hơn lịch chọn trước đó ` + ` ${moment(dto.medicineNextDate, 'YYYY-MM-DD')} - ${moment(taskDate, 'YYYY-MM-DD')}`,
           );
 
-          if (isBeforeWithSetted) {
+          if (isSameBeforeWithSetted) {
             // cập nhập lại taskDate bằng  dto.medicineNextDate
             await this.todoAppRepository.updateDateOfTaskAlarm(moment(dto.medicineNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
             this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
