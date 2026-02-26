@@ -339,7 +339,7 @@ export class QrAppRepository {
       whereSql += ` AND E.isSave = 'Y' `;
     }
 
-    let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
+    let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
      IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave,
      CASE
         WHEN D.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
