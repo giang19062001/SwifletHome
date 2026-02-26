@@ -407,43 +407,18 @@ export class QrAppRepository {
 
   // TODO: SELL-INTERACT
   async maskRequestSell(requestCode: string, userCode: string, markType: MarkTypeEnum): Promise<number> {
-    const sqlInsert = `
+    const sql = `
     INSERT INTO ${this.tableInteract}
       (requestCode, userCode, isView, isSave, createdId, createdAt, updatedId, updatedAt)
     VALUES (?, ?, 'N', 'N', ?, NOW(), ?, NOW())
     ON DUPLICATE KEY UPDATE
+      isView = ${markType === MarkTypeEnum.VIEW ? `'Y'` : 'isView'},
+      isSave = ${markType === MarkTypeEnum.SAVE ? `CASE WHEN isSave='Y' THEN 'N' ELSE 'Y' END` : 'isSave'},
       updatedId = VALUES(updatedId),
       updatedAt = NOW()
-  `;
-
-    await this.db.execute(sqlInsert, [requestCode, userCode, userCode, userCode]);
-
-    let updateSql: string;
-
-    if (markType === MarkTypeEnum.VIEW) {
-      // VIEW luôn set Y
-      updateSql = `
-      UPDATE ${this.tableInteract}
-      SET isView = 'Y',
-          updatedId = ?,
-          updatedAt = NOW()
-      WHERE requestCode = ? AND userCode = ?
     `;
-    } else {
-      // SAVE thì toggle
-      updateSql = `
-      UPDATE ${this.tableInteract}
-      SET isSave = CASE 
-                      WHEN isSave = 'Y' THEN 'N'
-                      ELSE 'Y'
-                   END,
-          updatedId = ?,
-          updatedAt = NOW()
-      WHERE requestCode = ? AND userCode = ?
-    `;
-    }
 
-    const [result] = await this.db.execute<ResultSetHeader>(updateSql, [userCode, requestCode, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [requestCode, userCode, userCode, userCode]);
     return result.affectedRows;
   }
 }
