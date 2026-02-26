@@ -146,7 +146,9 @@ export class TodoAppService {
       if (String(dto.taskAlarmCode).trim() == '') {
         // kiểm tra trùng ngày hoặc không
         const isToday = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
-        this.logger.log(logbase, isToday ? `Ngày lăn thuốc đã thiết lập trước đó trùng ngày hôm nay -- OK` : `Lịch chọn không trùng hôm này`);
+        this.logger.log(logbase, isToday ? `Lịch chọn và hôm nay giống nhau` : `Lịch chọn và hôm nay không giống nhau`
+          +`${today} - ${moment(dto.medicineNextDate, 'YYYY-MM-DD')}`
+        );
 
         // nếu ngày chọn lịch nhắc kế tiếp ko phải hôm nay -> insert lịch nhắc lần sau
         if (!isToday) {
@@ -190,6 +192,7 @@ export class TodoAppService {
         // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành
         //? Trước đó Set ngày 25 và hôm nay là 25 ---> HOÀN THÀNH
         const isTodayWithSetted = today.isSame(moment(taskDate, 'YYYY-MM-DD'), 'day');
+        this.logger.log(logbase, isTodayWithSetted ? `Lịch chọn trước đó và hôm nay giống nhau` : `Lịch chọn trước đó và hôm nay không giống nhau` +`${today} - ${moment(taskDate, 'YYYY-MM-DD')}`);
         if (isTodayWithSetted) {
           await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành' vì đến ngày đã thiết lập`);
@@ -198,16 +201,22 @@ export class TodoAppService {
         // nếu hôm nay = ngày chọn lịch nhắc cho lần sau --> hoàn thành
         //? Pick ngày 25 NHƯNG hôm nay cũng là 25 ---> HOÀN THÀNH
         const isTodayWithDto = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
+        this.logger.log(logbase, isTodayWithDto ? `Lịch chọn và hôm nay giống nhau` : `Lịch chọn và hôm nay không giống nhau` + `${today} - ${moment(dto.medicineNextDate, 'YYYY-MM-DD')}`);
         if (isTodayWithDto) {
           await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành' vì cùng ngày thiết lập`);
         } else {
           // nếu hôm nay != ngày chọn lịch nhắc cho lần sau --> insert mới với trạng thái 'WAITING'
-          const isBeforeWithSetted = moment(dto.medicineNextDate, 'YYYY-MM-DD').isBefore(moment(taskDate, 'YYYY-MM-DD'), 'day');
-
           //? Pick ngày 25 NHƯNG hôm nay cũng là 25 ---> KO INSERT CÁI MỚI
           //? Pick ngày 27 NHƯNG hôm nay là 25 --->  INSERT CÁI MỚI
           //? Pick ngày 27 NHƯNG ngày trước đó set là 28 --->  UPDATE taskDate
+          const isBeforeWithSetted = moment(dto.medicineNextDate, 'YYYY-MM-DD').isBefore(moment(taskDate, 'YYYY-MM-DD'), 'day');
+          this.logger.log(
+            logbase,
+            isBeforeWithSetted
+              ? `Lịch chọn nhỏ hơn lịch chọn trước đó `
+              : `Lịch chọn lớn hơn lịch chọn trước đó ` + `${moment(dto.medicineNextDate, 'YYYY-MM-DD')} - ${moment(taskDate, 'YYYY-MM-DD')}`,
+          );
 
           if (isBeforeWithSetted) {
             // cập nhập lại taskDate bằng  dto.medicineNextDate
