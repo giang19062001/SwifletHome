@@ -296,7 +296,7 @@ export class TodoAppRepository {
       AND A.userHomeCode = ?
   `;
 
-    const params = ['Y', taskAlarmCode,  userCode, userHomeCode];
+    const params = ['Y', userCode, taskAlarmCode,  userCode, userHomeCode];
     const [result] = await this.db.execute<ResultSetHeader>(sql, params);
     return result.affectedRows;
   }
