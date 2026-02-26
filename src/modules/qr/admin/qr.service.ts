@@ -12,7 +12,7 @@ import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
-import { GetAllInfoRequestQrCodeAdminResDto } from './qr.response';
+import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
 
 @Injectable()
 export class QrAdminService {
@@ -30,7 +30,7 @@ export class QrAdminService {
     const list = await this.qrAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(requestCode: string): Promise<GetAllInfoRequestQrCodeAdminResDto | null> {
+  async getDetail(requestCode: string): Promise<GetInfoRequestQrCodeAdminResDto | null> {
     const result = await this.qrAdminRepository.getDetail(requestCode);
     return result;
   }

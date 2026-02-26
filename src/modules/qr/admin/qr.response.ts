@@ -2,7 +2,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { RequestQrCodeResDto } from '../app/qr.response';
 
-export class GetAllInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeResDto, ['uniqueId'] as const) {
+export class GetInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeResDto, ['uniqueId'] as const) {
   @ApiProperty({ example: '' })
   @IsString()
   userCode: string;

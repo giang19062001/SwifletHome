@@ -5,8 +5,10 @@ import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
 import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
-import { GetApprovedRequestQrCodeResDto, GetRequestSellDetailResDto, GetRequestSellListResDto, RequestQrCodeResDto } from './qr.response';
+import { GetApprovedRequestQrCodeResDto, GetRequestSellDetailResDto, GetRequestSellListResDto, RequestQrCodeResDto, TaskMedicineQrResDto } from './qr.response';
 import { PagingDto } from 'src/dto/admin.dto';
+import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class QrAppRepository {
@@ -18,7 +20,10 @@ export class QrAppRepository {
   private readonly tableHome = 'tbl_user_home';
   private readonly tableInteract = 'tbl_qr_request_sell_interact';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+  constructor(
+    @Inject('MYSQL_CONNECTION') private readonly db: Pool,
+    private readonly todoAppRepository: TodoAppRepository,
+  ) {}
 
   // TODO: REQUEST
   async getRequestQrCocdeTotal(userCode: string): Promise<number> {
@@ -178,13 +183,33 @@ export class QrAppRepository {
     return result.insertId;
   }
 
-  async cancelRequest(requestCode: string, updatedId: string): Promise<number> {
+  // async cancelRequest(requestCode: string, updatedId: string): Promise<number> {
+  //   const sql = `
+  //     UPDATE ${this.table} SET requestStatus = ? , updatedId = ? , updatedAt = NOW()
+  //     WHERE requestCode = ?
+  //   `;
+  //   const [result] = await this.db.execute<ResultSetHeader>(sql, [RequestStatusEnum.CANCEL, updatedId, requestCode]);
+
+  //   return result.affectedRows;
+  // }
+
+  async cancelRequest(taskMedicineList: TaskMedicineQrResDto[], seq: number, requestCode: string, userHomeCode: string, userCode: string): Promise<number> {
+    // cập nhập lại isUse = 'N' cho các lần lăn thuốc của requestQr này
+    if (taskMedicineList.length) {
+      for (const med of taskMedicineList) {
+        await this.todoAppRepository.useOrUnuseTaskMedicineForQr(userCode, userHomeCode, med.medicineTaskAlarmCode, YnEnum.N);
+      }
+    }
+
+    // đánh dấu file sẽ bị xóa
+    await this.markFileNotUse(seq, userCode);
+
+    // xóa hẵn qrcode
     const sql = `
-      UPDATE ${this.table} SET requestStatus = ? , updatedId = ? , updatedAt = NOW()
+      DELETE FROM ${this.table}
       WHERE requestCode = ? 
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [RequestStatusEnum.CANCEL, updatedId, requestCode]);
-
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [requestCode]);
     return result.affectedRows;
   }
 
@@ -198,6 +223,22 @@ export class QrAppRepository {
     `,
     );
     return rows as IQrRequestFile[];
+  }
+  async markFileNotUse(qrRequestSeq: number, updatedId: string): Promise<number> {
+    if (!qrRequestSeq) return 0;
+
+    const sql = `
+    UPDATE ${this.tableFile}
+    SET qrRequestSeq = 0,
+        updatedId = ?,
+        updatedAt = NOW()
+    WHERE qrRequestSeq = ?
+      AND qrRequestSeq <> 0
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [updatedId, qrRequestSeq]);
+
+    return result.affectedRows ?? 0;
   }
   async deleteFile(seq: number): Promise<number> {
     const sql = `

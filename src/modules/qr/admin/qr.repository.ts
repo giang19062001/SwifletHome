@@ -5,7 +5,7 @@ import { IQrRequest } from './qr.inteface';
 import { QR_CODE_CONST, RequestStatusEnum } from '../qr.interface';
 import { WriteQrBlockchainDto } from './qr.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
-import { GetAllInfoRequestQrCodeAdminResDto } from './qr.response';
+import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
 
 @Injectable()
 export class QrAdminRepository {
@@ -41,7 +41,7 @@ export class QrAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as IQrRequest[];
   }
-  async getDetail(requestCode: string): Promise<GetAllInfoRequestQrCodeAdminResDto | null> {
+  async getDetail(requestCode: string): Promise<GetInfoRequestQrCodeAdminResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.requestStatus,
          CASE
@@ -75,7 +75,7 @@ export class QrAdminRepository {
         `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
-    return rows.length ? (rows[0] as GetAllInfoRequestQrCodeAdminResDto) : null;
+    return rows.length ? (rows[0] as GetInfoRequestQrCodeAdminResDto) : null;
   }
   async updateRequsetStatus(requestCode: string, requestStatus: RequestStatusEnum, updatedId: string): Promise<number> {
     const sql = `

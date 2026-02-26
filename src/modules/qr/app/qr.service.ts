@@ -150,19 +150,17 @@ export class QrAppService {
         return result;
       }
 
-      console.log("dataInsertDto", dataInsertDto);
-      // dánh đấu các lăn thuốc là đã dùng
-      if (dataInsertDto.taskMedicineList.length) {
-        for (const med of dataInsertDto.taskMedicineList) {
-          console.log("med -----------------", med);
-          await this.todoAppRepository.useTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode)
-        }
-      }
-      
       // tìm file đã upload cùng uniqueId
       const filesUploaded = await this.qrAppRepository.findFilesByUniqueId(dto.uniqueId);
       // có file được upload cùng uuid -> insert
       if (filesUploaded) {
+        // dánh đấu các lăn thuốc là đã dùng
+        if (dataInsertDto.taskMedicineList.length) {
+          for (const med of dataInsertDto.taskMedicineList) {
+            await this.todoAppRepository.useOrUnuseTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode, YnEnum.Y);
+          }
+        }
+
         // thêm nhà yến của user
         this.logger.log(logbase, `Video quy trình chế biến đóng gói của Yêu câu tạo mã Qrcode này là: ${filesUploaded.filename} `);
 
@@ -209,7 +207,7 @@ export class QrAppService {
         data: 0,
       });
     }
-    const result = await this.qrAppRepository.cancelRequest(requestCode, userCode);
+    const result = await this.qrAppRepository.cancelRequest(requestInfo.taskMedicineList, requestInfo.seq!!, requestCode, requestInfo.userHomeCode, userCode);
     return result;
   }
   // TODO: FILE
@@ -236,14 +234,14 @@ export class QrAppService {
   // TODO: SELL
   async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<IListApp<GetRequestSellListResDto>> {
     const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
-    const total = await this.qrAppRepository.getRequestSellTotal(dto, userCode)
+    const total = await this.qrAppRepository.getRequestSellTotal(dto, userCode);
     const rows = await this.qrAppRepository.getRequestSellList(dto, userCode);
     return { total: total, list: rows };
   }
   async getRequestSellDetail(requestCode: string, userCode: string): Promise<GetRequestSellDetailResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
     // đánh dầu đã xem
-    await this.maskRequestSell(requestCode, userCode, MarkTypeEnum.VIEW)
+    await this.maskRequestSell(requestCode, userCode, MarkTypeEnum.VIEW);
     const result = await this.qrAppRepository.getRequestSellDetail(requestCode);
     return result;
   }

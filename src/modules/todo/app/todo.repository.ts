@@ -284,7 +284,7 @@ export class TodoAppRepository {
 
     return result.affectedRows;
   }
-   async useTaskMedicineForQr(userCode: string, userHomeCode: string, taskAlarmCode: string): Promise<number> {
+   async useOrUnuseTaskMedicineForQr(userCode: string, userHomeCode: string, taskAlarmCode: string, isUse: YnEnum): Promise<number> {
     const sql = `
     UPDATE ${this.tableHomeTaskMedicine} A
     LEFT JOIN ${this.tableHomeTaskAlarm} B
@@ -295,8 +295,7 @@ export class TodoAppRepository {
       AND A.userCode = ?
       AND A.userHomeCode = ?
   `;
-
-    const params = ['Y', userCode, taskAlarmCode,  userCode, userHomeCode];
+    const params = [isUse, userCode, taskAlarmCode,  userCode, userHomeCode];
     const [result] = await this.db.execute<ResultSetHeader>(sql, params);
     return result.affectedRows;
   }

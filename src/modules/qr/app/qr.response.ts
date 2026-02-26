@@ -7,6 +7,10 @@ import { RequestStatusEnum } from '../qr.interface';
 
 export class GetInfoToRequestQrcodeResDto {
   @ApiProperty({ example: '' })
+  @IsOptional()
+  seq?: number;
+
+  @ApiProperty({ example: '' })
   userName: string;
 
   @ApiProperty({ example: '' })
