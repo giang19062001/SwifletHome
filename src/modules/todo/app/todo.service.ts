@@ -130,29 +130,8 @@ export class TodoAppService {
     }
     return 0;
   }
+
   // TODO: MEDICINE
-  /* 
-    NẾU taskAlarmCode = ""
-
-      NẾU HÔM NAY = NGÀY CHỌN KẾ TIẾP
-        -> INSERT VỚI CHẾ ĐỘ HOÀN THÀNH
-
-      NẾU HÔM NÀY != NGÀY CHỌN KẾ TIẾP
-        -> INSERT VỚI CHẾ ĐỘ CHỜ
-
-    NẾU taskAlarmCode != ""
-      NẾU HÔM NÀY = NGÀY taskDate
-        -> CẬP NHẬP THUỐC, CẬP NHẬP HOÀN THÀNH
-
-      NẾU HÔM NÀY != NGÀY taskDate
-        -> CẬP NHẬP THUỐC (medicineOptionCode, medicineOther, medicineUsage)
-
-      NẾU HÔM NÀY != NGÀY CHỌN KẾ TIẾP
-        -> INSERT VỚI CHẾ ĐỘ CHỜ
-
-      NẾU HÔM NÀY = NGÀY CHỌN KẾ TIẾP
-        -> BỎ QUA
- */
   async handleTaskMedicineCurrentAndNextime(userCode: string, userHomeCode: string, taskDate: Date | null, task: ITodoTask, dto: SetTaskMedicineDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskMedicine:`;
 
@@ -161,8 +140,7 @@ export class TodoAppService {
     try {
       // kiểm tra ngày chọn có trùng ngày hôm nay
       const today = moment().startOf('day');
-      // ! TEST
-      // const today = moment('2026-01-29').startOf('day');
+      // const today = moment('2026-01-29').startOf('day');   // ! TEST
 
       // dữ liệu alarm chưa có
       if (String(dto.taskAlarmCode).trim() == '') {
@@ -204,33 +182,28 @@ export class TodoAppService {
         result = 1;
       } else {
         // dữ liệu alarm có sẵn
-
-        // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành
-        const isTodayWithSetted = today.isSame(moment(taskDate, 'YYYY-MM-DD'), 'day');
-        //? Trước đó Set ngày 25 và hôm nay là 25 ---> HOÀN THÀNH
-        if (isTodayWithSetted) {
-          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
-          this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành'`);
-        } else {
-          //? Trước đó Set ngày 25 NHƯNG hôm nay là 23 ---> SKIP
-          // chưa tới ngày lăn thuốc
-          this.logger.error(logbase, `${Msg.MedicineInvalidDateExecute} của taskAlarmCode(${dto.taskAlarmCode}) với hôm nay(${today.toDate()}) và ngày đã set trước đó là ${taskDate}`);
-          // return -3;
-        }
-
-        // cập nhập lại taskDate bằng  dto.medicineNextDate
-        // await this.todoAppRepository.updateDateOfTaskAlarm(moment(dto.medicineNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
-        // this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
-
-        // update lăn thuốc hiện tại
+        // update lăn thuốc hiện tại (tên thuốc, liều lượng)
         await this.todoAppRepository.updateTaskMedicine(userCode, userHomeCode, dto.taskAlarmCode, dto);
         this.logger.log(logbase, `Cập nhập dữ liệu lăn thuốc hiện tại taskAlarmCode(${dto.taskAlarmCode})`);
 
-        // nếu hôm nay != ngày chọn lịch nhắc cho lần sau --> insert mới với trạng thái 'WAITING'
-        //? Chọn ngày 25 NHƯNG hôm nay cũng là 25 ---> KO INSERT CÁI MỚI
-        //? Chọn ngày 27 NHƯNG hôm nay là 25 --->  INSERT CÁI MỚI
+        // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành
+        //? Trước đó Set ngày 25 và hôm nay là 25 ---> HOÀN THÀNH
+        const isTodayWithSetted = today.isSame(moment(taskDate, 'YYYY-MM-DD'), 'day');
+        if (isTodayWithSetted) {
+          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+          this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành' vì đến ngày đã thiết lập`);
+        }
+
+        // nếu hôm nay = ngày chọn lịch nhắc cho lần sau --> hoàn thành
+        //? Pick ngày 25 NHƯNG hôm nay cũng là 25 ---> HOÀN THÀNH
         const isTodayWithDto = today.isSame(moment(dto.medicineNextDate, 'YYYY-MM-DD'), 'day');
-        if (!isTodayWithDto) {
+        if (isTodayWithDto) {
+          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+          this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành' vì cùng ngày thiết lập`);
+        } else {
+          // nếu hôm nay != ngày chọn lịch nhắc cho lần sau --> insert mới với trạng thái 'WAITING'
+          //? Pick ngày 25 NHƯNG hôm nay cũng là 25 ---> KO INSERT CÁI MỚI
+          //? Pick ngày 27 NHƯNG hôm nay là 25 --->  INSERT CÁI MỚI
           const alarmMedicionNextTimeDto: ITodoTaskAlram = {
             userHomeCode: userHomeCode,
             taskCode: task.taskCode,
