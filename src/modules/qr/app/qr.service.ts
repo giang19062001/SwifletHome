@@ -150,7 +150,7 @@ export class QrAppService {
         return result;
       }
 
-      
+      console.log("dataInsertDto", dataInsertDto);
       // dánh đấu các lăn thuốc là đã dùng
       if (dataInsertDto.taskMedicineList.length) {
         for (const med of dataInsertDto.taskMedicineList) {
