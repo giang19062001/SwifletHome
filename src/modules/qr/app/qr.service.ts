@@ -135,6 +135,7 @@ export class QrAppService {
         result = -2;
         return result;
       }
+
       // lấy thông tin lăn thuốc, thu hoạch,.. từ DB để insert
       const dataInsertDto = await this.getInfoToRequestQrcode(dto.userHomeCode, user, dto.harvestPhase);
       if (!dataInsertDto) {
@@ -142,12 +143,21 @@ export class QrAppService {
         result = 0;
         return result;
       }
+
       if (!dataInsertDto.taskHarvestList.length) {
         this.logger.error(logbase, `${Msg.RequestNotAllowHarvestEmpty} của người dùng (${user.userCode}) và nhà yến (${dto.userHomeCode})`);
         result = -3;
         return result;
       }
 
+      
+      // dánh đấu các lăn thuốc là đã dùng
+      if (!dataInsertDto.taskMedicineList.length) {
+        for (const med of dataInsertDto.taskMedicineList) {
+          await this.todoAppRepository.useTaskMedicineForQr(med.medicineTaskAlarmCode, user.userCode, dataInsertDto.userHomeCode)
+        }
+      }
+      
       // tìm file đã upload cùng uniqueId
       const filesUploaded = await this.qrAppRepository.findFilesByUniqueId(dto.uniqueId);
       // có file được upload cùng uuid -> insert

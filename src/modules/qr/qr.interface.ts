@@ -26,7 +26,7 @@ export const QR_CODE_CONST = {
     },
     SOLD: {
       value: 'SOLD',
-      text: 'Đã bán',
+      text: 'Đã đăng bán',
     },
   },
 };
