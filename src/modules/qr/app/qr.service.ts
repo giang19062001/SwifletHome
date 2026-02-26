@@ -154,6 +154,7 @@ export class QrAppService {
       // dánh đấu các lăn thuốc là đã dùng
       if (!dataInsertDto.taskMedicineList.length) {
         for (const med of dataInsertDto.taskMedicineList) {
+          console.log("med -----------------", med);
           await this.todoAppRepository.useTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode)
         }
       }
