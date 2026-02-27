@@ -349,7 +349,7 @@ export class TodoAppService {
           medicineNextDate: moment(result?.taskDate).format('YYYY-MM-DD'),
         };
       } else {
-        this.logger.error(logbase, `Gía trị (${Msg.InvalidValue('taskAlarmCode')}) không hợp lệ`);
+        this.logger.error(logbase, `Giá trị (${Msg.InvalidValue('taskAlarmCode')}) không hợp lệ`);
         return null;
       }
     }

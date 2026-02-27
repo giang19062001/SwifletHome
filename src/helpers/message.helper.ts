@@ -67,7 +67,7 @@ export const Msg = {
   RequestCannotCancelNotWaiting: `Chỉ có thể hủy các yêu cầu đang ở chế độ chờ`,
   OnlyPurcharseCanFetch:`Chỉ có tài khoản người mua mới có thể lấy danh sách yến được bán`,
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
-  InvalidValue: (filedName: string) => `Gía trị của ${convertFiledName(filedName)} không hợp lệ`,
+  InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
   InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
   MustBeGreaterThanAndEqualNow: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
 };
@@ -88,7 +88,7 @@ const convertFiledName = (filedName: string) => {
       txt = "Ngày nhắc lịch"
       break;
     case "periodValue":
-      txt = "Gía trị tháng hoặc tuần"
+      txt = "Giá trị tháng hoặc tuần"
       break;
     default:
       txt = filedName;

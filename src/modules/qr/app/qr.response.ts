@@ -126,6 +126,10 @@ export class GetRequestSellDetailResDto extends GetApprovedRequestQrCodeResDto {
   @IsString()
   priceOptionCode: string;
 
+  @ApiProperty({ example: '' })
+  @IsString()
+  priceOptionLabel?: string;
+
   @ApiProperty({ example: 0 })
   @IsNumber()
   pricePerKg: number;
@@ -145,6 +149,10 @@ export class GetRequestSellDetailResDto extends GetApprovedRequestQrCodeResDto {
   @ApiProperty({ example: '' })
   @IsString()
   ingredientNestOptionCode: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  ingredientNestOptionLabel?: string;
 }
 
 export class UploadRequestVideoResDto {
@@ -223,6 +231,10 @@ export class GetRequestSellListResDto {
   @ApiProperty({ example: '' })
   @IsString()
   priceOptionCode: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  priceOptionLabel?: string;
 
   @ApiProperty({ example: 0 })
   @IsNumber()

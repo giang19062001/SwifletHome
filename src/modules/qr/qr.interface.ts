@@ -4,7 +4,7 @@ export const QR_CODE_CONST = {
   PRICE_OPTION: {
     NEGOTIATE: {
       value: 'NEGOTIATE',
-      text: 'Gía thương lượng',
+      text: 'Giá thương lượng',
     },
   },
   REQUEST_STATUS: {

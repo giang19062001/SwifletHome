@@ -84,7 +84,7 @@ export default class QrAppController {
   **uniqueId**  là giá trị **uuid** được generate phía app\n
   **userName** là tên chủ\n
   **userHomeCode** là mã code nhà yến\n
-  **harvestPhase** là **Int** đợt thu hoạch ( Gía trị minimun là 1 )\n
+  **harvestPhase** là **Int** đợt thu hoạch ( Giá trị minimun là 1 )\n
     `,
   })
   @HttpCode(HttpStatus.OK)

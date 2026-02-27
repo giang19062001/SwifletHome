@@ -341,13 +341,12 @@ export class QrAppRepository {
     }
 
     let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
-     IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave,
      CASE
         WHEN D.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
           THEN '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.text}'
         ELSE  CONCAT(FORMAT(A.pricePerKg, 0), ' đ/ Kg')
       END AS priceOptionLabel, A.pricePerKg, A.volumeForSell, A.nestQuantity,
-      A.ingredientNestOptionCode, A.humidity
+      A.ingredientNestOptionCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
       FROM ${this.tableSell}  A
         LEFT JOIN ${this.table} B
        ON A.requestCode = B.requestCode  
@@ -385,7 +384,13 @@ export class QrAppRepository {
         ELSE ''
       END AS requestStatusLabel,
        B.filename AS processingPackingVideoUrl, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
-      D.priceOptionCode, D.pricePerKg, D.volumeForSell, D.nestQuantity, D.humidity, D.ingredientNestOptionCode,
+      D.priceOptionCode,
+      CASE
+        WHEN F.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
+          THEN '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.text}'
+        ELSE  CONCAT(FORMAT(D.pricePerKg, 0), ' đ/ Kg')
+      END AS priceOptionLabel, D.pricePerKg, D.volumeForSell, D.nestQuantity, D.humidity, 
+      D.ingredientNestOptionCode, G.valueOption AS ingredientNestOptionLabel,
        CASE
           WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
           ELSE 'N'
@@ -399,6 +404,10 @@ export class QrAppRepository {
       ON A.requestCode = D.requestCode  
       LEFT JOIN ${this.tableHome} E
       ON A.userHomeCode = E.userHomeCode  
+      LEFT JOIN ${this.tableOption} F
+       ON D.priceOptionCode = F.code
+      LEFT JOIN ${this.tableOption} G
+       ON D.ingredientNestOptionCode = G.code
       WHERE A.requestCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y'
      `;
 

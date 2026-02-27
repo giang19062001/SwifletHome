@@ -79,13 +79,13 @@ async function updateBoxTask() {
   const values = [boxTaskCode1.value, boxTaskCode2.value, boxTaskCode3.value];
 
   if (values.some((v) => v === '')) {
-    toastErr('Gía trị các hộp thoại không thể để trống');
+    toastErr('Giá trị các hộp thoại không thể để trống');
     return;
   }
 
   const uniqueLen = new Set(values).size;
   if (uniqueLen !== values.length) {
-    toastErr('Gía trị các hộp thoại  không được trùng nhau.');
+    toastErr('Giá trị các hộp thoại  không được trùng nhau.');
     return;
   }
 
