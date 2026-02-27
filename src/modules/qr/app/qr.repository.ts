@@ -72,6 +72,7 @@ export class QrAppRepository {
       LEFT JOIN ${this.tableHome} E
       ON A.userHomeCode = E.userHomeCode  
       WHERE A.userCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y'
+      ORDER BY A.harvestPhase DESC, A.harvestYear DESC
      `;
 
     const params: any[] = [];

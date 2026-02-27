@@ -1,6 +1,6 @@
 export const Msg = {
-  UploadOk: 'Tải ảnh lên thành công',
-  UploadErr: 'Tải ảnh lên thất bại',
+  UploadOk: 'Tải file lên thành công',
+  UploadErr: 'Tải file lên thất bại',
   GetOk: 'Lấy thông tin thành công',
   GetErr: 'Lấy thông tin thất bại',
   RegisterOk: 'Đăng ký thông tin thành công',
