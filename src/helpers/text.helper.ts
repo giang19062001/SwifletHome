@@ -21,5 +21,4 @@ export const NOTIFICATIONS = {
 
 export const TEXTS = {
   PACKAGE_FREE: 'Gói dùng thử',
-  NOTIFICATION_TYPE_TODO: 'Việc cần làm',
 };

@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusEnum } from './notification.dto';
-import { INotification, INotificationTopic, IUserNotificationTopic, NotificationStatusEnum } from '../notification.interface';
+import { INotification, INotificationTopic, IUserNotificationTopic, NOTIFICATION_CONST, NotificationStatusEnum, NotificationTypeEnum } from '../notification.interface';
 import { handleTimezoneQuery } from 'src/helpers/func.helper';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UPDATOR } from 'src/helpers/const.helper';
@@ -29,7 +29,13 @@ export class NotificationAppRepository {
   async getAll(dto: PagingDto, userCode: string): Promise<INotification[]> {
     let query = `
     SELECT B.seq, B.notificationId, B.messageId, B.title, B.body, B.targetScreen, B.data, 
-            IF(B.notificationType = 'TODO', '${TEXTS.NOTIFICATION_TYPE_TODO}', B.notificationType) AS notificationType,
+    B.notificationType,
+      CASE
+        WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN.text}'
+        WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.TODO.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.TODO.text}'
+        WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN_QR.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN_QR.text}'
+        ELSE  ''
+    END AS notificationTypeLabel, 
             A.notificationStatus, A.isActive, 
            ${handleTimezoneQuery('A.createdAt')}, A.createdId
     FROM ${this.tableUser} A
@@ -54,7 +60,13 @@ export class NotificationAppRepository {
   async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `   SELECT B.seq, B.notificationId, B.messageId, B.title, B.body, B.targetScreen, B.data, 
-            IF(B.notificationType = 'TODO', '${TEXTS.NOTIFICATION_TYPE_TODO}', B.notificationType) AS notificationType,
+           B.notificationType,
+      CASE
+        WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN.text}'
+        WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.TODO.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.TODO.text}'
+        WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN_QR.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN_QR.text}'
+        ELSE  ''
+    END AS notificationTypeLabel, 
             A.notificationStatus, A.isActive, 
            ${handleTimezoneQuery('A.createdAt')}, A.createdId
         FROM ${this.tableUser} A

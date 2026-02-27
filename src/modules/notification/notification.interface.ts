@@ -4,6 +4,20 @@ export const NOTIFICATION_CONST = {
   TOPIC: {
     COMMON: 'COMMON',
   },
+  NOTIFICATION_TYPE: {
+    ADMIN: {
+      value: 'ADMIN',
+      text: 'Admin',
+    },
+    TODO: {
+      value: 'TODO',
+      text: 'Việc cần làm',
+    },
+    ADMIN_QR: {
+      value: 'ADMIN_QR',
+      text: 'Thông tin QRcode',
+    },
+  },
 };
 
 export enum NotificationStatusEnum {
@@ -14,7 +28,7 @@ export enum NotificationStatusEnum {
 export enum NotificationTypeEnum {
   ADMIN = 'ADMIN',
   TODO = 'TODO',
-  ADMIN_QR = 'ADMIN_QR'
+  ADMIN_QR = 'ADMIN_QR',
 }
 
 export interface INotification {
@@ -29,6 +43,7 @@ export interface INotification {
   userCodesMuticast?: string[];
   topicCode?: string;
   notificationType: NotificationTypeEnum;
+  notificationTypeLabel?: string;
   notificationStatus: NotificationStatusEnum;
   isActive: YnEnum;
   createdAt: Date;
