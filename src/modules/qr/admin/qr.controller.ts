@@ -7,6 +7,7 @@ import { QrAdminService } from './qr.service';
 import { IQrRequest } from './qr.inteface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import * as authInterface from 'src/modules/auth/admin/auth.interface';
+import { RefuseRequestDto } from './qr.dto';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/qrcode')
@@ -38,9 +39,12 @@ export class QrAdminController {
 
   @ApiParam({ name: 'requestCode', type: String })
   @Put('refuse/:requestCode')
+   @ApiBody({
+    type: RefuseRequestDto,
+  })
   @HttpCode(HttpStatus.OK)
-  async refuse(@Param('requestCode') requestCode: string, @GetUserAdmin() admin: authInterface.ITokenUserAdmin): Promise<number> {
-    const result = await this.qrAdminService.refuse(requestCode, admin.userId);
+  async refuse(@Param('requestCode') requestCode: string, @Body() dto: RefuseRequestDto, @GetUserAdmin() admin: authInterface.ITokenUserAdmin): Promise<number> {
+    const result = await this.qrAdminService.refuse(requestCode, dto.userCode);
     if (result === 0) {
       throw new BadRequestException();
     }

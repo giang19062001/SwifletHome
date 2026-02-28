@@ -14,7 +14,7 @@
                                         <div class="card-body">
                                              <div class="row mb-2" id="blockchain-box">
                                                 <div class="col-5 text-muted">Blockchain:</div>
-                                                <div class="col-7"><a href="<%= values.qrData.transactionHash %>">Link  </a></div>
+                                                <div class="col-7"><a href="<%= values.qrData.transactionHash %>">Blockchain Transaction Link</a></div>
                                             </div>
                                             <div class="row mb-2">
                                                 <div class="col-5 text-muted">Mã code:</div>
@@ -158,8 +158,8 @@
 <% } %>
 
 <script>
-  const qrData = <%- JSON.stringify(values.qrData) %>
-  console.log('qrData', qrData);
+  const qrDataGlobal = <%- JSON.stringify(values.qrData) %>
+  console.log('qrDataGlobal', qrDataGlobal);
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -168,7 +168,7 @@
         if (!container) return;
         container.innerHTML = '';
 
-        const videoUrl = qrData?.processingPackingVideoUrl;
+        const videoUrl = qrDataGlobal?.processingPackingVideoUrl;
 
         if (videoUrl && typeof videoUrl === 'string' && videoUrl.trim() !== '') {
             const fullUrl = `${CURRENT_URL}/${videoUrl}`;
@@ -191,16 +191,8 @@
         }
         // ASSING BLOCKCHAIN LINK
         const el = document.getElementById("blockchain-box")
-        if (el && (!window.location.href.includes("qrcode-global") || !qrData.transactionHash)) {
+        if (el &&  !qrDataGlobal.transactionHash) {
             el.style.display = "none"
         }
-        // ASSIGN NÚT TỪ CHỐI
-        const btnRefuse = document.querySelector('#btn-refuse'); 
-
-            if (btnRefuse) {
-                btnRefuse.addEventListener('click', async function () {
-                    await refuseQrcode(qrData.requestCode)
-                });
-            }
 });
 </script>

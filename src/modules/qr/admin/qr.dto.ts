@@ -1,5 +1,12 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
+export class RefuseRequestDto {
+  @IsString()
+  @IsNotEmpty()
+  userCode: string;
+}
+
+
 export class WriteQrBlockchainDto {
   @IsString()
   @IsNotEmpty()

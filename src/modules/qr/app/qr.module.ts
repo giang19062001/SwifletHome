@@ -10,6 +10,6 @@ import { TodoAppModule } from 'src/modules/todo/app/todo.module';
   imports: [AuthAppModule, TodoAppModule ,UserHomeAppModule],
   controllers: [QrAppController],
   providers: [QrAppService, QrAppRepository],
-  exports: [QrAppRepository],
+  exports: [QrAppRepository, QrAppService],
 })
 export class QrAppModule {}

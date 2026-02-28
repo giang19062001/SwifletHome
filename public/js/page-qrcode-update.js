@@ -1,5 +1,6 @@
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
+  console.log("qrDataqrDataqrDataqrDataqrDataqrDataqrData", qrData);
   // ASSIGN NÚT CHẤP THUẬN
   const btnApproved = document.querySelector('#btn-approved');
 
@@ -11,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
         await approvedQrcode(qrData.requestCode);
       } catch (err) {
         toastErr('Chỉnh sửa thất bại');
-        console.log('error', error);
+        console.log('error', err);
       } finally {
         btnApproved.disabled = false;
       }
@@ -23,13 +24,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (btnRefuse) {
     btnRefuse.addEventListener('click', async function () {
-      btnApproved.disabled = true;
+      btnRefuse.disabled = true;
 
       try {
         await refuseQrcode(qrData.requestCode);
       } catch (err) {
         toastErr('Chỉnh sửa thất bại');
-        console.log('error', error);
+        console.log('error', err);
       } finally {
         btnRefuse.disabled = false;
       }
@@ -55,7 +56,7 @@ async function refuseQrcode(requestCode) {
   if (!confirmed) {
     return;
   }
-  await axios.put(CURRENT_URL + `/api/admin/qrcode/refuse/${requestCode}`, {}, axiosAuth()).then(function (response) {
+  await axios.put(CURRENT_URL + `/api/admin/qrcode/refuse/${requestCode}`, {userCode: qrData.userCode}, axiosAuth()).then(function (response) {
     console.log('response', response);
     toastOk('Chỉnh sửa thành công');
     reloadPage('/dashboard/qrcode');

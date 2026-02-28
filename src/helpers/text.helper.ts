@@ -17,6 +17,10 @@ export const NOTIFICATIONS = {
     TITLE: `Thông báo trạng thái yêu cầu Qr code`,
     BODY: `Mã yêu cầu Qr code (${requestCode}) của bạn đã được duyệt`,
   }),
+    QR_CODE_REFUSE: (requestCode: string) => ({
+    TITLE: `Thông báo trạng thái yêu cầu Qr code`,
+    BODY: `Mã yêu cầu Qr code (${requestCode}) của bạn đã bị từ chối`,
+  }),
 };
 
 export const TEXTS = {
