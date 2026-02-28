@@ -41,6 +41,7 @@ import { MqttModule } from './common/mqtt/mqtt.module';
 import { QrAppModule } from './modules/qr/app/qr.module';
 import { QrAdminModule } from './modules/qr/admin/qr.module';
 import { PhoneCodeModule } from './modules/phoneCode/phoneCode.module';
+import { TeamAppModule } from './modules/team/app/team.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { PhoneCodeModule } from './modules/phoneCode/phoneCode.module';
     BlogAppModule,
     TodoAppModule,
     QrAppModule,
+    TeamAppModule,
 
     //admin
     AuthAdminModule,

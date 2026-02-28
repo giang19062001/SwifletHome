@@ -5,6 +5,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
 import { IsTodayOrAfter } from 'src/decorator/validate.decorator';
+import { Msg } from 'src/helpers/message.helper';
 
 export class GetListTaskAlarmsDTO extends PagingDto {
   @ApiProperty({
@@ -191,7 +192,7 @@ export class SetTaskMedicineDto {
     example: '',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: Msg.medicineUsageCannotBlank})
   medicineUsage: string;
 
   @ApiProperty({

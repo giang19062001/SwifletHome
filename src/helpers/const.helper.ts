@@ -63,4 +63,9 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'RQC000001',
   },
+   teamCode: {
+    PRE: 'TEM',
+    LEN: 6,
+    FRIST_CODE: 'TEM000001',
+  },
 };

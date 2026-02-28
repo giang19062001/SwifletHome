@@ -1,11 +1,9 @@
 import { YnEnum } from 'src/interfaces/admin.interface';
 
-
 export enum RequestSellPriceOptionEnum {
   SELLER = 'SELLER',
   NEGOTIATE = 'NEGOTIATE',
 }
-
 
 export const OPTION_CONST = {
   SIGHTSEEING: {
@@ -24,6 +22,12 @@ export const OPTION_CONST = {
     INGREDIENT_NEST: {
       mainOption: 'REQUSET_SELL',
       subOption: 'INGREDIENT_NEST',
+    },
+  },
+  USER_TEAM: {
+    TECHNICAL_TYPE: {
+      mainOption: 'USER_TEAM',
+      subOption: 'TECHNICAL_TYPE',
     },
   },
 };

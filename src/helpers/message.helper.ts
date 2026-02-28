@@ -26,8 +26,8 @@ export const Msg = {
   LoginErr: 'Đăng nhập thất bại',
   RegisterAccountOk: 'Đăng ký tài khoản thành công',
   RegisterAccountErr: 'Đăng ký tài khoản thất bại',
-  InvalidUserType:"Loại tài khoản người dùng không hợp lệ",
-  InvalidPhoneCode:"Mã vùng điện thoại người dùng không hợp lệ",
+  InvalidUserType: 'Loại tài khoản người dùng không hợp lệ',
+  InvalidPhoneCode: 'Mã vùng điện thoại người dùng không hợp lệ',
   PasswordChangeOk: 'Đổi mật khẩu thành công',
   PasswordChangeErr: 'Đổi mật khẩu thất bại',
   AccountLoginWrong: 'Tài khoản hoặc mật khẩu không hợp lệ',
@@ -53,20 +53,22 @@ export const Msg = {
   InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
   DuplicateTaskAlram: 'Lịch nhắc này đã tồn tại',
   DuplicateTaskPeriod: 'Chu kỳ lịch nhắc này đã tồn tại',
-  AlreadyCompleteCannotDo:"Lịch nhắc này đã hoàn thành không thể thực hiện tác vụ này",
-  OnlyMedicineTaskCanDo:`Chỉ có lịch nhắc 'Lăn thuốc' mới có thể thực hiện tác vụ này`,
-  OnlyHarvestTaskCanDo:`Chỉ có lịch nhắc 'Thu hoạch' mới có thể thực hiện tác vụ này`,
-  HomeOfAlarmNotExist:"Nhà yến của lịch nhắc này không tồn tại",
-  FloorOfHomeIsZero:"Số tầng của nhà yến hiện tại là 0 - không thể khởi tạo dữ liệu thu hoạch",
-  MedicineTaskAlreadyAdded:`Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
-  MedicineInvalidDateExecute:"Chưa đến ngày lăn thuốc",
-  HarvestTaskAlreadyAdded:`Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
+  AlreadyCompleteCannotDo: 'Lịch nhắc này đã hoàn thành không thể thực hiện tác vụ này',
+  OnlyMedicineTaskCanDo: `Chỉ có lịch nhắc 'Lăn thuốc' mới có thể thực hiện tác vụ này`,
+  OnlyHarvestTaskCanDo: `Chỉ có lịch nhắc 'Thu hoạch' mới có thể thực hiện tác vụ này`,
+  HomeOfAlarmNotExist: 'Nhà yến của lịch nhắc này không tồn tại',
+  FloorOfHomeIsZero: 'Số tầng của nhà yến hiện tại là 0 - không thể khởi tạo dữ liệu thu hoạch',
+  MedicineTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
+  MedicineInvalidDateExecute: 'Chưa đến ngày lăn thuốc',
+  HarvestTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
   RequestQrcodeAlreadyExsist: `Yêu cầu Qr code của nhà yến  với đợt thu hoạch này đã có rồi`,
   RequestQrcodeNotFound: `Không tìm thấy thông tin Qrcode của yêu cầu bán hiện tại`,
   RequestInfoAlreadySold: `Thông tin của Qr code này đã được rao bán rồi`,
   RequestNotAllowHarvestEmpty: `Nhà yến chưa có dữ liệu thu hoạch, không thể yêu cầu mã Qrcode`,
   RequestCannotCancelNotWaiting: `Chỉ có thể hủy các yêu cầu đang ở chế độ chờ`,
-  OnlyPurcharseCanFetch:`Chỉ có tài khoản người mua mới có thể lấy danh sách yến được bán`,
+  OnlyPurcharseCanFetch: `Chỉ có tài khoản người mua mới có thể lấy danh sách yến được bán`,
+  OnlyOwnerCanFetch: `Chỉ có tài khoản chủ nhà yến có thể lấy danh sách yến được bán`,
+  medicineUsageCannotBlank:`Duong lượng thuốc không thể để trống`,
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
   InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
   InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
@@ -74,22 +76,22 @@ export const Msg = {
 };
 
 const convertFiledName = (filedName: string) => {
-  let txt = filedName ;
+  let txt = filedName;
   switch (filedName) {
-    case "taskCustomName":
-      txt = "Tên lịch nhắc tùy chỉnh"
+    case 'taskCustomName':
+      txt = 'Tên lịch nhắc tùy chỉnh';
       break;
-    case "taskCode":
-      txt = "Mã lịch nhắc"
+    case 'taskCode':
+      txt = 'Mã lịch nhắc';
       break;
-    case "periodType":
-      txt = "Loại chu kỳ"
+    case 'periodType':
+      txt = 'Loại chu kỳ';
       break;
-    case "specificValue":
-      txt = "Ngày nhắc lịch"
+    case 'specificValue':
+      txt = 'Ngày nhắc lịch';
       break;
-    case "periodValue":
-      txt = "Giá trị tháng hoặc tuần"
+    case 'periodValue':
+      txt = 'Giá trị tháng hoặc tuần';
       break;
     default:
       txt = filedName;

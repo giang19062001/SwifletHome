@@ -194,7 +194,7 @@ export default class QrAppController {
     if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
       throw new BadRequestException({
         message: Msg.OnlyPurcharseCanFetch,
-        data: [],
+        data: null,
       });
     }
     const result = await this.qrAppService.getRequestSellList(dto, user.userCode);
