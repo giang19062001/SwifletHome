@@ -25,6 +25,17 @@ export class UserAppRepository {
 
     return rows as ITokenUserApp[];
   }
+    async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserApp | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
+     FROM ${this.table} A
+     LEFT JOIN ${this.tableType} B
+     ON A.userTypeCode = B.userTypeCode
+     WHERE A.userPhone = ? AND A.isActive = 'Y' LIMIT 1`,
+      [userPhone],
+    );
+    return rows.length ? (rows[0] as ITokenUserApp) : null;
+  }
   async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode

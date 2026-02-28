@@ -127,12 +127,12 @@ export class AuthAppService extends AbAuthService {
       throw new BadRequestException(Msg.InvalidUserType);
     }
     // kiểm số phone
-    const user = await this.userAppService.findByPhone(dto.userPhone, dto.countryCode);
+    const user = await this.userAppService.findByPhoneWithoutCountry(dto.userPhone);
 
     // lỗi -> số điện thoại đã tồn tại
     if (user) {
-      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.PhoneExist}`);
-      throw new BadRequestException(Msg.PhoneExist);
+      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.PhoneExistCountry + dto.countryCode}`);
+      throw new BadRequestException(Msg.PhoneExistCountry + dto.countryCode);
     }
 
     // kiểm tra xác thực otp chưa

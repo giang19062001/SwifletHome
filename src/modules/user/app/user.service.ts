@@ -21,6 +21,9 @@ export class UserAppService {
     return await this.userAppRepository.findByCode(userCode);
   }
 
+   async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserApp | null> {
+    return await this.userAppRepository.findByPhoneWithoutCountry(userPhone);
+  }
   async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserApp | null> {
     return await this.userAppRepository.findByPhone(userPhone, countryCode);
   }
