@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { generateCode } from 'src/helpers/func.helper';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { IUserApp, IUserPackageApp } from './user.interface';
+import { IUserApp, IUserPackageApp, USER_CONST } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
 import { ITokenUserApp, ITokenUserAppWithPassword } from 'src/modules/auth/app/auth.interface';
 import { CODES, UPDATOR } from 'src/helpers/const.helper';
@@ -18,6 +18,7 @@ export class UserAppRepository {
   private readonly tableType = 'tbl_user_type';
   private readonly tablePackageHistory = 'tbl_user_package_history';
   private readonly tableHome = 'tbl_user_home';
+  private readonly tableTeam = 'tbl_team_user';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAllUserCode(): Promise<ITokenUserApp[]> {
@@ -25,7 +26,7 @@ export class UserAppRepository {
 
     return rows as ITokenUserApp[];
   }
-    async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserAppWithPassword | null> {
+  async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserAppWithPassword | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
      FROM ${this.table} A
@@ -142,7 +143,7 @@ export class UserAppRepository {
       return 0;
     }
   }
-  
+
   async update(userName: string, userPhone: string, userCode: string): Promise<number> {
     const sql = `
         UPDATE ${this.table} SET userName = ?, updatedAt = NOW(), updatedId = ?
@@ -221,19 +222,45 @@ export class UserAppRepository {
   }
 
   // TODO: TYPE
-   async getAllUserType(): Promise<UserTypeResDto[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT userTypeCode, userTypeKeyWord, userTypeName
-       FROM ${this.tableType} WHERE isActive = 'Y' `, []);
+  async getAllUserType(): Promise<UserTypeResDto[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT userTypeCode, userTypeKeyWord, userTypeName
+       FROM ${this.tableType} WHERE isActive = 'Y' `,
+      [],
+    );
     return rows as UserTypeResDto[];
   }
   async getOneUserType(userTypeCode: string): Promise<UserTypeResDto | null> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT userTypeCode, userTypeKeyWord, userTypeName
-       FROM ${this.tableType} WHERE isActive = 'Y' AND  userTypeCode = ? `, [userTypeCode]);
-    return rows.length ? rows[0] as UserTypeResDto : null
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT userTypeCode, userTypeKeyWord, userTypeName
+       FROM ${this.tableType} WHERE isActive = 'Y' AND  userTypeCode = ? `,
+      [userTypeCode],
+    );
+    return rows.length ? (rows[0] as UserTypeResDto) : null;
   }
-     async getOneUserTypeByKeyword(userTypeKeyWord: string): Promise<UserTypeResDto | null> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT userTypeCode, userTypeKeyWord, userTypeName
-       FROM ${this.tableType} WHERE isActive = 'Y' AND  userTypeKeyWord = ? `, [userTypeKeyWord]);
-    return rows.length ? rows[0] as UserTypeResDto : null
+  async getOneUserTypeByKeyword(userTypeKeyWord: string): Promise<UserTypeResDto | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT userTypeCode, userTypeKeyWord, userTypeName
+       FROM ${this.tableType} WHERE isActive = 'Y' AND  userTypeKeyWord = ? `,
+      [userTypeKeyWord],
+    );
+    return rows.length ? (rows[0] as UserTypeResDto) : null;
+  }
+
+  async getAllowTypesOfUser(userCode: string): Promise<UserTypeResDto[]> {
+    const sql = ` SELECT userTypeCode, userTypeKeyWord, userTypeName
+       FROM ${this.tableType} WHERE isActive = 'Y' 
+       AND (userTypeKeyWord = '${USER_CONST.USER_TYPE.OWNER.value}'  OR  userTypeKeyWord = '${USER_CONST.USER_TYPE.PURCHASER.value}')
+       UNION ALL
+       SELECT A.userTypeCode, A.userTypeKeyWord, A.userTypeName
+       FROM ${this.tableType} A
+       JOIN ${this.tableTeam} B
+       ON A.userTypeCode = B.userTypeCode
+       WHERE A.isActive = 'Y' 
+       AND (A.userTypeKeyWord = '${USER_CONST.USER_TYPE.FACTORY.value}'  OR  A.userTypeKeyWord = '${USER_CONST.USER_TYPE.TECHNICAL.value}')
+       AND B.userCode = ? `;
+       console.log(sql);
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode]);
+    return rows as UserTypeResDto[];
   }
 }

@@ -28,6 +28,8 @@ export class AuthAppController {
   @UseGuards(ApiAuthAppGuard)
   @ApiOperation({
     summary: 'Cần đăng nhập',
+    description:
+`**userTypeCode** và **userTypeKeyWord** sẽ được thay đổi `
   })
   @Post('changeTypeToken')
   @HttpCode(HttpStatus.OK)

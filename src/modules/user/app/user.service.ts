@@ -21,7 +21,7 @@ export class UserAppService {
     return await this.userAppRepository.findByCode(userCode);
   }
 
-   async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserAppWithPassword | null> {
+  async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserAppWithPassword | null> {
     return await this.userAppRepository.findByPhoneWithoutCountry(userPhone);
   }
   async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserAppWithPassword | null> {
@@ -90,10 +90,13 @@ export class UserAppService {
   async getAllUserType(): Promise<UserTypeResDto[]> {
     return await this.userAppRepository.getAllUserType();
   }
-   async getOneUserType(userTypeCode: string): Promise<UserTypeResDto | null> {
+  async getOneUserType(userTypeCode: string): Promise<UserTypeResDto | null> {
     return await this.userAppRepository.getOneUserType(userTypeCode);
   }
-   async getOneUserTypeByKeyword(userTypeKeyWord: string): Promise<UserTypeResDto | null> {
+  async getOneUserTypeByKeyword(userTypeKeyWord: string): Promise<UserTypeResDto | null> {
     return await this.userAppRepository.getOneUserTypeByKeyword(userTypeKeyWord);
+  }
+  async getAllowTypesOfUser(userCode: string): Promise<UserTypeResDto[]> {
+    return await this.userAppRepository.getAllowTypesOfUser(userCode);
   }
 }
