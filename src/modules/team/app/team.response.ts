@@ -56,10 +56,10 @@ export class GetDetailTeamResDto {
     type: Object,
     nullable: true,
     example: {
-      floor: 'ABC',
-      root: 'ABC',
-      light: 'ABC',
-      nest: 'ABC',
+      floor: {text: "Sàn", value:"ABC"},
+      root: {text: "Mái", value:"ABC"},
+      light: {text: "Đèn", value:"ABC"},
+      nest: {text: "Lam", value:"ABC"},
     },
   })
   teamDescriptionSpecial: Record<string, any> | null;

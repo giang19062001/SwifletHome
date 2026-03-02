@@ -6,6 +6,8 @@ import { GetAllTeamDto, GetReviewListOfTeamDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto } from './team.response';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { PagingDto } from 'src/dto/admin.dto';
+import { OptionService } from 'src/modules/options/option.service';
+import { OPTION_CONST } from 'src/modules/options/option.interface';
 
 @Injectable()
 export class TeamAppService {
@@ -13,6 +15,7 @@ export class TeamAppService {
 
   constructor(
     private readonly teamAppRepository: TeamAppRepository,
+    private readonly optionService: OptionService,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
@@ -27,9 +30,28 @@ export class TeamAppService {
 
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetailTeam:`;
-    const result = await this.teamAppRepository.getDetailTeam(teamCode);
+    let result = await this.teamAppRepository.getDetailTeam(teamCode);
+
     if (!result || !result.teamImages?.length) {
       return result;
+    }
+
+    // lấy option và handle teamDescriptionSpecial trả ra { text, value}
+    const technicalTypes = await this.optionService.getAll({
+      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
+      subOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.subOption,
+    });
+    if (result.teamDescriptionSpecial !== null) {
+      const optionMap = Object.fromEntries(technicalTypes.map((o) => [o.keyOption.toLowerCase(), o.valueOption]));
+      result.teamDescriptionSpecial = Object.fromEntries(
+        Object.entries(result.teamDescriptionSpecial).map(([key, value]) => [
+          key,
+          {
+            text: optionMap[key],
+            value,
+          },
+        ]),
+      );
     }
 
     // Duyệt qua từng ảnh để thêm width, height
