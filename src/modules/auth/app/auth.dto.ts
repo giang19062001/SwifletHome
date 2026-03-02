@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, Matches, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, Matches, IsEnum, IsOptional } from 'class-validator';
 import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
@@ -44,6 +44,16 @@ export class UpdateDeviceTokenDto {
   @IsNotEmpty()
   countryCode: string;
 }
+
+export class ChangeTypeTokenDto {
+  @ApiProperty({
+    example: 'UST000002',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userTypeCode: string;
+}
+
 
 
 
@@ -111,7 +121,7 @@ export class RegisterUserAppDto {
     example: 'UST000001',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   userTypeCode: string;
 
   @ApiProperty({

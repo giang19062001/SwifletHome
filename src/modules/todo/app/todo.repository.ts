@@ -1,14 +1,14 @@
 import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IHarvestTask, IHarvestTaskPhase, ITodoTask, ITodoTaskAlram, ITodoTaskMedicine, PeriodTypeEnum, TaskStatusEnum, TODO_CONST } from '../todo.interface';
-import { SetTaskAlarmDto, HarvestDataRowDto, SetTaskMedicineDto } from './todo.dto';
+import { ITodoTask, ITodoTaskAlram, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { HarvestDataRowInputDto, SetTaskMedicineDto } from './todo.dto';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode, handleTimezoneQuery } from 'src/helpers/func.helper';
 import moment from 'moment';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskHarvestQrResDto, TaskMedicineQrResDto } from 'src/modules/qr/app/qr.response';
-import { GetTaskAlarmResDto } from './todo.response';
+import { GetHarvestTaskPhaseResDto, GetTaskAlarmResDto, GetTasksMedicineRowResDto } from './todo.response';
 
 @Injectable()
 export class TodoAppRepository {
@@ -240,7 +240,7 @@ export class TodoAppRepository {
   }
 
   // TODO: MEDICINE
-  async getTaskMedicine(taskAlarmCode: string): Promise<(GetTaskAlarmResDto & ITodoTaskMedicine) | null> {
+  async getTaskMedicine(taskAlarmCode: string): Promise<(GetTaskAlarmResDto & GetTasksMedicineRowResDto) | null> {
     let query = `  SELECT A.taskAlarmCode, A.taskCode, C.taskKeyword, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
     B.seq, B.seqNextTime, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineUsage
     FROM ${this.tableHomeTaskAlarm} A
@@ -253,7 +253,7 @@ export class TodoAppRepository {
     LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
-    return rows.length ? (rows[0] as GetTaskAlarmResDto & ITodoTaskMedicine) : null;
+    return rows.length ? (rows[0] as GetTaskAlarmResDto & GetTasksMedicineRowResDto) : null;
   }
 
   async insertTaskMedicine(userCode: string, userHomeCode: string, seqNextTime: number, dto: SetTaskMedicineDto): Promise<number> {
@@ -302,7 +302,7 @@ export class TodoAppRepository {
 
   // TODO: HARVERT
 
-  async getTaskHarvestRows(seq: number, isOnlyActive: boolean): Promise<(GetTaskAlarmResDto & IHarvestTask)[]> {
+  async getTaskHarvestRows(seq: number, isOnlyActive: boolean): Promise<(GetTaskAlarmResDto & HarvestDataRowInputDto)[]> {
     let query = `  SELECT A.seq, A.taskAlarmCode, A.taskCode, C.taskKeyword, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
      B.seq, B.seqAlarm, B.userCode, B.userHomeCode, B.floor, B.cell, B.cellCollected, B.cellRemain
     FROM ${this.tableHomeTaskAlarm} A
@@ -314,9 +314,9 @@ export class TodoAppRepository {
     ${isOnlyActive ? ` AND B.isActive = 'Y' ` : ''} `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [seq]);
-    return rows as (GetTaskAlarmResDto & IHarvestTask)[];
+    return rows as (GetTaskAlarmResDto & HarvestDataRowInputDto)[];
   }
-  async getOneTaskHarvest(taskAlarmCode: string): Promise<GetTaskAlarmResDto | null> {
+  async getOneTaskHarvest(taskAlarmCode: string): Promise<GetTaskAlarmResDto  & GetHarvestTaskPhaseResDto | null> {
     let query = ` SELECT A.seq, A.taskAlarmCode, A.taskCode, B.taskKeyword, A.taskName, A.taskDate, A.taskStatus,
     A.userCode, A.userHomeCode, A.taskNote
     FROM ${this.tableHomeTaskAlarm}  A
@@ -326,7 +326,7 @@ export class TodoAppRepository {
     LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskAlarmCode]);
-    return rows.length ? (rows[0] as GetTaskAlarmResDto & IHarvestTaskPhase) : null;
+    return rows.length ? (rows[0] as GetTaskAlarmResDto & GetHarvestTaskPhaseResDto) : null;
   }
   async getMaxHarvestPhase(userHomeCode: string): Promise<number> {
     const currentYear = moment().year(); // lấy năm hiện tại
@@ -365,7 +365,7 @@ export class TodoAppRepository {
     return result.affectedRows;
   }
 
-  async insertTaskHarvestRows(dto: HarvestDataRowDto): Promise<number> {
+  async insertTaskHarvestRows(dto: HarvestDataRowInputDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableHomeTaskHarvest}  (seqAlarm, userCode,  userHomeCode, floor, cell, cellCollected, cellRemain, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)
@@ -374,7 +374,7 @@ export class TodoAppRepository {
 
     return result.insertId;
   }
-  async updateTaskHarvestRows(dto: HarvestDataRowDto): Promise<number> {
+  async updateTaskHarvestRows(dto: HarvestDataRowInputDto): Promise<number> {
     const sql = `
     UPDATE ${this.tableHomeTaskHarvest}
     SET cellCollected = ?, cellRemain = ?, updatedId = ?, updatedAt = NOW(), isActive = 'Y'

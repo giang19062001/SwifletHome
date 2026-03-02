@@ -1,4 +1,4 @@
-import { HarvestDataDto } from 'src/modules/todo/app/todo.dto';
+import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsDecimal, IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';

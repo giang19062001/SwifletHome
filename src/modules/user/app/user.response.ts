@@ -15,6 +15,12 @@ export class UserAppResDto {
   userPhone: string;
 
   @ApiProperty({ example: '' })
+  userTypeCode: string;
+
+  @ApiProperty({ example: '' })
+  userTypeKeyWord: string;
+
+  @ApiProperty({ example: '' })
   deviceToken: string;
 
   @ApiProperty({ example: '' })

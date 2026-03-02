@@ -21,7 +21,6 @@ import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { multerVideoConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
-import { GetTypeEnum } from '../qr.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 
 @ApiTags('app/qr')

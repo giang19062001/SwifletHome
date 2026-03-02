@@ -92,27 +92,27 @@ export class SetHarvestTaskDto {
   @IsNotEmpty()
   isComplete: YnEnum;
 
-  @ApiProperty({ type: () => HarvestDataDto, isArray: true })
+  @ApiProperty({ type: () => HarvestDataInputDto, isArray: true })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HarvestDataDto)
-  harvestData: HarvestDataDto[];
+  @Type(() => HarvestDataInputDto)
+  harvestData: HarvestDataInputDto[];
 }
 
-export class HarvestDataDto {
+export class HarvestDataInputDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
   @IsNotEmpty()
   floor: number;
 
-  @ApiProperty({ type: () => FloorDataDto, isArray: true })
+  @ApiProperty({ type: () => FloorDataInputDto, isArray: true })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => FloorDataDto)
-  floorData: FloorDataDto[];
+  @Type(() => FloorDataInputDto)
+  floorData: FloorDataInputDto[];
 }
 
-export class FloorDataDto {
+export class FloorDataInputDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
   @IsNotEmpty()
@@ -129,7 +129,7 @@ export class FloorDataDto {
   cellRemain: number;
 }
 
-export class HarvestDataRowDto {
+export class HarvestDataRowInputDto {
   @ApiProperty({ example: 0 })
   @IsString()
   @IsNotEmpty()

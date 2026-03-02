@@ -4,7 +4,7 @@ import { UserAppRepository } from './user.repository';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
-import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
+import { ITokenUserApp, ITokenUserAppWithPassword } from 'src/modules/auth/app/auth.interface';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UserTypeResDto } from './user.response';
 import { Msg } from 'src/helpers/message.helper';
@@ -17,17 +17,17 @@ export class UserAppService {
     private readonly userAppRepository: UserAppRepository,
     private readonly logger: LoggingService,
   ) {}
-  async findByCode(userCode: string): Promise<ITokenUserApp | null> {
+  async findByCode(userCode: string): Promise<ITokenUserAppWithPassword | null> {
     return await this.userAppRepository.findByCode(userCode);
   }
 
-   async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserApp | null> {
+   async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserAppWithPassword | null> {
     return await this.userAppRepository.findByPhoneWithoutCountry(userPhone);
   }
-  async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserApp | null> {
+  async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserAppWithPassword | null> {
     return await this.userAppRepository.findByPhone(userPhone, countryCode);
   }
-  async deleteAccount(userCode: string, user: ITokenUserApp): Promise<number> {
+  async deleteAccount(userCode: string, user: ITokenUserAppWithPassword): Promise<number> {
     try {
       return await this.userAppRepository.deleteAccount(userCode, user);
     } catch (error) {
@@ -92,5 +92,8 @@ export class UserAppService {
   }
    async getOneUserType(userTypeCode: string): Promise<UserTypeResDto | null> {
     return await this.userAppRepository.getOneUserType(userTypeCode);
+  }
+   async getOneUserTypeByKeyword(userTypeKeyWord: string): Promise<UserTypeResDto | null> {
+    return await this.userAppRepository.getOneUserTypeByKeyword(userTypeKeyWord);
   }
 }

@@ -5,7 +5,7 @@ import { generateCode } from 'src/helpers/func.helper';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { IUserApp, IUserPackageApp } from './user.interface';
 import { CreateUserPackageAppDto } from './user.dto';
-import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
+import { ITokenUserApp, ITokenUserAppWithPassword } from 'src/modules/auth/app/auth.interface';
 import { CODES, UPDATOR } from 'src/helpers/const.helper';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UserTypeResDto } from './user.response';
@@ -25,7 +25,7 @@ export class UserAppRepository {
 
     return rows as ITokenUserApp[];
   }
-    async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserApp | null> {
+    async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserAppWithPassword | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
      FROM ${this.table} A
@@ -34,9 +34,9 @@ export class UserAppRepository {
      WHERE A.userPhone = ? AND A.isActive = 'Y' LIMIT 1`,
       [userPhone],
     );
-    return rows.length ? (rows[0] as ITokenUserApp) : null;
+    return rows.length ? (rows[0] as ITokenUserAppWithPassword) : null;
   }
-  async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserApp | null> {
+  async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserAppWithPassword | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
      FROM ${this.table} A
@@ -45,9 +45,9 @@ export class UserAppRepository {
      WHERE A.userPhone = ? AND A.countryCode = ? AND A.isActive = 'Y' LIMIT 1`,
       [userPhone, countryCode],
     );
-    return rows.length ? (rows[0] as ITokenUserApp) : null;
+    return rows.length ? (rows[0] as ITokenUserAppWithPassword) : null;
   }
-  async findBySeq(seq: number): Promise<ITokenUserApp | null> {
+  async findBySeq(seq: number): Promise<ITokenUserAppWithPassword | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
     FROM ${this.table} A
@@ -56,9 +56,9 @@ export class UserAppRepository {
       WHERE A.seq = ? LIMIT 1`,
       [seq],
     );
-    return rows.length ? (rows[0] as ITokenUserApp) : null;
+    return rows.length ? (rows[0] as ITokenUserAppWithPassword) : null;
   }
-  async findByCode(userCode: string): Promise<ITokenUserApp | null> {
+  async findByCode(userCode: string): Promise<ITokenUserAppWithPassword | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
       FROM ${this.table} A
@@ -67,7 +67,7 @@ export class UserAppRepository {
         WHERE A.userCode = ? LIMIT 1`,
       [userCode],
     );
-    return rows.length ? (rows[0] as ITokenUserApp) : null;
+    return rows.length ? (rows[0] as ITokenUserAppWithPassword) : null;
   }
   async getUserPackageInfo(userCode: string): Promise<IUserPackageApp | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
@@ -172,7 +172,7 @@ export class UserAppRepository {
     return result.affectedRows;
   }
 
-  async deleteAccount(userCode: string, user: ITokenUserApp): Promise<number> {
+  async deleteAccount(userCode: string, user: ITokenUserAppWithPassword): Promise<number> {
     const conn = await this.db.getConnection();
     try {
       await conn.beginTransaction();
@@ -226,9 +226,14 @@ export class UserAppRepository {
        FROM ${this.tableType} WHERE isActive = 'Y' `, []);
     return rows as UserTypeResDto[];
   }
-    async getOneUserType(userTypeCode: string): Promise<UserTypeResDto | null> {
+  async getOneUserType(userTypeCode: string): Promise<UserTypeResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT userTypeCode, userTypeKeyWord, userTypeName
        FROM ${this.tableType} WHERE isActive = 'Y' AND  userTypeCode = ? `, [userTypeCode]);
+    return rows.length ? rows[0] as UserTypeResDto : null
+  }
+     async getOneUserTypeByKeyword(userTypeKeyWord: string): Promise<UserTypeResDto | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT userTypeCode, userTypeKeyWord, userTypeName
+       FROM ${this.tableType} WHERE isActive = 'Y' AND  userTypeKeyWord = ? `, [userTypeKeyWord]);
     return rows.length ? rows[0] as UserTypeResDto : null
   }
 }

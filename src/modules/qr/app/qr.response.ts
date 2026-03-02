@@ -1,4 +1,4 @@
-import { HarvestDataDto } from 'src/modules/todo/app/todo.dto';
+import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsDecimal, IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
@@ -70,9 +70,9 @@ export class TaskHarvestQrResDto {
   @ApiProperty({ example: 2026 })
   harvestYear: number;
 
-  @ApiProperty({ type: () => [HarvestDataDto] })
+  @ApiProperty({ type: () => [HarvestDataInputDto] })
   @IsArray()
-  harvestData: HarvestDataDto[];
+  harvestData: HarvestDataInputDto[];
 }
 
 export class RequestQrCodeResDto extends GetInfoToRequestQrcodeResDto {

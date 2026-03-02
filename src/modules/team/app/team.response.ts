@@ -1,44 +1,24 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
-export class GetDetailTeamResDto {
+export class TeamImgResDto {
   @ApiProperty({ example: 1 })
   seq: number;
 
-  @ApiProperty({ example: '' })
-  userCode: string;
+  @ApiProperty({ example: 'uploads/images/***/***.jpg' })
+  filename: string;
 
-  @ApiProperty({ example: '' })
-  userTypeCode: string;
+  @ApiProperty({ example: 'image/jpeg' })
+  mimetype: string;
 
-  @ApiProperty({ example: '' })
-  teamCode: string;
+  @ApiProperty({ required: false, example: 800 })
+  width?: number;
 
-  @ApiProperty({ example: '' })
-  teamName: string;
-
-  @ApiProperty({ example: '' })
-  teamAddres: string;
-
-  @ApiProperty({ example: '' })
-  teamDescription: string;
-
-  @ApiProperty({
-    type: Object,
-    nullable: true,
-    example: {
-      floor: 'ABC',
-      root: 'ABC',
-      light: 'ABC',
-      nest: 'ABC',
-    },
-  })
-  teamDescriptionSpecial: Record<string, any> | null;
-
-  @ApiProperty({ example: '0' })
-  provinceCode: string;
+  @ApiProperty({ required: false, example: 600 })
+  height?: number;
 }
 
-export class GetAllTeamResDto {
+export class GetDetailTeamResDto {
   @ApiProperty({ example: 1 })
   seq: number;
 
@@ -63,9 +43,67 @@ export class GetAllTeamResDto {
   @ApiProperty({ example: '' })
   teamAddres: string;
 
+  @ApiProperty({ example: '0' })
+  provinceCode: string;
+
+  @ApiProperty({ example: 5.0 })
+  star: number;
+
   @ApiProperty({ example: '' })
   teamDescription: string;
 
-  @ApiProperty({ example: '0' })
-  provinceCode: string;
+  @ApiProperty({
+    type: Object,
+    nullable: true,
+    example: {
+      floor: 'ABC',
+      root: 'ABC',
+      light: 'ABC',
+      nest: 'ABC',
+    },
+  })
+  teamDescriptionSpecial: Record<string, any> | null;
+
+  @ApiProperty({
+    type: () => TeamImgResDto,
+    isArray: true,
+  })
+  teamImages: TeamImgResDto[];
+}
+
+export class GetAllTeamResDto extends OmitType(GetDetailTeamResDto, ['teamDescription', 'teamDescriptionSpecial', 'teamImages'] as const) {}
+
+
+export class GetReviewListOfTeamResDto {
+  @ApiProperty({ example: 1 })
+  seq: number;
+
+  @ApiProperty({ example: 'Good' })
+  review: string
+
+  @ApiProperty({ example: 5 })
+  star: number;
+
+  @ApiProperty({ example: 'USR000001' })
+  reviewBy: string;
+
+  @ApiProperty({ example: 'Giang' })
+  reviewByName: string;
+
+  @ApiProperty({
+    type: () => RviewImgResDto,
+    isArray: true,
+  })
+  reviewImages: RviewImgResDto[];
+}
+
+export class RviewImgResDto {
+  @ApiProperty({ example: 1 })
+  seq: number;
+
+  @ApiProperty({ example: 'uploads/images/***/***.jpg' })
+  filename: string;
+
+  @ApiProperty({ example: 'image/jpeg' })
+  mimetype: string;
 }

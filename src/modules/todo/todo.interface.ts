@@ -97,53 +97,14 @@ export interface ITodoTask {
   updatedId: string;
 }
 
-
 export interface ITodoTaskAlram {
   taskAlarmCode?: string;
-  taskCode: string | null;
   taskKeyword?: string;
   userCode?: string;
+  taskCode: string | null;
   userHomeCode: string;
   taskName: string;
   taskDate: Date;
   taskStatus: TaskStatusEnum;
   taskNote: string;
-}
-
-export interface ITodoTaskMedicine {
-  seq: number;
-  seqNextTime: number;
-  userCode: string;
-  userHomeCode: string;
-  medicineOptionCode: string;
-  medicineOther: string;
-  medicineUsage: string;
-}
-
-export interface IHarvestTask {
-  seqAlarm: number;
-  userCode: string;
-  userHomeCode: string;
-  floor: number;
-  cell: number;
-  cellCollected: number;
-  cellRemain: number;
-}
-export interface IHarvestTaskPhase {
-  seq: number;
-  seqAlarm: string;
-  harvestPhase: number;
-  harvestYear: number;
-  isDone: string;
-}
-
-interface IHarvestData {
-  floor: number;
-  floorData: IFloorData[];
-}
-
-interface IFloorData {
-  cell: number;
-  cellCollected: number;
-  cellRemain: number;
 }

@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { IHarvestTask, ITodoTaskAlram, ITodoTask, ITodoTaskMedicine, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { ITodoTaskAlram, ITodoTask, TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { SetHarvestTaskDto, FloorDataDto, HarvestDataDto, HarvestDataRowDto, SetTaskAlarmDto, SetTaskMedicineDto } from './todo.dto';
+import { SetHarvestTaskDto, FloorDataInputDto, HarvestDataInputDto, HarvestDataRowInputDto, SetTaskAlarmDto, SetTaskMedicineDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IListApp } from 'src/interfaces/app.interface';
@@ -355,14 +355,14 @@ export class TodoAppService {
     }
   }
   // TODO: HARVERT
-  async insUpDelHarvestRows(userCode: string, userHomeCode: string, seq: number, harvestData: HarvestDataDto[]) {
+  async insUpDelHarvestRows(userCode: string, userHomeCode: string, seq: number, harvestData: HarvestDataInputDto[]) {
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
     const harvestCurrentDatas = await this.todoAppRepository.getTaskHarvestRows(seq, false); // false -> lấy luôn cả cell bị isActive = 'N'
 
     // insert / update/ detele dữ liệu tầng ô hiện có
     if (harvestCurrentDatas.length) {
       // biến dữ liệu lồng từ request thành row
-      const requestRows: IHarvestTask[] = [];
+      const requestRows: HarvestDataRowInputDto[] = [];
       for (const flo of harvestData) {
         for (const cel of flo.floorData) {
           requestRows.push({
@@ -378,16 +378,16 @@ export class TodoAppService {
       }
 
       // map từ request
-      const requestMap = new Map<string, IHarvestTask>();
+      const requestMap = new Map<string, HarvestDataRowInputDto>();
       requestRows.forEach((r) => requestMap.set(`${r.floor}_${r.cell}`, r));
 
       // map từ database
-      const dbMap = new Map<string, IHarvestTask>();
+      const dbMap = new Map<string, HarvestDataRowInputDto>();
       harvestCurrentDatas.forEach((r) => dbMap.set(`${r.floor}_${r.cell}`, r));
 
-      const toInsert: IHarvestTask[] = [];
-      const toUpdate: IHarvestTask[] = [];
-      const toDelete: IHarvestTask[] = [];
+      const toInsert: HarvestDataRowInputDto[] = [];
+      const toUpdate: HarvestDataRowInputDto[] = [];
+      const toDelete: HarvestDataRowInputDto[] = [];
 
       // so sánh
       for (const [key, requestRow] of requestMap.entries()) {
@@ -412,12 +412,12 @@ export class TodoAppService {
     } else {
       // insert mới toàn bộ dữ liệu tầng ô
       if (harvestData.length) {
-        let harvestDataRows: HarvestDataRowDto[] = [];
+        let harvestDataRows: HarvestDataRowInputDto[] = [];
         for (const flo of harvestData) {
           const floor = flo.floor;
           if (flo.floorData.length) {
             for (const cel of flo.floorData) {
-              const row: HarvestDataRowDto = {
+              const row: HarvestDataRowInputDto = {
                 seqAlarm: seq,
                 userCode: userCode,
                 userHomeCode: userHomeCode,
@@ -436,9 +436,9 @@ export class TodoAppService {
       }
     }
   }
-  async arrangeHarvestRows(seq: number, userHomeFloor: number): Promise<HarvestDataDto[]> {
+  async arrangeHarvestRows(seq: number, userHomeFloor: number): Promise<HarvestDataInputDto[]> {
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
-    let harvestData: HarvestDataDto[] = [];
+    let harvestData: HarvestDataInputDto[] = [];
     const harvestRows = await this.todoAppRepository.getTaskHarvestRows(seq, true); // true -> chỉ lấy cell  isActive = 'Y'
     if (!harvestRows.length) {
       // khởi tạo Rows mặc định
@@ -456,7 +456,7 @@ export class TodoAppService {
       }
     } else {
       // lồng dữ liệu đã có
-      const floorMap = new Map<number, { floor: number; floorData: FloorDataDto[] }>();
+      const floorMap = new Map<number, { floor: number; floorData: FloorDataInputDto[] }>();
 
       for (const row of harvestRows) {
         if (!floorMap.has(row.floor)) {
@@ -598,7 +598,7 @@ export class TodoAppService {
       return -3;
     }
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
-    const harvestData: HarvestDataDto[] = await this.arrangeHarvestRows(alramHarvestDetail?.seq ?? 0, homeArea.userHomeFloor);
+    const harvestData: HarvestDataInputDto[] = await this.arrangeHarvestRows(alramHarvestDetail?.seq ?? 0, homeArea.userHomeFloor);
 
     // lấy thông tin 'đợt' theo năm
     const harvestPhase = await this.todoAppRepository.getMaxHarvestPhase(mainHomeOfUser?.userHomeCode);

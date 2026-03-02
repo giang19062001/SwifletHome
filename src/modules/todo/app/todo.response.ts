@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
-import { HarvestDataDto } from './todo.dto';
+import { HarvestDataInputDto } from './todo.dto';
 import { IsEnum } from 'class-validator';
 
 export class GetTaskResDto {
@@ -13,6 +13,23 @@ export class GetTaskResDto {
 
   @ApiProperty({ example: '' })
   taskName: string;
+}
+
+export class GetHarvestTaskPhaseResDto {
+  @ApiProperty({ example: 0 })
+  seqAlarm: string;
+
+  @ApiProperty({ example: 0 })
+  harvestPhase: number;
+
+  @ApiProperty({ example: 2025 })
+  harvestYear: number;
+
+  @ApiProperty({
+    example: YnEnum.Y,
+    enum: YnEnum,
+  })
+  isDone: YnEnum;
 }
 
 export class GetTaskAlarmResDto {
@@ -37,7 +54,7 @@ export class GetTaskAlarmResDto {
   @ApiProperty({ example: '' })
   userHomeCode: string;
 
-  @ApiProperty({ example: '2026-01-01', type: String, format: 'date'})
+  @ApiProperty({ example: '2026-01-01', type: String, format: 'date' })
   taskDate: Date;
 
   @ApiProperty({ example: TaskStatusEnum.WAITING, enum: TaskStatusEnum })
@@ -148,8 +165,8 @@ export class GetTaskHarvestResDto {
   @ApiProperty({ example: 'N' })
   isComplete: string;
 
-  @ApiProperty({ type: () => HarvestDataDto, isArray: true })
-  harvestData: HarvestDataDto[];
+  @ApiProperty({ type: () => HarvestDataInputDto, isArray: true })
+  harvestData: HarvestDataInputDto[];
 }
 
 export class GetTasksMedicineResDto {
@@ -167,4 +184,18 @@ export class GetTasksMedicineResDto {
 
   @ApiProperty({ example: '2026-01-01' })
   medicineNextDate: string;
+}
+
+export class GetTasksMedicineRowResDto extends GetTasksMedicineResDto{
+  @ApiProperty({ example: 0 })
+  seq: number;
+
+  @ApiProperty({ example: 0 })
+  seqNextTime: number;
+
+  @ApiProperty({ example: '' })
+  userCode: string;
+
+  @ApiProperty({ example: '' })
+  userHomeCode: string;
 }

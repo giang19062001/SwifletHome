@@ -19,3 +19,12 @@ export class GetAllTeamDto extends PagingDto{
   @IsOptional()
   txtSearch: string;
 }
+
+export class GetReviewListOfTeamDto extends PagingDto{
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  teamCode: string;
+}

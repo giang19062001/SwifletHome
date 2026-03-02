@@ -2,7 +2,7 @@ import { ApiAppResponse } from '../../../interfaces/app.interface';
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param, UseGuards, Delete, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { AuthAppService } from './auth.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
@@ -21,6 +21,24 @@ import { NumberOkResponseDto } from 'src/dto/common.dto';
 @UseInterceptors(ResponseAppInterceptor)
 export class AuthAppController {
   constructor(private readonly authAppService: AuthAppService) {}
+
+  @ApiBody({
+    type: ChangeTypeTokenDto,
+  })
+  @UseGuards(ApiAuthAppGuard)
+  @ApiOperation({
+    summary: 'Cần đăng nhập',
+  })
+  @Post('changeTypeToken')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(LoginResDto) })
+  async changeTypeToken(@Body() dto: ChangeTypeTokenDto, @GetUserApp() user: authInterface.ITokenUserApp) {
+    const result = await this.authAppService.changeTypeToken(user, dto);
+    return {
+      message: result ? Msg.LoginOk : Msg.LoginErr,
+      data: result,
+    };
+  }
 
   @ApiBody({
     type: LoginAppDto,

@@ -1,4 +1,4 @@
-import { YnEnum } from "src/interfaces/admin.interface";
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export interface IPackage {
   seq: number;
@@ -8,12 +8,12 @@ export interface IPackage {
   packagePrice: string;
   packageItemSamePrice: string;
   packageExpireDay: number;
+  packageOptionType: PackageOptionTypeEnum;
   isActive: YnEnum;
   createdAt: Date;
   updatedAt: Date;
   createdId: string;
   updatedId: string;
-  packageOptionType:  PackageOptionTypeEnum
 }
 
 export enum PackageOptionTypeEnum {

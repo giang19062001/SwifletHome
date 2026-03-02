@@ -2,15 +2,15 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import * as bcrypt from 'bcrypt';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message.helper';
-import { LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { AbAuthService } from '../auth.abstract';
-import { ITokenUserApp } from './auth.interface';
+import { ITokenUserApp, ITokenUserAppWithPassword } from './auth.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { IUserApp } from 'src/modules/user/app/user.interface';
+import { IUserApp, USER_CONST } from 'src/modules/user/app/user.interface';
 import { AUTH_CONFIG } from '../auth.config';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { PhoneCodeService } from 'src/modules/phoneCode/phoneCode.service';
@@ -33,10 +33,10 @@ export class AuthAppService extends AbAuthService {
   private async verifyPhoneBeforeOtp(userPhone: string, purpose: string, countryCode: string) {
     const logbase = `${this.SERVICE_NAME}/verifyPhoneBeforeOtp`;
     // kiểm tra mã phone code hợp lệ hay ko
-    const isPhoneCodeValid = await this.phoneCodeService.getDetail(countryCode)
-    if(!isPhoneCodeValid){
-        this.logger.error(logbase, `${userPhone} -> ${Msg.InvalidPhoneCode}`);
-        throw new BadRequestException(Msg.InvalidPhoneCode);
+    const isPhoneCodeValid = await this.phoneCodeService.getDetail(countryCode);
+    if (!isPhoneCodeValid) {
+      this.logger.error(logbase, `${userPhone} -> ${Msg.InvalidPhoneCode}`);
+      throw new BadRequestException(Msg.InvalidPhoneCode);
     }
     // nếu đăng ký mới cần kiểm tra số điện thoại đã được sử dụng hay chưa
     if (purpose == PurposeEnum.REGISTER) {
@@ -104,7 +104,7 @@ export class AuthAppService extends AbAuthService {
     const { userPassword, ...userWithoutPassword } = user;
 
     // generate token
-    const payload = {
+    const payload: ITokenUserApp = {
       ...userWithoutPassword,
       deviceToken: dto.deviceToken,
     };
@@ -121,10 +121,15 @@ export class AuthAppService extends AbAuthService {
     const logbase = `${this.SERVICE_NAME}/register`;
 
     // kiểm tra loại ng dùng
-    const isCountryValid = await this.userAppService.getOneUserType(dto.userTypeCode);
-    if (!isCountryValid) {
+    // const isUserTypeValid = await this.userAppService.getOneUserType(dto.userTypeCode);  28-02-2026
+    const userTypeKeyWord = USER_CONST.USER_TYPE.OWNER.value; // ! HARDCODE
+    const isUserTypeValid = await this.userAppService.getOneUserTypeByKeyword(userTypeKeyWord);
+
+    if (!isUserTypeValid) {
       this.logger.error(logbase, `${dto.userPhone} -> ${Msg.InvalidUserType}`);
       throw new BadRequestException(Msg.InvalidUserType);
+    } else {
+      dto.userTypeCode = isUserTypeValid.userTypeCode; // ! HARDCODE
     }
     // kiểm số phone
     const user = await this.userAppService.findByPhoneWithoutCountry(dto.userPhone);
@@ -274,6 +279,36 @@ export class AuthAppService extends AbAuthService {
     }
   }
 
+  async changeTypeToken(payload: ITokenUserApp, dto: ChangeTypeTokenDto) {
+    const logbase = `${this.SERVICE_NAME}/changeTypeToken`;
+
+    try {
+      // kiểm tra loại ng dùng
+      const isUserTypeValid = await this.userAppService.getOneUserType(dto.userTypeCode);
+      if (!isUserTypeValid) {
+        this.logger.error(logbase, `${dto.userTypeCode} -> ${Msg.InvalidUserType}`);
+        throw new BadRequestException(Msg.InvalidUserType);
+      }
+      // loại bỏ  iat, exp
+      const { iat, exp, ...cleanPayload } = payload;
+
+      // ghi đè userTypeCode và userTypeKeyWord
+      const newPayload = {
+        ...cleanPayload,
+        userTypeCode: dto.userTypeCode,
+        userTypeKeyWord: isUserTypeValid.userTypeKeyWord,
+      };
+      this.logger.log(`${this.SERVICE_NAME} - Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của user(${payload.userCode})`);
+
+      // ky lại token mới
+      const accessToken = this.signToken(newPayload, YnEnum.Y);
+      return {...newPayload, accessToken: accessToken}
+    } catch (err) {
+      this.logger.error(`${this.SERVICE_NAME} - changeTypeToken error: ${err.message}`);
+      throw new UnauthorizedException(Msg.TokenInvalid);
+    }
+  }
+
   async requestOtp(dto: RequestOtpDto): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/requestOtp`;
     this.logger.log(logbase, `${JSON.stringify(dto)}`);
@@ -289,24 +324,28 @@ export class AuthAppService extends AbAuthService {
     return await this.otpService.verifyOtp(dto);
   }
 
-  signToken(payload: any, isSave: YnEnum) {
+  signToken(payload: ITokenUserApp, isSave: YnEnum) {
+    // bỏ iat và exp ra khỏi payload để tránh xung đột với expiresIn
+    const { iat, exp, ...cleanPayload } = payload as any;
+
     let expiresIn: JwtSignOptions['expiresIn'];
 
     if (isSave === YnEnum.Y) {
       expiresIn = AUTH_CONFIG.EXPIRED_APP_SAVE; // '365d'
-    } else if (isSave === YnEnum.N) {
-      expiresIn = AUTH_CONFIG.EXPIRED_APP_NONE_SAVE; // '7d'
     } else {
       expiresIn = AUTH_CONFIG.EXPIRED_APP_NONE_SAVE; // '7d'
     }
 
-    return this.jwtService.sign(payload, { expiresIn });
+    return this.jwtService.sign(cleanPayload, { expiresIn });
   }
   verifyToken(token: string) {
+    const logbase = `${this.SERVICE_NAME}/verifyToken`;
+
     try {
       const payload = this.jwtService.verify(token);
       return payload;
     } catch (err) {
+      this.logger.error(`${logbase} - error: ${err.message}`);
       throw new ForbiddenException(Msg.TokenInvalid);
     }
   }
