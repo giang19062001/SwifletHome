@@ -29,6 +29,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
   console.log('getFileLocation ---> ', mimetype, fieldname);
   let result = '';
   if (mimetype.startsWith('image/')) {
+    // image
     if (fieldname === 'editorImg' || fieldname.includes('editorImg')) {
       result = 'images/editors';
     }
@@ -45,12 +46,21 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'images/configs';
     }
 
+    if (fieldname === 'teamImg' || fieldname.includes('teamImg')) {
+      result = 'images/teams';
+    }
+
+    if (fieldname === 'reviewImg' || fieldname.includes('reviewImg')) {
+      result = 'images/reviews';
+    }
+
     // quan trọng
     if (fieldname === 'qrcode' || fieldname.includes('qrcode')) {
       result = 'images/qrcodes';
     }
   }
   if (mimetype.startsWith('video/')) {
+    //video
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
       result = 'videos/doctors';
     }
@@ -59,6 +69,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     }
   }
   if (mimetype.startsWith('audio/')) {
+    //audio
     if (fieldname === 'editorAudio' || fieldname.includes('editorAudio')) {
       result = 'audios/editors';
     }
