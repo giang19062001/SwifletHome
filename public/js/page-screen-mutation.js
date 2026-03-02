@@ -67,6 +67,13 @@ function mapContentFileds(data) {
         // contentEnd: data.contentEnd ?? '',
       };
       break;
+    case 'REQUEST_QR_GUIDE':
+      screenContent = {
+        contentStart: data.contentStart ?? '',
+        // contentCenter: data.contentCenter ?? '',
+        // contentEnd: data.contentEnd ?? '',
+      };
+      break;
     default:
       screenContent = {};
   }

@@ -8,6 +8,7 @@ export const APP_SCREENS = {
   NOTIFICATION_SCREEN: 'NOTIFICATION_SCREEN',
   SIGNUP_SERVICE: 'SIGNUP_SERVICE',
   REQUEST_DOCTOR: 'REQUEST_DOCTOR',
+  REQUEST_QR_GUIDE: 'REQUEST_QR_GUIDE',
 };
 
 export const QUERY_HELPER = {
@@ -17,7 +18,6 @@ export const QUERY_HELPER = {
   OTP_EXPIRY_MINUTES: 1,
   OTP_MAX_ATTEMPTS: 5,
   DAY_CREATE_ALARM_NEXT_TIME: 90,
-
 };
 
 export const UPDATOR = 'SYSTEM';
@@ -63,7 +63,7 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'RQC000001',
   },
-   teamCode: {
+  teamCode: {
     PRE: 'TEM',
     LEN: 6,
     FRIST_CODE: 'TEM000001',

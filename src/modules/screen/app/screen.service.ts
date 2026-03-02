@@ -96,7 +96,16 @@ export class ScreenAppService {
             } as IScreenSignupService;
           }
           break;
-
+        case APP_SCREENS.REQUEST_QR_GUIDE:
+          if (screen.screenContent) {
+            let contentStart = replaceNbspToSpace(screen.screenContent.contentStart);
+            result = {
+              contentStart: contentStart,
+              contentCenter: {},
+              contentEnd: "",
+            } as IScreenSignupService;
+          }
+          break;
         default:
           break;
       }

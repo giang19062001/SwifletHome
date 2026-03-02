@@ -22,7 +22,8 @@ export class ScreenAppController {
   @ApiParam({
     description: `
 **SIGNUP_SERVICE**: Màn hình đăng kí dịch vụ,\n
-**REQUEST_DOCTOR**: Màn hình khám bệnh nhà yến`,
+**REQUEST_DOCTOR**: Màn hình khám bệnh nhà yến\n
+**REQUEST_QR_GUIDE**: Popup hướng dẫn cho màn hình yêu cầu mã QR`,
     name: 'keyword',
     type: String,
   })
