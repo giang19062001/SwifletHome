@@ -1,5 +1,5 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put, UploadedFiles } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
@@ -8,12 +8,15 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { TeamAppService } from './team.service';
-import { GetAllTeamDto, GetReviewListOfTeamDto } from './team.dto';
-import { ListResponseDto, NullResponseDto } from 'src/dto/common.dto';
+import { GetAllTeamDto, GetReviewListOfTeamDto, ReviewTeamDto, UploadReviewFilesDto } from './team.dto';
+import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { IList } from 'src/interfaces/admin.interface';
-import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto } from './team.response';
+import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, UploadReviewFilesResDto } from './team.response';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { PagingDto } from 'src/dto/admin.dto';
+import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { multerImgConfig } from 'src/config/multer.config';
 
 @ApiTags('app/team')
 @Controller('/api/app/team')
@@ -79,5 +82,56 @@ export class TeamAppController {
     }
     const result = await this.teamAppService.getReviewListOfTeam(dto);
     return result;
+  }
+
+  @ApiOperation({
+    summary: 'Viết đánh giá',
+  })
+  @Post('reviewTeam')
+  @ApiBody({ type: ReviewTeamDto, description: `
+**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file\N
+**star**: number (1 -> 5 )\n
+**review**: text (nội dung)` })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  async reviewTeam(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: ReviewTeamDto) {
+    const result = await this.teamAppService.reviewTeam(user.userCode, dto);
+    if (result === -1) {
+      throw new BadRequestException({
+        message: Msg.UuidNotFound,
+        data: 0,
+      });
+    }
+    if (result === -2) {
+      throw new BadRequestException({
+        message: Msg.TeamNotFound,
+        data: 0,
+      });
+    }
+    if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.RegisterErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.RegisterOk,
+      data: result,
+    };
+  }
+
+  @Post('uploadReviewFiles')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadReviewFilesDto })
+  @UseFilters(MulterBadRequestFilter)
+  @UseInterceptors(FilesInterceptor('reviewImg', 5, multerImgConfig))
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto([UploadReviewFilesResDto]) })
+  async uploadReviewFiles(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UploadReviewFilesDto, @UploadedFiles() reviewImgs: Express.Multer.File[]) {
+    const result = await this.teamAppService.uploadReviewFiles(user.userCode, dto, reviewImgs);
+    return {
+      message: result.length ? Msg.UploadOk : Msg.UploadErr,
+      data: result,
+    };
   }
 }

@@ -91,13 +91,13 @@ export class GetReviewListOfTeamResDto {
   reviewByName: string;
 
   @ApiProperty({
-    type: () => RviewImgResDto,
+    type: () => ReviewImgResDto,
     isArray: true,
   })
-  reviewImages: RviewImgResDto[];
+  reviewImages: ReviewImgResDto[];
 }
 
-export class RviewImgResDto {
+export class ReviewImgResDto {
   @ApiProperty({ example: 1 })
   seq: number;
 
@@ -106,4 +106,13 @@ export class RviewImgResDto {
 
   @ApiProperty({ example: 'image/jpeg' })
   mimetype: string;
+}
+
+
+export class UploadReviewFilesResDto {
+   @ApiProperty({ example: 0 })
+  seq: number;
+
+  @ApiProperty({ example: '' })
+  filename: string;
 }

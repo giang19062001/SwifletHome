@@ -131,4 +131,4 @@ export const multerVideoConfig = createMulterConfig(VIDEO_TYPES, {
   fileSize: 50 * 1024 * 1024, // 50MB cho media
 });
 
-export const getDoctorMulterConfig = (files: number) => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES], { fileSize: 50 * 1024 * 1024, files: files });
+export const getImgVideoMulterConfig = (files: number) => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES], { fileSize: 50 * 1024 * 1024, files: files });

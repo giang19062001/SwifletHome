@@ -1,4 +1,4 @@
-import { getDoctorMulterConfig } from './../../../config/multer.config';
+import { getImgVideoMulterConfig } from './../../../config/multer.config';
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters, Delete, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -54,7 +54,7 @@ export class DoctorAppController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: DoctorFileDto })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('doctorFiles', 5, getDoctorMulterConfig(5)))
+  @UseInterceptors(FilesInterceptor('doctorFiles', 5, getImgVideoMulterConfig(5)))
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadFileDoctorResDto]) })
   async uploadRequestFile(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {

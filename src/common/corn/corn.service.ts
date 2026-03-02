@@ -14,6 +14,7 @@ import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
 import TodoAppValidate from 'src/modules/todo/app/todo.validate';
 import { QrAppRepository } from 'src/modules/qr/app/qr.repository';
+import { TeamAppRepository } from 'src/modules/team/app/team.repository';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -21,6 +22,7 @@ export class CornService implements OnModuleInit {
 
   constructor(
     private readonly doctorAppRepository: DoctorAppRepository,
+    private readonly teamAppRepository: TeamAppRepository,
     private readonly userAppRepository: UserAppRepository,
     private readonly userHomeAppRepository: UserHomeAppRepository,
     private readonly todoAppValidate: TodoAppValidate,
@@ -37,7 +39,7 @@ export class CornService implements OnModuleInit {
     const jobDaily = new CronJob('0 1 * * *', async () => {
       await this.deleteDoctorFilesNotUse();
       await this.deleteUserHomeFilesNotUse();
-      await this.deleteQrRequestFilesNotUse()
+      await this.deleteQrRequestFilesNotUse();
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();
@@ -63,13 +65,14 @@ export class CornService implements OnModuleInit {
 
     this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
     jobDailyAt8AM.start();
-    // ! DEV
+    // ! test
     // await this.deleteQrRequestFilesNotUse()
     //  await this.deleteDoctorFilesNotUse();
     // await this.deleteUserHomeFilesNotUse();
     // await this.pushNotificationsByTaskAlarms();
     // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.MONTH);
     // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
+    // await this.deleteReviewFilesNotUse();
   }
 
   async pushNotificationsByTaskAlarms() {
@@ -116,6 +119,26 @@ export class CornService implements OnModuleInit {
       this.logger.error(logbase, `Có lỗi khi xóa các file khám bệnh không dùng theo lịch trình : ${JSON.stringify(error)}`);
     }
   }
+
+  async deleteReviewFilesNotUse() {
+    const logbase = `${this.SERVICE_NAME}/deleteReviewFilesNotUse`;
+    this.logger.log(logbase, `Chuẩn bị xóa các file review không dùng theo lịch trình....`);
+    try {
+      const filesNotUse = await this.teamAppRepository.getFilesNotUse();
+      if (filesNotUse.length) {
+        for (const file of filesNotUse) {
+          await this.teamAppRepository.deleteFile(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file review không dùng đã được xóa theo lịch trình thành công`);
+      } else {
+        this.logger.log(logbase, `Không có file review nào cần được xóa`);
+      }
+    } catch (error) {
+      this.logger.error(logbase, `Có lỗi khi xóa các file review không dùng theo lịch trình : ${JSON.stringify(error)}`);
+    }
+  }
+
   async deleteUserHomeFilesNotUse() {
     const logbase = `${this.SERVICE_NAME}/deleteUserHomeFilesNotUse`;
     this.logger.log(logbase, `Chuẩn bị xóa các file ảnh nhà yến của khách hàng không dùng theo lịch trình....`);

@@ -1,8 +1,9 @@
 import { Injectable, Inject, Query } from '@nestjs/common';
-import type { Pool, RowDataPacket } from 'mysql2/promise';
+import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { GetAllTeamDto, GetReviewListOfTeamDto } from './team.dto';
+import { GetAllTeamDto, GetReviewListOfTeamDto, ReviewTeamDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto } from './team.response';
+import { ITeamReviewFile } from './team.interface';
 @Injectable()
 export class TeamAppRepository {
   private readonly table = 'tbl_team_user';
@@ -14,6 +15,12 @@ export class TeamAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   // TODO: TEAM
+  async findTeamByCode(teamCode: string): Promise<Boolean> {
+    let query = ` 
+        SELECT A.seq FROM ${this.table} A  WHERE A.teamCode = ? `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode]);
+    return rows.length ? true : false;
+  }
   async getTotalTeams(dto: GetAllTeamDto, userCode: string): Promise<number> {
     let query = ` 
     SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A  
@@ -140,6 +147,7 @@ export class TeamAppRepository {
         LEFT JOIN ${this.tableUser} B
         ON A.reviewBy = B.userCode
         WHERE A.isActive = 'Y' AND A.teamCode = ?
+        ORDER BY A.seq DESC
     `;
     const params: any[] = [dto.teamCode];
 
@@ -150,5 +158,61 @@ export class TeamAppRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as GetReviewListOfTeamResDto[];
+  }
+
+  async insertReview(userCode: string, dto: ReviewTeamDto): Promise<number> {
+    const sql = `
+        INSERT INTO ${this.tableReview}  (teamCode, review, star, reviewBy, uniqueId, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?)
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.teamCode, dto.review, dto.star, userCode, dto.uniqueId, userCode]);
+
+    return result.insertId;
+  }
+  async uploadFile(seq: number, uniqueId: string, teamCode: string, userCode: string, filenamePath: string, file: Express.Multer.File | ITeamReviewFile): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableReviewImg} (filename, originalname, size, mimetype, uniqueId, reviewSeq, teamCode, createdId)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, uniqueId, seq, teamCode, userCode]);
+
+    return result.insertId;
+  }
+  async findFilesByUniqueId(uniqueId: string, teamCode: string): Promise<{ seq: number }[]> {
+    const sql = `
+      SELECT seq FROM  ${this.tableReviewImg} WHERE reviewSeq = 0 AND isActive = 'Y' AND uniqueId = ? AND teamCode = ?
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId, teamCode]);
+
+    return rows as { seq: number }[];
+  }
+  async updateSeqFiles(reviewSeq: number, seq: number, uniqueId: string, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE  ${this.tableReviewImg} SET reviewSeq = ? , updatedId = ? , updatedAt = NOW()
+      WHERE seq = ? AND uniqueId = ? AND isActive = 'Y'
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [reviewSeq, updatedId, seq, uniqueId]);
+
+    return result.affectedRows;
+  }
+
+  async getFilesNotUse(): Promise<ITeamReviewFile[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.reviewSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableReviewImg} A
+        WHERE A.reviewSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.tableReview} ) OR A.isActive = 'N'
+        `,
+    );
+    return rows as ITeamReviewFile[];
+  }
+
+  async deleteFile(seq: number): Promise<number> {
+    const sql = `
+        DELETE FROM ${this.tableReviewImg}
+        WHERE seq = ?
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
+
+    return result.affectedRows;
   }
 }

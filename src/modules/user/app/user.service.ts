@@ -96,7 +96,9 @@ export class UserAppService {
   async getOneUserTypeByKeyword(userTypeKeyWord: string): Promise<UserTypeResDto | null> {
     return await this.userAppRepository.getOneUserTypeByKeyword(userTypeKeyWord);
   }
-  async getAllowTypesOfUser(userCode: string): Promise<UserTypeResDto[]> {
-    return await this.userAppRepository.getAllowTypesOfUser(userCode);
+  async getAllowTypesOfUser(userCode: string, userTypeKeyWord: string): Promise<UserTypeResDto[]> {
+    // loại bỏ type đang active hiện tại
+    const result = await this.userAppRepository.getAllowTypesOfUser(userCode);
+    return result.filter((ele : UserTypeResDto) => ele.userTypeKeyWord !== userTypeKeyWord)
   }
 }

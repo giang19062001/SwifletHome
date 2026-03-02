@@ -35,7 +35,7 @@ export class UserAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UserTypeResDto]) })
   async getAllowTypesOfUser(@GetUserApp() user: authInterface.ITokenUserApp): Promise<UserTypeResDto[]> {
-    const result = await this.userAppService.getAllowTypesOfUser(user.userCode);
+    const result = await this.userAppService.getAllowTypesOfUser(user.userCode, user.userTypeKeyWord);
     return result;
   }
 }
