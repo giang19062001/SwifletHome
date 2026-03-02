@@ -89,7 +89,7 @@ export class TeamAppController {
   })
   @Post('reviewTeam')
   @ApiBody({ type: ReviewTeamDto, description: `
-**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file\N
+**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file\n
 **star**: number (1 -> 5 )\n
 **review**: text (nội dung)` })
   @HttpCode(HttpStatus.OK)

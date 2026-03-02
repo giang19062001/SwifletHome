@@ -259,7 +259,6 @@ export class UserAppRepository {
        WHERE A.isActive = 'Y' 
        AND (A.userTypeKeyWord = '${USER_CONST.USER_TYPE.FACTORY.value}'  OR  A.userTypeKeyWord = '${USER_CONST.USER_TYPE.TECHNICAL.value}')
        AND B.userCode = ? `;
-       console.log(sql);
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode]);
     return rows as UserTypeResDto[];
   }
