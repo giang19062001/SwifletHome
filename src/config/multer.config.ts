@@ -46,6 +46,10 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'images/configs';
     }
 
+    if (fieldname === 'requestQrcodeFiles' || fieldname.includes('requestQrcodeFiles')) {
+      result = 'images/requestQrcodes';
+    }
+
     if (fieldname === 'teamImg' || fieldname.includes('teamImg')) {
       result = 'images/teams';
     }
@@ -64,7 +68,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
       result = 'videos/doctors';
     }
-    if (fieldname === 'requestQrcodeVideo' || fieldname.includes('requestQrcodeVideo')) {
+    if (fieldname === 'requestQrcodeFiles' || fieldname.includes('requestQrcodeFiles')) {
       result = 'videos/requestQrcodes';
     }
   }

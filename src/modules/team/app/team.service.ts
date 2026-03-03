@@ -98,7 +98,6 @@ export class TeamAppService {
 
       // tìm tất cả file đã upload cùng uniqueId
       const filesUploaded: { seq: number }[] = await this.teamAppRepository.findFilesByUniqueId(dto.uniqueId, dto.teamCode);
-
       if (filesUploaded.length) {
         // mặc định là chờ
         const seq = await this.teamAppRepository.insertReview(userCode, dto);

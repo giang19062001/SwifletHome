@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Param, BadRequestException, UseInterceptors, UseFilters, UploadedFile, Query } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Param, BadRequestException, UseInterceptors, UseFilters, UploadedFile, Query, UploadedFiles } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
@@ -16,9 +16,9 @@ import {
 import { GetRequestSellListDto, InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import * as authInterface from 'src/modules/auth/app/auth.interface';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
-import { multerVideoConfig } from 'src/config/multer.config';
+import { getImgVideoMulterConfig, multerVideoConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -32,7 +32,7 @@ export default class QrAppController {
   constructor(private readonly qrAppService: QrAppService) {}
 
   @ApiOperation({
-    summary: 'Lấy danh sách  yêu cầu qrcode của user hiện tại',
+    summary: 'Lấy danh sách yêu cầu qrcode của user hiện tại',
     description: ``,
   })
   @Post('getRequestQrCocdeList')
@@ -48,7 +48,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Lấy thông tin Qrcode đã được ADMIN chấp thuận từ yêu cầu tạo mã Qrcode trước đó',
+    summary: 'Lấy thông tin Qrcode đã được ADMIN chấp thuận',
     description: ``,
   })
   @Get('getApprovedRequestQrCocde/:requestCode')
@@ -61,7 +61,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Lấy thông tin để yêu cầu tạo mã Qrcode',
+    summary: 'Lấy thông tin ( LĂN THUỐC, THU HOẠCH ) để yêu cầu tạo mã Qrcode bằng mã nhà yến (userHomeCode)',
     description: ``,
   })
   @Get('getInfoToRequestQrcode/:userHomeCode')
@@ -143,26 +143,26 @@ export default class QrAppController {
   @ApiOperation({
     summary: 'Dùng cho nút UPLOAD quy trình chế biến đóng gói ',
   })
-  @Post('uploadRequestVideo')
+  @Post('uploadRequestFile')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: UploadRequestVideoDto,
   })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FileInterceptor('requestQrcodeVideo', multerVideoConfig))
+  @UseInterceptors(FilesInterceptor('requestQrcodeFiles', 5, getImgVideoMulterConfig(5)))
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(UploadRequestVideoResDto) })
-  async uploadRequestVideo(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UploadRequestVideoDto, @UploadedFile() requestQrcodeVideo: Express.Multer.File) {
-    const result = await this.qrAppService.uploadRequestVideo(user.userCode, dto, requestQrcodeVideo);
+  @ApiOkResponse({ type: ApiAppResponseDto([UploadRequestVideoResDto]) })
+  async uploadRequestFile(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UploadRequestVideoDto, @UploadedFiles() requestQrcodeFiles: Express.Multer.File[]) {
+    const result = await this.qrAppService.uploadRequestFile(user.userCode, dto, requestQrcodeFiles);
     return {
-      message: result.filename != '' ? Msg.UploadOk : Msg.UploadErr,
+      message: result.length ? Msg.UploadOk : Msg.UploadErr,
       data: result,
     };
   }
 
   // TODO: SELL
   @ApiOperation({
-    summary: `Lấy chi tiết 1 yêu cầu bán tổ yến`,
+    summary: `Lấy chi tiết đơn bán sản lượng yến`,
     description: ``,
   })
   @Get('getRequestSellDetail/:requestCode')
@@ -174,7 +174,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Lấy danh sách yêu cầu bán tổ yến',
+    summary: 'Lấy danh sách đơn bán sản lượng yến',
     description: `
   **getType**: enum('ALL', 'VIEW', 'SAVE')\n
   *ALL*: lấy tất cả \n

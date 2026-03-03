@@ -60,7 +60,7 @@
                                     </div>
                                 </div>
 
-                                <!-- video-->
+                                <!-- video, img-->
                                 <div class="col-lg-6">
                                     <div class="card border shadow-sm h-100">
                                         <div class="card-header bg-light fw-bold">Sơ chế đóng gói</div>
@@ -68,7 +68,7 @@
                                             <div class="loading-placeholder d-flex align-items-center justify-content-center h-100 text-muted">
                                                 <div class="text-center">
                                                     <div class="spinner-border text-primary mb-3" role="status"></div>
-                                                    <p class="mb-0 small">Đang tải video...</p>
+                                                    <p class="mb-0 small">Đang tải...</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -156,43 +156,74 @@
     Không tìm thấy dữ liệu QR
 </div>
 <% } %>
-
 <script>
-  const qrDataGlobal = <%- JSON.stringify(values.qrData) %>
-  console.log('qrDataGlobal', qrDataGlobal);
+    const qrDataGlobal = <%- JSON.stringify(values.qrData) %>;
+    console.log('qrDataGlobal', qrDataGlobal);
 </script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // RENDER VIDEO
+        // RENDER MEDIA (ẢNH & VIDEO)
         const container = document.getElementById('processing-packing-container');
-        if (!container) return;
-        container.innerHTML = '';
+        if (container) {
+            container.innerHTML = ''; // Clear loading
 
-        const videoUrl = qrDataGlobal?.processingPackingVideoUrl;
+            // Lấy dữ liệu file (kiểm tra parse nếu đang lưu dạng chuỗi JSON)
+            let files = qrDataGlobal?.requestQrcodeFiles;
+            if (typeof files === 'string') {
+                try {
+                    files = JSON.parse(files);
+                } catch (e) {
+                   console.log(e);
+                }
+            }
 
-        if (videoUrl && typeof videoUrl === 'string' && videoUrl.trim() !== '') {
-            const fullUrl = `${CURRENT_URL}/${videoUrl}`;
+            if (Array.isArray(files) && files.length > 0) {
+                //  max-height và scrollbar 
+                let mediaHTML = `<div class="row g-2" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">`;
 
-            const videoHTML = `
-                        <div class="ratio ratio-16x9">
-                            <video 
-                                controls 
-                                preload="metadata"
-                                class="w-100 rounded-bottom object-fit-cover"
-                                style="max-height: 400px;"
-                            >
-                                <source src="${fullUrl}" type="video/mp4">
-                                Trình duyệt không hỗ trợ phát video.
-                            </video>
-                        </div>
-                    `;
+                files.forEach(file => {
+                    const fullUrl = typeof CURRENT_URL !== 'undefined' ? `${CURRENT_URL}/${file.filename}` : `/${file.filename}`;
 
-            container.innerHTML = videoHTML;
+                    if (file.mimetype && file.mimetype.startsWith('video/')) {
+                        // Video
+                        mediaHTML += `
+                            <div class="col-12">
+                                <div class="ratio ratio-16x9 bg-dark rounded shadow-sm">
+                                    <video controls preload="metadata" class="w-100 h-100 rounded object-fit-contain">
+                                        <source src="${fullUrl}" type="${file.mimetype}">
+                                        Trình duyệt không hỗ trợ phát video.
+                                    </video>
+                                </div>
+                            </div>
+                        `;
+                    } else if (file.mimetype && file.mimetype.startsWith('image/')) {
+                        // Hình ảnh
+                        mediaHTML += `
+                            <div class="col-6">
+                                <a href="${fullUrl}" target="_blank" class="d-block w-100 h-100">
+                                    <img src="${fullUrl}" 
+                                         class="img-fluid w-100 rounded shadow-sm" 
+                                         style="height: 150px; object-fit: cover;" 
+                                         alt="Hình ảnh sơ chế"
+                                         loading="lazy">
+                                </a>
+                            </div>
+                        `;
+                    }
+                });
+
+                mediaHTML += `</div>`;
+                container.innerHTML = mediaHTML;
+            } else {
+                container.innerHTML = `<div class="alert alert-warning mb-0 text-center">Chưa có dữ liệu hình ảnh/video</div>`;
+            }
         }
-        // ASSING BLOCKCHAIN LINK
-        const el = document.getElementById("blockchain-box")
-        if (el &&  !qrDataGlobal.transactionHash) {
-            el.style.display = "none"
+
+        // --- 2. ASSIGN BLOCKCHAIN LINK ---
+        const blockchainBox = document.getElementById("blockchain-box");
+        if (blockchainBox && (!qrDataGlobal || !qrDataGlobal.transactionHash)) {
+            blockchainBox.style.display = "none";
         }
-});
+    });
 </script>

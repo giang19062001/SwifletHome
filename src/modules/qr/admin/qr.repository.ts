@@ -56,7 +56,22 @@ export class QrAdminRepository {
           THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
         ELSE ''
       END AS requestStatusLabel,
-        A.taskMedicineList, A.taskHarvestList, C.filename AS processingPackingVideoUrl,
+        A.taskMedicineList, A.taskHarvestList,
+        
+         COALESCE(
+          (
+            SELECT JSON_ARRAYAGG(
+              JSON_OBJECT(
+                'seq', C.seq,
+                'filename', C.filename,
+                'mimetype', C.mimetype
+              )
+            )
+            FROM ${this.tableFile} C
+            WHERE C.qrRequestSeq = A.seq AND C.isActive = 'Y'
+          ),
+          JSON_ARRAY()
+        ) AS requestQrcodeFiles,
         CASE
           WHEN D.transactionHash IS NULL THEN ''
           ELSE CONCAT('${process.env.BLOCKCHAIN_NET}/tx/', D.transactionHash)
@@ -65,13 +80,11 @@ export class QrAdminRepository {
         FROM ${this.table}  A
         LEFT JOIN ${this.tableUserHome} B
         ON A.userHomeCode = B.userHomeCode  
-          LEFT JOIN ${this.tableFile} C
-        ON A.seq = C.qrRequestSeq  
          LEFT JOIN ${this.tableBlockChain} D
         ON A.requestCode = D.requestCode  
          LEFT JOIN ${this.tableSell} E
       ON A.requestCode = E.requestCode  
-        WHERE A.requestCode = ? AND A.isActive = 'Y' AND C.isActive = 'Y'
+        WHERE A.requestCode = ? AND A.isActive = 'Y' 
         `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);

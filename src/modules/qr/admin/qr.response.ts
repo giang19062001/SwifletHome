@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { RequestQrCodeResDto } from '../app/qr.response';
+import { RequestQrcodeFilesResDto, RequestQrCodeResDto } from '../app/qr.response';
 
 export class GetInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeResDto, ['uniqueId'] as const) {
   @ApiProperty({ example: '' })
@@ -11,9 +11,11 @@ export class GetInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeResDt
   @IsString()
   transactionHash: string;
 
-  @ApiProperty({ example: '' })
-  @IsString()
-  processingPackingVideoUrl: string;
+  @ApiProperty({
+    type: () => RequestQrcodeFilesResDto,
+    isArray: true,
+  })
+  requestQrcodeFiles: RequestQrcodeFilesResDto[];
 
   @ApiProperty({ example: '' })
   @IsString()

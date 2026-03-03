@@ -42,6 +42,12 @@ export interface IQrRequestFile {
   isActive: YnEnum;
 }
 
+
+export interface IQrRequestFileStr {
+  seq: number;
+  filename: string;
+}
+
 export enum GetTypeEnum {
   ALL = 'ALL',
   VIEW = 'VIEW',

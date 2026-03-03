@@ -104,10 +104,23 @@ export class RequestQrCodeResDto extends GetInfoToRequestQrcodeResDto {
   uniqueId: string;
 }
 
+export class RequestQrcodeFilesResDto {
+  @ApiProperty({ example: 1 })
+  seq: number;
+
+  @ApiProperty({ example: 'uploads/images/***/***.jpg' })
+  filename: string;
+
+  @ApiProperty({ example: 'image/jpeg' })
+  mimetype: string;
+}
+
 export class GetApprovedRequestQrCodeResDto extends OmitType(RequestQrCodeResDto, ['uniqueId'] as const) {
-  @ApiProperty({ example: '' })
-  @IsString()
-  processingPackingVideoUrl: string;
+  @ApiProperty({
+    type: () => RequestQrcodeFilesResDto,
+    isArray: true,
+  })
+  requestQrcodeFiles: RequestQrcodeFilesResDto[];
 
   @ApiProperty({ example: '' })
   @IsString()

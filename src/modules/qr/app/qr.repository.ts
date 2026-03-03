@@ -133,21 +133,32 @@ export class QrAppRepository {
           THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
         ELSE ''
       END AS requestStatusLabel,
-       B.filename AS processingPackingVideoUrl, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
+         COALESCE(
+          (
+            SELECT JSON_ARRAYAGG(
+              JSON_OBJECT(
+                'seq', B.seq,
+                'filename', B.filename,
+                'mimetype', B.mimetype
+              )
+            )
+            FROM ${this.tableFile} B
+            WHERE B.qrRequestSeq = A.seq AND B.isActive = 'Y'
+          ),
+          JSON_ARRAY()
+        ) AS requestQrcodeFiles, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
        CASE
           WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
           ELSE 'N'
       END AS isSold
-      FROM ${this.table}  A
-      LEFT JOIN ${this.tableFile} B
-      ON A.seq = B.qrRequestSeq  
+      FROM ${this.table}  A 
       LEFT JOIN ${this.tableBlockChain} C
       ON A.requestCode = C.requestCode  
        LEFT JOIN ${this.tableSell} D
       ON A.requestCode = D.requestCode  
         LEFT JOIN ${this.tableHome} E
       ON A.userHomeCode = E.userHomeCode 
-      WHERE A.requestCode  = ? AND A.isActive = 'Y' AND B.isActive = 'Y' AND A.requestStatus = ?
+      WHERE A.requestCode  = ? AND A.isActive = 'Y'  AND A.requestStatus = ?
       LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, RequestStatusEnum.APPROVED]);
@@ -250,7 +261,7 @@ export class QrAppRepository {
 
     return result.affectedRows;
   }
-  async uploadRequestVideo(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | IQrRequestFile): Promise<number> {
+  async uploadRequestFile(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | IQrRequestFile): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableFile} (filename, originalname, size, mimetype, uniqueId, qrRequestSeq, userCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -260,18 +271,19 @@ export class QrAppRepository {
 
     return result.insertId;
   }
-  async findFilesByUniqueId(uniqueId: string): Promise<{ seq: number; filename: string; mimetype: string } | null> {
+  async findFilesByUniqueId(uniqueId: string): Promise<{ seq: number }[]> {
     const sql = `
-      SELECT seq, filename, mimetype FROM ${this.tableFile} WHERE qrRequestSeq = 0 AND uniqueId = ? LIMIT 1
+      SELECT seq, filename, mimetype FROM ${this.tableFile} WHERE qrRequestSeq = 0 AND isActive = 'Y'  AND uniqueId = ?
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
 
-    return rows ? (rows[0] as { seq: number; filename: string; mimetype: string }) : null;
+    return rows as { seq: number }[];
   }
+
   async updateSeqFiles(qrRequestSeq: number, seq: number, uniqueId: string, updatedId: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableFile} SET qrRequestSeq = ? , updatedId = ? , updatedAt = NOW()
-      WHERE seq = ? AND uniqueId = ?
+      WHERE seq = ? AND uniqueId = ?  AND isActive = 'Y'
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [qrRequestSeq, updatedId, seq, uniqueId]);
 
@@ -299,7 +311,7 @@ export class QrAppRepository {
     const params: any[] = [];
     whereSql += ' AND E.userCode = ? ';
     params.push(userCode);
-    
+
     if (dto.getType == GetTypeEnum.VIEW) {
       whereSql += ` AND E.isView = 'Y' `;
     }
@@ -379,7 +391,20 @@ export class QrAppRepository {
           THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
         ELSE ''
       END AS requestStatusLabel,
-       B.filename AS processingPackingVideoUrl, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
+        COALESCE(
+          (
+            SELECT JSON_ARRAYAGG(
+              JSON_OBJECT(
+                'seq', B.seq,
+                'filename', B.filename,
+                'mimetype', B.mimetype
+              )
+            )
+            FROM ${this.tableFile} B
+            WHERE B.qrRequestSeq = A.seq AND B.isActive = 'Y'
+          ),
+          JSON_ARRAY()
+        ) AS requestQrcodeFiles, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
       D.priceOptionCode,
       CASE
         WHEN F.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
@@ -392,8 +417,6 @@ export class QrAppRepository {
           ELSE 'N'
       END AS isSold
       FROM ${this.table}  A
-      LEFT JOIN ${this.tableFile} B
-      ON A.seq = B.qrRequestSeq  
       LEFT JOIN ${this.tableBlockChain} C
       ON A.requestCode = C.requestCode  
        LEFT JOIN ${this.tableSell} D
@@ -404,7 +427,7 @@ export class QrAppRepository {
        ON D.priceOptionCode = F.code
       LEFT JOIN ${this.tableOption} G
        ON D.ingredientNestOptionCode = G.code
-      WHERE A.requestCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y'
+      WHERE A.requestCode = ? AND A.isActive = 'Y' 
      `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);

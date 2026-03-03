@@ -27,10 +27,14 @@ export class UploadRequestVideoDto {
   uniqueId: string;
 
   @ApiProperty({
-    type: 'string',
-    format: 'binary',
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'binary',
+    },
+    description: 'Tối đa 5 file (ảnh, video)',
   })
-  requestQrcodeVideo: any;
+  requestQrcodeFiles: any[];
 }
 
 export class RequestQrCodeDto {

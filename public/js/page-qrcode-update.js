@@ -1,6 +1,6 @@
 // TODO: INIT
 document.addEventListener('DOMContentLoaded', function () {
-  console.log("qrDataqrDataqrDataqrDataqrDataqrDataqrData", qrData);
+  console.log("qrData --", qrData);
   // ASSIGN NÚT CHẤP THUẬN
   const btnApproved = document.querySelector('#btn-approved');
 

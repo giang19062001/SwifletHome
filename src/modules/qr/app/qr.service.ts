@@ -1,4 +1,4 @@
-import { GetTypeEnum, MarkTypeEnum } from './../qr.interface';
+import { GetTypeEnum, IQrRequestFileStr, MarkTypeEnum } from './../qr.interface';
 import { QrAppRepository } from './qr.repository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
@@ -150,10 +150,9 @@ export class QrAppService {
         return result;
       }
 
-      // tìm file đã upload cùng uniqueId
+      // tìm tất cả file đã upload cùng uniqueId
       const filesUploaded = await this.qrAppRepository.findFilesByUniqueId(dto.uniqueId);
-      // có file được upload cùng uuid -> insert
-      if (filesUploaded) {
+      if (filesUploaded.length) {
         // dánh đấu các lăn thuốc là đã dùng
         if (dataInsertDto.taskMedicineList.length) {
           for (const med of dataInsertDto.taskMedicineList) {
@@ -161,9 +160,7 @@ export class QrAppService {
           }
         }
 
-        // thêm nhà yến của user
-        this.logger.log(logbase, `Video quy trình chế biến đóng gói của Yêu câu tạo mã Qrcode này là: ${filesUploaded.filename} `);
-
+        // insert dữ liệu yêu cầu QR
         const seq = await this.qrAppRepository.insertRequestQrCode(user.userCode, {
           ...dataInsertDto,
           harvestYear: moment().year(), // lấy năm hiện tại
@@ -171,11 +168,16 @@ export class QrAppService {
           requestStatus: RequestStatusEnum.WAITING,
           uniqueId: dto.uniqueId,
         });
-        // cập nhập userHomeSEQ của file đã tìm cùng uniqueId với nhà yến vừa created
-        await this.qrAppRepository.updateSeqFiles(seq, filesUploaded.seq, dto.uniqueId, user.userCode);
+
+        // cập nhập qrRequestSeq của các file đã tìm cùng uniqueId
+        for (const file of filesUploaded) {
+          console.log(file);
+          await this.qrAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId, user.userCode);
+        }
       } else {
         // không có file ảnh nào được upload của nhà yến này -> báo lỗi
         result = -1;
+        this.logger.error(logbase, `${Msg.UuidNotFound} --> uniqueId: ${dto.uniqueId}`);
         return result;
       }
 
@@ -211,24 +213,28 @@ export class QrAppService {
     return result;
   }
   // TODO: FILE
-  async uploadRequestVideo(userCode: string, dto: UploadRequestVideoDto, requestQrcodeVideoFile: Express.Multer.File): Promise<UploadRequestVideoResDto> {
-    const logbase = `${this.SERVICE_NAME}/uploadRequestVideo:`;
+  async uploadRequestFile(userCode: string, dto: UploadRequestVideoDto, requestQrcodeFiles: Express.Multer.File[]): Promise<IQrRequestFileStr[]> {
+    const logbase = `${this.SERVICE_NAME}/uploadRequestFile:`;
     try {
-      let res: UploadRequestVideoResDto = { seq: 0, filename: '' };
-      if (requestQrcodeVideoFile) {
-        this.logger.log(logbase, JSON.stringify(requestQrcodeVideoFile));
-
-        const filenamePath = `${getFileLocation(requestQrcodeVideoFile.mimetype, requestQrcodeVideoFile.fieldname)}/${requestQrcodeVideoFile.filename}`;
-        const insertId = await this.qrAppRepository.uploadRequestVideo(0, dto.uniqueId, userCode, filenamePath, requestQrcodeVideoFile);
-        if (insertId > 0) {
-          res.seq = insertId;
-          res.filename = filenamePath;
+      let res: IQrRequestFileStr[] = [];
+      if (requestQrcodeFiles.length > 0) {
+        for (const file of requestQrcodeFiles) {
+          this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);
+          const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+          const insertId = await this.qrAppRepository.uploadRequestFile(0, dto.uniqueId, userCode, filenamePath, file);
+          if (insertId > 0) {
+            res.push({
+              seq: insertId,
+              filename: filenamePath,
+            });
+          }
         }
       }
+      this.logger.log(logbase, `Upload file thành công: ${JSON.stringify(res)}`);
       return res;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
-      return { seq: 0, filename: '' };
+      this.logger.error(logbase, `Upload file thất bại: ${JSON.stringify(error)}`);
+      return [];
     }
   }
   // TODO: SELL
