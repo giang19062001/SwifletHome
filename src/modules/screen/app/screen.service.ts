@@ -98,7 +98,7 @@ export class ScreenAppService {
           break;
         case APP_SCREENS.REQUEST_QR_GUIDE:
           if (screen.screenContent) {
-            let contentStart = replaceNbspToSpace(screen.screenContent.contentStart);
+            let contentStart = screen.screenContent.contentStart
             result = {
               contentStart: contentStart,
               contentCenter: {},
