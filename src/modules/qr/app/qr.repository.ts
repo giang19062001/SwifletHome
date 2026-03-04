@@ -28,7 +28,7 @@ export class QrAppRepository {
   // TODO: REQUEST
   async getRequestQrCocdeTotal(userCode: string): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT COUNT(A.seq) AS TOTAL
+      ` SELECT COUNT(DISTINCT A.seq) AS TOTAL
        FROM ${this.table}  A
       LEFT JOIN ${this.tableFile} B
       ON A.seq = B.qrRequestSeq  
@@ -45,7 +45,7 @@ export class QrAppRepository {
   }
 
   async getRequestQrCocdeList(userCode: string, dto: PagingDto): Promise<GetApprovedRequestQrCodeResDto[]> {
-    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+    let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
       CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'

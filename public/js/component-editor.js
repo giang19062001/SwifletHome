@@ -56,7 +56,7 @@ const quillGlobal = new Quill('#editor', {
   placeholder: 'Nhập nội dung của bạn...',
 });
 
-
+/*
 // giá trị trạng thái hiện tại
 let isHTMLMode = false;
 let htmlContent = '';
@@ -112,6 +112,7 @@ if (htmlButton && editorContainer) {
     }
   });
 }
+*/
 
 // lắng nghe sự kiện copy/paste
 quillGlobal.root.addEventListener('paste', (e) => {
