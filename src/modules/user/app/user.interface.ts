@@ -33,12 +33,12 @@ export interface IUserPackageApp {
   endDate: string | null;
 }
 
-interface IuserTypeApp{
+interface IUserTypeApp{
   userTypeCode: string,
   userTypeKeyWord: string,
   userTypeName: string
 }
-export interface IUserApp extends ITokenUserApp, IuserTypeApp, IUserPackageApp {
+export interface IUserApp extends ITokenUserApp, IUserTypeApp, IUserPackageApp {
   homesTotal: number;
 }
 

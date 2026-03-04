@@ -1,0 +1,101 @@
+<div class="page-user-teams-mutaion">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                 <p class="title-page"><%= title %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="team-update-form" novalidate>
+                               <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-md-12 form-group mb-3">
+                                                <label for="teamName" class="form-label">Tên đội</label>
+                                                <input type="text" class="form-control" id="teamName" name="teamName" />
+                                                <div class="error-message" data-error="teamName"></div>
+                                            </div>
+
+                                            <div class="col-md-12 form-group mb-3">
+                                                <label for="teamAddress" class="form-label">Địa chỉ</label>
+                                                <input type="text" class="form-control" id="teamAddress"
+                                                    name="teamAddress" />
+                                                <div class="error-message" data-error="teamAddress"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-8">
+                                        <div class="row">
+                                            <div class="col-md-3 form-group">
+                                                <label for="teamImage" class="form-label">Ảnh chính</label>
+                                                <br />
+                                                <label for="teamImage" class="file-label">
+                                                    <span class="file-button">Chọn ảnh chính</span>
+                                                </label>
+                                                <input type="file" class="form-control" id="teamImage" name="teamImage"
+                                                    accept=".png, .jpg, .jpeg, .heic" style="display: none;" />
+                                                <div class="error-message mt-2" data-error="teamImage"></div>
+                                                <div class="mt-3 mb-2" id="teamImagePreview"></div>
+                                            </div>
+
+                                            <div class="col-md-9 form-group">
+                                                <label for="teamImages" class="form-label">Ảnh phụ</label>
+                                                <br />
+                                                <label for="teamImages" class="file-label">
+                                                    <span class="file-button">Chọn ảnh phụ</span>
+                                                </label>
+                                                <input type="file" class="form-control" id="teamImages"
+                                                    name="teamImages" multiple accept=".png, .jpg, .jpeg, .heic"
+                                                    style="display: none;" />
+                                                <div class="error-message mt-2" data-error="teamImages"></div>
+
+                                                <div class="image-preview-container" id="teamImagesPreview"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label for="teamDescription" class="form-label">Mô tả</label>
+                                            <!-- <textarea type="text" class="form-control" id="teamDescription"
+                                                name="teamDescription" rows="10"></textarea> -->
+                                            <%- include('./component-editor', { content: "" }) %>
+                                                <div class="error-message" data-error="teamDescription"></div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="col-12 form-group d-flex justify-content-center mt-4">
+                                        <button type="submit" class="btn-submit-lg">Lưu</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+  const teamData = <%- JSON.stringify(values.teamData) %>
+  console.log('teamData', teamData);
+</script>
+
+<script src="/js/common-validate.js"></script>
+<script src="/js/page-user-teams-mutation.js"></script>

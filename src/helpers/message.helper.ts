@@ -70,6 +70,7 @@ export const Msg = {
   OnlyOwnerCanFetch: `Chỉ có tài khoản chủ nhà yến có thể lấy danh sách yến được bán`,
   medicineUsageCannotBlank:`Dung lượng thuốc không thể để trống`,
   TeamNotFound:"Đội gia công - kỹ thuật không tồn tại",
+  YouAlreadyReview: "Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi",
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
   InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
   InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,

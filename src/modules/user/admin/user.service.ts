@@ -10,6 +10,7 @@ import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { PackageAdminService } from 'src/modules/package/admin/package.service';
 import moment from 'moment';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
+import { IUserType } from './user.interface';
 
 @Injectable()
 export class UserAdminService {
@@ -91,5 +92,10 @@ export class UserAdminService {
       }
     }
     return result;
+  }
+
+  // TODO: TYPE
+  async getTypesForTeam(): Promise<IUserType[]> {
+    return await this.userAdminRepository.getTypesForTeam();
   }
 }

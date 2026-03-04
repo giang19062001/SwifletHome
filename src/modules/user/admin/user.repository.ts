@@ -3,10 +3,11 @@ import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IUserApp } from '../app/user.interface';
+import { IUserApp, USER_CONST } from '../app/user.interface';
 import { GetAllUserDto, UpdateUserPackageAdminDto, UserPackageFilterEnum } from './user.dto';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UPDATOR } from 'src/helpers/const.helper';
+import { IUserType } from './user.interface';
 
 @Injectable()
 export class UserAdminRepository {
@@ -14,6 +15,7 @@ export class UserAdminRepository {
   private readonly tableApp = 'tbl_user_app';
   private readonly tablePackage = 'tbl_user_package';
   private readonly tablePackageHistory = 'tbl_user_package_history';
+  private readonly tableType = 'tbl_user_type';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -120,12 +122,15 @@ export class UserAdminRepository {
 
     return result.insertId;
   }
-   async isFristTimesUpdatePackage(userCode: string): Promise<Boolean> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` 
+  async isFristTimesUpdatePackage(userCode: string): Promise<Boolean> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` 
       SELECT seq FROM ${this.tablePackage} 
       WHERE userCode = ? AND updatedAt IS NOT NULL
       AND  updatedId IS NOT NULL
-      LIMIT 1`, [userCode]);
+      LIMIT 1`,
+      [userCode],
+    );
     return rows[0] == null ? true : false; // NẾU NULL -> LẦN ĐẦU, NẾU CÓ -> ĐÃ UPDATE NHIEU LẦN
   }
 
@@ -136,5 +141,15 @@ export class UserAdminRepository {
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, updatedId, updatedAt, userCode]);
     return result.affectedRows;
+  }
+
+  // TODO: TYPE
+  async getTypesForTeam(): Promise<IUserType[]> {
+    const sql = ` SELECT userTypeCode, userTypeKeyWord, userTypeName
+         FROM ${this.tableType} WHERE isActive = 'Y' 
+         AND userTypeKeyWord != '${USER_CONST.USER_TYPE.OWNER.value}'  AND  userTypeKeyWord != '${USER_CONST.USER_TYPE.PURCHASER.value}' `;
+         console.log(sql);
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
+    return rows as IUserType[];
   }
 }

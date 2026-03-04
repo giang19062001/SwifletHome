@@ -61,7 +61,7 @@ validate.validators.quillPresence = (value, options) => {
 
 // gắn validate tự động cho form
 const attachValidateForm = (form, constraints) => {
-  form.querySelectorAll('input, textarea').forEach((input) => {
+  form.querySelectorAll('input, textarea, select').forEach((input) => {
     input.addEventListener('input', () => validateField(constraints, input));
   });
 };

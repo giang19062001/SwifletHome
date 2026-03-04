@@ -161,6 +161,12 @@ export class TeamAppRepository {
     return rows as GetReviewListOfTeamResDto[];
   }
 
+  async checkDuplicateReview(teamCode: string, userCode: string): Promise<Boolean> {
+    let query = ` 
+        SELECT A.seq FROM ${this.tableReview} A  WHERE A.teamCode = ? AND A.reviewBy = ? `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode, userCode]);
+    return rows.length ? true : false;
+  }
   async insertReview(userCode: string, dto: ReviewTeamDto): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableReview}  (teamCode, review, star, reviewBy, uniqueId, createdId) 

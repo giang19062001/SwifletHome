@@ -96,6 +96,14 @@ export class TeamAppService {
         return result;
       }
 
+      // kiểm tra teamCode
+      const isDupcateReview = await this.teamAppRepository.checkDuplicateReview(dto.teamCode, userCode);
+      if (isDupcateReview) {
+        result = -3;
+        this.logger.error(logbase, `${Msg.YouAlreadyReview} --> teamCode: ${dto.teamCode}`);
+        return result;
+      }
+
       // tìm tất cả file đã upload cùng uniqueId
       const filesUploaded: { seq: number }[] = await this.teamAppRepository.findFilesByUniqueId(dto.uniqueId, dto.teamCode);
       if (filesUploaded.length) {

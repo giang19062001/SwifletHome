@@ -203,6 +203,32 @@ export class AppController {
       values: values,
     };
   }
+  @Get('/dashboard/user/teams/create')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/user-teams-create')
+  async renderTeamCreate(@Req() req: Request) {
+    const values = await this.appService.renderTeamCreate();
+    return {
+      title: 'Thêm  đội gia công - kỹ thuật',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
+  @Get('/dashboard/user/teams/update/:id')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/user-teams-update')
+  async renderTeamUpdate(@Req() req: Request) {
+    const values = await this.appService.renderTeamUpdate(req.params.id);
+    return {
+      title: 'Chỉnh sửa  đội gia công - kỹ thuật',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
   // media
   @Get('/dashboard/media')
   @UseGuards(PageAuthAdminGuard)

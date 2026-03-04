@@ -9,6 +9,8 @@ import { ObjectAdminService } from './modules/object/admin/object.service';
 import { ScreenAdminService } from './modules/screen/admin/screen.service';
 import { ProvinceService } from './modules/province/province.service';
 import { TodoAdminService } from './modules/todo/admin/todo.service';
+import { TeamAdminService } from './modules/team/admin/team.service';
+import { UserAdminService } from './modules/user/admin/user.service';
 
 @Injectable()
 export class AppService {
@@ -16,12 +18,14 @@ export class AppService {
     private readonly answerAdminService: AnswerAdminService,
     private readonly catetegoryAdminService: CategoryAdminService,
     private readonly homeAdminService: HomeSaleAdminService,
+    private readonly teamAdminService: TeamAdminService,
     private readonly blogAdminService: BlogAdminService,
     private readonly objectAdminService: ObjectAdminService,
     private readonly provinceService: ProvinceService,
     private readonly screenAdminService: ScreenAdminService,
     private readonly todoAdminService: TodoAdminService,
     private readonly qrAdminService: QrAdminService,
+    private readonly userAdminService: UserAdminService,
   ) {}
 
   async renderAnswerCreate(): Promise<any> {
@@ -99,8 +103,8 @@ export class AppService {
     };
   }
   // home
-  async renderHomeUpdate(answerCode: string): Promise<any> {
-    const homeData = await this.homeAdminService.getDetail(answerCode);
+  async renderHomeUpdate(homeCode: string): Promise<any> {
+    const homeData = await this.homeAdminService.getDetail(homeCode);
     return {
       homeData: homeData,
     };
@@ -120,7 +124,7 @@ export class AppService {
       provinces: provinces,
     };
   }
-    async renderUserTeams(): Promise<any> {
+  async renderUserTeams(): Promise<any> {
     const provinces = await this.provinceService.getAll();
     return {
       provinces: provinces,
@@ -149,6 +153,28 @@ export class AppService {
     const qrData = await this.qrAdminService.getDetail(requestCode);
     return {
       qrData: qrData,
+    };
+  }
+
+  // team
+  async renderTeamCreate(): Promise<any> {
+    const provinces = await this.provinceService.getAll();
+    const userTypes = await this.userAdminService.getTypesForTeam();
+
+    return {
+      provinces: provinces,
+      userTypes: userTypes,
+    };
+  }
+  async renderTeamUpdate(teamCode: string): Promise<any> {
+    const teamData = await this.teamAdminService.getDetail(teamCode);
+    const provinces = await this.provinceService.getAll();
+    const userTypes = await this.userAdminService.getTypesForTeam();
+
+    return {
+      teamData: teamData,
+      provinces: provinces,
+      userTypes: userTypes,
     };
   }
 }

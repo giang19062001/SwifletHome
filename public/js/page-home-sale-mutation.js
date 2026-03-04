@@ -5,7 +5,7 @@ const homeMutationConstraints = {
   },
   homeAddress: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập vị trí nhà yến.' },
-    length: { minimum: 5, message: '^Tên nhà yến phải có ít nhất 5 ký tự.' },
+    length: { minimum: 5, message: '^Vị trí nhà yến phải có ít nhất 5 ký tự.' },
   },
   latitude: {
     presence: { message: '^Vui lòng nhập vĩ độ.' },

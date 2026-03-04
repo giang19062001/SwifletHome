@@ -88,10 +88,13 @@ export class TeamAppController {
     summary: 'Viết đánh giá',
   })
   @Post('reviewTeam')
-  @ApiBody({ type: ReviewTeamDto, description: `
+  @ApiBody({
+    type: ReviewTeamDto,
+    description: `
 **uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file\n
 **star**: number (1 -> 5 )\n
-**review**: text (nội dung)` })
+**review**: text (nội dung)`,
+  })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   async reviewTeam(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: ReviewTeamDto) {
@@ -108,6 +111,13 @@ export class TeamAppController {
         data: 0,
       });
     }
+      if (result === -3) {
+      throw new BadRequestException({
+        message: Msg.YouAlreadyReview,
+        data: 0,
+      });
+    }
+    
     if (result === 0) {
       throw new BadRequestException({
         message: Msg.RegisterErr,
