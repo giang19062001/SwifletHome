@@ -56,13 +56,16 @@ export class GetDetailTeamResDto {
     type: Object,
     nullable: true,
     example: {
-      floor: {text: "Sàn", value:"ABC"},
-      root: {text: "Mái", value:"ABC"},
-      light: {text: "Đèn", value:"ABC"},
-      nest: {text: "Lam", value:"ABC"},
+      floor: { text: 'Sàn', value: 'ABC' },
+      root: { text: 'Mái', value: 'ABC' },
+      light: { text: 'Đèn', value: 'ABC' },
+      nest: { text: 'Lam', value: 'ABC' },
     },
   })
   teamDescriptionSpecial: Record<string, any> | null;
+
+  @ApiProperty({ example: 'uploads/images/***/***.jpg' })
+  teamImage: string;
 
   @ApiProperty({
     type: () => TeamImgResDto,
@@ -73,13 +76,12 @@ export class GetDetailTeamResDto {
 
 export class GetAllTeamResDto extends OmitType(GetDetailTeamResDto, ['teamDescription', 'teamDescriptionSpecial', 'teamImages'] as const) {}
 
-
 export class GetReviewListOfTeamResDto {
   @ApiProperty({ example: 1 })
   seq: number;
 
   @ApiProperty({ example: 'Good' })
-  review: string
+  review: string;
 
   @ApiProperty({ example: 5 })
   star: number;
@@ -108,9 +110,8 @@ export class ReviewImgResDto {
   mimetype: string;
 }
 
-
 export class UploadReviewFilesResDto {
-   @ApiProperty({ example: 0 })
+  @ApiProperty({ example: 0 })
   seq: number;
 
   @ApiProperty({ example: '' })

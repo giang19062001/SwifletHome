@@ -47,7 +47,7 @@ export class TeamAppRepository {
   }
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<GetAllTeamResDto[]> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddres,
-    A.provinceCode, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star
+    A.provinceCode, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage
     FROM ${this.table} A 
     LEFT JOIN ${this.tableUserType} B
     ON A.userTypeCode = B.userTypeCode
@@ -80,6 +80,7 @@ export class TeamAppRepository {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
             A.teamCode, A.teamName, A.teamAddres,A.provinceCode,
             IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial,
+             A.teamImage,
             COALESCE(
               (
                 SELECT JSON_ARRAYAGG(
@@ -90,7 +91,7 @@ export class TeamAppRepository {
                   )
                 )
                 FROM ${this.tableTeamImg} D
-                WHERE D.teamSeq = A.seq
+                WHERE D.teamSeq = A.seq AND D.filename <> A.teamImage
               ),
               JSON_ARRAY()
             ) AS teamImages

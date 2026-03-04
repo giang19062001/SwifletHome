@@ -120,6 +120,12 @@ export class AppService {
       provinces: provinces,
     };
   }
+    async renderUserTeams(): Promise<any> {
+    const provinces = await this.provinceService.getAll();
+    return {
+      provinces: provinces,
+    };
+  }
   // notification
   async renderNotification(): Promise<any> {
     const provinces = await this.provinceService.getAll();

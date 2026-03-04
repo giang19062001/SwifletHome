@@ -99,7 +99,7 @@ export class HomeSaleAdminService {
         for (const file of fileNeedCreates) {
           const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
           const insertImgResult = await this.homSaleAdminRepository.createImages(home.seq, 'admin', filenamePath, file);
-          this.logger.log(logbase, `Insdert file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
+          this.logger.log(logbase, `Insert file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
         }
       }
       const result = await this.homSaleAdminRepository.update(dto, homeImagePath, updatedId, homeCode);

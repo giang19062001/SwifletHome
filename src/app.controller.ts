@@ -190,6 +190,19 @@ export class AppController {
       values: values,
     };
   }
+  @Get('/dashboard/user/teams')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/user-teams')
+  async renderUserTeams(@Req() req: Request) {
+    const values = await this.appService.renderUserTeams();
+
+    return {
+      title: 'Danh sách đội gia công - kỹ thuật',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
   // media
   @Get('/dashboard/media')
   @UseGuards(PageAuthAdminGuard)
