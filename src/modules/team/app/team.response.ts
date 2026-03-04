@@ -41,7 +41,7 @@ export class GetDetailTeamResDto {
   teamName: string;
 
   @ApiProperty({ example: '' })
-  teamAddres: string;
+  teamAddress: string;
 
   @ApiProperty({ example: '0' })
   provinceCode: string;

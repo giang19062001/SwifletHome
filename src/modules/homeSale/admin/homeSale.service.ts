@@ -26,7 +26,7 @@ export class HomeSaleAdminService {
     let result = await this.homSaleAdminRepository.getDetail(homeCode);
     if (result) {
       let homeImages = await this.homSaleAdminRepository.getImages(result ? result?.seq : 0);
-      // remove main img
+      // tách biệt ảnh chính và danh sách ảnh phụ
       let homeImagesExceptMain: IHomeSaleImg[] = [];
       for (const img of homeImages) {
         if (img.filename == result.homeImage) {

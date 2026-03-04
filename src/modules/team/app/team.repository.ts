@@ -46,7 +46,7 @@ export class TeamAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<GetAllTeamResDto[]> {
-    let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddres,
+    let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress,
     A.provinceCode, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage
     FROM ${this.table} A 
     LEFT JOIN ${this.tableUserType} B
@@ -65,7 +65,7 @@ export class TeamAppRepository {
       params.push(`%${dto.txtSearch}%`);
     }
 
-    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddres, A.provinceCode `;
+    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress, A.provinceCode `;
 
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
@@ -78,7 +78,7 @@ export class TeamAppRepository {
 
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
-            A.teamCode, A.teamName, A.teamAddres,A.provinceCode,
+            A.teamCode, A.teamName, A.teamAddress,A.provinceCode,
             IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial,
              A.teamImage,
             COALESCE(

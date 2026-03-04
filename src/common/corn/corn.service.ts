@@ -40,6 +40,7 @@ export class CornService implements OnModuleInit {
       await this.deleteDoctorFilesNotUse();
       await this.deleteUserHomeFilesNotUse();
       await this.deleteQrRequestFilesNotUse();
+      await this.deleteReviewFilesNotUse();
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();

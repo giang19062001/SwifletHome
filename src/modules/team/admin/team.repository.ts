@@ -1,0 +1,148 @@
+import { Injectable, Inject } from '@nestjs/common';
+import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { PagingDto } from 'src/dto/admin.dto';
+import { generateCode } from 'src/helpers/func.helper';
+import { CODES } from 'src/helpers/const.helper';
+import { ITeam, ITeamImg } from './team.interface';
+import { CreateTeamDto, UpdateTeamDto } from './team.dto';
+
+@Injectable()
+export class TeamAdminRepository {
+  private readonly table = 'tbl_team_user';
+  private readonly tableImg = 'tbl_team_img';
+  private readonly tableUser = 'tbl_user_app';
+  private readonly tableProvince = 'tbl_provinces';
+
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+
+  async getTotal(): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+  async getAll(dto: PagingDto): Promise<ITeam[]> {
+    let query = `   SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCode,
+     A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, C.provinceName
+        FROM ${this.table} A  
+          LEFT JOIN ${this.tableUser} B
+          ON A.userCode = B.userCode 
+          LEFT JOIN ${this.tableProvince} C
+          ON A.provinceCode = C.provinceCode
+        WHERE A.isActive = 'Y'
+        ORDER BY A.createdAt DESC `;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows as ITeam[];
+  }
+  async getDetail(teamCode: string): Promise<ITeam | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial,
+      A.provinceCode, A.isActive
+          FROM ${this.table} A 
+          WHERE A.teamCode = ? AND A.isActive = 'Y'
+          LIMIT 1 `,
+      [teamCode],
+    );
+    return rows ? (rows[0] as ITeam) : null;
+  }
+  async create(dto: CreateTeamDto, teamImagePath: string, createdId: string): Promise<number> {
+    const sqlLast = ` SELECT teamCode FROM ${this.table} ORDER BY teamCode DESC LIMIT 1`;
+    const [rows] = await this.db.execute<any[]>(sqlLast);
+    let teamCode = CODES.teamCode.FRIST_CODE;
+    if (rows.length > 0) {
+      teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
+    }
+    const sql = `
+      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCode, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      teamCode,
+      dto.userCode,
+      dto.userTypeCode,
+      teamImagePath,
+      dto.teamAddress,
+      dto.teamDescription,
+      dto.teamDescriptionSpecial,
+      dto.provinceCode,
+      createdId,
+    ]);
+
+    return result.insertId;
+  }
+  async update(dto: UpdateTeamDto, teamImagePath: string, updatedId: string, teamCode: string): Promise<number> {
+    const sql = `
+        UPDATE ${this.table} SET teamName = ?, teamAddress = ?, teamDescription = ?, teamDescriptionSpecial = ?, provinceCode = ?, teamImage = ?,
+        updatedId = ?, updatedAt = ?
+        WHERE teamCode = ?
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.teamName, dto.teamAddress, dto.teamDescription, dto.teamDescriptionSpecial,
+         dto.provinceCode,teamImagePath, updatedId, new Date(), teamCode]);
+         
+    return result.affectedRows;
+  }
+
+  async delete(teamCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET isActive = "N"
+      WHERE teamCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [teamCode]);
+
+    return result.affectedRows;
+  }
+  // IMAGE
+  async getImages(seq: number): Promise<ITeamImg[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.teamSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive
+          FROM ${this.tableImg} A 
+          WHERE A.teamSeq = ? `,
+      [seq],
+    );
+    return rows as ITeamImg[];
+  }
+  async createImages(seq: number, createdId: string, filenamePath: string, file: Express.Multer.File | ITeamImg): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, teamSeq, createdId)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, seq, createdId]);
+
+    return result.insertId;
+  }
+
+  async deleteHomeImages(seq: number): Promise<number> {
+    const sql = `
+      DELETE FROM  ${this.tableImg}
+      WHERE teamSeq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
+
+    return result.affectedRows;
+  }
+  async deleteHomeImagesOne(seq: number): Promise<number> {
+    const sql = `
+      DELETE FROM  ${this.tableImg}
+      WHERE seq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
+
+    return result.affectedRows;
+  }
+  async deleteHomeImagesMulti(seqList: number[]): Promise<number> {
+    const placeholders = seqList.map(() => '?').join(', ');
+    const sql = `
+    DELETE FROM ${this.tableImg}
+    WHERE seq IN (${placeholders})
+  `;
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, seqList);
+    return result.affectedRows;
+  }
+}

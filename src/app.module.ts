@@ -42,6 +42,7 @@ import { QrAppModule } from './modules/qr/app/qr.module';
 import { QrAdminModule } from './modules/qr/admin/qr.module';
 import { PhoneCodeModule } from './modules/phoneCode/phoneCode.module';
 import { TeamAppModule } from './modules/team/app/team.module';
+import { TeamAdminModule } from './modules/team/admin/team.module';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { TeamAppModule } from './modules/team/app/team.module';
     TodoAdminModule,
     NotificationAdminModule,
     QrAdminModule,
+    TeamAdminModule
   ],
   controllers: [AppController],
   providers: [

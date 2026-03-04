@@ -112,7 +112,7 @@ export class HomeSaleAdminController {
     ),
   )
   async update(
-    @Body() createHomeDto: UpdateHomeDto,
+    @Body() updateHomeDto: UpdateHomeDto,
     @Param('homeCode') homeCode: string,
     @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
     @UploadedFiles()
@@ -124,7 +124,7 @@ export class HomeSaleAdminController {
     const homeImage = files.homeImage?.[0] || null;
     const homeImages = files.homeImages || [];
     const dto = {
-      ...createHomeDto,
+      ...updateHomeDto,
       homeImage,
       homeImages,
     };
