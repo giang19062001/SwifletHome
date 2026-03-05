@@ -1,17 +1,20 @@
 const pageType = window.location.pathname.includes('/update') ? 'update' : 'create';
 const teamMutationConstraints = {
   teamName: {
-    presence: { allowEmpty: false, message: '^Vui lòng nhập tên đội.' },
+    presence: { allowEmpty: false, message: '^Vui lòng nhập tên đội công xưởng.' },
   },
   teamAddress: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập địa chỉ.' },
     length: { minimum: 5, message: '^Địa chỉ phải có ít nhất 5 ký tự.' },
   },
-  userTypeCode: {
-    presence: { allowEmpty: false, message: '^Vui lòng chọn loại.' },
-  },
   provinceCode: {
     presence: { allowEmpty: false, message: '^Vui lòng chọn tỉnh thành.' },
+  },
+  userTypeCode: {
+    presence: { allowEmpty: false, message: '^Vui lòng chọn loại công xưởng.' },
+  },
+  userCode: {
+    presence: { allowEmpty: false, message: '^Vui lòng người dùng sở hữu công xưởng.' },
   },
   teamDescription: {
     quillPresence: { message: '^Vui lòng nhập mô tả.' },
@@ -37,6 +40,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+document.getElementById('userTypeCode').addEventListener('change', async function () {
+  const userTypeCode = this.value;
+  const selectedOption = this.options[this.selectedIndex];
+  const userTypeKeyWord = selectedOption.dataset.keyword;
+  const userSelect = document.getElementById('userCode');
+
+  userSelect.value = '';
+  userSelect.innerHTML = '<option value="">-- Chọn khách hàng sở hữu --</option>';
+
+  userSelect.disabled = true;
+  if (userTypeCode) {
+    // render danh sách người dùng theo type
+    const userList = await getUsersForTeamByType(userTypeCode);
+
+    if (userList && userList.length > 0) {
+      userSelect.disabled = false;
+
+      userList.forEach((user) => {
+        const option = document.createElement('option');
+        option.value = user.userCode;
+        option.textContent = user.userName;
+        userSelect.appendChild(option);
+      });
+    }
+  }
+
+  // ẩn/ hiện form thông tin chuyên môn cho type kỹ thuật
+  const technicalDiv = document.querySelector('.last-box > div:first-child');
+  const descriptionDiv = document.querySelector('.last-box > div:nth-child(2)');
+  if (technicalDiv) {
+    if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
+      technicalDiv.style.display = 'block';
+      if (descriptionDiv) descriptionDiv.className = 'col-lg-6';
+    } else {
+      technicalDiv.style.display = 'none';
+      if (descriptionDiv) descriptionDiv.className = 'col-lg-12';
+    }
+  }
+});
 function initializeForm() {
   const form = document.getElementById(pageType === 'create' ? 'team-create-form' : 'team-update-form');
   const teamImagePreview = form.querySelector('#teamImagePreview');
@@ -51,6 +93,9 @@ function initializeForm() {
     const formData = {
       teamName: form.querySelector('#teamName').value,
       teamAddress: form.querySelector('#teamAddress').value,
+      provinceCode: form.querySelector('#provinceCode').value,
+      userTypeCode: form.querySelector('#userTypeCode').value,
+      userCode: form.querySelector('#userCode').value,
       teamDescription: quillGlobal.root.innerHTML,
       teamImage: form.querySelector('#teamImage').files,
       teamImages: form.querySelector('#teamImages').files,
@@ -65,7 +110,7 @@ function initializeForm() {
     if (pageType === 'update') {
       await updateTeam(formData);
     } else if (pageType === 'create') {
-      await updateTeam(formData);
+      await createTeam(formData);
     }
   });
 
@@ -213,7 +258,7 @@ function renderImagePreview(file, index, input, preview, field) {
 }
 
 // TODO: API
-async function updateTeam(formData) {
+async function createTeam(formData) {
   await submitTeam(formData, '/api/admin/team/create', 'post', 'Thêm thành công');
 }
 
@@ -224,8 +269,26 @@ async function updateTeam(formData) {
 async function submitTeam(formData, url, method, successMessage) {
   // add dự liệu input vào formData
   const postData = new FormData();
-  const fields = ['teamName', 'teamAddress', 'teamDescription'];
+  const fields = ['teamName', 'teamAddress', 'provinceCode', 'userTypeCode', 'userCode', 'teamDescription'];
   fields.forEach((field) => postData.append(field, formData[field]));
+
+  // add dữ liệu chuyên môn của đội kỹ thuật
+  const userTypeKeyWord = document.querySelector('#userTypeCode option:checked')?.dataset.keyword;
+  if (userTypeKeyWord == VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
+    let teamDescriptionSpecial = {};
+    if (typeof technicalTypes !== 'undefined' && Array.isArray(technicalTypes)) {
+      technicalTypes.forEach(function (item) {
+        const textareaElement = document.getElementById(item.keyOption);
+        if (textareaElement) {
+          teamDescriptionSpecial[item.keyOption.toLowerCase()] = textareaElement.value;
+        }
+      });
+    }
+
+    postData.append('teamDescriptionSpecial', JSON.stringify(teamDescriptionSpecial));
+  } else {
+    postData.append('teamDescriptionSpecial', null);
+  }
 
   // đẩy teamImage, teamImages vào formData nếu có thay đổi
   if (formData.teamImage?.length) {
@@ -254,4 +317,23 @@ async function submitTeam(formData, url, method, successMessage) {
     }
     submitBtn.disabled = false;
   }
+}
+
+async function getUsersForTeamByType(userTypeCode) {
+  return await axios
+    .post(
+      CURRENT_URL + '/api/admin/user/getUsersForTeamByType',
+      {
+        userTypeCode: userTypeCode,
+      },
+      axiosAuth(),
+    )
+    .then(function (response) {
+      console.log('getUsersForTeamByType -- ', response);
+      return response.data;
+    })
+    .catch(function (error) {
+      console.error('getUsersForTeamByType --', error);
+      return [];
+    });
 }

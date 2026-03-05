@@ -15,6 +15,16 @@ export class TeamAdminRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
+  async checkDuplicateTeam(userCode: string, userTypeCode: string): Promise<boolean> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` 
+      SELECT seq AS TOTAL FROM ${this.table} 
+      WHERE userCode = ? AND userTypeCode = ?
+      `,
+      [userCode, userTypeCode],
+    );
+    return rows.length ? true : false;
+  }
   async getTotal(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
@@ -57,6 +67,7 @@ export class TeamAdminRepository {
     if (rows.length > 0) {
       teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
     }
+    console.log(dto);
     const sql = `
       INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCode, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -65,8 +76,9 @@ export class TeamAdminRepository {
       teamCode,
       dto.userCode,
       dto.userTypeCode,
-      teamImagePath,
+      dto.teamName,
       dto.teamAddress,
+      teamImagePath,
       dto.teamDescription,
       dto.teamDescriptionSpecial,
       dto.provinceCode,
@@ -81,9 +93,18 @@ export class TeamAdminRepository {
         updatedId = ?, updatedAt = ?
         WHERE teamCode = ?
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.teamName, dto.teamAddress, dto.teamDescription, dto.teamDescriptionSpecial,
-         dto.provinceCode,teamImagePath, updatedId, new Date(), teamCode]);
-         
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      dto.teamName,
+      dto.teamAddress,
+      dto.teamDescription,
+      dto.teamDescriptionSpecial,
+      dto.provinceCode,
+      teamImagePath,
+      updatedId,
+      new Date(),
+      teamCode,
+    ]);
+
     return result.affectedRows;
   }
 

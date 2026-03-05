@@ -6,7 +6,9 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
-                             <p class="title-page"><%= title %></p>
+                                <p class="title-page">
+                                    <%= title %>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -21,7 +23,7 @@
                                     <div class="col-lg-4">
                                         <div class="row">
                                             <div class="col-md-12 form-group mb-3">
-                                                <label for="teamName" class="form-label">Tên đội</label>
+                                                <label for="teamName" class="form-label">Tên đội công xưởng</label>
                                                 <input type="text" class="form-control" id="teamName" name="teamName" />
                                                 <div class="error-message" data-error="teamName"></div>
                                             </div>
@@ -33,26 +35,12 @@
                                                 <div class="error-message" data-error="teamAddress"></div>
                                             </div>
 
-                                             <div class="col-md-12 form-group mb-3">
-                                                <label for="province" class="form-label">Loại</label>
-                                                <select class="form-select" id="province" name="userTypeCode">
-                                                    <option value="">-- Chọn tỉnh/thành --</option>
-                                                    <% if (values?.userTypes && values.userTypes.length > 0) { %>
-                                                        <% values.userTypes.forEach(function(utype) { %>
-                                                            <option value="<%= utype.userTypeCode %>">
-                                                                <%= utype.userTypeName %>
-                                                            </option>
-                                                        <% }) %>
-                                                    <% } %>
-                                                </select>
-                                                <div class="error-message" data-error="provinceCode"></div>
-                                            </div>
 
                                             <div class="col-md-12 form-group mb-3">
-                                                <label for="province" class="form-label">Tỉnh / Thành phố</label>
-                                                <select class="form-select" id="province" name="provinceCode">
+                                                <label for="provinceCode" class="form-label">Tỉnh / Thành phố</label>
+                                                <select class="form-select" id="provinceCode" name="provinceCode">
                                                     <option value="">-- Chọn tỉnh/thành --</option>
-                                                    <% if (values?.provinces && values.provinces.length > 0) { %>
+                                                    <% if (values?.provinces && values.provinces.length> 0) { %>
                                                         <% values.provinces.forEach(function(province) { %>
                                                             <option value="<%= province.provinceCode %>">
                                                                 <%= province.provinceName %>
@@ -62,6 +50,30 @@
                                                 </select>
                                                 <div class="error-message" data-error="provinceCode"></div>
                                             </div>
+
+                                            <div class="col-md-12 form-group mb-3">
+                                                <label for="userTypeCode" class="form-label">Loại công xưởng</label>
+                                                <select class="form-select" id="userTypeCode" name="userTypeCode">
+                                                    <option value="">-- Chọn loại công xưởng --</option>
+                                                    <% if (values?.userTypes && values.userTypes.length> 0) { %>
+                                                        <% values.userTypes.forEach(function(utype) { %>
+                                                            <option value="<%= utype.userTypeCode %>"  data-keyword="<%= utype.userTypeKeyWord %>">
+                                                                <%= utype.userTypeName %>
+                                                            </option>
+                                                        <% }) %>
+                                                    <% } %>
+                                                </select>
+                                                <div class="error-message" data-error="userTypeCode"></div>
+                                            </div>
+
+                                            <div class="col-md-12 form-group mb-3">
+                                                <label for="userCode" class="form-label">khách hàng sở hữu</label>
+                                                <select class="form-select" id="userCode" name="userCode" disabled>
+                                                    <option value="">-- Chọn khách hàng sở hữu --</option>
+                                                </select>
+                                                <div class="error-message" data-error="userCode"></div>
+                                            </div>
+
                                         </div>
                                     </div>
 
@@ -74,7 +86,7 @@
                                                     <span class="file-button">Chọn ảnh chính</span>
                                                 </label>
                                                 <input type="file" class="form-control" id="teamImage" name="teamImage"
-                                                      accept=".png, .jpg, .jpeg, .heic"  style="display: none;" />
+                                                    accept=".png, .jpg, .jpeg, .heic" style="display: none;" />
                                                 <div class="error-message mt-2" data-error="teamImage"></div>
                                                 <div class="mt-3 mb-2" id="teamImagePreview"></div>
                                             </div>
@@ -86,7 +98,7 @@
                                                     <span class="file-button">Chọn ảnh phụ</span>
                                                 </label>
                                                 <input type="file" class="form-control" id="teamImages"
-                                                    name="teamImages" multiple   accept=".png, .jpg, .jpeg, .heic" 
+                                                    name="teamImages" multiple accept=".png, .jpg, .jpeg, .heic"
                                                     style="display: none;" />
                                                 <div class="error-message mt-2" data-error="teamImages"></div>
 
@@ -97,12 +109,25 @@
                                     </div>
                                 </div>
 
-                                <div class="row mt-2">
+                                <div class="row mt-2 last-box">
+                                    <div class="col-lg-6" style="display: none;">
+                                        <% if (values?.technicalTypes && values.technicalTypes.length> 0) { %>
+                                            <% values.technicalTypes.forEach(function(item) { %>
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-3">
+                                                        <label for="<%= item.keyOption %>" class="form-label">
+                                                            Thông tin kỹ thuật - <%= item.valueOption %>
+                                                        </label>
+                                                        <textarea class="form-control" id="<%= item.keyOption %>"
+                                                            name="<%= item.keyOption %>" rows="4"></textarea>
+                                                    </div>
+                                                </div>
+                                            <% }) %>
+                                        <% } %>
+                                    </div>
                                     <div class="col-lg-12">
                                         <div class="form-group">
                                             <label for="teamDescription" class="form-label">Mô tả</label>
-                                            <!-- <textarea type="text" class="form-control" id="teamDescription"
-                                                name="teamDescription" rows="10"></textarea> -->
                                             <%- include('./component-editor', { content: "" }) %>
                                                 <div class="error-message" data-error="teamDescription"></div>
                                         </div>
@@ -122,6 +147,10 @@
         </div>
     </div>
 </div>
+<script>
+  const technicalTypes = <%- JSON.stringify(values.technicalTypes) %>
+  console.log('technicalTypes', technicalTypes);
+</script>
 
 <script src="/js/common-validate.js"></script>
 <script src="/js/page-user-teams-mutation.js"></script>

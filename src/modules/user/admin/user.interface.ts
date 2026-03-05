@@ -3,3 +3,9 @@ export interface IUserType{
   userTypeKeyWord: string,
   userTypeName: string
 }
+
+export interface IUserForTeamByType{
+  userCode: string,
+  userName: string,
+  userPhone: string
+}

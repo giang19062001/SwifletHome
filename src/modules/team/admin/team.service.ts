@@ -42,22 +42,32 @@ export class TeamAdminService {
     }
   }
   async create(dto: CreateTeamDto, createdId: string): Promise<number> {
-    const teamImagePath = dto.teamImage ? `${getFileLocation(dto.teamImage.mimetype, dto.teamImage.fieldname)}/${dto.teamImage.filename}` : '';
-    const seq = await this.teamAdminRepository.create(dto, teamImagePath, createdId);
-    if (seq) {
-      //teamImage
-      if (dto.teamImage) {
-        await this.teamAdminRepository.createImages(seq, createdId, teamImagePath, dto.teamImage);
+    try {
+      // kiểm tra trùng lặp
+      const isDuplicate = await this.teamAdminRepository.checkDuplicateTeam(dto.userCode, dto.userTypeCode);
+      if (isDuplicate) {
+        return -1;
       }
-      //teamImages
-      if (dto.teamImages.length > 0) {
-        for (const file of dto.teamImages) {
-          const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
-          await this.teamAdminRepository.createImages(seq, createdId, filenamePath, file);
+      const teamImagePath = dto.teamImage ? `${getFileLocation(dto.teamImage.mimetype, dto.teamImage.fieldname)}/${dto.teamImage.filename}` : '';
+      const seq = await this.teamAdminRepository.create(dto, teamImagePath, createdId);
+      if (seq) {
+        //teamImage
+        if (dto.teamImage) {
+          await this.teamAdminRepository.createImages(seq, createdId, teamImagePath, dto.teamImage);
+        }
+        //teamImages
+        if (dto.teamImages.length > 0) {
+          for (const file of dto.teamImages) {
+            const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+            await this.teamAdminRepository.createImages(seq, createdId, filenamePath, file);
+          }
         }
       }
+      return seq;
+    } catch (error) {
+      console.log('error', error);
+      return 0;
     }
-    return seq;
   }
 
   async update(dto: UpdateTeamDto, updatedId: string, teamCode: string): Promise<number> {

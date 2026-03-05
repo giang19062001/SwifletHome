@@ -68,9 +68,9 @@ export const Msg = {
   RequestCannotCancelNotWaiting: `Chỉ có thể hủy các yêu cầu đang ở chế độ chờ`,
   OnlyPurcharseCanFetch: `Chỉ có tài khoản người mua mới có thể lấy danh sách yến được bán`,
   OnlyOwnerCanFetch: `Chỉ có tài khoản chủ nhà yến có thể lấy danh sách yến được bán`,
-  medicineUsageCannotBlank:`Dung lượng thuốc không thể để trống`,
-  TeamNotFound:"Đội gia công - kỹ thuật không tồn tại",
-  YouAlreadyReview: "Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi",
+  medicineUsageCannotBlank: `Dung lượng thuốc không thể để trống`,
+  TeamNotFound: 'Đội gia công - kỹ thuật không tồn tại',
+  YouAlreadyReview: 'Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi',
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
   InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
   InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
@@ -106,4 +106,5 @@ export const MsgAdmin = {
   pushNotifyOk: 'Gửi thông báo thành công',
   pushNotifyErr: 'Gửi thông báo thất bại',
   pushProvinceEmpty: 'Không có người dùng nào có nhà yến thuộc những tỉnh thành này',
+  userAlreadyCreateThisTeam: 'Người dùng hiện tại đã đăng ký đội công xưởng này rồi',
 };

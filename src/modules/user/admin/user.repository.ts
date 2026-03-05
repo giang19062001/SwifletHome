@@ -7,7 +7,7 @@ import { IUserApp, USER_CONST } from '../app/user.interface';
 import { GetAllUserDto, UpdateUserPackageAdminDto, UserPackageFilterEnum } from './user.dto';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UPDATOR } from 'src/helpers/const.helper';
-import { IUserType } from './user.interface';
+import { IUserForTeamByType, IUserType } from './user.interface';
 
 @Injectable()
 export class UserAdminRepository {
@@ -16,6 +16,7 @@ export class UserAdminRepository {
   private readonly tablePackage = 'tbl_user_package';
   private readonly tablePackageHistory = 'tbl_user_package_history';
   private readonly tableType = 'tbl_user_type';
+  private readonly tableTeam = 'tbl_team_user';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -148,8 +149,16 @@ export class UserAdminRepository {
     const sql = ` SELECT userTypeCode, userTypeKeyWord, userTypeName
          FROM ${this.tableType} WHERE isActive = 'Y' 
          AND userTypeKeyWord != '${USER_CONST.USER_TYPE.OWNER.value}'  AND  userTypeKeyWord != '${USER_CONST.USER_TYPE.PURCHASER.value}' `;
-         console.log(sql);
     const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
     return rows as IUserType[];
+  }
+  async getUsersForTeamByType(userTypeCode: string): Promise<IUserForTeamByType[]> {
+    const sql = ` SELECT A.userCode, A.userName, A.userPhone
+         FROM ${this.tableApp} A
+         WHERE A.isActive = 'Y' 
+         AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = '${userTypeCode}')
+      `;
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
+    return rows as IUserForTeamByType[];
   }
 }

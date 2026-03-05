@@ -19331,7 +19331,7 @@ select {
 }
 
 .page-user-teams-mutaion #editor {
-  height: 30vh;
+  height: 60vh;
 }
 .page-user-teams-mutaion .file-label {
   display: inline-flex;

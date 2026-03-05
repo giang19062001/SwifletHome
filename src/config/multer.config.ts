@@ -50,7 +50,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'images/requestQrcodes';
     }
 
-    if (fieldname === 'teamImg' || fieldname.includes('teamImg') || fieldname === 'teamImgs' || fieldname.includes('teamImgs')) {
+    if (fieldname === 'teamImage' || fieldname.includes('teamImage') || fieldname === 'teamImages' || fieldname.includes('teamImages')) {
       result = 'images/teams';
     }
 

@@ -37,11 +37,11 @@ export class GetAllUserDto extends PagingDto {
   userPackageFilter?: UserPackageFilterEnum;
 }
 
-export class GetDetailDto {
-  @ApiProperty({ example: 'APP', enum: UserTypeEnum })
-  @IsEnum(UserTypeEnum)
+export class GetUsersForTeamByTypeDto {
+  @ApiProperty()
+  @IsString()
   @IsNotEmpty()
-  type: string;
+  userTypeCode: string;
 }
 
 export class UpdateUserPackageAdminDto {
@@ -53,4 +53,12 @@ export class UpdateUserPackageAdminDto {
   @ValidateIf((_, value) => value !== null) // bỏ qua validate khi value string === null
   @IsString()
   packageCode: string | null;
+}
+
+
+export class GetDetailDto {
+  @ApiProperty({ example: 'APP', enum: UserTypeEnum })
+  @IsEnum(UserTypeEnum)
+  @IsNotEmpty()
+  type: string;
 }

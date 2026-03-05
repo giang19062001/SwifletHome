@@ -17,6 +17,10 @@ const VARIABLE_ENUM = {
     ITEM: 'Vật phẩm',
     BOTH: 'Tiền/Vật phẩm',
   },
+  USER_TEAM_TYPE: {
+    FACTORY: 'FACTORY',
+    TECHNICAL: 'TECHNICAL',
+  },
 };
 const LIST_ENUM = {
   QR_REQUEST_STATUS: [
@@ -32,7 +36,7 @@ const LIST_ENUM = {
       value: 'REFUSE',
       text: 'Từ chối duyệt',
     },
-     {
+    {
       value: 'CANCEL',
       text: 'Đã hủy',
     },

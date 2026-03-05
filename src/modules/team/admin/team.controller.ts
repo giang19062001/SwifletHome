@@ -23,13 +23,14 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/
 import { PagingDto } from 'src/dto/admin.dto';
 import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { FileFieldsInterceptor, } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
 import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { TeamAdminService } from './team.service';
 import { ITeam } from './team.interface';
 import { CreateTeamDto, UpdateTeamDto } from './team.dto';
+import { MsgAdmin } from 'src/helpers/message.helper';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/team')
@@ -94,6 +95,10 @@ export class TeamAdminController {
     const result = await this.teamAdminService.create(body, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
+    } else if (result === -1) {
+      throw new BadRequestException({
+        message: MsgAdmin.userAlreadyCreateThisTeam,
+      });
     }
     return result;
   }

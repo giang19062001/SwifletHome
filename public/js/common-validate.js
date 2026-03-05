@@ -35,7 +35,6 @@ const checkingErrors = (formData, constraints) => {
 
 // Validate field
 const validateField = (constraints, input) => {
-  console.log("input", input.name);
   const fieldName = input.name;
   const fieldValue = input.type === 'file' ? input.files : input.value;
   const errors = validate.single(fieldValue, constraints[fieldName]);

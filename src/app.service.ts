@@ -11,6 +11,8 @@ import { ProvinceService } from './modules/province/province.service';
 import { TodoAdminService } from './modules/todo/admin/todo.service';
 import { TeamAdminService } from './modules/team/admin/team.service';
 import { UserAdminService } from './modules/user/admin/user.service';
+import { OptionService } from './modules/options/option.service';
+import { OPTION_CONST } from './modules/options/option.interface';
 
 @Injectable()
 export class AppService {
@@ -26,6 +28,7 @@ export class AppService {
     private readonly todoAdminService: TodoAdminService,
     private readonly qrAdminService: QrAdminService,
     private readonly userAdminService: UserAdminService,
+    private readonly optionService: OptionService,
   ) {}
 
   async renderAnswerCreate(): Promise<any> {
@@ -160,21 +163,29 @@ export class AppService {
   async renderTeamCreate(): Promise<any> {
     const provinces = await this.provinceService.getAll();
     const userTypes = await this.userAdminService.getTypesForTeam();
-
+    const technicalTypes = await this.optionService.getAll({
+      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
+      subOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.subOption,
+    });
     return {
       provinces: provinces,
       userTypes: userTypes,
+      technicalTypes: technicalTypes,
     };
   }
   async renderTeamUpdate(teamCode: string): Promise<any> {
     const teamData = await this.teamAdminService.getDetail(teamCode);
     const provinces = await this.provinceService.getAll();
     const userTypes = await this.userAdminService.getTypesForTeam();
-
+    const technicalTypes = await this.optionService.getAll({
+      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
+      subOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.subOption,
+    });
     return {
       teamData: teamData,
       provinces: provinces,
       userTypes: userTypes,
+      technicalTypes: technicalTypes,
     };
   }
 }

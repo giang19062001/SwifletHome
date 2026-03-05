@@ -177,19 +177,7 @@ export class AppController {
       user: req.session.user,
     };
   }
-  @Get('/dashboard/user/homes')
-  @UseGuards(PageAuthAdminGuard)
-  @Render('pages/user-homes')
-  async renderUserHomes(@Req() req: Request) {
-    const values = await this.appService.renderUserHomes();
 
-    return {
-      title: 'Danh sách nhà yến khách hàng',
-      isLayout: true,
-      user: req.session.user,
-      values: values,
-    };
-  }
   @Get('/dashboard/user/teams')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/user-teams')
@@ -278,7 +266,20 @@ export class AppController {
     };
   }
 
-  //home/sale
+  //home
+  @Get('/dashboard/home/users')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/user-homes')
+  async renderUserHomes(@Req() req: Request) {
+    const values = await this.appService.renderUserHomes();
+    return {
+      title: 'Danh sách nhà yến khách hàng',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+  
   @Get('/dashboard/home/sale')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-sale')

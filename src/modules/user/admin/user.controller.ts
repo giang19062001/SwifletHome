@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserAdminService } from './user.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { GetAllUserDto, GetDetailDto, UpdateUserPackageAdminDto } from './user.dto';
+import { GetAllUserDto, GetDetailDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto } from './user.dto';
 import * as userInterface from '../../auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 
@@ -21,6 +21,17 @@ export class UserAdminController {
   @HttpCode(HttpStatus.OK)
   async getAllUser(@Body() dto: GetAllUserDto) {
     const result = await this.userAdminService.getAllUser(dto);
+    return result;
+  }
+
+  
+  @ApiBody({
+    type: GetUsersForTeamByTypeDto,
+  })
+  @Post('getUsersForTeamByType')
+  @HttpCode(HttpStatus.OK)
+  async getUsersForTeamByType(@Body() dto: GetUsersForTeamByTypeDto) {
+    const result = await this.userAdminService.getUsersForTeamByType(dto.userTypeCode);
     return result;
   }
 
