@@ -4,7 +4,7 @@ import { RowDataPacket } from 'mysql2/promise';
 import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IUserApp, USER_CONST } from '../app/user.interface';
-import { GetAllUserDto, UpdateUserPackageAdminDto, UserPackageFilterEnum } from './user.dto';
+import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserPackageFilterEnum } from './user.dto';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UPDATOR } from 'src/helpers/const.helper';
 import { IUserForTeamByType, IUserType } from './user.interface';
@@ -152,11 +152,11 @@ export class UserAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
     return rows as IUserType[];
   }
-  async getUsersForTeamByType(userTypeCode: string): Promise<IUserForTeamByType[]> {
+  async getUsersForTeamByType(dto: GetUsersForTeamByTypeDto): Promise<IUserForTeamByType[]> {
     const sql = ` SELECT A.userCode, A.userName, A.userPhone
          FROM ${this.tableApp} A
          WHERE A.isActive = 'Y' 
-         AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = '${userTypeCode}')
+         ${dto.pageType === "create" ? ` AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = '${dto.userTypeCode}' )` : ""}
       `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
     return rows as IUserForTeamByType[];

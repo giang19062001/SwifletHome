@@ -166,6 +166,60 @@ async function assignForm(teamData) {
   // điền giá trị các input bằng dữ liệu từ API
   form.querySelector('#teamName').value = teamData.teamName || '';
   form.querySelector('#teamAddress').value = teamData.teamAddress || '';
+  form.querySelector('#provinceCode').value = teamData.provinceCode || '';
+
+  // điền giá trị userTypeCode
+  const userTypeCodeSelect = form.querySelector('#userTypeCode');
+  userTypeCodeSelect.value = teamData.userTypeCode || '';
+  userTypeCodeSelect.disabled = true;
+  if (teamData.userTypeCode) {
+    const userSelect = form.querySelector('#userCode');
+    userSelect.innerHTML = '<option value="">-- Chọn khách hàng sở hữu --</option>';
+    userSelect.disabled = true;
+
+    // điền giá trị userCode
+    const userList = await getUsersForTeamByType(teamData.userTypeCode);
+    if (userList && userList.length > 0) {
+      userList.forEach((user) => {
+        const option = document.createElement('option');
+        option.value = user.userCode;
+        option.textContent = user.userName;
+        userSelect.appendChild(option);
+      });
+      userSelect.value = teamData.userCode || '';
+    }
+
+    // dựa giá trị userTypeKeyWord mà hiện/ ẩn component
+    const userTypeCodeSelected = userTypeCodeSelect.options[userTypeCodeSelect.selectedIndex];
+    if (userTypeCodeSelected) {
+      const userTypeKeyWord = userTypeCodeSelected.dataset.keyword;
+      const technicalDiv = document.querySelector('.last-box > div:first-child');
+      const descriptionDiv = document.querySelector('.last-box > div:nth-child(2)');
+      if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
+        // hiện form chuyên môn cho đội kỹ thuật / chia đôi chiều rộng của editor
+        technicalDiv.style.display = 'block';
+        descriptionDiv.className = 'col-lg-6';
+
+        // điền giá trị teamDescriptionSpecial vào từng Textarea
+        if (teamData.teamDescriptionSpecial) {
+          const specialData = typeof teamData.teamDescriptionSpecial === 'string' ? JSON.parse(teamData.teamDescriptionSpecial) : teamData.teamDescriptionSpecial;
+          if (typeof technicalTypes !== 'undefined' && Array.isArray(technicalTypes)) {
+            technicalTypes.forEach((item) => {
+              const textareaElement = document.getElementById(item.keyOption);
+              if (textareaElement && specialData[item.keyOption.toLowerCase()] !== undefined) {
+                textareaElement.value = specialData[item.keyOption.toLowerCase()];
+              }
+            });
+          }
+        }
+      } else {
+        // ẩn form chuyên môn cho đội kỹ thuật / bật chiều rộng full cho editor
+        technicalDiv.style.display = 'none';
+        descriptionDiv.className = 'col-lg-12';
+      }
+    }
+  }
+
   quillGlobal.root.innerHTML = quillGlobal && teamData.teamDescription ? teamData.teamDescription : '';
 
   // teamImage
@@ -325,6 +379,7 @@ async function getUsersForTeamByType(userTypeCode) {
       CURRENT_URL + '/api/admin/user/getUsersForTeamByType',
       {
         userTypeCode: userTypeCode,
+        pageType: pageType,
       },
       axiosAuth(),
     )

@@ -32,6 +32,47 @@
                                                     name="teamAddress" />
                                                 <div class="error-message" data-error="teamAddress"></div>
                                             </div>
+
+
+                                            <div class="col-md-12 form-group mb-3">
+                                                <label for="provinceCode" class="form-label">Tỉnh / Thành phố</label>
+                                                <select class="form-select" id="provinceCode" name="provinceCode">
+                                                    <option value="">-- Chọn tỉnh/thành --</option>
+                                                    <% if (values?.provinces && values.provinces.length> 0) { %>
+                                                        <% values.provinces.forEach(function(province) { %>
+                                                            <option value="<%= province.provinceCode %>">
+                                                                <%= province.provinceName %>
+                                                            </option>
+                                                        <% }) %>
+                                                    <% } %>
+                                                </select>
+                                                <div class="error-message" data-error="provinceCode"></div>
+                                            </div>
+
+                                            <div class="col-md-12 form-group mb-3">
+                                                <label for="userTypeCode" class="form-label">Loại công xưởng</label>
+                                                <select class="form-select" id="userTypeCode" name="userTypeCode">
+                                                    <option value="">-- Chọn loại công xưởng --</option>
+                                                    <% if (values?.userTypes && values.userTypes.length> 0) { %>
+                                                        <% values.userTypes.forEach(function(utype) { %>
+                                                            <option value="<%= utype.userTypeCode %>"
+                                                                data-keyword="<%= utype.userTypeKeyWord %>">
+                                                                <%= utype.userTypeName %>
+                                                            </option>
+                                                        <% }) %>
+                                                    <% } %>
+                                                </select>
+                                                <div class="error-message" data-error="userTypeCode"></div>
+                                            </div>
+
+                                            <div class="col-md-12 form-group mb-3">
+                                                <label for="userCode" class="form-label">khách hàng sở hữu</label>
+                                                <select class="form-select" id="userCode" name="userCode" disabled>
+                                                    <option value="">-- Chọn khách hàng sở hữu --</option>
+                                                </select>
+                                                <div class="error-message" data-error="userCode"></div>
+                                            </div>
+
                                         </div>
                                     </div>
 
@@ -67,7 +108,22 @@
                                     </div>
                                 </div>
 
-                                <div class="row mt-2">
+                                <div class="row mt-2 last-box">
+                                    <div class="col-lg-6" style="display: none;">
+                                        <% if (values?.technicalTypes && values.technicalTypes.length> 0) { %>
+                                            <% values.technicalTypes.forEach(function(item) { %>
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-3">
+                                                        <label for="<%= item.keyOption %>" class="form-label">
+                                                            Thông tin kỹ thuật - <%= item.valueOption %>
+                                                        </label>
+                                                        <textarea class="form-control" id="<%= item.keyOption %>"
+                                                            name="<%= item.keyOption %>" rows="4"></textarea>
+                                                    </div>
+                                                </div>
+                                            <% }) %>
+                                        <% } %>
+                                    </div>
                                     <div class="col-lg-12">
                                         <div class="form-group">
                                             <label for="teamDescription" class="form-label">Mô tả</label>
@@ -75,8 +131,6 @@
                                                 <div class="error-message" data-error="teamDescription"></div>
                                         </div>
                                     </div>
-
-
 
                                     <div class="col-12 form-group d-flex justify-content-center mt-4">
                                         <button type="submit" class="btn-submit-lg">Lưu</button>
@@ -91,9 +145,10 @@
     </div>
 </div>
 <script>
+  const technicalTypes = <%- JSON.stringify(values.technicalTypes) %>
   const teamData = <%- JSON.stringify(values.teamData) %>
-  console.log('teamData', teamData);
+  console.log('technicalTypes', technicalTypes);
+  console.log("teamData", teamData);
 </script>
-
 <script src="/js/common-validate.js"></script>
 <script src="/js/page-user-teams-mutation.js"></script>

@@ -4,7 +4,7 @@ import { UserAdminRepository } from './user.repository';
 import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
 import { IList } from 'src/interfaces/admin.interface';
 import { IUserApp } from '../app/user.interface';
-import { GetAllUserDto, UpdateUserPackageAdminDto } from './user.dto';
+import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto } from './user.dto';
 import { IPackage } from 'src/modules/package/package.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { PackageAdminService } from 'src/modules/package/admin/package.service';
@@ -98,7 +98,7 @@ export class UserAdminService {
   async getTypesForTeam(): Promise<IUserType[]> {
     return await this.userAdminRepository.getTypesForTeam();
   }
-  async getUsersForTeamByType(userTypeCode: string): Promise<IUserForTeamByType[]> {
-    return await this.userAdminRepository.getUsersForTeamByType(userTypeCode);
+  async getUsersForTeamByType(dto: GetUsersForTeamByTypeDto): Promise<IUserForTeamByType[]> {
+    return await this.userAdminRepository.getUsersForTeamByType(dto);
   }
 }

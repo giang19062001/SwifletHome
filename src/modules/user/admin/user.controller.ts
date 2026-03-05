@@ -31,7 +31,7 @@ export class UserAdminController {
   @Post('getUsersForTeamByType')
   @HttpCode(HttpStatus.OK)
   async getUsersForTeamByType(@Body() dto: GetUsersForTeamByTypeDto) {
-    const result = await this.userAdminService.getUsersForTeamByType(dto.userTypeCode);
+    const result = await this.userAdminService.getUsersForTeamByType(dto);
     return result;
   }
 

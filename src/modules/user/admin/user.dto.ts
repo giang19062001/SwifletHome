@@ -42,6 +42,12 @@ export class GetUsersForTeamByTypeDto {
   @IsString()
   @IsNotEmpty()
   userTypeCode: string;
+
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  pageType: "create" | "update"
 }
 
 export class UpdateUserPackageAdminDto {
