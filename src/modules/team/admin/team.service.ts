@@ -6,8 +6,8 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { TeamAdminRepository } from './team.repository';
-import { ITeam, ITeamImg } from './team.interface';
-import { CreateTeamDto, UpdateTeamDto } from './team.dto';
+import { ITeam, ITeamImg, ITeamReview } from './team.interface';
+import { ChangDisplayReviewDto, CreateTeamDto, UpdateTeamDto } from './team.dto';
 
 @Injectable()
 export class TeamAdminService {
@@ -127,5 +127,22 @@ export class TeamAdminService {
     } else {
       return 0;
     }
+  }
+
+  // TODO: REVIEW
+  async getAllReview(dto: PagingDto): Promise<IList<ITeamReview>> {
+    const total = await this.teamAdminRepository.getTotalReview();
+    const list = await this.teamAdminRepository.getAllReview(dto);
+    return { total, list };
+  }
+
+  async getDetailReview(seq: number): Promise<ITeamReview | null> {
+    const result = await this.teamAdminRepository.getDetailReview(seq);
+    return result;
+  }
+
+  async changeDisplay(dto: ChangDisplayReviewDto, updatedId: string, seq: number): Promise<number> {
+    const result = await this.teamAdminRepository.changeDisplay(dto.isDisplay, updatedId, seq);
+    return result;
   }
 }

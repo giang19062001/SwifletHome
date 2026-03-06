@@ -1,9 +1,10 @@
+import { YnEnum } from './../../../interfaces/admin.interface';
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
-import { ITeam, ITeamImg } from './team.interface';
+import { ITeam, ITeamImg, ITeamReview } from './team.interface';
 import { CreateTeamDto, UpdateTeamDto } from './team.dto';
 
 @Injectable()
@@ -12,9 +13,12 @@ export class TeamAdminRepository {
   private readonly tableImg = 'tbl_team_img';
   private readonly tableUser = 'tbl_user_app';
   private readonly tableProvince = 'tbl_provinces';
+  private readonly tableReview = 'tbl_team_review';
+  private readonly tableReviewImg = 'tbl_team_review_img';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
+  // TODO: TEAM
   async checkDuplicateTeam(userCode: string, userTypeCode: string): Promise<boolean> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` 
@@ -30,7 +34,7 @@ export class TeamAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<ITeam[]> {
-    let query = `   SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCode,
+    let query = `   SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCode,
      A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, C.provinceName
         FROM ${this.table} A  
           LEFT JOIN ${this.tableUser} B
@@ -39,7 +43,6 @@ export class TeamAdminRepository {
           ON A.provinceCode = C.provinceCode
         WHERE A.isActive = 'Y'
         ORDER BY A.createdAt DESC `;
-
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
@@ -117,7 +120,7 @@ export class TeamAdminRepository {
 
     return result.affectedRows;
   }
-  // IMAGE
+  // TODO: IMAGE
   async getImages(seq: number): Promise<ITeamImg[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.teamSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive
@@ -164,6 +167,92 @@ export class TeamAdminRepository {
   `;
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, seqList);
+    return result.affectedRows;
+  }
+  // TODO: REVIEW
+  async getTotalReview(): Promise<number> {
+    let query = ` 
+      SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableReview} A `;
+
+    const params: any[] = [];
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+  async getAllReview(dto: PagingDto): Promise<ITeamReview[]> {
+    let query = ` SELECT A.seq, A.isDisplay, A.teamCode, A.review, A.star, A.reviewBy, B.userName AS reviewByName, 
+      C.teamName, D.userName as ownerName, A.createdAt, A.updatedAt,
+          COALESCE(
+            (
+              SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                  'seq', D.seq,
+                  'filename', D.filename,
+                  'mimetype', D.mimetype
+                )
+              )
+              FROM ${this.tableReviewImg} D
+              WHERE D.reviewSeq = A.seq
+            ),
+            JSON_ARRAY()
+          ) AS reviewImages
+          FROM ${this.tableReview} A 
+          LEFT JOIN ${this.tableUser} B
+            ON A.reviewBy = B.userCode
+          LEFT JOIN ${this.table} C
+            ON A.teamCode = C.teamCode
+          LEFT JOIN ${this.tableUser} D
+            ON C.userCode = D.userCode
+          WHERE A.isActive = 'Y'
+          ORDER BY A.seq DESC
+      `;
+    const params: any[] = [];
+
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows as ITeamReview[];
+  }
+  async getDetailReview(seq: number): Promise<ITeamReview | null> {
+    let query = ` SELECT A.seq, A.isDisplay, A.teamCode, A.review, A.star, A.reviewBy, B.userName AS reviewByName, C.teamName, D.userName as ownerName, A.createdAt, A.updatedAt,
+          COALESCE(
+            (
+              SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                  'seq', D.seq,
+                  'filename', D.filename,
+                  'mimetype', D.mimetype
+                )
+              )
+              FROM ${this.tableReviewImg} D
+              WHERE D.reviewSeq = A.seq
+            ),
+            JSON_ARRAY()
+          ) AS reviewImages
+          FROM ${this.tableReview} A 
+          LEFT JOIN ${this.tableUser} B
+            ON A.reviewBy = B.userCode
+          LEFT JOIN ${this.table} C
+            ON A.teamCode = C.teamCode
+          LEFT JOIN ${this.tableUser} D
+            ON C.userCode = D.userCode
+          WHERE A.isActive = 'Y' AND A.seq = ?
+          LIMIT 1
+      `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [seq]);
+    return rows.length ? (rows[0] as ITeamReview) : null;
+  }
+  async changeDisplay(isDisplay: YnEnum, updatedId: string, seq: number): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableReview} SET isDisplay =  ?, 
+      updatedId = ?, updatedAt = ?
+      WHERE seq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [isDisplay, updatedId, new Date(), seq]);
+
     return result.affectedRows;
   }
 }

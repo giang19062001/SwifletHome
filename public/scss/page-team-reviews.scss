@@ -1,0 +1,17 @@
+.team-review-modal {
+  #reviewImages-images {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .file-item {
+    display: inline-block;
+    img {
+      width: 200px;
+      min-height: 150px;
+      border-radius: 5px;
+    }
+  }
+}

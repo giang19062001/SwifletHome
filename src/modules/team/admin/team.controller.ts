@@ -28,8 +28,8 @@ import { multerImgConfig } from 'src/config/multer.config';
 import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { TeamAdminService } from './team.service';
-import { ITeam } from './team.interface';
-import { CreateTeamDto, UpdateTeamDto } from './team.dto';
+import { ITeam, ITeamReview } from './team.interface';
+import { ChangDisplayReviewDto, CreateTeamDto, UpdateTeamDto } from './team.dto';
 import { MsgAdmin } from 'src/helpers/message.helper';
 
 @ApiBearerAuth('admin-auth')
@@ -39,6 +39,7 @@ import { MsgAdmin } from 'src/helpers/message.helper';
 export class TeamAdminController {
   constructor(private readonly teamAdminService: TeamAdminService) {}
 
+  // TODO: TEAM
   @ApiBody({
     type: PagingDto,
   })
@@ -141,14 +142,49 @@ export class TeamAdminController {
     return result;
   }
 
-  @Delete('delete/:teamCode')
+  // @Delete('delete/:teamCode')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiParam({ name: 'teamCode', type: String })
+  // async delete(@Param('teamCode') teamCode: string): Promise<number> {
+  //   const result = await this.teamAdminService.delete(teamCode);
+  //   if (result === 0) {
+  //     throw new BadRequestException();
+  //   }
+  //   return result;
+  // }
+
+  // TODO: REVIEW
+  @ApiBody({
+    type: PagingDto,
+  })
+  @Post('getAllReview')
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'teamCode', type: String })
-  async delete(@Param('teamCode') teamCode: string): Promise<number> {
-    const result = await this.teamAdminService.delete(teamCode);
-    if (result === 0) {
+  async getAllReview(@Body() dto: PagingDto): Promise<IList<ITeamReview>> {
+    const result = await this.teamAdminService.getAllReview(dto);
+    return result;
+  }
+
+  @ApiParam({ name: 'seq', type: Number })
+  @Get('getDetailReview/:seq')
+  @HttpCode(HttpStatus.OK)
+  async getDetailReview(@Param('seq') seq: number): Promise<ITeamReview | null> {
+    const result = await this.teamAdminService.getDetailReview(seq);
+    if (!result) {
       throw new BadRequestException();
     }
     return result;
   }
+
+    @ApiBody({ type: ChangDisplayReviewDto })
+    @ApiParam({ name: 'seq', type: String })
+    @Put('changeDisplay/:seq')
+    @HttpCode(HttpStatus.OK)
+    async changeDisplay(@Body() dto: ChangDisplayReviewDto, @Param('seq') seq: number, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+      const result = await this.teamAdminService.changeDisplay(dto, admin.userId, seq);
+      if (result === 0) {
+        throw new BadRequestException();
+      }
+      return result;
+    }
+  
 }

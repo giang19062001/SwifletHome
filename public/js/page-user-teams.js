@@ -36,7 +36,6 @@ function renderAllTeam(data, objElement) {
             <td><p>${ele.provinceName}</p></td>
             <td><p>${ele.teamAddress}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
-            <td><p>${ele.createdId ?? ''}</p></td>
             <td>
                <button class="btn-edit" onclick="gotoTeamUpdate('${ele.teamCode}')">Chỉnh sửa</button> 
             </td>

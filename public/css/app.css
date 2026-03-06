@@ -19746,6 +19746,21 @@ select {
   padding-top: 20px;
 }
 
+.team-review-modal #reviewImages-images {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.team-review-modal .file-item {
+  display: inline-block;
+}
+.team-review-modal .file-item img {
+  width: 200px;
+  min-height: 150px;
+  border-radius: 5px;
+}
+
 .component-upload {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
   border-radius: 15px;

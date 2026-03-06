@@ -32,16 +32,16 @@ const renderAllBlog = (data, objElement) => {
             <td><p>${ele.objectName}</p></td>
             <td><p>${ele.blogName}</p></td>
             <td><b class="${ele.isFree == 'Y' ? 'txt-free' : 'txt-pay'}">${ele.isFree == 'Y' ? 'Miễn phí' : 'Tính phí'}</b></td>
-           <td class="text-center align-middle">
-            <div class="form-check form-switch d-flex justify-content-center align-items-center">
-              <input class="form-check-input"
-                type="checkbox"
-                role="switch"
-                data-blog-code="${ele.blogCode}"
-                onChange="changeToMain(this)"
-                  ${ele.isMain === 'Y' ? 'checked disabled' : ''}>
-            </div>
-          </td>
+            <td class="text-center align-middle">
+              <div class="form-check form-switch d-flex justify-content-center align-items-center">
+                <input class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  data-blog-code="${ele.blogCode}"
+                  onChange="changeToMain(this)"
+                    ${ele.isMain === 'Y' ? 'checked disabled' : ''}>
+              </div>
+            </td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td><p>${ele.createdId ?? ''}</p></td>
             <td>

@@ -178,6 +178,7 @@ export class AppController {
     };
   }
 
+  // user - team
   @Get('/dashboard/user/teams')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/user-teams')
@@ -185,7 +186,7 @@ export class AppController {
     const values = await this.appService.renderUserTeams();
 
     return {
-      title: 'Danh sách đội gia công - kỹ thuật',
+      title: 'Danh sách xưởng gia công - kỹ thuật',
       isLayout: true,
       user: req.session.user,
       values: values,
@@ -197,7 +198,7 @@ export class AppController {
   async renderTeamCreate(@Req() req: Request) {
     const values = await this.appService.renderTeamCreate();
     return {
-      title: 'Thêm  đội gia công - kỹ thuật',
+      title: 'Thêm xưởng gia công - kỹ thuật',
       isLayout: true,
       user: req.session.user,
       values: values,
@@ -210,13 +211,24 @@ export class AppController {
   async renderTeamUpdate(@Req() req: Request) {
     const values = await this.appService.renderTeamUpdate(req.params.id);
     return {
-      title: 'Chỉnh sửa  đội gia công - kỹ thuật',
+      title: 'Chỉnh sửa xưởng gia công - kỹ thuật',
       isLayout: true,
       user: req.session.user,
       values: values,
     };
   }
 
+  // team - review
+  @Get('/dashboard/user/team-reviews')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/team-reviews')
+  async renderTeamReviews(@Req() req: Request) {
+    return {
+      title: 'Danh sách đánh giá xưởng gia công - kỹ thuật',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   // media
   @Get('/dashboard/media')
   @UseGuards(PageAuthAdminGuard)
@@ -279,7 +291,7 @@ export class AppController {
       values: values,
     };
   }
-  
+
   @Get('/dashboard/home/sale')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-sale')

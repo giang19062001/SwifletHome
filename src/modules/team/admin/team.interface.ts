@@ -21,6 +21,29 @@ export interface ITeam {
   teamImages: ITeamImg[];
 }
 
+export interface ITeamReview {
+  seq: number;
+  review: string;
+  star: number;
+  reviewBy: string;
+  reviewByName?: string;
+  teamNam: string;
+  ownerName?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isDisplay: YnEnum;
+  reviewImages: ITeamReviewFile[];
+}
+export interface ITeamReviewFile {
+  seq: number;
+  reviewSeq: number;
+  filename: string;
+  originalname: string;
+  size: number;
+  mimetype: string;
+  isActive: YnEnum;
+}
+
 export interface ITeamImg {
   seq: number;
   teamSeq: number;

@@ -52,7 +52,7 @@ export class TeamAppRepository {
     LEFT JOIN ${this.tableUserType} B
     ON A.userTypeCode = B.userTypeCode
     LEFT JOIN ${this.tableReview} C
-    ON A.teamCode = C.teamCode
+    ON A.teamCode = C.teamCode AND C.isDisplay = 'Y'
     WHERE A.isActive = 'Y'  AND A.userCode != ?`;
 
     const params: any[] = [userCode];
@@ -104,6 +104,7 @@ export class TeamAppRepository {
                 teamCode,
                 CAST(ROUND(AVG(star),1) AS DOUBLE) AS star
               FROM ${this.tableReview}
+              WHERE isActive = 'Y' AND isDisplay = 'Y'
               GROUP BY teamCode
           ) R ON A.teamCode = R.teamCode
           WHERE A.isActive = 'Y'
@@ -122,7 +123,7 @@ export class TeamAppRepository {
   async getReviewTotalOfTeam(dto: GetReviewListOfTeamDto): Promise<number> {
     let query = ` 
     SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableReview} A  
-    WHERE A.isActive = 'Y' AND A.teamCode = ?`;
+    WHERE A.isActive = 'Y' AND A.isDisplay = 'Y' AND A.teamCode = ?`;
 
     const params: any[] = [dto.teamCode];
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
@@ -147,7 +148,7 @@ export class TeamAppRepository {
         FROM ${this.tableReview} A 
         LEFT JOIN ${this.tableUser} B
         ON A.reviewBy = B.userCode
-        WHERE A.isActive = 'Y' AND A.teamCode = ?
+        WHERE A.isActive = 'Y' AND A.isDisplay = 'Y' AND A.teamCode = ?
         ORDER BY A.seq DESC
     `;
     const params: any[] = [dto.teamCode];

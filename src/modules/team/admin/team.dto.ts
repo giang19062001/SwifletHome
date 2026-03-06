@@ -1,6 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class CreateTeamDto {
   @ApiProperty({
@@ -69,3 +70,14 @@ export class CreateTeamDto {
 }
 
 export class UpdateTeamDto extends CreateTeamDto {}
+
+
+export class ChangDisplayReviewDto {
+  @ApiProperty({
+    example: YnEnum.Y,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  @IsNotEmpty()
+  isDisplay: YnEnum;
+}

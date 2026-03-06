@@ -1,7 +1,7 @@
 const pageType = window.location.pathname.includes('/update') ? 'update' : 'create';
 const teamMutationConstraints = {
   teamName: {
-    presence: { allowEmpty: false, message: '^Vui lòng nhập tên đội công xưởng.' },
+    presence: { allowEmpty: false, message: '^Vui lòng nhập tên xưởng công xưởng.' },
   },
   teamAddress: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập địa chỉ.' },
@@ -196,7 +196,7 @@ async function assignForm(teamData) {
       const technicalDiv = document.querySelector('.last-box > div:first-child');
       const descriptionDiv = document.querySelector('.last-box > div:nth-child(2)');
       if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
-        // hiện form chuyên môn cho đội kỹ thuật / chia đôi chiều rộng của editor
+        // hiện form chuyên môn cho xưởng kỹ thuật / chia đôi chiều rộng của editor
         technicalDiv.style.display = 'block';
         descriptionDiv.className = 'col-lg-6';
 
@@ -213,7 +213,7 @@ async function assignForm(teamData) {
           }
         }
       } else {
-        // ẩn form chuyên môn cho đội kỹ thuật / bật chiều rộng full cho editor
+        // ẩn form chuyên môn cho xưởng kỹ thuật / bật chiều rộng full cho editor
         technicalDiv.style.display = 'none';
         descriptionDiv.className = 'col-lg-12';
       }
@@ -326,7 +326,7 @@ async function submitTeam(formData, url, method, successMessage) {
   const fields = ['teamName', 'teamAddress', 'provinceCode', 'userTypeCode', 'userCode', 'teamDescription'];
   fields.forEach((field) => postData.append(field, formData[field]));
 
-  // add dữ liệu chuyên môn của đội kỹ thuật
+  // add dữ liệu chuyên môn của xưởng kỹ thuật
   const userTypeKeyWord = document.querySelector('#userTypeCode option:checked')?.dataset.keyword;
   if (userTypeKeyWord == VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
     let teamDescriptionSpecial = {};
