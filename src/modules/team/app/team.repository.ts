@@ -26,9 +26,9 @@ export class TeamAppRepository {
     SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A  
     LEFT JOIN ${this.tableUserType} B
     ON A.userTypeCode = B.userTypeCode
-    WHERE A.isActive = 'Y' AND A.userCode != ? `;
+    WHERE A.isActive = 'Y' AND A.userCode != ? AND B.userTypeKeyWord = ? `;
 
-    const params: any[] = [userCode];
+    const params: any[] = [userCode, dto.userTypeKeyWord];
     if (dto.provinceCode) {
       query += ` AND A.provinceCode = ? `;
       params.push(dto.provinceCode);
@@ -53,9 +53,9 @@ export class TeamAppRepository {
     ON A.userTypeCode = B.userTypeCode
     LEFT JOIN ${this.tableReview} C
     ON A.teamCode = C.teamCode AND C.isDisplay = 'Y'
-    WHERE A.isActive = 'Y'  AND A.userCode != ?`;
+    WHERE A.isActive = 'Y'  AND A.userCode != ? AND B.userTypeKeyWord = ? `;
 
-    const params: any[] = [userCode];
+    const params: any[] = [userCode, dto.userTypeKeyWord];
     if (dto.provinceCode) {
       query += ` AND A.provinceCode = ? `;
       params.push(dto.provinceCode);

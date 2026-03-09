@@ -29,7 +29,8 @@ export class TeamAppController {
   // TODO: TEAM
   @ApiOperation({
     summary: 'Lấy danh sách các đội kỹ thuật - thi công',
-    description: ``,
+    description: `
+**userTypeKeyWord**: enum('FACTORY', ''TECHNICAL)`,
   })
   @ApiBody({
     type: GetAllTeamDto,

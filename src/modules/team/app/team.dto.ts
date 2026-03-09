@@ -3,6 +3,7 @@ import { Transform, Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, Min, ValidateNested } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { IUserTeamTypeEnum } from 'src/modules/user/app/user.interface';
 
 export class GetAllTeamDto extends PagingDto {
   @ApiProperty({
@@ -11,6 +12,14 @@ export class GetAllTeamDto extends PagingDto {
   @IsString()
   @IsOptional()
   provinceCode: string;
+
+  @ApiProperty({
+    example: IUserTeamTypeEnum.FACTORY,
+    enum: IUserTeamTypeEnum,
+  })
+  @IsEnum(IUserTeamTypeEnum)
+  @IsNotEmpty()
+  userTypeKeyWord: IUserTeamTypeEnum;
 
   @ApiProperty({
     example: '',
@@ -63,7 +72,7 @@ export class ReviewTeamDto {
     minimum: 1,
     maximum: 5,
   })
-  @Type(() => Number) 
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   @Max(5)
