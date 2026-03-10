@@ -19746,6 +19746,29 @@ select {
   padding-top: 20px;
 }
 
+#page-terms-of-use {
+  padding: 5em 0em;
+}
+#page-terms-of-use [class*=policy-] {
+  margin-bottom: 2em;
+}
+#page-terms-of-use p,
+#page-terms-of-use b,
+#page-terms-of-use span,
+#page-terms-of-use li {
+  font-size: 18px !important;
+}
+#page-terms-of-use h5, #page-terms-of-use .h5,
+#page-terms-of-use h3,
+#page-terms-of-use .h3 {
+  font-family: "Pretendard" !important;
+  font-weight: 700 !important;
+  margin-bottom: 0 !important;
+}
+#page-terms-of-use li {
+  margin-bottom: 8px;
+}
+
 .team-review-modal #reviewImages-images {
   display: flex;
   flex-direction: row;

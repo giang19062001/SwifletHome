@@ -31,6 +31,14 @@ export class AppController {
     return { title: 'Trung tâm hỗ trợ', isLayout: false };
   }
 
+  
+  @Get('/terms-of-use')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/terms-of-use')
+  renderTermsOfUse() {
+    return { title: 'Điều khoản sử dụng', isLayout: false };
+  }
+
   // dashboard
   @Get('/dashboard/main')
   @UseGuards(PageAuthAdminGuard)
