@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, ValidateNested } from 'class-validator';
+import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, ValidateIf, ValidateNested } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { PeriodTypeEnum, TaskStatusEnum } from '../todo.interface';
+import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { IsTodayOrAfter } from 'src/decorator/validate.decorator';
-import { Msg } from 'src/helpers/message.helper';
+import { MsgDto } from 'src/helpers/message.helper';
 
 export class GetListTaskAlarmsDTO extends PagingDto {
   @ApiProperty({
@@ -185,14 +185,15 @@ export class SetTaskMedicineDto {
     example: '',
   })
   @IsString()
-  @IsOptional()
+  @ValidateIf(o => o.medicineOptionCode === TODO_CONST.TASK_OPTION_MEDICINE.OTHER.value)
+  @IsNotEmpty({ message:  MsgDto.CannotNull('medicineOther') })
   medicineOther: string;
 
   @ApiProperty({
     example: '',
   })
   @IsString()
-  @IsNotEmpty({ message: Msg.medicineUsageCannotBlank})
+  @IsNotEmpty({ message: MsgDto.CannotNull('medicineUsage')})
   medicineUsage: string;
 
   @ApiProperty({

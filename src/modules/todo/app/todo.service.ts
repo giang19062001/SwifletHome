@@ -267,10 +267,6 @@ export class TodoAppService {
       this.logger.error(logbase, `Medicine optione không có dữ liệu`);
       throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
     }
-    if (medicineOption.keyOption === TODO_CONST.TASK_OPTION_MEDICINE.OTHER.value && dto.medicineOther == '') {
-      this.logger.error(logbase, `Medicine other không thể trống khi mã code là 'OTHER'`);
-      throw new BadRequestException({ message: Msg.CannotNull('medicineOther'), data: 0 });
-    }
 
     // kiểm tra task phải là 'lăn thuốc'
     const task = await this.todoAppRepository.getTaskByKeyword(TODO_CONST.TASK_BOX.MEDICINE.value);
@@ -349,7 +345,7 @@ export class TodoAppService {
           medicineNextDate: moment(result?.taskDate).format('YYYY-MM-DD'),
         };
       } else {
-        this.logger.error(logbase, `Giá trị (${Msg.InvalidValue('taskAlarmCode')}) không hợp lệ`);
+        this.logger.error(logbase, `taskAlarmCode(${taskAlarmCode}) không có dữ liệu`);
         return null;
       }
     }

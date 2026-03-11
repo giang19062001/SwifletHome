@@ -73,6 +73,12 @@ function mapContentFileds(data) {
         // contentCenter: data.contentCenter ?? '',
         // contentEnd: data.contentEnd ?? '',
       };
+    case 'CONSIGNMENT_GUIDE':
+       screenContent = {
+        contentStart: data.contentStart ?? '',
+        // contentCenter: data.contentCenter ?? '',
+        // contentEnd: data.contentEnd ?? '',
+      };
       break;
     default:
       screenContent = {};

@@ -23,7 +23,8 @@ export class ScreenAppController {
     description: `
 **SIGNUP_SERVICE**: Màn hình đăng kí dịch vụ,\n
 **REQUEST_DOCTOR**: Màn hình khám bệnh nhà yến\n
-**REQUEST_QR_GUIDE**: Popup hướng dẫn cho màn hình yêu cầu mã QR`,
+**REQUEST_QR_GUIDE**: Popup hướng dẫn cho màn hình yêu cầu mã QR \n
+**CONSIGNMENT_GUIDE**: Popup hướng dẫn cho màn hình ký gửi`,
     name: 'keyword',
     type: String,
   })

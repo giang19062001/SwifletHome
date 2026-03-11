@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, Matches, IsEnum, IsOptional } from 'class-validator';
-import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class UpdateUserDto {

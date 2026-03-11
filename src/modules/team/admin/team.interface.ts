@@ -19,6 +19,8 @@ export interface ITeam {
   updatedId: string;
   teamImage: string | ITeamImg;
   teamImages: ITeamImg[];
+  userTypeKeyWord: string;
+  userTypeName: string
 }
 
 export interface ITeamReview {
@@ -27,7 +29,7 @@ export interface ITeamReview {
   star: number;
   reviewBy: string;
   reviewByName?: string;
-  teamNam: string;
+  teamName: string;
   ownerName?: string;
   createdAt: Date;
   updatedAt: Date;

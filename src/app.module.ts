@@ -43,6 +43,7 @@ import { QrAdminModule } from './modules/qr/admin/qr.module';
 import { PhoneCodeModule } from './modules/phoneCode/phoneCode.module';
 import { TeamAppModule } from './modules/team/app/team.module';
 import { TeamAdminModule } from './modules/team/admin/team.module';
+import { ConsignmentAppModile } from './modules/consigment/app/consigment.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { TeamAdminModule } from './modules/team/admin/team.module';
     TodoAppModule,
     QrAppModule,
     TeamAppModule,
+    ConsignmentAppModile,
 
     //admin
     AuthAdminModule,

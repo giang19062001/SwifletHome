@@ -9,6 +9,7 @@ export const APP_SCREENS = {
   SIGNUP_SERVICE: 'SIGNUP_SERVICE',
   REQUEST_DOCTOR: 'REQUEST_DOCTOR',
   REQUEST_QR_GUIDE: 'REQUEST_QR_GUIDE',
+  CONSIGNMENT_GUIDE: 'CONSIGNMENT_GUIDE',
 };
 
 export const QUERY_HELPER = {
@@ -68,4 +69,9 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'TEM000001',
   },
+  consignmentCode:{
+     PRE: 'CSM',
+    LEN: 6,
+    FRIST_CODE: 'CSM000001',
+  }
 };

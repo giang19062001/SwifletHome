@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ITodoTaskAlram, TaskStatusEnum } from '../todo.interface';
-import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { SetTaskAlarmDto } from './todo.dto';
+import { MsgDto } from 'src/helpers/message.helper';
 
 @Injectable()
 export default class TodoAppValidate {
@@ -15,7 +15,7 @@ export default class TodoAppValidate {
 
     //specificValue bắt buộc phải có
     if (dto.specificValue == null) {
-      error = Msg.CannotNull('specificValue');
+      error = MsgDto.CannotNull('specificValue');
       return error;
     }
     const specificDate = new Date(dto.specificValue);
@@ -27,12 +27,12 @@ export default class TodoAppValidate {
 
     // validate ngày hợp lệ
     if (isNaN(specificDate.getTime())) {
-      return Msg.InvalidValue('specificValue');
+      return MsgDto.InvalidValue('specificValue');
     }
 
     // specificValue phải lớn hơn và bằng ngày hiện tại
     if (specificDate < now) {
-      return Msg.MustBeGreaterThanAndEqualNow('specificValue');
+      return MsgDto.MustBeGreaterThanAndEqualNow('specificValue');
     }
 
     dto.specificValue = specificDate;

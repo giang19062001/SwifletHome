@@ -68,13 +68,8 @@ export const Msg = {
   RequestCannotCancelNotWaiting: `Chỉ có thể hủy các yêu cầu đang ở chế độ chờ`,
   OnlyPurcharseCanFetch: `Chỉ có tài khoản người mua mới có thể lấy danh sách yến được bán`,
   OnlyOwnerCanFetch: `Chỉ có tài khoản chủ nhà yến có thể lấy danh sách yến được bán`,
-  medicineUsageCannotBlank: `Dung lượng thuốc không thể để trống`,
   TeamNotFound: 'Đội gia công - kỹ thuật không tồn tại',
-  YouAlreadyReview: 'Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi',
-  CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
-  InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
-  InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
-  MustBeGreaterThanAndEqualNow: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
+  YouAlreadyReview: 'Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi'
 };
 
 const convertFiledName = (filedName: string) => {
@@ -95,11 +90,30 @@ const convertFiledName = (filedName: string) => {
     case 'periodValue':
       txt = 'Giá trị tháng hoặc tuần';
       break;
+    case 'medicineOther':
+      txt = 'Tên thuốc';
+      break;
+    case 'senderName':
+      txt = 'Tên người gửi';
+      break;
+    case 'senderPhone':
+      txt = 'SĐT người gửi';
+      break;
+    case 'deliveryAddress':
+      txt = 'Địa chỉ cần giao thuốc';
+      break;
+    case 'receiverName':
+      txt = 'Tên người nhận';
+      break;
+    case 'receiverPhone':
+      txt = 'SĐT người nhận';
+      break;
     default:
       txt = filedName;
   }
   return txt;
 };
+
 export const MsgAdmin = {
   pushAlarmOk: 'Tạo lịch nhắc và gửi thông báo thành công',
   pushAlarmErr: 'Tạo lịch nhắc thành công nhưng gửi thông báo thất bại',
@@ -107,4 +121,13 @@ export const MsgAdmin = {
   pushNotifyErr: 'Gửi thông báo thất bại',
   pushProvinceEmpty: 'Không có người dùng nào có nhà yến thuộc những tỉnh thành này',
   userAlreadyCreateThisTeam: 'Người dùng hiện tại đã đăng ký đội công xưởng này rồi',
+};
+
+export const MsgDto = {
+  InvalidPhone: `Số điện thoại không hợp lệ`,
+  CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
+  MustBeGreaterZero: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn 0`,
+  InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
+  InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
+  MustBeGreaterThanAndEqualNow: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
 };

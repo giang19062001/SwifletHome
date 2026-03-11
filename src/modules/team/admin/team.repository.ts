@@ -12,6 +12,7 @@ export class TeamAdminRepository {
   private readonly table = 'tbl_team_user';
   private readonly tableImg = 'tbl_team_img';
   private readonly tableUser = 'tbl_user_app';
+  private readonly tableUserType = 'tbl_user_type';
   private readonly tableProvince = 'tbl_provinces';
   private readonly tableReview = 'tbl_team_review';
   private readonly tableReviewImg = 'tbl_team_review_img';
@@ -34,13 +35,15 @@ export class TeamAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<ITeam[]> {
-    let query = `   SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCode,
-     A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, C.provinceName
+    let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCode,
+     A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, C.provinceName, D.userTypeKeyWord, D.userTypeName
         FROM ${this.table} A  
           LEFT JOIN ${this.tableUser} B
           ON A.userCode = B.userCode 
           LEFT JOIN ${this.tableProvince} C
           ON A.provinceCode = C.provinceCode
+          LEFT JOIN ${this.tableUserType} D
+          ON A.userTypeCode = D.userTypeCode
         WHERE A.isActive = 'Y'
         ORDER BY A.createdAt DESC `;
     const params: any[] = [];

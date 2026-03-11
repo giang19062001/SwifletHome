@@ -96,7 +96,7 @@ export class ScreenAppService {
             } as IScreenSignupService;
           }
           break;
-        case APP_SCREENS.REQUEST_QR_GUIDE:
+        case APP_SCREENS.REQUEST_QR_GUIDE, APP_SCREENS.CONSIGNMENT_GUIDE:
           if (screen.screenContent) {
             let contentStart = screen.screenContent.contentStart
             result = {

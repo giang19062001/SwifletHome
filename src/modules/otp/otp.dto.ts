@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
-import { Msg } from 'src/helpers/message.helper';
 
 export enum PurposeEnum {
   REGISTER = 'REGISTER',
