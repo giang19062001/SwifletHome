@@ -55,3 +55,8 @@ pids
 *.pid
 *.seed
 *.pid.lock
+
+
+# Jenskin
+.current_deps_hash
+.last_deps_hash
