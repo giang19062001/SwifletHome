@@ -12144,8 +12144,8 @@ textarea.form-control-lg {
 }
 .vertical-menu #sidebar-menu ul li a svg.my-icon,
 .vertical-menu #sidebar-menu ul li a i {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   min-width: 1.75rem;
   margin-right: 10px;
   color: #7f8387;
@@ -12160,6 +12160,7 @@ textarea.form-control-lg {
 .vertical-menu #sidebar-menu ul li a.active i, .vertical-menu #sidebar-menu ul li a.child-active svg.my-icon,
 .vertical-menu #sidebar-menu ul li a.child-active i {
   color: #0175ff;
+  stroke: #0175ff;
 }
 .vertical-menu #sidebar-menu ul li .sub-menu {
   overflow: hidden;

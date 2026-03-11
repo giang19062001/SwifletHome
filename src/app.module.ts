@@ -44,6 +44,7 @@ import { PhoneCodeModule } from './modules/phoneCode/phoneCode.module';
 import { TeamAppModule } from './modules/team/app/team.module';
 import { TeamAdminModule } from './modules/team/admin/team.module';
 import { ConsignmentAppModile } from './modules/consigment/app/consigment.module';
+import { ConsignmentAdminModule } from './modules/consigment/admin/consignment.module';
 
 @Module({
   imports: [
@@ -92,7 +93,8 @@ import { ConsignmentAppModile } from './modules/consigment/app/consigment.module
     TodoAdminModule,
     NotificationAdminModule,
     QrAdminModule,
-    TeamAdminModule
+    TeamAdminModule,
+    ConsignmentAdminModule
   ],
   controllers: [AppController],
   providers: [

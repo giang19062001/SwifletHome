@@ -395,7 +395,7 @@ export class AppController {
   @Render('pages/qrcode')
   renderQrcode(@Req() req: Request) {
     return {
-      title: 'Gửi thông báo',
+      title: 'Danh sách yêu cầu QRcode',
       isLayout: true,
       user: req.session.user,
     };
@@ -426,7 +426,17 @@ export class AppController {
       values: values,
     };
   }
-
+  //qrcode
+  @Get('/dashboard/consignment')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/consignment')
+  renderConsignment(@Req() req: Request) {
+    return {
+      title: 'Danh sách ký gửi',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   //notification
   @Get('/dashboard/notification')
   @UseGuards(PageAuthAdminGuard)

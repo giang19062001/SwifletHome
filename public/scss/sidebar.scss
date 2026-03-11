@@ -49,8 +49,8 @@
 
           svg.my-icon,
           i {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             min-width: 1.75rem;
             margin-right: 10px;
             color: $sidebar-menu-item-icon-color;
@@ -67,6 +67,7 @@
             svg.my-icon,
             i {
               color: $sidebar-menu-item-active-color;
+              stroke: $sidebar-menu-item-active-color;
             }
           }
         }

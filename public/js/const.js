@@ -41,6 +41,28 @@ const LIST_ENUM = {
       text: 'Đã hủy',
     },
   ],
+  CONSIGNMENT_STATUS: [
+    {
+      value: 'WAITING',
+      text: 'Đang chờ duyệt',
+    },
+    {
+      value: 'DELIVERING',
+      text: 'Đang giao',
+    },
+    {
+      value: 'DELIVERED',
+      text: 'Giao thành công',
+    },
+    {
+      value: 'CANCEL',
+      text: 'Đã hủy',
+    },
+    {
+      value: 'RETURN',
+      text: 'Đã hoàn trả',
+    },
+  ],
   HOME_SALE_SIGHTSEEING_STATUS: [
     {
       value: 'WAITING',
