@@ -61,7 +61,9 @@ export const Msg = {
   MedicineTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
   MedicineInvalidDateExecute: 'Chưa đến ngày lăn thuốc',
   HarvestTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
+  ThisHarvestRequestQrcodeAlreadyCannotAdjust: `Đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi - không thể chỉnh sửa`,
   ThisHarvestRequestQrcodeAlready: `Đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi`,
+  ThisQrNotApproved: 'Qr không tồn tại hoặc chưa được duyệt',
   RequestQrcodeNotFound: `Không tìm thấy thông tin Qrcode của yêu cầu bán hiện tại`,
   RequestInfoAlreadySold: `Thông tin của Qr code này đã được rao bán rồi`,
   RequestNotAllowHarvestEmpty: `Nhà yến chưa có dữ liệu của đợt thu hoạch này, không thể yêu cầu mã Qrcode`,
@@ -69,7 +71,7 @@ export const Msg = {
   OnlyPurcharseCanFetch: `Chỉ có tài khoản người mua mới có thể lấy danh sách yến được bán`,
   OnlyOwnerCanFetch: `Chỉ có tài khoản chủ nhà yến có thể lấy danh sách yến được bán`,
   TeamNotFound: 'Đội gia công - kỹ thuật không tồn tại',
-  YouAlreadyReview: 'Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi'
+  YouAlreadyReview: 'Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi',
 };
 
 const convertFiledName = (filedName: string) => {

@@ -2,13 +2,13 @@ import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Para
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetTasksMedicineResDto, GetTaskHarvestResDto, GetListTaskHarvestResDto } from './todo.response';
+import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetTasksMedicineResDto, GetTaskHarvestResDto, GetListTaskHarvestResDto, GetInfoTaskHarvestForAdjustResDto } from './todo.response';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto, GetListTaskHarvestForAdjustDto } from './todo.dto';
+import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto, GetListTaskHarvestForAdjustDto, AdjustHarvestTaskDto, GetInfoTaskHarvestForAdjustDto } from './todo.dto';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
 import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
@@ -291,6 +291,8 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
 
   @ApiOperation({
     summary: 'Lấy danh sách thu hoạch chưa yêu cầu mã QRcode để điều chỉnh',
+    description: `
+**userHomeCode**: Mã nhà yến`,
   })
   @ApiBody({
     type: GetListTaskHarvestForAdjustDto,
@@ -302,4 +304,75 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
     const result = await this.todoAppService.getListTaskHarvestForAdjust(dto, user.userCode);
     return result;
   }
+  
+
+  @ApiOperation({
+    summary: 'Lấy thông tin dữ liệu thu hoạch trước khi thực hiện điều chỉnh',
+    description: `
+**seq**: Truyền giá trị từ <i>getListTaskHarvestForAdjust</i> API\n
+**userHomeCode**: Truyền giá trị từ <i>getListTaskHarvestForAdjust</i> API\n
+**harvestPhase**: Truyền giá trị từ <i>getListTaskHarvestForAdjust</i> API\n
+**harvestYear**: Truyền giá trị từ <i>getListTaskHarvestForAdjust</i> API`,
+  })
+    @ApiBody({
+    type: GetInfoTaskHarvestForAdjustDto,
+  })
+  @Post('getInfoTaskHarvestForAdjust')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetInfoTaskHarvestForAdjustResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getInfoTaskHarvestForAdjust(@Body() dto: GetInfoTaskHarvestForAdjustDto, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.todoAppService.getInfoTaskHarvestForAdjust(user.userCode, dto);
+    return result;
+  }
+
+   @ApiOperation({
+    summary: 'Điều chỉnh dữ liệu thu hoạch chưa được yêu cầu tạo mã Qrcode',
+  })
+  @Post('adjustTaskHarvest')
+  @ApiBody({
+    type: AdjustHarvestTaskDto,
+    description: `
+Dữ liệu này được truyền giá trị từ <i>getInfoTaskHarvestForAdjust</i> API\n
+<ul>
+  <li><b>seq</b>: Mã thứ tự </li>
+  <li><b>userHomeCode</b>: Mã nhà yến
+  <li><b>harvestData</b>: Danh sách dữ liệu thu hoạch
+    <ul>
+      <li><b>floor</b>: Số tầng</li>
+      <li><b>floorData</b>: Danh sách ô trong tầng
+        <ul>
+          <li><b>cell</b>: Số ô</li>
+          <li><b>cellCollected</b>: Giá trị dữ liệu thu hoạch của ô - đã thu </li>
+          <li><b>cellRemain</b>: Giá trị dữ liệu thu hoạch của ô - còn lại</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+`,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async adjustTaskHarvest(@GetUserApp() user: TokenUserAppResDto, @Body() dto: AdjustHarvestTaskDto) {
+    const result = await this.todoAppService.adjustTaskHarvest(user.userCode, dto);
+    if (result == -1) {
+      throw new BadRequestException({
+        message: Msg.ThisHarvestRequestQrcodeAlreadyCannotAdjust,
+        data: 0,
+      });
+    }
+    if (result == 0) {
+      throw new BadRequestException({
+        message: Msg.UpdateErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.UpdateOk,
+      data: result,
+    };
+  }
+
 }

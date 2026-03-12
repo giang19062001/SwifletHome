@@ -3,17 +3,28 @@ import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { SetHarvestTaskDto, FloorDataInputDto, HarvestDataInputDto, HarvestDataRowInputDto, SetTaskAlarmDto, SetTaskMedicineDto, GetListTaskHarvestForAdjustDto } from './todo.dto';
+import {
+  SetHarvestTaskDto,
+  FloorDataInputDto,
+  HarvestDataInputDto,
+  HarvestDataRowInputDto,
+  SetTaskAlarmDto,
+  SetTaskMedicineDto,
+  GetListTaskHarvestForAdjustDto,
+  AdjustHarvestTaskDto,
+  GetInfoTaskHarvestForAdjustDto,
+} from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import moment from 'moment';
 import TodoAppValidate from './todo.validate';
 import { OptionService } from 'src/modules/options/option.service';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
-import { GetListTaskHarvestResDto, GetTaskHarvestResDto, GetTasksMedicineResDto } from './todo.response';
+import { GetInfoTaskHarvestForAdjustResDto, GetListTaskHarvestResDto, GetTaskHarvestResDto, GetTasksMedicineResDto } from './todo.response';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { ListResponseDto } from 'src/dto/common.dto';
 import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
+import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
 
 @Injectable()
 export class TodoAppService {
@@ -472,11 +483,11 @@ export class TodoAppService {
     return harvestData;
   }
   async setTaskHarvest(userCode: string, dto: SetHarvestTaskDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setCompleteTaskHarvest:`;
+    const logbase = `${this.SERVICE_NAME}/setTaskHarvest:`;
     try {
       let result = 1;
 
-      // kiểm tra task phải là 'lăn thuốc'
+      // kiểm tra task phải là 'thu hoạch'
       const task = await this.todoAppRepository.getTaskByKeyword(TODO_CONST.TASK_BOX.HARVEST.value);
       if (!task) {
         this.logger.error(logbase, `Task không có dữ liệu`);
@@ -548,6 +559,50 @@ export class TodoAppService {
           await this.todoAppRepository.completeTaskHarvestPhase(userCode, alramDetail?.userHomeCode ?? '', alramDetail?.seq ?? 0, dto.harvestPhase);
         }
       }
+
+      return result;
+    } catch (error) {
+      this.logger.error(logbase, `${JSON.stringify(error)}`);
+      return 0;
+    }
+  }
+  async getInfoTaskHarvestForAdjust(userCode: string, dto: GetInfoTaskHarvestForAdjustDto): Promise<GetInfoTaskHarvestForAdjustResDto | null> {
+    const logbase = `${this.SERVICE_NAME}/getInfoTaskHarvestForAdjust:`;
+    // lấy thông tin nhà
+    const homeInfo = await this.userHomeAppService.getDetail(dto.userHomeCode);
+    if (!homeInfo) {
+      this.logger.error(logbase, `Nhà yến ko có dữ liệu userHomeCode(${dto.userHomeCode})`);
+      throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
+    }
+    if (homeInfo.userCode !== userCode) {
+      this.logger.error(logbase, `Nhà yến ko không thuộc về user hiện tại userHomeCode(${dto.userHomeCode})`);
+      throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
+    }
+
+    // lấy thông tin thu hoạch nhà yến này với đợt, năm này
+    let taskHarvestComplete = await this.todoAppRepository.getTaskHarvestCompleteAndNotUseOne(dto.userHomeCode, dto.harvestPhase, dto.harvestYear);
+    const harvestData = taskHarvestComplete ? await this.arrangeHarvestRows(taskHarvestComplete.seq, homeInfo.userHomeFloor) : [];
+
+    return {
+      seq: dto.seq,
+      userHomeCode: dto.userHomeCode,
+      harvestData: harvestData,
+    } as GetInfoTaskHarvestForAdjustResDto;
+  }
+  async adjustTaskHarvest(userCode: string, dto: AdjustHarvestTaskDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/adjustTaskHarvest:`;
+    try {
+      let result = 1;
+
+      // kiểm tra đợt thu hoạch này đã dùng yêu cầu qrcode hay chưa
+      const isNotUsed = await this.todoAppRepository.checkTaskHarvestCompleteAndNotUse(dto.seq);
+      if (isNotUsed == false) {
+        this.logger.error(logbase, `${Msg.ThisHarvestRequestQrcodeAlreadyCannotAdjust}`);
+        result = -1;
+      }
+
+      // insert / update/ detele dữ liệu tầng ô
+      await this.insUpDelHarvestRows(userCode, dto.userHomeCode, dto.seq, dto.harvestData);
 
       return result;
     } catch (error) {

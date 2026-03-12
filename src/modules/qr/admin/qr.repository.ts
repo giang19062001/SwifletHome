@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IQrRequest } from './qr.inteface';
 import { QR_CODE_CONST, RequestStatusEnum } from '../qr.interface';
 import { WriteQrBlockchainDto } from './qr.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
@@ -23,7 +22,7 @@ export class QrAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<IQrRequest[]> {
+  async getAll(dto: PagingDto): Promise<GetInfoRequestQrCodeAdminResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
         IFNULL(JSON_LENGTH(A.taskMedicineList), 0) AS taskMedicineCount, A.createdAt
@@ -42,7 +41,7 @@ export class QrAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IQrRequest[];
+    return rows as GetInfoRequestQrCodeAdminResDto[];
   }
   async getDetail(requestCode: string): Promise<GetInfoRequestQrCodeAdminResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,

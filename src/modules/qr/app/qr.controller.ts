@@ -57,6 +57,12 @@ export default class QrAppController {
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getApprovedRequestQrCocde(@Param('requestCode') requestCode: string, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.qrAppService.getApprovedRequestQrCocde(requestCode, user);
+    if(!result){
+       throw new BadRequestException({
+        message: Msg.ThisQrNotApproved,
+        data: null,
+      });
+    }
     return result;
   }
 

@@ -3,11 +3,11 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { QrAdminService } from './qr.service';
-import { IQrRequest } from './qr.inteface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { RefuseRequestDto } from './qr.dto';
 import { ListResponseDto } from "src/dto/common.dto";
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/qrcode')
@@ -21,7 +21,7 @@ export class QrAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: IQrRequest[] }> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: GetInfoRequestQrCodeAdminResDto[] }> {
     const result = await this.qrAdminService.getAll(dto);
     return result;
   }

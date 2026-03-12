@@ -22,7 +22,7 @@ import { OptionService } from 'src/modules/options/option.service';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import moment from 'moment';
 import { PagingDto } from 'src/dto/admin.dto';
-import { QrRequestFileStrResDto } from "../qr.response";
+import { QrRequestFileStrResDto } from "./qr.response";
 import { TokenUserAppResDto } from "../../auth/app/auth.dto";
 
 @Injectable()
@@ -94,10 +94,12 @@ export class QrAppService {
     }
 
     // lấy thông tin lăn thuốc nhà yến này
-    const taskMedicineList = await this.todoAppRepository.getTaskMedicineCompleteList(userHomeCode);
+    const taskMedicineList = await this.todoAppRepository.getTaskMedicineCompleteAndNotUseList(userHomeCode);
 
     // lấy thông tin thu hoạc nhà yến này
-    let taskHarvestCompleteList = await this.todoAppRepository.getTaskHarvestCompleteList(userHomeCode, harvestPhase); // harvestPhase = 0 --> LẤY TẤT CẢ ĐỢT
+    //? harvestPhase = 0 --> lấy tất cả các đợt để làm SelectBox cho Form yêu cầu Qr
+    //? harvestPhase > 0 --> Chọn đợt và insert cho Qr table
+    let taskHarvestCompleteList = await this.todoAppRepository.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase); 
     const taskHarvestList: TaskHarvestQrResDto[] = await Promise.all(
       taskHarvestCompleteList.map(async (ele) => ({
         harvestTaskAlarmCode: ele.harvestTaskAlarmCode,

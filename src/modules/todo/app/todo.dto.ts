@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, ValidateIf, ValidateNested } from 'class-validator';
+import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Min, ValidateIf, ValidateNested } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
@@ -99,6 +99,24 @@ export class SetHarvestTaskDto {
   harvestData: HarvestDataInputDto[];
 }
 
+export class AdjustHarvestTaskDto {
+  @ApiProperty({ example: 1 })
+  @IsNumber()
+  @IsNotEmpty()
+  seq: number;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+
+  @ApiProperty({ type: () => HarvestDataInputDto, isArray: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => HarvestDataInputDto)
+  harvestData: HarvestDataInputDto[];
+}
+
 export class HarvestDataInputDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
@@ -185,15 +203,15 @@ export class SetTaskMedicineDto {
     example: '',
   })
   @IsString()
-  @ValidateIf(o => o.medicineOptionCode === TODO_CONST.TASK_OPTION_MEDICINE.OTHER.value)
-  @IsNotEmpty({ message:  MsgDto.CannotNull('medicineOther') })
+  @ValidateIf((o) => o.medicineOptionCode === TODO_CONST.TASK_OPTION_MEDICINE.OTHER.value)
+  @IsNotEmpty({ message: MsgDto.CannotNull('medicineOther') })
   medicineOther: string;
 
   @ApiProperty({
     example: '',
   })
   @IsString()
-  @IsNotEmpty({ message: MsgDto.CannotNull('medicineUsage')})
+  @IsNotEmpty({ message: MsgDto.CannotNull('medicineUsage') })
   medicineUsage: string;
 
   @ApiProperty({
@@ -210,7 +228,6 @@ export class SetTaskMedicineDto {
   medicineNextDate: Date;
 }
 
-
 export class GetListTaskHarvestForAdjustDto extends PagingDto {
   @ApiProperty({
     example: '',
@@ -218,4 +235,36 @@ export class GetListTaskHarvestForAdjustDto extends PagingDto {
   @IsString()
   @IsNotEmpty()
   userHomeCode: string;
+}
+
+export class GetInfoTaskHarvestForAdjustDto {
+  @ApiProperty({
+    example: 0,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  seq: number;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+
+  @ApiProperty({
+    example: 1,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(1)
+  harvestPhase: number;
+
+  
+  @ApiProperty({
+    example: 2025,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  harvestYear: number;
 }

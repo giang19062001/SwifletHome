@@ -2,7 +2,6 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { QrAdminRepository } from './qr.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Injectable } from '@nestjs/common';
-import { IQrRequest } from './qr.inteface';
 import { RequestStatusEnum } from '../qr.interface';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { WriteQrBlockchainDto } from './qr.dto';
@@ -27,7 +26,7 @@ export class QrAdminService {
     private readonly userAdminRepository: UserAdminRepository,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: PagingDto): Promise<{ total: number; list: IQrRequest[] }> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: GetInfoRequestQrCodeAdminResDto[] }> {
     const total = await this.qrAdminRepository.getTotal();
     const list = await this.qrAdminRepository.getAll(dto);
     return { total, list };

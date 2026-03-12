@@ -2,7 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
 import { HarvestDataInputDto } from './todo.dto';
-import { IsEnum } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })
@@ -207,9 +208,34 @@ export class GetListTaskHarvestResDto {
   @ApiProperty({ example: '' })
   taskAlarmCode: string;
 
+  @ApiProperty({ example: '' })
+  userHomeCode: string;
+
   @ApiProperty({ example: 0 })
   harvestPhase: number;
 
   @ApiProperty({ example: 2020 })
   harvestYear: number;
+
+  @ApiProperty({ example: 1 })
+  totalFloor: number;
+
+  @ApiProperty({ example: 0 })
+  totalCellCollected: number;
+
+  @ApiProperty({ example: 0 })
+  totalCellRemain: number;
+}
+
+
+export class GetInfoTaskHarvestForAdjustResDto {
+  @ApiProperty({ example: '' })
+  seq: number;
+
+  @ApiProperty({ example: '' })
+  userHomeCode: string;
+
+  @ApiProperty({ type: () => [HarvestDataInputDto] })
+  @IsArray()
+  harvestData: HarvestDataInputDto[];
 }

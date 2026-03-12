@@ -308,7 +308,8 @@ export class TodoAppRepository {
             SELECT 1
             FROM ${this.tableQr} D
             WHERE D.seqHarvestPhase = C.seq
-        ) `,[dto.userHomeCode, userCode],
+        ) `,
+      [dto.userHomeCode, userCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
@@ -321,7 +322,12 @@ export class TodoAppRepository {
       params.push((dto.page - 1) * dto.limit);
     }
 
-    let query = ` SELECT A.seq, A.taskAlarmCode, C.harvestPhase, C.harvestYear
+    let query = ` 
+        SELECT 
+            A.seq, A.taskAlarmCode, A.userHomeCode, C.harvestPhase,  C.harvestYear,
+            CAST(IFNULL(MAX(D.floor), 1) AS SIGNED) AS totalFloor,
+            CAST(IFNULL(SUM(D.cellCollected), 0) AS SIGNED) AS totalCellCollected,
+            CAST(IFNULL(SUM(D.cellRemain), 0) AS SIGNED) AS totalCellRemain
         FROM ${this.tableTaskAlarm} A
         INNER JOIN ${this.tableTask} B
           ON A.taskCode = B.taskCode
@@ -329,15 +335,18 @@ export class TodoAppRepository {
         INNER JOIN ${this.tableTaskHarvestPhase} C
           ON A.seq = C.seqAlarm
           AND C.isDone = 'Y'
+        LEFT JOIN ${this.tableTaskHarvest} D
+          ON A.seq = D.seqAlarm
         WHERE A.userHomeCode = ?
           AND A.userCode = ?
           AND NOT EXISTS (
             SELECT 1
-            FROM ${this.tableQr} D
-            WHERE D.seqHarvestPhase = C.seq
+            FROM ${this.tableQr} Q 
+            WHERE Q.seqHarvestPhase = C.seq
         )
+        GROUP BY A.seq, A.taskAlarmCode, C.harvestPhase, C.harvestYear
         ${offsetQuery}
-   `;
+    `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as GetListTaskHarvestResDto[];
   }
@@ -441,7 +450,7 @@ export class TodoAppRepository {
   }
 
   // TODO -- QRCODE
-  async getTaskMedicineCompleteList(userHomeCode: string): Promise<TaskMedicineQrResDto[]> {
+  async getTaskMedicineCompleteAndNotUseList(userHomeCode: string): Promise<TaskMedicineQrResDto[]> {
     const currentYear = moment().year(); // lấy năm hiện tại
 
     const query = `
@@ -467,7 +476,7 @@ export class TodoAppRepository {
     return rows as TaskMedicineQrResDto[];
   }
 
-  async getTaskHarvestCompleteList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number })[]> {
+  async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number })[]> {
     const currentYear = moment().year(); // lấy năm hiện tại
 
     let query = ` SELECT  A.seq, B.seq AS seqHarvestPhase, A.taskAlarmCode AS harvestTaskAlarmCode, B.harvestPhase, B.harvestYear
@@ -480,7 +489,7 @@ export class TodoAppRepository {
       AND harvestYear = ? 
       AND NOT EXISTS (
         SELECT 1
-        FROM tbl_qr_request Q
+        FROM ${this.tableQr} Q
         WHERE Q.seqHarvestPhase = B.seq
       )
      ${harvestPhase != 0 ? ' AND B.harvestPhase  = ? ' : ''}
@@ -488,5 +497,48 @@ export class TodoAppRepository {
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, harvestPhase != 0 ? [userHomeCode, currentYear, harvestPhase] : [userHomeCode, currentYear]);
     return rows as (TaskHarvestQrResDto & { seq: number })[];
+  }
+  async checkTaskHarvestCompleteAndNotUse(seq: number): Promise<boolean> {
+  const query = `
+    SELECT A.seq
+    FROM ${this.tableTaskAlarm} A
+    INNER JOIN ${this.tableTask} B
+      ON A.taskCode = B.taskCode
+      AND B.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+    INNER JOIN ${this.tableTaskHarvestPhase} C
+      ON A.seq = C.seqAlarm
+      AND C.isDone = 'Y'
+    WHERE A.seq = ?
+      AND NOT EXISTS (
+        SELECT 1
+        FROM ${this.tableQr} Q
+        WHERE Q.seqHarvestPhase = C.seq
+      )
+    LIMIT 1
+  `;
+
+  const [rows] = await this.db.query<RowDataPacket[]>(query, [seq]);
+
+  return rows.length > 0;
+}
+  async getTaskHarvestCompleteAndNotUseOne(userHomeCode: string, harvestPhase: number, harvestYear: number): Promise<(TaskHarvestQrResDto & { seq: number }) | null> {
+    let query = ` SELECT  A.seq, B.seq AS seqHarvestPhase, A.taskAlarmCode AS harvestTaskAlarmCode, B.harvestPhase, B.harvestYear
+    FROM ${this.tableTaskAlarm}  A
+    LEFT JOIN ${this.tableTaskHarvestPhase} B
+      ON A.seq = B.seqAlarm 
+    LEFT JOIN ${this.tableTask} C
+      ON A.taskCode = C.taskCode
+     WHERE A.userHomeCode  = ?  AND A.taskStatus = 'COMPLETE' AND B.isDone = 'Y' AND C.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+      AND harvestYear = ? 
+      AND NOT EXISTS (
+        SELECT 1
+        FROM ${this.tableQr} Q
+        WHERE Q.seqHarvestPhase = B.seq
+      ) AND B.harvestPhase  = ? 
+      LIMIT 1
+    `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, harvestYear, harvestPhase]);
+    return rows.length ? (rows[0] as TaskHarvestQrResDto & { seq: number }) : null;
   }
 }

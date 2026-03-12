@@ -9,7 +9,7 @@ import { GetApprovedRequestQrCodeResDto, GetRequestSellDetailResDto, GetRequestS
 import { PagingDto } from 'src/dto/admin.dto';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { QrRequestFileResDto } from "../qr.response";
+import { QrRequestFileResDto } from "./qr.response";
 
 @Injectable()
 export class QrAppRepository {
@@ -172,15 +172,16 @@ export class QrAppRepository {
     return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
   async checkUsedThisHarvest(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
+    const currentYear = new Date().getFullYear(); // năm nay
     let query = ` SELECT A.seq
       FROM ${this.table}  A
       LEFT JOIN ${this.tableHarvestPhase} F
       ON A.seqHarvestPhase = F.seq
-      WHERE A.userHomeCode  = ? AND A.userCode = ? AND F.harvestPhase = ?
+      WHERE A.userHomeCode  = ? AND A.userCode = ? AND F.harvestPhase = ? AND F.harvestYear = ?
       LIMIT 1 `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, userCode, harvestPhase]);
-    return rows.length ? true : false;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, userCode, harvestPhase, currentYear]);
+    return rows.length > 0;
   }
   async insertRequestQrCode(userCode: string, dto: RequestQrCodeResDto): Promise<number> {
     const sqlLast = ` SELECT requestCode FROM ${this.table} ORDER BY requestCode DESC LIMIT 1`;
