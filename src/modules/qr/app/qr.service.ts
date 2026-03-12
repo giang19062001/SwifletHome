@@ -80,7 +80,7 @@ export class QrAppService {
     const result = await this.qrAppRepository.getApprovedRequestQrCocde(requestCode, user.userCode);
     return result;
   }
-  async getInfoToRequestQrcode(userHomeCode: string, user: TokenUserAppResDto, harvestPhase: number): Promise<GetInfoToRequestQrcodeResDto | null> {
+  async getInfoToRequestQrcode(userHomeCode: string, user: TokenUserAppResDto, harvestPhase: number): Promise<(GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number }) | null> {
     const logbase = `${this.SERVICE_NAME}/getInfoToRequestQrcode:`;
     // lấy thông tin nhà
     const homeInfo = await this.userHomeAppService.getDetail(userHomeCode);
@@ -119,7 +119,8 @@ export class QrAppService {
       humidity: 0,
       taskMedicineList: taskMedicineList,
       taskHarvestList: taskHarvestList,
-    } as GetInfoToRequestQrcodeResDto;
+      seqHarvestPhase: taskHarvestCompleteList.length > 0 ? (taskHarvestCompleteList[0] as any).seqHarvestPhase : undefined,
+    } as GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number };
   }
   async requestQrCode(user: TokenUserAppResDto, dto: RequestQrCodeDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/requestQrCode:`;
@@ -137,7 +138,8 @@ export class QrAppService {
 
       // lấy thông tin lăn thuốc, thu hoạch,.. từ DB để insert
       const dataInsertDto = await this.getInfoToRequestQrcode(dto.userHomeCode, user, dto.harvestPhase);
-      if (!dataInsertDto) {
+      
+      if (!dataInsertDto || !dataInsertDto.seqHarvestPhase) {
         this.logger.error(logbase, `Không thê lấy thông tin yêu cầu mã Qr từ cơ sở dữ liệu của người dùng (${user.userCode}) và nhà yến (${dto.userHomeCode})`);
         result = 0;
         return result;
@@ -162,8 +164,7 @@ export class QrAppService {
         // insert dữ liệu yêu cầu QR
         const seq = await this.qrAppRepository.insertRequestQrCode(user.userCode, {
           ...dataInsertDto,
-          harvestYear: moment().year(), // lấy năm hiện tại
-          harvestPhase: dto.harvestPhase,
+          seqHarvestPhase: dataInsertDto.seqHarvestPhase, 
           requestStatus: RequestStatusEnum.WAITING,
           uniqueId: dto.uniqueId,
         });

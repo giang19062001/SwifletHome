@@ -76,13 +76,16 @@ export class TaskHarvestQrResDto {
 }
 
 export class RequestQrCodeResDto extends GetInfoToRequestQrcodeResDto {
-  @ApiProperty({ example: 1 })
-  @IsNumber()
-  harvestPhase: number;
+  // @ApiProperty({ example: 1 })
+  // @IsNumber()
+  // harvestPhase: number;
 
-  @ApiProperty({ example: 2025 })
-  @IsNumber()
-  harvestYear: number;
+  // @ApiProperty({ example: 2025 })
+  // @IsNumber()
+  // harvestYear: number;
+
+  @ApiProperty({ example: 1 })
+  seqHarvestPhase: number;
 
   @ApiProperty({
     example: RequestStatusEnum.WAITING,

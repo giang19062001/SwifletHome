@@ -307,9 +307,7 @@ export class TodoAppRepository {
           AND NOT EXISTS (
             SELECT 1
             FROM ${this.tableQr} D
-            WHERE D.userHomeCode = A.userHomeCode
-              AND D.harvestPhase = C.harvestPhase
-              AND D.harvestYear = C.harvestYear
+            WHERE D.seqHarvestPhase = C.seq
         ) `,[dto.userHomeCode, userCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
@@ -336,9 +334,7 @@ export class TodoAppRepository {
           AND NOT EXISTS (
             SELECT 1
             FROM ${this.tableQr} D
-            WHERE D.userHomeCode = A.userHomeCode
-              AND D.harvestPhase = C.harvestPhase
-              AND D.harvestYear = C.harvestYear
+            WHERE D.seqHarvestPhase = C.seq
         )
         ${offsetQuery}
    `;
@@ -474,7 +470,7 @@ export class TodoAppRepository {
   async getTaskHarvestCompleteList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number })[]> {
     const currentYear = moment().year(); // lấy năm hiện tại
 
-    let query = ` SELECT  A.seq, A.taskAlarmCode AS harvestTaskAlarmCode, B.harvestPhase, B.harvestYear
+    let query = ` SELECT  A.seq, B.seq AS seqHarvestPhase, A.taskAlarmCode AS harvestTaskAlarmCode, B.harvestPhase, B.harvestYear
     FROM ${this.tableTaskAlarm}  A
     LEFT JOIN ${this.tableTaskHarvestPhase} B
       ON A.seq = B.seqAlarm 
@@ -485,9 +481,7 @@ export class TodoAppRepository {
       AND NOT EXISTS (
         SELECT 1
         FROM tbl_qr_request Q
-        WHERE Q.userHomeCode = A.userHomeCode
-          AND Q.harvestYear = B.harvestYear
-          AND Q.harvestPhase = B.harvestPhase
+        WHERE Q.seqHarvestPhase = B.seq
       )
      ${harvestPhase != 0 ? ' AND B.harvestPhase  = ? ' : ''}
     `;

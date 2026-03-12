@@ -20,7 +20,7 @@ export class QrAppRepository {
   private readonly tableOption = 'tbl_option_common';
   private readonly tableHome = 'tbl_user_home';
   private readonly tableInteract = 'tbl_qr_request_sell_interact';
-
+  private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase'
   constructor(
     @Inject('MYSQL_CONNECTION') private readonly db: Pool,
     private readonly todoAppRepository: TodoAppRepository,
@@ -46,7 +46,7 @@ export class QrAppRepository {
   }
 
   async getRequestQrCocdeList(userCode: string, dto: PagingDto): Promise<GetApprovedRequestQrCodeResDto[]> {
-    let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+    let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
       CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
@@ -72,8 +72,10 @@ export class QrAppRepository {
       ON A.requestCode = D.requestCode  
       LEFT JOIN ${this.tableHome} E
       ON A.userHomeCode = E.userHomeCode  
+      LEFT JOIN ${this.tableHarvestPhase} F
+      ON A.seqHarvestPhase = F.seq
       WHERE A.userCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y'
-      ORDER BY A.harvestPhase DESC, A.harvestYear DESC
+      ORDER BY F.harvestPhase DESC, F.harvestYear DESC
      `;
 
     const params: any[] = [];
@@ -87,7 +89,7 @@ export class QrAppRepository {
     return rows as GetApprovedRequestQrCodeResDto[];
   }
   async getRequestQrCocde(requestCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
-    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
       CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
@@ -113,6 +115,8 @@ export class QrAppRepository {
       ON A.requestCode = D.requestCode  
       LEFT JOIN ${this.tableHome} E
       ON A.userHomeCode = E.userHomeCode  
+      LEFT JOIN ${this.tableHarvestPhase} F
+      ON A.seqHarvestPhase = F.seq
       WHERE A.requestCode = ? AND A.isActive = 'Y' AND B.isActive = 'Y' LIMIT 1
      `;
 
@@ -121,7 +125,7 @@ export class QrAppRepository {
   }
   async getApprovedRequestQrCocde(requestCode: string, userCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-      A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+      A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
          CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
@@ -159,6 +163,8 @@ export class QrAppRepository {
       ON A.requestCode = D.requestCode  
         LEFT JOIN ${this.tableHome} E
       ON A.userHomeCode = E.userHomeCode 
+      LEFT JOIN ${this.tableHarvestPhase} F
+      ON A.seqHarvestPhase = F.seq
       WHERE A.requestCode  = ? AND A.isActive = 'Y'  AND A.requestStatus = ?
       LIMIT 1 `;
 
@@ -168,7 +174,9 @@ export class QrAppRepository {
   async checkUsedThisHarvest(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     let query = ` SELECT A.seq
       FROM ${this.table}  A
-      WHERE A.userHomeCode  = ? AND A.userCode = ? AND A.harvestPhase = ?
+      LEFT JOIN ${this.tableHarvestPhase} F
+      ON A.seqHarvestPhase = F.seq
+      WHERE A.userHomeCode  = ? AND A.userCode = ? AND F.harvestPhase = ?
       LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, userCode, harvestPhase]);
@@ -184,13 +192,13 @@ export class QrAppRepository {
 
     const sql = `
         INSERT INTO ${this.table}  (requestCode, userCode, userName, userHomeCode, userHomeLength, userHomeWidth, userHomeFloor,
-        userHomeAddress, temperature, humidity, harvestPhase, harvestYear, taskMedicineList, taskHarvestList, uniqueId, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        userHomeAddress, temperature, humidity, seqHarvestPhase, taskMedicineList, taskHarvestList, uniqueId, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     // prettier-ignore
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       requestCode, userCode, dto.userName,  dto.userHomeCode, dto.userHomeLength, dto.userHomeWidth, dto.userHomeFloor,
-      dto.userHomeAddress,  dto.temperature,  dto.humidity, dto.harvestPhase, dto.harvestYear, dto.taskMedicineList,  dto.taskHarvestList, dto.uniqueId, userCode,
+      dto.userHomeAddress,  dto.temperature,  dto.humidity, dto.seqHarvestPhase, dto.taskMedicineList,  dto.taskHarvestList, dto.uniqueId, userCode,
     ]);
 
     return result.insertId;
@@ -379,7 +387,7 @@ export class QrAppRepository {
   async getRequestSellDetail(requestCode: string): Promise<GetRequestSellDetailResDto | null> {
     let query = `
      SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-      A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+      A.userHomeAddress, A.temperature, A.humidity, H.harvestPhase, H.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
          CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
@@ -428,6 +436,8 @@ export class QrAppRepository {
        ON D.priceOptionCode = F.code
       LEFT JOIN ${this.tableOption} G
        ON D.ingredientNestOptionCode = G.code
+      LEFT JOIN ${this.tableHarvestPhase} H
+      ON A.seqHarvestPhase = H.seq
       WHERE A.requestCode = ? AND A.isActive = 'Y' 
      `;
 

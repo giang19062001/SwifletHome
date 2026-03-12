@@ -15,6 +15,7 @@ export class QrAdminRepository {
   private readonly tableSell = 'tbl_qr_request_sell';
   private readonly tableUserApp = 'tbl_user_app';
   private readonly tableUserHome = 'tbl_user_home';
+  private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase'
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -24,11 +25,13 @@ export class QrAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<IQrRequest[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-        A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.requestStatus,
+        A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
         IFNULL(JSON_LENGTH(A.taskMedicineList), 0) AS taskMedicineCount, A.createdAt
         FROM ${this.table}  A
         LEFT JOIN ${this.tableUserHome} B
         ON A.userHomeCode = B.userHomeCode  
+        LEFT JOIN ${this.tableHarvestPhase} F
+        ON A.seqHarvestPhase = F.seq
         WHERE  A.isActive = 'Y' 
         ORDER BY A.createdAt DESC `;
 
@@ -43,7 +46,7 @@ export class QrAdminRepository {
   }
   async getDetail(requestCode: string): Promise<GetInfoRequestQrCodeAdminResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-        A.userHomeAddress, A.temperature, A.humidity, A.harvestPhase, A.requestStatus,
+        A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
          CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
@@ -84,6 +87,8 @@ export class QrAdminRepository {
         ON A.requestCode = D.requestCode  
          LEFT JOIN ${this.tableSell} E
       ON A.requestCode = E.requestCode  
+        LEFT JOIN  ${this.tableHarvestPhase} F
+      ON A.seqHarvestPhase = F.seq
         WHERE A.requestCode = ? AND A.isActive = 'Y' 
         `;
 
