@@ -1,13 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { generateCode } from 'src/helpers/func.helper';
-import { RequestConsigmentDto } from './consigment.dto';
+import { GetAllConsignmentDto, RequestConsigmentDto } from './consigment.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { ConsignmentStatusEnum } from './consigment.interface';
+import { PagingDto } from 'src/dto/admin.dto';
+import { ConsignmentResDto } from './consignment.response';
 
 @Injectable()
 export class ConsignmentAppRepository {
   private readonly table = 'tbl_consignment';
+  private readonly tableDelivering = 'tbl_consignment_delivering';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -38,5 +41,60 @@ export class ConsignmentAppRepository {
     ]);
 
     return result.insertId;
+  }
+
+  async getTotal(dto: GetAllConsignmentDto, userCode: string): Promise<number> {
+    let whereSql = ` WHERE A.userCode = ? `;
+    const params: any[] = [userCode];
+    if (dto.consignmentStatus != 'ALL') {
+      whereSql += ` AND A.consignmentStatus = ? `;
+      params.push(dto.consignmentStatus);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT COUNT(A.seq) AS TOTAL 
+      FROM ${this.table} A
+       ${whereSql}`,
+      params,
+    );
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+  async getAll(dto: GetAllConsignmentDto, userCode: string): Promise<ConsignmentResDto[]> {
+    let whereSql = ` WHERE A.userCode = ?  `;
+    const params: any[] = [userCode];
+    if (dto.consignmentStatus != 'ALL') {
+      whereSql += ` AND A.consignmentStatus = ? `;
+      params.push(dto.consignmentStatus);
+    }
+
+    whereSql += ` GROUP BY A.seq `;
+
+    if (dto.limit != 0 && dto.page != 0) {
+      whereSql += ` LIMIT ? OFFSET ? `;
+      params.push(dto.limit);
+      params.push((dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT  A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestQuantity, A.deliveryAddress,
+      A.receiverName, A.receiverPhone, A.consignmentStatus,
+         CASE 
+          WHEN COUNT(B.seq) = 0 THEN JSON_ARRAY()
+          ELSE JSON_ARRAYAGG(
+                JSON_OBJECT(
+                  'seq', B.seq,
+                  'address', B.address
+                )
+              )
+        END AS deliveringAddressList,
+          A.createdAt,
+          A.updatedAt
+        FROM ${this.table} A
+        LEFT JOIN ${this.tableDelivering} B
+          ON A.consignmentCode = B.consignmentCode
+          AND B.isActive = 'Y'
+        ${whereSql}
+        `, params, );
+    return rows as ConsignmentResDto[];
   }
 }

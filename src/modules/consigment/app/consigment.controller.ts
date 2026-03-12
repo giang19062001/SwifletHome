@@ -5,9 +5,11 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
 import { ConsignmentAppService } from './consigment.service';
-import { RequestConsigmentDto } from './consigment.dto';
-import { NumberOkResponseDto } from 'src/dto/common.dto';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { GetAllConsignmentDto, RequestConsigmentDto } from './consigment.dto';
+import { ListResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { ConsignmentResDto } from './consignment.response';
 
 @ApiTags('app/consignment')
 @Controller('/api/app/consignment')
@@ -15,8 +17,7 @@ import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class ConsignmentAppController {
-  constructor(private readonly consignmentAppService: ConsignmentAppService,
-  ) {}
+  constructor(private readonly consignmentAppService: ConsignmentAppService) {}
 
   @Post('requestConsigment')
   @ApiBody({
@@ -46,4 +47,17 @@ export class ConsignmentAppController {
     };
   }
 
+  @ApiBody({
+    type: GetAllConsignmentDto,
+    description: `
+**consignmentStatus**: enum('ALL','WAITING','DELIVERING','CANCEL','DELIVERED','RETURN)\n
+  `,
+  })
+  @Post('getAll')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(ConsignmentResDto)) })
+  async GetAllConsignment(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetAllConsignmentDto,): Promise<{ total: number; list: ConsignmentResDto[] }> {
+    const result = await this.consignmentAppService.GetAllConsignment(dto, user.userCode);
+    return result;
+  }
 }

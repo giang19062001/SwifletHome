@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { RequestConsigmentDto } from './consigment.dto';
+import { GetAllConsignmentDto, RequestConsigmentDto } from './consigment.dto';
 import { ConsignmentAppRepository } from './consigment.repository';
+import { ConsignmentResDto } from './consignment.response';
 
 @Injectable()
 export class ConsignmentAppService {
@@ -23,5 +24,14 @@ export class ConsignmentAppService {
       this.logger.error(logbase, JSON.stringify(error));
       return 0;
     }
+  }
+  async GetAllConsignment(dto: GetAllConsignmentDto, userCode: string): Promise<{ total: number; list: ConsignmentResDto[] }> {
+    const logbase = `${this.SERVICE_NAME}/GetAllConsignment:`;
+
+    const total = await this.consignmentAppRepository.getTotal(dto, userCode);
+    const list = await this.consignmentAppRepository.getAll(dto, userCode);
+    this.logger.log(logbase, `total(${total})`);
+
+    return { total, list };
   }
 }

@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsNumberString, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
+import { IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsNumberString, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
+import { PagingDto } from 'src/dto/admin.dto';
 import { MsgDto } from 'src/helpers/message.helper';
+import { ConsignmentStatusEnum } from './consigment.interface';
 
 export class RequestConsigmentDto {
   @ApiProperty({
@@ -45,4 +47,16 @@ export class RequestConsigmentDto {
   @IsString()
   @IsNotEmpty({ message: MsgDto.CannotNull('receiverPhone') })
   receiverPhone: string;
+}
+
+export class GetAllConsignmentDto extends PagingDto {
+
+  @ApiProperty({
+    example: 'ALL',
+    enum: [...Object.values(ConsignmentStatusEnum), 'ALL'],
+  })
+  @IsNotEmpty()
+  @IsIn([...Object.values(ConsignmentStatusEnum), 'ALL'])
+  consignmentStatus: ConsignmentStatusEnum | 'ALL';
+
 }
