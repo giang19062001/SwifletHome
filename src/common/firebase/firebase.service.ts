@@ -6,10 +6,12 @@ import { PushDataPayload } from './firebase.interface';
 import { NotificationAppRepository } from 'src/modules/notification/app/notification.repository';
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { IUserNotificationTopic, NotificationStatusEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NotificationStatusEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { ConfigService } from '@nestjs/config';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { NotificationAppService } from 'src/modules/notification/app/notification.service';
+import { UserNotificationTopicResDto } from "../../modules/notification/notification.response";
+
 const serviceAccount = serviceAccountJson as any;
 
 @Injectable()
@@ -292,7 +294,7 @@ export class FirebaseService implements OnModuleInit {
     const allTopics = await this.notificationAppRepository.getAllTopic({ limit: 0, page: 0 });
 
     // lọc ra các topic chưa đăng ký
-    const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: IUserNotificationTopic) => sub.topicCode === topic.topicCode));
+    const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: UserNotificationTopicResDto) => sub.topicCode === topic.topicCode));
 
     // đăng ký tất cả topic cho device token mới
     if (isNewOrChange) {

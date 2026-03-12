@@ -2,7 +2,6 @@ import { Injectable, BadRequestException, InternalServerErrorException, NotFound
 import { existsSync, mkdirSync, unlinkSync } from 'fs';
 import { promises as fs } from 'fs';
 import { UploadAdminRepository } from './upload.repository';
-import { IAudioFreePay, IFileMedia, IFileUpload } from '../upload.interface';
 import * as path from 'path';
 import { UploadAudioFilesDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
 import { sortByDate } from 'src/helpers/func.helper';
@@ -10,6 +9,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { getFileLocation } from 'src/config/multer.config';
+import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
 
 @Injectable()
 export class UploadAdminService {
@@ -95,26 +95,26 @@ export class UploadAdminService {
     return result;
   }
   //* get
-  async getAllAudioFile(): Promise<IFileUpload[]> {
+  async getAllAudioFile(): Promise<FileUploadResDto[]> {
     const audios = await this.uploadAdminRepository.getAllAudioFile();
     return audios;
   }
-  async getAllFile(): Promise<IFileUpload[]> {
+  async getAllFile(): Promise<FileUploadResDto[]> {
     const files = await this.uploadAdminRepository.getAllImgFile();
     const audios = await this.uploadAdminRepository.getAllAudioFile();
     const videos = await this.uploadAdminRepository.getAllVideoLink();
     return sortByDate('createdAt', [...files, ...audios, ...videos]);
   }
-  async getAllMediaAudioFile(): Promise<IFileMedia[]> {
+  async getAllMediaAudioFile(): Promise<FileMediaResDto[]> {
     const audios = await this.uploadAdminRepository.getAllMediaAudioFile();
     return sortByDate('createdAt', [...audios]);
   }
 
-  async getAllMediaVideoLink(): Promise<IFileMedia[]> {
+  async getAllMediaVideoLink(): Promise<FileMediaResDto[]> {
     const videos = await this.uploadAdminRepository.getAllMediaVideoLink();
     return sortByDate('createdAt', [...videos]);
   }
-  async getFileAudio(seq: number): Promise<IAudioFreePay | null> {
+  async getFileAudio(seq: number): Promise<AudioFreePayResDto | null> {
     const files = await this.uploadAdminRepository.getFileAudio(seq);
     return files;
   }

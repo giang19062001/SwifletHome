@@ -6,8 +6,8 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { AnswerReplyDto } from './answer.dto';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { Msg } from 'src/helpers/message.helper';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/answer')
 @Controller('/api/app/answer')
@@ -23,7 +23,7 @@ export class AnswerAppController {
   @ApiBody({ type: AnswerReplyDto })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(String) })
-  async reply(@Body() dto: AnswerReplyDto, @GetUserApp() user: authInterface.ITokenUserApp) {
+  async reply(@Body() dto: AnswerReplyDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.answerAppService.reply(dto.question, user.userCode);
     return {
       message: Msg.GetOk,

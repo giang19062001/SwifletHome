@@ -2,12 +2,11 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppRepository } from './user.repository';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { IUserApp } from './user.interface';
-import { CreateUserPackageAppDto } from './user.dto';
-import { ITokenUserApp, ITokenUserAppWithPassword } from 'src/modules/auth/app/auth.interface';
+import { CreateUserPackageAppDto, UserAppResDto } from './user.dto';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UserTypeResDto } from './user.response';
 import { Msg } from 'src/helpers/message.helper';
+import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.dto";
 
 @Injectable()
 export class UserAppService {
@@ -17,36 +16,36 @@ export class UserAppService {
     private readonly userAppRepository: UserAppRepository,
     private readonly logger: LoggingService,
   ) {}
-  async findByCode(userCode: string): Promise<ITokenUserAppWithPassword | null> {
+  async findByCode(userCode: string): Promise<TokenUserAppWithPasswordResDto | null> {
     return await this.userAppRepository.findByCode(userCode);
   }
 
-  async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserAppWithPassword | null> {
+  async findByPhoneWithoutCountry(userPhone: string): Promise<TokenUserAppWithPasswordResDto | null> {
     return await this.userAppRepository.findByPhoneWithoutCountry(userPhone);
   }
-  async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserAppWithPassword | null> {
+  async findByPhone(userPhone: string, countryCode: string): Promise<TokenUserAppWithPasswordResDto | null> {
     return await this.userAppRepository.findByPhone(userPhone, countryCode);
   }
-  async deleteAccount(userCode: string, user: ITokenUserAppWithPassword): Promise<number> {
+  async deleteAccount(userCode: string, user: TokenUserAppWithPasswordResDto): Promise<number> {
     try {
       return await this.userAppRepository.deleteAccount(userCode, user);
     } catch (error) {
       return 0;
     }
   }
-  async getInfo(userCode: string): Promise<IUserApp | null> {
+  async getInfo(userCode: string): Promise<UserAppResDto | null> {
     const info = await this.userAppRepository.getInfo(userCode);
-    if (info?.packageCode && info.packageRemainDay <= 0) {
+    if ((info as any)?.packageCode && (info as any).packageRemainDay <= 0) {
       // gói hết hạn -> cho 'packageCode' là null
-      return { ...info, packageCode: null, packageName: TEXTS.PACKAGE_FREE, packageDescription: '', startDate: null, endDate: null };
+      return { ...info, packageCode: null, packageName: TEXTS.PACKAGE_FREE, packageDescription: '', startDate: null, endDate: null } as any;
     } else {
       return info;
     }
   }
 
-  async register(dto: RegisterUserAppDto): Promise<ITokenUserApp | null> {
+  async register(dto: RegisterUserAppDto): Promise<TokenUserAppResDto | null> {
     const logbase = `${this.SERVICE_NAME}/register`;
-    let userInserted: ITokenUserApp | null = null;
+    let userInserted: any = null;
     const insertId = await this.userAppRepository.create(dto);
     if (insertId) {
       const user = await this.userAppRepository.findBySeq(insertId);
@@ -55,7 +54,7 @@ export class UserAppService {
         this.logger.log(logbase, 'Thiết lập gói miễn phí cho người dùng đăng kí mới');
         // mặc định user mới sẽ sử dụng gói miễn phí
         const dto: CreateUserPackageAppDto = {
-          userCode: user.userCode,
+          userCode: (user as any).userCode,
           packageCode: null,
           endDate: null,
           startDate: null,

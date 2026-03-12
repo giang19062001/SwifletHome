@@ -6,7 +6,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { GetContentBlogResDto } from './blog.response';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiBearerAuth('app-auth')
 @ApiTags('app/blog')
@@ -24,7 +24,7 @@ export class BlogAppController {
   @Get('getContent')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetContentBlogResDto) })
-  async getContent(@GetUserApp() user: authInterface.ITokenUserApp): Promise<string> {
+  async getContent(@GetUserApp() user: TokenUserAppResDto): Promise<string> {
     const result = await this.blogAppService.getContent(user.userCode);
     return result
   }

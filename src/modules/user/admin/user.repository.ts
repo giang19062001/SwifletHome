@@ -1,13 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
-import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IUserApp, USER_CONST } from '../app/user.interface';
-import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserPackageFilterEnum } from './user.dto';
+import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserPackageFilterEnum, UserTypeResDto, UserForTeamByTypeResDto } from './user.dto';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UPDATOR } from 'src/helpers/const.helper';
-import { IUserForTeamByType, IUserType } from './user.interface';
+import { TokenUserAdminResDto } from "../../auth/admin/auth.dto";
+import { UserAppResDto } from "../app/user.dto";
+import { USER_CONST } from "../app/user.interface";
 
 @Injectable()
 export class UserAdminRepository {
@@ -20,9 +20,9 @@ export class UserAdminRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async findByUserId(userId: string): Promise<ITokenUserAdmin | null> {
+  async findByUserId(userId: string): Promise<TokenUserAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT seq, userId, userPassword, userName, isActive FROM ${this.tableAdmin} WHERE userId = ? LIMIT 1`, [userId]);
-    return rows.length ? (rows[0] as ITokenUserAdmin) : null;
+    return rows.length ? (rows[0] as TokenUserAdminResDto) : null;
   }
 
   async getDeviceTokensByUsers(userCodesMuticast: string[]): Promise<{ userCode: string; deviceToken: string }[]> {
@@ -53,7 +53,7 @@ export class UserAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 
-  async getAllUserApp(dto: GetAllUserDto): Promise<IUserApp[]> {
+  async getAllUserApp(dto: GetAllUserDto): Promise<UserAppResDto[]> {
     try {
       let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone,  A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
@@ -90,13 +90,13 @@ export class UserAdminRepository {
       }
 
       const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-      return rows as IUserApp[];
+      return rows as UserAppResDto[];
     } catch (error) {
       console.log('error', error);
       return [];
     }
   }
-  async getDetailUserApp(userCode: string): Promise<IUserApp | null> {
+  async getDetailUserApp(userCode: string): Promise<UserAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
@@ -110,7 +110,7 @@ export class UserAdminRepository {
      LIMIT 1`,
       [userCode],
     );
-    return rows.length ? (rows[0] as IUserApp) : null;
+    return rows.length ? (rows[0] as UserAppResDto) : null;
   }
 
   //TODO:PACKAGE
@@ -145,20 +145,20 @@ export class UserAdminRepository {
   }
 
   // TODO: TYPE
-  async getTypesForTeam(): Promise<IUserType[]> {
+  async getTypesForTeam(): Promise<UserTypeResDto[]> {
     const sql = ` SELECT userTypeCode, userTypeKeyWord, userTypeName
          FROM ${this.tableType} WHERE isActive = 'Y' 
          AND userTypeKeyWord != '${USER_CONST.USER_TYPE.OWNER.value}'  AND  userTypeKeyWord != '${USER_CONST.USER_TYPE.PURCHASER.value}' `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
-    return rows as IUserType[];
+    return rows as UserTypeResDto[];
   }
-  async getUsersForTeamByType(dto: GetUsersForTeamByTypeDto): Promise<IUserForTeamByType[]> {
+  async getUsersForTeamByType(dto: GetUsersForTeamByTypeDto): Promise<UserForTeamByTypeResDto[]> {
     const sql = ` SELECT A.userCode, A.userName, A.userPhone
          FROM ${this.tableApp} A
          WHERE A.isActive = 'Y' 
          ${dto.pageType === "create" ? ` AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = '${dto.userTypeCode}' )` : ""}
       `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
-    return rows as IUserForTeamByType[];
+    return rows as UserForTeamByTypeResDto[];
   }
 }

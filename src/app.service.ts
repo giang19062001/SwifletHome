@@ -1,7 +1,6 @@
 import { QrAdminService } from './modules/qr/admin/qr.service';
 import { Injectable } from '@nestjs/common';
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
-import { IAnswer } from './modules/answer/answer.interface';
 import { HomeSaleAdminService } from './modules/homeSale/admin/homeSale.service';
 import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
@@ -13,6 +12,7 @@ import { TeamAdminService } from './modules/team/admin/team.service';
 import { UserAdminService } from './modules/user/admin/user.service';
 import { OptionService } from './modules/options/option.service';
 import { OPTION_CONST } from './modules/options/option.interface';
+import { AnswerResDto } from "./modules/answer/answer.response";
 
 @Injectable()
 export class AppService {

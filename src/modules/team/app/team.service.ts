@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IList, YnEnum } from 'src/interfaces/admin.interface';
+import { YnEnum } from 'src/interfaces/admin.interface';
 import { TeamAppRepository } from './team.repository';
-import { GetAllTeamDto, GetReviewListOfTeamDto, ReviewTeamDto, UploadReviewFilesDto } from './team.dto';
+import { GetAllTeamDto, GetReviewListOfTeamDto, ReviewTeamDto, UploadReviewFilesDto, TeamReviewFileStrResDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto } from './team.response';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { OptionService } from 'src/modules/options/option.service';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { getFileLocation } from 'src/config/multer.config';
-import { ITeamReviewFileStr } from './team.interface';
 import { Msg } from 'src/helpers/message.helper';
+import { ListResponseDto } from "src/dto/common.dto";
 
 @Injectable()
 export class TeamAppService {
@@ -23,7 +23,7 @@ export class TeamAppService {
     private readonly logger: LoggingService,
   ) {}
   // TODO: TEAM
-  async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<IList<GetAllTeamResDto>> {
+  async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<{ total: number; list: GetAllTeamResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.teamAppRepository.getTotalTeams(dto, userCode);
     const list = await this.teamAppRepository.getAllTeams(dto, userCode);
@@ -73,7 +73,7 @@ export class TeamAppService {
   }
 
   // TODO: REVIEW
-  async getReviewListOfTeam(dto: GetReviewListOfTeamDto): Promise<IList<GetReviewListOfTeamResDto>> {
+  async getReviewListOfTeam(dto: GetReviewListOfTeamDto): Promise<{ total: number; list: GetReviewListOfTeamResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.teamAppRepository.getReviewTotalOfTeam(dto);
     const list = await this.teamAppRepository.getReviewListOfTeam(dto);
@@ -129,7 +129,7 @@ export class TeamAppService {
     }
   }
 
-  async uploadReviewFiles(userCode: string, dto: UploadReviewFilesDto, reviewImgs: Express.Multer.File[]): Promise<ITeamReviewFileStr[]> {
+  async uploadReviewFiles(userCode: string, dto: UploadReviewFilesDto, reviewImgs: Express.Multer.File[]): Promise<TeamReviewFileStrResDto[]> {
     const logbase = `${this.SERVICE_NAME}/uploadFile:`;
     try {
       // kiểm tra teamCode
@@ -141,7 +141,7 @@ export class TeamAppService {
         });
       }
       // upload
-      let res: ITeamReviewFileStr[] = [];
+      let res: TeamReviewFileStrResDto[] = [];
       if (reviewImgs.length > 0) {
         for (const file of reviewImgs) {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);

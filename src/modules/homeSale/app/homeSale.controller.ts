@@ -1,18 +1,17 @@
 import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, UseInterceptors, BadRequestException, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IHomeSale } from '../homeSale.interface';
 import { HomeSaleAppService } from './homeSale.service';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { IListApp } from 'src/interfaces/app.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { CreateHomeSightSeeingDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetHomeSaleDetailResDto, GetHomeSaleResDto } from './homesale.response';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { ListResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import { HomeSaleResDto } from "../homeSale.response";
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/homeSale')
 @Controller('/api/app/homeSale')
@@ -28,7 +27,7 @@ export class HomeSaleAppController {
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetHomeSaleResDto)) })
-  async getAll(@Body() dto: PagingDto): Promise<IListApp<IHomeSale>> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: HomeSaleResDto[] }> {
     const result = await this.homeSaleAppService.getAll(dto);
     return result;
   }
@@ -37,7 +36,7 @@ export class HomeSaleAppController {
   @Get('getDetail/:homeCode')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetHomeSaleDetailResDto) })
-  async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
+  async getDetail(@Param('homeCode') homeCode: string): Promise<HomeSaleResDto | null> {
     const result = await this.homeSaleAppService.getDetail(homeCode);
     return result;
   }
@@ -55,7 +54,7 @@ export class HomeSaleAppController {
   @Post('registerSightSeeing')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: authInterface.ITokenUserApp) {
+  async registerSightSeeing(@Body() dto: CreateHomeSightSeeingDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.homeSaleAppService.registerSightSeeing(dto, user.userCode);
     if (result === 0) {
       throw new BadRequestException({

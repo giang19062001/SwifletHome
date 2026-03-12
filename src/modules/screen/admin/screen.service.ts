@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { ScreenAdminRepository } from './screen.repository';
-import { IScreen, IScreenRequestDoctor } from '../screen.interface';
 import { UpdateScreenDto } from './screen.dto';
 import { APP_SCREENS } from 'src/helpers/const.helper';
+import { ListResponseDto } from "src/dto/common.dto";
+import { ScreenResDto, ScreenRequestDoctorResDto } from "../screen.response";
 
 @Injectable()
 export class ScreenAdminService {
   constructor(private readonly screenAdminRepository: ScreenAdminRepository) {}
-  async getAll(dto: PagingDto): Promise<IList<IScreen>> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: ScreenResDto[] }> {
     const total = await this.screenAdminRepository.getTotal();
     const list = await this.screenAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(screenKeyword: string): Promise<IScreen | null> {
+  async getDetail(screenKeyword: string): Promise<ScreenResDto | null> {
     const result = await this.screenAdminRepository.getDetail(screenKeyword);
     if (result) {
       if (result.screenKeyword === APP_SCREENS.REQUEST_DOCTOR) {
@@ -34,7 +34,7 @@ export class ScreenAdminService {
 
   async update(dto: UpdateScreenDto, updatedId: string, screenKeyword: string): Promise<number> {
     if (screenKeyword === APP_SCREENS.REQUEST_DOCTOR) {
-      let screenContent: IScreenRequestDoctor = {
+      let screenContent: ScreenRequestDoctorResDto = {
         contentStart: dto.screenContent.contentStart,
         contentEnd: '',
         contentCenter: {

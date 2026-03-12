@@ -21,16 +21,15 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
-import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { TeamAdminService } from './team.service';
-import { ITeam, ITeamReview } from './team.interface';
-import { ChangDisplayReviewDto, CreateTeamDto, UpdateTeamDto } from './team.dto';
+import { ChangDisplayReviewDto, CreateTeamDto, UpdateTeamDto, TeamResDto, TeamReviewResDto } from './team.dto';
 import { MsgAdmin } from 'src/helpers/message.helper';
+import { ListResponseDto } from "src/dto/common.dto";
+import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/team')
@@ -45,7 +44,7 @@ export class TeamAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<IList<ITeam>> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: TeamResDto[] }> {
     const result = await this.teamAdminService.getAll(dto);
     return result;
   }
@@ -53,7 +52,7 @@ export class TeamAdminController {
   @ApiParam({ name: 'teamCode', type: String })
   @Get('getDetail/:teamCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('teamCode') teamCode: string): Promise<ITeam | null> {
+  async getDetail(@Param('teamCode') teamCode: string): Promise<TeamResDto | null> {
     const result = await this.teamAdminService.getDetail(teamCode);
     if (!result) {
       throw new BadRequestException();
@@ -77,7 +76,7 @@ export class TeamAdminController {
   )
   async create(
     @Body() createTeamDto: CreateTeamDto,
-    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
     // @UploadedFiles() files: Express.Multer.File[],
     @UploadedFiles()
     files: {
@@ -120,7 +119,7 @@ export class TeamAdminController {
   async update(
     @Body() updateTeamDto: UpdateTeamDto,
     @Param('teamCode') teamCode: string,
-    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
     @UploadedFiles()
     files: {
       teamImage?: Express.Multer.File[];
@@ -159,7 +158,7 @@ export class TeamAdminController {
   })
   @Post('getAllReview')
   @HttpCode(HttpStatus.OK)
-  async getAllReview(@Body() dto: PagingDto): Promise<IList<ITeamReview>> {
+  async getAllReview(@Body() dto: PagingDto): Promise<{ total: number; list: TeamReviewResDto[] }> {
     const result = await this.teamAdminService.getAllReview(dto);
     return result;
   }
@@ -167,7 +166,7 @@ export class TeamAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Get('getDetailReview/:seq')
   @HttpCode(HttpStatus.OK)
-  async getDetailReview(@Param('seq') seq: number): Promise<ITeamReview | null> {
+  async getDetailReview(@Param('seq') seq: number): Promise<TeamReviewResDto | null> {
     const result = await this.teamAdminService.getDetailReview(seq);
     if (!result) {
       throw new BadRequestException();
@@ -179,7 +178,7 @@ export class TeamAdminController {
     @ApiParam({ name: 'seq', type: String })
     @Put('changeDisplay/:seq')
     @HttpCode(HttpStatus.OK)
-    async changeDisplay(@Body() dto: ChangDisplayReviewDto, @Param('seq') seq: number, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+    async changeDisplay(@Body() dto: ChangDisplayReviewDto, @Param('seq') seq: number, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
       const result = await this.teamAdminService.changeDisplay(dto, admin.userId, seq);
       if (result === 0) {
         throw new BadRequestException();

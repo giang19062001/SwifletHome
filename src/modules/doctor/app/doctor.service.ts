@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
-import { DoctorStatusEnum, IDoctorFileStr } from '../doctor.interface';
+import { DoctorStatusEnum } from '../doctor.interface';
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
+import { DoctorFileStrResDto } from "../doctor.response";
 
 @Injectable()
 export class DoctorAppService {
@@ -45,10 +46,10 @@ export class DoctorAppService {
       return 0;
     }
   }
-  async uploadRequestFile(userCode: string, dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<IDoctorFileStr[]> {
+  async uploadRequestFile(userCode: string, dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<DoctorFileStrResDto[]> {
     const logbase = `${this.SERVICE_NAME}/uploadFile:`;
     try {
-      let res: IDoctorFileStr[] = [];
+      let res: DoctorFileStrResDto[] = [];
       if (doctorFiles.length > 0) {
         for (const file of doctorFiles) {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);

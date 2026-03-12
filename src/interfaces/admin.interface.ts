@@ -4,11 +4,6 @@ export interface IPaging {
   page: number;
 }
 
-export interface IList<T> {
-  total: number;
-  list: T[];
-}
-
 export enum YnEnum {
   Y = 'Y',
   N = 'N',

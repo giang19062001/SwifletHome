@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { ITodoTaskAlram, TaskStatusEnum } from '../todo.interface';
+import { TaskStatusEnum } from '../todo.interface';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { SetTaskAlarmDto } from './todo.dto';
 import { MsgDto } from 'src/helpers/message.helper';
+import { TodoTaskAlramResDto } from "../todo.response";
 
 @Injectable()
 export default class TodoAppValidate {
@@ -40,10 +41,10 @@ export default class TodoAppValidate {
     return error;
   }
 
-  async handleAlarmData(dto: SetTaskAlarmDto): Promise<ITodoTaskAlram> {
+  async handleAlarmData(dto: SetTaskAlarmDto): Promise<any> {
     const logbase = `${this.SERVICE_NAME}/handleAlarmData:`;
 
-    let alramDto: ITodoTaskAlram = {
+    let alramDto: any = {
       userHomeCode: dto.userHomeCode,
       taskCode: null,
       taskName: '',

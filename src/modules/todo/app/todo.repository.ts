@@ -1,6 +1,6 @@
 import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { ITodoTask, ITodoTaskAlram, TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { HarvestDataRowInputDto, SetTaskMedicineDto } from './todo.dto';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -9,6 +9,7 @@ import moment from 'moment';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskHarvestQrResDto, TaskMedicineQrResDto } from 'src/modules/qr/app/qr.response';
 import { GetHarvestTaskPhaseResDto, GetTaskAlarmResDto, GetTasksMedicineRowResDto } from './todo.response';
+import { TodoTaskResDto, TodoTaskAlramResDto } from "../todo.response";
 
 @Injectable()
 export class TodoAppRepository {
@@ -25,33 +26,33 @@ export class TodoAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   // TODO: BOX - TASK
-  async getBoxTasks(): Promise<ITodoTask[]> {
+  async getBoxTasks(): Promise<TodoTaskResDto[]> {
     let query = `  SELECT A.seq, A.taskCode, B.taskName, A.sortOrder FROM ${this.tableBoxTask} A
     LEFT JOIN ${this.tableTask} B
     ON A.taskCode = B.taskCode
     WHERE A.isActive = 'Y' `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
-    return rows as ITodoTask[];
+    return rows as TodoTaskResDto[];
   }
   // TODO: TASK
-  async getTasks(): Promise<ITodoTask[]> {
+  async getTasks(): Promise<TodoTaskResDto[]> {
     let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
-    return rows as ITodoTask[];
+    return rows as TodoTaskResDto[];
   }
-  async getDetailTask(taskCode: string): Promise<ITodoTask | null> {
+  async getDetailTask(taskCode: string): Promise<TodoTaskResDto | null> {
     let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' AND taskCode  = ? LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskCode]);
-    return rows.length ? (rows[0] as ITodoTask) : null;
+    return rows.length ? (rows[0] as TodoTaskResDto) : null;
   }
-  async getTaskByKeyword(taskKeyword: string): Promise<ITodoTask | null> {
+  async getTaskByKeyword(taskKeyword: string): Promise<TodoTaskResDto | null> {
     let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' AND taskKeyword  = ? LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskKeyword]);
-    return rows.length ? (rows[0] as ITodoTask) : null;
+    return rows.length ? (rows[0] as TodoTaskResDto) : null;
   }
 
   // TODO: ALARM
@@ -193,7 +194,7 @@ export class TodoAppRepository {
     return result.affectedRows;
   }
 
-  async insertTaskAlarm(userCode: string, dto: ITodoTaskAlram): Promise<number> {
+  async insertTaskAlarm(userCode: string, dto: any): Promise<number> {
     const sqlLast = ` SELECT taskAlarmCode FROM ${this.tableHomeTaskAlarm} ORDER BY taskAlarmCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let taskAlarmCode = CODES.taskAlarmCode.FRIST_CODE;
@@ -219,7 +220,7 @@ export class TodoAppRepository {
 
     return result.insertId;
   }
-  async checkDuplicateTaskAlarm(userCode: string, dto: ITodoTaskAlram): Promise<GetTaskAlarmResDto | null> {
+  async checkDuplicateTaskAlarm(userCode: string, dto: any): Promise<GetTaskAlarmResDto | null> {
     const query = `
       SELECT seq, userCode, userHomeCode, taskAlarmCode, taskCode, taskName, taskDate, taskNote, isActive
       FROM ${this.tableHomeTaskAlarm}

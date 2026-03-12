@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ITodoBoxTask, ITodoTask, TaskStatusEnum } from '../todo.interface';
+import { TaskStatusEnum } from '../todo.interface';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskDto } from './todo.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
+import { TodoBoxTaskResDto, TodoTaskResDto } from "../todo.response";
 
 @Injectable()
 export class TodoAdminRepository {
@@ -18,7 +19,7 @@ export class TodoAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableTask} WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllTasks(dto: PagingDto): Promise<ITodoTask[]> {
+  async getAllTasks(dto: PagingDto): Promise<TodoTaskResDto[]> {
     let query = `  SELECT seq, taskCode, taskName, createdId, createdAt
         FROM ${this.tableTask} 
         WHERE isActive = 'Y'
@@ -31,17 +32,17 @@ export class TodoAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as ITodoTask[];
+    return rows as TodoTaskResDto[];
   }
   // todo: BOX-TASK
-  async getBoxTasks(): Promise<ITodoBoxTask[]> {
+  async getBoxTasks(): Promise<TodoBoxTaskResDto[]> {
     let query = `  SELECT seq, taskCode, sortOrder, isActive
         FROM ${this.tableBoxTask} 
         WHERE isActive = 'Y' AND seq IN(1,2,3)
         ORDER BY sortOrder ASC
         LIMIT 3 `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
-    return rows as ITodoBoxTask[];
+    return rows as TodoBoxTaskResDto[];
   }
   async updateBoxTask(dto: UpdateBoxTaskDto, updatedId: string): Promise<number> {
     const sql = `

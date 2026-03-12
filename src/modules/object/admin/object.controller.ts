@@ -12,10 +12,10 @@ import {
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { ObjectAdminService } from './object.service';
-import { IObject } from '../object.interface';
+import { ListResponseDto } from "src/dto/common.dto";
+import { ObjectResDto } from "../object.response";
 
 @ApiBearerAuth('admin-auth') 
 @ApiTags('admin/object')
@@ -31,7 +31,7 @@ export class ObjectAdminController {
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Body() dto: PagingDto,
-  ): Promise<IList<IObject>> {
+  ): Promise<{ total: number; list: ObjectResDto[] }> {
     const result = await this.objectAdminService.getAll(dto);
     return result;
   }

@@ -1,13 +1,13 @@
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, Param, BadRequestException, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { ScreenAdminService } from './screen.service';
-import { IScreen } from '../screen.interface';
 import { UpdateScreenDto } from './screen.dto';
-import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
+import { ListResponseDto } from "src/dto/common.dto";
+import { ScreenResDto } from "../screen.response";
+import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/screen')
@@ -21,7 +21,7 @@ export class ScreenAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<IList<IScreen>> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: ScreenResDto[] }> {
     const result = await this.screenAdminService.getAll(dto);
     return result;
   }
@@ -30,7 +30,7 @@ export class ScreenAdminController {
   @ApiParam({ name: 'keyword', type: String })
   @Put('update/:keyword')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateScreenDto, @Param('keyword') screenKeyword: string,  @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+  async update(@Body() dto: UpdateScreenDto, @Param('keyword') screenKeyword: string,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.screenAdminService.update(dto, admin.userId, screenKeyword);
     if (result === 0) {
       throw new BadRequestException();

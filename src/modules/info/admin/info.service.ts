@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { UpdateInfoDto } from './info.dto';
-import { IInfo } from '../info.interface';
 import { InfoAdminRepository } from './info.repository';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { getFileLocation, validateImgExt } from 'src/config/multer.config';
 import { IMG_TYPES } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
+import { ListResponseDto } from "src/dto/common.dto";
+import { InfoResDto } from "../info.response";
 
 @Injectable()
 export class InfoAdminService {
@@ -38,12 +38,12 @@ export class InfoAdminService {
       throw new BadRequestException(Msg.FileWrongType(file.originalname, IMG_TYPES));
     }
   }
-  async getAll(dto: PagingDto): Promise<IList<IInfo>> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: InfoResDto[] }> {
     const total = await this.infoAdminRepository.getTotal();
     const list = await this.infoAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(infoKeyword: string): Promise<IInfo | null> {
+  async getDetail(infoKeyword: string): Promise<InfoResDto | null> {
     const result = await this.infoAdminRepository.getDetail(infoKeyword);
     return result;
   }

@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { ChangToMainBlogDto, CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { BlogAdminRepository } from './blog.repository';
-import { IBlog } from '../blog.interface';
+import { ListResponseDto } from "src/dto/common.dto";
+import { BlogResDto } from "../blog.response";
 
 @Injectable()
 export class BlogAdminService {
   constructor(private readonly blogAdminRepository: BlogAdminRepository) {}
-  async getAll(dto: GetAllBlogDto): Promise<IList<IBlog>> {
+  async getAll(dto: GetAllBlogDto): Promise<{ total: number; list: BlogResDto[] }> {
     const total = await this.blogAdminRepository.getTotal(dto);
     const list = await this.blogAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(blogCode: string): Promise<IBlog | null> {
+  async getDetail(blogCode: string): Promise<BlogResDto | null> {
     const result = await this.blogAdminRepository.getDetail(blogCode);
     return result;
   }

@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { diffByTwoArr } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { TeamAdminRepository } from './team.repository';
-import { ITeam, ITeamImg, ITeamReview } from './team.interface';
-import { ChangDisplayReviewDto, CreateTeamDto, UpdateTeamDto } from './team.dto';
+import { ChangDisplayReviewDto, CreateTeamDto, UpdateTeamDto, TeamResDto, TeamReviewResDto, TeamImgResDto } from './team.dto';
+import { ListResponseDto } from "src/dto/common.dto";
 
 @Injectable()
 export class TeamAdminService {
@@ -17,17 +16,17 @@ export class TeamAdminService {
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: PagingDto): Promise<IList<ITeam>> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: TeamResDto[] }> {
     const total = await this.teamAdminRepository.getTotal();
     const list = await this.teamAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(teamCode: string): Promise<ITeam | null> {
+  async getDetail(teamCode: string): Promise<TeamResDto | null> {
     let result = await this.teamAdminRepository.getDetail(teamCode);
     if (result) {
       let teamImages = await this.teamAdminRepository.getImages(result ? result?.seq : 0);
       // tách biệt ảnh chính và danh sách ảnh phụ
-      let teamImagesExceptMain: ITeamImg[] = [];
+      let teamImagesExceptMain: TeamImgResDto[] = [];
       for (const img of teamImages) {
         if (img.filename == result.teamImage) {
           result.teamImage = img;
@@ -74,25 +73,25 @@ export class TeamAdminService {
     const logbase = `${this.SERVICE_NAME}/update`;
 
     const home = await this.getDetail(teamCode);
-    let teamImagePath = (home?.teamImage as ITeamImg).filename;
+    let teamImagePath = (home?.teamImage as TeamImgResDto).filename;
     if (home) {
       // teamImage bị thay đổi -> xóa ảnh hiện tại của nó
-      if (dto.teamImage.filename !== (home.teamImage as ITeamImg).filename) {
+      if (dto.teamImage.filename !== (home.teamImage as TeamImgResDto).filename) {
         // xóa file local
-        await this.fileLocalService.deleteLocalFile((home.teamImage as ITeamImg).filename);
+        await this.fileLocalService.deleteLocalFile((home.teamImage as TeamImgResDto).filename);
 
         // xóa trong db
-        await this.teamAdminRepository.deleteHomeImagesOne((home.teamImage as ITeamImg).seq);
+        await this.teamAdminRepository.deleteHomeImagesOne((home.teamImage as TeamImgResDto).seq);
 
         // instart file mới vào db
         teamImagePath = `${getFileLocation(dto.teamImage.mimetype, dto.teamImage.fieldname)}/${dto.teamImage.filename}`;
         await this.teamAdminRepository.createImages(home.seq, 'admin', teamImagePath, dto.teamImage);
       }
 
-      const fileNeedDeletes: ITeamImg[] = diffByTwoArr(dto.teamImages, home.teamImages, 'filename');
+      const fileNeedDeletes: TeamImgResDto[] = diffByTwoArr(dto.teamImages, home.teamImages, 'filename');
       this.logger.log(logbase, `Danh sách file cần xóa --> ${JSON.stringify(fileNeedDeletes.map((fi) => fi.filename))}`);
 
-      const fileNeedCreates: ITeamImg[] = diffByTwoArr(home.teamImages, dto.teamImages, 'filename');
+      const fileNeedCreates: TeamImgResDto[] = diffByTwoArr(home.teamImages, dto.teamImages, 'filename');
       this.logger.log(logbase, `Danh sách file cần thêm mới --> ${JSON.stringify(fileNeedCreates.map((fi) => fi.filename))}`);
 
       // teamImages bị thay đổi -> xóa ~ ảnh hiện tại của nó
@@ -130,13 +129,13 @@ export class TeamAdminService {
   }
 
   // TODO: REVIEW
-  async getAllReview(dto: PagingDto): Promise<IList<ITeamReview>> {
+  async getAllReview(dto: PagingDto): Promise<{ total: number; list: TeamReviewResDto[] }> {
     const total = await this.teamAdminRepository.getTotalReview();
     const list = await this.teamAdminRepository.getAllReview(dto);
     return { total, list };
   }
 
-  async getDetailReview(seq: number): Promise<ITeamReview | null> {
+  async getDetailReview(seq: number): Promise<TeamReviewResDto | null> {
     const result = await this.teamAdminRepository.getDetailReview(seq);
     return result;
   }

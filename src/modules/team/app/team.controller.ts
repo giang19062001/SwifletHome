@@ -1,3 +1,4 @@
+import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put, UploadedFiles } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
@@ -5,18 +6,16 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { TeamAppService } from './team.service';
 import { GetAllTeamDto, GetReviewListOfTeamDto, ReviewTeamDto, UploadReviewFilesDto } from './team.dto';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, UploadReviewFilesResDto } from './team.response';
-import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/team')
 @Controller('/api/app/team')
@@ -38,7 +37,7 @@ export class TeamAppController {
   @Post('getAllTeams')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetAllTeamResDto)) })
-  async getAllTeams(@Body() dto: GetAllTeamDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<IList<GetAllTeamResDto>> {
+  async getAllTeams(@Body() dto: GetAllTeamDto, @GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: GetAllTeamResDto[] }> {
     if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.OWNER.value) {
       throw new BadRequestException({
         message: Msg.OnlyOwnerCanFetch,
@@ -59,7 +58,7 @@ export class TeamAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetDetailTeamResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getInfoToRequestQrcode(@Param('teamCode') teamCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
+  async getInfoToRequestQrcode(@Param('teamCode') teamCode: string, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.teamAppService.getDetailTeam(teamCode);
     return result;
   }
@@ -74,7 +73,7 @@ export class TeamAppController {
   @Post('getReviewListOfTeam')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetReviewListOfTeamResDto)) })
-  async getReviewListOfTeam(@Body() dto: GetReviewListOfTeamDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<IList<GetReviewListOfTeamResDto>> {
+  async getReviewListOfTeam(@Body() dto: GetReviewListOfTeamDto, @GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: GetReviewListOfTeamResDto[] }> {
     if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.OWNER.value) {
       throw new BadRequestException({
         message: Msg.OnlyOwnerCanFetch,
@@ -98,7 +97,7 @@ export class TeamAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async reviewTeam(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: ReviewTeamDto) {
+  async reviewTeam(@GetUserApp() user: TokenUserAppResDto, @Body() dto: ReviewTeamDto) {
     const result = await this.teamAppService.reviewTeam(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({
@@ -138,7 +137,7 @@ export class TeamAppController {
   @UseInterceptors(FilesInterceptor('reviewImg', 5, multerImgConfig))
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadReviewFilesResDto]) })
-  async uploadReviewFiles(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UploadReviewFilesDto, @UploadedFiles() reviewImgs: Express.Multer.File[]) {
+  async uploadReviewFiles(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadReviewFilesDto, @UploadedFiles() reviewImgs: Express.Multer.File[]) {
     const result = await this.teamAppService.uploadReviewFiles(user.userCode, dto, reviewImgs);
     return {
       message: result.length ? Msg.UploadOk : Msg.UploadErr,

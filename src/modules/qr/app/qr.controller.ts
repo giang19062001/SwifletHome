@@ -15,13 +15,13 @@ import {
 } from './qr.response';
 import { GetRequestSellListDto, InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { getImgVideoMulterConfig, multerVideoConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
-import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { PagingDto } from 'src/dto/admin.dto';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { USER_CONST } from "src/modules/user/app/user.interface";
 
 @ApiTags('app/qr')
 @Controller('/api/app/qr')
@@ -42,7 +42,7 @@ export default class QrAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetRequestQrCodeListResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getRequestQrCocdeList(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp) {
+  async getRequestQrCocdeList(@Body() dto: PagingDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.qrAppService.getRequestQrCocdeList(user, dto);
     return result;
   }
@@ -55,7 +55,7 @@ export default class QrAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetApprovedRequestQrCodeResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getApprovedRequestQrCocde(@Param('requestCode') requestCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
+  async getApprovedRequestQrCocde(@Param('requestCode') requestCode: string, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.qrAppService.getApprovedRequestQrCocde(requestCode, user);
     return result;
   }
@@ -68,7 +68,7 @@ export default class QrAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetInfoToRequestQrcodeResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getInfoToRequestQrcode(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: authInterface.ITokenUserApp) {
+  async getInfoToRequestQrcode(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.qrAppService.getInfoToRequestQrcode(userHomeCode, user, 0);
     return result;
   }
@@ -88,7 +88,7 @@ export default class QrAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async requestQrCode(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: RequestQrCodeDto) {
+  async requestQrCode(@GetUserApp() user: TokenUserAppResDto, @Body() dto: RequestQrCodeDto) {
     const result = await this.qrAppService.requestQrCode(user, dto);
     if (result === -1) {
       throw new BadRequestException({
@@ -127,7 +127,7 @@ export default class QrAppController {
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'requestCode', type: String })
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async cancelRequest(@Param('requestCode') requestCode: string, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
+  async cancelRequest(@Param('requestCode') requestCode: string, @GetUserApp() user: TokenUserAppResDto): Promise<number> {
     const result = await this.qrAppService.cancelRequest(requestCode, user.userCode);
     if (result === 0) {
       throw new BadRequestException({
@@ -152,7 +152,7 @@ export default class QrAppController {
   @UseInterceptors(FilesInterceptor('requestQrcodeFiles', 5, getImgVideoMulterConfig(5)))
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadRequestVideoResDto]) })
-  async uploadRequestFile(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UploadRequestVideoDto, @UploadedFiles() requestQrcodeFiles: Express.Multer.File[]) {
+  async uploadRequestFile(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadRequestVideoDto, @UploadedFiles() requestQrcodeFiles: Express.Multer.File[]) {
     const result = await this.qrAppService.uploadRequestFile(user.userCode, dto, requestQrcodeFiles);
     return {
       message: result.length ? Msg.UploadOk : Msg.UploadErr,
@@ -168,7 +168,7 @@ export default class QrAppController {
   @Get('getRequestSellDetail/:requestCode')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetRequestSellDetailResDto) })
-  async getRequestSellDetail(@GetUserApp() user: authInterface.ITokenUserApp, @Param('requestCode') requestCode: string) {
+  async getRequestSellDetail(@GetUserApp() user: TokenUserAppResDto, @Param('requestCode') requestCode: string) {
     const result = await this.qrAppService.getRequestSellDetail(requestCode, user.userCode);
     return result;
   }
@@ -189,7 +189,7 @@ export default class QrAppController {
   })
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetRequestSellListResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getRequestSellList(@Body() dto: GetRequestSellListDto, @GetUserApp() user: authInterface.ITokenUserApp) {
+  async getRequestSellList(@Body() dto: GetRequestSellListDto, @GetUserApp() user: TokenUserAppResDto) {
     if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
       throw new BadRequestException({
         message: Msg.OnlyPurcharseCanFetch,
@@ -220,7 +220,7 @@ export default class QrAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async requestSell(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: InsertRequestSellDto) {
+  async requestSell(@GetUserApp() user: TokenUserAppResDto, @Body() dto: InsertRequestSellDto) {
     const result = await this.qrAppService.requestSell(user, dto);
     if (result === -1) {
       throw new BadRequestException({
@@ -267,7 +267,7 @@ export default class QrAppController {
     type: MaskRequestSellDto,
   })
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async maskRequestSell(@GetUserApp() user: authInterface.ITokenUserApp, @Param('requestCode') requestCode: string, @Body() dto: MaskRequestSellDto) {
+  async maskRequestSell(@GetUserApp() user: TokenUserAppResDto, @Param('requestCode') requestCode: string, @Body() dto: MaskRequestSellDto) {
     const result = await this.qrAppService.maskRequestSell(requestCode, user.userCode, dto.markType);
     return result;
   }

@@ -1,5 +1,4 @@
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { QrAdminRepository } from './qr.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Injectable } from '@nestjs/common';
@@ -14,6 +13,7 @@ import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
 import { QrAppService } from '../app/qr.service';
+import { ListResponseDto } from "src/dto/common.dto";
 
 @Injectable()
 export class QrAdminService {
@@ -27,7 +27,7 @@ export class QrAdminService {
     private readonly userAdminRepository: UserAdminRepository,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: PagingDto): Promise<IList<IQrRequest>> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: IQrRequest[] }> {
     const total = await this.qrAdminRepository.getTotal();
     const list = await this.qrAdminRepository.getAll(dto);
     return { total, list };

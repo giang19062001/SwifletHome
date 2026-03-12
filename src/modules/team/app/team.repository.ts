@@ -3,7 +3,8 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { GetAllTeamDto, GetReviewListOfTeamDto, ReviewTeamDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto } from './team.response';
-import { ITeamReviewFile } from './team.interface';
+import { TeamReviewFileResDto } from "../admin/team.dto";
+
 @Injectable()
 export class TeamAppRepository {
   private readonly table = 'tbl_team_user';
@@ -177,7 +178,7 @@ export class TeamAppRepository {
 
     return result.insertId;
   }
-  async uploadFile(seq: number, uniqueId: string, teamCode: string, userCode: string, filenamePath: string, file: Express.Multer.File | ITeamReviewFile): Promise<number> {
+  async uploadFile(seq: number, uniqueId: string, teamCode: string, userCode: string, filenamePath: string, file: Express.Multer.File | TeamReviewFileResDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableReviewImg} (filename, originalname, size, mimetype, uniqueId, reviewSeq, teamCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -205,13 +206,13 @@ export class TeamAppRepository {
     return result.affectedRows;
   }
 
-  async getFilesNotUse(): Promise<ITeamReviewFile[]> {
+  async getFilesNotUse(): Promise<TeamReviewFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.reviewSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableReviewImg} A
         WHERE A.reviewSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.tableReview} ) OR A.isActive = 'N'
         `,
     );
-    return rows as ITeamReviewFile[];
+    return rows as TeamReviewFileResDto[];
   }
 
   async deleteFile(seq: number): Promise<number> {

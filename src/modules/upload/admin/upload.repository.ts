@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IAudioFreePay, IFileMedia, IFileUpload } from '../upload.interface';
 import { UploadAudioFilesDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
+import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
 
 @Injectable()
 export class UploadAdminRepository {
@@ -12,17 +12,17 @@ export class UploadAdminRepository {
   private readonly tableMediaVideo = 'tbl_media_video';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getAllImgFile(): Promise<IFileUpload[]> {
+  async getAllImgFile(): Promise<FileUploadResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
         FROM ${this.tableImg} A 
         WHERE isActive = 'Y' 
         ORDER BY A.createdAt DESC`,
     );
-    return rows as IFileUpload[];
+    return rows as FileUploadResDto[];
   }
   //* get audio
-  async getAllAudioFile(): Promise<IFileUpload[]> {
+  async getAllAudioFile(): Promise<FileUploadResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, B.filename AS filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
         FROM ${this.tableAudio} A 
@@ -32,7 +32,7 @@ export class UploadAdminRepository {
          ORDER BY A.createdAt DESC
          `,
     );
-    return rows as IFileUpload[];
+    return rows as FileUploadResDto[];
   }
   // async getAllMediaAudioFile(): Promise<IFileMedia[]> {
   //   const [rows] = await this.db.query<RowDataPacket[]>(
@@ -45,7 +45,7 @@ export class UploadAdminRepository {
   //   );
   //   return rows as IFileMedia[];
   // }
-  async getAllMediaAudioFile(): Promise<IFileMedia[]> {
+  async getAllMediaAudioFile(): Promise<FileMediaResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink, A.isFree, A.isCoupleFree, A.badge
         FROM ${this.tableMediaAudio} A 
@@ -53,19 +53,19 @@ export class UploadAdminRepository {
        ORDER BY A.createdAt DESC
          `,
     );
-    return rows as IFileMedia[];
+    return rows as FileMediaResDto[];
   }
   //* get video
-  async getAllVideoLink(): Promise<IFileUpload[]> {
+  async getAllVideoLink(): Promise<FileUploadResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, '' as filename, '' as originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink
         FROM ${this.tableVideo} A 
         WHERE isActive = 'Y' 
          ORDER BY A.createdAt DESC `,
     );
-    return rows as IFileUpload[];
+    return rows as FileUploadResDto[];
   }
-  async getAllMediaVideoLink(): Promise<IFileMedia[]> {
+  async getAllMediaVideoLink(): Promise<FileMediaResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, '' as filename, A.originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink, 'Y' as isFree,
        'Y' as isCoupleFree,  A.badge
@@ -73,19 +73,19 @@ export class UploadAdminRepository {
         WHERE isActive = 'Y' 
          ORDER BY A.createdAt DESC `,
     );
-    return rows as IFileMedia[];
+    return rows as FileMediaResDto[];
   }
-  async getFileImg(filename: string): Promise<IFileUpload | null> {
+  async getFileImg(filename: string): Promise<FileUploadResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.filename, A.mimetype
         FROM ${this.tableImg} A 
         WHERE A.filename =? `,
       [filename],
     );
-    return rows ? (rows[0] as IFileUpload) : null;
+    return rows ? (rows[0] as FileUploadResDto) : null;
   }
   //*get audio
-  async getFileAudio(seq: number): Promise<IAudioFreePay | null> {
+  async getFileAudio(seq: number): Promise<AudioFreePayResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` 
         SELECT 
@@ -103,9 +103,9 @@ export class UploadAdminRepository {
          `,
       [seq],
     );
-    return rows ? (rows[0] as IAudioFreePay) : null;
+    return rows ? (rows[0] as AudioFreePayResDto) : null;
   }
-  async getFileMediaAudio(seq: number): Promise<IAudioFreePay | null> {
+  async getFileMediaAudio(seq: number): Promise<AudioFreePayResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT 
             A.seq,
@@ -123,7 +123,7 @@ export class UploadAdminRepository {
          `,
       [seq],
     );
-    return rows ? (rows[0] as IAudioFreePay) : null;
+    return rows ? (rows[0] as AudioFreePayResDto) : null;
   }
   //* image
   async uploadImg(file: Express.Multer.File, filenamePath: string, createdId: string): Promise<number> {

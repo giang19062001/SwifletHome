@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IConsignment } from './consignment.interface';
+import { ConsignmentResDto } from "./consignment.response";
 
 @Injectable()
 export class ConsignmentAdminRepository {
@@ -13,7 +13,7 @@ export class ConsignmentAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<IConsignment[]> {
+  async getAll(dto: PagingDto): Promise<ConsignmentResDto[]> {
     let query = ` SELECT A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestQuantity, A.deliveryAddress, A.receiverName,
      A.receiverPhone, A.consignmentStatus, A.isActive, A.createdAt 
         FROM ${this.table} A  
@@ -26,6 +26,6 @@ export class ConsignmentAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IConsignment[];
+    return rows as ConsignmentResDto[];
   }
 }

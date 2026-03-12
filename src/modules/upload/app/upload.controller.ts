@@ -1,18 +1,16 @@
 import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException, Get, Res, Param, Req, UseGuards, HttpCode, HttpStatus, Delete, Body, UploadedFiles } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
-import { IAudioFreePay, IFileMedia, IFileUpload } from '../upload.interface';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { UploadAppService } from './upload.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto } from 'src/dto/common.dto';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
-import { IListApp } from 'src/interfaces/app.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { GetAllMediaDto } from './upload.dto';
 import { GetAllMediaResDto } from './upload.response';
-
+import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/upload')
 @Controller('/api/app/upload')
@@ -32,7 +30,7 @@ export class UploadAppController {
        description: `
 **MediaType: enum('AUDIO','VIDEO')**\n
 **badge: enum('NEW','NORMAL')**` })
-    async getAllMedia(@Body() dto: GetAllMediaDto, @GetUserApp() user: authInterface.ITokenUserApp,): Promise<IListApp<IFileMedia>> {
+    async getAllMedia(@Body() dto: GetAllMediaDto, @GetUserApp() user: TokenUserAppResDto,): Promise<{ total: number; list: FileMediaResDto[] }> {
       const result = await this.uploadAppService.getAllMedia(dto, user.userCode);
       return result;
     }

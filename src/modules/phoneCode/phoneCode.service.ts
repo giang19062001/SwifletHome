@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PhoneCodeRepository } from './phoneCode.repository';
-import { IPhoneCode } from './phoneCode.interface';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { PhoneCodeResDto } from "./phoneCode.response";
 
 @Injectable()
 export class PhoneCodeService {
@@ -11,7 +11,7 @@ export class PhoneCodeService {
     private readonly phoneCodeRepository: PhoneCodeRepository,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(): Promise<IPhoneCode[]> {
+  async getAll(): Promise<PhoneCodeResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
 
     const list = await this.phoneCodeRepository.getAll();
@@ -19,7 +19,7 @@ export class PhoneCodeService {
 
     return list;
   }
-   async getDetail(countryCode: string): Promise<IPhoneCode | null> {
+   async getDetail(countryCode: string): Promise<PhoneCodeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail:`;
 
     const result = await this.phoneCodeRepository.getDetail(countryCode);

@@ -3,16 +3,15 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperat
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetTasksMedicineResDto, GetTaskHarvestResDto } from './todo.response';
-import { ITodoTaskAlram, ITodoTask } from '../todo.interface';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto } from './todo.dto';
-import { IListApp } from 'src/interfaces/app.interface';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
+import { TodoTaskResDto, TodoTaskAlramResDto } from "../todo.response";
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -28,7 +27,7 @@ export default class TodoAppController {
   @Get('getTasks')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([GetTaskResDto]) })
-  async getTasks(): Promise<ITodoTask[]> {
+  async getTasks(): Promise<TodoTaskResDto[]> {
     const result = await this.todoAppService.getTasks();
     return result;
   }
@@ -58,7 +57,7 @@ export default class TodoAppController {
 **rightEventLabel**: enum('Hoàn thành')  --- Hiển thị text nút bên phải của lịch nhắc trên APP \n
 `,
   })
-  async getAll(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: GetListTaskAlarmsDTO): Promise<IListApp<ITodoTaskAlram>> {
+  async getAll(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetListTaskAlarmsDTO): Promise<{ total: number; list: TodoTaskAlramResDto[] }> {
     const result = await this.todoAppService.getListTaskAlarms(user.userCode, dto.userHomeCode, dto);
     return result;
   }
@@ -74,7 +73,7 @@ export default class TodoAppController {
     description: `**taskStatus**: enum('COMPLETE','CANCEL')`,
   })
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async changeTaskAlarmStatus(@Param('taskAlarmCode') taskAlarmCode: string, @Body() dto: ChangeTaskAlarmStatusDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
+  async changeTaskAlarmStatus(@Param('taskAlarmCode') taskAlarmCode: string, @Body() dto: ChangeTaskAlarmStatusDto, @GetUserApp() user: TokenUserAppResDto): Promise<number> {
     const result = await this.todoAppService.changeTaskAlarmStatus(dto.taskStatus, user.userCode, taskAlarmCode);
 
     // ko nên cập nhập lại thành "chờ"
@@ -101,7 +100,7 @@ export default class TodoAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([GetScheduledTasksResDto]) })
   @ApiBadRequestResponse({ type: EmptyArrayResponseDto })
-  async getScheduledTasks(@GetUserApp() user: authInterface.ITokenUserApp) {
+  async getScheduledTasks(@GetUserApp() user: TokenUserAppResDto) {
     const result = await this.todoAppService.getScheduledTasks(user.userCode);
     if (!result.length) {
       throw new BadRequestException({
@@ -130,7 +129,7 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setTaskMedicine(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskMedicineDto) {
+  async setTaskMedicine(@GetUserApp() user: TokenUserAppResDto, @Body() dto: SetTaskMedicineDto) {
     const result = await this.todoAppService.setTaskMedicine(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
@@ -214,7 +213,7 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setTaskHarvest(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetHarvestTaskDto) {
+  async setTaskHarvest(@GetUserApp() user: TokenUserAppResDto, @Body() dto: SetHarvestTaskDto) {
     const result = await this.todoAppService.setTaskHarvest(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
@@ -256,7 +255,7 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetTaskHarvestResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getTaskHarvest(@GetUserApp() user: authInterface.ITokenUserApp, @Query('taskAlarmCode') taskAlarmCode?: string) {
+  async getTaskHarvest(@GetUserApp() user: TokenUserAppResDto, @Query('taskAlarmCode') taskAlarmCode?: string) {
     const result = await this.todoAppService.getTaskHarvest(user.userCode, taskAlarmCode ?? '');
     if (result == 0) {
       throw new BadRequestException({

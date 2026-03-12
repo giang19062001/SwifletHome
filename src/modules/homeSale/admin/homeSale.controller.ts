@@ -21,15 +21,15 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { HomeSaleAdminService } from './homeSale.service';
-import { IHomeSale, IHomeSaleSightSeeing } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { FileFieldsInterceptor, } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
-import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
+import { ListResponseDto } from "src/dto/common.dto";
+import { HomeSaleResDto, HomeSaleSightSeeingResDto } from "../homeSale.response";
+import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/homeSale')
@@ -43,7 +43,7 @@ export class HomeSaleAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<IList<IHomeSale>> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: HomeSaleResDto[] }> {
     const result = await this.homeSaleAdminService.getAll(dto);
     return result;
   }
@@ -51,7 +51,7 @@ export class HomeSaleAdminController {
   @ApiParam({ name: 'homeCode', type: String })
   @Get('getDetail/:homeCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('homeCode') homeCode: string): Promise<IHomeSale | null> {
+  async getDetail(@Param('homeCode') homeCode: string): Promise<HomeSaleResDto | null> {
     const result = await this.homeSaleAdminService.getDetail(homeCode);
     if (!result) {
       throw new BadRequestException();
@@ -75,7 +75,7 @@ export class HomeSaleAdminController {
   )
   async create(
     @Body() createHomeDto: CreateHomeDto,
-    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
     // @UploadedFiles() files: Express.Multer.File[],
     @UploadedFiles()
     files: {
@@ -114,7 +114,7 @@ export class HomeSaleAdminController {
   async update(
     @Body() updateHomeDto: UpdateHomeDto,
     @Param('homeCode') homeCode: string,
-    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
     @UploadedFiles()
     files: {
       homeImage?: Express.Multer.File[];
@@ -153,7 +153,7 @@ export class HomeSaleAdminController {
   })
   @Post('getAllSightseeing')
   @HttpCode(HttpStatus.OK)
-  async getAllSightseeing(@Body() dto: PagingDto): Promise<IList<IHomeSaleSightSeeing>> {
+  async getAllSightseeing(@Body() dto: PagingDto): Promise<{ total: number; list: HomeSaleSightSeeingResDto[] }> {
     const result = await this.homeSaleAdminService.getAllSightseeing(dto);
     return result;
   }
@@ -162,7 +162,7 @@ export class HomeSaleAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Put('updateSightseeing/:seq')
   @HttpCode(HttpStatus.OK)
-  async updateSightseeing(@Body() dto: UpdateStatusDto, @Param('seq') seq: number, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+  async updateSightseeing(@Body() dto: UpdateStatusDto, @Param('seq') seq: number, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.homeSaleAdminService.updateSightseeing(dto, admin.userId, seq);
     if (result === 0) {
       throw new BadRequestException();
@@ -173,7 +173,7 @@ export class HomeSaleAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Get('getDetailSightseeing/:seq')
   @HttpCode(HttpStatus.OK)
-  async getDetailSightseeing(@Param('seq') seq: number): Promise<IHomeSaleSightSeeing | null> {
+  async getDetailSightseeing(@Param('seq') seq: number): Promise<HomeSaleSightSeeingResDto | null> {
     const result = await this.homeSaleAdminService.getDetailSightseeing(seq);
     if (!result) {
       throw new BadRequestException();

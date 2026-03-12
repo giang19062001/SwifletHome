@@ -3,7 +3,7 @@ import { Transform, Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, Min, ValidateNested } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { IUserTeamTypeEnum } from 'src/modules/user/app/user.interface';
+import { IUserTeamTypeEnum } from '../../user/app/user.interface';
 
 export class GetAllTeamDto extends PagingDto {
   @ApiProperty({
@@ -100,4 +100,34 @@ export class ReviewTeamDto {
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
+}
+
+export class TeamReviewFileStrResDto {
+    @ApiProperty({ example: 0 })
+    seq: number;
+    @ApiProperty({ example: '' })
+    filename: string;
+}
+
+export class TeamReviewFileResDto {
+    @ApiProperty({ example: 0 })
+    seq: number;
+    @ApiProperty({ example: 0 })
+    reviewSeq: number;
+    @ApiProperty({ example: '' })
+    teamCode: string;
+    @ApiProperty({ example: '' })
+    homeName: string;
+    @ApiProperty({ example: '' })
+    filename: string;
+    @ApiProperty({ example: '' })
+    originalname: string;
+    @ApiProperty({ example: 0 })
+    size: number;
+    @ApiProperty({ example: '' })
+    mimetype: string;
+    @ApiProperty({ example: '' })
+    uniqueId: string;
+    @ApiProperty({ example: YnEnum.N })
+    isActive: YnEnum;
 }

@@ -1,14 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IPackage } from '../package.interface';
+import { PackageResDto } from "../package.response";
 
 @Injectable()
 export class PackageAppRepository {
   private readonly table = 'tbl_package';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async getOne(): Promise<IPackage> {
+  async getOne(): Promise<PackageResDto> {
     let query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageItemSamePrice,
               A.packageOptionType, A.packageExpireDay, A.packageDescription
                FROM ${this.table} A
@@ -18,6 +18,6 @@ export class PackageAppRepository {
     const params: any[] = [];
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows[0] as IPackage;
+    return rows[0] as PackageResDto;
   }
 }

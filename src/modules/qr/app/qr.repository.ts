@@ -1,7 +1,7 @@
 import { GetTypeEnum, MarkTypeEnum, QR_CODE_CONST } from './../qr.interface';
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IQrRequestFile, RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
+import { RequestSellStatusEnum, RequestStatusEnum } from '../qr.interface';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
 import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
@@ -9,6 +9,7 @@ import { GetApprovedRequestQrCodeResDto, GetRequestSellDetailResDto, GetRequestS
 import { PagingDto } from 'src/dto/admin.dto';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { QrRequestFileResDto } from "../qr.response";
 
 @Injectable()
 export class QrAppRepository {
@@ -226,7 +227,7 @@ export class QrAppRepository {
   }
 
   // TODO: FILE
-  async getFilesNotUse(): Promise<IQrRequestFile[]> {
+  async getFilesNotUse(): Promise<QrRequestFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.qrRequestSeq, A.uniqueId, A.filename, A.mimetype 
             FROM ${this.tableFile} A
@@ -234,7 +235,7 @@ export class QrAppRepository {
           NOT IN (SELECT uniqueId FROM ${this.table})
     `,
     );
-    return rows as IQrRequestFile[];
+    return rows as QrRequestFileResDto[];
   }
   async markFileNotUse(qrRequestSeq: number, updatedId: string): Promise<number> {
     if (!qrRequestSeq) return 0;
@@ -261,7 +262,7 @@ export class QrAppRepository {
 
     return result.affectedRows;
   }
-  async uploadRequestFile(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | IQrRequestFile): Promise<number> {
+  async uploadRequestFile(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | QrRequestFileResDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableFile} (filename, originalname, size, mimetype, uniqueId, qrRequestSeq, userCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)

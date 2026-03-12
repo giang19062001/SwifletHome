@@ -5,7 +5,7 @@ import { LoggingService } from '../logger/logger.service';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
 import { ISearchItem } from './search.interface';
 import { UploadAppService } from 'src/modules/upload/app/upload.service';
-import { IFileUpload } from 'src/modules/upload/upload.interface';
+import { FileUploadResDto } from "../../modules/upload/upload.response";
 
 @Injectable()
 export class SearchService {
@@ -39,7 +39,7 @@ export class SearchService {
       .trim();
   }
 
-  handleAudio(content: string, remainDay: number, isFree: string, fileList: IFileUpload[]) {
+  handleAudio(content: string, remainDay: number, isFree: string, fileList: FileUploadResDto[]) {
     // TODO: [AUDIO]
     return content.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
       const baseUrl = url.split('/').slice(0, 3).join('/');

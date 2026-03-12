@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Forbi
 import { Request } from 'express';
 import { AuthAppService } from './auth.service';
 import { Msg } from 'src/helpers/message.helper';
-import { ITokenUserApp } from './auth.interface';
+import { TokenUserAppResDto } from "./auth.dto";
 
 @Injectable()
 export class ApiAuthAppGuard implements CanActivate {
@@ -17,7 +17,7 @@ export class ApiAuthAppGuard implements CanActivate {
     }
 
     try {
-      const payload: ITokenUserApp = await this.authAppService.verifyToken(token);
+      const payload: TokenUserAppResDto = await this.authAppService.verifyToken(token);
       const checkUserHas = await this.authAppService.findUser(payload.userCode);
       if (checkUserHas) {
         req['user'] = payload;

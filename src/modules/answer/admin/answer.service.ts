@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { IList } from 'src/interfaces/admin.interface';
 import { AnswerAdminRepository } from './answer.repository';
-import { IAnswer } from '../answer.interface';
-import { CreateAnswerDto, UpdateAnswerDto } from './answer.dto';
+import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
 import { QuestionAdminService } from 'src/modules/question/admin/question.service';
-import { GetAllAnswerResDto } from './answer.response';
+import { ListResponseDto } from "src/dto/common.dto";
+import { AnswerResDto } from "../answer.response";
 
 @Injectable()
 export class AnswerAdminService {
@@ -12,12 +11,12 @@ export class AnswerAdminService {
     private readonly answerAdminRepository: AnswerAdminRepository,
     private readonly questionAdminService: QuestionAdminService,
   ) {}
-  async getAll(dto: GetAllAnswerResDto): Promise<IList<IAnswer>> {
+  async getAll(dto: GetAllAnswerDto): Promise<{ total: number; list: AnswerResDto[] }> {
     const total = await this.answerAdminRepository.getTotal(dto);
     const list = await this.answerAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(answerCode: string): Promise<IAnswer | null> {
+  async getDetail(answerCode: string): Promise<AnswerResDto | null> {
     const result = await this.answerAdminRepository.getDetail(answerCode);
     return result;
   }

@@ -31,14 +31,3 @@ export const OPTION_CONST = {
     },
   },
 };
-
-export interface IOpition {
-  seq: number;
-  code: string;
-  mainOption: string;
-  subOption: string;
-  keyOption: string;
-  valueOption: string;
-  sortOrder: number;
-  isActive: YnEnum;
-}

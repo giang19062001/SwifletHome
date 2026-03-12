@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { PackageAdminRepository } from './package.repository';
-import { IPackage } from '../package.interface';
 import { formatPrice } from 'src/helpers/func.helper';
 import { UpdatePackageDto } from './package.dto';
+import { ListResponseDto } from "src/dto/common.dto";
+import { PackageResDto } from "../package.response";
 
 @Injectable()
 export class PackageAdminService {
   constructor(private readonly packageAdminRepository: PackageAdminRepository) {}
-  async getAll(dto: PagingDto): Promise<IList<IPackage>> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: PackageResDto[] }> {
     const total = await this.packageAdminRepository.getTotal();
     const list = await this.packageAdminRepository.getAll(dto);
 
@@ -20,7 +20,7 @@ export class PackageAdminService {
 
     return { total, list: listHandle };
   }
-  async getDetail(packageCode: string): Promise<IPackage | null> {
+  async getDetail(packageCode: string): Promise<PackageResDto | null> {
     const result = await this.packageAdminRepository.getDetail(packageCode);
     return result ? { ...result, packagePrice: formatPrice(result.packagePrice) } : null;
   }

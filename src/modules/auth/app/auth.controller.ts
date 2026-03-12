@@ -12,8 +12,8 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
 import { RequestOtpResDto } from 'src/modules/otp/otp.response';
-import * as authInterface from './auth.interface';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiBearerAuth('app-auth')
 @ApiTags('app/auth')
@@ -34,7 +34,7 @@ export class AuthAppController {
   @Post('changeTypeToken')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(LoginResDto) })
-  async changeTypeToken(@Body() dto: ChangeTypeTokenDto, @GetUserApp() user: authInterface.ITokenUserApp) {
+  async changeTypeToken(@Body() dto: ChangeTypeTokenDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.authAppService.changeTypeToken(user, dto);
     return {
       message: result ? Msg.LoginOk : Msg.LoginErr,
@@ -79,7 +79,7 @@ export class AuthAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async delete(@GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
+  async delete(@GetUserApp() user: TokenUserAppResDto): Promise<number> {
     const result = await this.authAppService.deleteAccount(user.userCode);
     if (result === 0) {
       throw new BadRequestException();
@@ -95,7 +95,7 @@ export class AuthAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetInfoUserAppResDto) })
-  async getInfo(@GetUserApp() user: authInterface.ITokenUserApp) {
+  async getInfo(@GetUserApp() user: TokenUserAppResDto) {
     const result = await this.authAppService.getInfo(user.userCode);
     return {
       message: result ? Msg.GetOk : Msg.GetErr,
@@ -112,7 +112,7 @@ export class AuthAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async update(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: UpdateUserDto, @Param('userPhone') userPhone: string, @Req() req: Request) {
+  async update(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UpdateUserDto, @Param('userPhone') userPhone: string, @Req() req: Request) {
     const result = await this.authAppService.update(dto, userPhone, user.userCode, user.countryCode);
     return {
       message: result ? Msg.UpdateOk : Msg.UpdateErr,

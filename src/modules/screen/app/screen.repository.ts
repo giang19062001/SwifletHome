@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IScreen } from '../screen.interface';
+import { ScreenResDto } from "../screen.response";
 
 @Injectable()
 export class ScreenAppRepository {
@@ -8,13 +8,13 @@ export class ScreenAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getDetail(screenKeyword: string): Promise<IScreen | null> {
+  async getDetail(screenKeyword: string): Promise<ScreenResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.screenKeyword, A.screenName, A.screenContent, A.screenDescription, A.isActive
         FROM ${this.table} A WHERE A.screenKeyword = ? AND A.isActive = 'Y'
         LIMIT 1`,
       [screenKeyword],
     );
-    return rows ? (rows[0] as IScreen) : null;
+    return rows ? (rows[0] as ScreenResDto) : null;
   }
 }

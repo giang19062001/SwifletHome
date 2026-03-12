@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ICategory } from '../category.interface';
+import { CategoryResDto } from "../category.response";
 
 @Injectable()
 export class CategoryAdminRepository {
@@ -13,7 +13,7 @@ export class CategoryAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<ICategory[]> {
+  async getAll(dto: PagingDto): Promise<CategoryResDto[]> {
     let query = `  SELECT seq, categoryCode, categoryName, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} WHERE isActive = 'Y'
         ORDER BY createdAt DESC `;
@@ -25,6 +25,6 @@ export class CategoryAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as ICategory[];
+    return rows as CategoryResDto[];
   }
 }

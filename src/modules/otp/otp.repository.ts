@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IOtp } from './otp.interface';
+import { OtpResDto } from "./otp.dto";
 
 @Injectable()
 export class OtpRepository {
@@ -26,17 +26,17 @@ export class OtpRepository {
     await this.db.query(sql, [purpose, otpCode, expiresAt, new Date(), userPhone, countryCode]);
   }
 
-  async findOtpExist(userPhone: string, countryCode: string): Promise<IOtp | null> {
+  async findOtpExist(userPhone: string, countryCode: string): Promise<OtpResDto | null> {
     const sql = `
       SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed  FROM ${this.table} 
       WHERE userPhone = ? AND  countryCode = ?
       LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, countryCode]);
-    return rows ? (rows[0] as IOtp) : null;
+    return rows ? (rows[0] as OtpResDto) : null;
   }
 
-  async findValidOtp(userPhone: string, purpose: string, countryCode: string): Promise<IOtp | null> {
+  async findValidOtp(userPhone: string, purpose: string, countryCode: string): Promise<OtpResDto | null> {
     const sql = `
       SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed FROM ${this.table} 
       WHERE userPhone = ? 
@@ -50,10 +50,10 @@ export class OtpRepository {
     `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, purpose, countryCode]);
-    return rows ? (rows[0] as IOtp) : null;
+    return rows ? (rows[0] as OtpResDto) : null;
   }
 
-  async checkPhoneVarified(userPhone: string, purpose: string, countryCode: string): Promise<IOtp | null> {
+  async checkPhoneVarified(userPhone: string, purpose: string, countryCode: string): Promise<OtpResDto | null> {
     const sql = `
       SELECT seq, userPhone, otpCode, purpose, attemptCount, maxAttempts, expiresAt, createdAt, isUsed 
       FROM ${this.table} 
@@ -66,7 +66,7 @@ export class OtpRepository {
     `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userPhone, purpose, countryCode]);
-    return rows ? (rows[0] as IOtp) : null;
+    return rows ? (rows[0] as OtpResDto) : null;
   }
 
   async updateOtpAttempt(otpId: number, attemptCount: number): Promise<void> {

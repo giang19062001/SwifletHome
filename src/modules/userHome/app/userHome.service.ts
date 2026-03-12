@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { getFileLocation } from 'src/config/multer.config';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IUserHome, IUserHomeArea, IUserHomeImageStr } from './userHome.interface';
-import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
+import { MutationUserHomeDto, UploadUserHomeImageDto, UserHomeAreaResDto, UserHomeResDto, UserHomeImageStrResDto } from './userHome.dto';
 import { UserHomeAppRepository } from './userHome.repository';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList, YnEnum } from 'src/interfaces/admin.interface';
+import { YnEnum } from 'src/interfaces/admin.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import { ListResponseDto } from "src/dto/common.dto";
 
 @Injectable()
 export class UserHomeAppService {
@@ -20,7 +20,7 @@ export class UserHomeAppService {
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: PagingDto, userCode: string): Promise<IList<IUserHome>> {
+  async getAll(dto: PagingDto, userCode: string): Promise<{ total: number; list: UserHomeResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.userHomeAppRepository.getTotalHomes(userCode);
     const list = await this.userHomeAppRepository.getAllHomes(dto, userCode);
@@ -28,18 +28,18 @@ export class UserHomeAppService {
     return { total, list };
   }
 
-  async getDetail(userHomeCode: string): Promise<IUserHome | null> {
+  async getDetail(userHomeCode: string): Promise<UserHomeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail:`;
     const result = await this.userHomeAppRepository.getDetailHome(userHomeCode);
     return result;
   }
-  async getAreaHome(userHomeCode: string): Promise<IUserHomeArea | null> {
+  async getAreaHome(userHomeCode: string): Promise<UserHomeAreaResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getAreaHome:`;
     const result = await this.userHomeAppRepository.getAreaHome(userHomeCode);
     return result;
   }
 
-  async getMainHomeByUser(userCode: string): Promise<IUserHome | null> {
+  async getMainHomeByUser(userCode: string): Promise<UserHomeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getMainHomeByUser:`;
     this.logger.log(logbase, `userCode(${userCode})`);
     const result = await this.userHomeAppRepository.getMainHomeByUser(userCode);
@@ -166,10 +166,10 @@ export class UserHomeAppService {
       return 0;
     }
   }
-  async uploadHomeImage(userCode: string, dto: UploadUserHomeImageDto, userHomeImageFile: Express.Multer.File): Promise<IUserHomeImageStr> {
+  async uploadHomeImage(userCode: string, dto: UploadUserHomeImageDto, userHomeImageFile: Express.Multer.File): Promise<UserHomeImageStrResDto> {
     const logbase = `${this.SERVICE_NAME}/uploadHomeImage:`;
     try {
-      let res: IUserHomeImageStr = { seq: 0, filename: '' };
+      let res: UserHomeImageStrResDto = { seq: 0, filename: '' };
       if (userHomeImageFile) {
         this.logger.log(logbase, JSON.stringify(userHomeImageFile));
 

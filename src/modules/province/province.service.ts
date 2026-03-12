@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ProvinceRepository } from './province.repository';
-import { IProvince } from './province.interface';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { ProvinceResDto } from "./province.response";
 
 @Injectable()
 export class ProvinceService {
@@ -11,7 +11,7 @@ export class ProvinceService {
     private readonly provinceRepository: ProvinceRepository,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(): Promise<IProvince[]> {
+  async getAll(): Promise<ProvinceResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
 
     const list = await this.provinceRepository.getAll();

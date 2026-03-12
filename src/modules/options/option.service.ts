@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OptionRepository } from './option.repository';
-import { GetOptionDto } from './option.dto';
-import { IOpition } from './option.interface';
+import { GetOptionDto, OpitionResDto } from './option.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 
 @Injectable()
@@ -12,7 +11,7 @@ export class OptionService {
     private readonly optionRepository: OptionRepository,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: GetOptionDto): Promise<IOpition[]> {
+  async getAll(dto: GetOptionDto): Promise<OpitionResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
 
     const list = await this.optionRepository.getAll(dto);

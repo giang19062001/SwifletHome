@@ -30,23 +30,6 @@ export const QR_CODE_CONST = {
     },
   },
 };
-export interface IQrRequestFile {
-  seq: number;
-  qrRequestSeq: number;
-  userCode: string;
-  uniqueId: string;
-  filename: string;
-  originalname: string;
-  size: number;
-  mimetype: string;
-  isActive: YnEnum;
-}
-
-
-export interface IQrRequestFileStr {
-  seq: number;
-  filename: string;
-}
 
 export enum GetTypeEnum {
   ALL = 'ALL',

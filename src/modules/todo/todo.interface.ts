@@ -76,35 +76,3 @@ export enum TaskRightEventEnum {
   // MEDICINE = 'MEDICINE',
   COMPLETE = 'COMPLETE',
 }
-
-export interface ITodoBoxTask {
-  seq: number;
-  taskCode: string;
-  taskName?: string;
-  sortOrder: number;
-  isActive: YnEnum;
-}
-
-export interface ITodoTask {
-  seq: number;
-  taskCode: string;
-  taskName: string;
-  taskKeyword: string;
-  isActive: YnEnum;
-  createdAt: Date;
-  updatedAt: Date;
-  createdId: string;
-  updatedId: string;
-}
-
-export interface ITodoTaskAlram {
-  taskAlarmCode?: string;
-  taskKeyword?: string;
-  userCode?: string;
-  taskCode: string | null;
-  userHomeCode: string;
-  taskName: string;
-  taskDate: Date;
-  taskStatus: TaskStatusEnum;
-  taskNote: string;
-}

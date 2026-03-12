@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { INotification, INotificationTopic, IUserNotificationTopic, NotificationStatusEnum } from '../notification.interface';
+import { NotificationStatusEnum } from '../notification.interface';
+import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from "../notification.response";
 
 @Injectable()
 export class NotificationAdminRepository {
@@ -9,7 +10,7 @@ export class NotificationAdminRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getDetailTopic(topicKeyword: string): Promise<INotificationTopic | null> {
+  async getDetailTopic(topicKeyword: string): Promise<NotificationTopicResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.topicCode, A.topicKeyword, A.topicName, A.topicDescription, A.isActive, A.createdAt, A.createdId
         FROM ${this.tableTopic} A
@@ -17,6 +18,6 @@ export class NotificationAdminRepository {
         LIMIT 1`,
       [topicKeyword],
     );
-    return rows ? (rows[0] as INotificationTopic) : null;
+    return rows ? (rows[0] as NotificationTopicResDto) : null;
   }
 }

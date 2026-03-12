@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { HomeSaleSightSeeingStatusEnum, IHomeSale, IHomeSaleImg } from '../homeSale.interface';
+import { HomeSaleSightSeeingStatusEnum } from '../homeSale.interface';
 import { HomeSaleAppRepository } from './homeSale.repository';
-import { IListApp } from 'src/interfaces/app.interface';
 import { CreateHomeSightSeeingDto } from './homeSale.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { OptionService } from 'src/modules/options/option.service';
@@ -10,6 +9,8 @@ import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
+import { ListResponseDto } from "src/dto/common.dto";
+import { HomeSaleResDto, HomeSaleImgResDto } from "../homeSale.response";
 
 @Injectable()
 export class HomeSaleAppService {
@@ -21,7 +22,7 @@ export class HomeSaleAppService {
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: PagingDto): Promise<IListApp<IHomeSale>> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: HomeSaleResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
 
     const total = await this.homeSaleAppRepository.getTotal();
@@ -31,7 +32,7 @@ export class HomeSaleAppService {
     // return { limit: dto.limit, page: dto.page, total, list };
     return { total, list };
   }
-  async getDetail(homeCode: string): Promise<IHomeSale | null> {
+  async getDetail(homeCode: string): Promise<HomeSaleResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail:`;
 
     const result = await this.homeSaleAppRepository.getDetail(homeCode);

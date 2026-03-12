@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { NotificationAppRepository } from './notification.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IListApp } from 'src/interfaces/app.interface';
-import { INotification, INotificationTopic, NotificationStatusEnum } from '../notification.interface';
+import { NotificationStatusEnum } from '../notification.interface';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
 import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusDto } from './notification.dto';
+import { ListResponseDto } from "src/dto/common.dto";
+import { NotificationResDto, NotificationTopicResDto } from "../notification.response";
 
 @Injectable()
 export class NotificationAppService {
@@ -17,7 +17,7 @@ export class NotificationAppService {
     private readonly userAppRepository: UserAppRepository,
     private readonly logger: LoggingService,
   ) {}
-  async getAllTopic(dto: PagingDto): Promise<IList<INotificationTopic>> {
+  async getAllTopic(dto: PagingDto): Promise<{ total: number; list: NotificationTopicResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAllTopic`;
 
     const total = await this.notificationAppRepository.getTotalTopic();
@@ -25,7 +25,7 @@ export class NotificationAppService {
     return { total, list };
   }
   //* lấy các thông báo có userCode là user hiện tại OR có userCodesMulticast chứa userCode của user hiện tại OR thông báo là thông báo chung cho toàn user
-  async getAll(dto: PagingDto, userCode: string): Promise<IListApp<INotification>> {
+  async getAll(dto: PagingDto, userCode: string): Promise<{ total: number; list: NotificationResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     // kiem tra user có bị xóa ko
     const checkUserHas = await this.userAppRepository.findByCode(userCode);
@@ -50,7 +50,7 @@ export class NotificationAppService {
       return 0;
     }
   }
-  async getDetail(notificationId: string, userCode: string): Promise<INotification | null> {
+  async getDetail(notificationId: string, userCode: string): Promise<NotificationResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail`;
     const result = await this.notificationAppRepository.getDetail(notificationId, userCode);
     return result;

@@ -4,16 +4,15 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { NotificationAppService } from './notification.service';
 import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetNotificationResDto } from './notification.response';
-import { INotification } from '../notification.interface';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IListApp } from 'src/interfaces/app.interface';
 import { DeleteNotificationByStatusDto } from './notification.dto';
+import { NotificationResDto } from "../notification.response";
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/notification')
 @Controller('/api/app/notification')
@@ -38,7 +37,7 @@ export class NotificationAppController {
 **notificationStatus**: enum('SENT','READ')\n
 **targetScreen**: 'REMINDER_SCREEN' | 'NOTIFICATION_SCREEN' | 'QR_SCREEN'`,
   })
-  async getAll(@Body() dto: PagingDto, @GetUserApp() user: authInterface.ITokenUserApp): Promise<IListApp<INotification>> {
+  async getAll(@Body() dto: PagingDto, @GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: NotificationResDto[] }> {
     const result = await this.notificationAppService.getAll(dto, user.userCode);
     return result;
   }
@@ -50,7 +49,7 @@ export class NotificationAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async getCntNotifyNotReadByUser(@GetUserApp() user: authInterface.ITokenUserApp): Promise<number> {
+  async getCntNotifyNotReadByUser(@GetUserApp() user: TokenUserAppResDto): Promise<number> {
     const result = await this.notificationAppService.getCntNotifyNotReadByUser(user.userCode);
     return result;
   }
@@ -60,7 +59,7 @@ export class NotificationAppController {
   @ApiParam({ name: 'notificationId', type: String })
   @ApiOkResponse({ type: ApiAppResponseDto(GetNotificationResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getDetail(@GetUserApp() user: authInterface.ITokenUserApp, @Param('notificationId') notificationId: string): Promise<INotification | null> {
+  async getDetail(@GetUserApp() user: TokenUserAppResDto, @Param('notificationId') notificationId: string): Promise<NotificationResDto | null> {
     const result = await this.notificationAppService.getDetail(notificationId, user.userCode);
     if (!result) {
       throw new BadRequestException();
@@ -75,7 +74,7 @@ export class NotificationAppController {
   @ApiParam({ name: 'notificationId', type: String })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async maskAsRead(@GetUserApp() user: authInterface.ITokenUserApp, @Param('notificationId') notificationId: string) {
+  async maskAsRead(@GetUserApp() user: TokenUserAppResDto, @Param('notificationId') notificationId: string) {
     const result = await this.notificationAppService.maskAsRead(notificationId, user.userCode);
     if (result === 0) {
       throw new BadRequestException({
@@ -96,7 +95,7 @@ export class NotificationAppController {
   @ApiParam({ name: 'notificationId', type: String })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async deteteNotification(@GetUserApp() user: authInterface.ITokenUserApp, @Param('notificationId') notificationId: string) {
+  async deteteNotification(@GetUserApp() user: TokenUserAppResDto, @Param('notificationId') notificationId: string) {
     const result = await this.notificationAppService.deteteNotification(notificationId, user.userCode);
     if (result === 0) {
       throw new BadRequestException({
@@ -122,7 +121,7 @@ export class NotificationAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async deteteNotificationByStatus(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: DeleteNotificationByStatusDto) {
+  async deteteNotificationByStatus(@GetUserApp() user: TokenUserAppResDto, @Body() dto: DeleteNotificationByStatusDto) {
     const result = await this.notificationAppService.deteteNotificationByStatus(dto, user.userCode);
     // if (result === 0) {
     //   throw new BadRequestException({

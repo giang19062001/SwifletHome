@@ -4,8 +4,8 @@ import { UserAdminService } from './user.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { GetAllUserDto, GetDetailDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto } from './user.dto';
-import * as userInterface from '../../auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
+import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/user')
@@ -50,7 +50,7 @@ export class UserAdminController {
     @ApiParam({ name: 'userCode', type: String })
     @Put('updatePackage/:userCode')
     @HttpCode(HttpStatus.OK)
-    async update(@Body() dto: UpdateUserPackageAdminDto,  @Param('userCode') userCode: string,  @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+    async update(@Body() dto: UpdateUserPackageAdminDto,  @Param('userCode') userCode: string,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
       // cập nhâp gói miễn phí -> bỏ qua
       if(dto.packageCode == ''){
       return 1

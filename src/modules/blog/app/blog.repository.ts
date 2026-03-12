@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IBlog } from '../blog.interface';
+import { BlogResDto } from "../blog.response";
 
 @Injectable()
 export class BlogAdppRepository {
@@ -8,7 +8,7 @@ export class BlogAdppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getOneContent(): Promise<IBlog | null> {
+  async getOneContent(): Promise<BlogResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.blogCode, A.blogName, A.blogContent, A.isFree
         FROM ${this.table} A 
@@ -16,7 +16,7 @@ export class BlogAdppRepository {
         LIMIT 1 `,
       [],
     );
-    return rows ? (rows[0] as IBlog) : null;
+    return rows ? (rows[0] as BlogResDto) : null;
   }
   
 }

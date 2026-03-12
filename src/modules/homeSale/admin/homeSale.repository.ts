@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IHomeSale, IHomeSaleImg, IHomeSaleSightSeeing } from '../homeSale.interface';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
+import { HomeSaleResDto, HomeSaleImgResDto, HomeSaleSightSeeingResDto } from "../homeSale.response";
 
 @Injectable()
 export class HomeSaleAdminRepository {
@@ -19,7 +19,7 @@ export class HomeSaleAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<IHomeSale[]> {
+  async getAll(dto: PagingDto): Promise<HomeSaleResDto[]> {
     let query = `   SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive, A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A  
         WHERE A.isActive = 'Y'
@@ -32,9 +32,9 @@ export class HomeSaleAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IHomeSale[];
+    return rows as HomeSaleResDto[];
   }
-  async getDetail(homeCode: string): Promise<IHomeSale | null> {
+  async getDetail(homeCode: string): Promise<HomeSaleResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.homeName, A.homeAddress, A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive
           FROM ${this.table} A 
@@ -42,7 +42,7 @@ export class HomeSaleAdminRepository {
           LIMIT 1 `,
       [homeCode],
     );
-    return rows ? (rows[0] as IHomeSale) : null;
+    return rows ? (rows[0] as HomeSaleResDto) : null;
   }
   async create(dto: CreateHomeDto, homeImagePath: string, createdId: string): Promise<number> {
     const sqlLast = ` SELECT homeCode FROM ${this.table} ORDER BY homeCode DESC LIMIT 1`;
@@ -80,16 +80,16 @@ export class HomeSaleAdminRepository {
     return result.affectedRows;
   }
   // IMAGE
-  async getImages(seq: number): Promise<IHomeSaleImg[]> {
+  async getImages(seq: number): Promise<HomeSaleImgResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive
           FROM ${this.tableImg} A 
           WHERE A.homeSeq = ? `,
       [seq],
     );
-    return rows as IHomeSaleImg[];
+    return rows as HomeSaleImgResDto[];
   }
-  async createImages(seq: number, createdId: string, filenamePath: string, file: Express.Multer.File | IHomeSaleImg): Promise<number> {
+  async createImages(seq: number, createdId: string, filenamePath: string, file: Express.Multer.File | HomeSaleImgResDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, homeSeq, createdId)
       VALUES (?, ?, ?, ?, ?, ?)
@@ -135,7 +135,7 @@ export class HomeSaleAdminRepository {
           ON A.userCode = AU.userCode`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllSightseeing(dto: PagingDto): Promise<IHomeSaleSightSeeing[]> {
+  async getAllSightseeing(dto: PagingDto): Promise<HomeSaleSightSeeingResDto[]> {
     let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.status, A.note, A.cancelReason, A.createdAt,
           B.homeName, B.homeImage, C.valueOption AS numberAttend
           FROM ${this.tableSightseeing} A 
@@ -154,10 +154,10 @@ export class HomeSaleAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IHomeSaleSightSeeing[];
+    return rows as HomeSaleSightSeeingResDto[];
   }
 
-  async getDetailSightseeing(seq: number): Promise<IHomeSaleSightSeeing | null> {
+  async getDetailSightseeing(seq: number): Promise<HomeSaleSightSeeingResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.status, A.note, A.cancelReason, A.createdAt,
           B.homeName, B.homeImage, C.valueOption AS numberAttend
@@ -170,7 +170,7 @@ export class HomeSaleAdminRepository {
           LIMIT 1 `,
       [seq],
     );
-    return rows ? (rows[0] as IHomeSaleSightSeeing) : null;
+    return rows ? (rows[0] as HomeSaleSightSeeingResDto) : null;
   }
 
   async updateSightseeing(dto: UpdateStatusDto, updatedId: string, seq: number): Promise<number> {

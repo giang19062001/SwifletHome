@@ -1,5 +1,5 @@
 
-import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
+import { TokenUserAppResDto } from "../../auth/app/auth.dto";
 
 export const USER_CONST = {
   USER_TYPE: {
@@ -26,23 +26,3 @@ export enum IUserTeamTypeEnum {
   FACTORY = 'FACTORY',
   TECHNICAL = 'TECHNICAL',
 }
-
-export interface IUserPackageApp {
-  userCode: string;
-  packageCode: string | null;     
-  packageName: string;
-  packageDescription: string;
-  packageRemainDay: number;
-  startDate: string | null;        
-  endDate: string | null;
-}
-
-interface IUserTypeApp{
-  userTypeCode: string,
-  userTypeKeyWord: string,
-  userTypeName: string
-}
-export interface IUserApp extends ITokenUserApp, IUserTypeApp, IUserPackageApp {
-  homesTotal: number;
-}
-

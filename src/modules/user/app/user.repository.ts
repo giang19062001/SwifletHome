@@ -3,12 +3,12 @@ import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { generateCode } from 'src/helpers/func.helper';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { IUserApp, IUserPackageApp, USER_CONST } from './user.interface';
-import { CreateUserPackageAppDto } from './user.dto';
-import { ITokenUserApp, ITokenUserAppWithPassword } from 'src/modules/auth/app/auth.interface';
+import { CreateUserPackageAppDto, UserPackageAppResDto, UserAppResDto } from './user.dto';
 import { CODES, UPDATOR } from 'src/helpers/const.helper';
 import { TEXTS } from 'src/helpers/text.helper';
 import { UserTypeResDto } from './user.response';
+import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.dto";
+import { USER_CONST } from "./user.interface";
 
 @Injectable()
 export class UserAppRepository {
@@ -21,12 +21,12 @@ export class UserAppRepository {
   private readonly tableTeam = 'tbl_team_user';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async getAllUserCode(): Promise<ITokenUserApp[]> {
+  async getAllUserCode(): Promise<TokenUserAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT seq, userCode FROM ${this.table} WHERE isActive = 'Y' `, []);
 
-    return rows as ITokenUserApp[];
+    return rows as TokenUserAppResDto[];
   }
-  async findByPhoneWithoutCountry(userPhone: string): Promise<ITokenUserAppWithPassword | null> {
+  async findByPhoneWithoutCountry(userPhone: string): Promise<TokenUserAppWithPasswordResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
      FROM ${this.table} A
@@ -35,9 +35,9 @@ export class UserAppRepository {
      WHERE A.userPhone = ? AND A.isActive = 'Y' LIMIT 1`,
       [userPhone],
     );
-    return rows.length ? (rows[0] as ITokenUserAppWithPassword) : null;
+    return rows.length ? (rows[0] as TokenUserAppWithPasswordResDto) : null;
   }
-  async findByPhone(userPhone: string, countryCode: string): Promise<ITokenUserAppWithPassword | null> {
+  async findByPhone(userPhone: string, countryCode: string): Promise<TokenUserAppWithPasswordResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
      FROM ${this.table} A
@@ -46,9 +46,9 @@ export class UserAppRepository {
      WHERE A.userPhone = ? AND A.countryCode = ? AND A.isActive = 'Y' LIMIT 1`,
       [userPhone, countryCode],
     );
-    return rows.length ? (rows[0] as ITokenUserAppWithPassword) : null;
+    return rows.length ? (rows[0] as TokenUserAppWithPasswordResDto) : null;
   }
-  async findBySeq(seq: number): Promise<ITokenUserAppWithPassword | null> {
+  async findBySeq(seq: number): Promise<TokenUserAppWithPasswordResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
     FROM ${this.table} A
@@ -57,9 +57,9 @@ export class UserAppRepository {
       WHERE A.seq = ? LIMIT 1`,
       [seq],
     );
-    return rows.length ? (rows[0] as ITokenUserAppWithPassword) : null;
+    return rows.length ? (rows[0] as TokenUserAppWithPasswordResDto) : null;
   }
-  async findByCode(userCode: string): Promise<ITokenUserAppWithPassword | null> {
+  async findByCode(userCode: string): Promise<TokenUserAppWithPasswordResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
       FROM ${this.table} A
@@ -68,9 +68,9 @@ export class UserAppRepository {
         WHERE A.userCode = ? LIMIT 1`,
       [userCode],
     );
-    return rows.length ? (rows[0] as ITokenUserAppWithPassword) : null;
+    return rows.length ? (rows[0] as TokenUserAppWithPasswordResDto) : null;
   }
-  async getUserPackageInfo(userCode: string): Promise<IUserPackageApp | null> {
+  async getUserPackageInfo(userCode: string): Promise<UserPackageAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
@@ -83,9 +83,9 @@ export class UserAppRepository {
        LIMIT 1`,
       [userCode],
     );
-    return rows.length ? (rows[0] as IUserPackageApp) : null;
+    return rows.length ? (rows[0] as UserPackageAppResDto) : null;
   }
-  async getInfo(userCode: string): Promise<IUserApp | null> {
+  async getInfo(userCode: string): Promise<UserAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode,
       B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
@@ -108,7 +108,7 @@ export class UserAppRepository {
        LIMIT 1`,
       [userCode],
     );
-    return rows.length ? (rows[0] as IUserApp) : null;
+    return rows.length ? (rows[0] as UserAppResDto) : null;
   }
 
   async create(dto: RegisterUserAppDto): Promise<number> {
@@ -173,7 +173,7 @@ export class UserAppRepository {
     return result.affectedRows;
   }
 
-  async deleteAccount(userCode: string, user: ITokenUserAppWithPassword): Promise<number> {
+  async deleteAccount(userCode: string, user: TokenUserAppWithPasswordResDto): Promise<number> {
     const conn = await this.db.getConnection();
     try {
       await conn.beginTransaction();
@@ -182,7 +182,7 @@ export class UserAppRepository {
       await conn.query(
         ` INSERT INTO ${this.tableDel} (userCode, userName, userPassword, userPhone, deviceToken)
           VALUES (?, ?, ?, ?, ?) `,
-        [user.userCode, user.userName, user.userPassword, user.userPhone, user.deviceToken],
+        [(user as any).userCode, user.userName, user.userPassword, user.userPhone, (user as any).deviceToken],
       );
       // Delete khỏi bảng chính
       const [deleteResult]: any = await conn.query(` DELETE FROM ${this.table} WHERE userCode = ? LIMIT 1`, [userCode]);

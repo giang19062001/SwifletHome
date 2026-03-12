@@ -2,13 +2,13 @@ import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException, G
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UploadAudioFilesDto, UploadImgFileDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
-import { IAudioFreePay, IFileMedia, IFileUpload } from '../upload.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { multerAudioConfig, multerImgConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
-import * as userInterface from '../../auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { UploadAdminService } from './upload.service';
+import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
+import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/upload')
@@ -21,7 +21,7 @@ export class UploadAdminController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadImgFileDto })
   @UseInterceptors(FileInterceptor('editorImg', multerImgConfig))
-  async uploadImg(@Body() dto: UploadImgFileDto, @UploadedFile() file: Express.Multer.File, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+  async uploadImg(@Body() dto: UploadImgFileDto, @UploadedFile() file: Express.Multer.File, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     if (!file) {
       throw new BadRequestException(Msg.FileEmpty);
     }
@@ -45,7 +45,7 @@ export class UploadAdminController {
   //* audio
   async uploadAudios(
     @Body() dto: UploadAudioFilesDto,
-    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
     @UploadedFiles()
     files: {
       editorAudioFree?: Express.Multer.File;
@@ -81,7 +81,7 @@ export class UploadAdminController {
   )
   async uploadMediaAudios(
     @Body() dto: UploadMediaAudioFilesDto,
-    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
     @UploadedFiles()
     files: {
       mediaAudioFree?: Express.Multer.File;
@@ -106,7 +106,7 @@ export class UploadAdminController {
   @ApiBody({ type: UploadVideoLinkDto })
   @Post('uploadVideoLink')
   @HttpCode(HttpStatus.OK)
-  async uploadVideoLink(@Body() dto: UploadVideoLinkDto, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+  async uploadVideoLink(@Body() dto: UploadVideoLinkDto, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.uploadAdminService.uploadVideoLink(dto, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
@@ -116,7 +116,7 @@ export class UploadAdminController {
   @ApiBody({ type: UploadMediaVideoLinkDto })
   @Post('uploadMediaVideoLink')
   @HttpCode(HttpStatus.OK)
-  async uploadMediaVideoLink(@Body() dto: UploadMediaVideoLinkDto, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+  async uploadMediaVideoLink(@Body() dto: UploadMediaVideoLinkDto, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.uploadAdminService.uploadMediaVideoLink(dto, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
@@ -126,21 +126,21 @@ export class UploadAdminController {
 
   @Get('getAllFile')
   @HttpCode(HttpStatus.OK)
-  async getAll(): Promise<IFileUpload[]> {
+  async getAll(): Promise<FileUploadResDto[]> {
     const result = await this.uploadAdminService.getAllFile();
     return result;
   }
 
   @Get('getAllMediaAudioFile')
   @HttpCode(HttpStatus.OK)
-  async getAllMediaAudioFile(): Promise<IFileMedia[]> {
+  async getAllMediaAudioFile(): Promise<FileMediaResDto[]> {
     const result = await this.uploadAdminService.getAllMediaAudioFile();
     return result;
   }
 
   @Get('getAllMediaVideoLink')
   @HttpCode(HttpStatus.OK)
-  async getAllMediaVideoLink(): Promise<IFileMedia[]> {
+  async getAllMediaVideoLink(): Promise<FileMediaResDto[]> {
     const result = await this.uploadAdminService.getAllMediaVideoLink();
     return result;
   }
@@ -148,7 +148,7 @@ export class UploadAdminController {
   @Get('getFileAudio/:seq')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'seq', type: Number })
-  async getFileAudio(@Param('seq') seq: number): Promise<IAudioFreePay | null> {
+  async getFileAudio(@Param('seq') seq: number): Promise<AudioFreePayResDto | null> {
     const result = await this.uploadAdminService.getFileAudio(seq);
     return result;
   }

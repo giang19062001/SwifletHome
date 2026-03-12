@@ -1,9 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IScreen } from '../screen.interface';
-import { IPaging, IList } from 'src/interfaces/admin.interface';
+import { IPaging } from 'src/interfaces/admin.interface';
 import { PagingDto } from 'src/dto/admin.dto';
 import { UpdateScreenDto } from './screen.dto';
+import { ListResponseDto } from "src/dto/common.dto";
+import { ScreenResDto } from "../screen.response";
 
 @Injectable()
 export class ScreenAdminRepository {
@@ -15,7 +16,7 @@ export class ScreenAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<IScreen[]> {
+  async getAll(dto: PagingDto): Promise<ScreenResDto[]> {
     let query = `  SELECT seq, screenKeyword, screenName, screenContent, screenDescription, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} ORDER BY createdAt DESC`;
 
@@ -26,9 +27,9 @@ export class ScreenAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IScreen[];
+    return rows as ScreenResDto[];
   }
-  async getDetail(screenKeyword: string): Promise<IScreen | null> {
+  async getDetail(screenKeyword: string): Promise<ScreenResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `  SELECT A.seq, A.screenKeyword, A.screenName, A.screenContent, A.screenDescription, A.isActive,
         A.createdAt, A.updatedAt, A.createdId, A.updatedId 
@@ -37,7 +38,7 @@ export class ScreenAdminRepository {
         LIMIT 1`,
       [screenKeyword],
     );
-    return rows ? (rows[0] as IScreen) : null;
+    return rows ? (rows[0] as ScreenResDto) : null;
   }
 
   async update(dto: UpdateScreenDto, updatedId: string, screenKeyword: string): Promise<number> {

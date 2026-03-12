@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IUserHome, IUserHomeArea, IUserHomeImageFile } from './userHome.interface';
-import { MutationUserHomeDto } from './userHome.dto';
+import { MutationUserHomeDto, UserHomeAreaResDto, UserHomeResDto, UserHomeImageFileResDto } from './userHome.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
@@ -20,7 +19,7 @@ export class UserHomeAppRepository {
     WHERE A.userCode = ?`, [userCode]);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllHomes(dto: PagingDto, userCode: string): Promise<IUserHome[]> {
+  async getAllHomes(dto: PagingDto, userCode: string): Promise<UserHomeResDto[]> {
     let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, B.provinceName AS userHomeProvince,
      A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
     A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain
@@ -40,9 +39,9 @@ export class UserHomeAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IUserHome[];
+    return rows as UserHomeResDto[];
   }
-   async getAreaHome(userHomeCode: string): Promise<IUserHomeArea | null> {
+   async getAreaHome(userHomeCode: string): Promise<UserHomeAreaResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userHomeCode,  A.userHomeLength, A.userHomeWidth, A.userHomeFloor
           FROM ${this.table} A 
@@ -52,9 +51,9 @@ export class UserHomeAppRepository {
           LIMIT 1 `,
       [userHomeCode],
     );
-    return rows ? (rows[0] as IUserHome) : null;
+    return rows ? (rows[0] as UserHomeResDto) : null;
   }
-  async getDetailHome(userHomeCode: string): Promise<IUserHome | null> {
+  async getDetailHome(userHomeCode: string): Promise<UserHomeResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince,
        A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
@@ -66,9 +65,9 @@ export class UserHomeAppRepository {
           LIMIT 1 `,
       [userHomeCode],
     );
-    return rows ? (rows[0] as IUserHome) : null;
+    return rows ? (rows[0] as UserHomeResDto) : null;
   }
-  async getMainHomeByUser(userCode: string): Promise<IUserHome | null> {
+  async getMainHomeByUser(userCode: string): Promise<UserHomeResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode,  A.userHomeCode,  A.userHomeName, A.userHomeAddress, A.userHomeProvince,
        A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
@@ -80,7 +79,7 @@ export class UserHomeAppRepository {
           LIMIT 1 `,
       [userCode],
     );
-    return rows ? (rows[0] as IUserHome) : null;
+    return rows ? (rows[0] as UserHomeResDto) : null;
   }
 
   async createHome(userCode: string, dto: MutationUserHomeDto, isMain: string, userHomeImage: string): Promise<number> {
@@ -173,7 +172,7 @@ export class UserHomeAppRepository {
   }
   // TODO: IMG
 
-  async uploadHomeImage(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | IUserHomeImageFile): Promise<number> {
+  async uploadHomeImage(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | UserHomeImageFileResDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, uniqueId, userHomeSeq, userCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -201,13 +200,13 @@ export class UserHomeAppRepository {
 
     return result.affectedRows;
   }
-  async getFilesNotUse(): Promise<IUserHomeImageFile[]> {
+  async getFilesNotUse(): Promise<UserHomeImageFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userHomeSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableImg} A
         WHERE A.userHomeSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table})
         `,
     );
-    return rows as IUserHomeImageFile[];
+    return rows as UserHomeImageFileResDto[];
   }
 
   async deleteFile(seq: number): Promise<number> {

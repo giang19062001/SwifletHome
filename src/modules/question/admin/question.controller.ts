@@ -1,13 +1,13 @@
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { QuestionAdminService } from './question.service';
-import { IQuestion } from '../question.interface';
-import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
+import { ListResponseDto } from "src/dto/common.dto";
+import { QuestionResDto } from "../question.response";
+import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/question')
@@ -21,7 +21,7 @@ export class QuestionAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<IList<IQuestion>> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: QuestionResDto[] }> {
     const result = await this.questionAdminService.getAll(dto);
     return result;
   }
@@ -29,7 +29,7 @@ export class QuestionAdminController {
   @ApiParam({ name: 'questionCode', type: String })
   @Get('getDetail/:questionCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('questionCode') questionCode: string): Promise<IQuestion | null> {
+  async getDetail(@Param('questionCode') questionCode: string): Promise<QuestionResDto | null> {
     const result = await this.questionAdminService.getDetail(questionCode);
     if (!result) {
       throw new BadRequestException();
@@ -40,7 +40,7 @@ export class QuestionAdminController {
   @ApiBody({ type: CreateQuestionDto })
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  async create(@Body() dto: CreateQuestionDto, @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+  async create(@Body() dto: CreateQuestionDto, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.questionAdminService.create(dto, admin.userId);
     if (result === 0) {
       throw new BadRequestException();
@@ -52,7 +52,7 @@ export class QuestionAdminController {
   @ApiParam({ name: 'questionCode', type: String })
   @Put('update/:questionCode')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateQuestionDto, @Param('questionCode') questionCode: string,  @GetUserAdmin() admin: userInterface.ITokenUserAdmin): Promise<number> {
+  async update(@Body() dto: UpdateQuestionDto, @Param('questionCode') questionCode: string,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.questionAdminService.update(dto, admin.userId, questionCode);
     if (result === 0) {
       throw new BadRequestException();

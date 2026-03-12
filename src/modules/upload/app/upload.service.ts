@@ -1,11 +1,11 @@
 import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { IAudioFreePay, IFileMedia, IFileUpload } from '../upload.interface';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { GetAllMediaDto } from './upload.dto';
 import { UploadAppRepository } from './upload.repository';
-import { IListApp } from 'src/interfaces/app.interface';
 import { AuthAppService } from 'src/modules/auth/app/auth.service';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { ListResponseDto } from "src/dto/common.dto";
+import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
 
 @Injectable()
 export class UploadAppService {
@@ -18,8 +18,8 @@ export class UploadAppService {
   ) {}
 
   //*media
-  async getAllMedia(dto: GetAllMediaDto, userCode: string): Promise<IListApp<IFileMedia>> {
-    let list: IFileMedia[] = [];
+  async getAllMedia(dto: GetAllMediaDto, userCode: string): Promise<{ total: number; list: FileMediaResDto[] }> {
+    let list: FileMediaResDto[] = [];
     const userPackageInfo = await this.authAppService.getInfo(userCode);
 
     const isUpgrade = userPackageInfo?.packageCode && userPackageInfo.packageRemainDay > 0 ? 'UPGRADE' : 'NOT_UPGRADE';
@@ -31,7 +31,7 @@ export class UploadAppService {
         if (isUpgrade === 'UPGRADE') {
           // -> hiện file full
           if (file.isFree === 'Y') {
-            list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "Y"})); // BỎ  isCoupleFree
+            list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "Y"}) as any); // BỎ  isCoupleFree
           }
         }
         // user chưa  cập nhập gói
@@ -40,14 +40,14 @@ export class UploadAppService {
           if (file.isCoupleFree == 'Y') {
             if (file.isFree == 'N') {
               // -> hiện file full
-              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "Y"}));  // BỎ  isCoupleFree
+              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "Y"}) as any);  // BỎ  isCoupleFree
             }
           }
           //  files là tính phí
           else if (file.isCoupleFree == 'N') {
             if (file.isFree == 'Y') {
               // -> hiện file demo
-              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "N"}));  // BỎ  isCoupleFree
+              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "N"}) as any);  // BỎ  isCoupleFree
             }
           }
         }
@@ -67,7 +67,7 @@ export class UploadAppService {
     };
   }
   //*upload-editor
-  async getAllAudioFile(): Promise<IFileUpload[]> {
+  async getAllAudioFile(): Promise<FileUploadResDto[]> {
     const audios = await this.uploadAppRepository.getAllAudioFile();
     return audios;
   }

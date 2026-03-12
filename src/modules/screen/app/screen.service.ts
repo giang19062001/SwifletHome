@@ -3,13 +3,13 @@ import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { PackageAppService } from 'src/modules/package/app/package.service';
 import { InfoAppService } from 'src/modules/info/app/info.service';
-import { IInfoBank } from 'src/modules/info/info.interface';
-import { IScreenSignupService } from '../screen.interface';
 import { ScreenAppRepository } from './screen.repository';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
 import { PackageOptionTypeEnum } from 'src/modules/package/package.interface';
 import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import { InfoBankResDto } from "../../info/info.response";
+import { ScreenSignupServiceResDto } from "../screen.response";
 
 @Injectable()
 export class ScreenAppService {
@@ -66,7 +66,7 @@ export class ScreenAppService {
             } else {
               // thông tin chuyển khoản
               const bankInfo = await this.infoAppService.getDetail('BANK');
-              const infoContent: IInfoBank = bankInfo ? bankInfo.infoContent : null;
+              const infoContent: InfoBankResDto = bankInfo ? bankInfo.infoContent : null;
               result = {
                 contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
                 contentCenter: {
@@ -74,7 +74,7 @@ export class ScreenAppService {
                   bankInfo: infoContent ? { ...infoContent, accountName: `${infoContent.accountNumber} - ${infoContent.accountName}` } : null,
                 },
                 contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
-              } as IScreenSignupService;
+              } as ScreenSignupServiceResDto;
             }
           }
           break;
@@ -93,7 +93,7 @@ export class ScreenAppService {
               contentStart: contentStart,
               contentCenter: screen.screenContent.contentCenter,
               contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
-            } as IScreenSignupService;
+            } as ScreenSignupServiceResDto;
           }
           break;
         case APP_SCREENS.REQUEST_QR_GUIDE, APP_SCREENS.CONSIGNMENT_GUIDE:
@@ -103,7 +103,7 @@ export class ScreenAppService {
               contentStart: contentStart,
               contentCenter: {},
               contentEnd: "",
-            } as IScreenSignupService;
+            } as ScreenSignupServiceResDto;
           }
           break;
         default:

@@ -2,18 +2,18 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import * as bcrypt from 'bcrypt';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { Msg } from 'src/helpers/message.helper';
-import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto, TokenUserAppResDto, TokenUserAppWithPasswordResDto } from './auth.dto';
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { AbAuthService } from '../auth.abstract';
-import { ITokenUserApp, ITokenUserAppWithPassword } from './auth.interface';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { IUserApp, USER_CONST } from 'src/modules/user/app/user.interface';
 import { AUTH_CONFIG } from '../auth.config';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { PhoneCodeService } from 'src/modules/phoneCode/phoneCode.service';
+import { UserAppResDto } from "../../user/app/user.dto";
+import { USER_CONST } from "../../user/app/user.interface";
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -60,7 +60,7 @@ export class AuthAppService extends AbAuthService {
       }
     }
   }
-  async login(dto: LoginAppDto): Promise<Omit<ITokenUserApp, 'userPassword'> & { accessToken: string }> {
+  async login(dto: LoginAppDto): Promise<Omit<TokenUserAppResDto, 'userPassword'> & { accessToken: string }> {
     const logbase = `${this.SERVICE_NAME}/login`;
 
     const user = await this.userAppService.findByPhone(dto.userPhone, dto.countryCode);
@@ -104,7 +104,7 @@ export class AuthAppService extends AbAuthService {
     const { userPassword, ...userWithoutPassword } = user;
 
     // generate token
-    const payload: ITokenUserApp = {
+    const payload: TokenUserAppResDto = {
       ...userWithoutPassword,
       deviceToken: dto.deviceToken,
     };
@@ -151,7 +151,7 @@ export class AuthAppService extends AbAuthService {
 
     // hash -> insert thông tin bao gồm cả device token
     const hashedPassword = await this.hashPassword(dto.userPassword);
-    const userInserted: ITokenUserApp | null = await this.userAppService.register({
+    const userInserted: TokenUserAppResDto | null = await this.userAppService.register({
       ...dto,
       userPassword: hashedPassword,
     });
@@ -240,12 +240,12 @@ export class AuthAppService extends AbAuthService {
     return 1;
   }
 
-  async findUser(userCode: string): Promise<ITokenUserApp | null> {
+  async findUser(userCode: string): Promise<TokenUserAppResDto | null> {
     const logbase = `${this.SERVICE_NAME}/findUser`;
     const result = await this.userAppService.findByCode(userCode);
     return result;
   }
-  async getInfo(userCode: string): Promise<IUserApp | null> {
+  async getInfo(userCode: string): Promise<UserAppResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getInfo`;
 
     const result = await this.userAppService.getInfo(userCode);
@@ -279,7 +279,7 @@ export class AuthAppService extends AbAuthService {
     }
   }
 
-  async changeTypeToken(payload: ITokenUserApp, dto: ChangeTypeTokenDto) {
+  async changeTypeToken(payload: TokenUserAppResDto, dto: ChangeTypeTokenDto) {
     const logbase = `${this.SERVICE_NAME}/changeTypeToken`;
 
     try {
@@ -324,7 +324,7 @@ export class AuthAppService extends AbAuthService {
     return await this.otpService.verifyOtp(dto);
   }
 
-  signToken(payload: ITokenUserApp, isSave: YnEnum) {
+  signToken(payload: TokenUserAppResDto, isSave: YnEnum) {
     // bỏ iat và exp ra khỏi payload để tránh xung đột với expiresIn
     const { iat, exp, ...cleanPayload } = payload as any;
 

@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IPackage } from '../package.interface';
 import { UpdatePackageDto } from './package.dto';
 import { formatDecimal } from 'src/helpers/func.helper';
+import { PackageResDto } from "../package.response";
 
 @Injectable()
 export class PackageAdminRepository {
@@ -15,7 +15,7 @@ export class PackageAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y' `);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<IPackage[]> {
+  async getAll(dto: PagingDto): Promise<PackageResDto[]> {
     let query = `  SELECT seq, packageCode, packageName, packagePrice, packageItemSamePrice, packageExpireDay, packageDescription,
         packageOptionType, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table}
@@ -29,9 +29,9 @@ export class PackageAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IPackage[];
+    return rows as PackageResDto[];
   }
-  async getDetail(packageCode: string): Promise<IPackage | null> {
+  async getDetail(packageCode: string): Promise<PackageResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, packageCode, packageName, packagePrice, packageItemSamePrice, packageExpireDay, packageDescription,
         packageOptionType, isActive, createdAt, updatedAt, createdId, updatedId 
@@ -39,7 +39,7 @@ export class PackageAdminRepository {
         WHERE packageCode = ? AND isActive = 'Y'`,
       [packageCode],
     );
-    return rows ? (rows[0] as IPackage) : null;
+    return rows ? (rows[0] as PackageResDto) : null;
   }
   async update(dto: UpdatePackageDto, updatedId: string, packageCode: string): Promise<number> {
     const sql = `

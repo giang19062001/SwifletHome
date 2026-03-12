@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { IUserHome, IUserHomeImageStr } from '../app/userHome.interface';
-import { IList, YnEnum } from 'src/interfaces/admin.interface';
+import { YnEnum } from 'src/interfaces/admin.interface';
 import { UserHomeAdminRepository } from './userHome.repository';
-import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
-import { IUserHomeSensor } from './userhome.interface';
+import { GetHomesAdminDto, TriggerUserHomeSensorDto, UserHomeSensorResDto } from './userHome.dto';
+import { ListResponseDto } from "src/dto/common.dto";
+import { UserHomeResDto, UserHomeImageStrResDto } from "../app/userHome.dto";
 
 @Injectable()
 export class UserHomeAdminService {
@@ -14,12 +14,12 @@ export class UserHomeAdminService {
     private readonly userHomeAdminRepository: UserHomeAdminRepository,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: GetHomesAdminDto): Promise<IList<IUserHome>> {
+  async getAll(dto: GetHomesAdminDto): Promise<{ total: number; list: UserHomeResDto[] }> {
     const total = await this.userHomeAdminRepository.getTotal(dto);
     const list = await this.userHomeAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(userHomeCode: string): Promise<IUserHomeSensor | null> {
+  async getDetail(userHomeCode: string): Promise<UserHomeSensorResDto | null> {
     const result = await this.userHomeAdminRepository.getDetail(userHomeCode);
     return result;
   }

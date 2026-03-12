@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { IBlog } from '../blog.interface';
 import { BlogAdppRepository } from './blog.repository';
 import { SearchService } from 'src/common/search/search.service';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { BlogResDto } from "../blog.response";
 
 @Injectable()
 export class BlogAppService {

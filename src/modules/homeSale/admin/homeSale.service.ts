@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
-import { IHomeSale, IHomeSaleImg, IHomeSaleSightSeeing } from '../homeSale.interface';
 import { HomeSaleAdminRepository } from './homeSale.repository';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { diffByTwoArr } from 'src/helpers/func.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { getFileLocation } from 'src/config/multer.config';
+import { ListResponseDto } from "src/dto/common.dto";
+import { HomeSaleResDto, HomeSaleImgResDto, HomeSaleSightSeeingResDto } from "../homeSale.response";
 
 @Injectable()
 export class HomeSaleAdminService {
@@ -17,17 +17,17 @@ export class HomeSaleAdminService {
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: PagingDto): Promise<IList<IHomeSale>> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: HomeSaleResDto[] }> {
     const total = await this.homSaleAdminRepository.getTotal();
     const list = await this.homSaleAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(homeCode: string): Promise<IHomeSale | null> {
+  async getDetail(homeCode: string): Promise<HomeSaleResDto | null> {
     let result = await this.homSaleAdminRepository.getDetail(homeCode);
     if (result) {
       let homeImages = await this.homSaleAdminRepository.getImages(result ? result?.seq : 0);
       // tách biệt ảnh chính và danh sách ảnh phụ
-      let homeImagesExceptMain: IHomeSaleImg[] = [];
+      let homeImagesExceptMain: HomeSaleImgResDto[] = [];
       for (const img of homeImages) {
         if (img.filename == result.homeImage) {
           result.homeImage = img;
@@ -64,25 +64,25 @@ export class HomeSaleAdminService {
     const logbase = `${this.SERVICE_NAME}/update`;
 
     const home = await this.getDetail(homeCode);
-    let homeImagePath = (home?.homeImage as IHomeSaleImg).filename
+    let homeImagePath = (home?.homeImage as HomeSaleImgResDto).filename
     if (home) {
       // homeImage bị thay đổi -> xóa ảnh hiện tại của nó
-      if (dto.homeImage.filename !== (home.homeImage as IHomeSaleImg).filename) {
+      if (dto.homeImage.filename !== (home.homeImage as HomeSaleImgResDto).filename) {
         // xóa file local
-        await this.fileLocalService.deleteLocalFile((home.homeImage as IHomeSaleImg).filename);
+        await this.fileLocalService.deleteLocalFile((home.homeImage as HomeSaleImgResDto).filename);
 
         // xóa trong db
-        await this.homSaleAdminRepository.deleteHomeImagesOne((home.homeImage as IHomeSaleImg).seq);
+        await this.homSaleAdminRepository.deleteHomeImagesOne((home.homeImage as HomeSaleImgResDto).seq);
 
         // instart file mới vào db
          homeImagePath = `${getFileLocation(dto.homeImage.mimetype, dto.homeImage.fieldname)}/${dto.homeImage.filename}`;
         await this.homSaleAdminRepository.createImages(home.seq, 'admin', homeImagePath, dto.homeImage);
       }
 
-      const fileNeedDeletes: IHomeSaleImg[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
+      const fileNeedDeletes: HomeSaleImgResDto[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
       this.logger.log(logbase, `Danh sách file cần xóa --> ${JSON.stringify(fileNeedDeletes.map((fi)=>fi.filename))}`);
 
-      const fileNeedCreates: IHomeSaleImg[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
+      const fileNeedCreates: HomeSaleImgResDto[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
       this.logger.log(logbase, `Danh sách file cần thêm mới --> ${JSON.stringify(fileNeedCreates.map((fi)=>fi.filename))}`);
 
       // homeImages bị thay đổi -> xóa ~ ảnh hiện tại của nó
@@ -120,12 +120,12 @@ export class HomeSaleAdminService {
   }
 
   // TODO: SIGHTSEEING
-  async getAllSightseeing(dto: PagingDto): Promise<IList<IHomeSaleSightSeeing>> {
+  async getAllSightseeing(dto: PagingDto): Promise<{ total: number; list: HomeSaleSightSeeingResDto[] }> {
     const total = await this.homSaleAdminRepository.getTotalSightseeing();
     const list = await this.homSaleAdminRepository.getAllSightseeing(dto);
     return { total, list };
   }
-  async getDetailSightseeing(seq: number): Promise<IHomeSaleSightSeeing | null> {
+  async getDetailSightseeing(seq: number): Promise<HomeSaleSightSeeingResDto | null> {
     const result = await this.homSaleAdminRepository.getDetailSightseeing(seq);
     return result;
   }

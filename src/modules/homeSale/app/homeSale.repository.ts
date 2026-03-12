@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IHomeSale, IHomeSaleImg } from '../homeSale.interface';
 import { CreateHomeSightSeeingDto } from './homeSale.dto';
+import { HomeSaleResDto, HomeSaleImgResDto } from "../homeSale.response";
 
 @Injectable()
 export class HomeSaleAppRepository {
@@ -15,7 +15,7 @@ export class HomeSaleAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<IHomeSale[]> {
+  async getAll(dto: PagingDto): Promise<HomeSaleResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.seq, A.homeCode, A.homeName, A.homeAddress,A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive,
           COALESCE(
@@ -32,7 +32,7 @@ export class HomeSaleAppRepository {
       dto.limit == 0 && dto.page == 0 ? [] : [dto.limit, (dto.page - 1) * dto.limit],
     );
 
-    const result = (rows as IHomeSale[]).map((row) => ({
+    const result = (rows as HomeSaleResDto[]).map((row) => ({
       ...row,
       homeImages: typeof row.homeImages === 'string' ? JSON.parse(row.homeImages) : row.homeImages,
     }));
@@ -40,7 +40,7 @@ export class HomeSaleAppRepository {
     return result;
   }
 
-  async getDetail(homeCode: string): Promise<IHomeSale | null> {
+  async getDetail(homeCode: string): Promise<HomeSaleResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.seq, A.homeCode, A.homeName, A.homeAddress,A.homeDescription, A.latitude, A.longitude, A.homeImage, A.isActive,
           COALESCE(
@@ -59,7 +59,7 @@ export class HomeSaleAppRepository {
       [homeCode],
     );
 
-    let result = rows ? (rows[0] as IHomeSale) : null;
+    let result = rows ? (rows[0] as HomeSaleResDto) : null;
     if (result) {
       result.homeImages = typeof result.homeImages === 'string' ? JSON.parse(result.homeImages) : result.homeImages;
     }

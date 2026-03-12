@@ -3,8 +3,8 @@ import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { PackageAppRepository } from './package.repository';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IPackage } from '../package.interface';
 import { formatPrice } from 'src/helpers/func.helper';
+import { PackageResDto } from "../package.response";
 
 @Injectable()
 export class PackageAppService {
@@ -15,7 +15,7 @@ export class PackageAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async getOne(): Promise<IPackage> {
+  async getOne(): Promise<PackageResDto> {
     const result = await this.packageAppRepository.getOne();
 
     return {

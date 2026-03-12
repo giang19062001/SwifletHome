@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { AnswerAppRepository } from './answer.repository';
-import { IAnswer } from '../answer.interface';
 import { QuestionAppService } from 'src/modules/question/app/question.service';
-import { IQuestion } from 'src/modules/question/question.interface';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { SearchService } from 'src/common/search/search.service';
+import { AnswerResDto } from "../answer.response";
+import { QuestionResDto } from "../../question/question.response";
+
 @Injectable()
 export class AnswerAppService {
   private readonly SERVICE_NAME = 'AnswerAppService';
@@ -22,9 +23,9 @@ export class AnswerAppService {
     this.logger.log(logbase, `Câu hỏi(${question})`);
 
     // get question
-    const questions: IQuestion[] = await this.questionAppService.getQuestionReplied();
+    const questions: QuestionResDto[] = await this.questionAppService.getQuestionReplied();
 
-    let answers: IAnswer[] = [];
+    let answers: AnswerResDto[] = [];
 
     if (questions.length) {
       for (const ques of questions) {

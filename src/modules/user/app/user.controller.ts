@@ -5,8 +5,8 @@ import { UserAppService } from 'src/modules/user/app/user.service';
 import { UserTypeResDto } from 'src/modules/user/app/user.response';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/user')
 @Controller('/api/app/user')
@@ -34,7 +34,7 @@ export class UserAppController {
   @Get('getAllowTypesOfUser')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UserTypeResDto]) })
-  async getAllowTypesOfUser(@GetUserApp() user: authInterface.ITokenUserApp): Promise<UserTypeResDto[]> {
+  async getAllowTypesOfUser(@GetUserApp() user: TokenUserAppResDto): Promise<UserTypeResDto[]> {
     const result = await this.userAppService.getAllowTypesOfUser(user.userCode, user.userTypeKeyWord);
     return result;
   }

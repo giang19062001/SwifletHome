@@ -1,16 +1,15 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserAdminRepository } from './user.repository';
-import { ITokenUserAdmin } from '../../auth/admin/auth.interface';
-import { IList } from 'src/interfaces/admin.interface';
-import { IUserApp } from '../app/user.interface';
-import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto } from './user.dto';
-import { IPackage } from 'src/modules/package/package.interface';
+import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserTypeResDto, UserForTeamByTypeResDto } from './user.dto';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { PackageAdminService } from 'src/modules/package/admin/package.service';
 import moment from 'moment';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
-import { IUserForTeamByType, IUserType } from './user.interface';
+import { ListResponseDto } from "src/dto/common.dto";
+import { PackageResDto } from "../../package/package.response";
+import { TokenUserAdminResDto } from "../../auth/admin/auth.dto";
+import { UserAppResDto } from "../app/user.dto";
 
 @Injectable()
 export class UserAdminService {
@@ -23,11 +22,11 @@ export class UserAdminService {
     private readonly logger: LoggingService,
   ) {}
 
-  async findByUserId(userId: string): Promise<ITokenUserAdmin | null> {
+  async findByUserId(userId: string): Promise<TokenUserAdminResDto | null> {
     return await this.userAdminRepository.findByUserId(userId);
   }
 
-  async getAllUser(dto: GetAllUserDto): Promise<IList<IUserApp> | IList<ITokenUserAdmin>> {
+  async getAllUser(dto: GetAllUserDto): Promise<{ total: number; list: UserAppResDto[] } | { total: number; list: TokenUserAdminResDto[] }> {
     if (dto.type == 'APP') {
       // app
       const total = await this.userAdminRepository.getTotalUserApp(dto);
@@ -39,7 +38,7 @@ export class UserAdminService {
     }
   }
 
-  async getDetailUser(userCode: string, type: string): Promise<IUserApp | ITokenUserAdmin | null> {
+  async getDetailUser(userCode: string, type: string): Promise<UserAppResDto | TokenUserAdminResDto | null> {
     if (type == 'APP') {
       // app
       return await this.userAdminRepository.getDetailUserApp(userCode);
@@ -56,7 +55,7 @@ export class UserAdminService {
     const updatedAt = new Date();
     let startDate: string | null = null;
     let endDate: string | null = null;
-    let packageData: IPackage | null = null;
+    let packageData: PackageResDto | null = null;
     // chọn gói miễn phí
     if (!dto.packageCode) {
       startDate = null;
@@ -88,17 +87,17 @@ export class UserAdminService {
     if (result) {
       const user = await this.userAdminRepository.getDetailUserApp(userCode);
       if (user) {
-        this.firebaseService.sendNotification(user.userCode, user.deviceToken, notify.TITLE, notify.BODY);
+        this.firebaseService.sendNotification((user as any).userCode, (user as any).deviceToken, notify.TITLE, notify.BODY);
       }
     }
     return result;
   }
 
   // TODO: TYPE
-  async getTypesForTeam(): Promise<IUserType[]> {
+  async getTypesForTeam(): Promise<UserTypeResDto[]> {
     return await this.userAdminRepository.getTypesForTeam();
   }
-  async getUsersForTeamByType(dto: GetUsersForTeamByTypeDto): Promise<IUserForTeamByType[]> {
+  async getUsersForTeamByType(dto: GetUsersForTeamByTypeDto): Promise<UserForTeamByTypeResDto[]> {
     return await this.userAdminRepository.getUsersForTeamByType(dto);
   }
 }

@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IUserHome } from '../app/userHome.interface';
-import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
+import { GetHomesAdminDto, TriggerUserHomeSensorDto, UserHomeSensorResDto } from './userHome.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { IUserHomeSensor } from './userhome.interface';
-import { IUserHomeForPush, IUserHomeProvinceForPush } from 'src/modules/notification/notification.interface';
+import { UserHomeProvinceForPushResDto, UserHomeForPushResDto } from "../../notification/notification.response";
+import { UserHomeResDto } from "../app/userHome.dto";
+
 @Injectable()
 export class UserHomeAdminRepository {
   private readonly table = 'tbl_user_home';
@@ -39,7 +39,7 @@ export class UserHomeAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: GetHomesAdminDto): Promise<IUserHome[]> {
+  async getAll(dto: GetHomesAdminDto): Promise<UserHomeResDto[]> {
     let query = ` SELECT A.seq, A.userCode, B.userName, B.userPhone, A.userHomeCode, A.userHomeName, A.userHomeAddress, 
     C.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
     A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
@@ -75,9 +75,9 @@ export class UserHomeAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IUserHome[];
+    return rows as UserHomeResDto[];
   }
-async getUserHomesByUser(userCode?: string | string[]): Promise<IUserHomeForPush[]> {
+async getUserHomesByUser(userCode?: string | string[]): Promise<UserHomeForPushResDto[]> {
   try {
     let query = `
       SELECT B.userCode, B.deviceToken, A.userHomeCode
@@ -101,7 +101,7 @@ async getUserHomesByUser(userCode?: string | string[]): Promise<IUserHomeForPush
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IUserHomeForPush[];
+    return rows as UserHomeForPushResDto[];
 
   } catch (error) {
     console.log(error);
@@ -110,7 +110,7 @@ async getUserHomesByUser(userCode?: string | string[]): Promise<IUserHomeForPush
 }
 
 
-async getUserHomesByProvinces(provinceCodes: string[]): Promise<IUserHomeProvinceForPush[]> {
+async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvinceForPushResDto[]> {
   try {
     if (!provinceCodes.length) return [];
 
@@ -126,14 +126,14 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<IUserHomeProvinc
     `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, provinceCodes);
-    return rows as IUserHomeProvinceForPush[];
+    return rows as UserHomeProvinceForPushResDto[];
   } catch (error) {
     console.log(error);
     return [];
   }
 }
 
-  async getDetail(userHomeCode: string): Promise<IUserHomeSensor | null> {
+  async getDetail(userHomeCode: string): Promise<UserHomeSensorResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `
        SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
@@ -146,7 +146,7 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<IUserHomeProvinc
           LIMIT 1 `,
       [userHomeCode],
     );
-    return rows ? (rows[0] as IUserHomeSensor) : null;
+    return rows ? (rows[0] as UserHomeSensorResDto) : null;
   }
   async triggerHome(userHomeCode: string, updatedId: string): Promise<number> {
     const sql = `

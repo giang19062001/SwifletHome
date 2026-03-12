@@ -13,3 +13,14 @@ export class GetPhoneCodeResDto {
   @ApiProperty({ example: '' })
   isoCode: string;
 }
+
+export class PhoneCodeResDto {
+    @ApiProperty({ example: 0 })
+    seq: number;
+    @ApiProperty({ example: 0 })
+    countryName: number;
+    @ApiProperty({ example: '' })
+    countryCode: string;
+    @ApiProperty({ example: '' })
+    isoCode: string;
+}

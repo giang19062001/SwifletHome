@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ApiMutationResponse, IList } from 'src/interfaces/admin.interface';
+import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 import { TodoAdminRepository } from './todo.repository';
-import { ITodoBoxTask, ITodoTask } from '../todo.interface';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { SentTypeEnum } from 'src/modules/notification/admin/notification.dto';
@@ -12,6 +11,8 @@ import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
 import { UserHomeAdminRepository } from 'src/modules/userHome/admin/userHome.repository';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { NOTIFICATION_CONST } from 'src/modules/notification/notification.interface';
+import { ListResponseDto } from "src/dto/common.dto";
+import { TodoBoxTaskResDto, TodoTaskResDto } from "../todo.response";
 
 @Injectable()
 export class TodoAdminService {
@@ -25,12 +26,12 @@ export class TodoAdminService {
     private readonly userAdminRepository: UserAdminRepository,
     private readonly userHomeAdminRepository: UserHomeAdminRepository,
   ) {}
-  async getAllTasks(dto: PagingDto): Promise<IList<ITodoTask>> {
+  async getAllTasks(dto: PagingDto): Promise<{ total: number; list: TodoTaskResDto[] }> {
     const total = await this.todoAdminRepository.getTotalTasks();
     const list = await this.todoAdminRepository.getAllTasks(dto);
     return { total, list };
   }
-  async getBoxTasks(): Promise<ITodoBoxTask[]> {
+  async getBoxTasks(): Promise<TodoBoxTaskResDto[]> {
     const result = await this.todoAdminRepository.getBoxTasks();
     return result;
   }

@@ -1,24 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
-import { IQuestion } from '../question.interface';
 import { QuestionAdminRepository } from './question.repository';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
+import { ListResponseDto } from "src/dto/common.dto";
+import { QuestionResDto } from "../question.response";
 
 @Injectable()
 export class QuestionAdminService {
   constructor(private readonly questionAdminRepository: QuestionAdminRepository) {
   }
-  async getAll(dto: PagingDto): Promise<IList<IQuestion>> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: QuestionResDto[] }> {
     const total = await this.questionAdminRepository.getTotal();
     const list = await this.questionAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getAllByAnswer(answerCode: string): Promise<IQuestion[]> {
+  async getAllByAnswer(answerCode: string): Promise<QuestionResDto[]> {
     const result = await this.questionAdminRepository.getAllByAnswer(answerCode);
     return result;
   }
-  async getDetail(questionCode: string): Promise<IQuestion | null> {
+  async getDetail(questionCode: string): Promise<QuestionResDto | null> {
     const result = await this.questionAdminRepository.getDetail(questionCode);
     return result;
   }

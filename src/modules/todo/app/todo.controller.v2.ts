@@ -3,12 +3,12 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperat
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import {NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import TodoAppValidate from './todo.validate';
 import { SetTaskAlarmDto } from './todo.dto';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/todo')
 @Controller('/api/app/v2/todo')
@@ -32,7 +32,7 @@ export default class TodoAppControllerV2 {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setTaskAlarm(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: SetTaskAlarmDto) {
+  async setTaskAlarm(@GetUserApp() user: TokenUserAppResDto, @Body() dto: SetTaskAlarmDto) {
     const err: string = TodoAppValidate.setTaskAlarmValidate(dto);
     if (err) {
       throw new BadRequestException({

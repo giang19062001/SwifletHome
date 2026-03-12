@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IDoctor, IDoctorFile } from '../doctor.interface';
 import { UpdateDoctorDto } from './doctor.dto';
+import { DoctorResDto, DoctorFileResDto } from "../doctor.response";
 
 @Injectable()
 export class DoctorAdminRepository {
@@ -17,7 +17,7 @@ export class DoctorAdminRepository {
         ON A.userCode = B.userCode`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<IDoctor[]> {
+  async getAll(dto: PagingDto): Promise<DoctorResDto[]> {
     let query = `  SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
         FROM ${this.table} A  
         INNER JOIN ${this.tableUserApp} B
@@ -31,10 +31,10 @@ export class DoctorAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as IDoctor[];
+    return rows as DoctorResDto[];
   }
 
-  async getDetail(seq: number): Promise<IDoctor | null> {
+  async getDetail(seq: number): Promise<DoctorResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
         FROM ${this.table} A 
@@ -42,7 +42,7 @@ export class DoctorAdminRepository {
         LIMIT 1 `,
       [seq],
     );
-    return rows ? (rows[0] as IDoctor) : null;
+    return rows ? (rows[0] as DoctorResDto) : null;
   }
   async update(dto: UpdateDoctorDto, updatedId: string, seq: number): Promise<number> {
     const sql = `
@@ -54,7 +54,7 @@ export class DoctorAdminRepository {
     return result.affectedRows;
   }
 
-  async getFilesBySeq(seq: number): Promise<IDoctorFile[]> {
+  async getFilesBySeq(seq: number): Promise<DoctorFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT B.seq, B.filename,  B.mimetype
         FROM ${this.table} A 
@@ -64,6 +64,6 @@ export class DoctorAdminRepository {
       `,
       [seq],
     );
-    return rows as IDoctorFile[];
+    return rows as DoctorFileResDto[];
   }
 }

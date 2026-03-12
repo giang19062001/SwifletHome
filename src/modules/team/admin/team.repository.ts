@@ -4,8 +4,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
-import { ITeam, ITeamImg, ITeamReview } from './team.interface';
-import { CreateTeamDto, UpdateTeamDto } from './team.dto';
+import { CreateTeamDto, UpdateTeamDto, TeamResDto, TeamReviewResDto, TeamImgResDto } from './team.dto';
 
 @Injectable()
 export class TeamAdminRepository {
@@ -34,7 +33,7 @@ export class TeamAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<ITeam[]> {
+  async getAll(dto: PagingDto): Promise<TeamResDto[]> {
     let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCode,
      A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, C.provinceName, D.userTypeKeyWord, D.userTypeName
         FROM ${this.table} A  
@@ -53,9 +52,9 @@ export class TeamAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as ITeam[];
+    return rows as TeamResDto[];
   }
-  async getDetail(teamCode: string): Promise<ITeam | null> {
+  async getDetail(teamCode: string): Promise<TeamResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial,
       A.provinceCode, A.isActive
@@ -64,7 +63,7 @@ export class TeamAdminRepository {
           LIMIT 1 `,
       [teamCode],
     );
-    return rows ? (rows[0] as ITeam) : null;
+    return rows ? (rows[0] as TeamResDto) : null;
   }
   async create(dto: CreateTeamDto, teamImagePath: string, createdId: string): Promise<number> {
     const sqlLast = ` SELECT teamCode FROM ${this.table} ORDER BY teamCode DESC LIMIT 1`;
@@ -124,16 +123,16 @@ export class TeamAdminRepository {
     return result.affectedRows;
   }
   // TODO: IMAGE
-  async getImages(seq: number): Promise<ITeamImg[]> {
+  async getImages(seq: number): Promise<TeamImgResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.teamSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive
           FROM ${this.tableImg} A 
           WHERE A.teamSeq = ? `,
       [seq],
     );
-    return rows as ITeamImg[];
+    return rows as TeamImgResDto[];
   }
-  async createImages(seq: number, createdId: string, filenamePath: string, file: Express.Multer.File | ITeamImg): Promise<number> {
+  async createImages(seq: number, createdId: string, filenamePath: string, file: Express.Multer.File | TeamImgResDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, teamSeq, createdId)
       VALUES (?, ?, ?, ?, ?, ?)
@@ -181,7 +180,7 @@ export class TeamAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllReview(dto: PagingDto): Promise<ITeamReview[]> {
+  async getAllReview(dto: PagingDto): Promise<TeamReviewResDto[]> {
     let query = ` SELECT A.seq, A.isDisplay, A.teamCode, A.review, A.star, A.reviewBy, B.userName AS reviewByName, 
       C.teamName, D.userName as ownerName, A.createdAt, A.updatedAt,
           COALESCE(
@@ -216,9 +215,9 @@ export class TeamAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as ITeamReview[];
+    return rows as TeamReviewResDto[];
   }
-  async getDetailReview(seq: number): Promise<ITeamReview | null> {
+  async getDetailReview(seq: number): Promise<TeamReviewResDto | null> {
     let query = ` SELECT A.seq, A.isDisplay, A.teamCode, A.review, A.star, A.reviewBy, B.userName AS reviewByName, C.teamName, D.userName as ownerName, A.createdAt, A.updatedAt,
           COALESCE(
             (
@@ -246,7 +245,7 @@ export class TeamAdminRepository {
       `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [seq]);
-    return rows.length ? (rows[0] as ITeamReview) : null;
+    return rows.length ? (rows[0] as TeamReviewResDto) : null;
   }
   async changeDisplay(isDisplay: YnEnum, updatedId: string, seq: number): Promise<number> {
     const sql = `

@@ -4,10 +4,10 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
-import * as authInterface from 'src/modules/auth/app/auth.interface';
 import { ConsignmentAppService } from './consigment.service';
 import { RequestConsigmentDto } from './consigment.dto';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 
 @ApiTags('app/consignment')
 @Controller('/api/app/consignment')
@@ -32,7 +32,7 @@ export class ConsignmentAppController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async requestConsigment(@GetUserApp() user: authInterface.ITokenUserApp, @Body() dto: RequestConsigmentDto) {
+  async requestConsigment(@GetUserApp() user: TokenUserAppResDto, @Body() dto: RequestConsigmentDto) {
     const result = await this.consignmentAppService.requestConsigment(user.userCode, dto);
     if (result === 0) {
       throw new BadRequestException({

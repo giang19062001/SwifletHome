@@ -1,8 +1,7 @@
-import { GetTypeEnum, IQrRequestFileStr, MarkTypeEnum } from './../qr.interface';
+import { GetTypeEnum, MarkTypeEnum } from './../qr.interface';
 import { QrAppRepository } from './qr.repository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { ITokenUserApp } from 'src/modules/auth/app/auth.interface';
 import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 import {
@@ -23,8 +22,10 @@ import { OPTION_CONST, RequestSellPriceOptionEnum } from 'src/modules/options/op
 import { OptionService } from 'src/modules/options/option.service';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import moment from 'moment';
-import { IListApp } from 'src/interfaces/app.interface';
 import { PagingDto } from 'src/dto/admin.dto';
+import { ListResponseDto } from "src/dto/common.dto";
+import { QrRequestFileStrResDto } from "../qr.response";
+import { TokenUserAppResDto } from "../../auth/app/auth.dto";
 
 @Injectable()
 export class QrAppService {
@@ -37,7 +38,7 @@ export class QrAppService {
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
   ) {}
-  async getRequestQrCocdeList(user: ITokenUserApp, dto: PagingDto): Promise<IListApp<GetRequestQrCodeListResDto>> {
+  async getRequestQrCocdeList(user: TokenUserAppResDto, dto: PagingDto): Promise<{ total: number; list: GetRequestQrCodeListResDto[] }> {
     const total = await this.qrAppRepository.getRequestQrCocdeTotal(user.userCode);
     const rows = await this.qrAppRepository.getRequestQrCocdeList(user.userCode, dto);
     const list = rows.map((item: any) => {
@@ -76,12 +77,12 @@ export class QrAppService {
     return { total: total, list: list };
   }
 
-  async getApprovedRequestQrCocde(requestCode: string, user: ITokenUserApp): Promise<GetApprovedRequestQrCodeResDto | null> {
+  async getApprovedRequestQrCocde(requestCode: string, user: TokenUserAppResDto): Promise<GetApprovedRequestQrCodeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getApprovedRequestQrCocde:`;
     const result = await this.qrAppRepository.getApprovedRequestQrCocde(requestCode, user.userCode);
     return result;
   }
-  async getInfoToRequestQrcode(userHomeCode: string, user: ITokenUserApp, harvestPhase: number): Promise<GetInfoToRequestQrcodeResDto | null> {
+  async getInfoToRequestQrcode(userHomeCode: string, user: TokenUserAppResDto, harvestPhase: number): Promise<GetInfoToRequestQrcodeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getInfoToRequestQrcode:`;
     // lấy thông tin nhà
     const homeInfo = await this.userHomeAppService.getDetail(userHomeCode);
@@ -122,7 +123,7 @@ export class QrAppService {
       taskHarvestList: taskHarvestList,
     } as GetInfoToRequestQrcodeResDto;
   }
-  async requestQrCode(user: ITokenUserApp, dto: RequestQrCodeDto): Promise<number> {
+  async requestQrCode(user: TokenUserAppResDto, dto: RequestQrCodeDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/requestQrCode:`;
 
     try {
@@ -213,10 +214,10 @@ export class QrAppService {
     return result;
   }
   // TODO: FILE
-  async uploadRequestFile(userCode: string, dto: UploadRequestVideoDto, requestQrcodeFiles: Express.Multer.File[]): Promise<IQrRequestFileStr[]> {
+  async uploadRequestFile(userCode: string, dto: UploadRequestVideoDto, requestQrcodeFiles: Express.Multer.File[]): Promise<QrRequestFileStrResDto[]> {
     const logbase = `${this.SERVICE_NAME}/uploadRequestFile:`;
     try {
-      let res: IQrRequestFileStr[] = [];
+      let res: QrRequestFileStrResDto[] = [];
       if (requestQrcodeFiles.length > 0) {
         for (const file of requestQrcodeFiles) {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);
@@ -238,7 +239,7 @@ export class QrAppService {
     }
   }
   // TODO: SELL
-  async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<IListApp<GetRequestSellListResDto>> {
+  async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<{ total: number; list: GetRequestSellListResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
     const total = await this.qrAppRepository.getRequestSellTotal(dto, userCode);
     const rows = await this.qrAppRepository.getRequestSellList(dto, userCode);
@@ -251,7 +252,7 @@ export class QrAppService {
     const result = await this.qrAppRepository.getRequestSellDetail(requestCode);
     return result;
   }
-  async requestSell(user: ITokenUserApp, dto: InsertRequestSellDto): Promise<number> {
+  async requestSell(user: TokenUserAppResDto, dto: InsertRequestSellDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/insertRequestSell:`;
 
     try {

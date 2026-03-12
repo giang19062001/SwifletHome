@@ -1,14 +1,14 @@
 import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Param, BadRequestException, Put, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
-import { IList } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { InfoAdminService } from './info.service';
-import { IInfo } from '../info.interface';
 import { UpdateInfoDto } from './info.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import * as userInterface from 'src/modules/auth/admin/auth.interface';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
+import { ListResponseDto } from "src/dto/common.dto";
+import { InfoResDto } from "../info.response";
+import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/info')
@@ -22,7 +22,7 @@ export class InfoAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<IList<IInfo>> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: InfoResDto[] }> {
     const result = await this.infoAdminService.getAll(dto);
     return result;
   }
@@ -30,7 +30,7 @@ export class InfoAdminController {
   @ApiParam({ name: 'infoKeyword', type: String })
   @Get('getDetail/:infoKeyword')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('infoKeyword') infoKeyword: string): Promise<IInfo | null> {
+  async getDetail(@Param('infoKeyword') infoKeyword: string): Promise<InfoResDto | null> {
     const result = await this.infoAdminService.getDetail(infoKeyword);
     if (!result) {
       throw new BadRequestException();
@@ -45,7 +45,7 @@ export class InfoAdminController {
   async update(
     @Body() dto: UpdateInfoDto,
     @Param('keyword') infoKeyword: string,
-    @GetUserAdmin() admin: userInterface.ITokenUserAdmin,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
     @UploadedFiles() files: Express.Multer.File[], // tất cả file trong formData
   ): Promise<number> {
     const filedFile = this.infoAdminService.getFieldFileByKeyword(infoKeyword);
