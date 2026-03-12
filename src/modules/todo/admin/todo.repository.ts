@@ -11,7 +11,7 @@ import { TodoBoxTaskResDto, TodoTaskResDto } from "../todo.response";
 export class TodoAdminRepository {
   private readonly tableTask = 'tbl_todo_tasks';
   private readonly tableBoxTask = 'tbl_todo_box_tasks';
-  private readonly tableHomeTaskAlarm = 'tbl_todo_home_task_alarm';
+  private readonly tableTaskAlarm = 'tbl_todo_task_alarm';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -56,14 +56,14 @@ export class TodoAdminRepository {
 
   // todo: ALARM
   async insertTaskAlarm(userCode: string, userHomeCode: string, dto: SetTaskAlarmByAdminDto, createdId: string): Promise<number> {
-    const sqlLast = ` SELECT taskAlarmCode FROM ${this.tableHomeTaskAlarm} ORDER BY taskAlarmCode DESC LIMIT 1`;
+    const sqlLast = ` SELECT taskAlarmCode FROM ${this.tableTaskAlarm} ORDER BY taskAlarmCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let taskAlarmCode = CODES.taskAlarmCode.FRIST_CODE;
     if (rows.length > 0) {
       taskAlarmCode = generateCode(rows[0].taskAlarmCode, CODES.taskAlarmCode.PRE, 6);
     }
     const sql = `
-        INSERT INTO ${this.tableHomeTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskCode, taskName, taskDate, taskStatus, taskNote, createdId) 
+        INSERT INTO ${this.tableTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskCode, taskName, taskDate, taskStatus, taskNote, createdId) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, userHomeCode, taskAlarmCode, dto.taskCode, dto.taskName, dto.taskDate, TaskStatusEnum.WAITING, "", createdId]);

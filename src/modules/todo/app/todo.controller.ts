@@ -10,8 +10,8 @@ import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrRespo
 import { Msg } from 'src/helpers/message.helper';
 import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto } from './todo.dto';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
-import { TodoTaskResDto, TodoTaskAlramResDto } from "../todo.response";
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -111,7 +111,6 @@ export default class TodoAppController {
   }
 
   // TODO: MEDICINE
-
   @ApiOperation({
     summary: 'Ghi chú lăn thuốc',
   })
@@ -143,7 +142,7 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
         data: 0,
       });
     }
-     if (result == -3) {
+    if (result == -3) {
       throw new BadRequestException({
         message: Msg.MedicineInvalidDateExecute,
         data: 0,
@@ -239,7 +238,8 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
       data: result,
     };
   }
-
+  
+  //TODO: ALARM
   @ApiOperation({
     summary: 'Lấy thông tin dữ liệu thu hoạch có sẵn cho Form nhập dữ liệu thu hoạch',
     description: `Luôn gọi API này khi vào màn hình 'Form nhập dữ liệu thu hoạch' để nhận dữ liệu khởi tạo ban đầu Hoặc dữ liệu đã sẵn để gắn vào 'Form nhập dữ liệu thu hoạch'`,
@@ -281,7 +281,7 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
         data: null,
       });
     }
-     if (result == -4) {
+    if (result == -4) {
       throw new BadRequestException({
         message: Msg.AlreadyCompleteCannotDo,
         data: null,
