@@ -32,7 +32,7 @@ export default class QrAppController {
   constructor(private readonly qrAppService: QrAppService) {}
 
   @ApiOperation({
-    summary: 'Lấy danh sách yêu cầu qrcode của user hiện tại',
+    summary: 'Lấy danh sách yêu cầu lấy mã QRcode của user hiện tại',
     description: ``,
   })
   @Post('getRequestQrCocdeList')
@@ -61,7 +61,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Lấy thông tin ( LĂN THUỐC, THU HOẠCH ) để yêu cầu tạo mã Qrcode bằng mã nhà yến (userHomeCode)',
+    summary: 'Lấy thông tin ( LĂN THUỐC, THU HOẠCH ) để yêu cầu tạo mã Qrcode cho 1 nhà yến cụ thể',
     description: ``,
   })
   @Get('getInfoToRequestQrcode/:userHomeCode')
@@ -121,7 +121,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Hủy yêu cầu qrcode',
+    summary: 'Hủy yêu cầu lấy QRcode',
   })
   @Put('cancelRequest/:requestCode')
   @HttpCode(HttpStatus.OK)
@@ -162,7 +162,7 @@ export default class QrAppController {
 
   // TODO: SELL
   @ApiOperation({
-    summary: `Lấy chi tiết đơn bán sản lượng yến`,
+    summary: `Lấy chi tiết yêu cầu bán sản lượng yến  liên kết với mã Qrcode`,
     description: ``,
   })
   @Get('getRequestSellDetail/:requestCode')
@@ -174,7 +174,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Lấy danh sách đơn bán sản lượng yến',
+    summary: 'Lấy danh sách yêu cầu bán sản lượng yến liên kết với mã Qrcode',
     description: `
   **getType**: enum('ALL', 'VIEW', 'SAVE')\n
   *ALL*: lấy tất cả \n
@@ -201,7 +201,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Tạo yêu cầu cần bán sản lượng yến ',
+    summary: 'Tạo yêu cầu cần bán sản lượng yến sau khi mã QRcode đã được tạo và được ADMIN duyệt',
   })
   @Post('requestSell')
   @ApiBody({
@@ -254,11 +254,11 @@ export default class QrAppController {
 
   // TODO: SELL-INTERACT
   @ApiOperation({
-    summary: `Đánh dấu 1 'yêu cầu bán' là đã xem hay là lưu `,
+    summary: `Đánh dấu 1 'yêu cầu bán sản lượng yến liên kết với mã Qrcode' là đã 'XEM' hay là 'LƯU' `,
     description: `
   **markType**: enum('VIEW', 'SAVE')\n
-  *VIEW*: dùng khi click vào 1 'yêu cầu bán tổ yến' nào đó  \n
-  *SAVE*: dùng khi click nút lưu của 1 'yêu cầu bán tổ yến' nào đó \n
+  *VIEW*: dùng khi click vào 1 'yêu cầu bán sản lượng yến' nào đó  \n
+  *SAVE*: dùng khi click nút lưu của 1 'yêu cầu sản lượng yến' nào đó \n
   `,
   })
   @Put('maskRequestSell/:requestCode')

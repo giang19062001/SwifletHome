@@ -22,7 +22,7 @@ export default class TodoAppController {
   constructor(private readonly todoAppService: TodoAppService) {}
 
   @ApiOperation({
-    summary: 'Lấy danh sách các lịch nhắc có sẵn của hệ thống: Thu hoạch, lăn thuốc, dẫn dụ chim đêm,...',
+    summary: 'Lấy danh sách các lịch nhắc có sẵn của hệ thống: Thu hoạch, lăn thuốc, vệ sinh,.. ⚠️ TẠM THỜI KO DÙNG NỮA',
   })
   @Get('getTasks')
   @HttpCode(HttpStatus.OK)
@@ -33,7 +33,7 @@ export default class TodoAppController {
   }
 
   @ApiOperation({
-    summary: `Danh sách lịch nhắc việc của 1 nhà yến ( chỉ hiển thị lịch nhắc quá khứ, lịch nhắc trong ngầy hiện tại nếu có, và ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} ngày sắp tới )`,
+    summary: `Danh sách lịch nhắc việc của 1 nhà yến ( chỉ hiển thị lịch nhắc quá khứ, lịch nhắc trong ngày hiện tại nếu có, và ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} ngày sắp tới )`,
   })
   @ApiBody({
     type: GetListTaskAlarmsDTO,
@@ -94,7 +94,7 @@ export default class TodoAppController {
   }
 
   @ApiOperation({
-    summary: 'Thông tin todo của 1 nhà yến chính (thu hoạch, lăn thuốc,...)',
+    summary: 'Thông tin 4 BOX (thu hoạch, lăn thuốc, chim đêm, độ ẩm) của nhà yến chính',
   })
   @Get('getScheduledTasks')
   @HttpCode(HttpStatus.OK)

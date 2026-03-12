@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
@@ -19,6 +19,9 @@ import { ConsignmentResDto } from './consignment.response';
 export class ConsignmentAppController {
   constructor(private readonly consignmentAppService: ConsignmentAppService) {}
 
+  @ApiOperation({
+    summary: 'Yêu cầu ký gửi',
+  })
   @Post('requestConsigment')
   @ApiBody({
     type: RequestConsigmentDto,
@@ -47,6 +50,9 @@ export class ConsignmentAppController {
     };
   }
 
+  @ApiOperation({
+    summary: 'Lấy danh sách ký gửi',
+  })
   @ApiBody({
     type: GetAllConsignmentDto,
     description: `
@@ -56,7 +62,7 @@ export class ConsignmentAppController {
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(ConsignmentResDto)) })
-  async GetAllConsignment(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetAllConsignmentDto,): Promise<{ total: number; list: ConsignmentResDto[] }> {
+  async GetAllConsignment(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetAllConsignmentDto): Promise<{ total: number; list: ConsignmentResDto[] }> {
     const result = await this.consignmentAppService.GetAllConsignment(dto, user.userCode);
     return result;
   }
