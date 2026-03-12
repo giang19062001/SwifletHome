@@ -2,13 +2,13 @@ import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Para
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetTasksMedicineResDto, GetTaskHarvestResDto } from './todo.response';
+import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetTasksMedicineResDto, GetTaskHarvestResDto, GetListTaskHarvestResDto } from './todo.response';
 import { TodoAppService } from './todo.service';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto } from './todo.dto';
+import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto, GetListTaskHarvestForAdjustDto } from './todo.dto';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
 import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
@@ -238,8 +238,7 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
       data: result,
     };
   }
-  
-  //TODO: ALARM
+
   @ApiOperation({
     summary: 'Lấy thông tin dữ liệu thu hoạch có sẵn cho Form nhập dữ liệu thu hoạch',
     description: `Luôn gọi API này khi vào màn hình 'Form nhập dữ liệu thu hoạch' để nhận dữ liệu khởi tạo ban đầu Hoặc dữ liệu đã sẵn để gắn vào 'Form nhập dữ liệu thu hoạch'`,
@@ -287,6 +286,20 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
         data: null,
       });
     }
+    return result;
+  }
+
+  @ApiOperation({
+    summary: 'Lấy danh sách thu hoạch chưa yêu cầu mã QRcode để điều chỉnh',
+  })
+  @ApiBody({
+    type: GetListTaskHarvestForAdjustDto,
+  })
+  @Post('getListTaskHarvestForAdjust')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetListTaskHarvestResDto)) })
+  async getListTaskHarvestForAdjust(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetListTaskHarvestForAdjustDto) {
+    const result = await this.todoAppService.getListTaskHarvestForAdjust(dto, user.userCode);
     return result;
   }
 }

@@ -165,7 +165,7 @@ export class QrAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, RequestStatusEnum.APPROVED]);
     return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
-  async checkDuplicateReuqestQrCode(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
+  async checkUsedThisHarvest(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     let query = ` SELECT A.seq
       FROM ${this.table}  A
       WHERE A.userHomeCode  = ? AND A.userCode = ? AND A.harvestPhase = ?

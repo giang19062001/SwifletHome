@@ -61,7 +61,7 @@ export const Msg = {
   MedicineTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
   MedicineInvalidDateExecute: 'Chưa đến ngày lăn thuốc',
   HarvestTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
-  RequestQrcodeAlreadyExsist: `Đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi`,
+  ThisHarvestRequestQrcodeAlready: `Đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi`,
   RequestQrcodeNotFound: `Không tìm thấy thông tin Qrcode của yêu cầu bán hiện tại`,
   RequestInfoAlreadySold: `Thông tin của Qr code này đã được rao bán rồi`,
   RequestNotAllowHarvestEmpty: `Nhà yến chưa có dữ liệu của đợt thu hoạch này, không thể yêu cầu mã Qrcode`,

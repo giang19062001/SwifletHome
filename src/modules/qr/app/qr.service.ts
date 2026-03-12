@@ -11,7 +11,6 @@ import {
   GetRequestSellDetailResDto,
   GetRequestSellListResDto,
   TaskHarvestQrResDto,
-  UploadRequestVideoResDto,
 } from './qr.response';
 import { GetRequestSellListDto, InsertRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { Msg } from 'src/helpers/message.helper';
@@ -23,7 +22,6 @@ import { OptionService } from 'src/modules/options/option.service';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import moment from 'moment';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ListResponseDto } from "src/dto/common.dto";
 import { QrRequestFileStrResDto } from "../qr.response";
 import { TokenUserAppResDto } from "../../auth/app/auth.dto";
 
@@ -129,10 +127,10 @@ export class QrAppService {
     try {
       let result = 1;
 
-      // kiểm tra nhà yến với đợt thu hoạch này đã yêu cầu chưa
-      const isDuplicate = await this.qrAppRepository.checkDuplicateReuqestQrCode(dto.userHomeCode, user.userCode, dto.harvestPhase);
-      if (isDuplicate) {
-        this.logger.error(logbase, `${Msg.RequestQrcodeAlreadyExsist} - nhà yến (${dto.userHomeCode}) - đợt  (${dto.harvestPhase}) `);
+      // kiểm tra đợt thu hoạch của nhà yến này đã yêu cầu qrcode chưa
+      const isUsed = await this.qrAppRepository.checkUsedThisHarvest(dto.userHomeCode, user.userCode, dto.harvestPhase);
+      if (isUsed) {
+        this.logger.error(logbase, `${Msg.ThisHarvestRequestQrcodeAlready} - nhà yến (${dto.userHomeCode}) - đợt  (${dto.harvestPhase}) `);
         result = -2;
         return result;
       }

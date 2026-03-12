@@ -3,17 +3,17 @@ import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoAppRepository } from './todo.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { SetHarvestTaskDto, FloorDataInputDto, HarvestDataInputDto, HarvestDataRowInputDto, SetTaskAlarmDto, SetTaskMedicineDto } from './todo.dto';
+import { SetHarvestTaskDto, FloorDataInputDto, HarvestDataInputDto, HarvestDataRowInputDto, SetTaskAlarmDto, SetTaskMedicineDto, GetListTaskHarvestForAdjustDto } from './todo.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import moment from 'moment';
 import TodoAppValidate from './todo.validate';
 import { OptionService } from 'src/modules/options/option.service';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
-import { GetTaskHarvestResDto, GetTasksMedicineResDto } from './todo.response';
+import { GetListTaskHarvestResDto, GetTaskHarvestResDto, GetTasksMedicineResDto } from './todo.response';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { ListResponseDto } from "src/dto/common.dto";
-import { TodoTaskResDto, TodoTaskAlramResDto } from "../todo.response";
+import { ListResponseDto } from 'src/dto/common.dto';
+import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
 
 @Injectable()
 export class TodoAppService {
@@ -613,5 +613,11 @@ export class TodoAppService {
       harvestData: harvestData, // dữ liệu tầng / ô
     };
     return result;
+  }
+
+  async getListTaskHarvestForAdjust(dto: GetListTaskHarvestForAdjustDto, userCode: string): Promise<{ total: number; list: GetListTaskHarvestResDto[] }> {
+    const total = await this.todoAppRepository.getTotalTaskHarvestForAdjust(dto, userCode);
+    const list = await this.todoAppRepository.getListTaskHarvestForAdjust(dto, userCode);
+    return { total: total, list: list };
   }
 }

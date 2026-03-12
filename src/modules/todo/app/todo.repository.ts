@@ -1,14 +1,14 @@
 import { Injectable, Inject, Query } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
-import { HarvestDataRowInputDto, SetTaskMedicineDto } from './todo.dto';
+import { GetListTaskHarvestForAdjustDto, HarvestDataRowInputDto, SetTaskMedicineDto } from './todo.dto';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
 import { generateCode, handleTimezoneQuery } from 'src/helpers/func.helper';
 import moment from 'moment';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskHarvestQrResDto, TaskMedicineQrResDto } from 'src/modules/qr/app/qr.response';
-import { GetHarvestTaskPhaseResDto, GetTaskAlarmResDto, GetTasksMedicineRowResDto } from './todo.response';
+import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto, GetTaskAlarmResDto, GetTasksMedicineRowResDto } from './todo.response';
 import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
 
 @Injectable()
@@ -21,6 +21,7 @@ export class TodoAppRepository {
   private readonly tableTaskHarvest = 'tbl_todo_task_harvest';
   private readonly tableTaskHarvestPhase = 'tbl_todo_task_harvest_phase';
   private readonly tableOption = 'tbl_option_common';
+  private readonly tableQr = 'tbl_qr_request';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -291,6 +292,60 @@ export class TodoAppRepository {
   }
 
   // TODO: HARVERT
+  async getTotalTaskHarvestForAdjust(dto: GetListTaskHarvestForAdjustDto, userCode: string): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT COUNT(A.seq) AS TOTAL        
+        FROM ${this.tableTaskAlarm} A
+        INNER JOIN ${this.tableTask} B
+          ON A.taskCode = B.taskCode
+          AND B.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+        INNER JOIN ${this.tableTaskHarvestPhase} C
+          ON A.seq = C.seqAlarm
+          AND C.isDone = 'Y'
+        WHERE A.userHomeCode = ?
+          AND A.userCode = ?
+          AND NOT EXISTS (
+            SELECT 1
+            FROM ${this.tableQr} D
+            WHERE D.userHomeCode = A.userHomeCode
+              AND D.harvestPhase = C.harvestPhase
+              AND D.harvestYear = C.harvestYear
+        ) `,[dto.userHomeCode, userCode],
+    );
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+  async getListTaskHarvestForAdjust(dto: GetListTaskHarvestForAdjustDto, userCode: string): Promise<GetListTaskHarvestResDto[]> {
+    let params: (string | number)[] = [dto.userHomeCode, userCode];
+    let offsetQuery = ` `;
+    if (dto.limit != 0 && dto.page != 0) {
+      offsetQuery += `LIMIT ? OFFSET ?`;
+      params.push(dto.limit);
+      params.push((dto.page - 1) * dto.limit);
+    }
+
+    let query = ` SELECT A.seq, A.taskAlarmCode, C.harvestPhase, C.harvestYear
+        FROM ${this.tableTaskAlarm} A
+        INNER JOIN ${this.tableTask} B
+          ON A.taskCode = B.taskCode
+          AND B.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+        INNER JOIN ${this.tableTaskHarvestPhase} C
+          ON A.seq = C.seqAlarm
+          AND C.isDone = 'Y'
+        WHERE A.userHomeCode = ?
+          AND A.userCode = ?
+          AND NOT EXISTS (
+            SELECT 1
+            FROM ${this.tableQr} D
+            WHERE D.userHomeCode = A.userHomeCode
+              AND D.harvestPhase = C.harvestPhase
+              AND D.harvestYear = C.harvestYear
+        )
+        ${offsetQuery}
+   `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows as GetListTaskHarvestResDto[];
+  }
+
   async getOneTaskHarvest(taskAlarmCode: string): Promise<(GetTaskAlarmResDto & GetHarvestTaskPhaseResDto) | null> {
     let query = ` SELECT A.seq, A.taskAlarmCode, A.taskCode, B.taskKeyword, A.taskName, A.taskDate, A.taskStatus,
     A.userCode, A.userHomeCode, A.taskNote

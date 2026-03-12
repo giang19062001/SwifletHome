@@ -209,3 +209,13 @@ export class SetTaskMedicineDto {
   @IsTodayOrAfter({ message: 'medicineNextDate must be today or later' })
   medicineNextDate: Date;
 }
+
+
+export class GetListTaskHarvestForAdjustDto extends PagingDto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userHomeCode: string;
+}

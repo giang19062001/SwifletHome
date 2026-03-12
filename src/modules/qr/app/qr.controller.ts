@@ -98,7 +98,7 @@ export default class QrAppController {
     }
     if (result === -2) {
       throw new BadRequestException({
-        message: Msg.RequestQrcodeAlreadyExsist,
+        message: Msg.ThisHarvestRequestQrcodeAlready,
         data: 0,
       });
     }

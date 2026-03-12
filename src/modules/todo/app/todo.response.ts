@@ -186,7 +186,7 @@ export class GetTasksMedicineResDto {
   medicineNextDate: string;
 }
 
-export class GetTasksMedicineRowResDto extends GetTasksMedicineResDto{
+export class GetTasksMedicineRowResDto extends GetTasksMedicineResDto {
   @ApiProperty({ example: 0 })
   seq: number;
 
@@ -198,4 +198,18 @@ export class GetTasksMedicineRowResDto extends GetTasksMedicineResDto{
 
   @ApiProperty({ example: '' })
   userHomeCode: string;
+}
+
+export class GetListTaskHarvestResDto {
+  @ApiProperty({ example: 0 })
+  seq: number;
+
+  @ApiProperty({ example: '' })
+  taskAlarmCode: string;
+
+  @ApiProperty({ example: 0 })
+  harvestPhase: number;
+
+  @ApiProperty({ example: 2020 })
+  harvestYear: number;
 }
