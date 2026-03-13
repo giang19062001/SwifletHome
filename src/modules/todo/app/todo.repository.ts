@@ -22,6 +22,7 @@ export class TodoAppRepository {
   private readonly tableTaskHarvestPhase = 'tbl_todo_task_harvest_phase';
   private readonly tableOption = 'tbl_option_common';
   private readonly tableQr = 'tbl_qr_request';
+  private readonly tableUserHome = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -325,7 +326,7 @@ export class TodoAppRepository {
     let query = ` 
         SELECT 
             A.seq, A.taskAlarmCode, A.userHomeCode, C.harvestPhase,  C.harvestYear,
-            CAST(IFNULL(MAX(D.floor), 1) AS SIGNED) AS totalFloor,
+            E.userHomeFloor AS totalFloor,
             CAST(IFNULL(SUM(D.cellCollected), 0) AS SIGNED) AS totalCellCollected,
             CAST(IFNULL(SUM(D.cellRemain), 0) AS SIGNED) AS totalCellRemain
         FROM ${this.tableTaskAlarm} A
@@ -335,6 +336,8 @@ export class TodoAppRepository {
         INNER JOIN ${this.tableTaskHarvestPhase} C
           ON A.seq = C.seqAlarm
           AND C.isDone = 'Y'
+        INNER JOIN ${this.tableUserHome} E
+          ON A.userHomeCode = E.userHomeCode
         LEFT JOIN ${this.tableTaskHarvest} D
           ON A.seq = D.seqAlarm
         WHERE A.userHomeCode = ?
@@ -344,7 +347,7 @@ export class TodoAppRepository {
             FROM ${this.tableQr} Q 
             WHERE Q.seqHarvestPhase = C.seq
         )
-        GROUP BY A.seq, A.taskAlarmCode, C.harvestPhase, C.harvestYear
+        GROUP BY A.seq, A.taskAlarmCode, C.harvestPhase, C.harvestYear, E.userHomeFloor
         ${offsetQuery}
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
