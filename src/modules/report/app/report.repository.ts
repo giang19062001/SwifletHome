@@ -64,7 +64,6 @@ export class ReportAppRepository {
           AND A.userCode = ?  AND C.harvestYear = ?
         GROUP BY C.harvestPhase, C.harvestYear
     `;
-    console.log(query, userCode);
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as GetHarvertReportSummaryResDto | GetHarvertReportDetailResDto[];
   }

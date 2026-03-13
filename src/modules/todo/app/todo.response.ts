@@ -3,7 +3,6 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
 import { HarvestDataInputDto } from './todo.dto';
 import { IsArray, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })

@@ -32,7 +32,7 @@ function renderRequestQrcode(data, objElement) {
             <td><p>${ele.userHomeName}</p></td>
             <td><p>${ele.taskMedicineCount}</p></td>
             <td><p>${ele.harvestPhase}</p></td>
-            <td><b class="txt-status-${String(ele.requestStatus).toLocaleLowerCase()}">${LIST_ENUM.QR_REQUEST_STATUS.find((fi) => fi.value == ele.requestStatus)?.text ?? ''}</b></td>
+            <td><b class="txt-status-${String(ele.requestStatus).toLocaleLowerCase()}">${VARIABLE_ENUM.QR_REQUEST_STATUS[ele.requestStatus] ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-edit"  onclick="gotoQrcodeDetail('${ele.requestCode}')">Chi tiết</button>

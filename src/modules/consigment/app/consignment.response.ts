@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ConsignmentStatusEnum } from './consigment.interface';
 
-class DeliveringAddressResDto {
+export class DeliveringAddressResDto {
   @ApiProperty({ example: 0 })
   seq: number;
 

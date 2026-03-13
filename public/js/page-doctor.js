@@ -88,16 +88,16 @@ async function openModal(doctorData) {
   const selectStatus = modalEl.querySelector('#status');
   selectStatus.innerHTML = '';
 
-  LIST_ENUM.DOCTOR_STATUS.forEach((ele) => {
+  Object.entries(VARIABLE_ENUM.DOCTOR_STATUS).forEach(([key, text]) => {
     const option = document.createElement('option');
-    option.value = ele.value;
-    option.textContent = ele.text;
+    option.value = key;
+    option.textContent = text;
     // nếu đã là duyệt và hủy -> disable 'chờ'
-    if (doctorData.statusKey !== 'WAITING' && ele.value == 'WAITING') {
+    if (doctorData.statusKey !== 'WAITING' && key == 'WAITING') {
       option.disabled = true;
     }
     // nếu match  -> tự selected
-    if (ele.value === doctorData.status) {
+    if (key === doctorData.status) {
       option.selected = true;
     }
 
@@ -125,7 +125,7 @@ function renderAllDoctor(data, objElement) {
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td class="note"><p>${ele.note}</p></td>
-            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${LIST_ENUM.DOCTOR_STATUS.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
+            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${VARIABLE_ENUM.DOCTOR_STATUS[ele.status] ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-edit"  onclick="getDetailDoctor('${ele.seq}')">Chỉnh sửa</button>
@@ -188,7 +188,6 @@ async function getDetailDoctor(seq) {
 }
 
 async function updateDoctor() {
-  console.log("sss");
   try {
     const modalBody = document.querySelector('.doctor-update-modal .modal-body form');
     const seq = modalBody.querySelector('#seq').value;

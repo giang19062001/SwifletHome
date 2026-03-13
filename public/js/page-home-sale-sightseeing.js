@@ -44,16 +44,16 @@ async function openModal(homeData) {
   const selectStatus = modalEl.querySelector('#status');
   selectStatus.innerHTML = '';
 
-  LIST_ENUM.HOME_SALE_SIGHTSEEING_STATUS.forEach((ele) => {
+  Object.entries(VARIABLE_ENUM.HOME_SALE_SIGHTSEEING_STATUS).forEach(([key, text]) => {
     const option = document.createElement('option');
-    option.value = ele.value;
-    option.textContent = ele.text;
+    option.value = key;
+    option.textContent = text;
     // nếu đã là duyệt và hủy -> disable 'chờ'
-    if (homeData.status !== 'WAITING' && ele.value == 'WAITING') {
+    if (homeData.status !== 'WAITING' && key == 'WAITING') {
       option.disabled = true;
     }
     // nếu match  -> tự selected
-    if (ele.value === homeData.status) {
+    if (key === homeData.status) {
       option.selected = true;
     }
 
@@ -87,7 +87,7 @@ function renderAllHomeSightseeing(data, objElement) {
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td><p>${ele.numberAttend}</p></td>
-            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${LIST_ENUM.HOME_SALE_SIGHTSEEING_STATUS.find((fi) => fi.value == ele.status)?.text ?? ''}</b></td>
+            <td><b class="txt-status-${String(ele.status).toLocaleLowerCase()}">${VARIABLE_ENUM.HOME_SALE_SIGHTSEEING_STATUS[ele.status] ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-edit" onclick="getDetailHomeSightseeing('${ele.seq}')">Chỉnh sửa</button>

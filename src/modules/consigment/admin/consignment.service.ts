@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { ConsignmentAdminRepository } from './consignment.repository';
-import { ListResponseDto } from "src/dto/common.dto";
-import { ConsignmentResDto } from "./consignment.response";
+import { ConsignmentResDto } from './consignment.response';
 
 @Injectable()
 export class ConsignmentAdminService {
@@ -16,5 +15,9 @@ export class ConsignmentAdminService {
     const total = await this.consignmentAdminRepository.getTotal();
     const list = await this.consignmentAdminRepository.getAll(dto);
     return { total, list };
+  }
+  async getDetail(consignmentCode: string): Promise<ConsignmentResDto | null> {
+    const result = await this.consignmentAdminRepository.getDetail(consignmentCode);
+    return result;
   }
 }

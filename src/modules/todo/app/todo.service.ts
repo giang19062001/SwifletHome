@@ -445,12 +445,33 @@ export class TodoAppService {
     }
   }
   async arrangeHarvestRows(seq: number, userHomeFloor: number): Promise<HarvestDataInputDto[]> {
-    // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
-    let harvestData: HarvestDataInputDto[] = [];
     const harvestRows = await this.todoAppRepository.getTaskHarvestRows(seq, true); // true -> chỉ lấy cell  isActive = 'Y'
-    if (!harvestRows.length) {
-      // khởi tạo Rows mặc định
-      for (let i = 1; i <= userHomeFloor; i++) {
+
+    const existingDataMap = new Map<number, FloorDataInputDto[]>();
+
+    for (const row of harvestRows) {
+      if (!existingDataMap.has(row.floor)) {
+        existingDataMap.set(row.floor, []);
+      }
+      existingDataMap.get(row.floor)!.push({
+        cell: row.cell,
+        cellCollected: row.cellCollected,
+        cellRemain: row.cellRemain,
+      });
+    }
+
+    // tạo mảng kết quả dựa trên userHomeFloor
+    const harvestData: HarvestDataInputDto[] = [];
+
+    for (let i = 1; i <= userHomeFloor; i++) {
+      if (existingDataMap.has(i)) {
+        // nếu tầng này đã có dữ liệu trong DB -> Lấy dữ liệu đó
+        harvestData.push({
+          floor: i,
+          floorData: existingDataMap.get(i)!,
+        });
+      } else {
+        // nếu tầng này chưa có -> Khởi tạo Row mặc định với cell 1
         harvestData.push({
           floor: i,
           floorData: [
@@ -462,26 +483,11 @@ export class TodoAppService {
           ],
         });
       }
-    } else {
-      // lồng dữ liệu đã có
-      const floorMap = new Map<number, { floor: number; floorData: FloorDataInputDto[] }>();
-
-      for (const row of harvestRows) {
-        if (!floorMap.has(row.floor)) {
-          floorMap.set(row.floor, { floor: row.floor, floorData: [] });
-        }
-
-        floorMap.get(row.floor)!.floorData.push({
-          cell: row.cell,
-          cellCollected: row.cellCollected,
-          cellRemain: row.cellRemain,
-        });
-      }
-
-      harvestData = Array.from(floorMap.values()).sort((a, b) => a.floor - b.floor);
     }
+
     return harvestData;
   }
+
   async setTaskHarvest(userCode: string, dto: SetHarvestTaskDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskHarvest:`;
     try {

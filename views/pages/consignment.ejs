@@ -56,4 +56,71 @@
       </div>
    </div>
    </div>
-      <script src="/js/page-consignment.js"></script>
+   <!-- modal update-->
+<div class="modal common-modal consignment-update-modal" tabindex="-1" role="dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-header-title">Chỉnh sửa trạng thái</p>
+                <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                        <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="consignmentCode" value="">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row mb-2">
+                                <label class="col-5">Tên người gửi:</label>
+                                <p class="col-7" id="senderName"></p>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="col-5">Số điện thoại người gửi:</label>
+                                <p class="col-7" id="senderPhone"></p>
+                            </div>
+                           <div class="row mb-2">
+                                <label class="col-5">Địa chỉ cần giao:</label>
+                                <p class="col-7" id="deliveryAddress"></p>
+                            </div>  
+                            <div class="row mb-2">
+                                <label class="col-5">Số lượng yến:</label>
+                                <p class="col-7" id="nestQuantity"></p>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="col-5">Trạng thái:</label>
+                                <div class="col-7">
+
+                                    <select class="form-select w-50" id="consignmentStatus"></select>
+                                </div>
+                            </div>
+                              <div class="row mb-3">
+                                    <div class="col-md-12">
+                                       <label class="mb-2">Thông báo:</label>
+                                       <textarea class="form-control" id="noticeContent" rows="3"></textarea>
+                                       <div class="err-noticeContent">Vui lòng nhập nội dung thông báo.</div>
+                                    </div>
+                              </div>
+                        </div>
+
+                    </div>
+                    <div class="row mb-3 d-none">
+                        <div class="col-md-12">
+                            <label class="mb-2">Phản hồi:</label>
+                            <textarea class="form-control" id="noteAnswered" rows="3"></textarea>
+                            <div class="err-noteAnswered">Vui lòng nhập nội dung phản hồi.</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-submit">Chỉnh sửa</button>
+            </div>
+        </div>
+    </div>
+   </div>
+   <script src="/js/page-consignment.js"></script>

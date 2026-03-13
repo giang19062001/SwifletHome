@@ -21,74 +21,27 @@ const VARIABLE_ENUM = {
     FACTORY: 'FACTORY',
     TECHNICAL: 'TECHNICAL',
   },
-};
-const LIST_ENUM = {
-  QR_REQUEST_STATUS: [
-    {
-      value: 'WAITING',
-      text: 'Đang chờ duyệt',
-    },
-    {
-      value: 'APPROVED',
-      text: 'Đã chấp thuận QrCode',
-    },
-    {
-      value: 'REFUSE',
-      text: 'Từ chối duyệt',
-    },
-    {
-      value: 'CANCEL',
-      text: 'Đã hủy',
-    },
-  ],
-  CONSIGNMENT_STATUS: [
-    {
-      value: 'WAITING',
-      text: 'Đang chờ duyệt',
-    },
-    {
-      value: 'DELIVERING',
-      text: 'Đang giao',
-    },
-    {
-      value: 'DELIVERED',
-      text: 'Giao thành công',
-    },
-    {
-      value: 'CANCEL',
-      text: 'Đã hủy',
-    },
-    {
-      value: 'RETURN',
-      text: 'Đã hoàn trả',
-    },
-  ],
-  HOME_SALE_SIGHTSEEING_STATUS: [
-    {
-      value: 'WAITING',
-      text: 'Đang chờ duyệt',
-    },
-    {
-      value: 'APPROVED',
-      text: 'Đã duyệt',
-    },
-    {
-      value: 'CANCEL',
-      text: 'Hủy',
-    },
-  ],
-  DOCTOR_STATUS: [
-    {
-      value: 'WAITING',
-      text: 'Đang chờ phản hồi',
-    },
-    {
-      value: 'ANSWERED',
-      text: 'Đã xác nhận phản hồi',
-    },
-    // {
-    //   value: 'CANCEL',
-    //   text: 'Hủy',
-    // },
-  ],
+    QR_REQUEST_STATUS: {
+    WAITING: 'Đang chờ duyệt',
+    APPROVED: 'Đã chấp thuận QrCode',
+    REFUSE: 'Từ chối duyệt',
+    CANCEL: 'Đã hủy',
+  },
+  HOME_SALE_SIGHTSEEING_STATUS: {
+    WAITING: 'Đang chờ duyệt',
+    APPROVED: 'Đã duyệt',
+    CANCEL: 'Hủy',
+  },
+  DOCTOR_STATUS: {
+    WAITING: 'Đang chờ phản hồi',
+    ANSWERED: 'Đã xác nhận phản hồi',
+    // CANCEL: 'Hủy',
+  },
+  CONSIGNMENT_STATUS: {
+    WAITING: 'Chờ xác nhận',
+    DELIVERING: 'Đang giao',
+    CANCEL: 'Giao thất bại - hủy bỏ',
+    DELIVERED: 'Giao thành công',
+    RETURN: 'Đã hoàn trả',
+  },
 };
