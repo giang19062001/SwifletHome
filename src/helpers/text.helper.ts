@@ -1,6 +1,10 @@
 import { PackageResDto } from "../modules/package/package.response";
 
 export const NOTIFICATIONS = {
+  UPDATE_STATUS_CONSIGNMENT: () => ({
+    TITLE: 'Thông báo trạng thái ký gửi',
+    BODY:   '',
+  }),
   UPDATE_PACKAGE_FRIST_TIME: (packageData?: PackageResDto | null, startDate?: string, endDate?: string) => ({
     TITLE: 'Thông báo kích hoạt gói',
     BODY: !packageData ? 'Gói Miễn phí được kích hoạt thành công' : `${packageData.packageName} đã được kích hoạt thành công, có hiệu lực từ ${startDate} đến ${endDate}`,

@@ -27,7 +27,8 @@ export class ConsignmentAppController {
     type: RequestConsigmentDto,
     description: `
 **senderName**: tên người gửi\n
-**senderPhone**: sđt người gửi *\n
+**senderPhone**: sđt người gửi \n
+**nestType**: loại yến ( mã code từ API /app/options/getAll {  "mainOption": "CONSIGNMENT_NEST", "subOption": "NEST_TYPE",})\n
 **nestQuantity**: số lượng yến\n
 **deliveryAddress**: địa chỉ cần giao\n
 **receiverName**: tên người nhận \n
@@ -38,6 +39,12 @@ export class ConsignmentAppController {
   @ApiOkResponse({ type: NumberOkResponseDto })
   async requestConsigment(@GetUserApp() user: TokenUserAppResDto, @Body() dto: RequestConsigmentDto) {
     const result = await this.consignmentAppService.requestConsigment(user.userCode, dto);
+    if (result === -1) {
+      throw new BadRequestException({
+        message: Msg.CodeInvalid,
+        data: 0,
+      });
+    }
     if (result === 0) {
       throw new BadRequestException({
         message: Msg.CreateErr,
@@ -56,7 +63,7 @@ export class ConsignmentAppController {
   @ApiBody({
     type: GetAllConsignmentDto,
     description: `
-**consignmentStatus**: enum('ALL','WAITING','DELIVERING','CANCEL','DELIVERED','RETURN)\n
+**consignmentStatus**: enum('ALL','WAITING','CONFIRMED','DELIVERING','CANCEL','DELIVERED','RETURN)\n
   `,
   })
   @Post('getAll')

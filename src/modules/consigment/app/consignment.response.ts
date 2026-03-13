@@ -25,6 +25,12 @@ export class ConsignmentResDto {
   @ApiProperty({ example: '' })
   senderPhone: string;
 
+  @ApiProperty({ example: '' })
+  nestTypeCode: string;
+
+  @ApiProperty({ example: '' })
+  nestTypeLabel: string;
+
   @ApiProperty({ example: 0 })
   nestQuantity: number;
 

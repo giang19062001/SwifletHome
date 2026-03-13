@@ -18,6 +18,7 @@ export default class OptionController {
 - **SIGHTSEEING**: đăng ký tham quan nhà yến\n
 - **TODO_TASK**: tạo lịch nhắc lăn thuốc
 - **REQUSET_SELL**: thông tin cho Modal cần bán sản lượng yến
+- **CONSIGNMENT_NEST**: thông tin loại yến cho form ký gửi
 
 
 **subOption:**
@@ -25,6 +26,7 @@ export default class OptionController {
   - **MEDICINE**: Danh sách thuốc
   - **PRICE_OPTION**: Kiểu thiết lập giá
   - **INGREDIENT_NEST**: Loại thanh làm tổ
+  - **NEST_TYPE**: Loại yến để ký gửi
 
 `,
     type: GetOptionDto,

@@ -29,4 +29,6 @@ export enum NotificationTypeEnum {
   ADMIN = 'ADMIN',
   TODO = 'TODO',
   ADMIN_QR = 'ADMIN_QR',
+  ADMIN_CONSIGNMENT = 'ADMIN_CONSIGNMENT',
+
 }

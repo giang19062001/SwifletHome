@@ -1,9 +1,10 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, BadRequestException, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, BadRequestException, Param, Get, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { ConsignmentAdminService } from './consignment.service';
 import { ConsignmentResDto } from './consignment.response';
+import { UpdateConsignmentDto } from './consignment.dto';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/consignment')
@@ -28,6 +29,18 @@ export class ConsignmentAdminController {
   async getDetail(@Param('consignmentCode') consignmentCode: string): Promise<ConsignmentResDto | null> {
     const result = await this.consignmentAdminService.getDetail(consignmentCode);
     if (!result) {
+      throw new BadRequestException();
+    }
+    return result;
+  }
+
+  @ApiParam({ name: 'consignmentCode', type: String })
+  @ApiBody({ type: UpdateConsignmentDto })
+  @Put('update/:consignmentCode')
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('consignmentCode') consignmentCode: string, @Body() dto: UpdateConsignmentDto): Promise<number> {
+    const result = await this.consignmentAdminService.update(consignmentCode, dto);
+    if (result === 0) {
       throw new BadRequestException();
     }
     return result;

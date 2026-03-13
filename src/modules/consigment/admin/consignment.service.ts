@@ -3,12 +3,21 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { ConsignmentAdminRepository } from './consignment.repository';
 import { ConsignmentResDto } from './consignment.response';
+import { UpdateConsignmentDto } from './consignment.dto';
+import { FirebaseService } from 'src/common/firebase/firebase.service';
+import { NotificationAdminRepository } from 'src/modules/notification/admin/notification.repository';
+import { NOTIFICATION_CONST, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NOTIFICATIONS } from 'src/helpers/text.helper';
+import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
 
 @Injectable()
 export class ConsignmentAdminService {
   private readonly SERVICE_NAME = 'ConsignmentAdminService';
   constructor(
     private readonly consignmentAdminRepository: ConsignmentAdminRepository,
+    private readonly firebaseService: FirebaseService,
+    private readonly notificationAdminRepository: NotificationAdminRepository,
+    private readonly userAdminRepository: UserAdminRepository,
     private readonly logger: LoggingService,
   ) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: ConsignmentResDto[] }> {
@@ -18,6 +27,18 @@ export class ConsignmentAdminService {
   }
   async getDetail(consignmentCode: string): Promise<ConsignmentResDto | null> {
     const result = await this.consignmentAdminRepository.getDetail(consignmentCode);
+    return result;
+  }
+  async update(consignmentCode: string, dto: UpdateConsignmentDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/update:`;
+
+    // send thông báo
+    const user = await this.userAdminRepository.getDetailUserApp(dto.userCode);
+    if (!user) return 0;
+    this.firebaseService.sendNotification(user.userCode, user.deviceToken, NOTIFICATIONS.UPDATE_STATUS_CONSIGNMENT().TITLE, dto.noticeContent, null, NotificationTypeEnum.ADMIN_CONSIGNMENT);
+
+    // cập nhập trạng thái, và xóa/ thêm địa chỉ tracking nếu có
+    const result = await this.consignmentAdminRepository.update(consignmentCode, dto);
     return result;
   }
 }

@@ -30,4 +30,10 @@ export const OPTION_CONST = {
       subOption: 'TECHNICAL_TYPE',
     },
   },
+  CONSIGNMENT_NEST: {
+    NEST_TYPE: {
+      mainOption: 'CONSIGNMENT_NEST',
+      subOption: 'NEST_TYPE',
+    },
+  },
 };

@@ -39,6 +39,7 @@ const VARIABLE_ENUM = {
   },
   CONSIGNMENT_STATUS: {
     WAITING: 'Chờ xác nhận',
+    CONFIRMED:'Đã xác nhận',
     DELIVERING: 'Đang giao',
     CANCEL: 'Giao thất bại - hủy bỏ',
     DELIVERED: 'Giao thành công',

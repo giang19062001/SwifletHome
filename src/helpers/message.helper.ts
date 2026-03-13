@@ -104,6 +104,9 @@ const convertFiledName = (filedName: string) => {
     case 'deliveryAddress':
       txt = 'Địa chỉ cần giao thuốc';
       break;
+    case 'nestType':
+      txt = 'Loại yến'
+      break;
     case 'receiverName':
       txt = 'Tên người nhận';
       break;

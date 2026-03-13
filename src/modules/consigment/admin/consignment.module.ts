@@ -4,11 +4,13 @@ import { FileLocalModule } from 'src/common/fileLocal/fileLocal.module';
 import { ConsignmentAdminService } from './consignment.service';
 import { ConsignmentAdminController } from './consignment.controller';
 import { ConsignmentAdminRepository } from './consignment.repository';
+import { NotificationAdminModule } from 'src/modules/notification/admin/notification.module';
+import { UserAdminModule } from 'src/modules/user/admin/user.module';
 
 @Module({
-  imports: [AuthAdminModule, FileLocalModule],
+  imports: [AuthAdminModule, FileLocalModule, NotificationAdminModule, UserAdminModule],
   controllers: [ConsignmentAdminController],
   providers: [ConsignmentAdminService, ConsignmentAdminRepository],
-  exports:[]
+  exports: [],
 })
 export class ConsignmentAdminModule {}

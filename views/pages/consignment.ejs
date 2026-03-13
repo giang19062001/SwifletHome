@@ -31,7 +31,10 @@
                                  <p>Địa chỉ cần giao</p>
                               </th>
                               <th>
-                                 <p>Số lượng yến</p>
+                                 <p>Loại yến</p>
+                              </th>
+                              <th>
+                                 <p>Khối lượng yến</p>
                               </th>
                                <th>
                                  <p>Trạng thái</p>
@@ -73,6 +76,8 @@
             <div class="modal-body">
                 <form>
                     <input type="hidden" id="consignmentCode" value="">
+                     <input type="hidden" id="userCode" value="">
+
                     <div class="row">
                         <div class="col-md-12">
                             <div class="row mb-2">
@@ -88,7 +93,11 @@
                                 <p class="col-7" id="deliveryAddress"></p>
                             </div>  
                             <div class="row mb-2">
-                                <label class="col-5">Số lượng yến:</label>
+                                <label class="col-5">Loại yến:</label>
+                                <p class="col-7" id="nestTypeLabel"></p>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="col-5">Khối lượng yến:</label>
                                 <p class="col-7" id="nestQuantity"></p>
                             </div>
                             <div class="row mb-2">
@@ -96,6 +105,17 @@
                                 <div class="col-7">
 
                                     <select class="form-select w-50" id="consignmentStatus"></select>
+                                </div>
+                            </div>
+                            <!-- Danh sách địa chỉ -->
+                            <div id="deliveringAddressSection" class="row mb-3 d-none">
+                                <div class="col-md-12">
+                                   <label class="mb-2">Danh sách các trạm / địa điểm vận chuyển:</label>
+                                   <div id="deliveringAddressList" class="mb-2"></div>
+                                   <div class="input-group" id="deliveringAddressInputGroup">
+                                       <input type="text" class="form-control" id="newDeliveringAddress" placeholder="Nhập địa chỉ mới...">
+                                       <button class="btn btn-outline-primary" type="button" id="btnAddDeliveringAddress">+</button>
+                                   </div>
                                 </div>
                             </div>
                               <div class="row mb-3">

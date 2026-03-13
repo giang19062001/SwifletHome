@@ -11,6 +11,7 @@ import { ConsignmentResDto } from './consignment.response';
 export class ConsignmentAppRepository {
   private readonly table = 'tbl_consignment';
   private readonly tableDelivering = 'tbl_consignment_delivering';
+  private readonly tableOption = 'tbl_option_common';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -23,15 +24,16 @@ export class ConsignmentAppRepository {
     }
 
     const sql = `
-       INSERT INTO ${this.table}  (userCode, consignmentCode, senderName, senderPhone, nestQuantity, deliveryAddress, receiverName,
+       INSERT INTO ${this.table}  (userCode, consignmentCode, senderName, senderPhone, nestType, nestQuantity, deliveryAddress, receiverName,
         receiverPhone, consignmentStatus, createdId) 
-       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       userCode,
       consignmentCode,
       dto.senderName,
       dto.senderPhone,
+      dto.nestType,
       dto.nestQuantity,
       dto.deliveryAddress,
       dto.receiverName,
@@ -76,7 +78,8 @@ export class ConsignmentAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT  A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestQuantity, A.deliveryAddress,
+      ` SELECT  A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestType AS nestTypeCode, C.valueOption AS nestTypeLabel,
+      A.nestQuantity, A.deliveryAddress,
       A.receiverName, A.receiverPhone, A.consignmentStatus,
          CASE 
           WHEN COUNT(B.seq) = 0 THEN JSON_ARRAY()
@@ -90,6 +93,8 @@ export class ConsignmentAppRepository {
           A.createdAt,
           A.updatedAt
         FROM ${this.table} A
+        INNER JOIN ${this.tableOption} C
+          ON A.nestType = C.code
         LEFT JOIN ${this.tableDelivering} B
           ON A.consignmentCode = B.consignmentCode
           AND B.isActive = 'Y'

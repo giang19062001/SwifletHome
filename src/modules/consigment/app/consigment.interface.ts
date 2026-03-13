@@ -1,6 +1,7 @@
 
 export enum ConsignmentStatusEnum {
   WAITING = 'WAITING',
+  CONFIRMED = 'CONFIRMED',
   DELIVERING = 'DELIVERING',
   CANCEL = 'CANCEL',
   DELIVERED = 'DELIVERED',

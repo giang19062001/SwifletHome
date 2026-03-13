@@ -19,6 +19,14 @@ export class RequestConsigmentDto {
   @IsNotEmpty({ message: MsgDto.CannotNull('senderPhone') })
   senderPhone: string;
 
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty({ message: MsgDto.CannotNull('nestType') })
+  nestType: string;
+  
   @ApiProperty({
     example: 1,
   })

@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { DeliveringAddressResDto } from '../app/consignment.response';
 
 export class ConsignmentResDto {
   @ApiProperty({ example: 0 })
@@ -17,6 +16,9 @@ export class ConsignmentResDto {
   @ApiProperty({ example: '' })
   senderPhone: string;
 
+  @ApiProperty({ example: '' })
+  nestTypeLabel: string;
+  
   @ApiProperty({ example: 0 })
   nestQuantity: number;
 
@@ -36,8 +38,8 @@ export class ConsignmentResDto {
   createdAt: Date;
 
   @ApiProperty({
-    type: DeliveringAddressResDto,
+    type: String,
     isArray: true,
   })
-  deliveringAddressList?: DeliveringAddressResDto[];
+  deliveringAddressList?: string[];
 }
