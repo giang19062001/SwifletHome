@@ -4,12 +4,12 @@ import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { GetListTaskHarvestForAdjustDto, HarvestDataRowInputDto, SetTaskMedicineDto } from './todo.dto';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { PagingDto } from 'src/dto/admin.dto';
-import { generateCode, handleTimezoneQuery } from 'src/helpers/func.helper';
+import { generateCode } from 'src/helpers/func.helper';
 import moment from 'moment';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskHarvestQrResDto, TaskMedicineQrResDto } from 'src/modules/qr/app/qr.response';
 import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto, GetTaskAlarmResDto, GetTasksMedicineRowResDto } from './todo.response';
-import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
+import { TodoTaskResDto } from '../todo.response';
 
 @Injectable()
 export class TodoAppRepository {
@@ -499,28 +499,28 @@ export class TodoAppRepository {
     return rows as (TaskHarvestQrResDto & { seq: number })[];
   }
   async checkTaskHarvestCompleteAndNotUse(seq: number): Promise<boolean> {
-  const query = `
-    SELECT A.seq
-    FROM ${this.tableTaskAlarm} A
-    INNER JOIN ${this.tableTask} B
-      ON A.taskCode = B.taskCode
-      AND B.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
-    INNER JOIN ${this.tableTaskHarvestPhase} C
-      ON A.seq = C.seqAlarm
-      AND C.isDone = 'Y'
-    WHERE A.seq = ?
-      AND NOT EXISTS (
-        SELECT 1
-        FROM ${this.tableQr} Q
-        WHERE Q.seqHarvestPhase = C.seq
-      )
-    LIMIT 1
-  `;
+    const query = `
+      SELECT A.seq
+      FROM ${this.tableTaskAlarm} A
+      INNER JOIN ${this.tableTask} B
+        ON A.taskCode = B.taskCode
+        AND B.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
+      INNER JOIN ${this.tableTaskHarvestPhase} C
+        ON A.seq = C.seqAlarm
+        AND C.isDone = 'Y'
+      WHERE A.seq = ?
+        AND NOT EXISTS (
+          SELECT 1
+          FROM ${this.tableQr} Q
+          WHERE Q.seqHarvestPhase = C.seq
+        )
+      LIMIT 1
+    `;
 
-  const [rows] = await this.db.query<RowDataPacket[]>(query, [seq]);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [seq]);
 
-  return rows.length > 0;
-}
+    return rows.length > 0;
+  }
   async getTaskHarvestCompleteAndNotUseOne(userHomeCode: string, harvestPhase: number, harvestYear: number): Promise<(TaskHarvestQrResDto & { seq: number }) | null> {
     let query = ` SELECT  A.seq, B.seq AS seqHarvestPhase, A.taskAlarmCode AS harvestTaskAlarmCode, B.harvestPhase, B.harvestYear
     FROM ${this.tableTaskAlarm}  A

@@ -45,6 +45,7 @@ import { TeamAppModule } from './modules/team/app/team.module';
 import { TeamAdminModule } from './modules/team/admin/team.module';
 import { ConsignmentAppModile } from './modules/consigment/app/consigment.module';
 import { ConsignmentAdminModule } from './modules/consigment/admin/consignment.module';
+import { ReportAppModule } from './modules/report/app/report.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { ConsignmentAdminModule } from './modules/consigment/admin/consignment.m
     QrAppModule,
     TeamAppModule,
     ConsignmentAppModile,
+    ReportAppModule,
 
     //admin
     AuthAdminModule,
