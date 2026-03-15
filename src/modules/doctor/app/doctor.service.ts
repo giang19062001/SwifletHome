@@ -75,4 +75,12 @@ export class DoctorAppService {
     const result = await this.doctorAppRepository.deleteSeqFile(seq, updatedId);
     return result;
   }
+
+  async getFilesNotUse() {
+    return await this.doctorAppRepository.getFilesNotUse();
+  }
+
+  async deleteFile(seq: number) {
+    return await this.doctorAppRepository.deleteFile(seq);
+  }
 }

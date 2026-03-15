@@ -3,10 +3,10 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { NotificationAppRepository } from './notification.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { NotificationStatusEnum } from '../notification.interface';
-import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import { UserAppService } from 'src/modules/user/app/user.service';
 import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusDto } from './notification.dto';
 import { ListResponseDto } from "src/dto/common.dto";
-import { NotificationResDto, NotificationTopicResDto } from "../notification.response";
+import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from "../notification.response";
 
 @Injectable()
 export class NotificationAppService {
@@ -14,10 +14,10 @@ export class NotificationAppService {
 
   constructor(
     private readonly notificationAppRepository: NotificationAppRepository,
-    private readonly userAppRepository: UserAppRepository,
+    private readonly userAppService: UserAppService,
     private readonly logger: LoggingService,
   ) {}
-  async getAllTopic(dto: PagingDto): Promise<{ total: number; list: NotificationTopicResDto[] }> {
+  async getAllTopic(dto: PagingDto = { limit: 0, page: 0 }): Promise<{ total: number; list: NotificationTopicResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAllTopic`;
 
     const total = await this.notificationAppRepository.getTotalTopic();
@@ -28,7 +28,7 @@ export class NotificationAppService {
   async getAll(dto: PagingDto, userCode: string): Promise<{ total: number; list: NotificationResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     // kiem tra user có bị xóa ko
-    const checkUserHas = await this.userAppRepository.findByCode(userCode);
+    const checkUserHas = await this.userAppService.findByCode(userCode);
     if (checkUserHas) {
       const total = await this.notificationAppRepository.getTotal(userCode);
       const list = await this.notificationAppRepository.getAll(dto, userCode);
@@ -42,7 +42,7 @@ export class NotificationAppService {
   async getCntNotifyNotReadByUser(userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/getCntNotifyNotReadByUser`;
     // kiem tra user có bị xóa ko
-    const checkUserHas = await this.userAppRepository.findByCode(userCode);
+    const checkUserHas = await this.userAppService.findByCode(userCode);
     if (checkUserHas) {
       const result = await this.notificationAppRepository.getCntNotifyNotReadByUser(userCode);
       return result;
@@ -71,7 +71,7 @@ export class NotificationAppService {
         // INSERT DỮ LIỆU TOÀN USER
         if (dto.topicCode) {
           // lấy danh sách toàn bộ user
-          const userList = await this.userAppRepository.getAllUserCode();
+          const userList = await this.userAppService.getAllUserCode();
           this.logger.log(logbase, `Số lượng user sẽ được thêm thông báo ${userList.length}`);
 
           // phân tán thông báo cho các user
@@ -131,5 +131,13 @@ export class NotificationAppService {
     this.logger.log(logbase, `Xóa thông báo ${notificationId}`);
     const result = await this.notificationAppRepository.deteteNotification(notificationId, userCode);
     return result;
+  }
+
+  async getUserSubscribedTopics(userCode: string): Promise<UserNotificationTopicResDto[]> {
+    return await this.notificationAppRepository.getUserSubscribedTopics(userCode);
+  }
+
+  async subscribeToTopic(userCode: string, topicCode: string): Promise<number> {
+    return await this.notificationAppRepository.subscribeToTopic(userCode, topicCode);
   }
 }

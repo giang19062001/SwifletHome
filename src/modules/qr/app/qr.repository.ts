@@ -7,7 +7,7 @@ import { CODES } from 'src/helpers/const.helper';
 import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
 import { GetApprovedRequestQrCodeResDto, GetRequestSellDetailResDto, GetRequestSellListResDto, RequestQrCodeResDto, TaskMedicineQrResDto } from './qr.response';
 import { PagingDto } from 'src/dto/admin.dto';
-import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
+
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { QrRequestFileResDto } from "./qr.response";
 
@@ -23,7 +23,6 @@ export class QrAppRepository {
   private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase'
   constructor(
     @Inject('MYSQL_CONNECTION') private readonly db: Pool,
-    private readonly todoAppRepository: TodoAppRepository,
   ) {}
 
   // TODO: REQUEST
@@ -215,14 +214,7 @@ export class QrAppRepository {
   //   return result.affectedRows;
   // }
 
-  async cancelRequest(taskMedicineList: TaskMedicineQrResDto[], seq: number, requestCode: string, userHomeCode: string, userCode: string): Promise<number> {
-    // cập nhập lại isUse = 'N' cho các lần lăn thuốc của requestQr này
-    if (taskMedicineList.length) {
-      for (const med of taskMedicineList) {
-        await this.todoAppRepository.useOrUnuseTaskMedicineForQr(userCode, userHomeCode, med.medicineTaskAlarmCode, YnEnum.N);
-      }
-    }
-
+  async cancelRequest(seq: number, requestCode: string, userCode: string): Promise<number> {
     // đánh dấu file sẽ bị xóa
     await this.markFileNotUse(seq, userCode);
 

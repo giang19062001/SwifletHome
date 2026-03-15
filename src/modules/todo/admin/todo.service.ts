@@ -6,9 +6,9 @@ import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { SentTypeEnum } from 'src/modules/notification/admin/notification.dto';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { NotificationAdminRepository } from 'src/modules/notification/admin/notification.repository';
-import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
-import { UserHomeAdminRepository } from 'src/modules/userHome/admin/userHome.repository';
+import { NotificationAdminService } from 'src/modules/notification/admin/notification.service';
+import { UserAdminService } from 'src/modules/user/admin/user.service';
+import { UserHomeAdminService } from 'src/modules/userHome/admin/userHome.service';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { NOTIFICATION_CONST } from 'src/modules/notification/notification.interface';
 import { ListResponseDto } from "src/dto/common.dto";
@@ -22,9 +22,9 @@ export class TodoAdminService {
     private readonly todoAdminRepository: TodoAdminRepository,
     private readonly logger: LoggingService,
     private readonly firebaseService: FirebaseService,
-    private readonly notificationAdminRepository: NotificationAdminRepository,
-    private readonly userAdminRepository: UserAdminRepository,
-    private readonly userHomeAdminRepository: UserHomeAdminRepository,
+    private readonly notificationAdminService: NotificationAdminService,
+    private readonly userAdminService: UserAdminService,
+    private readonly userHomeAdminService: UserHomeAdminService,
   ) {}
   async getAllTasks(dto: PagingDto): Promise<{ total: number; list: TodoTaskResDto[] }> {
     const total = await this.todoAdminRepository.getTotalTasks();
@@ -53,7 +53,7 @@ export class TodoAdminService {
     try {
       if (dto.sendType == SentTypeEnum.ALL) {
         // lấy danh sách nhà của tất cả user
-        const allHomes = await this.userHomeAdminRepository.getUserHomesByUser();
+        const allHomes = await this.userHomeAdminService.getUserHomesByUser();
         if (allHomes.length) {
           for (const home of allHomes) {
             this.logger.log(logbase, `Tạo lịch nhắc cho user(${home.userCode}) với nhà yến(${home.userHomeCode})`);
@@ -63,15 +63,15 @@ export class TodoAdminService {
           }
         }
         // lấy danh sách topic dùng cho tất cả user
-        const topicCommon = await this.notificationAdminRepository.getDetailTopic(NOTIFICATION_CONST.TOPIC.COMMON);
+        const topicCommon = await this.notificationAdminService.getDetailTopic(NOTIFICATION_CONST.TOPIC.COMMON);
         // gửi thông báo chung
         await this.firebaseService.sendNotificationToTopic(topicCommon?.topicCode ?? '', dto.title, dto.body);
       } else if (dto.sendType == SentTypeEnum.USER) {
-        const userDeviceTokens = await this.userAdminRepository.getDeviceTokensByUsers(dto.userCodesMuticast);
+        const userDeviceTokens = await this.userAdminService.getDeviceTokensByUsers(dto.userCodesMuticast);
 
         if (userDeviceTokens.length) {
           // lấy danh sách nhà của tất cả user
-          const allHomes = await this.userHomeAdminRepository.getUserHomesByUser(dto.userCodesMuticast);
+          const allHomes = await this.userHomeAdminService.getUserHomesByUser(dto.userCodesMuticast);
           if (allHomes.length) {
             for (const home of allHomes) {
               this.logger.log(logbase, `Tạo lịch nhắc cho user(${home.userCode}) với nhà yến(${home.userHomeCode})`);
@@ -89,7 +89,7 @@ export class TodoAdminService {
           }
         }
       } else if (dto.sendType == SentTypeEnum.PROVINCE) {
-        const userHomes = await this.userHomeAdminRepository.getUserHomesByProvinces(dto.provinceCodesMuticast);
+        const userHomes = await this.userHomeAdminService.getUserHomesByProvinces(dto.provinceCodesMuticast);
         // lọc các userCode duy nhất để chống trùng lặp có trong mảng
         const userDeviceTokens = Array.from(new Map(userHomes.map((item) => [item.userCode, item])).values()).map((item) => ({
           userCode: item.userCode,
@@ -99,7 +99,7 @@ export class TodoAdminService {
         // gửi thông báo
         if (userDeviceTokens.length) {
           // lấy danh sách nhà của tất cả user
-          const allHomes = await this.userHomeAdminRepository.getUserHomesByUser(userDeviceTokens.map((usr) => usr.userCode));
+          const allHomes = await this.userHomeAdminService.getUserHomesByUser(userDeviceTokens.map((usr) => usr.userCode));
           if (allHomes.length) {
             for (const home of allHomes) {
               this.logger.log(logbase, `Tạo lịch nhắc cho user(${home.userCode}) với nhà yến(${home.userHomeCode})`);

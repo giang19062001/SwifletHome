@@ -41,7 +41,7 @@ export class UserAdminService {
   async getDetailUser(userCode: string, type: string): Promise<UserAppResDto | TokenUserAdminResDto | null> {
     if (type == 'APP') {
       // app
-      return await this.userAdminRepository.getDetailUserApp(userCode);
+      return await this.getDetailUserApp(userCode);
     } else {
       // admin
       return null;
@@ -99,5 +99,13 @@ export class UserAdminService {
   }
   async getUsersForTeamByType(dto: GetUsersForTeamByTypeDto): Promise<UserForTeamByTypeResDto[]> {
     return await this.userAdminRepository.getUsersForTeamByType(dto);
+  }
+
+  async getDeviceTokensByUsers(userCodes: string[]) {
+    return await this.userAdminRepository.getDeviceTokensByUsers(userCodes);
+  }
+
+  async getDetailUserApp(userCode: string) {
+    return await this.userAdminRepository.getDetailUserApp(userCode);
   }
 }

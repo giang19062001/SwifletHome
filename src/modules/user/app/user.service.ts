@@ -100,4 +100,12 @@ export class UserAppService {
     const result = await this.userAppRepository.getAllowTypesOfUser(userCode);
     return result.filter((ele : UserTypeResDto) => ele.userTypeKeyWord !== userTypeKeyWord)
   }
+
+  async getUserPackageInfo(userCode: string) {
+    return await this.userAppRepository.getUserPackageInfo(userCode);
+  }
+
+  async getAllUserCode() {
+    return await this.userAppRepository.getAllUserCode();
+  }
 }

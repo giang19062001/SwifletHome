@@ -7,7 +7,7 @@ import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { WriteQrBlockchainDto } from './qr.dto';
 import { ContractService } from 'src/common/contract/contract.service';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
+import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
@@ -23,7 +23,7 @@ export class QrAdminService {
     private readonly fileLocalService: FileLocalService,
     private readonly contractService: ContractService,
     private readonly firebaseService: FirebaseService,
-    private readonly userAdminRepository: UserAdminRepository,
+    private readonly userAdminService: UserAdminService,
     private readonly logger: LoggingService,
   ) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: GetInfoRequestQrCodeAdminResDto[] }> {
@@ -65,7 +65,7 @@ export class QrAdminService {
         await this.qrAdminRepository.updateRequsetStatus(requestCode, RequestStatusEnum.APPROVED, updatedId);
 
         // send thông báo
-        const user = await this.userAdminRepository.getDetailUserApp(detail.userCode!!);
+        const user = await this.userAdminService.getDetailUserApp(detail.userCode!!);
         if (!user) return 0;
 
         const notify = NOTIFICATIONS.QR_CODE_APPROVED(requestCode);
@@ -84,7 +84,7 @@ export class QrAdminService {
       // const result = await this.qrAdminRepository.updateRequsetStatus(requestCode, RequestStatusEnum.REFUSE, updatedId);
       const result = await this.qrAppService.cancelRequest(requestCode, userCode);
       // send thông báo
-      const user = await this.userAdminRepository.getDetailUserApp(userCode);
+      const user = await this.userAdminService.getDetailUserApp(userCode);
       if (!user) return 0;
 
       const notify = NOTIFICATIONS.QR_CODE_REFUSE(requestCode);

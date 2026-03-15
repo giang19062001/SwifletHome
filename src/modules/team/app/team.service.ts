@@ -163,4 +163,12 @@ export class TeamAppService {
       throw error;
     }
   }
+
+  async getFilesNotUse() {
+    return await this.teamAppRepository.getFilesNotUse();
+  }
+
+  async deleteFile(seq: number) {
+    return await this.teamAppRepository.deleteFile(seq);
+  }
 }

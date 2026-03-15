@@ -3,7 +3,7 @@ import admin from 'firebase-admin';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { LoggingService } from '../logger/logger.service';
 import { PushDataPayload } from './firebase.interface';
-import { NotificationAppRepository } from 'src/modules/notification/app/notification.repository';
+
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { NotificationStatusEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
@@ -44,7 +44,6 @@ export class FirebaseService implements OnModuleInit {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly notificationAppRepository: NotificationAppRepository,
     private readonly notificationAppService: NotificationAppService,
     private readonly logger: LoggingService,
   ) {
@@ -289,9 +288,9 @@ export class FirebaseService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/subscribeToTopic: Device Token có thay đổi ? (${isNewOrChange}) `;
 
     // lấy topics đã đang đăng ký của user này
-    const existingSubs = await this.notificationAppRepository.getUserSubscribedTopics(userCode);
+    const existingSubs = await this.notificationAppService.getUserSubscribedTopics(userCode);
     // lấy tất cả topics
-    const allTopics = await this.notificationAppRepository.getAllTopic({ limit: 0, page: 0 });
+    const { list: allTopics } = await this.notificationAppService.getAllTopic();
 
     // lọc ra các topic chưa đăng ký
     const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: UserNotificationTopicResDto) => sub.topicCode === topic.topicCode));
@@ -327,7 +326,7 @@ export class FirebaseService implements OnModuleInit {
 
     // Chỉ subscribe những topic còn thiếu ( DB )
     for (const topic of missingTopics) {
-      await this.notificationAppRepository.subscribeToTopic(userCode, topic.topicCode);
+      await this.notificationAppService.subscribeToTopic(userCode, topic.topicCode);
     }
   }
 
@@ -336,7 +335,7 @@ export class FirebaseService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/unsubscribeFromTopic`;
 
     // lấy topics đã đang đăng ký của user này
-    const existingSubs = await this.notificationAppRepository.getUserSubscribedTopics(userCode);
+    const existingSubs = await this.notificationAppService.getUserSubscribedTopics(userCode);
 
     // Chỉ unsubscribe những topic đã đăng ký ( FCM )
     for (const topic of existingSubs) {

@@ -7,7 +7,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
-import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import { UserAppService } from 'src/modules/user/app/user.service';
 import { ListResponseDto } from "src/dto/common.dto";
 
 @Injectable()
@@ -16,7 +16,7 @@ export class UserHomeAppService {
 
   constructor(
     private readonly userHomeAppRepository: UserHomeAppRepository,
-    private readonly userAppRepository: UserAppRepository,
+    private readonly userAppService: UserAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
   ) {}
@@ -130,7 +130,7 @@ export class UserHomeAppService {
 
       // lấy tất cả home của user
       const homesTotal = await this.userHomeAppRepository.getTotalHomes(userCode);
-      const userPackage = await this.userAppRepository.getUserPackageInfo(userCode);
+      const userPackage = await this.userAppService.getUserPackageInfo(userCode);
       // nếu user xài gói miễn phí hoặc hết hạn và đã có hơn 1 nhà yến rồi -> ko thể thêm nữa trừ khi nâng cập
       if (homesTotal >= 1 && (!userPackage?.packageCode || (userPackage?.packageRemainDay ?? 0) <= 0)) {
         return -2;
@@ -185,5 +185,13 @@ export class UserHomeAppService {
       this.logger.error(logbase, JSON.stringify(error));
       return { seq: 0, filename: '' };
     }
+  }
+
+  async getFilesNotUse() {
+    return await this.userHomeAppRepository.getFilesNotUse();
+  }
+
+  async deleteFile(seq: number) {
+    return await this.userHomeAppRepository.deleteFile(seq);
   }
 }

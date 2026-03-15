@@ -44,4 +44,12 @@ export class UserHomeAdminService {
     this.logger.log(logbase, `Cập nhập cảm biến với Mac ${dto.macId} cho nhà yến ${userHomeCode} của khách hàng ${dto.userCode}`);
     return result;
   }
+
+  async getUserHomesByUser(userCodes?: string[]) {
+    return await this.userHomeAdminRepository.getUserHomesByUser(userCodes);
+  }
+
+  async getUserHomesByProvinces(provinceCodes: string[]) {
+    return await this.userHomeAdminRepository.getUserHomesByProvinces(provinceCodes);
+  }
 }

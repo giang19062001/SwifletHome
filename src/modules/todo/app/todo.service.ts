@@ -677,9 +677,24 @@ export class TodoAppService {
   }
 
   async getListTaskHarvestForAdjust(dto: GetListTaskHarvestForAdjustDto, userCode: string): Promise<{ total: number; list: GetListTaskHarvestResDto[] }> {
-    const logbase = `${this.SERVICE_NAME}/getListTaskHarvestForAdjust:`;
     const total = await this.todoAppRepository.getTotalTaskHarvestForAdjust(dto, userCode);
     const list = await this.todoAppRepository.getListTaskHarvestForAdjust(dto, userCode);
     return { total: total, list: list };
+  }
+
+  async getTaskMedicineCompleteAndNotUseList(userHomeCode: string) {
+    return await this.todoAppRepository.getTaskMedicineCompleteAndNotUseList(userHomeCode);
+  }
+
+  async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number) {
+    return await this.todoAppRepository.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
+  }
+
+  async useOrUnuseTaskMedicineForQr(userCode: string, userHomeCode: string, medicineTaskAlarmCode: string, isUsed: YnEnum) {
+    return await this.todoAppRepository.useOrUnuseTaskMedicineForQr(userCode, userHomeCode, medicineTaskAlarmCode, isUsed);
+  }
+
+  async getListTaskAlarmsToday(todayStr: string) {
+    return await this.todoAppRepository.getListTaskAlarmsToday(todayStr);
   }
 }

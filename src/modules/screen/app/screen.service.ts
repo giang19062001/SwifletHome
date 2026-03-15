@@ -7,7 +7,7 @@ import { ScreenAppRepository } from './screen.repository';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
 import { PackageOptionTypeEnum } from 'src/modules/package/package.interface';
-import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import { UserAppService } from 'src/modules/user/app/user.service';
 import { InfoBankResDto } from "../../info/info.response";
 import { ScreenSignupServiceResDto } from "../screen.response";
 
@@ -18,7 +18,7 @@ export class ScreenAppService {
   constructor(
     private readonly screenAppRepository: ScreenAppRepository,
     private readonly packageAppService: PackageAppService,
-    private readonly userAppRepository: UserAppRepository,
+    private readonly userAppService: UserAppService,
     private readonly infoAppService: InfoAppService,
     private readonly logger: LoggingService,
   ) {}
@@ -81,7 +81,7 @@ export class ScreenAppService {
         case APP_SCREENS.REQUEST_DOCTOR:
           if (screen.screenContent) {
             // lấy thông tin gói của user
-            const userPackage = await this.userAppRepository.getUserPackageInfo(userCode);
+            const userPackage = await this.userAppService.getUserPackageInfo(userCode);
             const remainDay = userPackage?.packageRemainDay ?? 0;
             let contentStart = replaceNbspToSpace(screen.screenContent.contentStart);
             if (remainDay > 0) {

@@ -5,10 +5,10 @@ import { ConsignmentAdminRepository } from './consignment.repository';
 import { ConsignmentResDto } from './consignment.response';
 import { UpdateConsignmentDto } from './consignment.dto';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { NotificationAdminRepository } from 'src/modules/notification/admin/notification.repository';
+import { NotificationAdminService } from 'src/modules/notification/admin/notification.service';
 import { NOTIFICATION_CONST, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
-import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
+import { UserAdminService } from 'src/modules/user/admin/user.service';
 
 @Injectable()
 export class ConsignmentAdminService {
@@ -16,8 +16,8 @@ export class ConsignmentAdminService {
   constructor(
     private readonly consignmentAdminRepository: ConsignmentAdminRepository,
     private readonly firebaseService: FirebaseService,
-    private readonly notificationAdminRepository: NotificationAdminRepository,
-    private readonly userAdminRepository: UserAdminRepository,
+    private readonly notificationAdminService: NotificationAdminService,
+    private readonly userAdminService: UserAdminService,
     private readonly logger: LoggingService,
   ) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: ConsignmentResDto[] }> {
@@ -33,7 +33,7 @@ export class ConsignmentAdminService {
     const logbase = `${this.SERVICE_NAME}/update:`;
 
     // send thông báo
-    const user = await this.userAdminRepository.getDetailUserApp(dto.userCode);
+    const user = await this.userAdminService.getDetailUserApp(dto.userCode);
     if (!user) return 0;
     this.firebaseService.sendNotification(user.userCode, user.deviceToken, NOTIFICATIONS.UPDATE_STATUS_CONSIGNMENT().TITLE, dto.noticeContent, null, NotificationTypeEnum.ADMIN_CONSIGNMENT);
 

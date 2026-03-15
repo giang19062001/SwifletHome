@@ -3,8 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { PushNotifycationByAdminDto, SentTypeEnum } from './notification.dto';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { UserAdminRepository } from 'src/modules/user/admin/user.repository';
-import { UserHomeAdminRepository } from 'src/modules/userHome/admin/userHome.repository';
+import { UserAdminService } from 'src/modules/user/admin/user.service';
+import { UserHomeAdminService } from 'src/modules/userHome/admin/userHome.service';
 import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { NOTIFICATION_CONST } from '../notification.interface';
@@ -14,8 +14,8 @@ export class NotificationAdminService {
   constructor(
     private readonly firebaseService: FirebaseService,
     private readonly notificationAdminRepository: NotificationAdminRepository,
-    private readonly userAdminRepository: UserAdminRepository,
-    private readonly userHomeAdminRepository: UserHomeAdminRepository,
+    private readonly userAdminService: UserAdminService,
+    private readonly userHomeAdminService: UserHomeAdminService,
     private readonly logger: LoggingService,
   ) {}
   async pushNotifycationByAdmin(dto: PushNotifycationByAdminDto, createdId: string): Promise<ApiMutationResponse> {
@@ -26,7 +26,7 @@ export class NotificationAdminService {
         // gửi thông báo chung
         await this.firebaseService.sendNotificationToTopic(topicCommon?.topicCode ?? '', dto.title, dto.body);
       } else if (dto.sendType == SentTypeEnum.USER) {
-        const userDeviceTokens = await this.userAdminRepository.getDeviceTokensByUsers(dto.userCodesMuticast);
+        const userDeviceTokens = await this.userAdminService.getDeviceTokensByUsers(dto.userCodesMuticast);
         if (userDeviceTokens.length) {
           // gửi thông báo cho 1 vài user cụ thể
           const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body);
@@ -37,7 +37,7 @@ export class NotificationAdminService {
           }
         }
       } else if (dto.sendType == SentTypeEnum.PROVINCE) {
-        const userHomes = await this.userHomeAdminRepository.getUserHomesByProvinces(dto.provinceCodesMuticast);
+        const userHomes = await this.userHomeAdminService.getUserHomesByProvinces(dto.provinceCodesMuticast);
         // lọc các userCode duy nhất để chống trùng lặp có trong mảng
         const userDeviceTokens = Array.from(new Map(userHomes.map((item) => [item.userCode, item])).values()).map((item) => ({
           userCode: item.userCode,
@@ -61,5 +61,9 @@ export class NotificationAdminService {
     } catch (error) {
       return { success: false, message: MsgAdmin.pushNotifyErr };
     }
+  }
+
+  async getDetailTopic(topicKeyWord: string) {
+    return await this.notificationAdminRepository.getDetailTopic(topicKeyWord);
   }
 }

@@ -4,30 +4,30 @@ import { CronJob } from 'cron';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
 import { LoggingService } from '../logger/logger.service';
 import path from 'path';
-import { DoctorAppRepository } from 'src/modules/doctor/app/doctor.repository';
-import { UserHomeAppRepository } from 'src/modules/userHome/app/userHome.repository';
-import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
+import { DoctorAppService } from 'src/modules/doctor/app/doctor.service';
+import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
+import { TodoAppService } from 'src/modules/todo/app/todo.service';
 import moment from 'moment';
 import { FirebaseService } from '../firebase/firebase.service';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
-import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import { UserAppService } from 'src/modules/user/app/user.service';
 import TodoAppValidate from 'src/modules/todo/app/todo.validate';
-import { QrAppRepository } from 'src/modules/qr/app/qr.repository';
-import { TeamAppRepository } from 'src/modules/team/app/team.repository';
+import { QrAppService } from 'src/modules/qr/app/qr.service';
+import { TeamAppService } from 'src/modules/team/app/team.service';
 
 @Injectable()
 export class CornService implements OnModuleInit {
   private readonly SERVICE_NAME = 'CornService';
 
   constructor(
-    private readonly doctorAppRepository: DoctorAppRepository,
-    private readonly teamAppRepository: TeamAppRepository,
-    private readonly userAppRepository: UserAppRepository,
-    private readonly userHomeAppRepository: UserHomeAppRepository,
+    private readonly doctorAppService: DoctorAppService,
+    private readonly teamAppService: TeamAppService,
+    private readonly userAppService: UserAppService,
+    private readonly userHomeAppService: UserHomeAppService,
     private readonly todoAppValidate: TodoAppValidate,
-    private readonly todoAppRepository: TodoAppRepository,
-    private readonly qrAppRepository: QrAppRepository,
+    private readonly todoAppService: TodoAppService,
+    private readonly qrAppService: QrAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
@@ -84,7 +84,7 @@ export class CornService implements OnModuleInit {
 
     this.logger.log(logbase, `Chuẩn bị tìm các lịch nhắc hôm nay để gửi thông báo...`);
 
-    const taskAlarmList = await this.todoAppRepository.getListTaskAlarmsToday(todayStr);
+    const taskAlarmList = await this.todoAppService.getListTaskAlarmsToday(todayStr);
     this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskAlarmList.length}`);
     if (taskAlarmList.length) {
       for (const task of taskAlarmList) {
@@ -93,7 +93,7 @@ export class CornService implements OnModuleInit {
         const daysLeft = taskDay.diff(todayStr, 'days');
 
         // lấy thông tin nhà
-        const home = await this.userHomeAppRepository.getDetailHome(task.userHomeCode);
+        const home = await this.userHomeAppService.getDetail(task.userHomeCode);
         const notify = NOTIFICATIONS.TODO_TASK_DAILY(home?.userHomeName ?? '', task.taskName, daysLeft);
         this.logger.log(logbase, `sẽ gửi thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode}) cho user(${task.userCode})`);
 
@@ -106,10 +106,10 @@ export class CornService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/deleteDoctorFilesNotUse`;
     this.logger.log(logbase, `Chuẩn bị xóa các file khám bệnh không dùng theo lịch trình....`);
     try {
-      const filesNotUse = await this.doctorAppRepository.getFilesNotUse();
+      const filesNotUse = await this.doctorAppService.getFilesNotUse();
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
-          await this.doctorAppRepository.deleteFile(file.seq);
+          await this.doctorAppService.deleteFile(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
         this.logger.log(logbase, `Các file khám bệnh không dùng đã được xóa theo lịch trình thành công`);
@@ -125,10 +125,10 @@ export class CornService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/deleteReviewFilesNotUse`;
     this.logger.log(logbase, `Chuẩn bị xóa các file review không dùng theo lịch trình....`);
     try {
-      const filesNotUse = await this.teamAppRepository.getFilesNotUse();
+      const filesNotUse = await this.teamAppService.getFilesNotUse();
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
-          await this.teamAppRepository.deleteFile(file.seq);
+          await this.teamAppService.deleteFile(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
         this.logger.log(logbase, `Các file review không dùng đã được xóa theo lịch trình thành công`);
@@ -144,10 +144,10 @@ export class CornService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/deleteUserHomeFilesNotUse`;
     this.logger.log(logbase, `Chuẩn bị xóa các file ảnh nhà yến của khách hàng không dùng theo lịch trình....`);
     try {
-      const filesNotUse = await this.userHomeAppRepository.getFilesNotUse();
+      const filesNotUse = await this.userHomeAppService.getFilesNotUse();
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
-          await this.userHomeAppRepository.deleteFile(file.seq);
+          await this.userHomeAppService.deleteFile(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
         this.logger.log(logbase, `Các file ảnh nhà yến của khách hàng  không dùng đã được xóa theo lịch trình thành công`);
@@ -162,10 +162,10 @@ export class CornService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/deleteQrRequestFilesNotUse`;
     this.logger.log(logbase, `Chuẩn bị xóa các file video yêu cầu Qrcode dư thừa theo lịch trình....`);
     try {
-      const filesNotUse = await this.qrAppRepository.getFilesNotUse();
+      const filesNotUse = await this.qrAppService.getFilesNotUse();
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
-          await this.qrAppRepository.deleteFile(file.seq);
+          await this.qrAppService.deleteFile(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
         this.logger.log(logbase, `Các file video yêu cầu Qrcode dư thừa đã được xóa theo lịch trình thành công`);

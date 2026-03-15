@@ -10,6 +10,6 @@ import { FileLocalModule } from 'src/common/fileLocal/fileLocal.module';
   imports: [AuthAppModule, UserAppModule, FileLocalModule],
   controllers: [TeamAppController],
   providers: [TeamAppService, TeamAppRepository],
-  exports: [TeamAppRepository],
+  exports: [TeamAppService, TeamAppRepository],
 })
 export class TeamAppModule {}

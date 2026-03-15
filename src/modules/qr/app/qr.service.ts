@@ -2,7 +2,7 @@ import { GetTypeEnum, MarkTypeEnum } from './../qr.interface';
 import { QrAppRepository } from './qr.repository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { TodoAppRepository } from 'src/modules/todo/app/todo.repository';
+
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 import {
   GetApprovedRequestQrCodeResDto,
@@ -30,7 +30,6 @@ export class QrAppService {
   private readonly SERVICE_NAME = 'QrAppService';
   constructor(
     private readonly todoAppService: TodoAppService,
-    private readonly todoAppRepository: TodoAppRepository,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly qrAppRepository: QrAppRepository,
     private readonly optionService: OptionService,
@@ -94,12 +93,12 @@ export class QrAppService {
     }
 
     // lấy thông tin lăn thuốc nhà yến này
-    const taskMedicineList = await this.todoAppRepository.getTaskMedicineCompleteAndNotUseList(userHomeCode);
+    const taskMedicineList = await this.todoAppService.getTaskMedicineCompleteAndNotUseList(userHomeCode);
 
     // lấy thông tin thu hoạc nhà yến này
     //? harvestPhase = 0 --> lấy tất cả các đợt để làm SelectBox cho Form yêu cầu Qr
     //? harvestPhase > 0 --> Chọn đợt và insert cho Qr table
-    let taskHarvestCompleteList = await this.todoAppRepository.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase); 
+    let taskHarvestCompleteList = await this.todoAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase); 
     const taskHarvestList: TaskHarvestQrResDto[] = await Promise.all(
       taskHarvestCompleteList.map(async (ele) => ({
         harvestTaskAlarmCode: ele.harvestTaskAlarmCode,
@@ -159,7 +158,7 @@ export class QrAppService {
         // dánh đấu các lăn thuốc là đã dùng
         if (dataInsertDto.taskMedicineList.length) {
           for (const med of dataInsertDto.taskMedicineList) {
-            await this.todoAppRepository.useOrUnuseTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode, YnEnum.Y);
+            await this.todoAppService.useOrUnuseTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode, YnEnum.Y);
           }
         }
 
@@ -211,7 +210,15 @@ export class QrAppService {
         data: 0,
       });
     }
-    const result = await this.qrAppRepository.cancelRequest(requestInfo.taskMedicineList, requestInfo.seq!!, requestCode, requestInfo.userHomeCode, userCode);
+    // cập nhập lại isUse = 'N' cho các lần lăn thuốc của requestQr này
+    const taskMedicineList = requestInfo.taskMedicineList as any;
+    if (taskMedicineList?.length) {
+      for (const med of taskMedicineList) {
+        await this.todoAppService.useOrUnuseTaskMedicineForQr(userCode, requestInfo.userHomeCode, med.medicineTaskAlarmCode, YnEnum.N);
+      }
+    }
+
+    const result = await this.qrAppRepository.cancelRequest(requestInfo.seq!!, requestCode, userCode);
     return result;
   }
   // TODO: FILE
@@ -309,5 +316,13 @@ export class QrAppService {
     const logbase = `${this.SERVICE_NAME}/maskRequestSell:`;
     const result = await this.qrAppRepository.maskRequestSell(requestCode, userCode, markType);
     return result;
+  }
+
+  async getFilesNotUse() {
+    return await this.qrAppRepository.getFilesNotUse();
+  }
+
+  async deleteFile(seq: number) {
+    return await this.qrAppRepository.deleteFile(seq);
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
 import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from '../logger/logger.service';
-import { UserAppRepository } from 'src/modules/user/app/user.repository';
+import { UserAppService } from 'src/modules/user/app/user.service';
 import { ISearchItem } from './search.interface';
 import { UploadAppService } from 'src/modules/upload/app/upload.service';
 import { FileUploadResDto } from "../../modules/upload/upload.response";
@@ -25,7 +25,7 @@ export class SearchService {
 
   constructor(
     private readonly uploadAppService: UploadAppService,
-    private readonly userAppRepository: UserAppRepository,
+    private readonly userAppService: UserAppService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -70,7 +70,7 @@ export class SearchService {
   async replyBaseOnUserPackage(contentHtml: string, isFree: string, userCode: string): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/replyBaseOnUserPackage`;
     // lấy thông tin gói của user
-    const userPackage = await this.userAppRepository.getUserPackageInfo(userCode);
+    const userPackage = await this.userAppService.getUserPackageInfo(userCode);
     const remainDay = userPackage?.packageRemainDay ?? 0;
 
     // this.logger.log(logbase, `Dữ liệu là miễn phí: ${isFree}; Số ngày hiệu lực còn lại của gói user:${remainDay}`);
