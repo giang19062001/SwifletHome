@@ -38,7 +38,7 @@ pipeline {
                     sh 'yarn build'
                     
                     sh '''
-                    sudo /usr/bin/pm2 reload SWIFLETHOME
+                    sudo /usr/bin/pm2 reload SWIFLETHOME --update-env
                     '''
                 }
             }
