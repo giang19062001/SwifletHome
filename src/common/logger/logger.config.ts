@@ -1,5 +1,6 @@
 import { createLogger, format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+import LokiTransport from 'winston-loki';
 
 
 // log ghi trong file
@@ -67,7 +68,15 @@ export const winstonConfig = {
       maxSize: '20m',
       maxFiles: '30d',
     }),
+    // new LokiTransport({
+    //   host: process.env.LOKI_HOST || "-",
+    //   labels: { app: process.env.LOKI_APP_NAME },
+    //   json: true,
+    //   format: format.json(),
+    //   replaceTimestamp: true,
+    //   onConnectionError: (err) => console.error('Loki connection error', err),
+    // }),
   ],
-  
+
   exitOnError: false, // tránh crash app khi có lỗi ghi log
 };

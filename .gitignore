@@ -57,6 +57,6 @@ pids
 *.pid.lock
 
 
-# Jenskin
+# devops
 .current_deps_hash
 .last_deps_hash
