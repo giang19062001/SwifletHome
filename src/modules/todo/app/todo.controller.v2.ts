@@ -1,14 +1,14 @@
-import { Controller, Post, Body, Res, HttpStatus,  HttpCode, UseGuards,  BadRequestException, UseInterceptors } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation,  ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TodoAppService } from './todo.service';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import {NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import { NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
-import TodoAppValidate from './todo.validate';
-import { SetTaskAlarmDto } from './todo.dto';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TodoAlarmAppService } from './todo-alarm.service';
+import { SetTaskAlarmDto } from './todo.dto';
+import TodoAppValidate from './todo.validate';
 
 @ApiTags('app/todo')
 @Controller('/api/app/v2/todo')
@@ -16,7 +16,7 @@ import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export default class TodoAppControllerV2 {
-  constructor(private readonly todoAppService: TodoAppService) {}
+  constructor(private readonly todoAlarmAppService: TodoAlarmAppService) {}
 
   @ApiOperation({
     summary: 'Thiết lập lịch nhắc cho 1 nhà yến nào đó',
@@ -40,7 +40,7 @@ export default class TodoAppControllerV2 {
         data: 0,
       });
     }
-    const result = await this.todoAppService.setTaskAlarm(user.userCode, dto);
+    const result = await this.todoAlarmAppService.setTaskAlarm(user.userCode, dto);
 
     if (result == -2) {
       throw new BadRequestException({

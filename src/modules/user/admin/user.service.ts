@@ -1,15 +1,14 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { LoggingService } from 'src/common/logger/logger.service';
-import { UserAdminRepository } from './user.repository';
-import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserTypeResDto, UserForTeamByTypeResDto } from './user.dto';
-import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { PackageAdminService } from 'src/modules/package/admin/package.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import moment from 'moment';
+import { FirebaseService } from 'src/common/firebase/firebase.service';
+import { LoggingService } from 'src/common/logger/logger.service';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
-import { ListResponseDto } from "src/dto/common.dto";
-import { PackageResDto } from "../../package/package.response";
+import { PackageAdminService } from 'src/modules/package/admin/package.service';
 import { TokenUserAdminResDto } from "../../auth/admin/auth.dto";
+import { PackageResDto } from "../../package/package.response";
 import { UserAppResDto } from "../app/user.dto";
+import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserForTeamByTypeResDto, UserTypeResDto } from './user.dto';
+import { UserAdminRepository } from './user.repository';
 
 @Injectable()
 export class UserAdminService {

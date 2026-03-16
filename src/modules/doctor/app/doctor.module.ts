@@ -9,6 +9,6 @@ import { UserAppModule } from 'src/modules/user/app/user.module';
   imports: [AuthAppModule, UserAppModule],
   controllers: [DoctorAppController],
   providers: [DoctorAppService, DoctorAppRepository],
-  exports:[DoctorAppService, DoctorAppRepository]
+  exports:[DoctorAppService]
 })
 export class DoctorAppModule{}

@@ -1,11 +1,10 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
-import { UserAdminService } from './user.service';
-import { PagingDto } from 'src/dto/admin.dto';
-import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { GetAllUserDto, GetDetailDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto } from './user.dto';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { GetAllUserDto, GetDetailDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto } from './user.dto';
+import { UserAdminService } from './user.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/user')

@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin.dto';
-import { ApiMutationResponse } from 'src/interfaces/admin.interface';
-import { TodoAdminRepository } from './todo.repository';
-import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
-import { LoggingService } from 'src/common/logger/logger.service';
-import { SentTypeEnum } from 'src/modules/notification/admin/notification.dto';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
+import { LoggingService } from 'src/common/logger/logger.service';
+import { PagingDto } from 'src/dto/admin.dto';
+import { MsgAdmin } from 'src/helpers/message.helper';
+import { ApiMutationResponse } from 'src/interfaces/admin.interface';
+import { SentTypeEnum } from 'src/modules/notification/admin/notification.dto';
 import { NotificationAdminService } from 'src/modules/notification/admin/notification.service';
+import { NOTIFICATION_CONST } from 'src/modules/notification/notification.interface';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { UserHomeAdminService } from 'src/modules/userHome/admin/userHome.service';
-import { MsgAdmin } from 'src/helpers/message.helper';
-import { NOTIFICATION_CONST } from 'src/modules/notification/notification.interface';
-import { ListResponseDto } from "src/dto/common.dto";
 import { TodoBoxTaskResDto, TodoTaskResDto } from "../todo.response";
+import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
+import { TodoAdminRepository } from './todo.repository';
 
 @Injectable()
 export class TodoAdminService {

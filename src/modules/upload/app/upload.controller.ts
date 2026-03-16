@@ -1,16 +1,15 @@
-import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException, Get, Res, Param, Req, UseGuards, HttpCode, HttpStatus, Delete, Body, UploadedFiles } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { UploadAppService } from './upload.service';
-import { PagingDto } from 'src/dto/admin.dto';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto } from 'src/dto/common.dto';
-import { GetUserApp } from 'src/decorator/auth.decorator';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
+import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { FileMediaResDto } from "../upload.response";
 import { GetAllMediaDto } from './upload.dto';
 import { GetAllMediaResDto } from './upload.response';
-import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { UploadAppService } from './upload.service';
 
 @ApiTags('app/upload')
 @Controller('/api/app/upload')

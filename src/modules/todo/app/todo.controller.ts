@@ -1,17 +1,34 @@
-import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Param, BadRequestException, UseInterceptors, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetScheduledTasksResDto, GetListTaskAlarmsResDto, GetTaskResDto, GetTasksMedicineResDto, GetTaskHarvestResDto, GetListTaskHarvestResDto, GetInfoTaskHarvestForAdjustResDto } from './todo.response';
-import { TodoAppService } from './todo.service';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { EmptyArrayResponseDto, ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
-import { Msg } from 'src/helpers/message.helper';
-import { ChangeTaskAlarmStatusDto, SetHarvestTaskDto, GetListTaskAlarmsDTO, SetTaskMedicineDto, GetListTaskHarvestForAdjustDto, AdjustHarvestTaskDto, GetInfoTaskHarvestForAdjustDto } from './todo.dto';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
-import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
+import { Msg } from 'src/helpers/message.helper';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TodoTaskAlramResDto, TodoTaskResDto } from '../todo.response';
+import { TodoAlarmAppService } from './todo-alarm.service';
+import { TodoHarvestMedicineAppService } from './todo-harvest-medicine.service';
+import {
+  AdjustHarvestTaskDto,
+  ChangeTaskAlarmStatusDto,
+  GetInfoTaskHarvestForAdjustDto,
+  GetListTaskAlarmsDTO,
+  GetListTaskHarvestForAdjustDto,
+  SetHarvestTaskDto,
+  SetTaskMedicineDto,
+} from './todo.dto';
+import {
+  GetInfoTaskHarvestForAdjustResDto,
+  GetListTaskAlarmsResDto,
+  GetListTaskHarvestResDto,
+  GetScheduledTasksResDto,
+  GetTaskHarvestResDto,
+  GetTaskResDto,
+  GetTasksMedicineResDto,
+} from './todo.response';
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -19,7 +36,10 @@ import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export default class TodoAppController {
-  constructor(private readonly todoAppService: TodoAppService) {}
+  constructor(
+    private readonly todoAlarmAppService: TodoAlarmAppService,
+    private readonly todoHarvestMedicineAppService: TodoHarvestMedicineAppService,
+  ) {}
 
   @ApiOperation({
     summary: 'Lấy danh sách các lịch nhắc có sẵn của hệ thống: Thu hoạch, lăn thuốc, vệ sinh,.. ⚠️ TẠM THỜI KO DÙNG NỮA',
@@ -28,7 +48,7 @@ export default class TodoAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([GetTaskResDto]) })
   async getTasks(): Promise<TodoTaskResDto[]> {
-    const result = await this.todoAppService.getTasks();
+    const result = await this.todoAlarmAppService.getTasks();
     return result;
   }
 
@@ -58,7 +78,7 @@ export default class TodoAppController {
 `,
   })
   async getAll(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetListTaskAlarmsDTO): Promise<{ total: number; list: TodoTaskAlramResDto[] }> {
-    const result = await this.todoAppService.getListTaskAlarms(user.userCode, dto.userHomeCode, dto);
+    const result = await this.todoAlarmAppService.getListTaskAlarms(user.userCode, dto.userHomeCode, dto);
     return result;
   }
 
@@ -74,7 +94,7 @@ export default class TodoAppController {
   })
   @ApiOkResponse({ type: NumberOkResponseDto })
   async changeTaskAlarmStatus(@Param('taskAlarmCode') taskAlarmCode: string, @Body() dto: ChangeTaskAlarmStatusDto, @GetUserApp() user: TokenUserAppResDto): Promise<number> {
-    const result = await this.todoAppService.changeTaskAlarmStatus(dto.taskStatus, user.userCode, taskAlarmCode);
+    const result = await this.todoAlarmAppService.changeTaskAlarmStatus(dto.taskStatus, user.userCode, taskAlarmCode);
 
     // ko nên cập nhập lại thành "chờ"
     if (dto.taskStatus == 'WAITING') {
@@ -101,7 +121,7 @@ export default class TodoAppController {
   @ApiOkResponse({ type: ApiAppResponseDto([GetScheduledTasksResDto]) })
   @ApiBadRequestResponse({ type: EmptyArrayResponseDto })
   async getScheduledTasks(@GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.todoAppService.getScheduledTasks(user.userCode);
+    const result = await this.todoAlarmAppService.getScheduledTasks(user.userCode);
     if (!result.length) {
       throw new BadRequestException({
         data: [],
@@ -129,7 +149,7 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async setTaskMedicine(@GetUserApp() user: TokenUserAppResDto, @Body() dto: SetTaskMedicineDto) {
-    const result = await this.todoAppService.setTaskMedicine(user.userCode, dto);
+    const result = await this.todoHarvestMedicineAppService.setTaskMedicine(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.OnlyMedicineTaskCanDo,
@@ -178,7 +198,7 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getTaskMedicine(@Query('taskAlarmCode') taskAlarmCode?: string) {
     // có thể rỗng -> init data, ko rỗng -> data từ db
-    const result = await this.todoAppService.getTaskMedicine(taskAlarmCode ?? '');
+    const result = await this.todoHarvestMedicineAppService.getTaskMedicine(taskAlarmCode ?? '');
     return result;
   }
   // TODO: HARVERT
@@ -213,7 +233,7 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async setTaskHarvest(@GetUserApp() user: TokenUserAppResDto, @Body() dto: SetHarvestTaskDto) {
-    const result = await this.todoAppService.setTaskHarvest(user.userCode, dto);
+    const result = await this.todoHarvestMedicineAppService.setTaskHarvest(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.OnlyHarvestTaskCanDo,
@@ -255,7 +275,7 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
   @ApiOkResponse({ type: ApiAppResponseDto(GetTaskHarvestResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getTaskHarvest(@GetUserApp() user: TokenUserAppResDto, @Query('taskAlarmCode') taskAlarmCode?: string) {
-    const result = await this.todoAppService.getTaskHarvest(user.userCode, taskAlarmCode ?? '');
+    const result = await this.todoHarvestMedicineAppService.getTaskHarvest(user.userCode, taskAlarmCode ?? '');
     if (result == 0) {
       throw new BadRequestException({
         message: Msg.GetErr,
@@ -301,10 +321,9 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetListTaskHarvestResDto)) })
   async getListTaskHarvestForAdjust(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetListTaskHarvestForAdjustDto) {
-    const result = await this.todoAppService.getListTaskHarvestForAdjust(dto, user.userCode);
+    const result = await this.todoHarvestMedicineAppService.getListTaskHarvestForAdjust(dto, user.userCode);
     return result;
   }
-  
 
   @ApiOperation({
     summary: 'Lấy thông tin dữ liệu thu hoạch trước khi thực hiện điều chỉnh',
@@ -314,7 +333,7 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
 **harvestPhase**: Truyền giá trị từ <i>getListTaskHarvestForAdjust</i> API\n
 **harvestYear**: Truyền giá trị từ <i>getListTaskHarvestForAdjust</i> API`,
   })
-    @ApiBody({
+  @ApiBody({
     type: GetInfoTaskHarvestForAdjustDto,
   })
   @Post('getInfoTaskHarvestForAdjust')
@@ -322,11 +341,11 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
   @ApiOkResponse({ type: ApiAppResponseDto(GetInfoTaskHarvestForAdjustResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getInfoTaskHarvestForAdjust(@Body() dto: GetInfoTaskHarvestForAdjustDto, @GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.todoAppService.getInfoTaskHarvestForAdjust(user.userCode, dto);
+    const result = await this.todoHarvestMedicineAppService.getInfoTaskHarvestForAdjust(user.userCode, dto);
     return result;
   }
 
-   @ApiOperation({
+  @ApiOperation({
     summary: 'Điều chỉnh dữ liệu thu hoạch chưa được yêu cầu tạo mã Qrcode',
   })
   @Post('adjustTaskHarvest')
@@ -356,7 +375,7 @@ Dữ liệu này được truyền giá trị từ <i>getInfoTaskHarvestForAdjus
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async adjustTaskHarvest(@GetUserApp() user: TokenUserAppResDto, @Body() dto: AdjustHarvestTaskDto) {
-    const result = await this.todoAppService.adjustTaskHarvest(user.userCode, dto);
+    const result = await this.todoHarvestMedicineAppService.adjustTaskHarvest(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.ThisHarvestRequestQrcodeAlreadyCannotAdjust,
@@ -374,5 +393,4 @@ Dữ liệu này được truyền giá trị từ <i>getInfoTaskHarvestForAdjus
       data: result,
     };
   }
-
 }

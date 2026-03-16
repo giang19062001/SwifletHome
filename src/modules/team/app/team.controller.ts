@@ -6,16 +6,15 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { UserAppService } from 'src/modules/user/app/user.service';
-import { TeamAppService } from './team.service';
 import { GetAllTeamDto, GetReviewListOfTeamDto, ReviewTeamDto, UploadReviewFilesDto } from './team.dto';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, UploadReviewFilesResDto } from './team.response';
-import { PagingDto } from 'src/dto/admin.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerImgConfig } from 'src/config/multer.config';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TeamUserAppService } from './team-user.service';
+import { TeamReviewAppService } from './team-review.service';
 
 @ApiTags('app/team')
 @Controller('/api/app/team')
@@ -23,7 +22,9 @@ import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class TeamAppController {
-  constructor(private readonly teamAppService: TeamAppService) {}
+  constructor(private readonly teamUserAppService: TeamUserAppService,
+    private readonly teamReviewAppService: TeamReviewAppService
+  ) {}
 
   // TODO: TEAM
   @ApiOperation({
@@ -44,7 +45,7 @@ export class TeamAppController {
         data: null,
       });
     }
-    const result = await this.teamAppService.getAllTeams(dto, user.userCode);
+    const result = await this.teamUserAppService.getAllTeams(dto, user.userCode);
     return result;
   }
 
@@ -59,10 +60,11 @@ export class TeamAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(GetDetailTeamResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getInfoToRequestQrcode(@Param('teamCode') teamCode: string, @GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.teamAppService.getDetailTeam(teamCode);
+    const result = await this.teamUserAppService.getDetailTeam(teamCode);
     return result;
   }
 
+  // TODO: REVIEW
   @ApiOperation({
     summary: 'Lấy danh sách review của 1 team',
     description: ``,
@@ -80,7 +82,7 @@ export class TeamAppController {
         data: null,
       });
     }
-    const result = await this.teamAppService.getReviewListOfTeam(dto);
+    const result = await this.teamReviewAppService.getReviewListOfTeam(dto);
     return result;
   }
 
@@ -98,7 +100,7 @@ export class TeamAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   async reviewTeam(@GetUserApp() user: TokenUserAppResDto, @Body() dto: ReviewTeamDto) {
-    const result = await this.teamAppService.reviewTeam(user.userCode, dto);
+    const result = await this.teamReviewAppService.reviewTeam(user.userCode, dto);
     if (result === -1) {
       throw new BadRequestException({
         message: Msg.UuidNotFound,
@@ -138,7 +140,7 @@ export class TeamAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadReviewFilesResDto]) })
   async uploadReviewFiles(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadReviewFilesDto, @UploadedFiles() reviewImgs: Express.Multer.File[]) {
-    const result = await this.teamAppService.uploadReviewFiles(user.userCode, dto, reviewImgs);
+    const result = await this.teamReviewAppService.uploadReviewFiles(user.userCode, dto, reviewImgs);
     return {
       message: result.length ? Msg.UploadOk : Msg.UploadErr,
       data: result,

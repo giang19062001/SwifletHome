@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { MediaBadgeEnum } from '../upload.interface';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { MediaBadgeEnum } from '../upload.interface';
 
 export class UploadVideoLinkDto {
   @ApiProperty({

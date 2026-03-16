@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
+import { FileLocalModule } from 'src/common/fileLocal/fileLocal.module';
 import { AuthAppModule } from 'src/modules/auth/app/auth.module';
 import { UserAppModule } from 'src/modules/user/app/user.module';
+import { TeamReviewAppRepository } from './team-review.repository';
+import { TeamReviewAppService } from './team-review.service';
+import { TeamUserAppRepository } from './team-user.repository';
+import { TeamUserAppService } from './team-user.service';
 import { TeamAppController } from './team.controller';
-import { TeamAppService } from './team.service';
-import { TeamAppRepository } from './team.repository';
-import { FileLocalModule } from 'src/common/fileLocal/fileLocal.module';
 
 @Module({
   imports: [AuthAppModule, UserAppModule, FileLocalModule],
   controllers: [TeamAppController],
-  providers: [TeamAppService, TeamAppRepository],
-  exports: [TeamAppService, TeamAppRepository],
+  providers: [TeamUserAppService, TeamReviewAppService, TeamUserAppRepository, TeamReviewAppRepository],
+  exports: [TeamReviewAppService],
 })
 export class TeamAppModule {}

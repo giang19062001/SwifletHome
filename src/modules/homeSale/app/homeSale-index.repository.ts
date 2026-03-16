@@ -1,13 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
-import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { CreateHomeSightSeeingDto } from './homeSale.dto';
-import { HomeSaleResDto, HomeSaleImgResDto } from "../homeSale.response";
+import { HomeSaleResDto } from "../homeSale.response";
 
 @Injectable()
-export class HomeSaleAppRepository {
+export class HomeSaleIndexAppRepository {
   private readonly table = 'tbl_home_sale';
-  private readonly tableSightSeeing = 'tbl_home_sale_sightseeing';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -64,15 +62,5 @@ export class HomeSaleAppRepository {
       result.homeImages = typeof result.homeImages === 'string' ? JSON.parse(result.homeImages) : result.homeImages;
     }
     return result;
-  }
-  // TODO: SIGHTSEEING 
-  async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string, status: string): Promise<number> {
-    const sql = `
-        INSERT INTO ${this.tableSightSeeing}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, status, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.homeCode, userCode, dto.userName, dto.userPhone, dto.numberAttendCode, dto.note, status, userCode]);
-
-    return result.insertId;
   }
 }

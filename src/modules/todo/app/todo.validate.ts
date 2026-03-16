@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { TaskStatusEnum } from '../todo.interface';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { SetTaskAlarmDto } from './todo.dto';
 import { MsgDto } from 'src/helpers/message.helper';
-import { TodoTaskAlramResDto } from "../todo.response";
+import { TaskStatusEnum } from '../todo.interface';
+import { SetTaskAlarmDto } from './todo.dto';
 
 @Injectable()
 export default class TodoAppValidate {

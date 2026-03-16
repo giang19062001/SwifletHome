@@ -1,43 +1,30 @@
-import { GetTypeEnum, MarkTypeEnum } from './../qr.interface';
-import { QrAppRepository } from './qr.repository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import {
-  GetApprovedRequestQrCodeResDto,
-  GetInfoToRequestQrcodeResDto,
-  GetRequestQrCodeListResDto,
-  GetRequestSellDetailResDto,
-  GetRequestSellListResDto,
-  TaskHarvestQrResDto,
-} from './qr.response';
-import { GetRequestSellListDto, InsertRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
+import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, GetRequestSellDetailResDto, GetRequestSellListResDto, TaskHarvestQrResDto } from './qr.response';
+import { RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { TodoAppService } from 'src/modules/todo/app/todo.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { RequestStatusEnum } from '../qr.interface';
-import { OPTION_CONST, RequestSellPriceOptionEnum } from 'src/modules/options/option.interface';
-import { OptionService } from 'src/modules/options/option.service';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import moment from 'moment';
 import { PagingDto } from 'src/dto/admin.dto';
-import { QrRequestFileStrResDto } from "./qr.response";
-import { TokenUserAppResDto } from "../../auth/app/auth.dto";
+import { QrRequestFileStrResDto } from './qr.response';
+import { TokenUserAppResDto } from '../../auth/app/auth.dto';
+import { TodoHarvestMedicineAppService } from 'src/modules/todo/app/todo-harvest-medicine.service';
+import { QrRequestAppRepository } from './qr-request.repository';
 
 @Injectable()
-export class QrAppService {
-  private readonly SERVICE_NAME = 'QrAppService';
+export class QrRequestAppService {
+  private readonly SERVICE_NAME = 'QrRequestAppService';
   constructor(
-    private readonly todoAppService: TodoAppService,
+    private readonly todoHarvestMedicineAppService: TodoHarvestMedicineAppService,
     private readonly userHomeAppService: UserHomeAppService,
-    private readonly qrAppRepository: QrAppRepository,
-    private readonly optionService: OptionService,
+    private readonly qrRequestAppRepository: QrRequestAppRepository,
     private readonly logger: LoggingService,
   ) {}
   async getRequestQrCocdeList(user: TokenUserAppResDto, dto: PagingDto): Promise<{ total: number; list: GetRequestQrCodeListResDto[] }> {
-    const total = await this.qrAppRepository.getRequestQrCocdeTotal(user.userCode);
-    const rows = await this.qrAppRepository.getRequestQrCocdeList(user.userCode, dto);
+    const total = await this.qrRequestAppRepository.getRequestQrCocdeTotal(user.userCode);
+    const rows = await this.qrRequestAppRepository.getRequestQrCocdeList(user.userCode, dto);
     const list = rows.map((item: any) => {
       let totalCellCollected = 0;
 
@@ -76,7 +63,7 @@ export class QrAppService {
 
   async getApprovedRequestQrCocde(requestCode: string, user: TokenUserAppResDto): Promise<GetApprovedRequestQrCodeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getApprovedRequestQrCocde:`;
-    const result = await this.qrAppRepository.getApprovedRequestQrCocde(requestCode, user.userCode);
+    const result = await this.qrRequestAppRepository.getApprovedRequestQrCocde(requestCode, user.userCode);
     return result;
   }
   async getInfoToRequestQrcode(userHomeCode: string, user: TokenUserAppResDto, harvestPhase: number): Promise<(GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number }) | null> {
@@ -93,18 +80,18 @@ export class QrAppService {
     }
 
     // lấy thông tin lăn thuốc nhà yến này
-    const taskMedicineList = await this.todoAppService.getTaskMedicineCompleteAndNotUseList(userHomeCode);
+    const taskMedicineList = await this.todoHarvestMedicineAppService.getTaskMedicineCompleteAndNotUseList(userHomeCode);
 
     // lấy thông tin thu hoạc nhà yến này
     //? harvestPhase = 0 --> lấy tất cả các đợt để làm SelectBox cho Form yêu cầu Qr
     //? harvestPhase > 0 --> Chọn đợt và insert cho Qr table
-    let taskHarvestCompleteList = await this.todoAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase); 
+    let taskHarvestCompleteList = await this.todoHarvestMedicineAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
     const taskHarvestList: TaskHarvestQrResDto[] = await Promise.all(
       taskHarvestCompleteList.map(async (ele) => ({
         harvestTaskAlarmCode: ele.harvestTaskAlarmCode,
         harvestPhase: ele.harvestPhase,
         harvestYear: ele.harvestYear,
-        harvestData: await this.todoAppService.arrangeHarvestRows(ele.seq, homeInfo.userHomeFloor),
+        harvestData: await this.todoHarvestMedicineAppService.arrangeHarvestRows(ele.seq, homeInfo.userHomeFloor),
       })),
     );
 
@@ -130,7 +117,7 @@ export class QrAppService {
       let result = 1;
 
       // kiểm tra đợt thu hoạch của nhà yến này đã yêu cầu qrcode chưa
-      const isUsed = await this.qrAppRepository.checkUsedThisHarvest(dto.userHomeCode, user.userCode, dto.harvestPhase);
+      const isUsed = await this.qrRequestAppRepository.checkUsedThisHarvest(dto.userHomeCode, user.userCode, dto.harvestPhase);
       if (isUsed) {
         this.logger.error(logbase, `${Msg.ThisHarvestRequestQrcodeAlready} - nhà yến (${dto.userHomeCode}) - đợt  (${dto.harvestPhase}) `);
         result = -2;
@@ -139,7 +126,7 @@ export class QrAppService {
 
       // lấy thông tin lăn thuốc, thu hoạch,.. từ DB để insert
       const dataInsertDto = await this.getInfoToRequestQrcode(dto.userHomeCode, user, dto.harvestPhase);
-      
+
       if (!dataInsertDto || !dataInsertDto.seqHarvestPhase) {
         this.logger.error(logbase, `Không thê lấy thông tin yêu cầu mã Qr từ cơ sở dữ liệu của người dùng (${user.userCode}) và nhà yến (${dto.userHomeCode})`);
         result = 0;
@@ -153,19 +140,19 @@ export class QrAppService {
       }
 
       // tìm tất cả file đã upload cùng uniqueId
-      const filesUploaded = await this.qrAppRepository.findFilesByUniqueId(dto.uniqueId);
+      const filesUploaded = await this.qrRequestAppRepository.findFilesByUniqueId(dto.uniqueId);
       if (filesUploaded.length) {
         // dánh đấu các lăn thuốc là đã dùng
         if (dataInsertDto.taskMedicineList.length) {
           for (const med of dataInsertDto.taskMedicineList) {
-            await this.todoAppService.useOrUnuseTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode, YnEnum.Y);
+            await this.todoHarvestMedicineAppService.useOrUnuseTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode, YnEnum.Y);
           }
         }
 
         // insert dữ liệu yêu cầu QR
-        const seq = await this.qrAppRepository.insertRequestQrCode(user.userCode, {
+        const seq = await this.qrRequestAppRepository.insertRequestQrCode(user.userCode, {
           ...dataInsertDto,
-          seqHarvestPhase: dataInsertDto.seqHarvestPhase, 
+          seqHarvestPhase: dataInsertDto.seqHarvestPhase,
           requestStatus: RequestStatusEnum.WAITING,
           uniqueId: dto.uniqueId,
         });
@@ -173,7 +160,7 @@ export class QrAppService {
         // cập nhập qrRequestSeq của các file đã tìm cùng uniqueId
         for (const file of filesUploaded) {
           console.log(file);
-          await this.qrAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId, user.userCode);
+          await this.qrRequestAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId, user.userCode);
         }
       } else {
         // không có file ảnh nào được upload của nhà yến này -> báo lỗi
@@ -195,7 +182,7 @@ export class QrAppService {
   async cancelRequest(requestCode: string, userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/cancelRequest:`;
 
-    const requestInfo = await this.qrAppRepository.getRequestQrCocde(requestCode);
+    const requestInfo = await this.qrRequestAppRepository.getRequestQrCocde(requestCode);
     if (!requestInfo) {
       throw new BadRequestException({
         message: Msg.UpdateErr,
@@ -214,11 +201,11 @@ export class QrAppService {
     const taskMedicineList = requestInfo.taskMedicineList as any;
     if (taskMedicineList?.length) {
       for (const med of taskMedicineList) {
-        await this.todoAppService.useOrUnuseTaskMedicineForQr(userCode, requestInfo.userHomeCode, med.medicineTaskAlarmCode, YnEnum.N);
+        await this.todoHarvestMedicineAppService.useOrUnuseTaskMedicineForQr(userCode, requestInfo.userHomeCode, med.medicineTaskAlarmCode, YnEnum.N);
       }
     }
 
-    const result = await this.qrAppRepository.cancelRequest(requestInfo.seq!!, requestCode, userCode);
+    const result = await this.qrRequestAppRepository.cancelRequest(requestInfo.seq!!, requestCode, userCode);
     return result;
   }
   // TODO: FILE
@@ -230,7 +217,7 @@ export class QrAppService {
         for (const file of requestQrcodeFiles) {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);
           const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
-          const insertId = await this.qrAppRepository.uploadRequestFile(0, dto.uniqueId, userCode, filenamePath, file);
+          const insertId = await this.qrRequestAppRepository.uploadRequestFile(0, dto.uniqueId, userCode, filenamePath, file);
           if (insertId > 0) {
             res.push({
               seq: insertId,
@@ -246,83 +233,12 @@ export class QrAppService {
       return [];
     }
   }
-  // TODO: SELL
-  async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<{ total: number; list: GetRequestSellListResDto[] }> {
-    const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
-    const total = await this.qrAppRepository.getRequestSellTotal(dto, userCode);
-    const rows = await this.qrAppRepository.getRequestSellList(dto, userCode);
-    return { total: total, list: rows };
-  }
-  async getRequestSellDetail(requestCode: string, userCode: string): Promise<GetRequestSellDetailResDto | null> {
-    const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
-    // đánh dầu đã xem
-    await this.maskRequestSell(requestCode, userCode, MarkTypeEnum.VIEW);
-    const result = await this.qrAppRepository.getRequestSellDetail(requestCode);
-    return result;
-  }
-  async requestSell(user: TokenUserAppResDto, dto: InsertRequestSellDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/insertRequestSell:`;
-
-    try {
-      // kiểm tra thông tin qr
-      const getRequestQrInfo = await this.qrAppRepository.getApprovedRequestQrCocde(dto.requestCode, user.userCode);
-      if (!getRequestQrInfo) {
-        this.logger.error(logbase, `${Msg.RequestQrcodeNotFound} ---- requestCode(${dto.requestCode})`);
-        return -1;
-      }
-
-      if (getRequestQrInfo.isSold === YnEnum.Y) {
-        this.logger.error(logbase, `${Msg.RequestInfoAlreadySold} ---- requestCode(${dto.requestCode})`);
-        return -3;
-      }
-
-      // kiểm tra priceOptionCode
-      const priceOptionCodes = await this.optionService.getAll({
-        mainOption: OPTION_CONST.REQUSET_SELL.PRICE_OPTION.mainOption,
-        subOption: OPTION_CONST.REQUSET_SELL.PRICE_OPTION.subOption,
-      });
-
-      const priceOption = priceOptionCodes.find((c) => c.code.includes(dto.priceOptionCode));
-      if (!priceOption) {
-        this.logger.error(logbase, `${Msg.CodeInvalid} ---- priceOptionCode(${dto.priceOptionCode})`);
-        return -2;
-      }
-
-      // trường hợp 'giá thương lượng' thì 'pricePerKg' cho là 0
-      if (priceOption.keyOption == RequestSellPriceOptionEnum.NEGOTIATE) {
-        dto.pricePerKg = 0;
-      }
-
-      // kiểm tra ingredientNestOptionCode
-      const ingredientNestOptionCodes = await this.optionService.getAll({
-        mainOption: OPTION_CONST.REQUSET_SELL.INGREDIENT_NEST.mainOption,
-        subOption: OPTION_CONST.REQUSET_SELL.INGREDIENT_NEST.subOption,
-      });
-
-      if (!ingredientNestOptionCodes.map((c) => c.code).includes(dto.ingredientNestOptionCode)) {
-        this.logger.error(logbase, `${Msg.CodeInvalid} ---- ingredientNestOptionCode(${dto.ingredientNestOptionCode})`);
-        return -2;
-      }
-      const result = await this.qrAppRepository.insertRequestSell(user.userCode, dto);
-
-      return result;
-    } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
-      return 0;
-    }
-  }
-  // TODO: SELL-INTERACT
-  async maskRequestSell(requestCode: string, userCode: string, markType: MarkTypeEnum): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/maskRequestSell:`;
-    const result = await this.qrAppRepository.maskRequestSell(requestCode, userCode, markType);
-    return result;
-  }
 
   async getFilesNotUse() {
-    return await this.qrAppRepository.getFilesNotUse();
+    return await this.qrRequestAppRepository.getFilesNotUse();
   }
 
   async deleteFile(seq: number) {
-    return await this.qrAppRepository.deleteFile(seq);
+    return await this.qrRequestAppRepository.deleteFile(seq);
   }
 }

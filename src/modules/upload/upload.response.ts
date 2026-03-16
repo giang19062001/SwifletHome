@@ -1,6 +1,6 @@
-import { MediaBadgeEnum } from "./upload.interface";
 import { ApiProperty } from "@nestjs/swagger";
 import { YnEnum } from "src/interfaces/admin.interface";
+import { MediaBadgeEnum } from "./upload.interface";
 
 export class FileUploadResDto {
     @ApiProperty({ example: 0 })

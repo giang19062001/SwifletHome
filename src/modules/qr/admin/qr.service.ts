@@ -11,15 +11,12 @@ import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
-import { QrAppService } from '../app/qr.service';
-import { ListResponseDto } from "src/dto/common.dto";
 
 @Injectable()
 export class QrAdminService {
   private readonly SERVICE_NAME = 'QrAdminService';
   constructor(
     private readonly qrAdminRepository: QrAdminRepository,
-    private readonly qrAppService: QrAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly contractService: ContractService,
     private readonly firebaseService: FirebaseService,
@@ -77,22 +74,5 @@ export class QrAdminService {
       return 0;
     }
   }
-  async refuse(requestCode: string, userCode: string): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/refuse:`;
-
-    try {
-      // const result = await this.qrAdminRepository.updateRequsetStatus(requestCode, RequestStatusEnum.REFUSE, updatedId);
-      const result = await this.qrAppService.cancelRequest(requestCode, userCode);
-      // send thông báo
-      const user = await this.userAdminService.getDetailUserApp(userCode);
-      if (!user) return 0;
-
-      const notify = NOTIFICATIONS.QR_CODE_REFUSE(requestCode);
-      this.firebaseService.sendNotification(user.userCode, user.deviceToken, notify.TITLE, notify.BODY, { requestCode: requestCode }, NotificationTypeEnum.ADMIN_QR);
-      return result;
-    } catch (error) {
-      this.logger.error(logbase, `error ${JSON.stringify(error)}`);
-      return 0;
-    }
-  }
+ 
 }

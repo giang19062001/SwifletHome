@@ -6,13 +6,10 @@ import type { Pool, RowDataPacket } from 'mysql2/promise';
 
 @Injectable()
 export class ReportAppRepository {
-  private readonly tableUserApp = 'tbl_user_app';
   private readonly tableTask = 'tbl_todo_tasks';
-  private readonly tableBoxTask = 'tbl_todo_box_tasks';
   private readonly tableTaskAlarm = 'tbl_todo_task_alarm';
   private readonly tableTaskHarvest = 'tbl_todo_task_harvest';
   private readonly tableTaskHarvestPhase = 'tbl_todo_task_harvest_phase';
-  private readonly tableQr = 'tbl_qr_request';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getHarvertReportSummary(dto: GetHarvertReportDto, userCode: string): Promise<GetHarvertReportSummaryResDto | GetHarvertReportDetailResDto[]> {

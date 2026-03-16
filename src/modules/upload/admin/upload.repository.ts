@@ -1,7 +1,7 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { UploadAudioFilesDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
-import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
+import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from "../upload.response";
+import { UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
 
 @Injectable()
 export class UploadAdminRepository {
@@ -21,7 +21,7 @@ export class UploadAdminRepository {
     );
     return rows as FileUploadResDto[];
   }
-  //* get audio
+
   async getAllAudioFile(): Promise<FileUploadResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, B.filename AS filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
@@ -34,17 +34,7 @@ export class UploadAdminRepository {
     );
     return rows as FileUploadResDto[];
   }
-  // async getAllMediaAudioFile(): Promise<IFileMedia[]> {
-  //   const [rows] = await this.db.query<RowDataPacket[]>(
-  //     ` SELECT A.seq, B.filename AS filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
-  //       FROM ${this.tableMediaAudio} A
-  //       LEFT JOIN  ${this.tableMediaAudio} B
-  //       ON A.seqPay = B.seq
-  //       WHERE A.isActive = 'Y' AND A.isFree = 'Y'
-  //        `,
-  //   );
-  //   return rows as IFileMedia[];
-  // }
+
   async getAllMediaAudioFile(): Promise<FileMediaResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink, A.isFree, A.isCoupleFree, A.badge
@@ -55,7 +45,7 @@ export class UploadAdminRepository {
     );
     return rows as FileMediaResDto[];
   }
-  //* get video
+
   async getAllVideoLink(): Promise<FileUploadResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, '' as filename, '' as originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink
@@ -65,6 +55,7 @@ export class UploadAdminRepository {
     );
     return rows as FileUploadResDto[];
   }
+
   async getAllMediaVideoLink(): Promise<FileMediaResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, '' as filenamePay, '' as filename, A.originalname, 0 as size, 'video/youtube' as mimetype, A.isActive, A.createdAt, A.urlLink, 'Y' as isFree,
@@ -75,6 +66,7 @@ export class UploadAdminRepository {
     );
     return rows as FileMediaResDto[];
   }
+
   async getFileImg(filename: string): Promise<FileUploadResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.filename, A.mimetype
@@ -84,7 +76,7 @@ export class UploadAdminRepository {
     );
     return rows ? (rows[0] as FileUploadResDto) : null;
   }
-  //*get audio
+
   async getFileAudio(seq: number): Promise<AudioFreePayResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` 
@@ -105,6 +97,7 @@ export class UploadAdminRepository {
     );
     return rows ? (rows[0] as AudioFreePayResDto) : null;
   }
+
   async getFileMediaAudio(seq: number): Promise<AudioFreePayResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT 
@@ -125,7 +118,7 @@ export class UploadAdminRepository {
     );
     return rows ? (rows[0] as AudioFreePayResDto) : null;
   }
-  //* image
+
   async uploadImg(file: Express.Multer.File, filenamePath: string, createdId: string): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableImg} (filename, originalname, size, mimetype, createdId)
@@ -137,7 +130,6 @@ export class UploadAdminRepository {
     return result.insertId;
   }
 
-  //* audio
   async uploadAudioFree(file: Express.Multer.File, filenamePath: string, createdId: string, seqPay: number): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableAudio} (filename, originalname, size, mimetype, isFree, seqPay, createdId)
@@ -181,7 +173,6 @@ export class UploadAdminRepository {
     return result.insertId;
   }
 
-  //*video
   async uploadVideoLink(dto: UploadVideoLinkDto, createdId: string): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableVideo} (urlLink, createdId) 
@@ -191,6 +182,7 @@ export class UploadAdminRepository {
 
     return result.insertId;
   }
+
   async uploadMediaVideoLink(dto: UploadMediaVideoLinkDto, createdId: string): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableMediaVideo} (originalname, urlLink, badge, createdId) 
@@ -201,7 +193,6 @@ export class UploadAdminRepository {
     return result.insertId;
   }
 
-  //*delete video
   async deleteVideoLink(seq: number): Promise<number> {
     const sql = `
       UPDATE  ${this.tableVideo} SET isActive = 'N' WHERE seq = ?
@@ -220,7 +211,6 @@ export class UploadAdminRepository {
 
     return result.affectedRows;
   }
-  //* delete audio
   async deleteAudio(filename: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableAudio} SET isActive = 'N' WHERE filename = ?
@@ -248,7 +238,6 @@ export class UploadAdminRepository {
 
     return result.affectedRows;
   }
-  //* delete image
 
   async deleteImg(seq: number): Promise<number> {
     const sql = `

@@ -10,6 +10,6 @@ import { UserAppModule } from 'src/modules/user/app/user.module';
   imports: [AuthAppModule, FileLocalModule, UserAppModule],
   controllers: [UserHomeAppController],
   providers: [UserHomeAppService, UserHomeAppRepository],
-  exports: [UserHomeAppService, UserHomeAppRepository],
+  exports: [UserHomeAppService],
 })
 export class UserHomeAppModule {}

@@ -1,11 +1,9 @@
-import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { AuthAppService } from 'src/modules/auth/app/auth.service';
+import { FileMediaResDto, FileUploadResDto } from "../upload.response";
 import { GetAllMediaDto } from './upload.dto';
 import { UploadAppRepository } from './upload.repository';
-import { AuthAppService } from 'src/modules/auth/app/auth.service';
-import { YnEnum } from 'src/interfaces/admin.interface';
-import { ListResponseDto } from "src/dto/common.dto";
-import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
 
 @Injectable()
 export class UploadAppService {

@@ -1,11 +1,11 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { TaskStatusEnum } from '../todo.interface';
-import { SetTaskAlarmByAdminDto, UpdateBoxTaskDto } from './todo.dto';
-import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
+import { generateCode } from 'src/helpers/func.helper';
+import { TaskStatusEnum } from '../todo.interface';
 import { TodoBoxTaskResDto, TodoTaskResDto } from "../todo.response";
+import { SetTaskAlarmByAdminDto, UpdateBoxTaskDto } from './todo.dto';
 
 @Injectable()
 export class TodoAdminRepository {
@@ -34,7 +34,7 @@ export class TodoAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as TodoTaskResDto[];
   }
-  // todo: BOX-TASK
+  // TODO: BOX-TASK
   async getBoxTasks(): Promise<TodoBoxTaskResDto[]> {
     let query = `  SELECT seq, taskCode, sortOrder, isActive
         FROM ${this.tableBoxTask} 
@@ -54,7 +54,7 @@ export class TodoAdminRepository {
     return result.affectedRows;
   }
 
-  // todo: ALARM
+  // TODO: ALARM
   async insertTaskAlarm(userCode: string, userHomeCode: string, dto: SetTaskAlarmByAdminDto, createdId: string): Promise<number> {
     const sqlLast = ` SELECT taskAlarmCode FROM ${this.tableTaskAlarm} ORDER BY taskAlarmCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);

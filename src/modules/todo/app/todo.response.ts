@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsEnum } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
 import { HarvestDataInputDto } from './todo.dto';
-import { IsArray, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })

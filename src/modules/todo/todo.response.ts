@@ -1,6 +1,6 @@
-import { TaskStatusEnum } from "./todo.interface";
 import { ApiProperty } from "@nestjs/swagger";
 import { YnEnum } from "src/interfaces/admin.interface";
+import { TaskStatusEnum } from "./todo.interface";
 
 export class TodoBoxTaskResDto {
     @ApiProperty({ example: 0 })

@@ -1,12 +1,12 @@
-import { Controller, HttpStatus, HttpCode, UseInterceptors, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { UserAppService } from 'src/modules/user/app/user.service';
-import { UserTypeResDto } from 'src/modules/user/app/user.response';
-import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { UserTypeResDto } from 'src/modules/user/app/user.response';
+import { UserAppService } from 'src/modules/user/app/user.service';
 
 @ApiTags('app/user')
 @Controller('/api/app/user')

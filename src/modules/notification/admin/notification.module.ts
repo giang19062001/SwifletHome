@@ -10,6 +10,6 @@ import { UserHomeAdminModule } from 'src/modules/userHome/admin/userHome.module'
   imports: [AuthAdminModule, UserAdminModule, UserHomeAdminModule],
   controllers: [NotificationAdminController],
   providers: [NotificationAdminService, NotificationAdminRepository],
-  exports: [NotificationAdminService, NotificationAdminRepository],
+  exports: [NotificationAdminService],
 })
 export class NotificationAdminModule {}

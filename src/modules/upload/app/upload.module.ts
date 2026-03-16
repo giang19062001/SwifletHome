@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UploadAppService } from './upload.service';
-import { UploadAppRepository } from './upload.repository';
-import { UploadAppController } from './upload.controller';
 import { AuthAppModule } from 'src/modules/auth/app/auth.module';
+import { UploadAppController } from './upload.controller';
+import { UploadAppRepository } from './upload.repository';
+import { UploadAppService } from './upload.service';
 
 @Module({
   imports: [AuthAppModule],

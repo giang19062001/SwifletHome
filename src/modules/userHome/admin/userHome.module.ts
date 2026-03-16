@@ -8,6 +8,6 @@ import { UserHomeAdminService } from "./userHome.service";
   imports: [AuthAdminModule],
   controllers: [UserHomeAdminController],
   providers: [UserHomeAdminService, UserHomeAdminRepository],
-  exports: [UserHomeAdminService, UserHomeAdminRepository],
+  exports: [UserHomeAdminService],
 })
 export class UserHomeAdminModule {}

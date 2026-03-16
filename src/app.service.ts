@@ -1,18 +1,17 @@
-import { QrAdminService } from './modules/qr/admin/qr.service';
 import { Injectable } from '@nestjs/common';
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
-import { HomeSaleAdminService } from './modules/homeSale/admin/homeSale.service';
 import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
+import { HomeSaleAdminService } from './modules/homeSale/admin/homeSale.service';
 import { ObjectAdminService } from './modules/object/admin/object.service';
-import { ScreenAdminService } from './modules/screen/admin/screen.service';
-import { ProvinceService } from './modules/province/province.service';
-import { TodoAdminService } from './modules/todo/admin/todo.service';
-import { TeamAdminService } from './modules/team/admin/team.service';
-import { UserAdminService } from './modules/user/admin/user.service';
-import { OptionService } from './modules/options/option.service';
 import { OPTION_CONST } from './modules/options/option.interface';
-import { AnswerResDto } from "./modules/answer/answer.response";
+import { OptionService } from './modules/options/option.service';
+import { ProvinceService } from './modules/province/province.service';
+import { QrAdminService } from './modules/qr/admin/qr.service';
+import { ScreenAdminService } from './modules/screen/admin/screen.service';
+import { TeamAdminService } from './modules/team/admin/team.service';
+import { TodoAdminService } from './modules/todo/admin/todo.service';
+import { UserAdminService } from './modules/user/admin/user.service';
 
 @Injectable()
 export class AppService {

@@ -1,148 +1,38 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
-import { TodoAppRepository } from './todo.repository';
+import moment from 'moment';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { Msg } from 'src/helpers/message.helper';
+import { YnEnum } from 'src/interfaces/admin.interface';
+import { OPTION_CONST } from 'src/modules/options/option.interface';
+import { OptionService } from 'src/modules/options/option.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
+import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { TodoTaskResDto } from '../todo.response';
+import { TodoAlarmAppRepository } from './todo-alram.repository';
+import { TodoHarvestMedicineAppRepository } from './todo-harvest-medicine.repository.ts';
 import {
-  SetHarvestTaskDto,
+  AdjustHarvestTaskDto,
   FloorDataInputDto,
+  GetInfoTaskHarvestForAdjustDto,
+  GetListTaskHarvestForAdjustDto,
   HarvestDataInputDto,
   HarvestDataRowInputDto,
-  SetTaskAlarmDto,
+  SetHarvestTaskDto,
   SetTaskMedicineDto,
-  GetListTaskHarvestForAdjustDto,
-  AdjustHarvestTaskDto,
-  GetInfoTaskHarvestForAdjustDto,
 } from './todo.dto';
-import { Msg } from 'src/helpers/message.helper';
-import { PagingDto } from 'src/dto/admin.dto';
-import moment from 'moment';
-import TodoAppValidate from './todo.validate';
-import { OptionService } from 'src/modules/options/option.service';
-import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { GetInfoTaskHarvestForAdjustResDto, GetListTaskHarvestResDto, GetTaskHarvestResDto, GetTasksMedicineResDto } from './todo.response';
-import { YnEnum } from 'src/interfaces/admin.interface';
-import { ListResponseDto } from 'src/dto/common.dto';
-import { TodoTaskResDto, TodoTaskAlramResDto } from '../todo.response';
-import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
 
 @Injectable()
-export class TodoAppService {
-  private readonly SERVICE_NAME = 'TodoAppService';
+export class TodoHarvestMedicineAppService {
+  private readonly SERVICE_NAME = 'TodoHarvestMedicineAppService';
 
   constructor(
-    private readonly todoAppRepository: TodoAppRepository,
-    private readonly todoAppValidate: TodoAppValidate,
+    private readonly todoHarvestMedicineAppRepository: TodoHarvestMedicineAppRepository,
+    private readonly todoAlarmAppRepository: TodoAlarmAppRepository,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
   ) {}
-
-  // TODO: BOX-TASK
-  async getScheduledTasks(userCode: string): Promise<{ [key: string]: string }[]> {
-    const logbase = `${this.SERVICE_NAME}/getScheduledTasks:`;
-
-    // userHomeCode -> main home
-    const home = await this.userHomeAppService.getMainHomeByUser(userCode);
-    const boxTasks = await this.todoAppRepository.getBoxTasks();
-    if (!home || !boxTasks.length) {
-      return boxTasks.map((ele) => {
-        return {
-          taskAlarmCode: '',
-          label: ele.taskName,
-          value: '_ / _',
-          date: '',
-          unit: '',
-        };
-      });
-    }
-
-    const today = moment().startOf('day');
-
-    const result = await Promise.all(
-      boxTasks.map(async (ele) => {
-        const data = await this.todoAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, ele.taskCode, ele.taskName, today.format('YYYY-MM-DD'));
-
-        this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${home.userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate}`);
-
-        const taskAlarmCode = data?.taskAlarmCode ?? '';
-        if (!data?.taskDate) {
-          return {
-            taskAlarmCode: taskAlarmCode,
-            label: ele.taskName,
-            value: '_ / _',
-            date: '',
-            unit: '',
-          };
-        } else {
-          const today = moment().startOf('day');
-          const taskDate = moment(data.taskDate).startOf('day');
-          const diff = taskDate.diff(today, 'days');
-
-          return {
-            taskAlarmCode: taskAlarmCode,
-            label: ele.taskName,
-            value: diff.toString(),
-            date: taskDate.format('YYYY-MM-DD'),
-            unit: 'ngày',
-          };
-        }
-      }),
-    );
-
-    return result;
-  }
-
-  // TODO: TASK
-  async getTasks(): Promise<TodoTaskResDto[]> {
-    const logbase = `${this.SERVICE_NAME}/getTasks:`;
-    const list = await this.todoAppRepository.getTasks();
-    this.logger.log(logbase, `list.length(${list.length})`);
-
-    return list;
-  }
-
-  // TODO: ALARM
-  async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<{ total: number; list: any[] }> {
-    const logbase = `${this.SERVICE_NAME}/getTaskAlarms:`;
-
-    const total = await this.todoAppRepository.getTotalTaskAlarm(userCode, userHomeCode);
-    const list = await this.todoAppRepository.getListTaskAlarms(userCode, userHomeCode, dto);
-
-    return { total, list };
-  }
-
-  async changeTaskAlarmStatus(taskStatus: TaskStatusEnum, userCode: string, taskAlarmCode: string): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/changeTaskAlarmStatus:`;
-    const result = await this.todoAppRepository.changeTaskAlarmStatus(taskStatus, userCode, taskAlarmCode);
-    this.logger.log(logbase, `cập nhập trạng thái của lịch nhắc thành (${taskStatus})`);
-    return result;
-  }
-  async setTaskAlarm(userCode: string, dto: SetTaskAlarmDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setTaskAlarm:`;
-
-    // kiểm tra duplicate lịch nhắc
-    let alramDto = await this.todoAppValidate.handleAlarmData(dto);
-
-    // taskDate khác null mới kiểm tra
-    if (alramDto.taskDate != null) {
-      const isDuplicateAlarm = await this.todoAppRepository.checkDuplicateTaskAlarm(userCode, alramDto);
-      if (isDuplicateAlarm) {
-        this.logger.log(logbase, Msg.DuplicateTaskAlram + `(${dto.userHomeCode})`);
-        return -1;
-      }
-    }
-
-    // insert lịch nhắc theo ngày tùy chỉnh
-    if (dto.specificValue != null) {
-      const result = await this.todoAppRepository.insertTaskAlarm(userCode, alramDto);
-      this.logger.log(logbase, `Đã thêm lịch nhắc ${moment(alramDto.taskDate).format('YYYY-MM-DD')} cho nhà yến ${dto.userHomeCode}`);
-
-      return result;
-    }
-    return 0;
-  }
-
   // TODO: MEDICINE
   async handleTaskMedicineCurrentAndNextime(userCode: string, userHomeCode: string, taskDate: Date | null, task: TodoTaskResDto, dto: SetTaskMedicineDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskMedicine:`;
@@ -170,9 +60,9 @@ export class TodoAppService {
             taskStatus: TaskStatusEnum.WAITING,
             taskDate: moment(dto.medicineNextDate).toDate(), // ngày lăn kế tiếp
           };
-          const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
+          const seqNextTime = await this.todoAlarmAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
           this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc mới thành công, hiện tại (${today.toDate().toLocaleDateString()}) --- (${moment().toDate().toLocaleDateString()})`);
-          await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
+          await this.todoHarvestMedicineAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
           this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc chO  lần sau SEQ(${seqNextTime})`);
         } else {
           // insert lịch nhắc cho hôm nay với trạng thái 'hoàn thành'
@@ -185,9 +75,9 @@ export class TodoAppService {
             taskDate: moment().toDate(), // lăn trong ngày hôm nay
           };
 
-          const seqNew = await this.todoAppRepository.insertTaskAlarm(userCode, newAlarmMedicionDto);
+          const seqNew = await this.todoAlarmAppRepository.insertTaskAlarm(userCode, newAlarmMedicionDto);
           this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc mới thành công, hiện tại (${today.toDate().toLocaleDateString()}) --- (${moment().toDate().toLocaleDateString()})`);
-          await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNew, dto);
+          await this.todoHarvestMedicineAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNew, dto);
           this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc chO  lần sau SEQ(${seqNew})`);
         }
 
@@ -196,7 +86,7 @@ export class TodoAppService {
         // dữ liệu alarm có sẵn
 
         // update lăn thuốc hiện tại (tên thuốc, liều lượng)
-        await this.todoAppRepository.updateTaskMedicine(userCode, userHomeCode, dto.taskAlarmCode, dto);
+        await this.todoHarvestMedicineAppRepository.updateTaskMedicine(userCode, userHomeCode, dto.taskAlarmCode, dto);
         this.logger.log(logbase, `Cập nhập dữ liệu lăn thuốc hiện tại taskAlarmCode(${dto.taskAlarmCode})`);
 
         // nếu hôm nay = ngày lịch nhắc thiết lập từ trước --> hoàn thành
@@ -204,7 +94,7 @@ export class TodoAppService {
         const isTodayWithSetted = today.isSame(moment(taskDate, 'YYYY-MM-DD'), 'day');
         this.logger.log(logbase, (isTodayWithSetted ? `Lịch chọn trước đó và hôm nay giống nhau` : `Lịch chọn trước đó và hôm nay không giống nhau`) + ` ${today} - ${moment(taskDate, 'YYYY-MM-DD')}`);
         if (isTodayWithSetted) {
-          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+          await this.todoAlarmAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành' vì đến ngày đã thiết lập`);
         }
 
@@ -214,11 +104,11 @@ export class TodoAppService {
         this.logger.log(logbase, (isTodayWithDto ? `Lịch chọn và hôm nay giống nhau` : ` Lịch chọn và hôm nay không giống nhau`) + `${today} - ${moment(dto.medicineNextDate, 'YYYY-MM-DD')}`);
         if (isTodayWithDto) {
           // cập nhập lại status
-          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+          await this.todoAlarmAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           this.logger.log(logbase, `Cập nhập trạng thái taskAlarmCode(${dto.taskAlarmCode}) lăn thuốc thành 'Hoàn thành' vì cùng ngày thiết lập`);
 
           // cập nhập lại taskDate là today
-          await this.todoAppRepository.updateDateOfTaskAlarm(moment(today).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
+          await this.todoAlarmAppRepository.updateDateOfTaskAlarm(moment(today).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
           this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
         } else {
           // nếu hôm nay != ngày chọn lịch nhắc cho lần sau --> insert mới với trạng thái 'WAITING'
@@ -234,7 +124,7 @@ export class TodoAppService {
 
           if (isSameBeforeWithSetted) {
             // cập nhập lại taskDate bằng  dto.medicineNextDate
-            await this.todoAppRepository.updateDateOfTaskAlarm(moment(dto.medicineNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
+            await this.todoAlarmAppRepository.updateDateOfTaskAlarm(moment(dto.medicineNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
             this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
           } else {
             const alarmMedicionNextTimeDto: any = {
@@ -245,9 +135,9 @@ export class TodoAppService {
               taskStatus: TaskStatusEnum.WAITING,
               taskDate: moment(dto.medicineNextDate).toDate(), // ngày lăn kế tiếp
             };
-            const seqNextTime = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
+            const seqNextTime = await this.todoAlarmAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
             this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc mới thành công, hiện tại (${today.toDate().toLocaleDateString()}) --- (${moment().toDate().toLocaleDateString()})`);
-            await this.todoAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
+            await this.todoHarvestMedicineAppRepository.insertTaskMedicine(userCode, userHomeCode, seqNextTime, dto);
             this.logger.log(logbaseChild, `Tạo lịch nhắc lăn thuốc chO  lần sau SEQ(${seqNextTime})`);
           }
         }
@@ -281,7 +171,7 @@ export class TodoAppService {
     }
 
     // kiểm tra task phải là 'lăn thuốc'
-    const task = await this.todoAppRepository.getTaskByKeyword(TODO_CONST.TASK_BOX.MEDICINE.value);
+    const task = await this.todoAlarmAppRepository.getTaskByKeyword(TODO_CONST.TASK_BOX.MEDICINE.value);
     if (!task) {
       this.logger.error(logbase, `Task không có dữ liệu`);
       throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
@@ -298,7 +188,7 @@ export class TodoAppService {
       result = await this.handleTaskMedicineCurrentAndNextime(userCode, mainHomeOfUser.userHomeCode, null, task, dto);
     } else {
       // lấy thông tin lịch nhắc lăn thuốc có sẵn đang countdown
-      const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
+      const alramDetail = await this.todoAlarmAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
       if (!alramDetail) {
         this.logger.error(logbase, `Lịch nhắc chi tiết (alramDetail) không có dữ liệu`);
         throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
@@ -336,7 +226,7 @@ export class TodoAppService {
       return DEFAULT_VALUE;
     } else {
       // lấy thông tin alram
-      const result = await this.todoAppRepository.getTaskMedicine(taskAlarmCode);
+      const result = await this.todoHarvestMedicineAppRepository.getTaskMedicine(taskAlarmCode);
       if (result) {
         // taskAlarmCode này không phải lăn thuốc
         if (result.taskKeyword !== TODO_CONST.TASK_BOX.MEDICINE.value) {
@@ -365,7 +255,7 @@ export class TodoAppService {
   // TODO: HARVERT
   async insUpDelHarvestRows(userCode: string, userHomeCode: string, seq: number, harvestData: HarvestDataInputDto[]) {
     // lấy dữ liệu thu hoạch của lịch nhắc này nếu có
-    const harvestCurrentDatas = await this.todoAppRepository.getTaskHarvestRows(seq, false); // false -> lấy luôn cả cell bị isActive = 'N'
+    const harvestCurrentDatas = await this.todoHarvestMedicineAppRepository.getTaskHarvestRows(seq, false); // false -> lấy luôn cả cell bị isActive = 'N'
 
     // insert / update/ detele dữ liệu tầng ô hiện có
     if (harvestCurrentDatas.length) {
@@ -412,11 +302,11 @@ export class TodoAppService {
         }
       }
       // insert
-      await Promise.all(toInsert.map((row) => this.todoAppRepository.insertTaskHarvestRows(row)));
+      await Promise.all(toInsert.map((row) => this.todoHarvestMedicineAppRepository.insertTaskHarvestRows(row)));
       // update
-      await Promise.all(toUpdate.map((row) => this.todoAppRepository.updateTaskHarvestRows(row)));
+      await Promise.all(toUpdate.map((row) => this.todoHarvestMedicineAppRepository.updateTaskHarvestRows(row)));
       // delete
-      await Promise.all(toDelete.map((row) => this.todoAppRepository.deleteTaskHarvestRows(row.seqAlarm, row.floor, row.cell, userCode, userHomeCode)));
+      await Promise.all(toDelete.map((row) => this.todoHarvestMedicineAppRepository.deleteTaskHarvestRows(row.seqAlarm, row.floor, row.cell, userCode, userHomeCode)));
     } else {
       // insert mới toàn bộ dữ liệu tầng ô
       if (harvestData.length) {
@@ -439,13 +329,13 @@ export class TodoAppService {
           }
         }
         if (harvestDataRows.length) {
-          await Promise.all(harvestDataRows.map((row) => this.todoAppRepository.insertTaskHarvestRows(row)));
+          await Promise.all(harvestDataRows.map((row) => this.todoHarvestMedicineAppRepository.insertTaskHarvestRows(row)));
         }
       }
     }
   }
   async arrangeHarvestRows(seq: number, userHomeFloor: number): Promise<HarvestDataInputDto[]> {
-    const harvestRows = await this.todoAppRepository.getTaskHarvestRows(seq, true); // true -> chỉ lấy cell  isActive = 'Y'
+    const harvestRows = await this.todoHarvestMedicineAppRepository.getTaskHarvestRows(seq, true); // true -> chỉ lấy cell  isActive = 'Y'
 
     const existingDataMap = new Map<number, FloorDataInputDto[]>();
 
@@ -494,7 +384,7 @@ export class TodoAppService {
       let result = 1;
 
       // kiểm tra task phải là 'thu hoạch'
-      const task = await this.todoAppRepository.getTaskByKeyword(TODO_CONST.TASK_BOX.HARVEST.value);
+      const task = await this.todoAlarmAppRepository.getTaskByKeyword(TODO_CONST.TASK_BOX.HARVEST.value);
       if (!task) {
         this.logger.error(logbase, `Task không có dữ liệu`);
         throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
@@ -522,16 +412,16 @@ export class TodoAppService {
         };
 
         // insert lịch nhắc alarm mới với taskCode của thu hoạch
-        const seq = await this.todoAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
+        const seq = await this.todoAlarmAppRepository.insertTaskAlarm(userCode, alarmMedicionNextTimeDto);
 
         // insert đợt cho thu hoạch
-        await this.todoAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestPhase, dto.isComplete == 'Y' ? YnEnum.Y : YnEnum.N);
+        await this.todoHarvestMedicineAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestPhase, dto.isComplete == 'Y' ? YnEnum.Y : YnEnum.N);
 
         // insert / update/ detele dữ liệu tầng ô mới
         await this.insUpDelHarvestRows(userCode, mainHomeOfUser.userHomeCode, seq, dto.harvestData);
       } else {
         //dữ liệu có sẵn
-        const alramDetail = await this.todoAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
+        const alramDetail = await this.todoAlarmAppRepository.getOneTaskAlarm(dto.taskAlarmCode);
 
         // taskAlarmCode này không phải là lịch nhắc chọn công việc có sẵn
         if (!alramDetail?.taskKeyword) {
@@ -551,7 +441,7 @@ export class TodoAppService {
         }
 
         // cập nhập lại taskDate bằng  dto.harvestNextDate
-        await this.todoAppRepository.updateDateOfTaskAlarm(moment(dto.harvestNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
+        await this.todoAlarmAppRepository.updateDateOfTaskAlarm(moment(dto.harvestNextDate).format('YYYY-MM-DD'), dto.taskAlarmCode, userCode);
         this.logger.log(logbase, `Cập nhập lại taskDate cho lịch nhắc thu hoạch taskAlarmCode(${dto.taskAlarmCode})`);
 
         // insert / update/ detele dữ liệu tầng ô
@@ -560,9 +450,9 @@ export class TodoAppService {
         // hoàn thành tất cả
         if (dto.isComplete == 'Y') {
           // cập nhập alarm là hoàn thành
-          await this.todoAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
+          await this.todoAlarmAppRepository.changeTaskAlarmStatus(TaskStatusEnum.COMPLETE, userCode, dto.taskAlarmCode);
           // cập nhập đợt của alarm là Done
-          await this.todoAppRepository.completeTaskHarvestPhase(userCode, alramDetail?.userHomeCode ?? '', alramDetail?.seq ?? 0, dto.harvestPhase);
+          await this.todoHarvestMedicineAppRepository.completeTaskHarvestPhase(userCode, alramDetail?.userHomeCode ?? '', alramDetail?.seq ?? 0, dto.harvestPhase);
         }
       }
 
@@ -586,7 +476,7 @@ export class TodoAppService {
     }
 
     // lấy thông tin thu hoạch nhà yến này với đợt, năm này
-    let taskHarvestComplete = await this.todoAppRepository.getTaskHarvestCompleteAndNotUseOne(dto.userHomeCode, dto.harvestPhase, dto.harvestYear);
+    let taskHarvestComplete = await this.todoHarvestMedicineAppRepository.getTaskHarvestCompleteAndNotUseOne(dto.userHomeCode, dto.harvestPhase, dto.harvestYear);
     const harvestData = taskHarvestComplete ? await this.arrangeHarvestRows(taskHarvestComplete.seq, homeInfo.userHomeFloor) : [];
 
     return {
@@ -601,7 +491,7 @@ export class TodoAppService {
       let result = 1;
 
       // kiểm tra đợt thu hoạch này đã dùng yêu cầu qrcode hay chưa
-      const isNotUsed = await this.todoAppRepository.checkTaskHarvestCompleteAndNotUse(dto.seq);
+      const isNotUsed = await this.todoHarvestMedicineAppRepository.checkTaskHarvestCompleteAndNotUse(dto.seq);
       if (isNotUsed == false) {
         this.logger.error(logbase, `${Msg.ThisHarvestRequestQrcodeAlreadyCannotAdjust}`);
         result = -1;
@@ -620,7 +510,7 @@ export class TodoAppService {
     const logbase = `${this.SERVICE_NAME}/getTaskHarvest:`;
 
     // lấy thông tin alram
-    const alramHarvestDetail = await this.todoAppRepository.getOneTaskHarvest(taskAlarmCode);
+    const alramHarvestDetail = await this.todoHarvestMedicineAppRepository.getOneTaskHarvest(taskAlarmCode);
     if (String(taskAlarmCode).trim() !== '' && alramHarvestDetail == null) {
       this.logger.error(logbase, `Không có thông tin thu hoạch của mã code taskAlarmCode(${taskAlarmCode})`);
       return 0;
@@ -659,7 +549,7 @@ export class TodoAppService {
     const harvestData: HarvestDataInputDto[] = await this.arrangeHarvestRows(alramHarvestDetail?.seq ?? 0, homeArea.userHomeFloor);
 
     // lấy thông tin 'đợt' theo năm
-    const harvestPhase = await this.todoAppRepository.getMaxHarvestPhase(mainHomeOfUser?.userHomeCode);
+    const harvestPhase = await this.todoHarvestMedicineAppRepository.getMaxHarvestPhase(mainHomeOfUser?.userHomeCode);
     const result: GetTaskHarvestResDto = {
       userHomeName: mainHomeOfUser.userHomeName,
       taskAlarmCode: String(taskAlarmCode).trim() !== '' && alramHarvestDetail != null ? taskAlarmCode : '',
@@ -677,24 +567,20 @@ export class TodoAppService {
   }
 
   async getListTaskHarvestForAdjust(dto: GetListTaskHarvestForAdjustDto, userCode: string): Promise<{ total: number; list: GetListTaskHarvestResDto[] }> {
-    const total = await this.todoAppRepository.getTotalTaskHarvestForAdjust(dto, userCode);
-    const list = await this.todoAppRepository.getListTaskHarvestForAdjust(dto, userCode);
+    const total = await this.todoHarvestMedicineAppRepository.getTotalTaskHarvestForAdjust(dto, userCode);
+    const list = await this.todoHarvestMedicineAppRepository.getListTaskHarvestForAdjust(dto, userCode);
     return { total: total, list: list };
   }
 
   async getTaskMedicineCompleteAndNotUseList(userHomeCode: string) {
-    return await this.todoAppRepository.getTaskMedicineCompleteAndNotUseList(userHomeCode);
+    return await this.todoHarvestMedicineAppRepository.getTaskMedicineCompleteAndNotUseList(userHomeCode);
   }
 
   async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number) {
-    return await this.todoAppRepository.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
+    return await this.todoHarvestMedicineAppRepository.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
   }
 
   async useOrUnuseTaskMedicineForQr(userCode: string, userHomeCode: string, medicineTaskAlarmCode: string, isUsed: YnEnum) {
-    return await this.todoAppRepository.useOrUnuseTaskMedicineForQr(userCode, userHomeCode, medicineTaskAlarmCode, isUsed);
-  }
-
-  async getListTaskAlarmsToday(todayStr: string) {
-    return await this.todoAppRepository.getListTaskAlarmsToday(todayStr);
+    return await this.todoHarvestMedicineAppRepository.useOrUnuseTaskMedicineForQr(userCode, userHomeCode, medicineTaskAlarmCode, isUsed);
   }
 }

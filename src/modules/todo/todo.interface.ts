@@ -1,4 +1,3 @@
-import { YnEnum } from 'src/interfaces/admin.interface';
 
 export const TODO_CONST = {
   TASK_STATUS: {

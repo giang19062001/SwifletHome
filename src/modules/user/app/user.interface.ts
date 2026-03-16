@@ -1,5 +1,4 @@
 
-import { TokenUserAppResDto } from "../../auth/app/auth.dto";
 
 export const USER_CONST = {
   USER_TYPE: {

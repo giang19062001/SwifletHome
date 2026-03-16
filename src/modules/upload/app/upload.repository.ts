@@ -1,8 +1,7 @@
-import { Injectable, Inject } from '@nestjs/common';
-import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { Inject, Injectable } from '@nestjs/common';
+import type { Pool, RowDataPacket } from 'mysql2/promise';
+import { FileMediaResDto, FileUploadResDto } from "../upload.response";
 import { GetAllMediaDto, MediaTypeEnum } from './upload.dto';
-import { YnEnum } from 'src/interfaces/admin.interface';
-import { FileUploadResDto, AudioFreePayResDto, FileMediaResDto } from "../upload.response";
 
 @Injectable()
 export class UploadAppRepository {

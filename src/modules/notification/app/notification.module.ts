@@ -9,6 +9,6 @@ import { UserAppModule } from 'src/modules/user/app/user.module';
   imports: [AuthAppModule, UserAppModule],
   controllers: [NotificationAppController],
   providers: [NotificationAppService, NotificationAppRepository],
-  exports: [NotificationAppService, NotificationAppRepository]
+  exports: [NotificationAppService]
 })
 export class NotificationAppModule {} 

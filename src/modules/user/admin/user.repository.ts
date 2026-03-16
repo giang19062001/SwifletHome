@@ -1,13 +1,13 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserPackageFilterEnum, UserTypeResDto, UserForTeamByTypeResDto } from './user.dto';
-import { TEXTS } from 'src/helpers/text.helper';
 import { UPDATOR } from 'src/helpers/const.helper';
+import { TEXTS } from 'src/helpers/text.helper';
 import { TokenUserAdminResDto } from "../../auth/admin/auth.dto";
 import { UserAppResDto } from "../app/user.dto";
 import { USER_CONST } from "../app/user.interface";
+import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserForTeamByTypeResDto, UserPackageFilterEnum, UserTypeResDto } from './user.dto';
 
 @Injectable()
 export class UserAdminRepository {

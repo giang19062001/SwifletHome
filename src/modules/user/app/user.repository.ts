@@ -1,14 +1,14 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
-import { generateCode } from 'src/helpers/func.helper';
-import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { CreateUserPackageAppDto, UserPackageAppResDto, UserAppResDto } from './user.dto';
 import { CODES, UPDATOR } from 'src/helpers/const.helper';
+import { generateCode } from 'src/helpers/func.helper';
 import { TEXTS } from 'src/helpers/text.helper';
-import { UserTypeResDto } from './user.response';
+import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.dto";
+import { CreateUserPackageAppDto, UserAppResDto, UserPackageAppResDto } from './user.dto';
 import { USER_CONST } from "./user.interface";
+import { UserTypeResDto } from './user.response';
 
 @Injectable()
 export class UserAppRepository {

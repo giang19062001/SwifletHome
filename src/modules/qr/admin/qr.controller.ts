@@ -37,17 +37,4 @@ export class QrAdminController {
     return result;
   }
 
-  @ApiParam({ name: 'requestCode', type: String })
-  @Put('refuse/:requestCode')
-   @ApiBody({
-    type: RefuseRequestDto,
-  })
-  @HttpCode(HttpStatus.OK)
-  async refuse(@Param('requestCode') requestCode: string, @Body() dto: RefuseRequestDto, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
-    const result = await this.qrAdminService.refuse(requestCode, dto.userCode);
-    if (result === 0) {
-      throw new BadRequestException();
-    }
-    return result;
-  }
 }

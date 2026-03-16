@@ -6,10 +6,9 @@ import { QrAdminRepository } from "./qr.repository";
 import { FileLocalModule } from "src/common/fileLocal/fileLocal.module";
 import { ContractModule } from "src/common/contract/contract.module";
 import { UserAdminModule } from "src/modules/user/admin/user.module";
-import { QrAppModule } from "../app/qr.module";
 
 @Module({
-  imports: [AuthAdminModule, FileLocalModule, ContractModule, UserAdminModule, QrAppModule],
+  imports: [AuthAdminModule, FileLocalModule, ContractModule, UserAdminModule],
   controllers: [QrAdminController],
   providers: [QrAdminService, QrAdminRepository],
   exports:[QrAdminService]

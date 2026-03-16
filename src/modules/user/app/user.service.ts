@@ -1,12 +1,11 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { UserAppRepository } from './user.repository';
-import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { CreateUserPackageAppDto, UserAppResDto } from './user.dto';
 import { TEXTS } from 'src/helpers/text.helper';
-import { UserTypeResDto } from './user.response';
-import { Msg } from 'src/helpers/message.helper';
+import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.dto";
+import { CreateUserPackageAppDto, UserAppResDto } from './user.dto';
+import { UserAppRepository } from './user.repository';
+import { UserTypeResDto } from './user.response';
 
 @Injectable()
 export class UserAppService {

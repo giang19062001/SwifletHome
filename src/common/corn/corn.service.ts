@@ -3,18 +3,15 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
 import { LoggingService } from '../logger/logger.service';
-import path from 'path';
 import { DoctorAppService } from 'src/modules/doctor/app/doctor.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { TodoAppService } from 'src/modules/todo/app/todo.service';
 import moment from 'moment';
 import { FirebaseService } from '../firebase/firebase.service';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
-import { UserAppService } from 'src/modules/user/app/user.service';
-import TodoAppValidate from 'src/modules/todo/app/todo.validate';
-import { QrAppService } from 'src/modules/qr/app/qr.service';
-import { TeamAppService } from 'src/modules/team/app/team.service';
+import { TodoAlarmAppService } from 'src/modules/todo/app/todo-alarm.service';
+import { QrRequestAppService } from 'src/modules/qr/app/qr-request.service';
+import { TeamReviewAppService } from 'src/modules/team/app/team-review.service';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -22,12 +19,10 @@ export class CornService implements OnModuleInit {
 
   constructor(
     private readonly doctorAppService: DoctorAppService,
-    private readonly teamAppService: TeamAppService,
-    private readonly userAppService: UserAppService,
+    private readonly teamReviewAppService: TeamReviewAppService,
     private readonly userHomeAppService: UserHomeAppService,
-    private readonly todoAppValidate: TodoAppValidate,
-    private readonly todoAppService: TodoAppService,
-    private readonly qrAppService: QrAppService,
+    private readonly todoAlarmAppService: TodoAlarmAppService,
+    private readonly qrRequestAppService: QrRequestAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
@@ -84,7 +79,7 @@ export class CornService implements OnModuleInit {
 
     this.logger.log(logbase, `Chuẩn bị tìm các lịch nhắc hôm nay để gửi thông báo...`);
 
-    const taskAlarmList = await this.todoAppService.getListTaskAlarmsToday(todayStr);
+    const taskAlarmList = await this.todoAlarmAppService.getListTaskAlarmsToday(todayStr);
     this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskAlarmList.length}`);
     if (taskAlarmList.length) {
       for (const task of taskAlarmList) {
@@ -125,10 +120,10 @@ export class CornService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/deleteReviewFilesNotUse`;
     this.logger.log(logbase, `Chuẩn bị xóa các file review không dùng theo lịch trình....`);
     try {
-      const filesNotUse = await this.teamAppService.getFilesNotUse();
+      const filesNotUse = await this.teamReviewAppService.getFilesNotUse();
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
-          await this.teamAppService.deleteFile(file.seq);
+          await this.teamReviewAppService.deleteFile(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
         this.logger.log(logbase, `Các file review không dùng đã được xóa theo lịch trình thành công`);
@@ -162,10 +157,10 @@ export class CornService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/deleteQrRequestFilesNotUse`;
     this.logger.log(logbase, `Chuẩn bị xóa các file video yêu cầu Qrcode dư thừa theo lịch trình....`);
     try {
-      const filesNotUse = await this.qrAppService.getFilesNotUse();
+      const filesNotUse = await this.qrRequestAppService.getFilesNotUse();
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
-          await this.qrAppService.deleteFile(file.seq);
+          await this.qrRequestAppService.deleteFile(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
         this.logger.log(logbase, `Các file video yêu cầu Qrcode dư thừa đã được xóa theo lịch trình thành công`);

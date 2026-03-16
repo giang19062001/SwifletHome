@@ -8,6 +8,6 @@ import { AuthAppModule } from 'src/modules/auth/app/auth.module';
   imports: [forwardRef(() => AuthAppModule)],
   controllers: [UserAppController],
   providers: [UserAppService, UserAppRepository],
-  exports: [UserAppService, UserAppRepository],
+  exports: [UserAppService],
 })
 export class UserAppModule {}
