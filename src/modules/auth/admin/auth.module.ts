@@ -1,10 +1,10 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { AuthAdminController } from './auth.controller';
-import { AuthAdminService } from './auth.service';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { UserAdminModule } from 'src/modules/user/admin/user.module';
 import { AUTH_CONFIG } from '../auth.config';
+import { AuthAdminController } from './auth.controller';
+import { AuthAdminService } from './auth.service';
 
 @Module({
   imports: [

@@ -1,6 +1,4 @@
-import { IsString, IsArray, IsNumber, ValidateNested, IsNotEmpty, ArrayNotEmpty } from 'class-validator';
-import { Type } from 'class-transformer';
-import { SensorDataDto } from '../socket.dto';
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator';
 
 export class LeaveRoomDto {
   @IsString()

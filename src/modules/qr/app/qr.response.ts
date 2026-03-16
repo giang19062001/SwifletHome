@@ -1,7 +1,7 @@
-import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { ArrayMinSize, IsArray, IsDecimal, IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
 import { RequestStatusEnum } from '../qr.interface';
 
 export class QrRequestFileResDto {

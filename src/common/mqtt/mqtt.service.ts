@@ -1,9 +1,9 @@
-import { Injectable, OnModuleInit, OnApplicationShutdown } from '@nestjs/common';
+import { Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as mqtt from 'mqtt';
 import { LoggingService } from '../logger/logger.service';
-import { ConfigService } from '@nestjs/config';
 import { ISensor, ISensorStatus } from '../socket/socket.interface';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class MqttService implements OnModuleInit, OnApplicationShutdown {

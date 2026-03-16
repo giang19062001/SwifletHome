@@ -1,10 +1,10 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GetOptionDto, OpitionResDto } from './option.dto';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { OptionService } from './option.service';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
+import { GetOptionDto, OpitionResDto } from './option.dto';
 import { GetOptionResDto } from './option.response';
+import { OptionService } from './option.service';
 
 @ApiTags('app/options')
 @Controller('/api/app/options')

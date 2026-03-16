@@ -1,6 +1,6 @@
-import { ProvinceRepository } from './province.repository';
 import { Module } from '@nestjs/common';
 import ProvinceController from './province.controller';
+import { ProvinceRepository } from './province.repository';
 import { ProvinceService } from './province.service';
 
 @Module({

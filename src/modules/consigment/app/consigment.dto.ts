@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsNumberString, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
+import { IsIn, IsInt, IsNotEmpty, IsNumberString, IsString, Min } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { MsgDto } from 'src/helpers/message.helper';
 import { ConsignmentStatusEnum } from './consigment.interface';

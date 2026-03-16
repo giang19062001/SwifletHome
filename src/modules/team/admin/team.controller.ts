@@ -1,35 +1,27 @@
 import {
-  Controller,
-  Post,
+  BadRequestException,
   Body,
-  Res,
-  HttpStatus,
-  Req,
+  Controller,
   Get,
   HttpCode,
-  UseGuards,
-  UseInterceptors,
-  UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
-  UploadedFiles,
-  BadRequestException,
-  Delete,
+  HttpStatus,
   Param,
+  Post,
   Put,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/admin.dto';
-import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { multerImgConfig } from 'src/config/multer.config';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
-import { TeamAdminService } from './team.service';
-import { ChangDisplayReviewDto, CreateTeamDto, UpdateTeamDto, TeamResDto, TeamReviewResDto } from './team.dto';
+import { PagingDto } from 'src/dto/admin.dto';
 import { MsgAdmin } from 'src/helpers/message.helper';
-import { ListResponseDto } from "src/dto/common.dto";
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { ChangDisplayReviewDto, CreateTeamDto, TeamResDto, TeamReviewResDto, UpdateTeamDto } from './team.dto';
+import { TeamAdminService } from './team.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/team')

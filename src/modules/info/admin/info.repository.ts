@@ -1,8 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { UpdateInfoDto } from './info.dto';
 import { InfoResDto } from "../info.response";
+import { UpdateInfoDto } from './info.dto';
 
 @Injectable()
 export class InfoAdminRepository {

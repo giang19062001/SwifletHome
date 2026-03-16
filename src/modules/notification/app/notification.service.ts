@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin.dto';
-import { NotificationAppRepository } from './notification.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { NotificationStatusEnum } from '../notification.interface';
+import { PagingDto } from 'src/dto/admin.dto';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusDto } from './notification.dto';
-import { ListResponseDto } from "src/dto/common.dto";
+import { NotificationStatusEnum } from '../notification.interface';
 import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from "../notification.response";
+import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusDto } from './notification.dto';
+import { NotificationAppRepository } from './notification.repository';
 
 @Injectable()
 export class NotificationAppService {

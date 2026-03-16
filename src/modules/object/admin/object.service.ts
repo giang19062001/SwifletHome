@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ObjectAdminRepository } from './object.repository';
-import { ListResponseDto } from "src/dto/common.dto";
 import { ObjectResDto } from "../object.response";
+import { ObjectAdminRepository } from './object.repository';
 
 @Injectable()
 export class ObjectAdminService   {

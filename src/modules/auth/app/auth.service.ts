@@ -1,19 +1,19 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { Msg } from 'src/helpers/message.helper';
-import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto, TokenUserAppResDto, TokenUserAppWithPasswordResDto } from './auth.dto';
-import { OtpService } from 'src/modules/otp/otp.service';
-import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
-import { LoggingService } from 'src/common/logger/logger.service';
-import { UserAppService } from 'src/modules/user/app/user.service';
-import { AbAuthService } from '../auth.abstract';
+import * as bcrypt from 'bcrypt';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
-import { AUTH_CONFIG } from '../auth.config';
+import { LoggingService } from 'src/common/logger/logger.service';
+import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
+import { OtpService } from 'src/modules/otp/otp.service';
 import { PhoneCodeService } from 'src/modules/phoneCode/phoneCode.service';
+import { UserAppService } from 'src/modules/user/app/user.service';
 import { UserAppResDto } from "../../user/app/user.dto";
 import { USER_CONST } from "../../user/app/user.interface";
+import { AbAuthService } from '../auth.abstract';
+import { AUTH_CONFIG } from '../auth.config';
+import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, TokenUserAppResDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {

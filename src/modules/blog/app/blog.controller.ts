@@ -1,12 +1,12 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, BadRequestException, Delete, Param, UseInterceptors } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { BlogAppService } from './blog.service';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { Controller, Get, HttpCode, HttpStatus, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { GetContentBlogResDto } from './blog.response';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { GetContentBlogResDto } from './blog.response';
+import { BlogAppService } from './blog.service';
 
 @ApiBearerAuth('app-auth')
 @ApiTags('app/blog')

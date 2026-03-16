@@ -1,19 +1,18 @@
-import { ApiAppResponse } from '../../../interfaces/app.interface';
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseInterceptors, Put, Param, UseGuards, Delete, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import type { Request, Response } from 'express';
-import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
-import { AuthAppService } from './auth.service';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
-import { Msg } from 'src/helpers/message.helper';
-import { ApiAuthAppGuard } from './auth.guard';
+import type { Request } from 'express';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
-import { RequestOtpResDto } from 'src/modules/otp/otp.response';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
+import { Msg } from 'src/helpers/message.helper';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
+import { RequestOtpResDto } from 'src/modules/otp/otp.response';
+import { GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
+import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { ApiAuthAppGuard } from './auth.guard';
+import { AuthAppService } from './auth.service';
 
 @ApiBearerAuth('app-auth')
 @ApiTags('app/auth')

@@ -1,6 +1,5 @@
-import { Injectable, Inject } from '@nestjs/common';
-import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/admin.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { InfoResDto } from "../info.response";
 
 @Injectable()

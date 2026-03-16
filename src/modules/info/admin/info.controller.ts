@@ -1,14 +1,13 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Param, BadRequestException, Put, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { InfoAdminService } from './info.service';
-import { UpdateInfoDto } from './info.dto';
-import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import { GetUserAdmin } from 'src/decorator/auth.decorator';
-import { ListResponseDto } from "src/dto/common.dto";
-import { InfoResDto } from "../info.response";
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { InfoResDto } from "../info.response";
+import { UpdateInfoDto } from './info.dto';
+import { InfoAdminService } from './info.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/info')

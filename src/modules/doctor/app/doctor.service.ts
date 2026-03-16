@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { LoggingService } from 'src/common/logger/logger.service';
+import { getFileLocation } from 'src/config/multer.config';
+import { Msg } from 'src/helpers/message.helper';
+import { DoctorStatusEnum } from '../doctor.interface';
+import { DoctorFileStrResDto } from "../doctor.response";
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
-import { DoctorStatusEnum } from '../doctor.interface';
-import { getFileLocation } from 'src/config/multer.config';
-import { LoggingService } from 'src/common/logger/logger.service';
-import { Msg } from 'src/helpers/message.helper';
-import { DoctorFileStrResDto } from "../doctor.response";
 
 @Injectable()
 export class DoctorAppService {

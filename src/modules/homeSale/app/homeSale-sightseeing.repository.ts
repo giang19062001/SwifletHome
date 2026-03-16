@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { CreateHomeSightSeeingDto } from './homeSale.dto';
 

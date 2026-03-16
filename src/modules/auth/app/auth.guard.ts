@@ -1,8 +1,8 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, ForbiddenException, forwardRef, Inject } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthAppService } from './auth.service';
 import { Msg } from 'src/helpers/message.helper';
 import { TokenUserAppResDto } from "./auth.dto";
+import { AuthAppService } from './auth.service';
 
 @Injectable()
 export class ApiAuthAppGuard implements CanActivate {

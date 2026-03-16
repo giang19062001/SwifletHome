@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { FileLocalModule } from 'src/common/fileLocal/fileLocal.module';
 import { AuthAdminModule } from 'src/modules/auth/admin/auth.module';
 import { HomeSaleAdminController } from './homeSale.controller';
 import { HomeSaleAdminRepository } from './homeSale.repository';
 import { HomeSaleAdminService } from './homeSale.service';
-import { FileLocalModule } from 'src/common/fileLocal/fileLocal.module';
 
 @Module({
   imports: [AuthAdminModule, FileLocalModule],

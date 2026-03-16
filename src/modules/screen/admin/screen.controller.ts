@@ -1,13 +1,12 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, Param, BadRequestException, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { ScreenAdminService } from './screen.service';
-import { UpdateScreenDto } from './screen.dto';
-import { GetUserAdmin } from 'src/decorator/auth.decorator';
-import { ListResponseDto } from "src/dto/common.dto";
-import { ScreenResDto } from "../screen.response";
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { ScreenResDto } from "../screen.response";
+import { UpdateScreenDto } from './screen.dto';
+import { ScreenAdminService } from './screen.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/screen')

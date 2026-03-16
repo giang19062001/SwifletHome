@@ -1,10 +1,7 @@
-import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
-import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsDecimal, IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
-import { YnEnum } from 'src/interfaces/admin.interface';
-import { GetTypeEnum, MarkTypeEnum } from '../qr.interface';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
+import { GetTypeEnum, MarkTypeEnum } from '../qr.interface';
 
 export class GetRequestSellListDto extends PagingDto {
   @ApiProperty({

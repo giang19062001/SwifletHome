@@ -1,18 +1,18 @@
 import {
-  Controller,
-  Post,
   Body,
-  Res,
-  HttpStatus,
-  Req,
+  Controller,
   Get,
   HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
 } from '@nestjs/common';
-import { AuthAdminService } from './auth.service';
-import { LoginAdminDto } from './auth.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { AUTH_CONFIG } from '../auth.config';
+import { LoginAdminDto } from './auth.dto';
+import { AuthAdminService } from './auth.service';
 
 @ApiTags('admin/auth')
 @Controller('/api/admin/auth')

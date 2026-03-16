@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
 import { Msg } from 'src/helpers/message.helper';
-import { LoggingService } from '../logger/logger.service';
-import { UserAppService } from 'src/modules/user/app/user.service';
-import { ISearchItem } from './search.interface';
 import { UploadAppService } from 'src/modules/upload/app/upload.service';
+import { UserAppService } from 'src/modules/user/app/user.service';
 import { FileUploadResDto } from "../../modules/upload/upload.response";
+import { LoggingService } from '../logger/logger.service';
+import { ISearchItem } from './search.interface';
 
 @Injectable()
 export class SearchService {

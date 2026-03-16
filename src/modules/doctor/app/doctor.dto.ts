@@ -1,6 +1,5 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class DoctorFileDto {
   @ApiProperty({

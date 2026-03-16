@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { YnEnum } from "src/interfaces/admin.interface";
-import { NotificationTypeEnum, NotificationStatusEnum } from "./notification.interface";
+import { NotificationStatusEnum, NotificationTypeEnum } from "./notification.interface";
 
 export class NotificationResDto {
     @ApiProperty({ example: 0 })

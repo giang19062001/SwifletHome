@@ -1,9 +1,9 @@
-import { Controller, HttpStatus, Get, HttpCode, UseInterceptors } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
+import { Controller, Get, HttpCode, HttpStatus, UseInterceptors } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { ProvinceService } from './province.service';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { GetProvinceResDto, ProvinceResDto } from './province.response';
+import { ProvinceService } from './province.service';
 
 @ApiTags('app/province')
 @Controller('/api/app/province')

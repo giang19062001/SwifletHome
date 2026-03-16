@@ -7,6 +7,7 @@ export enum DeleteNotificationByStatusEnum {
   READ = 'READ',
   ALL = 'ALL',
 }
+
 export class DeleteNotificationByStatusDto {
    @ApiProperty({
     example: 'SENT',
@@ -16,7 +17,6 @@ export class DeleteNotificationByStatusDto {
   @IsEnum(DeleteNotificationByStatusEnum)
   notificationStatus: DeleteNotificationByStatusEnum;
 }
-
 
 export class CreateNotificationDto {
   @ApiProperty({

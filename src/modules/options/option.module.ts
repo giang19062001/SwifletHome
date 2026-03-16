@@ -1,7 +1,7 @@
 import { Global, Module } from "@nestjs/common";
-import { OptionService } from "./option.service";
-import { OptionRepository } from "./option.repository";
 import OptionController from "./option.controller";
+import { OptionRepository } from "./option.repository";
+import { OptionService } from "./option.service";
 
 @Global() 
 @Module({

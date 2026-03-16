@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { PackageAppService } from "./package.service";
 import { PackageAppRepository } from "./package.repository";
+import { PackageAppService } from "./package.service";
 
 @Module({
   providers: [PackageAppService, PackageAppRepository],

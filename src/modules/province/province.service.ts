@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ProvinceRepository } from './province.repository';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { ProvinceRepository } from './province.repository';
 import { ProvinceResDto } from "./province.response";
 
 @Injectable()

@@ -1,15 +1,15 @@
-import { Injectable, OnModuleInit, Body } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import admin from 'firebase-admin';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { LoggingService } from '../logger/logger.service';
 import { PushDataPayload } from './firebase.interface';
 
-import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { NotificationStatusEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { ConfigService } from '@nestjs/config';
 import { APP_SCREENS } from 'src/helpers/const.helper';
+import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { NotificationAppService } from 'src/modules/notification/app/notification.service';
+import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { v4 as uuidv4 } from 'uuid';
 import { UserNotificationTopicResDto } from "../../modules/notification/notification.response";
 
 const serviceAccount = serviceAccountJson as any;

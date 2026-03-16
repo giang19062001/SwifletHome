@@ -1,20 +1,20 @@
-import { Controller, Post, Body, HttpStatus, Get, HttpCode, UseGuards, Put, Param, BadRequestException, UseInterceptors, UseFilters, UploadedFiles } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, UploadedFiles, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { getImgVideoMulterConfig } from 'src/config/multer.config';
+import { GetUserApp } from 'src/decorator/auth.decorator';
+import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
-import { GetRequestSellListDto, InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
-import { GetUserApp } from 'src/decorator/auth.decorator';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
-import { getImgVideoMulterConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
-import { PagingDto } from 'src/dto/admin.dto';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { QrRequestAppService } from './qr-request.service';
 import { QrSellAppService } from './qr-sell.service';
+import { GetRequestSellListDto, InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import {
   GetApprovedRequestQrCodeResDto,
   GetInfoToRequestQrcodeResDto,

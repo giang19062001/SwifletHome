@@ -1,7 +1,6 @@
-import { Injectable, Inject } from '@nestjs/common';
-import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { NotificationStatusEnum } from '../notification.interface';
-import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from "../notification.response";
+import { Inject, Injectable } from '@nestjs/common';
+import type { Pool, RowDataPacket } from 'mysql2/promise';
+import { NotificationTopicResDto } from "../notification.response";
 
 @Injectable()
 export class NotificationAdminRepository {

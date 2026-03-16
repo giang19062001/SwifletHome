@@ -1,12 +1,12 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ScreenAppService } from './screen.service';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { GetContentScreenResDto } from './screen.response';
 import { GetUserApp } from 'src/decorator/auth.decorator';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { GetContentScreenResDto } from './screen.response';
+import { ScreenAppService } from './screen.service';
 
 @ApiTags('app/screen')
 @Controller('/api/app/screen')

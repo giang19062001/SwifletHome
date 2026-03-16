@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ReportAppRepository } from './report.repository';
 import { GetHarvertReportDto, ReportTypeEnum } from './report.dto';
+import { ReportAppRepository } from './report.repository';
 import { GetHarvertReportDetailResDto, GetHarvertReportSummaryResDto } from './report.response';
 
 @Injectable()

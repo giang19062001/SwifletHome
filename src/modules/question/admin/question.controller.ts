@@ -1,13 +1,12 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/admin.dto';
-import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
-import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { QuestionAdminService } from './question.service';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
-import { ListResponseDto } from "src/dto/common.dto";
-import { QuestionResDto } from "../question.response";
+import { PagingDto } from 'src/dto/admin.dto';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { QuestionResDto } from "../question.response";
+import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
+import { QuestionAdminService } from './question.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/question')

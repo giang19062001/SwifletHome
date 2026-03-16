@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
+import { SearchModule } from "src/common/search/search.module";
 import { AuthAppModule } from "src/modules/auth/app/auth.module";
 import { BlogAppController } from "./blog.controller";
-import { BlogAppService } from "./blog.service";
 import { BlogAdppRepository } from "./blog.repository";
-import { SearchModule } from "src/common/search/search.module";
+import { BlogAppService } from "./blog.service";
 
 @Module({
   imports: [AuthAppModule, SearchModule],

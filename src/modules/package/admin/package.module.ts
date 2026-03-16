@@ -1,8 +1,8 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { AuthAdminModule } from 'src/modules/auth/admin/auth.module';
 import { PackageAdminController } from './package.controller';
-import { PackageAdminService } from './package.service';
 import { PackageAdminRepository } from './package.repository';
+import { PackageAdminService } from './package.service';
 
 @Module({
   imports: [forwardRef(() => AuthAdminModule)], // ← phá phụ thuộc vòng tròn

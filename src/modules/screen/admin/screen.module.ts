@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ScreenAdminController } from './screen.controller';
-import { ScreenAdminService } from './screen.service';
-import { ScreenAdminRepository } from './screen.repository';
 import { AuthAdminModule } from 'src/modules/auth/admin/auth.module';
+import { ScreenAdminController } from './screen.controller';
+import { ScreenAdminRepository } from './screen.repository';
+import { ScreenAdminService } from './screen.service';
 
 @Module({
   imports: [AuthAdminModule],

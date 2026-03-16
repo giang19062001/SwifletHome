@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
 import { AsyncLocalStorage } from 'async_hooks';
+import { NextFunction, Request, Response } from 'express';
 
 export interface RequestContext {
   requestId: string;

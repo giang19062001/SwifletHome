@@ -1,10 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { PagingDto } from 'src/dto/admin.dto';
-import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
-import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
+import { generateCode } from 'src/helpers/func.helper';
 import { AnswerResDto } from "../answer.response";
+import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
 
 @Injectable()
 export class AnswerAdminRepository {

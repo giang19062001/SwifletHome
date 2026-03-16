@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { LoggingService } from '../logger/logger.service';
 import { existsSync, promises as fs, mkdirSync } from 'fs';
 import * as path from 'path';
-import sharp from 'sharp';
 import * as QRCode from 'qrcode';
+import sharp from 'sharp';
 import { getFileLocation } from 'src/config/multer.config';
+import { LoggingService } from '../logger/logger.service';
 
 @Injectable()
 export class FileLocalService {

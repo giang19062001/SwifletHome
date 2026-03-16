@@ -1,13 +1,11 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, Put, BadRequestException, Param } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { QrAdminService } from './qr.service';
-import { GetUserAdmin } from 'src/decorator/auth.decorator';
-import { RefuseRequestDto } from './qr.dto';
-import { ListResponseDto } from "src/dto/common.dto";
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
+import { QrAdminService } from './qr.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/qrcode')

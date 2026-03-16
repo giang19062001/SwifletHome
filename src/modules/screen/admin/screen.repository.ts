@@ -1,10 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { IPaging } from 'src/interfaces/admin.interface';
 import { PagingDto } from 'src/dto/admin.dto';
-import { UpdateScreenDto } from './screen.dto';
-import { ListResponseDto } from "src/dto/common.dto";
 import { ScreenResDto } from "../screen.response";
+import { UpdateScreenDto } from './screen.dto';
 
 @Injectable()
 export class ScreenAdminRepository {

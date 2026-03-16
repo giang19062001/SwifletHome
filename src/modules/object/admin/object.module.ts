@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ObjectAdminController } from './object.controller';
-import { ObjectAdminService } from './object.service';
-import { ObjectAdminRepository } from './object.repository';
 import { AuthAdminModule } from 'src/modules/auth/admin/auth.module';
+import { ObjectAdminController } from './object.controller';
+import { ObjectAdminRepository } from './object.repository';
+import { ObjectAdminService } from './object.service';
 
 @Module({
   imports: [AuthAdminModule],

@@ -1,10 +1,10 @@
+import { BadRequestException } from '@nestjs/common';
+import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
-import { v4 as uuidv4 } from 'uuid';
-import { BadRequestException, Logger } from '@nestjs/common';
 import { AUDIO_TYPES, IMG_TYPES, VIDEO_TYPES } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
+import { v4 as uuidv4 } from 'uuid';
 
 interface MulterLimits {
   fileSize?: number;

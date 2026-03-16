@@ -1,8 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ConsignmentResDto } from "./consignment.response";
 import { UpdateConsignmentDto } from './consignment.dto';
+import { ConsignmentResDto } from "./consignment.response";
 
 @Injectable()
 export class ConsignmentAdminRepository {

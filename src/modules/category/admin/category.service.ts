@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CategoryAdminRepository } from './category.repository';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ListResponseDto } from "src/dto/common.dto";
 import { CategoryResDto } from "../category.response";
+import { CategoryAdminRepository } from './category.repository';
 
 @Injectable()
 export class CategoryAdminService   {

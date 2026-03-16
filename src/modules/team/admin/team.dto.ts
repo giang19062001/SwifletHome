@@ -1,6 +1,5 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class CreateTeamDto {

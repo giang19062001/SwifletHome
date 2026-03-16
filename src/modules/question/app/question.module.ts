@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { QuestionAppService } from './question.service';
 import { QuestionAppRepository } from './question.repository';
+import { QuestionAppService } from './question.service';
 
 @Module({
   imports: [],

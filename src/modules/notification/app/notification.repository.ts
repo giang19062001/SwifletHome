@@ -1,12 +1,11 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusEnum } from './notification.dto';
-import { NOTIFICATION_CONST, NotificationStatusEnum, NotificationTypeEnum } from '../notification.interface';
-import { handleTimezoneQuery } from 'src/helpers/func.helper';
-import { TEXTS } from 'src/helpers/text.helper';
 import { UPDATOR } from 'src/helpers/const.helper';
+import { handleTimezoneQuery } from 'src/helpers/func.helper';
+import { NOTIFICATION_CONST, NotificationStatusEnum } from '../notification.interface';
 import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from "../notification.response";
+import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusEnum } from './notification.dto';
 
 @Injectable()
 export class NotificationAppRepository {

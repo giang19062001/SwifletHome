@@ -1,6 +1,6 @@
-import { InfoBankResDto } from "../info/info.response";
 import { ApiProperty } from "@nestjs/swagger";
 import { YnEnum } from "src/interfaces/admin.interface";
+import { InfoBankResDto } from "../info/info.response";
 
 export class ScreenResDto {
     @ApiProperty({ example: 0 })

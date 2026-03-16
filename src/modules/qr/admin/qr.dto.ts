@@ -6,7 +6,6 @@ export class RefuseRequestDto {
   userCode: string;
 }
 
-
 export class WriteQrBlockchainDto {
   @IsString()
   @IsNotEmpty()

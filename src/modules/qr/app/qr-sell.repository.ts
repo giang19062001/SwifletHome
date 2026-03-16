@@ -1,10 +1,10 @@
-import { GetTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { YnEnum } from 'src/interfaces/admin.interface';
 import { RequestSellStatusEnum } from '../qr.interface';
+import { GetTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
 import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
 import { GetRequestSellDetailResDto, GetRequestSellListResDto } from './qr.response';
-import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class QrSellAppRepository {

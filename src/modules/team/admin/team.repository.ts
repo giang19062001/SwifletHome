@@ -1,10 +1,10 @@
-import { YnEnum } from './../../../interfaces/admin.interface';
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { generateCode } from 'src/helpers/func.helper';
 import { CODES } from 'src/helpers/const.helper';
-import { CreateTeamDto, UpdateTeamDto, TeamResDto, TeamReviewResDto, TeamImgResDto } from './team.dto';
+import { generateCode } from 'src/helpers/func.helper';
+import { YnEnum } from './../../../interfaces/admin.interface';
+import { CreateTeamDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto } from './team.dto';
 
 @Injectable()
 export class TeamAdminRepository {

@@ -1,11 +1,9 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import type { Request, Response } from 'express';
 import { PagingDto } from 'src/dto/admin.dto';
-import { CategoryAdminService } from './category.service';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { ListResponseDto } from "src/dto/common.dto";
 import { CategoryResDto } from "../category.response";
+import { CategoryAdminService } from './category.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/category')

@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ScreenAdminRepository } from './screen.repository';
-import { UpdateScreenDto } from './screen.dto';
 import { APP_SCREENS } from 'src/helpers/const.helper';
-import { ListResponseDto } from "src/dto/common.dto";
-import { ScreenResDto, ScreenRequestDoctorResDto } from "../screen.response";
+import { ScreenRequestDoctorResDto, ScreenResDto } from "../screen.response";
+import { UpdateScreenDto } from './screen.dto';
+import { ScreenAdminRepository } from './screen.repository';
 
 @Injectable()
 export class ScreenAdminService {

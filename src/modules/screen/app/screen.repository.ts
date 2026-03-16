@@ -1,5 +1,5 @@
-import { Injectable, Inject } from '@nestjs/common';
-import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { Inject, Injectable } from '@nestjs/common';
+import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { ScreenResDto } from "../screen.response";
 
 @Injectable()

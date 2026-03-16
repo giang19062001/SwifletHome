@@ -1,7 +1,7 @@
-import { Controller,HttpStatus, Get, HttpCode, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { GetPhoneCodeResDto, PhoneCodeResDto } from './phoneCode.response';
 import { PhoneCodeService } from './phoneCode.service';
 

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import QrAppController from './qr.controller';
 import { AuthAppModule } from 'src/modules/auth/app/auth.module';
-import { UserHomeAppModule } from 'src/modules/userHome/app/userHome.module';
 import { TodoAppModule } from 'src/modules/todo/app/todo.module';
-import { QrSellAppService } from './qr-sell.service';
-import { QrRequestAppService } from './qr-request.service';
+import { UserHomeAppModule } from 'src/modules/userHome/app/userHome.module';
 import { QrRequestAppRepository } from './qr-request.repository';
+import { QrRequestAppService } from './qr-request.service';
 import { QrSellAppRepository } from './qr-sell.repository';
+import { QrSellAppService } from './qr-sell.service';
+import QrAppController from './qr.controller';
 
 @Module({
   imports: [AuthAppModule, TodoAppModule ,UserHomeAppModule],

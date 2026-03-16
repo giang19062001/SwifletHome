@@ -1,14 +1,12 @@
-import { Controller, Post, Body, Res, HttpStatus, Req, Get, HttpCode, UseGuards, Put, Delete, Param, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
-import type { Request, Response } from 'express';
+import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { DoctorAdminService } from './doctor.service';
-import { UpdateDoctorDto } from './doctor.dto';
-import { GetUserAdmin } from 'src/decorator/auth.decorator';
-import { ListResponseDto } from "src/dto/common.dto";
-import { DoctorResDto } from "../doctor.response";
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { DoctorResDto } from "../doctor.response";
+import { UpdateDoctorDto } from './doctor.dto';
+import { DoctorAdminService } from './doctor.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/doctor')

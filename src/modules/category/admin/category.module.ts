@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CategoryAdminService } from './category.service';
-import { CategoryAdminRepository } from './category.repository';
-import { CategoryAdminController } from './category.controller';
 import { AuthAdminModule } from 'src/modules/auth/admin/auth.module';
+import { CategoryAdminController } from './category.controller';
+import { CategoryAdminRepository } from './category.repository';
+import { CategoryAdminService } from './category.service';
 
 @Module({
   imports: [AuthAdminModule],

@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Msg } from 'src/helpers/message.helper';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { PackageAppService } from 'src/modules/package/app/package.service';
-import { InfoAppService } from 'src/modules/info/app/info.service';
-import { ScreenAppRepository } from './screen.repository';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
+import { InfoAppService } from 'src/modules/info/app/info.service';
+import { PackageAppService } from 'src/modules/package/app/package.service';
 import { PackageOptionTypeEnum } from 'src/modules/package/package.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { InfoBankResDto } from "../../info/info.response";
 import { ScreenSignupServiceResDto } from "../screen.response";
+import { ScreenAppRepository } from './screen.repository';
 
 @Injectable()
 export class ScreenAppService {

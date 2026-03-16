@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
 import { RequestQrcodeFilesResDto, RequestQrCodeResDto } from '../app/qr.response';
 
 export class GetInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeResDto, ['uniqueId'] as const) {

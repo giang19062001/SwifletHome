@@ -1,18 +1,18 @@
-import { getImgVideoMulterConfig } from './../../../config/multer.config';
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, UploadedFiles, BadRequestException, UseFilters, Delete, Param } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Delete, HttpCode, HttpStatus, Param, Post, UploadedFiles, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
-import { DoctorAppService } from './doctor.service';
-import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserApp } from 'src/decorator/auth.decorator';
-import { Msg } from 'src/helpers/message.helper';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { UploadFileDoctorResDto } from './doctor.response';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
+import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
+import { Msg } from 'src/helpers/message.helper';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { getImgVideoMulterConfig } from './../../../config/multer.config';
+import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
+import { UploadFileDoctorResDto } from './doctor.response';
+import { DoctorAppService } from './doctor.service';
 
 @ApiTags('app/doctor')
 @Controller('/api/app/doctor')

@@ -1,9 +1,9 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { OtpRepository } from './otp.repository';
-import { Msg } from 'src/helpers/message.helper';
-import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from './otp.dto';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { QUERY_HELPER } from 'src/helpers/const.helper';
+import { Msg } from 'src/helpers/message.helper';
+import { RequestOtpDto, VerifyOtpDto } from './otp.dto';
+import { OtpRepository } from './otp.repository';
 @Injectable()
 export class OtpService {
   private readonly SERVICE_NAME = 'OtpService';

@@ -1,35 +1,28 @@
 import {
-  Controller,
-  Post,
+  BadRequestException,
   Body,
-  Res,
-  HttpStatus,
-  Req,
+  Controller,
+  Delete,
   Get,
   HttpCode,
-  UseGuards,
-  UseInterceptors,
-  UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
-  UploadedFiles,
-  BadRequestException,
-  Delete,
+  HttpStatus,
   Param,
+  Post,
   Put,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/admin.dto';
-import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { HomeSaleAdminService } from './homeSale.service';
-import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { FileFieldsInterceptor, } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { multerImgConfig } from 'src/config/multer.config';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
-import { ListResponseDto } from "src/dto/common.dto";
-import { HomeSaleResDto, HomeSaleSightSeeingResDto } from "../homeSale.response";
+import { PagingDto } from 'src/dto/admin.dto';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { HomeSaleResDto, HomeSaleSightSeeingResDto } from "../homeSale.response";
+import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
+import { HomeSaleAdminService } from './homeSale.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/homeSale')

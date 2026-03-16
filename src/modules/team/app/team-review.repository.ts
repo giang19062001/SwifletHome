@@ -1,8 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { TeamReviewFileResDto } from '../admin/team.dto';
 import { GetReviewListOfTeamDto, ReviewTeamDto } from './team.dto';
 import { GetReviewListOfTeamResDto } from './team.response';
-import { TeamReviewFileResDto } from '../admin/team.dto';
 
 @Injectable()
 export class TeamReviewAppRepository {
@@ -10,6 +10,7 @@ export class TeamReviewAppRepository {
   private readonly tableReview = 'tbl_team_review';
   private readonly tableReviewImg = 'tbl_team_review_img';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+  
   // TODO: REVIEW
   async getReviewTotalOfTeam(dto: GetReviewListOfTeamDto): Promise<number> {
     let query = ` 

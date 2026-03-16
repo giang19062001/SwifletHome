@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PagingDto } from 'src/dto/admin.dto';
+import { BlogResDto } from "../blog.response";
 import { ChangToMainBlogDto, CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { BlogAdminRepository } from './blog.repository';
-import { ListResponseDto } from "src/dto/common.dto";
-import { BlogResDto } from "../blog.response";
 
 @Injectable()
 export class BlogAdminService {

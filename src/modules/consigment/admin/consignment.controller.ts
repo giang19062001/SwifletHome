@@ -1,10 +1,10 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, BadRequestException, Param, Get, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { ConsignmentAdminService } from './consignment.service';
-import { ConsignmentResDto } from './consignment.response';
 import { UpdateConsignmentDto } from './consignment.dto';
+import { ConsignmentResDto } from './consignment.response';
+import { ConsignmentAdminService } from './consignment.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/consignment')

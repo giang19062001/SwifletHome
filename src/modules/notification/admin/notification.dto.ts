@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { YnEnum } from 'src/interfaces/admin.interface';
+import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export enum SentTypeEnum {
   PROVINCE = 'PROVINCE',

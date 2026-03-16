@@ -1,18 +1,18 @@
+import { OnEvent } from '@nestjs/event-emitter';
 import {
-  WebSocketGateway,
-  WebSocketServer,
-  SubscribeMessage,
-  MessageBody,
   ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ISensor, ISensorHome } from '../socket.interface';
 import { LoggingService } from '../../logger/logger.service';
+import { ISensor, ISensorHome } from '../socket.interface';
 import { JoinRoomDto, LeaveRoomDto } from './homesOfUser.dto';
-import { OnEvent } from '@nestjs/event-emitter';
 
 @WebSocketGateway({
   namespace: 'socket/homesOfUser',

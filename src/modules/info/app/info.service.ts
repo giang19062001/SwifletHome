@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { InfoAppRepository } from './info.repository';
 import { InfoResDto } from "../info.response";
+import { InfoAppRepository } from './info.repository';
 
 @Injectable()
 export class InfoAppService {

@@ -1,10 +1,10 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { InfoAppService } from './info.service';
 import { GetInfoResDto } from './info.response';
+import { InfoAppService } from './info.service';
 
 @ApiTags('app/info')
 @Controller('/api/app/info')

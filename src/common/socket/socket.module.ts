@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
-import { HomesOfUserGateway } from "./homesOfUserScreen/homesOfUser.gateway";
-import { HomeOfUserGateway } from "./homeOfUserScreen/homeOfUser.gateway";
 import { MqttModule } from "../mqtt/mqtt.module";
+import { HomeOfUserGateway } from "./homeOfUserScreen/homeOfUser.gateway";
+import { HomesOfUserGateway } from "./homesOfUserScreen/homesOfUser.gateway";
 
 @Module({
   imports: [MqttModule],

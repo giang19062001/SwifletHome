@@ -1,7 +1,7 @@
-import { PhoneCodeRepository } from './phoneCode.repository';
 import { Module } from '@nestjs/common';
-import { PhoneCodeService } from './phoneCode.service';
 import PhoneCodeController from './phoneCode.controller';
+import { PhoneCodeRepository } from './phoneCode.repository';
+import { PhoneCodeService } from './phoneCode.service';
 
 @Module({
   imports: [],

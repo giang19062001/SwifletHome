@@ -1,4 +1,3 @@
-import { YnEnum } from 'src/interfaces/admin.interface';
 
 export const QR_CODE_CONST = {
   PRICE_OPTION: {

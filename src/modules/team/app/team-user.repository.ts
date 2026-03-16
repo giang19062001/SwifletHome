@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { GetAllTeamDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto } from './team.response';

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { AnswerAppRepository } from './answer.repository';
-import { QuestionAppService } from 'src/modules/question/app/question.service';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { SearchService } from 'src/common/search/search.service';
-import { AnswerResDto } from "../answer.response";
+import { QuestionAppService } from 'src/modules/question/app/question.service';
 import { QuestionResDto } from "../../question/question.response";
+import { AnswerResDto } from "../answer.response";
+import { AnswerAppRepository } from './answer.repository';
 
 @Injectable()
 export class AnswerAppService {
