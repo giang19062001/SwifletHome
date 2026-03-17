@@ -20,17 +20,19 @@ function changePage(p) {
 // TODO: RENDER
 function renderDeliveringAddressList(isEditable = false) {
   const listEl = document.getElementById('deliveringAddressList');
-  if (!listEl) return;
   listEl.innerHTML = '';
   currentDeliveringAddressList.forEach((address, index) => {
     const item = document.createElement('div');
     item.className = 'd-flex justify-content-between align-items-center mb-1 p-2 border rounded bg-light';
     item.innerHTML = `
             <span class="text-dark">${address}</span>
-            ${isEditable ? `
+            ${isEditable
+        ? `
             <button type="button" class="btn btn-sm btn-link text-danger p-0 m-0" onclick="removeDeliveringAddress(${index})">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>` : ''}
+            </button>`
+        : ''
+      }
         `;
     listEl.appendChild(item);
   });
@@ -42,37 +44,28 @@ function toggleDeliveringSection(status) {
   const deliveringAddressInputGroup = document.querySelector('#deliveringAddressInputGroup');
 
   const hasData = currentDeliveringAddressList.length > 0;
-  const isNotWaitingOrConfirmed = status !== 'WAITING' && status !== 'CONFIRMED';
-  
-  if (status === 'DELIVERING' || (hasData && isNotWaitingOrConfirmed)) {
+  const isNotWaitingOrConfirmed = status !== VARIABLE_ENUM.CONSIGNMENT_STATUS.WAITING.VALUE && status !== VARIABLE_ENUM.CONSIGNMENT_STATUS.CONFIRMED.VALUE;
+
+  if (status === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE || (hasData && isNotWaitingOrConfirmed)) {
     deliveringAddressSection.classList.remove('d-none');
   } else {
     deliveringAddressSection.classList.add('d-none');
   }
 
   // Chỉ DELIVERING mới hiện input thêm mới
-  if (status === 'DELIVERING') {
+  if (status === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE) {
     deliveringAddressInputGroup.classList.remove('d-none');
   } else {
     deliveringAddressInputGroup.classList.add('d-none');
   }
-
-  // Ẩn noticeContent và nút cập nhật nếu là DELIVERED hoặc RETURN
-  const noticeSection = document.querySelector('#noticeContent').closest('.row');
-  const footerBtn = document.querySelector('.consignment-update-modal .modal-footer button');
-  if (status === 'DELIVERED' || status === 'RETURN') {
-    noticeSection.classList.add('d-none');
-    footerBtn.classList.add('d-none');
-  } else {
-    noticeSection.classList.remove('d-none');
-    footerBtn.classList.remove('d-none');
-  }
 }
+
 // xóa input tracking địa chỉ
 function removeDeliveringAddress(index) {
   currentDeliveringAddressList.splice(index, 1);
   const status = document.querySelector('#consignmentStatus').value;
-  renderDeliveringAddressList(status === 'DELIVERING');
+  // xóa input
+  renderDeliveringAddressList(status === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE);
 }
 
 // thêm input tracking địa chỉ
@@ -83,7 +76,8 @@ function addDeliveringAddress() {
     currentDeliveringAddressList.push(address);
     input.value = '';
     const status = document.querySelector('#consignmentStatus').value;
-    renderDeliveringAddressList(status === 'DELIVERING');
+    // render input
+    renderDeliveringAddressList(status === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE);
   }
 }
 function closeModal() {
@@ -119,40 +113,42 @@ async function openModal(consignmentData) {
   modalEl.querySelector('#senderPhone').innerText = consignmentData.senderPhone;
   modalEl.querySelector('#deliveryAddress').innerText = consignmentData.deliveryAddress;
   modalEl.querySelector('#nestTypeLabel').innerText = consignmentData.nestTypeLabel;
-  modalEl.querySelector('#nestQuantity').innerText = consignmentData.nestQuantity + " (g)";
+  modalEl.querySelector('#nestQuantity').innerText = consignmentData.nestQuantity + ' (g)';
 
   // render danh sách status
   const selectStatus = modalEl.querySelector('#consignmentStatus');
   selectStatus.innerHTML = '';
 
-  Object.entries(VARIABLE_ENUM.CONSIGNMENT_STATUS).forEach(([key, text]) => {
+  Object.entries(VARIABLE_ENUM.CONSIGNMENT_STATUS).forEach(([key, value]) => {
     const option = document.createElement('option');
-    option.value = key;
-    option.textContent = text;
+    option.value = value.VALUE;
+    option.textContent = value.TEXT;
 
     // chờ 'chỉ có thể thành' xác nhận
-    if (consignmentData.consignmentStatus == 'WAITING' && key != 'CONFIRMED') {
+    if (consignmentData.consignmentStatus == VARIABLE_ENUM.CONSIGNMENT_STATUS.WAITING.VALUE && key != VARIABLE_ENUM.CONSIGNMENT_STATUS.CONFIRMED.VALUE) {
       option.disabled = true;
     }
     //  xác nhận 'chỉ có thể thành' đang giao
-    if (consignmentData.consignmentStatus == 'CONFIRMED' && key != 'DELIVERING') {
+    if (consignmentData.consignmentStatus == VARIABLE_ENUM.CONSIGNMENT_STATUS.CONFIRMED.VALUE && key != VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE) {
       option.disabled = true;
     }
     // đang giao 'chỉ có thể thành' đã giao/giao thất bại
-    if (consignmentData.consignmentStatus == 'DELIVERING' && key != 'CANCEL' && key != 'DELIVERED') {
+    if (consignmentData.consignmentStatus == VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE 
+      && key != VARIABLE_ENUM.CONSIGNMENT_STATUS.CANCEL.VALUE 
+      && key != VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERED.VALUE) {
       option.disabled = true;
     }
     // giao thất bại 'chỉ có thể thành' đã hoàn trả
-    if (consignmentData.consignmentStatus == 'CANCEL' && key != 'RETURN') {
+    if (consignmentData.consignmentStatus == VARIABLE_ENUM.CONSIGNMENT_STATUS.CANCEL.VALUE && key != VARIABLE_ENUM.CONSIGNMENT_STATUS.RETURN.VALUE) {
       option.disabled = true;
     }
     // giao thành công 'không thể cập nhập nữa'
-    if (consignmentData.consignmentStatus == 'DELIVERED' && key != 'DELIVERED') {
+    if (consignmentData.consignmentStatus == VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERED.VALUE && key != VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERED.VALUE) {
       option.disabled = true;
     }
 
     // đã hoàn trả 'không thể cập nhập nữa'
-    if (consignmentData.consignmentStatus == 'RETURN' && key != 'RETURN') {
+    if (consignmentData.consignmentStatus == VARIABLE_ENUM.CONSIGNMENT_STATUS.RETURN.VALUE && key != VARIABLE_ENUM.CONSIGNMENT_STATUS.RETURN.VALUE) {
       option.disabled = true;
     }
 
@@ -165,22 +161,35 @@ async function openModal(consignmentData) {
     selectStatus.appendChild(option);
   });
 
+  // ẩn noticeContent và nút cập nhật 
+  const noticeSection = document.querySelector('#noticeContent').closest('.row');
+  const footerBtn = document.querySelector('.consignment-update-modal .modal-footer button');
+  if (consignmentData.consignmentStatus === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERED.VALUE 
+    || consignmentData.consignmentStatus === VARIABLE_ENUM.CONSIGNMENT_STATUS.RETURN.VALUE) {
+    noticeSection.classList.add('d-none');
+    footerBtn.classList.add('d-none');
+  } else {
+    noticeSection.classList.remove('d-none');
+    footerBtn.classList.remove('d-none');
+  }
+
   // Xử lý danh sách địa chỉ giao hàng
   currentDeliveringAddressList = consignmentData.deliveringAddressList || [];
 
   toggleDeliveringSection(consignmentData.consignmentStatus);
-  renderDeliveringAddressList(consignmentData.consignmentStatus === 'DELIVERING');
+
+  // render các input tracking address
+  renderDeliveringAddressList(consignmentData.consignmentStatus === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE);
 
   // Event listener cho việc thay đổi status
   selectStatus.onchange = (e) => {
     const newStatus = e.target.value;
     toggleDeliveringSection(newStatus);
-    renderDeliveringAddressList(newStatus === 'DELIVERING');
+    renderDeliveringAddressList(newStatus === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE);
   };
 
-  // Event listener cho nút thêm tracking địa chỉ
+  // nút thêm tracking địa chỉ
   modalEl.querySelector('#btnAddDeliveringAddress').onclick = addDeliveringAddress;
-  // Enter để thêm nhanh
   modalEl.querySelector('#newDeliveringAddress').onkeypress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -195,7 +204,7 @@ async function openModal(consignmentData) {
   });
 
   // assign <event> update
-  modalEl.querySelector('.modal-footer button').onclick = updateConsignment
+  modalEl.querySelector('.modal-footer button').onclick = updateConsignment;
 
   // show modal
   const modal = new bootstrap.Modal(modalEl);
@@ -218,7 +227,7 @@ function renderConsignment(data, objElement) {
             <td><p>${ele.deliveryAddress}</p></td>
             <td><p>${ele.nestTypeLabel}</p></td>
             <td><p>${ele.nestQuantity}(g)</p></td>
-            <td><b class="txt-status-${String(ele.consignmentStatus).toLocaleLowerCase()}">${VARIABLE_ENUM.CONSIGNMENT_STATUS[ele.consignmentStatus] ?? ''}</b></td>
+            <td><b class="txt-status-${String(ele.consignmentStatus).toLocaleLowerCase()}">${VARIABLE_ENUM.CONSIGNMENT_STATUS[ele.consignmentStatus]?.TEXT ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-info" onclick="getDetailConsignment('${ele.consignmentCode}')">Chi tiết</button>
@@ -290,7 +299,7 @@ async function updateConsignment() {
       modalBody.querySelector('.err-noticeContent').style.display = 'block';
       return;
     }
-    if (consignmentStatus === 'DELIVERING' && !currentDeliveringAddressList.length) {
+    if (consignmentStatus === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE && !currentDeliveringAddressList.length) {
       alert('Ít nhất có 1 giá trị địa chỉ nếu trạng thái đang là đang vận chuyển');
       return;
     }

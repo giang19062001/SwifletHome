@@ -37,12 +37,12 @@ const VARIABLE_ENUM = {
     ANSWERED: 'Đã xác nhận phản hồi',
     // CANCEL: 'Hủy',
   },
-  CONSIGNMENT_STATUS: {
-    WAITING: 'Chờ xác nhận',
-    CONFIRMED:'Đã xác nhận',
-    DELIVERING: 'Đang giao',
-    CANCEL: 'Giao thất bại - hủy bỏ',
-    DELIVERED: 'Giao thành công',
-    RETURN: 'Đã hoàn trả',
-  },
+ CONSIGNMENT_STATUS : {
+  WAITING: { TEXT: 'Chờ xác nhận', VALUE: 'WAITING' },
+  CONFIRMED: { TEXT: 'Đã xác nhận', VALUE: 'CONFIRMED' },
+  DELIVERING: { TEXT: 'Đang giao', VALUE: 'DELIVERING' },
+  CANCEL: { TEXT: 'Giao thất bại - hủy bỏ', VALUE: 'CANCEL' },
+  DELIVERED: { TEXT: 'Giao thành công', VALUE: 'DELIVERED' },
+  RETURN: { TEXT: 'Đã hoàn trả', VALUE: 'RETURN' },
+}
 };

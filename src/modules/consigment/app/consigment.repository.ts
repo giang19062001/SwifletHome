@@ -80,15 +80,16 @@ export class ConsignmentAppRepository {
       ` SELECT  A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestType AS nestTypeCode, C.valueOption AS nestTypeLabel,
       A.nestQuantity, A.deliveryAddress,
       A.receiverName, A.receiverPhone, A.consignmentStatus,
-         CASE 
-          WHEN COUNT(B.seq) = 0 THEN JSON_ARRAY()
-          ELSE JSON_ARRAYAGG(
-                JSON_OBJECT(
-                  'seq', B.seq,
-                  'address', B.address
-                )
-              )
-        END AS deliveringAddressList,
+       CASE 
+        WHEN COUNT(B.seq) = 0 THEN JSON_ARRAY()
+        ELSE JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'seq', B.seq,
+            'address', B.address,
+            'createdAt', DATE_FORMAT(B.createdAt, '%Y-%m-%d %H:%i:%s')
+          )
+        )
+      END AS deliveringAddressList,
           A.createdAt,
           A.updatedAt
         FROM ${this.table} A

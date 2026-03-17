@@ -207,11 +207,13 @@
   }
 }
 
-.txt-status-waiting {
+.txt-status-waiting,
+.txt-status-delivering {
   color: #ffc50f;
 }
 .txt-status-answered,
 .txt-status-approved,
+.txt-status-delivered,
 .txt-status-confirmed,
 .txt-free,
 .txt-ok {

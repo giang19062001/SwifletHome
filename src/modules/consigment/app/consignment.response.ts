@@ -7,6 +7,9 @@ export class DeliveringAddressResDto {
 
   @ApiProperty({ example: '' })
   address: string;
+
+  @ApiProperty({ example: '' })
+  createdAt: Date
 }
 
 export class ConsignmentResDto {
