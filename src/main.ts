@@ -20,8 +20,7 @@ async function bootstrap() {
 
 
   // (CSS, JS, IMG), views , engine
- app.useStaticAssets(join(__dirname, '..', 'public'));
-
+  app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('ejs');
   app.use(expressLayouts);

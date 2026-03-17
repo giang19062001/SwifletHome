@@ -52,6 +52,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     // global
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`, // phân biệt local hay production
     }),
     CornModule,
     DatabaseModule,

@@ -22,9 +22,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2,
   ) {
-    const MQTT_HOST = 'localhost';
-    const MQTT_PORT = this.configService.get<string>('MQTT_PORT') || '1883';
-    this.brokerUrl = `mqtt://${MQTT_HOST}:${MQTT_PORT}`;
+    this.brokerUrl =  this.configService.get<string>('MQTT_URL') ?? "";
   }
 
   onModuleInit() {
