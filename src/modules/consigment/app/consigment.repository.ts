@@ -88,6 +88,7 @@ export class ConsignmentAppRepository {
             'address', B.address,
             'createdAt', DATE_FORMAT(B.createdAt, '%Y-%m-%d %H:%i:%s')
           )
+          ORDER BY B.seq ASC
         )
       END AS deliveringAddressList,
           A.createdAt,
