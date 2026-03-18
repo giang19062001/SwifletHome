@@ -19,7 +19,7 @@ services:
       - grafana_data:/var/lib/grafana
     networks:
       - swiflethome-network
-      
+
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto_broker
@@ -46,6 +46,23 @@ services:
     networks:
       - swiflethome-network
 
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    # Jenkins cần quyền chạy yarn, build, access thư mục Mount ( Ko set mặc định dùng user 'jenkins')
+    user: root
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      # cho phép Jenskin trong container có thể điều kiển chính Docker chứa nó
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount thư mục nguồn với thư mục bên trong jenskin, build code và ghi đè mã nguồn được build vào thư mục nguồn
+      - /var/www/SwifletHome:/var/www/SwifletHome
+    networks:
+      - swiflethome-network
+
 networks:
   swiflethome-network:
     driver: bridge
@@ -60,4 +77,6 @@ volumes:
   grafana_data:
     driver: local
   loki_data:
+    driver: local
+  jenkins_data:
     driver: local

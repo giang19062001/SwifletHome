@@ -15,16 +15,8 @@ pipeline {
                 dir("${DEPLOY_DIR}") {
                     
                     git branch: 'main', url: 'https://github.com/giang19062001/SwifletHome.git'
-                    
-                    withCredentials([
-                        file(credentialsId: 'firebase-key', variable: 'FIREBASE_JSON'),
-                        file(credentialsId: 'env-file', variable: 'DOTENV_FILE')
-                    ]) {
-                        sh 'cat "$FIREBASE_JSON" > firebase-adminsdk.json'
-                        sh 'cat "$DOTENV_FILE" > .env'
-                    }
-                    
-                   sh '''
+                                   
+                sh '''
                     md5sum package.json > .current_deps_hash
                     
                     if cmp -s .current_deps_hash .last_deps_hash; then
