@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { DeliveringAddressDto } from './consignment.dto';
 
-export class ConsignmentResDto {
+export class GetAllConsignmentResDto {
   @ApiProperty({ example: 0 })
   seq: number;
 
@@ -38,8 +39,8 @@ export class ConsignmentResDto {
   createdAt: Date;
 
   @ApiProperty({
-    type: String,
+    type: DeliveringAddressDto,
     isArray: true,
   })
-  deliveringAddressList?: string[];
+  deliveringAddressList?: DeliveringAddressDto[];
 }

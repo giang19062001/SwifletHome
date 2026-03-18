@@ -8,7 +8,7 @@ import { NotificationTypeEnum } from 'src/modules/notification/notification.inte
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { UpdateConsignmentDto } from './consignment.dto';
 import { ConsignmentAdminRepository } from './consignment.repository';
-import { ConsignmentResDto } from './consignment.response';
+import { GetAllConsignmentResDto } from './consignment.response';
 
 @Injectable()
 export class ConsignmentAdminService {
@@ -20,12 +20,12 @@ export class ConsignmentAdminService {
     private readonly userAdminService: UserAdminService,
     private readonly logger: LoggingService,
   ) {}
-  async getAll(dto: PagingDto): Promise<{ total: number; list: ConsignmentResDto[] }> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: GetAllConsignmentResDto[] }> {
     const total = await this.consignmentAdminRepository.getTotal();
     const list = await this.consignmentAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(consignmentCode: string): Promise<ConsignmentResDto | null> {
+  async getDetail(consignmentCode: string): Promise<GetAllConsignmentResDto | null> {
     const result = await this.consignmentAdminRepository.getDetail(consignmentCode);
     return result;
   }
@@ -36,7 +36,6 @@ export class ConsignmentAdminService {
     const user = await this.userAdminService.getDetailUserApp(dto.userCode);
     if (!user) return 0;
     this.firebaseService.sendNotification(user.userCode, user.deviceToken, NOTIFICATIONS.UPDATE_STATUS_CONSIGNMENT().TITLE, dto.noticeContent, null, NotificationTypeEnum.ADMIN_CONSIGNMENT);
-
     // cập nhập trạng thái, và xóa/ thêm địa chỉ tracking nếu có
     const result = await this.consignmentAdminRepository.update(consignmentCode, dto);
     return result;

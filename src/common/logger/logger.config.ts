@@ -62,19 +62,21 @@ export const getWinstonConfig = () => {
     }),
   ];
 
-  // ghi log cho loki
-  const lokiHost = process.env.LOKI_HOST;
-  if (lokiHost && lokiHost.startsWith("http")) {
-    transportsList.push(
-      new LokiTransport({
-        host: lokiHost,
-        labels: { app: process.env.LOKI_APP_NAME },
-        json: true,
-        format: format.json(),
-        replaceTimestamp: true,
-        onConnectionError: (err) => console.error('Loki connection error', err),
-      }),
-    );
+  if(process.env.NODE_ENV != "local"){
+    // ghi log cho loki
+    const lokiHost = process.env.LOKI_HOST;
+    if (lokiHost && lokiHost.startsWith("http")) {
+      transportsList.push(
+        new LokiTransport({
+          host: lokiHost,
+          labels: { app: process.env.LOKI_APP_NAME },
+          json: true,
+          format: format.json(),
+          replaceTimestamp: true,
+          onConnectionError: (err) => console.error('Loki connection error', err),
+        }),
+      );
+    }
   }
 
   return {

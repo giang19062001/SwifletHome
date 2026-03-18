@@ -4,17 +4,18 @@ import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { GetAllConsignmentDto, RequestConsigmentDto } from './consigment.dto';
 import { ConsignmentStatusEnum } from './consigment.interface';
-import { ConsignmentResDto } from './consignment.response';
+import { GetAllConsignmentResDto, GetDetailConsignmentResDto } from './consignment.response';
 
 @Injectable()
 export class ConsignmentAppRepository {
   private readonly table = 'tbl_consignment';
   private readonly tableDelivering = 'tbl_consignment_delivering';
+  private readonly tableHistory = 'tbl_consignment_history';
   private readonly tableOption = 'tbl_option_common';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async requestConsigment(userCode: string, dto: RequestConsigmentDto): Promise<number> {
+  async requestConsigment(userCode: string, dto: RequestConsigmentDto): Promise<string> {
     const sqlLast = ` SELECT consignmentCode FROM ${this.table} ORDER BY consignmentCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
     let consignmentCode = CODES.consignmentCode.FRIST_CODE;
@@ -41,6 +42,16 @@ export class ConsignmentAppRepository {
       userCode,
     ]);
 
+    return consignmentCode;
+  }
+
+  async writeConsigmentHistory(userCode: string, consignmentCode: string, address: string | null, consignmentStatus: ConsignmentStatusEnum): Promise<number> {
+    const sql = `
+       INSERT INTO ${this.tableHistory}  (consignmentCode, address, consignmentStatus, createdId) 
+       VALUES(?, ?, ?, ?)
+     `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [consignmentCode, address, consignmentStatus, userCode]);
+
     return result.insertId;
   }
 
@@ -60,7 +71,7 @@ export class ConsignmentAppRepository {
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: GetAllConsignmentDto, userCode: string): Promise<ConsignmentResDto[]> {
+  async getAll(dto: GetAllConsignmentDto, userCode: string): Promise<GetAllConsignmentResDto[]> {
     let whereSql = ` WHERE A.userCode = ?  `;
     const params: any[] = [userCode];
     if (dto.consignmentStatus != 'ALL') {
@@ -80,10 +91,33 @@ export class ConsignmentAppRepository {
       ` SELECT  A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestType AS nestTypeCode, C.valueOption AS nestTypeLabel,
       A.nestQuantity, A.deliveryAddress,
       A.receiverName, A.receiverPhone, A.consignmentStatus,
-      ( SELECT COALESCE(
+          ( SELECT JSON_ARRAY()) AS deliveringAddressList,
+          A.createdAt,
+          A.updatedAt
+        FROM ${this.table} A
+        INNER JOIN ${this.tableOption} C
+          ON A.nestType = C.code
+        ${whereSql}
+        `,
+      params,
+    );
+    return rows as GetAllConsignmentResDto[];
+  }
+
+  async getDetail(consignmentCode: string, userCode: string): Promise<GetDetailConsignmentResDto | null> {
+    let whereSql = ` WHERE A.consignmentCode = ? AND A.userCode = ?  `;
+    const params: any[] = [consignmentCode, userCode];
+    whereSql += ` GROUP BY A.seq `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT  A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestType AS nestTypeCode, C.valueOption AS nestTypeLabel,
+      A.nestQuantity, A.deliveryAddress,
+      A.receiverName, A.receiverPhone, A.consignmentStatus,
+       ( SELECT COALESCE(
           JSON_ARRAYAGG(
             JSON_OBJECT(
               'seq', t.seq,
+              'consignmentStatus', t.consignmentStatus,
               'address', t.address,
               'createdAt', DATE_FORMAT(t.createdAt, '%Y-%m-%d %H:%i:%s')
             )
@@ -91,23 +125,22 @@ export class ConsignmentAppRepository {
           JSON_ARRAY()
         )
         FROM (
-          SELECT B.seq, B.address, B.createdAt
-          FROM ${this.tableDelivering} B
+          SELECT B.seq, B.consignmentStatus, B.address, B.createdAt
+          FROM ${this.tableHistory} B
           WHERE B.consignmentCode = A.consignmentCode
             AND B.isActive = 'Y'
           ORDER BY B.seq ASC
         ) t
-      ) AS deliveringAddressList,
+      ) AS consignmentHistories,
           A.createdAt,
           A.updatedAt
         FROM ${this.table} A
         INNER JOIN ${this.tableOption} C
           ON A.nestType = C.code
-        LEFT JOIN ${this.tableDelivering} B
-          ON A.consignmentCode = B.consignmentCode
-          AND B.isActive = 'Y'
         ${whereSql}
-        `, params, );
-    return rows as ConsignmentResDto[];
+        `,
+      params,
+    );
+    return rows.length ? rows[0] as GetDetailConsignmentResDto : null;
   }
 }

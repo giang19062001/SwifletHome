@@ -18,23 +18,17 @@ function changePage(p) {
 }
 
 // TODO: RENDER
-function renderDeliveringAddressList(isEditable = false) {
+function renderDeliveringAddressList() {
   const listEl = document.getElementById('deliveringAddressList');
+  if (!listEl) return;
   listEl.innerHTML = '';
-  currentDeliveringAddressList.forEach((address, index) => {
-    const item = document.createElement('div');
-    item.className = 'd-flex justify-content-between align-items-center mb-1 p-2 border rounded bg-light';
-    item.innerHTML = `
-            <span class="text-dark">${address}</span>
-            ${isEditable
-        ? `
-            <button type="button" class="btn btn-sm btn-link text-danger p-0 m-0" onclick="removeDeliveringAddress(${index})">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>`
-        : ''
-      }
-        `;
-    listEl.appendChild(item);
+  currentDeliveringAddressList.forEach((item, index) => {
+    const addressText = typeof item === 'string' ? item : item.address;
+    const div = document.createElement('div');
+    div.className = 'd-flex justify-content-between align-items-center mb-1 p-2 border rounded bg-light';
+    div.innerHTML = `
+      <span class="text-dark">${addressText}</span> `;
+    listEl.appendChild(div);
   });
 }
 
@@ -60,24 +54,14 @@ function toggleDeliveringSection(status) {
   }
 }
 
-// xóa input tracking địa chỉ
-function removeDeliveringAddress(index) {
-  currentDeliveringAddressList.splice(index, 1);
-  const status = document.querySelector('#consignmentStatus').value;
-  // xóa input
-  renderDeliveringAddressList(status === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE);
-}
-
 // thêm input tracking địa chỉ
 function addDeliveringAddress() {
   const input = document.getElementById('newDeliveringAddress');
   const address = input.value.trim();
   if (address) {
-    currentDeliveringAddressList.push(address);
+    currentDeliveringAddressList.push({ address: address });
     input.value = '';
-    const status = document.querySelector('#consignmentStatus').value;
-    // render input
-    renderDeliveringAddressList(status === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE);
+    renderDeliveringAddressList();
   }
 }
 function closeModal() {
@@ -108,6 +92,7 @@ async function openModal(consignmentData) {
   const modalBody = modalEl.querySelector('.modal-body');
 
   modalEl.querySelector('#consignmentCode').value = consignmentData.consignmentCode;
+  modalEl.querySelector('#consignmentStatusDb').value = consignmentData.consignmentStatus;
   modalEl.querySelector('#userCode').value = consignmentData.userCode;
   modalEl.querySelector('#senderName').innerText = consignmentData.senderName;
   modalEl.querySelector('#senderPhone').innerText = consignmentData.senderPhone;
@@ -179,13 +164,13 @@ async function openModal(consignmentData) {
   toggleDeliveringSection(consignmentData.consignmentStatus);
 
   // render các input tracking address
-  renderDeliveringAddressList(consignmentData.consignmentStatus === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE);
+  renderDeliveringAddressList();
 
   // Event listener cho việc thay đổi status
   selectStatus.onchange = (e) => {
     const newStatus = e.target.value;
     toggleDeliveringSection(newStatus);
-    renderDeliveringAddressList(newStatus === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE);
+    renderDeliveringAddressList();
   };
 
   // nút thêm tracking địa chỉ
@@ -291,12 +276,19 @@ async function updateConsignment() {
   try {
     const modalBody = document.querySelector('.consignment-update-modal .modal-body form');
     const consignmentCode = modalBody.querySelector('#consignmentCode').value;
+    const consignmentStatusDb = modalBody.querySelector('#consignmentStatusDb').value;
     const userCode = modalBody.querySelector('#userCode').value;
     const noticeContent = modalBody.querySelector('#noticeContent').value;
     const consignmentStatus = modalBody.querySelector('#consignmentStatus').value;
 
     if (String(noticeContent).trim() == '') {
       modalBody.querySelector('.err-noticeContent').style.display = 'block';
+      return;
+    }
+
+    if((consignmentStatusDb == consignmentStatus) && (consignmentStatus !== VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE)){
+      toastWar('Không có gì thay đổi');
+      closeModal();
       return;
     }
     if (consignmentStatus === VARIABLE_ENUM.CONSIGNMENT_STATUS.DELIVERING.VALUE && !currentDeliveringAddressList.length) {

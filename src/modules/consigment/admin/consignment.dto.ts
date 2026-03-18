@@ -1,11 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ConsignmentStatusEnum } from '../app/consigment.interface';
+
+export class DeliveringAddressDto {
+  @ApiProperty({ example: 0 })
+  @IsOptional()
+  seq?: number;
+
+  @ApiProperty({ example: 'Hà Nội' })
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+}
 
 export class UpdateConsignmentDto {
-  @ApiProperty({ example: 'DELIVERING' })
-  @IsEnum(['WAITING', 'CONFIRMED', 'DELIVERING', 'CANCEL', 'DELIVERED', 'RETURN'])
-  consignmentStatus: string;
-
+  @ApiProperty({ example: 'DELIVERING', enum: ConsignmentStatusEnum })
+  @IsEnum(ConsignmentStatusEnum)
+  consignmentStatus: ConsignmentStatusEnum;
+  
   @ApiProperty({ example: 'Đang giao hàng tới trạm trung chuyển' })
   @IsString()
   @IsNotEmpty()
@@ -15,10 +27,9 @@ export class UpdateConsignmentDto {
   @IsString()
   @IsNotEmpty()
   userCode: string;
-  
-  @ApiProperty({ example: ['Hà Nội', 'Hải Phòng'] })
+
+  @ApiProperty({ type: DeliveringAddressDto, isArray: true })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  deliveringAddressList?: string[];
+  deliveringAddressList?: DeliveringAddressDto[];
 }

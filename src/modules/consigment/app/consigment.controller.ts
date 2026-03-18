@@ -1,15 +1,15 @@
-import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { ListResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetAllConsignmentDto, RequestConsigmentDto } from './consigment.dto';
 import { ConsignmentAppService } from './consigment.service';
-import { ConsignmentResDto } from './consignment.response';
+import { GetAllConsignmentResDto, GetDetailConsignmentResDto } from './consignment.response';
 
 @ApiTags('app/consignment')
 @Controller('/api/app/consignment')
@@ -63,14 +63,26 @@ export class ConsignmentAppController {
   @ApiBody({
     type: GetAllConsignmentDto,
     description: `
-**consignmentStatus**: enum('ALL','WAITING','CONFIRMED','DELIVERING','CANCEL','DELIVERED','RETURN)\n
-  `,
+**consignmentStatus**: enum('ALL','WAITING','CONFIRMED','DELIVERING','CANCEL','DELIVERED','RETURN)  `,
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(ConsignmentResDto)) })
-  async GetAllConsignment(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetAllConsignmentDto): Promise<{ total: number; list: ConsignmentResDto[] }> {
-    const result = await this.consignmentAppService.GetAllConsignment(dto, user.userCode);
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetAllConsignmentResDto)), description: '**deliveringAddressList**: Không sử dụng filed này nữa -> sẽ luôn rỗng ⚠️' })
+  async getAllConsignment(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetAllConsignmentDto): Promise<{ total: number; list: GetAllConsignmentResDto[] }> {
+    const result = await this.consignmentAppService.getAllConsignment(dto, user.userCode);
+    return result;
+  }
+
+  @ApiOperation({
+    summary: 'Lấy thông tin chi tiết ký gửi',
+  })
+  @ApiParam({ name: 'consignmentCode', type: String })
+  @Get('getDetail/:consignmentCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetDetailConsignmentResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getDetail(@Param('consignmentCode') consignmentCode: string, @GetUserApp() user: TokenUserAppResDto): Promise<GetDetailConsignmentResDto | null> {
+    const result = await this.consignmentAppService.getDetailConsignment(consignmentCode, user.userCode);
     return result;
   }
 }

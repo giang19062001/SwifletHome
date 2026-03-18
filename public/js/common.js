@@ -135,6 +135,23 @@ function toastOk(text) {
   }).showToast();
 }
 
+function toastWar(text) {
+  Toastify({
+    text: text,
+    duration: 3000,
+    newWindow: true,
+    close: false,
+    gravity: 'top',
+    position: 'right',
+    stopOnFocus: true,
+    style: {
+      background: '#f2be16',
+      color: '#fff',
+      borderRadius: '0.25rem',
+    },
+  }).showToast();
+}
+
 function toastErr(text) {
   Toastify({
     text: text,
