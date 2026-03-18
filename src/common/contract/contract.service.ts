@@ -14,7 +14,7 @@ export class ContractService implements OnModuleInit {
   constructor(
     private readonly configService: ConfigService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
 
   onModuleInit() {
     const rpcUrl = this.configService.get<string>('RPC_URL')!;
@@ -28,16 +28,18 @@ export class ContractService implements OnModuleInit {
 
 
   async recordJson(data: any) {
+    const logbase = `${this.SERVICE_NAME}/recordJson`;
+
     try {
       const jsonData = JSON.stringify(data);
 
       const tx = await this.contract.recordJson(jsonData);
-      this.logger.log(this.SERVICE_NAME, `Transaction Hash: ${tx.hash}`);
+      this.logger.log(logbase, `Transaction Hash: ${tx.hash}`);
 
       const receipt = await tx.wait();
 
-      this.logger.log(this.SERVICE_NAME, `Transaction mined in block: ${receipt.blockNumber}`);
-      this.logger.log(this.SERVICE_NAME, `Gas used:: ${receipt.gasUsed.toString()}`);
+      this.logger.log(logbase, `Transaction mined in block: ${receipt.blockNumber}`);
+      this.logger.log(logbase, `Gas used:: ${receipt.gasUsed.toString()}`);
 
       const gasPrice = tx.gasPrice || (await this.provider.getFeeData()).gasPrice;
 
@@ -45,7 +47,7 @@ export class ContractService implements OnModuleInit {
       if (gasPrice) {
         const txFee = receipt.gasUsed * gasPrice;
         transactionFee = txFee.toString()
-        this.logger.log(this.SERVICE_NAME, `Transaction fee: ${txFee.toString()}`);
+        this.logger.log(logbase, `Transaction fee: ${txFee.toString()}`);
       }
 
       return {
@@ -54,7 +56,7 @@ export class ContractService implements OnModuleInit {
         transactionFee: transactionFee
       };
     } catch (error) {
-      this.logger.log(this.SERVICE_NAME, `error: ${error.toString()}`);
+      this.logger.log(logbase, `error: ${error.toString()}`);
       return {
         transactionHash: '',
         blockNumber: '',

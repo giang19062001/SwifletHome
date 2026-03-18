@@ -502,7 +502,7 @@ export class TodoHarvestMedicineAppService {
 
       return result;
     } catch (error) {
-      this.logger.error(logbase, `${JSON.stringify(error)}`);
+      this.logger.error(logbase, error);
       return 0;
     }
   }

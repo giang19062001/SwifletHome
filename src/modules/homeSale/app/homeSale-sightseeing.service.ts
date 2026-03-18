@@ -16,7 +16,7 @@ export class HomeSaleSightseeingAppService {
     private readonly homeSaleIndexAppRepository: HomeSaleIndexAppRepository,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/registerSightSeeing:`;
@@ -38,7 +38,7 @@ export class HomeSaleSightseeingAppService {
     }
     // mặc định status ban đầu là  'Đang chờ duyệt'
     const result = await this.homeSaleSightseeingAppRepository.registerSightSeeing(dto, userCode, HomeSaleSightSeeingStatusEnum.WAITING);
-    this.logger.log(logbase, `homeCode(${dto.homeCode}) -> ${result ? Msg.RegisterOk : Msg.RegisterErr}`);
+    this.logger.log(logbase, `Đăng ký tham quan homeCode(${dto.homeCode}) -> ${result ? Msg.RegisterOk : Msg.RegisterErr}`);
 
     return result;
   }

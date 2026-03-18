@@ -7,7 +7,7 @@ export interface RequestContext {
   ip: string;
   userId?: string;
   userAgent: string;
-  path: string;
+  url: string;
   method: string;
 }
 
@@ -20,7 +20,7 @@ export class IpMiddleware implements NestMiddleware {
       requestId: (req.headers['x-request-id'] as string) || (req.headers['x-correlation-id'] as string) || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       ip: req.ip || req.socket.remoteAddress || 'unknown',
       userAgent: req.headers['user-agent'] || 'unknown',
-      path: req.path,
+      url: req.baseUrl,
       method: req.method,
     };
 

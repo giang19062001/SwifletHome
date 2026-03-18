@@ -298,13 +298,13 @@ export class AuthAppService extends AbAuthService {
         userTypeCode: dto.userTypeCode,
         userTypeKeyWord: isUserTypeValid.userTypeKeyWord,
       };
-      this.logger.log(`${this.SERVICE_NAME} - Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của user(${payload.userCode})`);
+      this.logger.log(logbase, `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của user(${payload.userCode})`);
 
       // ky lại token mới
       const accessToken = this.signToken(newPayload, YnEnum.Y);
       return { ...newPayload, accessToken: accessToken }
     } catch (err) {
-      this.logger.error(`${this.SERVICE_NAME} - changeTypeToken error: ${err.message}`);
+      this.logger.error(logbase, err.message);
       throw new UnauthorizedException(Msg.TokenInvalid);
     }
   }
@@ -343,7 +343,7 @@ export class AuthAppService extends AbAuthService {
       const payload = this.jwtService.verify(token);
       return payload;
     } catch (err) {
-      this.logger.error(`${logbase} - Lỗi: ${err.message}`);
+      this.logger.error(logbase, err.message);
       throw new ForbiddenException(Msg.TokenInvalid);
     }
   }

@@ -45,8 +45,7 @@ export class TodoAlarmAppService {
     const result = await Promise.all(
       boxTasks.map(async (ele) => {
         const data = await this.todoAlarmAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, ele.taskCode, ele.taskName, today.format('YYYY-MM-DD'));
-
-        this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${home.userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate}`);
+        this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${home.userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate ?? " _ / _ "}`);
 
         const taskAlarmCode = data?.taskAlarmCode ?? '';
         if (!data?.taskDate) {

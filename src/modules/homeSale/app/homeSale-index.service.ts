@@ -42,8 +42,6 @@ export class HomeSaleIndexAppService {
         img.height = 0;
       }
     }
-    this.logger.log(logbase, `homeName(${result.homeName})`);
-
     return { ...result, homeDescription: replaceNbspToSpace(result.homeDescription) };
   }
 }

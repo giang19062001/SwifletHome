@@ -26,7 +26,7 @@ export class LoggingService implements LoggerService {
       ip: requestContext?.ip,
       requestId: requestContext?.requestId,
       userId: requestContext?.userId,
-      path: requestContext?.path,
+      url: requestContext?.url,
       method: requestContext?.method,
     };
   }
