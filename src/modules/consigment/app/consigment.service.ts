@@ -15,7 +15,7 @@ export class ConsignmentAppService {
     private readonly consignmentAppRepository: ConsignmentAppRepository,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
 
   async requestConsigment(userCode: string, dto: RequestConsigmentDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/requestConsigment:`;
@@ -36,7 +36,7 @@ export class ConsignmentAppService {
       this.logger.log(logbase, `Yêu cầu ký gửi cho người dùng(${userCode}) thành công`);
       return result;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return 0;
     }
   }
@@ -45,8 +45,6 @@ export class ConsignmentAppService {
 
     const total = await this.consignmentAppRepository.getTotal(dto, userCode);
     const list = await this.consignmentAppRepository.getAll(dto, userCode);
-    this.logger.log(logbase, `total(${total})`);
-
     return { total, list };
   }
 }

@@ -20,7 +20,7 @@ export class QrRequestAppService {
     private readonly userHomeAppService: UserHomeAppService,
     private readonly qrRequestAppRepository: QrRequestAppRepository,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getRequestQrCocdeList(user: TokenUserAppResDto, dto: PagingDto): Promise<{ total: number; list: GetRequestQrCodeListResDto[] }> {
     const total = await this.qrRequestAppRepository.getRequestQrCocdeTotal(user.userCode);
     const rows = await this.qrRequestAppRepository.getRequestQrCocdeList(user.userCode, dto);
@@ -173,7 +173,7 @@ export class QrRequestAppService {
       }
       return result;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return 0;
     }
   }

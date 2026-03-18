@@ -15,7 +15,7 @@ export class HomeSaleAdminService {
     private readonly homSaleAdminRepository: HomeSaleAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAll(dto: PagingDto): Promise<{ total: number; list: HomeSaleResDto[] }> {
     const total = await this.homSaleAdminRepository.getTotal();
     const list = await this.homSaleAdminRepository.getAll(dto);
@@ -74,18 +74,18 @@ export class HomeSaleAdminService {
         await this.homSaleAdminRepository.deleteHomeImagesOne((home.homeImage as HomeSaleImgResDto).seq);
 
         // instart file mới vào db
-         homeImagePath = `${getFileLocation(dto.homeImage.mimetype, dto.homeImage.fieldname)}/${dto.homeImage.filename}`;
+        homeImagePath = `${getFileLocation(dto.homeImage.mimetype, dto.homeImage.fieldname)}/${dto.homeImage.filename}`;
         await this.homSaleAdminRepository.createImages(home.seq, 'admin', homeImagePath, dto.homeImage);
       }
 
       const fileNeedDeletes: HomeSaleImgResDto[] = diffByTwoArr(dto.homeImages, home.homeImages, 'filename');
-      this.logger.log(logbase, `Danh sách file cần xóa --> ${JSON.stringify(fileNeedDeletes.map((fi)=>fi.filename))}`);
+      this.logger.log(logbase, `Danh sách file cần xóa --> ${JSON.stringify(fileNeedDeletes.map((fi) => fi.filename))}`);
 
       const fileNeedCreates: HomeSaleImgResDto[] = diffByTwoArr(home.homeImages, dto.homeImages, 'filename');
-      this.logger.log(logbase, `Danh sách file cần thêm mới --> ${JSON.stringify(fileNeedCreates.map((fi)=>fi.filename))}`);
+      this.logger.log(logbase, `Danh sách file cần thêm mới --> ${JSON.stringify(fileNeedCreates.map((fi) => fi.filename))}`);
 
       // homeImages bị thay đổi -> xóa ~ ảnh hiện tại của nó
-      if (fileNeedDeletes.length) { 
+      if (fileNeedDeletes.length) {
         // xóa ~ file local
         await this.homSaleAdminRepository.deleteHomeImagesMulti(fileNeedDeletes.map((ele) => ele.seq));
         // xóa ~ trong db
@@ -98,7 +98,7 @@ export class HomeSaleAdminService {
         for (const file of fileNeedCreates) {
           const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
           const insertImgResult = await this.homSaleAdminRepository.createImages(home.seq, 'admin', filenamePath, file);
-          this.logger.log(logbase, `Insert file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
+          this.logger.log(logbase, `Thêm file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
         }
       }
       const result = await this.homSaleAdminRepository.update(dto, homeImagePath, updatedId, homeCode);

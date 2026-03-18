@@ -7,10 +7,17 @@ import session from 'express-session';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { initSwagger } from './config/swagger.config';
+import { LoggingService } from './common/logger/logger.service';
+import { AllExceptionsFilter } from './filter/allException.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
+
+  // bắt lỗi toàn cục
+  const logger = app.get(LoggingService);
+  app.useGlobalFilters(new AllExceptionsFilter(logger));
+
 
   //CORS
   app.enableCors();
@@ -43,6 +50,6 @@ async function bootstrap() {
   initSwagger(app);
 
   // port
-  await app.listen(process.env.PORT ?? '');
+  await app.listen(process.env.PORT ?? '', '0.0.0.0');
 }
 bootstrap();

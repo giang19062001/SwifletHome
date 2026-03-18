@@ -1,6 +1,6 @@
 import { format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
-
+import LokiTransport from "winston-loki";
 
 // log ghi trong file
 const customFormat = format.printf(({ timestamp, level, message, context, stack, ip }) => {
@@ -22,15 +22,8 @@ const customFormat = format.printf(({ timestamp, level, message, context, stack,
   return JSON.stringify(logEntry);
 });
 
-export const winstonConfig = {
-  level: 'info',
-  format: format.combine(
-    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    format.errors({ stack: true }),
-    format.splat(),
-    customFormat
-  ),
-  transports: [
+export const getWinstonConfig = () => {
+  const transportsList: any[] = [
     // log ghi trong console
     new transports.Console({
       format: format.combine(
@@ -67,15 +60,34 @@ export const winstonConfig = {
       maxSize: '20m',
       maxFiles: '30d',
     }),
-    // new LokiTransport({
-    //   host: process.env.LOKI_HOST || "-",
-    //   labels: { app: process.env.LOKI_APP_NAME },
-    //   json: true,
-    //   format: format.json(),
-    //   replaceTimestamp: true,
-    //   onConnectionError: (err) => console.error('Loki connection error', err),
-    // }),
-  ],
+  ];
 
-  exitOnError: false, // tránh crash app khi có lỗi ghi log
+  // ghi log cho loki
+  const lokiHost = process.env.LOKI_HOST;
+  if (lokiHost && lokiHost.startsWith("http")) {
+    transportsList.push(
+      new LokiTransport({
+        host: lokiHost,
+        labels: { app: process.env.LOKI_APP_NAME },
+        json: true,
+        format: format.json(),
+        replaceTimestamp: true,
+        onConnectionError: (err) => console.error('Loki connection error', err),
+      }),
+    );
+  }
+
+  return {
+    level: 'info',
+    format: format.combine(
+      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      format.errors({ stack: true }),
+      format.splat(),
+      customFormat,
+    ),
+    transports: transportsList,
+    exitOnError: false, // tránh crash app khi có lỗi ghi log
+  };
 };
+
+

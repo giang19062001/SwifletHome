@@ -17,7 +17,7 @@ export class QrSellAppService {
     private readonly qrSellAppRepository: QrSellAppRepository,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
 
   // TODO: SELL
   async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<{ total: number; list: GetRequestSellListResDto[] }> {
@@ -82,7 +82,7 @@ export class QrSellAppService {
 
       return result;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return 0;
     }
   }

@@ -14,14 +14,12 @@ export class TeamReviewAppService {
     private readonly teamReviewAppRepository: TeamReviewAppRepository,
     private readonly teamUserAppRepository: TeamUserAppRepository,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   // TODO: REVIEW
   async getReviewListOfTeam(dto: GetReviewListOfTeamDto): Promise<{ total: number; list: GetReviewListOfTeamResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.teamReviewAppRepository.getReviewTotalOfTeam(dto);
     const list = await this.teamReviewAppRepository.getReviewListOfTeam(dto);
-    this.logger.log(logbase, `total(${total})`);
-
     return { total: total, list: list };
   }
 
@@ -67,7 +65,7 @@ export class TeamReviewAppService {
       }
       return result;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return 0;
     }
   }

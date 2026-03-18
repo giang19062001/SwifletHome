@@ -22,7 +22,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2,
   ) {
-    this.brokerUrl =  this.configService.get<string>('MQTT_URL') ?? "";
+    this.brokerUrl = this.configService.get<string>('MQTT_URL') ?? "";
   }
 
   onModuleInit() {
@@ -92,7 +92,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
       }
     });
 
-    this.client.on('reconnect', () => this.logger.warn(this.SERVICE_NAME, 'MQTT đang kết nối lại...'));
+    this.client.on('reconnect', () => this.logger.log(this.SERVICE_NAME, 'MQTT đang kết nối lại...'));
     this.client.on('offline', () => this.logger.error(this.SERVICE_NAME, 'MQTT broker offline'));
     this.client.on('error', (err) => this.logger.error(this.SERVICE_NAME, `MQTT error ${JSON.stringify(err)}`));
   }

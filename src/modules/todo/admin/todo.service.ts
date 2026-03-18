@@ -24,7 +24,7 @@ export class TodoAdminService {
     private readonly notificationAdminService: NotificationAdminService,
     private readonly userAdminService: UserAdminService,
     private readonly userHomeAdminService: UserHomeAdminService,
-  ) {}
+  ) { }
   async getAllTasks(dto: PagingDto): Promise<{ total: number; list: TodoTaskResDto[] }> {
     const total = await this.todoAdminRepository.getTotalTasks();
     const list = await this.todoAdminRepository.getAllTasks(dto);
@@ -120,7 +120,7 @@ export class TodoAdminService {
       }
       return { success: true, message: MsgAdmin.pushAlarmOk };
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return { success: false, message: MsgAdmin.pushAlarmErr };
     }
   }

@@ -14,7 +14,7 @@ export class TeamAdminService {
     private readonly teamAdminRepository: TeamAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAll(dto: PagingDto): Promise<{ total: number; list: TeamResDto[] }> {
     const total = await this.teamAdminRepository.getTotal();
     const list = await this.teamAdminRepository.getAll(dto);
@@ -107,7 +107,7 @@ export class TeamAdminService {
         for (const file of fileNeedCreates) {
           const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
           const insertImgResult = await this.teamAdminRepository.createImages(home.seq, 'admin', filenamePath, file);
-          this.logger.log(logbase, `Insert file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
+          this.logger.log(logbase, `Thêm file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
         }
       }
       const result = await this.teamAdminRepository.update(dto, teamImagePath, updatedId, teamCode);

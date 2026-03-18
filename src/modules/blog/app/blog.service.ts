@@ -11,12 +11,10 @@ export class BlogAppService {
     private readonly blogAppRepository: BlogAdppRepository,
     private readonly searchService: SearchService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getContent(userCode: string): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/getContent`;
-
     const blog = await this.blogAppRepository.getOneContent();
-    this.logger.log(logbase, `userCode(${userCode})`);
     const result = blog ? this.searchService.replyBaseOnUserPackage(blog?.blogContent, blog?.isFree, userCode) : '';
 
     return result;

@@ -19,12 +19,11 @@ export class UserHomeAppService {
     private readonly userAppService: UserAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAll(dto: PagingDto, userCode: string): Promise<{ total: number; list: UserHomeResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.userHomeAppRepository.getTotalHomes(userCode);
     const list = await this.userHomeAppRepository.getAllHomes(dto, userCode);
-    this.logger.log(logbase, `total(${total})`);
     return { total, list };
   }
 
@@ -41,7 +40,6 @@ export class UserHomeAppService {
 
   async getMainHomeByUser(userCode: string): Promise<UserHomeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getMainHomeByUser:`;
-    this.logger.log(logbase, `userCode(${userCode})`);
     const result = await this.userHomeAppRepository.getMainHomeByUser(userCode);
     return result;
   }
@@ -118,7 +116,7 @@ export class UserHomeAppService {
 
       return result;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return 0;
     }
   }
@@ -162,7 +160,7 @@ export class UserHomeAppService {
       }
       return result;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return 0;
     }
   }
@@ -171,8 +169,6 @@ export class UserHomeAppService {
     try {
       let res: UserHomeImageStrResDto = { seq: 0, filename: '' };
       if (userHomeImageFile) {
-        this.logger.log(logbase, JSON.stringify(userHomeImageFile));
-
         const filenamePath = `${getFileLocation(userHomeImageFile.mimetype, userHomeImageFile.fieldname)}/${userHomeImageFile.filename}`;
         const insertId = await this.userHomeAppRepository.uploadHomeImage(0, dto.uniqueId, userCode, filenamePath, userHomeImageFile);
         if (insertId > 0) {
@@ -182,7 +178,7 @@ export class UserHomeAppService {
       }
       return res;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return { seq: 0, filename: '' };
     }
   }

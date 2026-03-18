@@ -16,12 +16,10 @@ export class AnswerAppService {
     private readonly searchService: SearchService,
 
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
 
   async reply(question: string, userCode: string): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/reply`;
-    this.logger.log(logbase, `Câu hỏi(${question})`);
-
     // get question
     const questions: QuestionResDto[] = await this.questionAppService.getQuestionReplied();
 

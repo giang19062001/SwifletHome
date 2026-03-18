@@ -10,16 +10,13 @@ export class PhoneCodeService {
   constructor(
     private readonly phoneCodeRepository: PhoneCodeRepository,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAll(): Promise<PhoneCodeResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
-
     const list = await this.phoneCodeRepository.getAll();
-    this.logger.log(logbase, `list.length(${list.length})`);
-
     return list;
   }
-   async getDetail(countryCode: string): Promise<PhoneCodeResDto | null> {
+  async getDetail(countryCode: string): Promise<PhoneCodeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail:`;
 
     const result = await this.phoneCodeRepository.getDetail(countryCode);

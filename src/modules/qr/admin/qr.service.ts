@@ -22,7 +22,7 @@ export class QrAdminService {
     private readonly firebaseService: FirebaseService,
     private readonly userAdminService: UserAdminService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAll(dto: PagingDto): Promise<{ total: number; list: GetInfoRequestQrCodeAdminResDto[] }> {
     const total = await this.qrAdminRepository.getTotal();
     const list = await this.qrAdminRepository.getAll(dto);
@@ -70,9 +70,9 @@ export class QrAdminService {
       }
       return 1;
     } catch (error) {
-      this.logger.error(logbase, `error ${JSON.stringify(error)}`);
+      this.logger.error(logbase, error);
       return 0;
     }
   }
- 
+
 }

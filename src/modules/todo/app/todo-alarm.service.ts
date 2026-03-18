@@ -19,7 +19,7 @@ export class TodoAlarmAppService {
     private readonly todoAppValidate: TodoAppValidate,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
 
   // TODO: BOX-TASK
   async getScheduledTasks(userCode: string): Promise<{ [key: string]: string }[]> {
@@ -80,8 +80,6 @@ export class TodoAlarmAppService {
   async getTasks(): Promise<TodoTaskResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getTasks:`;
     const list = await this.todoAlarmAppRepository.getTasks();
-    this.logger.log(logbase, `list.length(${list.length})`);
-
     return list;
   }
 

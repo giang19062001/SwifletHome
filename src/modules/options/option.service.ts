@@ -10,13 +10,10 @@ export class OptionService {
   constructor(
     private readonly optionRepository: OptionRepository,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAll(dto: GetOptionDto): Promise<OpitionResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
-
     const list = await this.optionRepository.getAll(dto);
-    this.logger.log(logbase, `list.length(${list.length})`);
-
     return list;
   }
 }

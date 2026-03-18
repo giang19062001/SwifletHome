@@ -1,6 +1,8 @@
 import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { PrometheusModule, makeCounterProvider, makeHistogramProvider } from 'nestjs-prometheus';
+import { HttpMetricsInterceptor } from './interceptors/metrics.interceptor';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CornModule } from './common/corn/corn.module';
@@ -54,6 +56,11 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`, // phân biệt local hay production
     }),
+    PrometheusModule.register({
+      path: '/metrics',
+      defaultMetrics: { enabled: true },
+    }),
+    MqttModule,
     CornModule,
     DatabaseModule,
     LoggerModule,
@@ -102,6 +109,21 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
   controllers: [AppController],
   providers: [
     AppService,
+    makeCounterProvider({
+      name: 'http_requests_total',
+      help: 'Total number of HTTP requests',
+      labelNames: ['method', 'path', 'status'],
+    }),
+    makeHistogramProvider({
+      name: 'http_request_duration_seconds',
+      help: 'Duration of HTTP requests in seconds',
+      labelNames: ['method', 'path', 'status'],
+      buckets: [0.1, 0.5, 1, 2, 5],
+    }),
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpMetricsInterceptor,
+    },
     {
       provide: APP_PIPE,
       useClass: ValidationPipe, // bật bắt lỗi tự động dựa vào cấu hình DTO

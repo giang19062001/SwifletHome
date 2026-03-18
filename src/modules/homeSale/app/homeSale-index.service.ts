@@ -14,14 +14,12 @@ export class HomeSaleIndexAppService {
     private readonly homeSaleIndexAppRepository: HomeSaleIndexAppRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAll(dto: PagingDto): Promise<{ total: number; list: HomeSaleResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
 
     const total = await this.homeSaleIndexAppRepository.getTotal();
     const list = await this.homeSaleIndexAppRepository.getAll(dto);
-    this.logger.log(logbase, `total(${total})`);
-
     // return { limit: dto.limit, page: dto.page, total, list };
     return { total, list };
   }

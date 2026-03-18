@@ -14,7 +14,7 @@ export class DoctorAppService {
   constructor(
     private readonly doctorAppRepository: DoctorAppRepository,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
 
   async requestDoctor(userCode: string, dto: CreateDoctorDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/requestDoctor:`;
@@ -42,7 +42,7 @@ export class DoctorAppService {
       }
       return result;
     } catch (error) {
-      this.logger.error(logbase, JSON.stringify(error));
+      this.logger.error(logbase, error);
       return 0;
     }
   }

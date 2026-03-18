@@ -10,13 +10,10 @@ export class ProvinceService {
   constructor(
     private readonly provinceRepository: ProvinceRepository,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAll(): Promise<ProvinceResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
-
     const list = await this.provinceRepository.getAll();
-    this.logger.log(logbase, `list.length(${list.length})`);
-
     return list;
   }
 }

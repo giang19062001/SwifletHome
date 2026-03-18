@@ -32,7 +32,7 @@ export class TodoHarvestMedicineAppService {
     private readonly userHomeAppService: UserHomeAppService,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   // TODO: MEDICINE
   async handleTaskMedicineCurrentAndNextime(userCode: string, userHomeCode: string, taskDate: Date | null, task: TodoTaskResDto, dto: SetTaskMedicineDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskMedicine:`;
@@ -119,7 +119,7 @@ export class TodoHarvestMedicineAppService {
           this.logger.log(
             logbase,
             (isSameBeforeWithSetted ? `Lịch chọn nhỏ hơn hoặc bằng lịch chọn trước đó ` : `Lịch chọn lớn hơn lịch chọn trước đó `) +
-              ` ${moment(dto.medicineNextDate, 'YYYY-MM-DD')} - ${moment(taskDate, 'YYYY-MM-DD')}`,
+            ` ${moment(dto.medicineNextDate, 'YYYY-MM-DD')} - ${moment(taskDate, 'YYYY-MM-DD')}`,
           );
 
           if (isSameBeforeWithSetted) {
@@ -146,7 +146,7 @@ export class TodoHarvestMedicineAppService {
 
       return result;
     } catch (error) {
-      this.logger.error(logbaseChild, `${JSON.stringify(error)}`);
+      this.logger.error(logbaseChild, error);
       return 0;
     }
   }
@@ -458,7 +458,7 @@ export class TodoHarvestMedicineAppService {
 
       return result;
     } catch (error) {
-      this.logger.error(logbase, `${JSON.stringify(error)}`);
+      this.logger.error(logbase, error);
       return 0;
     }
   }

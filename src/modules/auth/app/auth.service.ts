@@ -302,7 +302,7 @@ export class AuthAppService extends AbAuthService {
 
       // ky lại token mới
       const accessToken = this.signToken(newPayload, YnEnum.Y);
-      return {...newPayload, accessToken: accessToken}
+      return { ...newPayload, accessToken: accessToken }
     } catch (err) {
       this.logger.error(`${this.SERVICE_NAME} - changeTypeToken error: ${err.message}`);
       throw new UnauthorizedException(Msg.TokenInvalid);
@@ -311,7 +311,6 @@ export class AuthAppService extends AbAuthService {
 
   async requestOtp(dto: RequestOtpDto): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/requestOtp`;
-    this.logger.log(logbase, `${JSON.stringify(dto)}`);
 
     await this.verifyPhoneBeforeOtp(dto.userPhone, dto.purpose, dto.countryCode);
     return await this.otpService.generateOtp(dto);
@@ -319,7 +318,6 @@ export class AuthAppService extends AbAuthService {
 
   async verifyOtp(dto: VerifyOtpDto): Promise<boolean> {
     const logbase = `${this.SERVICE_NAME}/requestOtp`;
-    this.logger.log(logbase, `${JSON.stringify(dto)}`);
     await this.verifyPhoneBeforeOtp(dto.userPhone, dto.purpose, dto.countryCode);
     return await this.otpService.verifyOtp(dto);
   }
@@ -345,7 +343,7 @@ export class AuthAppService extends AbAuthService {
       const payload = this.jwtService.verify(token);
       return payload;
     } catch (err) {
-      this.logger.error(`${logbase} - error: ${err.message}`);
+      this.logger.error(`${logbase} - Lỗi: ${err.message}`);
       throw new ForbiddenException(Msg.TokenInvalid);
     }
   }

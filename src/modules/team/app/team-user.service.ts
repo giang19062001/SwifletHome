@@ -16,13 +16,12 @@ export class TeamUserAppService {
     private readonly optionService: OptionService,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   // TODO: TEAM
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<{ total: number; list: GetAllTeamResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.teamUserAppRepository.getTotalTeams(dto, userCode);
     const list = await this.teamUserAppRepository.getAllTeams(dto, userCode);
-    this.logger.log(logbase, `total(${total})`);
     return { total, list };
   }
 
@@ -63,7 +62,6 @@ export class TeamUserAppService {
         img.height = 0;
       }
     }
-    this.logger.log(logbase, `homeName(${result.teamName})`);
     return result;
   }
 }

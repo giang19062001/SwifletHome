@@ -15,7 +15,7 @@ export class NotificationAppService {
     private readonly notificationAppRepository: NotificationAppRepository,
     private readonly userAppService: UserAppService,
     private readonly logger: LoggingService,
-  ) {}
+  ) { }
   async getAllTopic(dto: PagingDto = { limit: 0, page: 0 }): Promise<{ total: number; list: NotificationTopicResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAllTopic`;
 
@@ -31,8 +31,6 @@ export class NotificationAppService {
     if (checkUserHas) {
       const total = await this.notificationAppRepository.getTotal(userCode);
       const list = await this.notificationAppRepository.getAll(dto, userCode);
-      this.logger.log(logbase, `total(${total})`);
-
       return { total, list };
     } else {
       return { total: 0, list: [] };
@@ -113,7 +111,7 @@ export class NotificationAppService {
       }
       return result;
     } catch (error) {
-      this.logger.error(logbase, `Lỗi : ${JSON.stringify(error)}`);
+      this.logger.error(logbase, error);
       return 0;
     }
   }
@@ -124,7 +122,7 @@ export class NotificationAppService {
     const result = await this.notificationAppRepository.deteteNotificationByStatus(dto.notificationStatus, userCode);
     return result;
   }
-  
+
   async deteteNotification(notificationId: string, userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/deteteNotification`;
     this.logger.log(logbase, `Xóa thông báo ${notificationId}`);

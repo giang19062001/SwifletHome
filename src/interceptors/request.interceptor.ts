@@ -1,23 +1,25 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { LoggingService } from 'src/common/logger/logger.service';
 
 @Injectable()
 export class RequestLoggerInterceptor implements NestInterceptor {
-  constructor(private readonly logger: LoggingService) {}
+  constructor(private readonly logger: LoggingService) { }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const logbase = `RequestLoggerInterceptor`;
-
     const req = context.switchToHttp().getRequest();
+    const method = req.method;
+    const url = req.url;
 
-    // Chỉ bắt log các API chứa của APP
-    if (!req.url.includes('/api/app/')) {
+    // Chỉ bắt log các API của APP
+    if (!url.includes('/api/app/')) {
       return next.handle();
     }
     const contentType = req.headers['content-type'] || '';
     const logObj: any = {
-      url: req.url,
+      url: url,
+      method: method,
     };
 
     // Params nếu có
@@ -35,8 +37,9 @@ export class RequestLoggerInterceptor implements NestInterceptor {
       logObj.body = req.body;
     }
 
-    this.logger.log(logbase, `REQUEST ---> ${JSON.stringify(logObj)}`);
+    this.logger.log(`[REQUEST] ${method} ${url}`, logObj);
 
     return next.handle();
   }
 }
+
