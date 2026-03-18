@@ -29,9 +29,8 @@ pipeline {
                     
                     sh 'yarn build'
                     
-                    sh '''
-                    sudo /usr/bin/pm2 reload SWIFLETHOME --update-env
-                    '''
+                    // Tạo cú hích file để kích hoạt theo dõi (watch) bên ngoài và để pm2 tự động reload
+                    sh 'touch restart.txt'
                 }
             }
         }
