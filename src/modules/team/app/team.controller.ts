@@ -76,12 +76,6 @@ export class TeamAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetReviewListOfTeamResDto)) })
   async getReviewListOfTeam(@Body() dto: GetReviewListOfTeamDto, @GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: GetReviewListOfTeamResDto[] }> {
-    if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.OWNER.value) {
-      throw new BadRequestException({
-        message: Msg.OnlyOwnerCanFetch,
-        data: null,
-      });
-    }
     const result = await this.teamReviewAppService.getReviewListOfTeam(dto);
     return result;
   }
