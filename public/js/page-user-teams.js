@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // TODO: FUNC
-function gotoTeamCreate(){
-  gotoPage('/dashboard/user/teams/create');
+function gotoTeamCreate() {
+  gotoPage('/dashboard/user-teams/create');
 }
-function gotoTeamUpdate(teamCode){
-  gotoPage('/dashboard/user/teams/update/'+teamCode);
+function gotoTeamUpdate(teamCode) {
+  gotoPage('/dashboard/user-teams/update/' + teamCode);
 }
 function changePage(p) {
   page = p;
@@ -45,7 +45,7 @@ function renderAllTeam(data, objElement) {
     });
     objElement.innerHTML = HTML;
 
-   // phân trang
+    // phân trang
     let pagerHTML = renderPager(data.total, limit, page, 5, 'changePage');
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
@@ -60,7 +60,7 @@ function renderAllTeam(data, objElement) {
 
 async function getAllTeam(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
-    // Hiển thị skeleton
+  // Hiển thị skeleton
   showSkeleton(objElement, limit, 8);
 
   await axios

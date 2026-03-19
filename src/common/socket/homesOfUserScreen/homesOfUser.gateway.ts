@@ -36,6 +36,9 @@ export class HomesOfUserGateway
   // Trạng thái online/offline 
   private sensorOnline = new Map<string, boolean>(); // key: MAC-userCode-homeCode -> true/false
 
+  // Theo dõi client rớt mạng để tránh memory leak
+  private clientUserMap = new Map<string, string>(); // key: client.id, value: userCode
+
   constructor(private readonly logger: LoggingService) {}
 
   afterInit() {
@@ -48,6 +51,22 @@ export class HomesOfUserGateway
 
   handleDisconnect(client: Socket) {
     console.log(this.SERVICE_NAME, `Client disconnected: ${client.id}`);
+    
+    // Tìm userCode và dọn dẹp biến để tránh memory leak
+    const userCode = this.clientUserMap.get(client.id);
+    if (userCode) {
+      const homes = this.watchingHomes.get(userCode);
+      if (homes) {
+        homes.forEach((homeCode) => {
+          const key = `MAC-${userCode}-${homeCode}`;
+          this.latestSensorDataOfHomes.delete(key);
+          this.sensorOnline.delete(key);
+        });
+      }
+      this.watchingHomes.delete(userCode);
+      this.clientUserMap.delete(client.id);
+      console.log(this.SERVICE_NAME, `Đã dọn dẹp memory leak hoàn toàn cho user ${userCode}`);
+    }
   }
 
   @SubscribeMessage('joinRoom')
@@ -61,6 +80,7 @@ export class HomesOfUserGateway
     const room = `USER-${userCode}-ROOM`;
     client.join(room);
     this.watchingHomes.set(userCode, new Set(userHomeCodes));
+    this.clientUserMap.set(client.id, userCode); // Liên kết client.id với userCode
 
     // Khởi tạo trạng thái offline cho tất cả homes khi mới join
     userHomeCodes.forEach((homeCode) => {
@@ -99,6 +119,7 @@ export class HomesOfUserGateway
       });
     }
     this.watchingHomes.delete(userCode);
+    this.clientUserMap.delete(client.id); // Dọn dẹp
 
     console.log(this.SERVICE_NAME, `User ${userCode} đã rời phòng`);
   }

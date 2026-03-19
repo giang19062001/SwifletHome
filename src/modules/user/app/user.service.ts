@@ -5,7 +5,7 @@ import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.dto";
 import { CreateUserPackageAppDto, UserAppResDto } from './user.dto';
 import { UserAppRepository } from './user.repository';
-import { UserTypeResDto } from './user.response';
+import { AllowUserTypeResDto, UserTypeResDto } from './user.response';
 
 @Injectable()
 export class UserAppService {
@@ -94,10 +94,10 @@ export class UserAppService {
   async getOneUserTypeByKeyword(userTypeKeyWord: string): Promise<UserTypeResDto | null> {
     return await this.userAppRepository.getOneUserTypeByKeyword(userTypeKeyWord);
   }
-  async getAllowTypesOfUser(userCode: string, userTypeKeyWord: string): Promise<UserTypeResDto[]> {
+  async getAllowTypesOfUser(userCode: string, userTypeKeyWord: string): Promise<AllowUserTypeResDto[]> {
     // loại bỏ type đang active hiện tại
     const result = await this.userAppRepository.getAllowTypesOfUser(userCode);
-    return result.filter((ele : UserTypeResDto) => ele.userTypeKeyWord !== userTypeKeyWord)
+    return result.filter((ele : AllowUserTypeResDto) => ele.userTypeKeyWord !== userTypeKeyWord)
   }
 
   async getUserPackageInfo(userCode: string) {

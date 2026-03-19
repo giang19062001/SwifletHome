@@ -81,18 +81,29 @@ export class CornService implements OnModuleInit {
 
     const taskAlarmList = await this.todoAlarmAppService.getListTaskAlarmsToday(todayStr);
     this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskAlarmList.length}`);
+    
     if (taskAlarmList.length) {
-      for (const task of taskAlarmList) {
-        // insert thông và đẩy thông báo
-        const taskDay = moment(task.taskDate, 'YYYY-MM-DD');
-        const daysLeft = taskDay.diff(todayStr, 'days');
+      const CHUNK_SIZE = 50; // Xử lý mỗi 50 task một lúc để tránh thắt cổ chai
+      
+      for (let i = 0; i < taskAlarmList.length; i += CHUNK_SIZE) {
+        const chunk = taskAlarmList.slice(i, i + CHUNK_SIZE);
+        
+        const promises = chunk.map(async (task) => {
+          // insert thông và đẩy thông báo
+          const taskDay = moment(task.taskDate, 'YYYY-MM-DD');
+          const daysLeft = taskDay.diff(todayStr, 'days');
 
-        // lấy thông tin nhà
-        const home = await this.userHomeAppService.getDetail(task.userHomeCode);
-        const notify = NOTIFICATIONS.TODO_TASK_DAILY(home?.userHomeName ?? '', task.taskName, daysLeft);
-        this.logger.log(logbase, `sẽ gửi thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode}) cho user(${task.userCode})`);
+          // lấy thông tin nhà
+          const home = await this.userHomeAppService.getDetail(task.userHomeCode);
+          const notify = NOTIFICATIONS.TODO_TASK_DAILY(home?.userHomeName ?? '', task.taskName, daysLeft);
+          
+          this.logger.log(logbase, `sẽ gửi thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode}) cho user(${task.userCode})`);
 
-        await this.firebaseService.sendNotification(task.userCode!!, task.deviceToken, notify.TITLE, notify.BODY, null, NotificationTypeEnum.TODO);
+          return this.firebaseService.sendNotification(task.userCode!!, task.deviceToken, notify.TITLE, notify.BODY, null, NotificationTypeEnum.TODO);
+        });
+
+        // Đợi tất cả promises trong chunk xử lý xong, dù có success hay fail
+        await Promise.allSettled(promises);
       }
     }
   }

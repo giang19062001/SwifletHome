@@ -231,56 +231,65 @@ export class FirebaseService implements OnModuleInit {
       count: '0',
     };
 
-    const message: admin.messaging.MulticastMessage = {
-      tokens,
-      notification: { title, body },
-      data: dataPayload,
-      ...this.fcmConfig(title, body),
-    };
+    let totalSuccessCount = 0;
+    let totalFailureCount = 0;
+    const BATCH_SIZE = 500; // FCM giới hạn gửi tối đa 500 token mỗi lần
 
-    console.log('message -->', message);
+    // Chia mảng token lớn thành từng khối (chunk) nhỏ
+    for (let i = 0; i < tokens.length; i += BATCH_SIZE) {
+      const tokenBatch = tokens.slice(i, i + BATCH_SIZE);
+      const message: admin.messaging.MulticastMessage = {
+        tokens: tokenBatch,
+        notification: { title, body },
+        data: dataPayload,
+        ...this.fcmConfig(title, body),
+      };
 
-    try {
-      const batchResponse = await this.messaging.sendEachForMulticast(message);
-      console.log('batchResponse ---> ', batchResponse);
+      try {
+        const batchResponse = await this.messaging.sendEachForMulticast(message);
+        
+        totalSuccessCount += batchResponse.successCount;
+        totalFailureCount += batchResponse.failureCount;
 
-      this.logger.log(logbase, `Gửi thông báo multicast hoàn tất | Tổng ${tokens.length} | Thành công: ${batchResponse.successCount} | Thất bại: ${batchResponse.failureCount}`);
-      if (batchResponse.failureCount > 0) {
-        batchResponse.responses.forEach((resp, index) => {
-          if (!resp.success && resp.error) {
-            const failedToken = tokens[index];
-            const errorCode = resp.error.code || 'unknown';
-            const errorMessage = resp.error.message || 'No message';
+        if (batchResponse.failureCount > 0) {
+          batchResponse.responses.forEach((resp, index) => {
+            if (!resp.success && resp.error) {
+              const failedToken = tokenBatch[index];
+              const errorCode = resp.error.code || 'unknown';
+              const errorMessage = resp.error.message || 'No message';
 
-            this.logger.error(logbase, `Token thất bại [${index}] | Token: ${failedToken.substring(0, 30)}... | Error: ${errorCode} - ${errorMessage}`);
-          }
-        });
+              this.logger.error(logbase, `Token thất bại [${i + index}] | Token: ${failedToken.substring(0, 30)}... | Error: ${errorCode} - ${errorMessage}`);
+            }
+          });
+        }
+      } catch (error) {
+        this.logger.error(logbase, `Gửi thông báo batch ${i / BATCH_SIZE + 1} multicast thất bại: (${JSON.stringify(error)}) `);
       }
-      // insert những thông báo thành công vào DB
-      if (batchResponse.successCount > 0) {
-        this.logger.log(logbase, `Có ${batchResponse.successCount} token nhận thông báo multicast thành công`);
-        // Lưu vào DB
-        const notificationDto: CreateNotificationDto = {
-          notificationId,
-          messageId: 'mutilcast',
-          title,
-          body,
-          targetScreen: this.getAppScreen(notificationType),
-          data: data ?? null,
-          userCode: null, // null vì gửi theo multicast
-          userCodesMuticast: userCodes,
-          topicCode: null, // ko gửi bằng topic
-          notificationType,
-        };
-
-        await this.notificationAppService.createNotification(notificationDto);
-      }
-      return batchResponse.successCount;
-    } catch (error) {
-      this.logger.log(logbase, `Gửi thông báo multicast thất bại: (${JSON.stringify(error)}) `);
-
-      return 0;
     }
+
+    this.logger.log(logbase, `Gửi thông báo multicast hoàn tất | Tổng ${tokens.length} | Thành công: ${totalSuccessCount} | Thất bại: ${totalFailureCount}`);
+
+    // insert những thông báo thành công vào DB
+    if (totalSuccessCount > 0) {
+      this.logger.log(logbase, `Có ${totalSuccessCount} token nhận thông báo multicast thành công`);
+      // Lưu vào DB
+      const notificationDto: CreateNotificationDto = {
+        notificationId,
+        messageId: 'mutilcast',
+        title,
+        body,
+        targetScreen: this.getAppScreen(notificationType),
+        data: data ?? null,
+        userCode: null, // null vì gửi theo multicast
+        userCodesMuticast: [...new Set(userCodes)], // Tránh lưu danh sách user bị trùng lặp
+        topicCode: null, // ko gửi bằng topic
+        notificationType,
+      };
+
+      await this.notificationAppService.createNotification(notificationDto);
+    }
+    
+    return totalSuccessCount;
   }
 
   // todo: Khi tạo 1 topic nào đó nên tự động đăng kí topic đó cho tất cả user

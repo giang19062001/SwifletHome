@@ -5,10 +5,10 @@ import { CODES, UPDATOR } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { TEXTS } from 'src/helpers/text.helper';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.dto";
+import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from '../../auth/app/auth.dto';
 import { CreateUserPackageAppDto, UserAppResDto, UserPackageAppResDto } from './user.dto';
-import { USER_CONST } from "./user.interface";
-import { UserTypeResDto } from './user.response';
+import { USER_CONST } from './user.interface';
+import { AllowUserTypeResDto, UserTypeResDto } from './user.response';
 
 @Injectable()
 export class UserAppRepository {
@@ -247,19 +247,28 @@ export class UserAppRepository {
     return rows.length ? (rows[0] as UserTypeResDto) : null;
   }
 
-  async getAllowTypesOfUser(userCode: string): Promise<UserTypeResDto[]> {
-    const sql = ` SELECT userTypeCode, userTypeKeyWord, userTypeName
-       FROM ${this.tableType} WHERE isActive = 'Y' 
-       AND (userTypeKeyWord = '${USER_CONST.USER_TYPE.OWNER.value}'  OR  userTypeKeyWord = '${USER_CONST.USER_TYPE.PURCHASER.value}')
-       UNION ALL
-       SELECT A.userTypeCode, A.userTypeKeyWord, A.userTypeName
-       FROM ${this.tableType} A
-       JOIN ${this.tableTeam} B
-       ON A.userTypeCode = B.userTypeCode
-       WHERE A.isActive = 'Y' 
-       AND (A.userTypeKeyWord = '${USER_CONST.USER_TYPE.FACTORY.value}'  OR  A.userTypeKeyWord = '${USER_CONST.USER_TYPE.TECHNICAL.value}')
-       AND B.userCode = ? `;
+  async getAllowTypesOfUser(userCode: string): Promise<AllowUserTypeResDto[]> {
+    const sql = ` SELECT 
+                A.userTypeCode, 
+                A.userTypeKeyWord, 
+                A.userTypeName,
+                IF(
+                    A.userTypeKeyWord IN ('${USER_CONST.USER_TYPE.OWNER.value}', '${USER_CONST.USER_TYPE.PURCHASER.value}')
+                    OR (
+                        A.userTypeKeyWord IN ('${USER_CONST.USER_TYPE.FACTORY.value}', '${USER_CONST.USER_TYPE.TECHNICAL.value}')
+                        AND EXISTS (
+                            SELECT 1
+                            FROM tbl_team_user B
+                            WHERE B.userTypeCode = A.userTypeCode
+                              AND B.userCode = ?
+                        )
+                    ),
+                    'Y',
+                    'N'
+                ) AS isSetted
+            FROM tbl_user_type A
+            WHERE A.isActive = 'Y'`;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode]);
-    return rows as UserTypeResDto[];
+    return rows as AllowUserTypeResDto[];
   }
 }

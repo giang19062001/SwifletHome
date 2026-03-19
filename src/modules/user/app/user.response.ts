@@ -1,4 +1,5 @@
 import { ApiProperty, IntersectionType } from '@nestjs/swagger';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class UserAppResDto {
   @ApiProperty({ example: 0 })
@@ -26,6 +27,20 @@ export class UserAppResDto {
   countryCode: string
 }
 
+export class AllowUserTypeResDto {
+  @ApiProperty({ example: '' })
+  userTypeCode: string;
+
+  @ApiProperty({ example: '' })
+  userTypeKeyWord: string;
+
+  @ApiProperty({ example: '' })
+  userTypeName: string;
+
+  @ApiProperty({ example: 'N' })
+  isSetted: YnEnum
+
+}
 
 export class UserTypeResDto {
   @ApiProperty({ example: '' })

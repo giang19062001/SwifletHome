@@ -66,7 +66,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
             data: sensorData,
           });
         } catch (error) {
-          this.logger.error(this.SERVICE_NAME, `Invalid MQTT payload: JSON.stringify(error)`);
+          this.logger.error(this.SERVICE_NAME, `Invalid MQTT payload: ${JSON.stringify(error)}`);
         }
         return;
       }

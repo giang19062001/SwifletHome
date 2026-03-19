@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PrometheusModule, makeCounterProvider, makeHistogramProvider } from 'nestjs-prometheus';
 import { HttpMetricsInterceptor } from './interceptors/metrics.interceptor';
 import { AppController } from './app.controller';
@@ -56,6 +57,12 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`, // phân biệt local hay production
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 1 phút
+        limit: 100, // tối đa 100 request / 1 phút
+      }
+    ]),
     PrometheusModule.register({
       path: '/metrics',
       defaultMetrics: { enabled: true },
@@ -135,6 +142,10 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: RequestLoggerInterceptor, // log cho các request gửi đến server
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard, // rate limit
     },
   ],
 })

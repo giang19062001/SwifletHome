@@ -7,7 +7,7 @@ import { PageAuthAdminGuard } from './modules/auth/admin/auth.page.guard';
 @ApiExcludeController() // hide from swagger
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService) { }
 
   @Get('/')
   @UseGuards(PageAuthAdminGuard)
@@ -30,7 +30,7 @@ export class AppController {
     return { title: 'Trung tâm hỗ trợ', isLayout: false };
   }
 
-  
+
   @Get('/terms-of-use')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/terms-of-use')
@@ -186,7 +186,7 @@ export class AppController {
   }
 
   // user - team
-  @Get('/dashboard/user/teams')
+  @Get('/dashboard/user-teams')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/user-teams')
   async renderUserTeams(@Req() req: Request) {
@@ -199,7 +199,7 @@ export class AppController {
       values: values,
     };
   }
-  @Get('/dashboard/user/teams/create')
+  @Get('/dashboard/user-teams/create')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/user-teams-create')
   async renderTeamCreate(@Req() req: Request) {
@@ -212,7 +212,7 @@ export class AppController {
     };
   }
 
-  @Get('/dashboard/user/teams/update/:id')
+  @Get('/dashboard/user-teams/update/:id')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/user-teams-update')
   async renderTeamUpdate(@Req() req: Request) {
@@ -226,7 +226,7 @@ export class AppController {
   }
 
   // team - review
-  @Get('/dashboard/user/team-reviews')
+  @Get('/dashboard/user-teams/reviews')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/team-reviews')
   async renderTeamReviews(@Req() req: Request) {

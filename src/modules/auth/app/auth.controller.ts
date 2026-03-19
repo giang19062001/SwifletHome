@@ -19,7 +19,7 @@ import { AuthAppService } from './auth.service';
 @Controller('/api/app/auth')
 @UseInterceptors(ResponseAppInterceptor)
 export class AuthAppController {
-  constructor(private readonly authAppService: AuthAppService) {}
+  constructor(private readonly authAppService: AuthAppService) { }
 
   @ApiBody({
     type: ChangeTypeTokenDto,
@@ -28,7 +28,7 @@ export class AuthAppController {
   @ApiOperation({
     summary: 'Cần đăng nhập',
     description:
-`**userTypeCode** và **userTypeKeyWord** sẽ được thay đổi `
+      `**userTypeCode** và **userTypeKeyWord** sẽ được thay đổi `
   })
   @Post('changeTypeToken')
   @HttpCode(HttpStatus.OK)

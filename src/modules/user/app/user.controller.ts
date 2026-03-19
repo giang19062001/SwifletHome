@@ -5,7 +5,7 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { UserTypeResDto } from 'src/modules/user/app/user.response';
+import { AllowUserTypeResDto, UserTypeResDto } from 'src/modules/user/app/user.response';
 import { UserAppService } from 'src/modules/user/app/user.service';
 
 @ApiTags('app/user')
@@ -33,8 +33,8 @@ export class UserAppController {
   })
   @Get('getAllowTypesOfUser')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([UserTypeResDto]) })
-  async getAllowTypesOfUser(@GetUserApp() user: TokenUserAppResDto): Promise<UserTypeResDto[]> {
+  @ApiOkResponse({ type: ApiAppResponseDto([AllowUserTypeResDto]), description:`**isSetted** có giá trị bằng 'Y' là user này đã đăng ký thông tin loại người dùng này rồi, 'N' là chưa có thông tin ` })
+  async getAllowTypesOfUser(@GetUserApp() user: TokenUserAppResDto): Promise<AllowUserTypeResDto[]> {
     const result = await this.userAppService.getAllowTypesOfUser(user.userCode, user.userTypeKeyWord);
     return result;
   }

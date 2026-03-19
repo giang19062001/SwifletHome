@@ -27,6 +27,8 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
   
   // Theo dõi home mà user đang xem
   private watchingHome = new Map<string, string>(); // key: userCode, value: userHomeCode
+  // Theo dõi client rớt mạng để tránh memory leak
+  private clientUserMap = new Map<string, string>(); // key: client.id, value: userCode
 
   constructor(
     private readonly mqttService: MqttService,
@@ -43,6 +45,14 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
 
   handleDisconnect(client: Socket) {
     console.log(this.SERVICE_NAME, `Đóng kết nối: ${client.id}`);
+    
+    // Tìm userCode và xóa khỏi Map để tránh memory leak
+    const userCode = this.clientUserMap.get(client.id);
+    if (userCode) {
+      this.watchingHome.delete(userCode);
+      this.clientUserMap.delete(client.id);
+      console.log(this.SERVICE_NAME, `Đã thu hồi memory leak cho userCode: ${userCode}`);
+    }
   }
 
   @SubscribeMessage('joinRoom')
@@ -54,6 +64,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
     client.join(room);
 
     this.watchingHome.set(userCode, userHomeCode);
+    this.clientUserMap.set(client.id, userCode); // Liên kết client.id với userCode
 
     console.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
 
@@ -70,6 +81,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
     client.leave(room);
 
     this.watchingHome.delete(userCode);
+    this.clientUserMap.delete(client.id); // Dọn dẹp memory leak
 
     console.log(this.SERVICE_NAME, `${client.id} đã rời phòng: ${room}`);
   }

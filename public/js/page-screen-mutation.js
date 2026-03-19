@@ -80,6 +80,13 @@ function mapContentFileds(data) {
         // contentEnd: data.contentEnd ?? '',
       };
       break;
+    case 'USER_TYPE_NOT_REGISTER':
+       screenContent = {
+        contentStart: data.contentStart ?? '',
+        // contentCenter: data.contentCenter ?? '',
+        // contentEnd: data.contentEnd ?? '',
+      };
+      break;
     default:
       screenContent = {};
   }
@@ -104,7 +111,6 @@ function markKeyContent(key) {
 
   // lấy content từ screenContent dựa key
   const content = screenContent[keyActive];
-  console.log('content', content);
 
   // set giá trị cho quill editor
   setEditorContent(content);
