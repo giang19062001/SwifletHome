@@ -37,6 +37,9 @@ export class AllowUserTypeResDto {
   @ApiProperty({ example: '' })
   userTypeName: string;
 
+  @ApiProperty({ example: null })
+  teamCode: string | null
+
   @ApiProperty({ example: 'N' })
   isSetted: YnEnum
 

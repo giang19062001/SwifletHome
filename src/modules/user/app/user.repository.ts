@@ -252,23 +252,24 @@ export class UserAppRepository {
                 A.userTypeCode, 
                 A.userTypeKeyWord, 
                 A.userTypeName,
+                B.teamCode,
                 IF(
                     A.userTypeKeyWord IN ('${USER_CONST.USER_TYPE.OWNER.value}', '${USER_CONST.USER_TYPE.PURCHASER.value}')
                     OR (
                         A.userTypeKeyWord IN ('${USER_CONST.USER_TYPE.FACTORY.value}', '${USER_CONST.USER_TYPE.TECHNICAL.value}')
                         AND EXISTS (
                             SELECT 1
-                            FROM tbl_team_user B
+                            FROM ${this.tableTeam} B
                             WHERE B.userTypeCode = A.userTypeCode
                               AND B.userCode = ?
                         )
-                    ),
-                    'Y',
-                    'N'
+                    ),'Y','N'
                 ) AS isSetted
-            FROM tbl_user_type A
-            WHERE A.isActive = 'Y'`;
-    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode]);
+            FROM ${this.tableType} A
+            LEFT JOIN  ${this.tableTeam} B
+            ON B.userTypeCode = A.userTypeCode AND B.userCode = ?
+            WHERE A.isActive = 'Y' `;
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode, userCode]);
     return rows as AllowUserTypeResDto[];
   }
 }

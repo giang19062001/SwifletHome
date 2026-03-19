@@ -33,7 +33,8 @@ export class UserAppController {
   })
   @Get('getAllowTypesOfUser')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([AllowUserTypeResDto]), description:`**isSetted** có giá trị bằng 'Y' là user này đã đăng ký thông tin loại người dùng này rồi, 'N' là chưa có thông tin ` })
+  @ApiOkResponse({ type: ApiAppResponseDto([AllowUserTypeResDto]), description:`**isSetted** có giá trị bằng 'Y' là user này đã đăng ký thông tin loại người dùng này rồi, 'N' là chưa có thông tin \n
+**teamCode**: (string | null) teamCode sẽ != null khi userTypeKeyWord là ('FACTORY' or 'TECHNICAL') và  (isSetted = 'Y') ` })
   async getAllowTypesOfUser(@GetUserApp() user: TokenUserAppResDto): Promise<AllowUserTypeResDto[]> {
     const result = await this.userAppService.getAllowTypesOfUser(user.userCode, user.userTypeKeyWord);
     return result;
