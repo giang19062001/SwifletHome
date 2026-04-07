@@ -30,3 +30,8 @@ export const NOTIFICATIONS = {
 export const TEXTS = {
   PACKAGE_FREE: 'Gói dùng thử',
 };
+
+
+export const EMAIL = {
+  SUBJECT_SEND_CONSULTATION: 'Yêu cầu tư vấn nhà yến từ 3fam.vn',
+};

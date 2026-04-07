@@ -1,0 +1,67 @@
+<div class="common-table-container row" id="page-guest">
+   <div class="col-xl-12">
+      <div class="row mb-3">
+         <div class="col-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <p class="title-page mb-0"><%= title %></p>
+                     <button id="btn-filter-toggle" class="btn btn-outline-primary btn-sm" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#filter-collapse">
+                        <span id="filterIcon"><i class="fa fa-chevron-up"></i></span>
+                     </button>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- COLLAPSE -->
+      <div class="collapse show mb-3" id="filter-collapse">
+         <div class="card py-3">
+            <div class="card-body">
+               <div class="row g-3 align-items-end">
+                  <div class="col-md-4">
+                     <label class="form-label">Tên khách hàng</label>
+                     <input type="text" class="form-control" id="filterName" placeholder="Nhập tên...">
+                  </div>
+                  <div class="col-md-4">
+                     <label class="form-label">Số điện thoại</label>
+                     <input type="text" class="form-control" id="filterPhone" placeholder="Nhập SĐT...">
+                  </div>
+                  <div class="col-md-4 d-flex align-items-end justify-content-end gap-2">
+                     <button class="btn-sub" id="btn-filter-reset">Làm mới</button>
+                     <button class="btn-info" id="btn-filter-apply">Tìm kiếm</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="row">
+         <div class="col-12">
+            <div class="container-table">
+               <div class="table-responsive">
+                  <table class="table table-striped">
+                     <thead class="table-dark">
+                        <tr class="text-center">
+                           <th><p>STT</p></th>
+                           <th><p>Họ và tên</p></th>
+                           <th><p>Số điện thoại</p></th>
+                           <th><p>Hạng mục tư vấn</p></th>
+                           <th><p>Mô tả</p></th>
+                           <th><p>Ngày gửi</p></th>
+                        </tr>
+                     </thead>
+                     <tbody class="body-table"></tbody>
+                  </table>
+               </div>
+               <nav>
+                  <ul class="pagination" id="privacy-main-pager"></ul>
+               </nav>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<script src="/js/page-guest.js"></script>

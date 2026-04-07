@@ -3,7 +3,6 @@ import admin from 'firebase-admin';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { LoggingService } from '../logger/logger.service';
 import { PushDataPayload } from './firebase.interface';
-
 import { ConfigService } from '@nestjs/config';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';

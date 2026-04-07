@@ -11,6 +11,7 @@ import { FirebaseModule } from './common/firebase/firebase.module';
 import { LoggerModule } from './common/logger/logger.module';
 import { MqttModule } from './common/mqtt/mqtt.module';
 import { SocketModule } from './common/socket/socket.module';
+import { MailModule } from './common/mail/mail.module';
 import { DatabaseModule } from './database/database.module';
 import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
 import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
@@ -49,6 +50,8 @@ import { UploadAdminModule } from './modules/upload/admin/upload.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
+import { GuestModule } from './modules/guest/front/guest.module';
+import { GuestAdminModule } from './modules/guest/admin/guest.module';
 
 @Module({
   imports: [
@@ -73,6 +76,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     LoggerModule,
     SocketModule,
     FirebaseModule,
+    MailModule,
     MqttModule,
     // commmon
     OptionModule,
@@ -91,6 +95,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     TeamAppModule,
     ConsignmentAppModile,
     ReportAppModule,
+    GuestModule,
 
     //admin
     AuthAdminModule,
@@ -111,7 +116,8 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     NotificationAdminModule,
     QrAdminModule,
     TeamAdminModule,
-    ConsignmentAdminModule
+    ConsignmentAdminModule,
+    GuestAdminModule,
   ],
   controllers: [AppController],
   providers: [

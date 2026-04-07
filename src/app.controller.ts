@@ -425,6 +425,17 @@ export class AppController {
       values: values,
     };
   }
+  //guest
+  @Get('/dashboard/guest')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/guest')
+  renderGuest(@Req() req: Request) {
+    return {
+      title: 'Yêu cầu tư vấn',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   //qrcode
   @Get('/dashboard/consignment')
   @UseGuards(PageAuthAdminGuard)
