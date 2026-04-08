@@ -72,6 +72,7 @@ export const Msg = {
   OnlyOwnerCanFetch: `Chỉ có tài khoản chủ nhà yến có thể lấy danh sách yến được bán`,
   TeamNotFound: 'Đội gia công - kỹ thuật không tồn tại',
   YouAlreadyReview: 'Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi',
+  CapchaInvalid: 'Xác thực reCAPTCHA thất bại.',
 };
 
 const convertFiledName = (filedName: string) => {

@@ -20,7 +20,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (typeof errorResponse === 'object' && errorResponse !== null) {
       const msg = (errorResponse as any).message || (errorResponse as any).error;
       message = Array.isArray(msg) ? msg.join(', ') : msg || exception.message || message;
-      detailData = (errorResponse as any).data || (errorResponse as any).response?.data || null;
+      detailData = (errorResponse as any).data ?? (errorResponse as any).response?.data ?? null;
     } else {
       message = exception.message || message;
     }

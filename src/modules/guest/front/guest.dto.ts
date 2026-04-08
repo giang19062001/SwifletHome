@@ -21,4 +21,10 @@ export class CreateGuestConsulationDto {
   @IsString()
   @IsNotEmpty()
   issueDescription: string;
+
+
+  @ApiProperty({ example: 'recapchav3' })
+  @IsString()
+  @IsNotEmpty()
+  recapchav3: string;
 }
