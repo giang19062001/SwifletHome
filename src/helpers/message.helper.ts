@@ -1,139 +1,163 @@
+// ─── Factory functions chung ───────────────────────────────────────────────────
+const ok = (action: string) => `${action} thành công`;
+const err = (action: string) => `${action} thất bại`;
+const notFound = (subject: string) => `${subject} không tồn tại`;
+const alreadyExist = (subject: string) => `${subject} đã tồn tại`;
+const alreadyDone = (subject: string) => `${subject} đã được thực hiện rồi`;
+const cannotDo = (reason: string) => `Không thể thực hiện: ${reason}`;
+const onlyCan = (who: string, action: string) => `Chỉ có ${who} mới có thể ${action}`;
+const invalid = (subject: string) => `${subject} không hợp lệ`;
+
+// ─── Msg ───────────────────────────────────────────────────────────────────────
 export const Msg = {
-  UploadOk: 'Tải file lên thành công',
-  UploadErr: 'Tải file lên thất bại',
-  GetOk: 'Lấy thông tin thành công',
-  GetErr: 'Lấy thông tin thất bại',
-  RegisterOk: 'Đăng ký thông tin thành công',
-  RegisterErr: 'Đăng ký thông tin thất bại',
-  CreateOk: 'Thêm thông tin thành công',
-  CreateErr: 'Thêm thông tin thất bại',
-  UpdateOk: 'Cập nhập thông tin thành công',
-  UpdateErr: 'Cập nhập thông tin thất bại',
-  DeleteOk: 'Xóa thông tin thành công',
-  DeleteErr: 'Xóa thông tin thất bại',
-  SetTaskOk: 'Thiết lập lịch nhắc thành công',
-  SetTaskErr: 'Thiết lập lịch nhắc thất bại',
-  CodeInvalid: 'Mã code không hợp lệ',
+  // Upload
+  UploadOk: ok('Tải file lên'),
+  UploadErr: err('Tải file lên'),
+
+  // CRUD chung
+  GetOk: ok('Lấy thông tin'),
+  GetErr: err('Lấy thông tin'),
+  RegisterOk: ok('Đăng ký thông tin'),
+  RegisterErr: err('Đăng ký thông tin'),
+  CreateOk: ok('Thêm thông tin'),
+  CreateErr: err('Thêm thông tin'),
+  UpdateOk: ok('Cập nhập thông tin'),
+  UpdateErr: err('Cập nhập thông tin'),
+  DeleteOk: ok('Xóa thông tin'),
+  DeleteErr: err('Xóa thông tin'),
+  SetTaskOk: ok('Thiết lập lịch nhắc'),
+  SetTaskErr: err('Thiết lập lịch nhắc'),
+
+  // Token / Code
+  CodeInvalid: invalid('Mã code'),
   TokenMissing: 'Vui lòng xác thực token',
-  TokenInvalid: 'Token không hợp lệ',
-  PhoneExist: 'Số điện thoại đã tồn tại',
-  PhoneExistCountry: 'Số điện thoại đã tồn tại với mã vùng ',
+  TokenInvalid: invalid('Token'),
+
+  // Số điện thoại
+  PhoneExist: alreadyExist('Số điện thoại'),
+  PhoneExistCountry: (countryCode: string) => alreadyExist(`Số điện thoại với mã vùng ${countryCode}`),
   PhoneOk: 'Số điện thoại hợp lệ có thể thêm mới',
   PhoneExistForNew: 'Số điện thoại đã tồn tại cho việc đăng ký mới',
-  PhoneNotExist: 'Số điện thoại không tồn tại',
-  PhoneLoginWrong: 'Số điện thoại hoặc mật khẩu không hợp lệ',
-  LoginOk: 'Đăng nhập thành công',
-  LoginErr: 'Đăng nhập thất bại',
-  RegisterAccountOk: 'Đăng ký tài khoản thành công',
-  RegisterAccountErr: 'Đăng ký tài khoản thất bại',
-  InvalidUserType: 'Loại tài khoản người dùng không hợp lệ',
-  InvalidPhoneCode: 'Mã vùng điện thoại người dùng không hợp lệ',
-  PasswordChangeOk: 'Đổi mật khẩu thành công',
-  PasswordChangeErr: 'Đổi mật khẩu thất bại',
-  AccountLoginWrong: 'Tài khoản hoặc mật khẩu không hợp lệ',
+  PhoneNotExist: notFound('Số điện thoại'),
+  PhoneLoginWrong: invalid('Số điện thoại hoặc mật khẩu'),
+
+  // Đăng nhập / Tài khoản
+  LoginOk: ok('Đăng nhập'),
+  LoginErr: err('Đăng nhập'),
+  RegisterAccountOk: ok('Đăng ký tài khoản'),
+  RegisterAccountErr: err('Đăng ký tài khoản'),
+  InvalidUserType: invalid('Loại tài khoản người dùng'),
+  InvalidPhoneCode: invalid('Mã vùng điện thoại người dùng'),
+  PasswordChangeOk: ok('Đổi mật khẩu'),
+  PasswordChangeErr: err('Đổi mật khẩu'),
+  AccountLoginWrong: invalid('Tài khoản hoặc mật khẩu'),
   AccountLoginBlock: 'Tài khoản đã bị vô hiệu hóa',
-  UserNotFound: 'Người dùng không tồn tại',
-  HomeNotFound: 'Thông tin nhà yến không tồn tại',
-  HomeIsMainCannotDelete: 'Không thể xóa nhà yến đang được chọn là chính',
-  CannotReply: 'Những vấn đề kỹ thuật chuyên sâu cần độ chính xác cao. Vui lòng liên hệ qua Zalo hoặc Số điện thoại : 0966222612',
+
+  // Người dùng / Nhà yến
+  UserNotFound: notFound('Người dùng'),
+  HomeNotFound: notFound('Thông tin nhà yến'),
+  HomeIsMainCannotDelete: cannotDo('nhà yến đang được chọn là chính'),
+
+  // Hỗ trợ
+  CannotReply:
+    'Những vấn đề kỹ thuật chuyên sâu cần độ chính xác cao. Vui lòng liên hệ qua Zalo hoặc Số điện thoại : 0966222612',
+
+  // File
   UuidNotFound: 'Chưa từng có file nào được upload cùng với uuid này',
   FileEmpty: 'Không có file nào được upload',
   FileAudioRequire: 'Bắt buộc nhập 2 file audio',
   FileOvertake: 'Số file upload đã vượt quá số lượng tối đa',
-  FileWrongType: (ext: string, allowedExts: string[]) => `File không hỗ trợ: ${ext}. Cho phép: ${allowedExts.join(', ')}`,
+  FileWrongType: (ext: string, allowedExts: string[]) =>
+    `File không hỗ trợ: ${ext}. Cho phép: ${allowedExts.join(', ')}`,
   FileDeleteFail: 'Lỗi khi xóa file',
-  FileUploadFail: 'Lỗi khi xóa file',
+  FileUploadFail: err('Tải file lên'),
+
+  // OTP
   OtpNotVerify: 'Vui lòng xác thực OTP',
   OtpSent: 'OTP đã được gửi',
-  OtpValid: 'Xác thực OTP thành công',
-  OtpInvalid: 'Xác thực OTP thất bại',
+  OtpValid: ok('Xác thực OTP'),
+  OtpInvalid: err('Xác thực OTP'),
   OtpExpire: 'OTP không tồn tại hoặc đã hết hạn',
   OtpOvertake: 'Đã vượt quá số lần nhập OTP cho phép',
   OtpRemainAttempt: (num: number) => `Mã OTP không đúng. Còn ${num} lần thử.`,
+
+  // Gói / Lịch nhắc
   InvalidPackageToAddHome: 'Vui lòng nâng cấp gói để có thể thêm nhà yến mới',
-  DuplicateTaskAlram: 'Lịch nhắc này đã tồn tại',
-  DuplicateTaskPeriod: 'Chu kỳ lịch nhắc này đã tồn tại',
-  AlreadyCompleteCannotDo: 'Lịch nhắc này đã hoàn thành không thể thực hiện tác vụ này',
-  OnlyMedicineTaskCanDo: `Chỉ có lịch nhắc 'Lăn thuốc' mới có thể thực hiện tác vụ này`,
-  OnlyHarvestTaskCanDo: `Chỉ có lịch nhắc 'Thu hoạch' mới có thể thực hiện tác vụ này`,
-  HomeOfAlarmNotExist: 'Nhà yến của lịch nhắc này không tồn tại',
-  FloorOfHomeIsZero: 'Số tầng của nhà yến hiện tại là 0 - không thể khởi tạo dữ liệu thu hoạch',
+  DuplicateTaskAlram: alreadyExist('Lịch nhắc này'),
+  DuplicateTaskPeriod: alreadyExist('Chu kỳ lịch nhắc này'),
+  AlreadyCompleteCannotDo: cannotDo('lịch nhắc này đã hoàn thành'),
+  OnlyMedicineTaskCanDo: onlyCan(`lịch nhắc 'Lăn thuốc'`, 'thực hiện tác vụ này'),
+  OnlyHarvestTaskCanDo: onlyCan(`lịch nhắc 'Thu hoạch'`, 'thực hiện tác vụ này'),
+  HomeOfAlarmNotExist: notFound('Nhà yến của lịch nhắc này'),
+  FloorOfHomeIsZero:
+    'Số tầng của nhà yến hiện tại là 0 - không thể khởi tạo dữ liệu thu hoạch',
+
+  // Lăn thuốc
   MedicineTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
   MedicineInvalidDateExecute: 'Chưa đến ngày lăn thuốc',
-  HarvestTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
-  ThisHarvestRequestQrcodeAlreadyCannotAdjust: `Đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi - không thể chỉnh sửa`,
-  ThisHarvestRequestQrcodeAlready: `Đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi`,
+
+  // Thu hoạch
+  HarvestTaskAlreadyAdded: `Lịch nhắc 'Thu hoạch' này đã được ghi chú rồi`,
+  ThisHarvestRequestQrcodeAlreadyCannotAdjust: cannotDo(
+    'đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi',
+  ),
+  ThisHarvestRequestQrcodeAlready: alreadyDone('Đợt thu hoạch của nhà yến này đã yêu cầu QrCode'),
   ThisQrNotApproved: 'Qr không tồn tại hoặc chưa được duyệt',
-  RequestQrcodeNotFound: `Không tìm thấy thông tin Qrcode của yêu cầu bán hiện tại`,
-  RequestInfoAlreadySold: `Thông tin của Qr code này đã được rao bán rồi`,
-  RequestNotAllowHarvestEmpty: `Nhà yến chưa có dữ liệu của đợt thu hoạch này, không thể yêu cầu mã Qrcode`,
-  RequestCannotCancelNotWaiting: `Chỉ có thể hủy các yêu cầu đang ở chế độ chờ`,
-  OnlyPurcharseCanFetch: `Chỉ có tài khoản người mua mới có thể lấy danh sách yến được bán`,
-  OnlyOwnerCanFetch: `Chỉ có tài khoản chủ nhà yến có thể lấy danh sách yến được bán`,
-  TeamNotFound: 'Đội gia công - kỹ thuật không tồn tại',
-  YouAlreadyReview: 'Đội gia công - kỹ thuật này đã được bạn đánh giá trước đó rồi',
-  CapchaInvalid: 'Xác thực reCAPTCHA thất bại.',
+  RequestQrcodeNotFound: notFound('Thông tin Qrcode của yêu cầu bán hiện tại'),
+  RequestInfoAlreadySold: alreadyDone('Thông tin của Qr code này đã được rao bán'),
+  RequestNotAllowHarvestEmpty:
+    'Nhà yến chưa có dữ liệu của đợt thu hoạch này, không thể yêu cầu mã Qrcode',
+  RequestCannotCancelNotWaiting: cannotDo('chỉ có thể hủy các yêu cầu đang ở chế độ chờ'),
+
+  // Phân quyền / Mua bán yến
+  OnlyPurcharseCanFetch: onlyCan('tài khoản người mua', 'lấy danh sách yến được bán'),
+  OnlyOwnerCanFetch: onlyCan('tài khoản chủ nhà yến', 'lấy danh sách yến được bán'),
+
+  // Đội gia công
+  TeamNotFound: notFound('Đội gia công - kỹ thuật'),
+  YouAlreadyReview: alreadyDone('Đội gia công - kỹ thuật này đã được bạn đánh giá'),
+
+  // Captcha
+  CapchaInvalid: err('Xác thực reCAPTCHA'),
 };
 
-const convertFiledName = (filedName: string) => {
-  let txt = filedName;
-  switch (filedName) {
-    case 'taskCustomName':
-      txt = 'Tên lịch nhắc tùy chỉnh';
-      break;
-    case 'taskCode':
-      txt = 'Mã lịch nhắc';
-      break;
-    case 'periodType':
-      txt = 'Loại chu kỳ';
-      break;
-    case 'specificValue':
-      txt = 'Ngày nhắc lịch';
-      break;
-    case 'periodValue':
-      txt = 'Giá trị tháng hoặc tuần';
-      break;
-    case 'medicineOther':
-      txt = 'Tên thuốc';
-      break;
-    case 'senderName':
-      txt = 'Tên người gửi';
-      break;
-    case 'senderPhone':
-      txt = 'SĐT người gửi';
-      break;
-    case 'deliveryAddress':
-      txt = 'Địa chỉ cần giao thuốc';
-      break;
-    case 'nestType':
-      txt = 'Loại yến'
-      break;
-    case 'receiverName':
-      txt = 'Tên người nhận';
-      break;
-    case 'receiverPhone':
-      txt = 'SĐT người nhận';
-      break;
-    default:
-      txt = filedName;
-  }
-  return txt;
+// ─── Helpers dùng nội bộ ───────────────────────────────────────────────────────
+const convertFiledName = (filedName: string): string => {
+  const map: Record<string, string> = {
+    taskCustomName: 'Tên lịch nhắc tùy chỉnh',
+    taskCode: 'Mã lịch nhắc',
+    periodType: 'Loại chu kỳ',
+    specificValue: 'Ngày nhắc lịch',
+    periodValue: 'Giá trị tháng hoặc tuần',
+    medicineOther: 'Tên thuốc',
+    senderName: 'Tên người gửi',
+    senderPhone: 'SĐT người gửi',
+    deliveryAddress: 'Địa chỉ cần giao thuốc',
+    nestType: 'Loại yến',
+    receiverName: 'Tên người nhận',
+    receiverPhone: 'SĐT người nhận',
+  };
+  return map[filedName] ?? filedName;
 };
 
+// ─── MsgAdmin ─────────────────────────────────────────────────────────────────
 export const MsgAdmin = {
   pushAlarmOk: 'Tạo lịch nhắc và gửi thông báo thành công',
   pushAlarmErr: 'Tạo lịch nhắc thành công nhưng gửi thông báo thất bại',
-  pushNotifyOk: 'Gửi thông báo thành công',
-  pushNotifyErr: 'Gửi thông báo thất bại',
+  pushNotifyOk: ok('Gửi thông báo'),
+  pushNotifyErr: err('Gửi thông báo'),
   pushProvinceEmpty: 'Không có người dùng nào có nhà yến thuộc những tỉnh thành này',
-  userAlreadyCreateThisTeam: 'Người dùng hiện tại đã đăng ký đội công xưởng này rồi',
+  userAlreadyCreateThisTeam: alreadyDone('Người dùng hiện tại đã đăng ký đội công xưởng này'),
 };
 
+// ─── MsgDto ───────────────────────────────────────────────────────────────────
 export const MsgDto = {
-  InvalidPhone: `Số điện thoại không hợp lệ`,
+  InvalidPhone: invalid('Số điện thoại'),
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
   MustBeGreaterZero: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn 0`,
   InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
-  InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép giá trị cho phép (${range})`,
-  MustBeGreaterThanAndEqualNow: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
+  InvalidRange: (filedName: string, range: string) =>
+    `${convertFiledName(filedName)} phải nằm trong giá trị cho phép (${range})`,
+  MustBeGreaterThanAndEqualNow: (filedName: string) =>
+    `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
 };

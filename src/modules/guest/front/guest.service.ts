@@ -19,11 +19,14 @@ export class GuestService {
   ) {}
 
   private async verifyRecaptcha(token: string): Promise<boolean> {
+    const logbase = `${this.SERVICE_NAME}/verifyRecaptcha:`;
     const secret = this.configService.get<string>('KEY_CAPCHA');
     const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
 
     try {
       const response = await axios.post(url);
+      this.logger.log(logbase, ` URL: ${url} ==> Response: ${JSON.stringify(response.data)}`);
+
       return response.data?.success === true;
     } catch (error) {
       this.logger.error(`${this.SERVICE_NAME}/verifyRecaptcha`, `error: ${error.message}`);
@@ -34,7 +37,8 @@ export class GuestService {
   async requestConsulation(dto: CreateGuestConsulationDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/requestConsulation:`;
     try {
-      this.logger.log(logbase, ` DTO: ${JSON.stringify(dto)}`);
+      const { recapchav3, ...logDto } = dto;
+      this.logger.log(logbase, ` DTO: ${JSON.stringify(logDto)}`);
 
       // Kiểm tra reCAPTCHA v3 trước khi thực hiện action
       const isCaptchaValid = await this.verifyRecaptcha(dto.recapchav3);

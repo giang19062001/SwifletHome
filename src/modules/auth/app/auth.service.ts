@@ -136,8 +136,8 @@ export class AuthAppService extends AbAuthService {
 
     // lỗi -> số điện thoại đã tồn tại
     if (user) {
-      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.PhoneExistCountry + dto.countryCode}`);
-      throw new BadRequestException(Msg.PhoneExistCountry + user.countryCode);
+      this.logger.error(logbase, `${dto.userPhone} -> ${Msg.PhoneExistCountry(dto.countryCode)}`);
+      throw new BadRequestException(Msg.PhoneExistCountry(user.countryCode));
     }
 
     // kiểm tra xác thực otp chưa
