@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         DEPLOY_DIR = '/var/www/SwifletHome'
+        TZ = 'Asia/Ho_Chi_Minh'
     }
 
     stages {
