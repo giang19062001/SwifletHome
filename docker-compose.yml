@@ -63,6 +63,15 @@ services:
     networks:
       - swiflethome-network
 
+  yenhome-landing-page:
+    image: giangdev196/yenhome-landing:latest
+    container_name: yenhome_landing
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    networks:
+      - swiflethome-network
+
 networks:
   swiflethome-network:
     driver: bridge
