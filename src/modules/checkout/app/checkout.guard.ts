@@ -10,13 +10,13 @@ export class ApiKeyGuard implements CanActivate {
     const apiKey = request.headers['x-api-key'];
 
     if (!apiKey) {
-      throw new UnauthorizedException('API Key is missing');
+      throw new UnauthorizedException({ message: 'API Key is missing', data: 0 });
     }
 
     const validApiKey = this.configService.get<string>('REVENUE_CAT_API_KEY');
 
     if (apiKey !== validApiKey) {
-      throw new UnauthorizedException('Invalid API Key');
+      throw new UnauthorizedException({ message:'Invalid API Key', data: 0 });
     }
 
     return true;
