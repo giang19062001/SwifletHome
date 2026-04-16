@@ -39,7 +39,15 @@ export class RequestLoggerInterceptor implements NestInterceptor {
 
     this.logger.log(`[REQUEST] ${method} ${url}`, logObj);
 
-    return next.handle();
+    return next.handle().pipe(
+      tap((data) => {
+        this.logger.log(`[RESPONSE] ${method} ${url}`, {
+          url: url,
+          method: method,
+          response: data,
+        });
+      }),
+    );
   }
 }
 
