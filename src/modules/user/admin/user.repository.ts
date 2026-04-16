@@ -41,12 +41,27 @@ export class UserAdminRepository {
     return rows as { userCode: string; deviceToken: string }[];
   }
 
-  async getTotalUserApp(dto: PagingDto): Promise<number> {
-    let query = ` SELECT COUNT(seq) AS TOTAL  FROM ${this.tableApp}  `;
+  async getTotalUserApp(dto: GetAllUserDto): Promise<number> {
+    let query = ` SELECT COUNT(A.seq) AS TOTAL 
+     FROM ${this.tableApp} A 
+     LEFT JOIN ${this.tablePackage} B ON A.userCode = B.userCode
+     WHERE A.isActive = 'Y' 
+    `;
     const params: any[] = [];
-    if (dto.limit > 0 && dto.page > 0) {
-      query += ` LIMIT ? OFFSET ?`;
-      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    if (dto.userName) {
+      query += ` AND A.userName LIKE ?`;
+      params.push(`%${dto.userName}%`);
+    }
+
+    if (dto.userPhone) {
+      query += ` AND A.userPhone LIKE ?`;
+      params.push(`%${dto.userPhone}%`);
+    }
+
+    if (dto.userPackageFilter == UserPackageFilterEnum.FREE) {
+      query += ` AND B.packageCode IS NULL `;
+    } else if (dto.userPackageFilter == UserPackageFilterEnum.PAY) {
+      query += ` AND B.packageCode IS NOT NULL `;
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
@@ -57,7 +72,8 @@ export class UserAdminRepository {
     try {
       let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone,  A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
-     IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
+     IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,
+     CASE WHEN B.checkout_seq IS NOT NULL THEN (SELECT store FROM tbl_checkout WHERE seq = B.checkout_seq LIMIT 1) ELSE 'ADMIN' END AS paymentMethod
      FROM ${this.tableApp} A 
      LEFT JOIN ${this.tablePackage} B
      ON A.userCode = B.userCode
@@ -100,7 +116,8 @@ export class UserAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
-     IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
+     IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,
+     CASE WHEN B.checkout_seq IS NOT NULL THEN (SELECT store FROM tbl_checkout WHERE seq = B.checkout_seq LIMIT 1) ELSE 'ADMIN' END AS paymentMethod
      FROM ${this.tableApp} A 
      LEFT JOIN ${this.tablePackage} B
      ON A.userCode = B.userCode
@@ -116,8 +133,8 @@ export class UserAdminRepository {
   //TODO:PACKAGE
   async writePackageHistory(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, createdAt: Date): Promise<number> {
     const sql = `
-        INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
-        VALUES(?, ?, ?, ?, ?, ?)
+        INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt, checkout_seq) 
+        VALUES(?, ?, ?, ?, ?, ?, NULL)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, UPDATOR, createdAt]);
 
@@ -137,7 +154,7 @@ export class UserAdminRepository {
 
   async updatePackage(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, updatedId: string, updatedAt: Date): Promise<number> {
     const sql = `
-        UPDATE  ${this.tablePackage} SET packageCode = ?, startDate = ?, endDate = ?, updatedId = ?, updatedAt = ?
+        UPDATE ${this.tablePackage} SET packageCode = ?, startDate = ?, endDate = ?, updatedId = ?, updatedAt = ?, checkout_seq = NULL
         WHERE userCode = ?
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, updatedId, updatedAt, userCode]);

@@ -119,6 +119,10 @@ export const Msg = {
 
   // Captcha
   CapchaInvalid: err('Xác thực reCAPTCHA'),
+  
+  // Checkout
+  CheckoutTransactionExist: alreadyDone('Giao dịch thanh toán này'),
+  CheckoutPackageNotFound: notFound('Gói cước mặc định'),
 };
 
 // ─── Helpers dùng nội bộ ───────────────────────────────────────────────────────
@@ -136,6 +140,7 @@ const convertFiledName = (filedName: string): string => {
     nestType: 'Loại yến',
     receiverName: 'Tên người nhận',
     receiverPhone: 'SĐT người nhận',
+    app_user_id: 'ID người dùng',
   };
   return map[filedName] ?? filedName;
 };

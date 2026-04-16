@@ -133,9 +133,10 @@ function renderAllUser(data, objElement) {
             <td>
               <p class="txt-not-ok">${ele.packageRemainDay ? ele.packageRemainDay + ' ngày' : ''}</p>
             </td>
+            <td><p>${ele.paymentMethod ?? 'ADMIN'}</p></td>
             <td><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
            <td>
-                <button class="btn-edit" onclick="getDetailUser('${ele.userCode}', 'update')">Cập nhập gói</button> 
+                ${ele.packageRemainDay <= 1 ? `<button class="btn-edit" onclick="getDetailUser('${ele.userCode}', 'update')">Cập nhập gói</button>` : ''}
             </td> 
          </tr>`;
       HTML += rowHtml;
