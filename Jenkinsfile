@@ -14,9 +14,16 @@ pipeline {
         stage('Deploy Directly to Production') {
             steps {
                 dir("${DEPLOY_DIR}") {
-                    
-                    git branch: 'main', url: 'https://github.com/giang19062001/SwifletHome.git'
-                                   
+                    sh '''
+                        if [ ! -d ".git" ]; then
+                            git init
+                            git remote add origin https://github.com/giang19062001/SwifletHome.git
+                        fi
+                        
+                        git fetch origin main
+                        git reset --hard origin/main
+                    '''
+
                 sh '''
                     md5sum package.json > .current_deps_hash
                     
