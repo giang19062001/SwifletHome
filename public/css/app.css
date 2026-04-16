@@ -12104,6 +12104,21 @@ textarea.form-control-lg {
   background: #ffffff;
   z-index: 1001;
   box-shadow: 0px 2px 16px 0px rgba(0, 0, 0, 0.0588235294);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.vertical-menu::-webkit-scrollbar {
+  width: 6px;
+}
+.vertical-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+.vertical-menu::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+.vertical-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 .vertical-menu [data-simplebar] {
   height: 100%;

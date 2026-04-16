@@ -45,6 +45,8 @@ export class LoggingService implements LoggerService {
     }
 
     if (typeof obj !== 'object') return obj;
+    if (obj instanceof Date) return obj;
+    if (Buffer.isBuffer(obj)) return '[Buffer]';
     if (seen.has(obj)) return '[Circular]';
 
     seen.add(obj);
