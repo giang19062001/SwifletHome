@@ -15,6 +15,8 @@ pipeline {
             steps {
                 dir("${DEPLOY_DIR}") {
                     sh '''
+                        git config --global --add safe.directory /var/www/SwifletHome
+                        
                         if [ ! -d ".git" ]; then
                             git init
                             git remote add origin https://github.com/giang19062001/SwifletHome.git
