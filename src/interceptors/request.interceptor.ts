@@ -44,7 +44,7 @@ export class RequestLoggerInterceptor implements NestInterceptor {
         this.logger.log(`[RESPONSE] ${method} ${url}`, {
           url: url,
           method: method,
-          response: data,
+          response: data?.data || data?.message || "-",
         });
       }),
     );
