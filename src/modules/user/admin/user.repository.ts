@@ -13,10 +13,12 @@ import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, Use
 export class UserAdminRepository {
   private readonly tableAdmin = 'tbl_user_admin';
   private readonly tableApp = 'tbl_user_app';
-  private readonly tablePackage = 'tbl_user_package';
-  private readonly tablePackageHistory = 'tbl_user_package_history';
+  private readonly tableUserPackage = 'tbl_user_package';
+  private readonly tableUserPackageHistory = 'tbl_user_package_history';
   private readonly tableType = 'tbl_user_type';
   private readonly tableTeam = 'tbl_team_user';
+  private readonly tablePackage = 'tbl_package';
+  private readonly tableCheckout = 'tbl_checkout';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -44,7 +46,7 @@ export class UserAdminRepository {
   async getTotalUserApp(dto: GetAllUserDto): Promise<number> {
     let query = ` SELECT COUNT(A.seq) AS TOTAL 
      FROM ${this.tableApp} A 
-     LEFT JOIN ${this.tablePackage} B ON A.userCode = B.userCode
+     LEFT JOIN ${this.tableUserPackage} B ON A.userCode = B.userCode
      WHERE A.isActive = 'Y' 
     `;
     const params: any[] = [];
@@ -73,12 +75,14 @@ export class UserAdminRepository {
       let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone,  A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
      IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,
-     CASE WHEN B.checkout_seq IS NOT NULL THEN (SELECT store FROM tbl_checkout WHERE seq = B.checkout_seq LIMIT 1) ELSE 'ADMIN' END AS paymentMethod
+     IFNULL(D.store, 'ADMIN') AS paymentMethod
      FROM ${this.tableApp} A 
-     LEFT JOIN ${this.tablePackage} B
+     LEFT JOIN ${this.tableUserPackage} B
      ON A.userCode = B.userCode
-     LEFT JOIN tbl_package C
+     LEFT JOIN ${this.tablePackage} C
      ON B.packageCode = C.packageCode
+     LEFT JOIN ${this.tableCheckout} D
+     ON B.checkout_seq = D.seq
      WHERE A.isActive = 'Y' 
      `;
       const params: any[] = [];
@@ -117,12 +121,14 @@ export class UserAdminRepository {
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
      IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,
-     CASE WHEN B.checkout_seq IS NOT NULL THEN (SELECT store FROM tbl_checkout WHERE seq = B.checkout_seq LIMIT 1) ELSE 'ADMIN' END AS paymentMethod
+     IFNULL(D.store, 'ADMIN') AS paymentMethod
      FROM ${this.tableApp} A 
-     LEFT JOIN ${this.tablePackage} B
+     LEFT JOIN ${this.tableUserPackage} B
      ON A.userCode = B.userCode
-     LEFT JOIN tbl_package C
+     LEFT JOIN ${this.tablePackage} C
      ON B.packageCode = C.packageCode
+     LEFT JOIN ${this.tableCheckout} D
+     ON B.checkout_seq = D.seq
      WHERE A.userCode = ? AND A.isActive = 'Y'
      LIMIT 1`,
       [userCode],
@@ -133,7 +139,7 @@ export class UserAdminRepository {
   //TODO:PACKAGE
   async writePackageHistory(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, createdAt: Date): Promise<number> {
     const sql = `
-        INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt, checkout_seq) 
+        INSERT INTO ${this.tableUserPackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt, checkout_seq) 
         VALUES(?, ?, ?, ?, ?, ?, NULL)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, UPDATOR, createdAt]);
@@ -143,7 +149,7 @@ export class UserAdminRepository {
   async isFristTimesUpdatePackage(userCode: string): Promise<Boolean> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` 
-      SELECT seq FROM ${this.tablePackage} 
+      SELECT seq FROM ${this.tableUserPackage} 
       WHERE userCode = ? AND updatedAt IS NOT NULL
       AND  updatedId IS NOT NULL
       LIMIT 1`,
@@ -154,7 +160,7 @@ export class UserAdminRepository {
 
   async updatePackage(dto: UpdateUserPackageAdminDto, userCode: string, startDate: string | null, endDate: string | null, updatedId: string, updatedAt: Date): Promise<number> {
     const sql = `
-        UPDATE ${this.tablePackage} SET packageCode = ?, startDate = ?, endDate = ?, updatedId = ?, updatedAt = ?, checkout_seq = NULL
+        UPDATE ${this.tableUserPackage} SET packageCode = ?, startDate = ?, endDate = ?, updatedId = ?, updatedAt = ?, checkout_seq = NULL
         WHERE userCode = ?
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.packageCode == '' ? null : dto.packageCode, startDate, endDate, updatedId, updatedAt, userCode]);

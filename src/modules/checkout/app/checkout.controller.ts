@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiHeader, ApiOkResponse, ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { CheckoutPayDto } from './checkout.dto';
@@ -14,11 +14,7 @@ export class CheckoutAppController {
 
   @Post('pay')
   @ApiOperation({ summary: 'Webhook từ RevenueCat hoặc mobile app để nhận thanh toán' })
-  @ApiHeader({
-    name: 'x-api-key',
-    description: 'API key cho phần Authorization',
-    required: true,
-  })
+  @ApiSecurity('revenuecat-auth')
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   @UseGuards(ApiKeyGuard)

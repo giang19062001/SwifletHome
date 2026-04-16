@@ -14,11 +14,13 @@ import { AllowUserTypeResDto, UserTypeResDto } from './user.response';
 export class UserAppRepository {
   private readonly table = 'tbl_user_app';
   private readonly tableDel = 'tbl_user_app_delete';
-  private readonly tablePackage = 'tbl_user_package';
+  private readonly tableUserPackage = 'tbl_user_package';
   private readonly tableType = 'tbl_user_type';
-  private readonly tablePackageHistory = 'tbl_user_package_history';
+  private readonly tableUserPackageHistory = 'tbl_user_package_history';
   private readonly tableHome = 'tbl_user_home';
   private readonly tableTeam = 'tbl_team_user';
+  private readonly tablePackage = 'tbl_package';
+  private readonly tableCheckout = 'tbl_checkout';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAllUserCode(): Promise<TokenUserAppResDto[]> {
@@ -75,9 +77,9 @@ export class UserAppRepository {
       ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
       FROM ${this.table} A 
-      LEFT JOIN ${this.tablePackage} B
+      LEFT JOIN ${this.tableUserPackage} B
         ON A.userCode = B.userCode
-      LEFT JOIN tbl_package C
+      LEFT JOIN ${this.tablePackage} C
         ON B.packageCode = C.packageCode
       WHERE A.userCode = ? AND A.isActive = 'Y' 
        LIMIT 1`,
@@ -92,9 +94,9 @@ export class UserAppRepository {
       IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,  B.startDate, B.endDate,  
       COUNT(D.seq) AS homesTotal, E.userTypeCode, E.userTypeKeyWord, E.userTypeName
       FROM ${this.table} A 
-      LEFT JOIN ${this.tablePackage} B
+      LEFT JOIN ${this.tableUserPackage} B
         ON A.userCode = B.userCode
-      LEFT JOIN tbl_package C
+      LEFT JOIN ${this.tablePackage} C
         ON B.packageCode = C.packageCode
       LEFT JOIN ${this.tableHome} D
         ON D.userCode = A.userCode AND D.isActive = 'Y' 
@@ -204,7 +206,7 @@ export class UserAppRepository {
   // TODO: PACKAGE
   async writePackageHistory(dto: CreateUserPackageAppDto, createdAt: Date): Promise<number> {
     const sql = `
-          INSERT INTO ${this.tablePackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
+          INSERT INTO ${this.tableUserPackageHistory} (userCode, packageCode, startDate, endDate, createdId, createdAt) 
           VALUES(?, ?, ?, ?, ?, ?)
         `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, UPDATOR, createdAt]);
@@ -213,7 +215,7 @@ export class UserAppRepository {
   }
   async createPackage(dto: CreateUserPackageAppDto, createdAt: Date): Promise<number> {
     const sql = `
-          INSERT INTO ${this.tablePackage} (userCode, packageCode, startDate, endDate, isActive, createdId, createdAt) 
+          INSERT INTO ${this.tableUserPackage} (userCode, packageCode, startDate, endDate, isActive, createdId, createdAt) 
           VALUES(?, ?, ?, ?, ?, ?, ?)
         `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.userCode, dto.packageCode, dto.startDate, dto.endDate, 'Y', UPDATOR, createdAt]);

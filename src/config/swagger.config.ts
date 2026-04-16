@@ -25,6 +25,15 @@ export const initSwagger = (app) => {
       },
       'app-auth',
     )
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'Authorization',
+        in: 'header',
+        description: 'Format: x-api-key <your-key>',
+      },
+      'revenuecat-auth',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
