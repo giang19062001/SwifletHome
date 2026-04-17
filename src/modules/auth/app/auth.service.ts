@@ -14,6 +14,7 @@ import { USER_CONST } from "../../user/app/user.interface";
 import { AbAuthService } from '../auth.abstract';
 import { AUTH_CONFIG } from '../auth.config';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, TokenUserAppResDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { BadRequestExceptionNumData } from 'src/filter/badRequestNumber.exception';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -228,15 +229,18 @@ export class AuthAppService extends AbAuthService {
     return result;
   }
 
-  async checkDuplicatePhone(userPhone: string, countryCode: string): Promise<number> {
+  async checkDuplicatePhone(userPhone: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/checkDuplicatePhone`;
-    const phone = await this.userAppService.findByPhone(userPhone, countryCode);
+
+    // kiểm số phone
+    const phone = await this.userAppService.findByPhoneWithoutCountry(userPhone);
 
     // lỗi -> số điện thoại đã tồn tại
     if (phone) {
-      this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneExist}`);
-      return 0;
+      this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneExistCountry(phone.countryCode)}`);
+      throw new BadRequestExceptionNumData(Msg.PhoneExistCountry(phone.countryCode));
     }
+
     return 1;
   }
 

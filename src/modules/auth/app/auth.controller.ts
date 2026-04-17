@@ -155,7 +155,7 @@ export class AuthAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
   async checkDuplicatePhone(@Body() dto: CheckPhoneDto) {
-    const result = await this.authAppService.checkDuplicatePhone(dto.userPhone, dto.countryCode);
+    const result = await this.authAppService.checkDuplicatePhone(dto.userPhone);
     return {
       message: !result ? Msg.PhoneExist : Msg.PhoneOk,
       data: result,

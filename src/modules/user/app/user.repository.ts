@@ -182,9 +182,9 @@ export class UserAppRepository {
 
       // Insert vào bảng delete
       await conn.query(
-        ` INSERT INTO ${this.tableDel} (userCode, userName, userPassword, userPhone, deviceToken)
-          VALUES (?, ?, ?, ?, ?) `,
-        [(user as any).userCode, user.userName, user.userPassword, user.userPhone, (user as any).deviceToken],
+        ` INSERT INTO ${this.tableDel} (userCode, userName, userPassword, userPhone, countryCode, deviceToken)
+          VALUES (?, ?, ?, ?, ?, ?) `,
+        [(user as any).userCode, user.userName, user.userPassword, user.userPhone, (user as any).countryCode, (user as any).deviceToken],
       );
       // Delete khỏi bảng chính
       const [deleteResult]: any = await conn.query(` DELETE FROM ${this.table} WHERE userCode = ? LIMIT 1`, [userCode]);
