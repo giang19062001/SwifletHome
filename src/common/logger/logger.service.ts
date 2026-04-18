@@ -50,7 +50,7 @@ export class LoggingService implements LoggerService {
     if (seen.has(obj)) return '[Circular]';
 
     seen.add(obj);
-    const sensitiveFields = ['password', 'token', 'accessToken', 'refreshToken', 'secret', 'jwt', 'cookie', 'authorization'];
+    const sensitiveFields = ['password', 'token', 'refreshToken', 'secret', 'jwt', 'cookie'];
     const redacted = Array.isArray(obj) ? [] : {};
 
     for (const key in obj) {

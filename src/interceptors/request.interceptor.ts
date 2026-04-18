@@ -17,9 +17,11 @@ export class RequestLoggerInterceptor implements NestInterceptor {
       return next.handle();
     }
     const contentType = req.headers['content-type'] || '';
+    const accessToken = req.headers['authorization'] || '';
     const logObj: any = {
       url: url,
       method: method,
+      accessToken: accessToken,
     };
 
     // Params nếu có
