@@ -50,7 +50,7 @@ export class TodoAlarmAppService {
       boxTasks.map(async (ele) => {
         let data: { taskDate: string; taskAlarmCode?: string; medicineCode?: string; taskStatus: string } | null = null;
 
-        if (ele.taskCode === TODO_CONST.TASK_EVENT.HARVEST.value) {
+        if (ele.taskKeyword === TODO_CONST.TASK_EVENT.HARVEST.value) {
           const harvestData = await this.todoHarvestAppRepository.getNextHarvestSchedule(userCode, home.userHomeCode, today);
           if (harvestData) {
             data = {
@@ -59,7 +59,7 @@ export class TodoAlarmAppService {
               taskStatus: harvestData.taskStatus,
             };
           }
-        } else if (ele.taskCode === TODO_CONST.TASK_EVENT.MEDICINE.value) {
+        } else if (ele.taskKeyword === TODO_CONST.TASK_EVENT.MEDICINE.value) {
           const medicineData = await this.todoMedicineAppRepository.getNextMedicineSchedule(userCode, home.userHomeCode, today);
           if (medicineData) {
             data = {

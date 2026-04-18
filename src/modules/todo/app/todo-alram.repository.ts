@@ -19,7 +19,8 @@ export class TodoAlarmAppRepository {
 
   // TODO: BOX - TASK
   async getBoxTasks(): Promise<TodoTaskResDto[]> {
-    let query = `  SELECT A.seq, A.taskCode, B.taskName, A.sortOrder FROM ${this.tableBoxTask} A
+    let query = `  SELECT A.seq, A.taskCode, B.taskKeyword, B.taskName, A.sortOrder 
+    FROM ${this.tableBoxTask} A
     LEFT JOIN ${this.tableTask} B
     ON A.taskCode = B.taskCode
     WHERE A.isActive = 'Y' `;
