@@ -76,6 +76,10 @@ export class FirebaseService implements OnModuleInit {
   // Single device token (của bạn)
   async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
+    if (!deviceToken) {
+      this.logger.log(logbase, `Bỏ qua gửi thông báo cho user(${userCode}) vì deviceToken trống`);
+      return 0;
+    }
     const notificationId = uuidv4();
 
     // lấy số lượng các notify chưa được đọc của user hiện tại
@@ -207,7 +211,7 @@ export class FirebaseService implements OnModuleInit {
     data?: any,
     notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN,
   ): Promise<number> {
-    const tokens = [...new Set(userDeviceTokens.map((ele) => ele.deviceToken))]; // BỎ TRÙNG LẶP
+    const tokens = [...new Set(userDeviceTokens.map((ele) => ele.deviceToken).filter(token => !!token))]; // BỎ TRÙNG LẶP VÀ TOKEN TRỐNG
     const userCodes = userDeviceTokens.map((ele) => ele.userCode);
 
     console.log('tokens --> ', tokens);
@@ -305,6 +309,10 @@ export class FirebaseService implements OnModuleInit {
 
     // đăng ký tất cả topic cho device token mới
     if (isNewOrChange) {
+      if (!deviceToken) {
+        this.logger.log(logbase, `Bỏ qua subscribeToTopic cho user(${userCode}) vì deviceToken trống`);
+        return;
+      }
       //  subscribe tất cả topic ( FCM )
       for (const topic of allTopics) {
         const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
@@ -320,14 +328,18 @@ export class FirebaseService implements OnModuleInit {
         this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
       }
 
-      // Chỉ subscribe những topic còn thiếu ( FCM )
-      for (const topic of missingTopics) {
-        const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
-        if (response.failureCount > 0) {
-          this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
-        }
-        if (response.successCount > 0) {
-          this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+      if (!deviceToken) {
+        this.logger.log(logbase, `Bỏ qua subscribeToTopic (missingTopics) cho user(${userCode}) vì deviceToken trống`);
+      } else {
+        // Chỉ subscribe những topic còn thiếu ( FCM )
+        for (const topic of missingTopics) {
+          const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+          if (response.failureCount > 0) {
+            this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+          }
+          if (response.successCount > 0) {
+            this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+          }
         }
       }
     }
@@ -346,6 +358,11 @@ export class FirebaseService implements OnModuleInit {
     const existingSubs = await this.notificationAppService.getUserSubscribedTopics(userCode);
 
     // Chỉ unsubscribe những topic đã đăng ký ( FCM )
+    if (!deviceToken) {
+      this.logger.log(logbase, `Bỏ qua unsubscribeFromTopic cho user(${userCode}) vì deviceToken trống`);
+      return;
+    }
+
     for (const topic of existingSubs) {
       const response = await admin.messaging().unsubscribeFromTopic(deviceToken, topic.topicCode);
       if (response.failureCount > 0) {
@@ -357,63 +374,4 @@ export class FirebaseService implements OnModuleInit {
     }
   }
 
-  // // Lấy danh sách token của 1 topic
-  // async getTokensByTopic(topic: string): Promise<string[]> {
-  //   const query = `
-  //     SELECT fcm_token
-  //     FROM topic_subscription
-  //     WHERE topic = ?
-  //   `;
-
-  //   // const results = await this.dataSource.query<{ fcm_token: string }[]>(query, [topic]);
-  //   // return results.map((r) => r.fcm_token);
-  //   return [''];
-  // }
-
-  // // Lấy tất cả topic + số lượng subscriber
-  // async getAllTopicsWithCounts(): Promise<{ topic: string; count: number }[]> {
-  //   const query = `
-  //     SELECT topic, COUNT(*) AS count
-  //     FROM topic_subscription
-  //     GROUP BY topic
-  //     ORDER BY count DESC
-  //   `;
-
-  //   // const results = await this.dataSource.query<{ topic: string; count: string }[]>(query);
-  //   // return results.map((r) => ({
-  //   //   topic: r.topic,
-  //   //   count: Number(r.count),
-  //   // }));
-  //   return [{ topic: '', count: 0 }];
-  // }
-
-  // // 5ấy danh sách topic mà 1 token đang subscribe
-  // async getTopicsByToken(fcmToken: string): Promise<string[]> {
-  //   const query = `
-  //     SELECT topic
-  //     FROM topic_subscription
-  //     WHERE fcm_token = ?
-  //   `;
-
-  //   // const results = await this.dataSource.query<{ topic: string }[]>(query, [fcmToken]);
-  //   // return results.map((r) => r.topic);
-  //   return [''];
-  // }
-
-  // // Xóa token khỏi tất cả topic (logout / refresh token)
-  // async removeTokenFromAllTopics(fcmToken: string): Promise<void> {
-  //   // Lấy danh sách topic hiện tại của token
-  //   const topics = await this.getTopicsByToken(fcmToken);
-
-  //   // Nếu có topic → unsubscribe trên FCM (batch max 1000 token/topic, ở đây chỉ 1 token nên ok)
-  //   if (topics.length > 0) {
-  //     // FCM cho phép unsubscribe 1 token khỏi nhiều topic cùng lúc
-  //     for (const topic of topics) {
-  //       await admin.messaging().unsubscribeFromTopic([fcmToken], topic);
-  //     }
-  //   }
-
-  //   // Xóa toàn bộ record của token trong DB
-  //   // await this.dataSource.query(`DELETE FROM topic_subscription WHERE fcm_token = ?`, [fcmToken]);
-  // }
 }
