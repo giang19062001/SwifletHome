@@ -38,14 +38,45 @@ export class TodoHarvestAppRepository {
     taskStatus: TaskStatusEnum,
   ): Promise<number> {
     const currentYear = moment().year();
-    const sql = `
-      INSERT INTO ${this.tableTaskHarvestPhase} (userCode, userHomeCode, harvestPhase, isDone, harvestYear, taskDate, taskStatus, createdId)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      userCode, userHomeCode, harvestPhase, isDone, currentYear, taskDate, taskStatus, userCode,
-    ]);
-    return result.insertId;
+
+    // 1. Kiểm tra xem đã có record tương tự chưa
+    const [existing] = await this.db.query<RowDataPacket[]>(
+      `SELECT seq FROM ${this.tableTaskHarvestPhase}
+       WHERE userCode = ? AND userHomeCode = ? AND harvestPhase = ? AND harvestYear = ? LIMIT 1`,
+      [userCode, userHomeCode, harvestPhase, currentYear],
+    );
+
+    if (existing.length > 0) {
+      const seq = existing[0].seq;
+
+      // 2. Nếu có, "xóa" (soft delete) các record con liên quan trong tbl_todo_task_harvest
+      await this.db.execute(
+        `UPDATE ${this.tableTaskHarvest}
+         SET isActive = 'N', updatedId = ?, updatedAt = NOW()
+         WHERE seqHarvestPhase = ? AND isActive = 'Y'`,
+        [userCode, seq],
+      );
+
+      // 3. Ghi đè (update) record hiện tại
+      const sqlUpdate = `
+        UPDATE ${this.tableTaskHarvestPhase}
+        SET isDone = ?, taskDate = ?, taskStatus = ?, updatedId = ?, updatedAt = NOW()
+        WHERE seq = ?
+      `;
+      await this.db.execute(sqlUpdate, [isDone, taskDate, taskStatus, userCode, seq]);
+
+      return seq;
+    } else {
+      // 4. Nếu không có, thêm mới như bình thường
+      const sqlInsert = `
+        INSERT INTO ${this.tableTaskHarvestPhase} (userCode, userHomeCode, harvestPhase, isDone, harvestYear, taskDate, taskStatus, createdId)
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const [result] = await this.db.execute<ResultSetHeader>(sqlInsert, [
+        userCode, userHomeCode, harvestPhase, isDone, currentYear, taskDate, taskStatus, userCode,
+      ]);
+      return result.insertId;
+    }
   }
 
   async completeTaskHarvestPhase(userCode: string, userHomeCode: string, seqHarvestPhase: number, harvestPhase: number): Promise<number> {
