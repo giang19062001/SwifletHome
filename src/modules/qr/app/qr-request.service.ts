@@ -4,7 +4,8 @@ import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { TodoHarvestMedicineAppService } from 'src/modules/todo/app/todo-harvest-medicine.service';
+import { TodoHarvestAppService } from 'src/modules/todo/app/todo-harvest.service';
+import { TodoMedicineAppService } from 'src/modules/todo/app/todo-medicine.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { RequestStatusEnum } from '../qr.interface';
@@ -16,7 +17,8 @@ import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetReques
 export class QrRequestAppService {
   private readonly SERVICE_NAME = 'QrRequestAppService';
   constructor(
-    private readonly todoHarvestMedicineAppService: TodoHarvestMedicineAppService,
+    private readonly todoHarvestAppService: TodoHarvestAppService,
+    private readonly todoMedicineAppService: TodoMedicineAppService,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly qrRequestAppRepository: QrRequestAppRepository,
     private readonly logger: LoggingService,
@@ -79,18 +81,18 @@ export class QrRequestAppService {
     }
 
     // lấy thông tin lăn thuốc nhà yến này
-    const taskMedicineList = await this.todoHarvestMedicineAppService.getTaskMedicineCompleteAndNotUseList(userHomeCode);
+    const taskMedicineList = await this.todoMedicineAppService.getTaskMedicineCompleteAndNotUseList(userHomeCode);
 
     // lấy thông tin thu hoạc nhà yến này
     //? harvestPhase = 0 --> lấy tất cả các đợt để làm SelectBox cho Form yêu cầu Qr
     //? harvestPhase > 0 --> Chọn đợt và insert cho Qr table
-    let taskHarvestCompleteList = await this.todoHarvestMedicineAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
+    let taskHarvestCompleteList = await this.todoHarvestAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
     const taskHarvestList: TaskHarvestQrResDto[] = await Promise.all(
       taskHarvestCompleteList.map(async (ele) => ({
         harvestTaskAlarmCode: ele.harvestTaskAlarmCode,
         harvestPhase: ele.harvestPhase,
         harvestYear: ele.harvestYear,
-        harvestData: await this.todoHarvestMedicineAppService.arrangeHarvestRows(ele.seq, homeInfo.userHomeFloor),
+        harvestData: await this.todoHarvestAppService.arrangeHarvestRows(ele.seq, homeInfo.userHomeFloor),
       })),
     );
 
@@ -144,7 +146,7 @@ export class QrRequestAppService {
         // dánh đấu các lăn thuốc là đã dùng
         if (dataInsertDto.taskMedicineList.length) {
           for (const med of dataInsertDto.taskMedicineList) {
-            await this.todoHarvestMedicineAppService.useOrUnuseTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode, YnEnum.Y);
+            await this.todoMedicineAppService.useOrUnuseTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode, YnEnum.Y);
           }
         }
 
@@ -200,7 +202,7 @@ export class QrRequestAppService {
     const taskMedicineList = requestInfo.taskMedicineList as any;
     if (taskMedicineList?.length) {
       for (const med of taskMedicineList) {
-        await this.todoHarvestMedicineAppService.useOrUnuseTaskMedicineForQr(userCode, requestInfo.userHomeCode, med.medicineTaskAlarmCode, YnEnum.N);
+        await this.todoMedicineAppService.useOrUnuseTaskMedicineForQr(userCode, requestInfo.userHomeCode, med.medicineTaskAlarmCode, YnEnum.N);
       }
     }
 
