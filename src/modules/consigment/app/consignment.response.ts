@@ -9,7 +9,7 @@ export class DeliveringAddressResDto {
   address: string;
 
   @ApiProperty({ example: '' })
-  createdAt: Date;
+  createdAt: string;
 }
 
 export class ConsignmentHistoryResDto {
@@ -23,7 +23,7 @@ export class ConsignmentHistoryResDto {
   address: string | null;
 
   @ApiProperty({ example: '' })
-  createdAt: Date;
+  createdAt: string;
 }
 
 export class GetAllConsignmentResDto {
@@ -70,10 +70,10 @@ export class GetAllConsignmentResDto {
   deliveringAddressList: DeliveringAddressResDto[];
 
   @ApiProperty({ example: new Date() })
-  createdAt: Date;
+  createdAt: string;
 
   @ApiProperty({ example: new Date() })
-  updatedAt: Date;
+  updatedAt: string;
 }
 
 
@@ -122,8 +122,8 @@ export class GetDetailConsignmentResDto {
   consignmentHistories: ConsignmentHistoryResDto[];
 
   @ApiProperty({ example: new Date() })
-  createdAt: Date;
+  createdAt: string;
 
   @ApiProperty({ example: new Date() })
-  updatedAt: Date;
+  updatedAt: string;
 }

@@ -20,7 +20,7 @@ export class ConsignmentAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<GetAllConsignmentResDto[]> {
     let query = ` SELECT A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestQuantity, A.deliveryAddress,
-     A.receiverName, A.receiverPhone, A.consignmentStatus, A.isActive, A.createdAt,
+     A.receiverName, A.receiverPhone, A.consignmentStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') as createdAt,
      C.valueOption AS nestTypeLabel
         FROM ${this.table} A  
         INNER JOIN ${this.tableOption} C
@@ -38,7 +38,7 @@ export class ConsignmentAdminRepository {
   }
   async getDetail(consignmentCode: string): Promise<GetAllConsignmentResDto | null> {
     let query = ` SELECT A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestQuantity, A.deliveryAddress, A.receiverName,
-     A.receiverPhone, A.consignmentStatus, A.isActive, A.createdAt, C.valueOption AS nestTypeLabel,
+     A.receiverPhone, A.consignmentStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') as createdAt, C.valueOption AS nestTypeLabel,
          CASE 
           WHEN COUNT(B.seq) = 0 THEN JSON_ARRAY()
           ELSE JSON_ARRAYAGG(

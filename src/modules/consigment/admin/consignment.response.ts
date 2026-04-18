@@ -36,7 +36,7 @@ export class GetAllConsignmentResDto {
   consignmentStatus: string;
 
   @ApiProperty({ example: new Date() })
-  createdAt: Date;
+  createdAt: string;
 
   @ApiProperty({
     type: DeliveringAddressDto,

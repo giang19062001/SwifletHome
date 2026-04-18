@@ -92,8 +92,8 @@ export class ConsignmentAppRepository {
       A.nestQuantity, A.deliveryAddress,
       A.receiverName, A.receiverPhone, A.consignmentStatus,
           ( SELECT JSON_ARRAY()) AS deliveringAddressList,
-          A.createdAt,
-          A.updatedAt
+          DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') as createdAt,
+          DATE_FORMAT(A.updatedAt, '%Y-%m-%d %H:%i:%s') as updatedAt
         FROM ${this.table} A
         INNER JOIN ${this.tableOption} C
           ON A.nestType = C.code
@@ -132,8 +132,8 @@ export class ConsignmentAppRepository {
           ORDER BY B.seq ASC
         ) t
       ) AS consignmentHistories,
-          A.createdAt,
-          A.updatedAt
+          DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') as createdAt,
+          DATE_FORMAT(A.updatedAt, '%Y-%m-%d %H:%i:%s') as updatedAt
         FROM ${this.table} A
         INNER JOIN ${this.tableOption} C
           ON A.nestType = C.code
