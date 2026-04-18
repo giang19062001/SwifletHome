@@ -34,60 +34,46 @@ export class TodoMedicineAppService {
     let result = 0;
     try {
       const today = moment().startOf('day');
-      const selectedDate = moment(dto.medicineNextDate, 'YYYY-MM-DD');
+      const selectedDate = moment(dto.medicineNextDate).startOf('day');
 
       // ─── TẠO MỚI (chưa có medicineCode) ────────────────────────────────
       if (!currentMedicineCode) {
         const isToday = today.isSame(selectedDate, 'day');
-        this.logger.log(logbase, (isToday ? `Ngày chọn = hôm nay` : `Ngày chọn ≠ hôm nay`) + ` ${today.format('YYYY-MM-DD')} / ${selectedDate.format('YYYY-MM-DD')}`);
+        const status = isToday ? TaskStatusEnum.COMPLETE : TaskStatusEnum.WAITING;
 
-        if (!isToday) {
-          // Ngày kế tiếp chưa đến → insert với WAITING
-          const { medicineCode } = await this.todoMedicineAppRepository.insertTaskMedicine(
-            userCode, userHomeCode, selectedDate.toDate(), TaskStatusEnum.WAITING, dto,
-          );
-          this.logger.log(logbase, `Tạo lịch nhắc lăn thuốc lần sau medicineCode(${medicineCode})`);
-        } else {
-          // Ngày chọn là hôm nay → insert COMPLETE ngay
-          const { medicineCode } = await this.todoMedicineAppRepository.insertTaskMedicine(
-            userCode, userHomeCode, selectedDate.toDate(), TaskStatusEnum.COMPLETE, dto,
-          );
-          this.logger.log(logbase, `Tạo lịch nhắc lăn thuốc hôm nay medicineCode(${medicineCode})`);
-        }
+        const { medicineCode } = await this.todoMedicineAppRepository.insertTaskMedicine(
+          userCode, userHomeCode, selectedDate.toDate(), status, dto,
+        );
+        this.logger.log(logbase, `Tạo lịch nhắc lăn thuốc medicineCode(${medicineCode}) - Trạng thái: ${status}`);
         result = 1;
       } else {
         // ─── CẬP NHẬT (đã có medicineCode) ──────────────────────────────
+        // 1. Luôn cập nhật thông tin chung (medicineOptionCode, medicineUsage,...)
         await this.todoMedicineAppRepository.updateTaskMedicine(userCode, userHomeCode, currentMedicineCode, dto);
-        this.logger.log(logbase, `Cập nhật dữ liệu lăn thuốc medicineCode(${currentMedicineCode})`);
 
         const prevDate = currentTaskDate ? moment(currentTaskDate).startOf('day') : null;
-        const isTodayWithSetted = prevDate ? today.isSame(prevDate, 'day') : false;
         const isTodayWithDto = today.isSame(selectedDate, 'day');
 
-        // Nếu hôm nay đúng ngày đã thiết lập trước → COMPLETE
-        if (isTodayWithSetted) {
-          await this.todoMedicineAppRepository.changeMedicineStatus(userCode, userHomeCode, currentMedicineCode, TaskStatusEnum.COMPLETE);
-          this.logger.log(logbase, `Đánh dấu COMPLETE medicineCode(${currentMedicineCode}) (đúng ngày đã set)`);
-        }
-
         if (isTodayWithDto) {
-          // Ngày chọn lần này cũng là hôm nay → COMPLETE
+          // Ngày chọn là hôm nay -> Đánh dấu bản ghi hiện tại là COMPLETE
           await this.todoMedicineAppRepository.changeMedicineStatus(userCode, userHomeCode, currentMedicineCode, TaskStatusEnum.COMPLETE);
-          await this.todoMedicineAppRepository.updateMedicineTaskDate(userCode, userHomeCode, currentMedicineCode, moment().format('YYYY-MM-DD'));
-          this.logger.log(logbase, `Đánh dấu COMPLETE + taskDate = today medicineCode(${currentMedicineCode})`);
+          await this.todoMedicineAppRepository.updateMedicineTaskDate(userCode, userHomeCode, currentMedicineCode, today.format('YYYY-MM-DD'));
+          this.logger.log(logbase, `Đánh dấu COMPLETE + taskDate = today cho medicineCode(${currentMedicineCode})`);
         } else {
-          // Chọn ngày tương lai
-          const isSameOrBefore = selectedDate.isSameOrBefore(prevDate ?? today, 'day');
-          if (isSameOrBefore) {
-            // Vào trước hoặc đúng ngày trước → update taskDate
-            await this.todoMedicineAppRepository.updateMedicineTaskDate(userCode, userHomeCode, currentMedicineCode, selectedDate.format('YYYY-MM-DD'));
-            this.logger.log(logbase, `Update taskDate medicineCode(${currentMedicineCode}) → ${selectedDate.format('YYYY-MM-DD')}`);
-          } else {
-            // Ngày mới > ngày cũ → tạo thêm lịch nhắc mới (WAITING)
+          // Ngày chọn là tương lai
+          const isPostponed = selectedDate.isAfter(prevDate ?? today, 'day');
+
+          if (isPostponed) {
+            // Dời lịch xa hơn -> Đánh dấu task cũ là COMPLETE và tạo bản ghi mới WAITING
+            await this.todoMedicineAppRepository.changeMedicineStatus(userCode, userHomeCode, currentMedicineCode, TaskStatusEnum.COMPLETE);
             const { medicineCode: newCode } = await this.todoMedicineAppRepository.insertTaskMedicine(
               userCode, userHomeCode, selectedDate.toDate(), TaskStatusEnum.WAITING, dto,
             );
-            this.logger.log(logbase, `Tạo lịch nhắc lăn thuốc mới medicineCode(${newCode})`);
+            this.logger.log(logbase, `Postponed: Hoàn thành task cũ(${currentMedicineCode}) và tạo task mới(${newCode}) cho ngày ${selectedDate.format('YYYY-MM-DD')}`);
+          } else {
+            // Dời lịch sớm hơn hoặc giữ nguyên -> Chỉ cập nhật ngày cho bản ghi hiện tại
+            await this.todoMedicineAppRepository.updateMedicineTaskDate(userCode, userHomeCode, currentMedicineCode, selectedDate.format('YYYY-MM-DD'));
+            this.logger.log(logbase, `Cập nhật ngày nhắc cho medicineCode(${currentMedicineCode}) -> ${selectedDate.format('YYYY-MM-DD')}`);
           }
         }
         result = 1;
