@@ -13,7 +13,7 @@ export class QuestionAdminRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<QuestionResDto[]> {
@@ -24,6 +24,7 @@ export class QuestionAdminRepository {
         ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.questionObject = C.objectKeyword
+        WHERE A.isActive = 'Y'
         ORDER BY A.createdAt DESC  `;
 
     const params: any[] = [];
@@ -46,7 +47,7 @@ export class QuestionAdminRepository {
         ON A.questionObject = C.objectKeyword
         LEFT JOIN tbl_answer D
         ON A.answerCode = D.answerCode
-        WHERE A.questionCode = ? 
+        WHERE A.questionCode = ? AND A.isActive = 'Y'
         LIMIT 1`,
       [questionCode],
     );
@@ -80,7 +81,7 @@ export class QuestionAdminRepository {
 
   async delete(questionCode: string): Promise<number> {
     const sql = `
-      DELETE FROM ${this.table}
+      UPDATE ${this.table} SET isActive = 'N', updatedAt = NOW()
       WHERE questionCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [questionCode]);
@@ -97,7 +98,7 @@ export class QuestionAdminRepository {
         ON A.questionCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.questionObject = C.objectKeyword
-        WHERE A.answerCode IS NOT NULL AND A.answerCode = ?`,
+        WHERE A.answerCode IS NOT NULL AND A.answerCode = ? AND A.isActive = 'Y' `,
       [answerCode],
     );
     return rows as QuestionResDto[];

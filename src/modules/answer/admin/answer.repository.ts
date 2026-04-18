@@ -26,7 +26,7 @@ export class AnswerAdminRepository {
       params.push(dto.answerCategory);
     }
 
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`, params);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause} AND isActive = 'Y'`, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: GetAllAnswerDto): Promise<AnswerResDto[]> {
@@ -57,7 +57,7 @@ export class AnswerAdminRepository {
       FROM ${this.table} A 
       LEFT JOIN tbl_category B ON A.answerCategory = B.categoryCode
       LEFT JOIN tbl_object C ON A.answerObject = C.objectKeyword
-      ${whereClause}
+      ${whereClause} AND A.isActive = 'Y'
       ORDER BY A.createdAt DESC
       ${limitClause}`,
       params,
@@ -73,7 +73,7 @@ export class AnswerAdminRepository {
         ON A.answerCategory = B.categoryCode
         LEFT JOIN tbl_object C
         ON A.answerObject = C.objectKeyword
-        WHERE A.answerCode = ? 
+        WHERE A.answerCode = ? AND A.isActive = 'Y' 
         LIMIT 1 `,
       [answerCode],
     );
@@ -107,7 +107,7 @@ export class AnswerAdminRepository {
 
   async delete(answerCode: string): Promise<number> {
     const sql = `
-      DELETE FROM ${this.table}
+      UPDATE ${this.table} SET isActive = 'N', updatedAt = NOW()
       WHERE answerCode = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [answerCode]);

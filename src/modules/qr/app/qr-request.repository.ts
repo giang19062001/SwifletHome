@@ -164,10 +164,10 @@ export class QrRequestAppRepository {
   async checkUsedThisHarvest(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     const currentYear = new Date().getFullYear(); // năm nay
     let query = ` SELECT A.seq
-      FROM ${this.table}  A
+      FROM ${this.table} A
       LEFT JOIN ${this.tableHarvestPhase} F
       ON A.seqHarvestPhase = F.seq
-      WHERE A.userHomeCode  = ? AND A.userCode = ? AND F.harvestPhase = ? AND F.harvestYear = ?
+      WHERE A.userHomeCode  = ? AND A.userCode = ? AND F.harvestPhase = ? AND F.harvestYear = ? AND A.isActive = 'Y'
       LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, userCode, harvestPhase, currentYear]);
@@ -209,9 +209,9 @@ export class QrRequestAppRepository {
     // đánh dấu file sẽ bị xóa
     await this.markFileNotUse(seq, userCode);
 
-    // xóa hẵn qrcode
+    // soft xóa qrcode
     const sql = `
-      DELETE FROM ${this.table}
+      UPDATE ${this.table} SET isActive = 'N', updatedAt = NOW()
       WHERE requestCode = ? 
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [requestCode]);

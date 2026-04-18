@@ -12,7 +12,7 @@ export class QuestionAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.questionContent, A.answerCode
         FROM ${this.table} A 
-       WHERE A.answerCode IS NOT NULL `,
+       WHERE A.answerCode IS NOT NULL AND A.isActive = 'Y' `,
     );
     return rows as QuestionResDto[];
   }
