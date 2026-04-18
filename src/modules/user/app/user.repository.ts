@@ -133,6 +133,9 @@ export class UserAppRepository {
 
       const userCode = generateCode(baseCode, CODES.userCode.PRE, 6);
 
+      // Xóa deviceToken trùng lặp nếu có
+      await this.clearDuplicateDeviceToken(dto.deviceToken);
+
       const sql = `
       INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, userTypeCode, countryCode, deviceToken, isActive, createdId)
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -166,12 +169,25 @@ export class UserAppRepository {
     return result.affectedRows;
   }
   async updateDeviceToken(deviceToken: string, userPhone: string): Promise<number> {
+    // Xóa deviceToken trùng lặp nếu có
+    await this.clearDuplicateDeviceToken(deviceToken);
+
     const sql = `
         UPDATE ${this.table} SET deviceToken = ?, updatedAt = NOW(), updatedId = ?
         WHERE userPhone = ?
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [deviceToken, UPDATOR, userPhone]);
 
+    return result.affectedRows;
+  }
+
+  async clearDuplicateDeviceToken(deviceToken: string): Promise<number> {
+    if (!deviceToken || deviceToken === '') return 0;
+    const sql = `
+        UPDATE ${this.table} SET deviceToken = '', updatedAt = NOW(), updatedId = ?
+        WHERE deviceToken = ?
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [UPDATOR, deviceToken]);
     return result.affectedRows;
   }
 
