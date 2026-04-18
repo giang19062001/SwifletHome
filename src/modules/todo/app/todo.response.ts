@@ -17,13 +17,25 @@ export class GetTaskResDto {
 
 export class GetHarvestTaskPhaseResDto {
   @ApiProperty({ example: 0 })
-  seqAlarm: string;
+  seq: number;
+
+  @ApiProperty({ example: '' })
+  userCode: string;
+
+  @ApiProperty({ example: '' })
+  userHomeCode: string;
 
   @ApiProperty({ example: 0 })
   harvestPhase: number;
 
   @ApiProperty({ example: 2025 })
   harvestYear: number;
+
+  @ApiProperty({ example: '2026-01-01', type: String, format: 'date' })
+  taskDate: string;
+
+  @ApiProperty({ example: TaskStatusEnum.WAITING, enum: TaskStatusEnum })
+  taskStatus: TaskStatusEnum;
 
   @ApiProperty({
     example: YnEnum.Y,
@@ -190,14 +202,20 @@ export class GetTasksMedicineRowResDto extends GetTasksMedicineResDto {
   @ApiProperty({ example: 0 })
   seq: number;
 
-  @ApiProperty({ example: 0 })
-  seqAlarm: number;
+  @ApiProperty({ example: '' })
+  medicineCode: string;
 
   @ApiProperty({ example: '' })
   userCode: string;
 
   @ApiProperty({ example: '' })
   userHomeCode: string;
+
+  @ApiProperty({ example: '2026-01-01', type: String, format: 'date' })
+  taskDate: string;
+
+  @ApiProperty({ example: TaskStatusEnum.WAITING, enum: TaskStatusEnum })
+  taskStatus: TaskStatusEnum;
 }
 
 export class GetListTaskHarvestResDto {

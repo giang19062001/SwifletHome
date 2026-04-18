@@ -1,13 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { TODO_CONST } from 'src/modules/todo/todo.interface';
 import { GetHarvertReportDto } from './report.dto';
 import { GetHarvertReportDetailResDto, GetHarvertReportSummaryResDto } from './report.response';
 
 @Injectable()
 export class ReportAppRepository {
-  private readonly tableTask = 'tbl_todo_tasks';
-  private readonly tableTaskAlarm = 'tbl_todo_task_alarm';
   private readonly tableTaskHarvest = 'tbl_todo_task_harvest';
   private readonly tableTaskHarvestPhase = 'tbl_todo_task_harvest_phase';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -15,31 +12,27 @@ export class ReportAppRepository {
   async getHarvertReportSummary(dto: GetHarvertReportDto, userCode: string): Promise<GetHarvertReportSummaryResDto | GetHarvertReportDetailResDto[]> {
     let params: (string | number)[] = [dto.userHomeCode, userCode, dto.harvestYear];
     let query = ` 
-        SELECT C.harvestPhase,  C.harvestYear,
+        SELECT C.harvestPhase, C.harvestYear,
             CAST(IFNULL(SUM(D.cellCollected), 0) AS SIGNED) AS totalCellCollected
-        FROM ${this.tableTaskAlarm} A
-        INNER JOIN ${this.tableTask} B
-          ON A.taskCode = B.taskCode
-          AND B.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
-        INNER JOIN ${this.tableTaskHarvestPhase} C
-          ON A.seq = C.seqAlarm
-          AND C.isDone = 'Y'
+        FROM ${this.tableTaskHarvestPhase} C
         INNER JOIN ${this.tableTaskHarvest} D
-          ON A.seq = D.seqAlarm
-        WHERE A.userHomeCode = ?
-          AND A.userCode = ? AND C.harvestYear = ?
+          ON C.seq = D.seqHarvestPhase
+        WHERE C.userHomeCode = ?
+          AND C.userCode = ? AND C.harvestYear = ?
+          AND C.isDone = 'Y'
         GROUP BY C.harvestPhase, C.harvestYear
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as GetHarvertReportSummaryResDto | GetHarvertReportDetailResDto[];
   }
-   async getHarvertReportDetail(dto: GetHarvertReportDto, userCode: string): Promise<GetHarvertReportSummaryResDto | GetHarvertReportDetailResDto[]> {
+
+  async getHarvertReportDetail(dto: GetHarvertReportDto, userCode: string): Promise<GetHarvertReportSummaryResDto | GetHarvertReportDetailResDto[]> {
     let params: (string | number)[] = [dto.userHomeCode, userCode, dto.harvestYear];
     let query = ` 
-        SELECT C.harvestPhase,  C.harvestYear,
+        SELECT C.harvestPhase, C.harvestYear,
             CAST(IFNULL(SUM(D.cellCollected), 0) AS SIGNED) AS totalCellCollected,
             CASE 
-          WHEN COUNT(B.seq) = 0 THEN JSON_ARRAY()
+          WHEN COUNT(D.seq) = 0 THEN JSON_ARRAY()
           ELSE JSON_ARRAYAGG(
                 JSON_OBJECT(
                   'floor', D.floor,
@@ -48,17 +41,12 @@ export class ReportAppRepository {
                 )
               )
         END AS cellCollectedByfloor
-        FROM ${this.tableTaskAlarm} A
-        INNER JOIN ${this.tableTask} B
-          ON A.taskCode = B.taskCode
-          AND B.taskKeyword = '${TODO_CONST.TASK_EVENT.HARVEST.value}'
-        INNER JOIN ${this.tableTaskHarvestPhase} C
-          ON A.seq = C.seqAlarm
-          AND C.isDone = 'Y'
+        FROM ${this.tableTaskHarvestPhase} C
         INNER JOIN ${this.tableTaskHarvest} D
-          ON A.seq = D.seqAlarm
-        WHERE A.userHomeCode = ?
-          AND A.userCode = ?  AND C.harvestYear = ?
+          ON C.seq = D.seqHarvestPhase
+        WHERE C.userHomeCode = ?
+          AND C.userCode = ? AND C.harvestYear = ?
+          AND C.isDone = 'Y'
         GROUP BY C.harvestPhase, C.harvestYear
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);

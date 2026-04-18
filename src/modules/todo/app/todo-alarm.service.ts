@@ -4,9 +4,11 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { TaskStatusEnum } from '../todo.interface';
+import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoTaskResDto } from '../todo.response';
 import { TodoAlarmAppRepository } from './todo-alram.repository';
+import { TodoHarvestAppRepository } from './todo-harvest.repository';
+import { TodoMedicineAppRepository } from './todo-medicine.repository';
 import { SetTaskAlarmDto } from './todo.dto';
 import TodoAppValidate from './todo.validate';
 
@@ -16,6 +18,8 @@ export class TodoAlarmAppService {
 
   constructor(
     private readonly todoAlarmAppRepository: TodoAlarmAppRepository,
+    private readonly todoHarvestAppRepository: TodoHarvestAppRepository,
+    private readonly todoMedicineAppRepository: TodoMedicineAppRepository,
     private readonly todoAppValidate: TodoAppValidate,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly logger: LoggingService,
@@ -40,12 +44,43 @@ export class TodoAlarmAppService {
       });
     }
 
-    const today = moment().startOf('day');
+    const today = moment().format('YYYY-MM-DD');
 
     const result = await Promise.all(
       boxTasks.map(async (ele) => {
-        const data = await this.todoAlarmAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, ele.taskCode, ele.taskName, today.format('YYYY-MM-DD'));
-        this.logger.log(logbase, `taskDate of (userCode:${userCode}, userHomeCode:${home.userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate ?? " _ / _ "}`);
+        let data: { taskDate: string; taskAlarmCode?: string; medicineCode?: string; taskStatus: string } | null = null;
+
+        if (ele.taskCode === TODO_CONST.TASK_EVENT.HARVEST.value) {
+          const harvestData = await this.todoHarvestAppRepository.getNextHarvestSchedule(userCode, home.userHomeCode, today);
+          if (harvestData) {
+            data = {
+              taskDate: harvestData.taskDate,
+              taskAlarmCode: harvestData.seq.toString(),
+              taskStatus: harvestData.taskStatus,
+            };
+          }
+        } else if (ele.taskCode === TODO_CONST.TASK_EVENT.MEDICINE.value) {
+          const medicineData = await this.todoMedicineAppRepository.getNextMedicineSchedule(userCode, home.userHomeCode, today);
+          if (medicineData) {
+            data = {
+              taskDate: medicineData.taskDate,
+              taskAlarmCode: medicineData.medicineCode,
+              taskStatus: medicineData.taskStatus,
+            };
+          }
+        } else {
+          // Custom alarm
+          const alarmData = await this.todoAlarmAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, ele.taskName, today);
+          if (alarmData) {
+            data = {
+              taskDate: alarmData.taskDate as any,
+              taskAlarmCode: alarmData.taskAlarmCode,
+              taskStatus: alarmData.taskStatus,
+            };
+          }
+        }
+
+        this.logger.log(logbase, `taskData of (userCode:${userCode}, userHomeCode:${home.userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate ?? ' _ / _ '}`);
 
         const taskAlarmCode = data?.taskAlarmCode ?? '';
         if (!data?.taskDate) {
@@ -57,9 +92,9 @@ export class TodoAlarmAppService {
             unit: '',
           };
         } else {
-          const today = moment().startOf('day');
+          const todayMoment = moment().startOf('day');
           const taskDate = moment(data.taskDate).startOf('day');
-          const diff = taskDate.diff(today, 'days');
+          const diff = taskDate.diff(todayMoment, 'days');
 
           return {
             taskAlarmCode: taskAlarmCode,

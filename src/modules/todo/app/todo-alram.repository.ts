@@ -43,32 +43,23 @@ export class TodoAlarmAppRepository {
     return rows.length ? (rows[0] as TodoTaskResDto) : null;
   }
 
-  async getTaskByKeyword(taskKeyword: string): Promise<TodoTaskResDto | null> {
-    let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' AND taskKeyword  = ? LIMIT 1 `;
-
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [taskKeyword]);
-    return rows.length ? (rows[0] as TodoTaskResDto) : null;
-  }
-
   // TODO: ALARM
   async updateDateOfTaskAlarm(taskDate: string, taskAlarmCode: string, userCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableTaskAlarm}
       SET taskDate = ?, updatedId = ?, updatedAt = NOW()
-      WHERE taskAlarmCode = ?
+      WHERE taskAlarmCode = ? AND userCode = ?
   `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [taskDate, userCode, taskAlarmCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [taskDate, userCode, taskAlarmCode, userCode]);
 
     return result.affectedRows;
   }
 
   async getOneTaskAlarm(taskAlarmCode: string): Promise<GetTaskAlarmResDto | null> {
-    let query = ` SELECT A.seq, A.taskAlarmCode, A.taskCode, B.taskKeyword, A.taskName, A.taskDate, A.taskStatus,
+    let query = ` SELECT A.seq, A.taskAlarmCode, NULL AS taskCode, '' AS taskKeyword, A.taskName, A.taskDate, A.taskStatus,
       A.userCode, A.userHomeCode, A.taskNote
       FROM ${this.tableTaskAlarm}  A
-      LEFT JOIN ${this.tableTask} B
-      ON A.taskCode = B.taskCode  
       WHERE A.taskAlarmCode  = ? 
       LIMIT 1 `;
 
@@ -76,15 +67,15 @@ export class TodoAlarmAppRepository {
     return rows.length ? (rows[0] as GetTaskAlarmResDto) : null;
   }
 
-  async getOneTaskAlarmsNearly(userCode: string, userHomeCode: string, taskCode: string, taskName: string, today: string): Promise<GetTaskAlarmResDto | null> {
+  async getOneTaskAlarmsNearly(userCode: string, userHomeCode: string, taskName: string, today: string): Promise<GetTaskAlarmResDto | null> {
     let query = `
-        SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskCode, A.taskName,
+        SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode, A.taskName,
               DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
         FROM ${this.tableTaskAlarm} A
         WHERE A.isActive = 'Y'
           AND A.userCode = ?
           AND A.userHomeCode = ?
-          AND A.taskCode = ?
+          AND A.taskName = ?
           AND A.taskDate >= ?
           AND A.taskDate <= DATE_ADD(?, INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY)
           AND A.taskStatus = '${TaskStatusEnum.WAITING}'
@@ -94,45 +85,38 @@ export class TodoAlarmAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [
       userCode,
       userHomeCode,
-      taskCode,
-      // taskName,
-      today, // CURDATE()
-      today, // o CURDATE()
+      taskName,
+      today,
+      today,
     ]);
 
     return rows.length ? (rows[0] as GetTaskAlarmResDto) : null;
   }
 
   async getTotalTaskAlarm(userCode: string, userHomeCode: string): Promise<number> {
-    // let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
-    let whereQueryV2 = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskCode IS NULL  
-    AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
-
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableTaskAlarm} A
       INNER JOIN ${this.tableUserApp} B
       ON A.userCode = B.userCode
-      WHERE A.isActive = 'Y' ${whereQueryV2} `,
+      WHERE A.isActive = 'Y' 
+        AND A.userCode = ? 
+        AND A.userHomeCode = ? 
+        AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`,
       [userCode, userHomeCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 
   async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<GetTaskAlarmResDto[]> {
-    // let whereQuery = ` AND A.userCode = ? AND A.userHomeCode = ? AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
-    let whereQueryV2 = ` AND A.userCode = ? AND A.userHomeCode = ?  AND A.taskCode IS NULL  
-    AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY`;
-
-    let offsetQuery = ` `;
-
     let params: (string | number)[] = [userCode, userHomeCode];
+    let offsetQuery = ` `;
     if (dto.limit != 0 && dto.page != 0) {
       offsetQuery += `LIMIT ? OFFSET ?`;
       params.push(dto.limit);
       params.push((dto.page - 1) * dto.limit);
     }
     let query = `
-            SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskCode, A.taskName,
+            SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode, A.taskName,
             DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskNote, A.isActive,  A.taskStatus, 
             CASE
                   WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.WAITING.value}' THEN '${TODO_CONST.TASK_STATUS.WAITING.text}'
@@ -147,10 +131,10 @@ export class TodoAlarmAppRepository {
             FROM ${this.tableTaskAlarm} A
             INNER JOIN ${this.tableUserApp} B
             ON A.userCode = B.userCode
-            LEFT JOIN ${this.tableTask} C
-            ON A.taskCode = C.taskCode
             WHERE A.isActive = 'Y'
-              ${whereQueryV2} 
+              AND A.userCode = ? 
+              AND A.userHomeCode = ?  
+              AND A.taskDate <= CURDATE() + INTERVAL ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} DAY
             ORDER BY A.taskDate DESC
               ${offsetQuery}`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
@@ -160,7 +144,7 @@ export class TodoAlarmAppRepository {
   async getListTaskAlarmsToday(dateStr: string): Promise<(GetTaskAlarmResDto & { deviceToken: string })[]> {
     const query = `
         SELECT 
-              A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, A.taskCode,
+              A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode,
               A.taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, 
               A.taskStatus, A.taskNote, A.isActive, B.deviceToken
         FROM ${this.tableTaskAlarm} A
@@ -168,7 +152,6 @@ export class TodoAlarmAppRepository {
           ON A.userCode = B.userCode
         WHERE A.isActive = 'Y'
             AND A.taskDate >= ?
-            AND A.taskCode IS NULL  
             AND A.taskDate <= DATE_ADD(?, INTERVAL ${QUERY_HELPER.MAX_DAY_SEND_NOTIFY} DAY)
             AND A.taskStatus = '${TaskStatusEnum.WAITING}'
         ORDER BY A.taskDate DESC
@@ -181,12 +164,13 @@ export class TodoAlarmAppRepository {
     const sql = `
         UPDATE ${this.tableTaskAlarm}
         SET taskStatus = ?,  updatedId = ?, updatedAt = ?
-        WHERE taskAlarmCode = ?  `;
+        WHERE taskAlarmCode = ? AND userCode = ? `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       taskStatus,
-      userCode, // updatedId
+      userCode,
       new Date(),
       taskAlarmCode,
+      userCode,
     ]);
 
     return result.affectedRows;
@@ -200,18 +184,18 @@ export class TodoAlarmAppRepository {
       taskAlarmCode = generateCode(rows[0].taskAlarmCode, CODES.taskAlarmCode.PRE, 6);
     }
     const sql = `
-        INSERT INTO ${this.tableTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskCode,
+        INSERT INTO ${this.tableTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, 
         taskName, taskDate, taskStatus, taskNote, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userHomeCode, taskAlarmCode, dto.taskCode, dto.taskName, dto.taskDate, dto.taskStatus, dto.taskNote, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userHomeCode, taskAlarmCode, dto.taskName, dto.taskDate, dto.taskStatus, dto.taskNote, userCode]);
 
     return result.insertId;
   }
 
   async checkDuplicateTaskAlarm(userCode: string, dto: any): Promise<GetTaskAlarmResDto | null> {
     const query = `
-        SELECT seq, userCode, userHomeCode, taskAlarmCode, taskCode, taskName, taskDate, taskNote, isActive
+        SELECT seq, userCode, userHomeCode, taskAlarmCode, NULL AS taskCode, taskName, taskDate, taskNote, isActive
         FROM ${this.tableTaskAlarm}
         WHERE isActive = 'Y'
           AND taskName = ?

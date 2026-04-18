@@ -151,7 +151,7 @@ export class HarvestDataRowInputDto {
   @ApiProperty({ example: 0 })
   @IsString()
   @IsNotEmpty()
-  seqAlarm: number;
+  seqHarvestPhase: number;
 
   @ApiProperty({ example: '' })
   @IsString()

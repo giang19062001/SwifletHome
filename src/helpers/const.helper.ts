@@ -74,5 +74,10 @@ export const CODES = {
      PRE: 'CSM',
     LEN: 6,
     FRIST_CODE: 'CSM000001',
+  },
+  medicineCode: {
+    PRE: 'MED',
+    LEN: 6,
+    FRIST_CODE: 'MED000001',
   }
 };
