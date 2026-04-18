@@ -86,6 +86,9 @@ export class AuthAppService extends AbAuthService {
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
 
+    // Xóa device token trùng lặp ở các record khác nếu có
+    await this.userAppService.clearDuplicateDeviceToken(dto.deviceToken, dto.userPhone);
+
     // Chỉnh sửa lại device token mỗi lần đăng nhập (nếu khác)
     if (String(user.deviceToken) !== String(dto.deviceToken)) {
       // cập nhập token mới
@@ -224,6 +227,9 @@ export class AuthAppService extends AbAuthService {
       this.logger.error(logbase, `${userPhone} -> ${Msg.PhoneNotExist}`);
       throw new BadRequestException(Msg.PhoneNotExist);
     }
+
+    // Xóa deviceToken trùng lặp nếu có
+    await this.userAppService.clearDuplicateDeviceToken(dto.deviceToken);
 
     const result = await this.userAppService.updateDeviceToken(dto.deviceToken, userPhone);
     return result;

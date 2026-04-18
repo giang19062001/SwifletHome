@@ -113,7 +113,7 @@ export class UserAppRepository {
     return rows.length ? (rows[0] as UserAppResDto) : null;
   }
 
-  async create(dto: RegisterUserAppDto): Promise<number> {
+  async register(dto: RegisterUserAppDto): Promise<number> {
     try {
       const sqlLastMain = ` SELECT userCode FROM ${this.table} ORDER BY userCode DESC LIMIT 1`;
       const sqlLastDel = ` SELECT userCode FROM ${this.tableDel} ORDER BY userCode DESC LIMIT 1`;
@@ -132,9 +132,6 @@ export class UserAppRepository {
       }
 
       const userCode = generateCode(baseCode, CODES.userCode.PRE, 6);
-
-      // Xóa deviceToken trùng lặp nếu có
-      await this.clearDuplicateDeviceToken(dto.deviceToken);
 
       const sql = `
       INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, userTypeCode, countryCode, deviceToken, isActive, createdId)
@@ -169,8 +166,6 @@ export class UserAppRepository {
     return result.affectedRows;
   }
   async updateDeviceToken(deviceToken: string, userPhone: string): Promise<number> {
-    // Xóa deviceToken trùng lặp nếu có
-    await this.clearDuplicateDeviceToken(deviceToken);
 
     const sql = `
         UPDATE ${this.table} SET deviceToken = ?, updatedAt = NOW(), updatedId = ?
@@ -181,13 +176,20 @@ export class UserAppRepository {
     return result.affectedRows;
   }
 
-  async clearDuplicateDeviceToken(deviceToken: string): Promise<number> {
+  async clearDuplicateDeviceToken(deviceToken: string, excludeUserPhone?: string): Promise<number> {
     if (!deviceToken || deviceToken === '') return 0;
-    const sql = `
+    let sql = `
         UPDATE ${this.table} SET deviceToken = '', updatedAt = NOW(), updatedId = ?
         WHERE deviceToken = ?
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [UPDATOR, deviceToken]);
+    const params: any[] = [UPDATOR, deviceToken];
+
+    if (excludeUserPhone) {
+      sql += ` AND userPhone != ? `;
+      params.push(excludeUserPhone);
+    }
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, params);
     return result.affectedRows;
   }
 

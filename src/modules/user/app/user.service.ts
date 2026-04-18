@@ -45,7 +45,11 @@ export class UserAppService {
   async register(dto: RegisterUserAppDto): Promise<TokenUserAppResDto | null> {
     const logbase = `${this.SERVICE_NAME}/register`;
     let userInserted: any = null;
-    const insertId = await this.userAppRepository.create(dto);
+    // Xóa deviceToken trùng lặp nếu có
+    await this.userAppRepository.clearDuplicateDeviceToken(dto.deviceToken);
+
+    // insert dữ liệu
+    const insertId = await this.userAppRepository.register(dto);
     if (insertId) {
       const user = await this.userAppRepository.findBySeq(insertId);
       if (user) {
@@ -75,6 +79,10 @@ export class UserAppService {
     const logbase = `${this.SERVICE_NAME}/updateDeviceToken`;
     this.logger.log(logbase, `Cập nhập device token mới cho người dùng (${userPhone})`);
     return await this.userAppRepository.updateDeviceToken(deviceToken, userPhone);
+  }
+
+  async clearDuplicateDeviceToken(deviceToken: string, excludeUserPhone?: string): Promise<number> {
+    return await this.userAppRepository.clearDuplicateDeviceToken(deviceToken, excludeUserPhone);
   }
 
   // TODO: PACKAGE
