@@ -191,7 +191,7 @@ export class GetTasksMedicineRowResDto extends GetTasksMedicineResDto {
   seq: number;
 
   @ApiProperty({ example: 0 })
-  seqNextTime: number;
+  seqAlarm: number;
 
   @ApiProperty({ example: '' })
   userCode: string;

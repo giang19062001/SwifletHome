@@ -20,10 +20,10 @@ export class TodoMedicineAppRepository {
   async getTaskMedicine(taskAlarmCode: string): Promise<(GetTaskAlarmResDto & GetTasksMedicineRowResDto) | null> {
     let query = `  
       SELECT A.taskAlarmCode, A.taskCode, C.taskKeyword, A.taskName, A.taskDate, A.taskStatus, A.taskNote,
-        B.seq, B.seqNextTime, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineUsage
+        B.seq, B.seqAlarm, B.userCode, B.userHomeCode, B.medicineOptionCode, B.medicineOther, B.medicineUsage
         FROM ${this.tableTaskAlarm} A
         LEFT JOIN ${this.tableTaskMedicine} B
-        ON A.seq = B.seqNextTime
+        ON A.seq = B.seqAlarm
         LEFT JOIN ${this.tableTask} C
         ON A.taskCode = C.taskCode
         WHERE taskAlarmCode  = ?  AND C.taskKeyword = '${TODO_CONST.TASK_EVENT.MEDICINE.value}' 
@@ -33,12 +33,12 @@ export class TodoMedicineAppRepository {
     return rows.length ? (rows[0] as GetTaskAlarmResDto & GetTasksMedicineRowResDto) : null;
   }
 
-  async insertTaskMedicine(userCode: string, userHomeCode: string, seqNextTime: number, dto: SetTaskMedicineDto): Promise<number> {
+  async insertTaskMedicine(userCode: string, userHomeCode: string, seqAlarm: number, dto: SetTaskMedicineDto): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableTaskMedicine}  (seqNextTime, userCode, userHomeCode, medicineOptionCode, medicineOther, medicineUsage, createdId, isUse) 
+      INSERT INTO ${this.tableTaskMedicine}  (seqAlarm, userCode, userHomeCode, medicineOptionCode, medicineOther, medicineUsage, createdId, isUse) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqNextTime, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, userCode, 'N']);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqAlarm, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, userCode, 'N']);
     return result.insertId;
   }
 
@@ -46,7 +46,7 @@ export class TodoMedicineAppRepository {
     const sql = `
         UPDATE ${this.tableTaskMedicine} A
         LEFT JOIN ${this.tableTaskAlarm} B
-          ON A.seqNextTime = B.seq
+          ON A.seqAlarm = B.seq
         SET 
           A.medicineOptionCode = ?, A.medicineOther = ?, medicineUsage = ?, A.updatedId = ?, A.updatedAt = NOW()
         WHERE 
@@ -62,7 +62,7 @@ export class TodoMedicineAppRepository {
     const sql = `
         UPDATE ${this.tableTaskMedicine} A
         LEFT JOIN ${this.tableTaskAlarm} B
-          ON A.seqNextTime = B.seq
+          ON A.seqAlarm = B.seq
         SET isUse = ?, A.updatedId = ?, A.updatedAt = NOW()
         WHERE 
           B.taskAlarmCode = ?
@@ -85,7 +85,7 @@ export class TodoMedicineAppRepository {
             DATE_FORMAT(COALESCE(A.updatedAt, A.createdAt),'%Y-%m-%d %H:%i:%s') AS timestamp
           FROM ${this.tableTaskAlarm} A
           LEFT JOIN ${this.tableTaskMedicine} B
-            ON A.seq = B.seqNextTime
+            ON A.seq = B.seqAlarm
           LEFT JOIN ${this.tableOption} C
             ON B.medicineOptionCode = C.code
           LEFT JOIN ${this.tableTask} D
