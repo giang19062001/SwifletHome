@@ -362,7 +362,7 @@ async function submitTeam(formData, url, method, successMessage) {
     const response = await axios[method](url, postData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
     if (response.data) {
       toastOk(successMessage);
-      reloadPage('/dashboard/user/teams');
+      reloadPage('/dashboard/user-teams');
     }
   } catch (error) {
     console.error(`error:`, error);
