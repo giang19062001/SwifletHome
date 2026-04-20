@@ -22,11 +22,12 @@ export class TodoHarvestAppRepository {
     const currentYear = moment().year();
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT MAX(harvestPhase) AS PHASE
-       FROM ${this.tableTaskHarvestPhase}
-       WHERE userHomeCode = ? AND harvestYear = ? AND isDone = 'Y'`,
+       FROM ${this.tableTaskHarvestPhase} A
+       WHERE userHomeCode = ? AND harvestYear = ? AND isDone = 'Y'
+         AND EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = A.seq AND Q.isActive = 'Y')`,
       [userHomeCode, currentYear],
     );
-    return rows.length ? Number(rows[0].PHASE + 1) : 1;
+    return rows.length && rows[0].PHASE ? Number(rows[0].PHASE + 1) : 1;
   }
 
   async insertTaskHarvestPhase(
@@ -120,9 +121,15 @@ export class TodoHarvestAppRepository {
   async getNextHarvestSchedule(userCode: string, userHomeCode: string, today: string): Promise<{ seq: number; taskDate: string; taskStatus: string } | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT seq, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, taskStatus
-       FROM ${this.tableTaskHarvestPhase}
+       FROM ${this.tableTaskHarvestPhase} A
        WHERE userCode = ? AND userHomeCode = ?
-         AND taskStatus = '${TaskStatusEnum.WAITING}'
+         AND (
+           taskStatus = '${TaskStatusEnum.WAITING}'
+           OR (
+             taskStatus = '${TaskStatusEnum.COMPLETE}'
+             AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = A.seq AND Q.isActive = 'Y')
+           )
+         )
          AND taskDate >= ?
        ORDER BY taskDate ASC
        LIMIT 1`,
