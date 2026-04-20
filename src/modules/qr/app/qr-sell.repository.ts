@@ -52,7 +52,7 @@ export class QrSellAppRepository {
   async getRequestSellTotal(dto: GetRequestSellListDto, userCode: string): Promise<number> {
     let whereSql = '';
     const params: any[] = [];
-    whereSql += ' AND E.userCode != ? ';
+    whereSql += ' AND A.userCode != ? ';
     params.push(userCode);
 
     if (dto.getType == GetTypeEnum.VIEW) {
@@ -61,6 +61,8 @@ export class QrSellAppRepository {
     if (dto.getType == GetTypeEnum.SAVE) {
       whereSql += ` AND E.isSave = 'Y' `;
     }
+
+    params.push(userCode);
 
     let query = ` SELECT COUNT(A.seq) AS TOTAL 
         FROM ${this.tableSell}  A
@@ -71,8 +73,8 @@ export class QrSellAppRepository {
         LEFT JOIN ${this.tableOption} D
         ON A.priceOptionCode = D.code
         LEFT JOIN ${this.tableInteract} E
-        ON A.requestCode = E.requestCode
-        WHERE A.isActive = 'Y' ${whereSql}
+        ON A.requestCode = E.requestCode AND E.userCode = ?
+        WHERE A.isActive = 'Y' ${whereSql} 
      `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
@@ -82,7 +84,7 @@ export class QrSellAppRepository {
   async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<GetRequestSellListResDto[]> {
     let whereSql = '';
     const params: any[] = [];
-    whereSql += ' AND E.userCode != ? ';
+    whereSql += ' AND A.userCode != ? ';
     params.push(userCode);
 
     if (dto.getType == GetTypeEnum.VIEW) {
@@ -91,6 +93,8 @@ export class QrSellAppRepository {
     if (dto.getType == GetTypeEnum.SAVE) {
       whereSql += ` AND E.isSave = 'Y' `;
     }
+
+    params.push(userCode);
 
     let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
         CASE
@@ -107,7 +111,7 @@ export class QrSellAppRepository {
         LEFT JOIN ${this.tableOption} D
         ON A.priceOptionCode = D.code
         LEFT JOIN ${this.tableInteract} E
-        ON A.requestCode = E.requestCode
+        ON A.requestCode = E.requestCode AND E.userCode = ?
         WHERE A.isActive = 'Y'  ${whereSql}
      `;
 
