@@ -52,8 +52,10 @@ export class QrSellAppRepository {
   async getRequestSellTotal(dto: GetRequestSellListDto, userCode: string): Promise<number> {
     let whereSql = '';
     const params: any[] = [];
+    params.push(userCode); // placeholder for the JOIN: ON ... AND E.userCode = ?
+
     whereSql += ' AND A.userCode != ? ';
-    params.push(userCode);
+    params.push(userCode); // placeholder for the WHERE: AND A.userCode != ?
 
     if (dto.getType == GetTypeEnum.VIEW) {
       whereSql += ` AND E.isView = 'Y' `;
@@ -61,8 +63,6 @@ export class QrSellAppRepository {
     if (dto.getType == GetTypeEnum.SAVE) {
       whereSql += ` AND E.isSave = 'Y' `;
     }
-
-    params.push(userCode);
 
     let query = ` SELECT COUNT(A.seq) AS TOTAL 
         FROM ${this.tableSell}  A
@@ -84,8 +84,10 @@ export class QrSellAppRepository {
   async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<GetRequestSellListResDto[]> {
     let whereSql = '';
     const params: any[] = [];
+    params.push(userCode); // placeholder for the JOIN: ON ... AND E.userCode = ?
+
     whereSql += ' AND A.userCode != ? ';
-    params.push(userCode);
+    params.push(userCode); // placeholder for the WHERE: AND A.userCode != ?
 
     if (dto.getType == GetTypeEnum.VIEW) {
       whereSql += ` AND E.isView = 'Y' `;
@@ -93,8 +95,6 @@ export class QrSellAppRepository {
     if (dto.getType == GetTypeEnum.SAVE) {
       whereSql += ` AND E.isSave = 'Y' `;
     }
-
-    params.push(userCode);
 
     let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
         CASE
@@ -187,18 +187,43 @@ export class QrSellAppRepository {
 
   // TODO: SELL-INTERACT
   async maskRequestSell(requestCode: string, userCode: string, markType: MarkTypeEnum): Promise<number> {
-    const sql = `
-    INSERT INTO ${this.tableInteract}
-      (requestCode, userCode, isView, isSave, createdId, createdAt, updatedId, updatedAt)
-    VALUES (?, ?, 'N', 'N', ?, NOW(), ?, NOW())
-    ON DUPLICATE KEY UPDATE
-      isView = ${markType === MarkTypeEnum.VIEW ? `'Y'` : 'isView'},
-      isSave = ${markType === MarkTypeEnum.SAVE ? `CASE WHEN isSave='Y' THEN 'N' ELSE 'Y' END` : 'isSave'},
-      updatedId = VALUES(updatedId),
-      updatedAt = NOW()
-    `;
+    // 1. Kiểm tra xem đã có bản ghi tương tác chưa
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT seq, isView, isSave FROM ${this.tableInteract} WHERE requestCode = ? AND userCode = ? LIMIT 1`,
+      [requestCode, userCode],
+    );
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [requestCode, userCode, userCode, userCode]);
-    return result.affectedRows;
+    if (rows.length > 0) {
+      // 2. Nếu đã có, tiến hành UPDATE
+      const existing = rows[0];
+      let sql = `UPDATE ${this.tableInteract} SET updatedAt = NOW(), updatedId = ? `;
+      const params: any[] = [userCode];
+
+      if (markType === MarkTypeEnum.VIEW) {
+        sql += `, isView = 'Y' `;
+      } else if (markType === MarkTypeEnum.SAVE) {
+        // Toggle isSave
+        const nextSave = existing.isSave === YnEnum.Y ? YnEnum.N : YnEnum.Y;
+        sql += `, isSave = ? `;
+        params.push(nextSave);
+      }
+
+      sql += ` WHERE seq = ? `;
+      params.push(existing.seq);
+
+      const [result] = await this.db.execute<ResultSetHeader>(sql, params);
+      return result.affectedRows;
+    } else {
+      // 3. Nếu chưa có, tiến hành INSERT
+      const isView = markType === MarkTypeEnum.VIEW ? YnEnum.Y : YnEnum.N;
+      const isSave = markType === MarkTypeEnum.SAVE ? YnEnum.Y : YnEnum.N;
+
+      const sql = `
+        INSERT INTO ${this.tableInteract} (requestCode, userCode, isView, isSave, createdId, updatedId)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      const [result] = await this.db.execute<ResultSetHeader>(sql, [requestCode, userCode, isView, isSave, userCode, userCode]);
+      return result.insertId;
+    }
   }
 }
