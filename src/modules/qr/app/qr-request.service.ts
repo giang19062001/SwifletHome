@@ -206,6 +206,11 @@ export class QrRequestAppService {
       }
     }
 
+    // cập nhật lại trạng thái đợt thu hoạch nếu có
+    if (requestInfo.seqHarvestPhase) {
+      await this.todoHarvestAppService.uncompleteTaskHarvestPhase(userCode, requestInfo.seqHarvestPhase);
+    }
+
     const result = await this.qrRequestAppRepository.cancelRequest(requestInfo.seq!!, requestCode, userCode);
     return result;
   }

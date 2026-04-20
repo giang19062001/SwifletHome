@@ -79,7 +79,7 @@ export class QrRequestAppRepository {
     return rows as GetApprovedRequestQrCodeResDto[];
   }
   async getRequestQrCocde(requestCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
-    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.seqHarvestPhase, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
       CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
