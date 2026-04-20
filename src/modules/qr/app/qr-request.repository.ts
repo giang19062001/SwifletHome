@@ -224,7 +224,7 @@ export class QrRequestAppRepository {
       ` SELECT A.seq, A.qrRequestSeq, A.uniqueId, A.filename, A.mimetype 
             FROM ${this.tableFile} A
           WHERE A.qrRequestSeq = 0 OR A.uniqueId 
-          NOT IN (SELECT uniqueId FROM ${this.table})
+          NOT IN (SELECT uniqueId FROM ${this.table} WHERE isActive = 'Y')
     `,
     );
     return rows as QrRequestFileResDto[];

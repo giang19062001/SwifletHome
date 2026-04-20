@@ -195,8 +195,8 @@ export class TodoHarvestAppRepository {
        FROM ${this.tableTaskHarvestPhase} A
        WHERE A.userHomeCode = ? AND A.userCode = ? AND A.isDone = 'Y'
          AND NOT EXISTS (
-           SELECT 1 FROM ${this.tableQr} D WHERE D.seqHarvestPhase = A.seq
-         )`,
+           SELECT 1 FROM ${this.tableQr} D WHERE D.seqHarvestPhase = A.seq AND D.isActive = 'Y'
+         ) `,
       [dto.userHomeCode, userCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
@@ -220,7 +220,7 @@ export class TodoHarvestAppRepository {
       LEFT JOIN ${this.tableTaskHarvest} D ON A.seq = D.seqHarvestPhase
       WHERE A.userHomeCode = ? AND A.userCode = ? AND A.isDone = 'Y'
         AND NOT EXISTS (
-          SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = A.seq
+          SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = A.seq AND Q.isActive = 'Y'
         )
       GROUP BY A.seq, A.userHomeCode, A.harvestPhase, A.harvestYear, E.userHomeFloor
       ${offsetQuery}`;
@@ -235,7 +235,7 @@ export class TodoHarvestAppRepository {
       FROM ${this.tableTaskHarvestPhase} A
       WHERE A.userHomeCode = ? AND A.taskStatus = '${TaskStatusEnum.COMPLETE}' AND A.isDone = 'Y'
         AND A.harvestYear = ?
-        AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = A.seq)
+        AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = A.seq AND Q.isActive = 'Y')
       ${harvestPhase != 0 ? 'AND A.harvestPhase = ?' : ''}`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, harvestPhase != 0 ? [userHomeCode, currentYear, harvestPhase] : [userHomeCode, currentYear]);
     return rows as (TaskHarvestQrResDto & { seq: number })[];
@@ -245,7 +245,7 @@ export class TodoHarvestAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT seq FROM ${this.tableTaskHarvestPhase}
        WHERE seq = ? AND isDone = 'Y'
-         AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = seq)
+         AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = seq AND Q.isActive = 'Y')
        LIMIT 1`,
       [seqHarvestPhase],
     );
@@ -258,7 +258,7 @@ export class TodoHarvestAppRepository {
        FROM ${this.tableTaskHarvestPhase}
        WHERE userHomeCode = ? AND taskStatus = '${TaskStatusEnum.COMPLETE}' AND isDone = 'Y'
          AND harvestYear = ? AND harvestPhase = ?
-         AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = seq)
+         AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = seq AND Q.isActive = 'Y')
        LIMIT 1`,
       [userHomeCode, harvestYear, harvestPhase],
     );
