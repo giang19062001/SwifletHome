@@ -28,7 +28,7 @@ export class QrSellAppService {
   }
 
   async getRequestSellDetail(requestCode: string, userCode: string): Promise<GetRequestSellDetailResDto | null> {
-    const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
+    const logbase = `${this.SERVICE_NAME}/getRequestSellDetail:`;
     // đánh dầu đã xem
     await this.maskRequestSell(requestCode, userCode, MarkTypeEnum.VIEW);
     const result = await this.qrSellAppRepository.getRequestSellDetail(requestCode);

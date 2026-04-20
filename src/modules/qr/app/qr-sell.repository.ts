@@ -52,7 +52,7 @@ export class QrSellAppRepository {
   async getRequestSellTotal(dto: GetRequestSellListDto, userCode: string): Promise<number> {
     let whereSql = '';
     const params: any[] = [];
-    whereSql += ' AND E.userCode = ? ';
+    whereSql += ' AND E.userCode != ? ';
     params.push(userCode);
 
     if (dto.getType == GetTypeEnum.VIEW) {
@@ -82,7 +82,7 @@ export class QrSellAppRepository {
   async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<GetRequestSellListResDto[]> {
     let whereSql = '';
     const params: any[] = [];
-    whereSql += ' AND E.userCode = ? ';
+    whereSql += ' AND E.userCode != ? ';
     params.push(userCode);
 
     if (dto.getType == GetTypeEnum.VIEW) {
