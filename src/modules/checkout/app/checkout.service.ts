@@ -21,19 +21,20 @@ export class CheckoutAppService {
   async checkoutPay(dto: CheckoutPayDto): Promise<any> {
     const logbase = `${this.SERVICE_NAME}/checkoutPay`;
 
-    // 1. Kiểm tra transaction_id đã tồn tại chưa (tránh xử lý trùng lặp từ RevenueCat retry)
-    if (dto.event?.transaction_id) {
-      const exists = await this.checkoutAppRepository.existsByTransactionId(dto.event.transaction_id);
-      if (exists) {
-        this.logger.log(logbase, `transaction_id ${dto.event.transaction_id} ${Msg.CheckoutTransactionExist}`);
-        throw new BadRequestException({ message: Msg.CheckoutTransactionExist, data: 0 });
-      }
-    }
-
-    // 2. Lưu lại payload gửi lên
+    // 1. Lưu lại payload gửi lên (Upsert - Nếu trùng ID thì update, không báo lỗi)
     let checkoutSeq: number | null = null;
     try {
-      checkoutSeq = await this.checkoutAppRepository.saveCheckout(dto);
+      if (dto.event?.id) {
+        const existingSeq = await this.checkoutAppRepository.existsById(dto.event.id);
+        if (existingSeq !== null) {
+          this.logger.log(logbase, `id ${dto.event.id} ${Msg.CheckoutTransactionExist} -> Updating record.`);
+          checkoutSeq = await this.checkoutAppRepository.updateCheckout(dto);
+        } else {
+          checkoutSeq = await this.checkoutAppRepository.insertCheckout(dto);
+        }
+      } else {
+        checkoutSeq = await this.checkoutAppRepository.insertCheckout(dto);
+      }
       this.logger.log(logbase, `Saved checkout for app_user_id: ${dto.event?.app_user_id} seq: ${checkoutSeq}`);
     } catch (error) {
       this.logger.error(logbase, `Failed to save checkout for app_user_id: ${dto.event?.app_user_id}. Error: ${error.message}`);

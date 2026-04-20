@@ -1,7 +1,12 @@
-import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CheckoutPayEventDto {
+
+  @IsString()
+  @IsNotEmpty()
+  id: string; 
+
   @IsString()
   @IsOptional()
   app_id: string; 

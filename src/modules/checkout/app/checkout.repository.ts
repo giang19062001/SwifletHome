@@ -12,18 +12,18 @@ export class CheckoutAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async saveCheckout(dto: CheckoutPayDto): Promise<number> {
+  async insertCheckout(dto: CheckoutPayDto): Promise<number> {
     const event = dto.event || ({} as any);
 
     const sql = `
       INSERT INTO ${this.tableCheckout} (
-        api_version, app_id, app_user_id, country_code, currency, discount_amount, discount_identifier,
+        id, api_version, app_id, app_user_id, country_code, currency, discount_amount, discount_identifier,
         discount_percentage, entitlement_ids, environment, event_timestamp_ms, expiration_at_ms,
         is_family_share, is_trial_conversion, offer_code, period_type, presented_offering_context,
         presented_offering_id, price, price_in_purchased_currency, product_display_name,
         product_id, purchased_at_ms, renewal_number, store, takehome_percentage, transaction_id
       ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
@@ -33,6 +33,7 @@ export class CheckoutAppRepository {
     
     const entitlementIdsStr = event.entitlement_ids ? JSON.stringify(event.entitlement_ids) : null;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      event.id ?? null,
       dto.api_version ?? null,
       event.app_id ?? null,
       event.app_user_id ?? null,
@@ -96,9 +97,55 @@ export class CheckoutAppRepository {
     return rows.length ? rows[0] : null;
   }
 
-  async existsByTransactionId(transactionId: string): Promise<boolean> {
-    const sql = `SELECT seq FROM ${this.tableCheckout} WHERE transaction_id = ? LIMIT 1`;
-    const [rows] = await this.db.query<RowDataPacket[]>(sql, [transactionId]);
-    return rows.length > 0;
+  async existsById(id: string): Promise<number | null> {
+    const sql = `SELECT seq FROM ${this.tableCheckout} WHERE  id = ? LIMIT 1`;
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [id]);
+    return rows.length > 0 ? rows[0].seq : null;
+  }
+
+  async updateCheckout(dto: CheckoutPayDto): Promise<number | null> {
+    const event = dto.event || ({} as any);
+    const sql = `
+      UPDATE ${this.tableCheckout} SET
+        api_version = ?, app_id = ?, app_user_id = ?, country_code = ?, currency = ?, discount_amount = ?, discount_identifier = ?,
+        discount_percentage = ?, entitlement_ids = ?, environment = ?, event_timestamp_ms = ?, expiration_at_ms = ?,
+        is_family_share = ?, is_trial_conversion = ?, offer_code = ?, period_type = ?, presented_offering_context = ?,
+        presented_offering_id = ?, price = ?, price_in_purchased_currency = ?, product_display_name = ?,
+        product_id = ?, purchased_at_ms = ?, renewal_number = ?, store = ?, takehome_percentage = ?, transaction_id = ?
+      WHERE id = ?
+    `;
+    const entitlementIdsStr = event.entitlement_ids ? JSON.stringify(event.entitlement_ids) : null;
+    await this.db.execute(sql, [
+      dto.api_version ?? null,
+      event.app_id ?? null,
+      event.app_user_id ?? null,
+      event.country_code ?? null,
+      event.currency ?? null,
+      event.discount_amount ?? null,
+      event.discount_identifier ?? null,
+      event.discount_percentage ?? null,
+      entitlementIdsStr,
+      event.environment ?? null,
+      event.event_timestamp_ms ?? null,
+      event.expiration_at_ms ?? null,
+      event.is_family_share ?? null,
+      event.is_trial_conversion ?? null,
+      event.offer_code ?? null,
+      event.period_type ?? null,
+      event.presented_offering_context ?? null,
+      event.presented_offering_id ?? null,
+      event.price ?? null,
+      event.price_in_purchased_currency ?? null,
+      event.product_display_name ?? null,
+      event.product_id ?? null,
+      event.purchased_at_ms ?? null,
+      event.renewal_number ?? null,
+      event.store ?? null,
+      event.takehome_percentage ?? null,
+      event.transaction_id ?? null,
+      event.id,
+    ]);
+
+    return this.existsById(event.id);
   }
 }
