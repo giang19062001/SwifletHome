@@ -134,7 +134,7 @@ export class RegisterUserAppDto {
     example: 'ABCXYZ123',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   deviceToken: string;
 }
 

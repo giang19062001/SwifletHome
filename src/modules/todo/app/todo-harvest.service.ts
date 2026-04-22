@@ -289,7 +289,4 @@ export class TodoHarvestAppService {
     return await this.todoHarvestAppRepository.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
   }
 
-  async uncompleteTaskHarvestPhase(userCode: string, seqHarvestPhase: number) {
-    return await this.todoHarvestAppRepository.uncompleteTaskHarvestPhase(userCode, seqHarvestPhase);
-  }
 }

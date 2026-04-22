@@ -98,15 +98,6 @@ export class TodoHarvestAppRepository {
     return result.affectedRows;
   }
 
-  async uncompleteTaskHarvestPhase(userCode: string, seqHarvestPhase: number): Promise<number> {
-    const sql = `
-      UPDATE ${this.tableTaskHarvestPhase}
-      SET isDone = ?, taskStatus = ?, updatedId = ?, updatedAt = NOW()
-      WHERE seq = ?`;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [YnEnum.N, TaskStatusEnum.WAITING, userCode, seqHarvestPhase]);
-    return result.affectedRows;
-  }
-
   async updateTaskHarvestDate(userCode: string, seqHarvestPhase: number, taskDate: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableTaskHarvestPhase}

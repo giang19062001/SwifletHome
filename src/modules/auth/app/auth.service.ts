@@ -86,18 +86,24 @@ export class AuthAppService extends AbAuthService {
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
 
-    // Xóa device token trùng lặp ở các record khác nếu có
-    await this.userAppService.clearDuplicateDeviceToken(dto.deviceToken, dto.userPhone);
+    // Xóa device token trùng lặp ở các record khác nếu có và unsubscribe token đó khỏi topics
+    const duplicatedUsers = await this.userAppService.clearDuplicateDeviceToken(dto.deviceToken, dto.userPhone);
+    if (duplicatedUsers && duplicatedUsers.length > 0) {
+      await Promise.all(duplicatedUsers.map(u => 
+        this.firebaseService.unsubscribeFromTopic(u.userCode, dto.deviceToken)
+      ));
+    }
 
     // Chỉnh sửa lại device token mỗi lần đăng nhập (nếu khác)
     if (String(user.deviceToken) !== String(dto.deviceToken)) {
       // cập nhập token mới
       await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
-      // unscribe topic cho token cũ
-      await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
-      // kiểm tra va đăng ký thêm ~ topic mới nếu có và subcribe lại topic cũ với devicetoken mới
+      // Chạy song song: unscribe topic cho token cũ và subscribe topic cho token mới
       const isNewOrChange = true;
-      await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken, isNewOrChange);
+      await Promise.all([
+        this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
+        this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken, isNewOrChange)
+      ]);
     } else {
       // kiểm tra va đăng ký thêm ~ topic mới nếu có
       const isNewOrChange = false;
@@ -153,18 +159,12 @@ export class AuthAppService extends AbAuthService {
       throw new UnauthorizedException(Msg.OtpNotVerify);
     }
 
-    // hash -> insert thông tin bao gồm cả device token
+    // hash -> insert thông tin KHÔNG bao gồm cả device token
     const hashedPassword = await this.hashPassword(dto.userPassword);
     const userInserted: TokenUserAppResDto | null = await this.userAppService.register({
       ...dto,
       userPassword: hashedPassword,
     });
-
-    if (userInserted) {
-      // đăng ký topic cho push
-      const isNewOrChange = true;
-      await this.firebaseService.subscribeToTopic(userInserted.userCode, userInserted.deviceToken, isNewOrChange);
-    }
 
     this.logger.log(logbase, `${dto.userPhone} -> ${userInserted ? Msg.RegisterAccountOk : Msg.RegisterAccountErr}`);
     return userInserted ? 1 : 0;
@@ -270,12 +270,12 @@ export class AuthAppService extends AbAuthService {
       const user = await this.userAppService.findByCode(userCode);
       let result = 0;
       if (user) {
-        // unscribe topic cho user chuẩn bị xóa
-        this.logger.log(logbase, `Hủy topic cho người dùng: ${user.userCode}...`);
-        await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
-
-        // reset thông tin OTP
-        await this.otpService.resetOtp(user.userPhone, '0000', new Date(), PurposeEnum.REGISTER, user.countryCode);
+        // Chạy song song các tác vụ cleanup
+        this.logger.log(logbase, `Hủy topic và reset OTP cho người dùng: ${user.userCode}...`);
+        await Promise.all([
+          this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
+          this.otpService.resetOtp(user.userPhone, '0000', new Date(), PurposeEnum.REGISTER, user.countryCode)
+        ]);
 
         // xóa user ở bảng chính, insert user đó vào bảng xóa
         this.logger.log(logbase, `Xóa thông tin người dùng: ${JSON.stringify(user)}`);
@@ -362,5 +362,23 @@ export class AuthAppService extends AbAuthService {
     const saltRounds = 10;
     const hashed = await bcrypt.hash(password, saltRounds);
     return hashed;
+  }
+
+  async logout(user: TokenUserAppResDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/logout`;
+    try {
+      this.logger.log(logbase, `Người dùng ${user.userCode} đăng xuất. Xóa deviceToken và unsubscribe topics.`);
+      
+      // Chạy song song: unsubscribe topic và xóa deviceToken trong DB
+      await Promise.all([
+        this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
+        this.userAppService.clearDuplicateDeviceToken(user.deviceToken)
+      ]);
+
+      return 1;
+    } catch (error) {
+      this.logger.error(logbase, error.message);
+      return 0;
+    }
   }
 }

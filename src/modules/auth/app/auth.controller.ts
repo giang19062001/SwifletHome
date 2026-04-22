@@ -87,6 +87,21 @@ export class AuthAppController {
     return result;
   }
 
+  @Post('logout')
+  @UseGuards(ApiAuthAppGuard)
+  @ApiOperation({
+    summary: 'Đăng xuất khỏi thiết bị hiện tại',
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  async logout(@GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.authAppService.logout(user);
+    return {
+      message: result ? 'Đăng xuất thành công' : 'Đăng xuất thất bại',
+      data: result,
+    };
+  }
+
   @Get('getInfo')
   @UseGuards(ApiAuthAppGuard)
   @ApiOperation({

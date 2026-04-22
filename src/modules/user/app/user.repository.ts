@@ -137,7 +137,7 @@ export class UserAppRepository {
       INSERT INTO ${this.table}  (userCode, userName, userPhone, userPassword, userTypeCode, countryCode, deviceToken, isActive, createdId)
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-      const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.userTypeCode, dto.countryCode, dto.deviceToken, 'Y', UPDATOR]);
+      const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, dto.userName, dto.userPhone, dto.userPassword, dto.userTypeCode, dto.countryCode, '', 'Y', UPDATOR]);
 
       return result.insertId;
     } catch (error) {
@@ -176,8 +176,18 @@ export class UserAppRepository {
     return result.affectedRows;
   }
 
-  async clearDuplicateDeviceToken(deviceToken: string, excludeUserPhone?: string): Promise<number> {
-    if (!deviceToken || deviceToken === '') return 0;
+  async clearDuplicateDeviceToken(deviceToken: string, excludeUserPhone?: string): Promise<{userCode: string}[]> {
+    if (!deviceToken || deviceToken === '') return [];
+    
+    // Lấy danh sách user cũ dùng token này
+    let selectSql = `SELECT userCode FROM ${this.table} WHERE deviceToken = ?`;
+    const selectParams: any[] = [deviceToken];
+    if (excludeUserPhone) {
+      selectSql += ` AND userPhone != ? `;
+      selectParams.push(excludeUserPhone);
+    }
+    const [users] = await this.db.query<RowDataPacket[]>(selectSql, selectParams);
+
     let sql = `
         UPDATE ${this.table} SET deviceToken = '', updatedAt = NOW(), updatedId = ?
         WHERE deviceToken = ?
@@ -189,8 +199,8 @@ export class UserAppRepository {
       params.push(excludeUserPhone);
     }
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, params);
-    return result.affectedRows;
+    await this.db.execute<ResultSetHeader>(sql, params);
+    return users as {userCode: string}[];
   }
 
   async deleteAccount(userCode: string, user: TokenUserAppWithPasswordResDto): Promise<number> {

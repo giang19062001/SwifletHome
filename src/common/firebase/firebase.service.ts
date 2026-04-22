@@ -321,15 +321,19 @@ export class FirebaseService implements OnModuleInit {
         return;
       }
       //  subscribe tất cả topic ( FCM )
-      for (const topic of allTopics) {
-        const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
-        if (response.failureCount > 0) {
-          this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+      await Promise.all(allTopics.map(async (topic) => {
+        try {
+          const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+          if (response.failureCount > 0) {
+            this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+          }
+          if (response.successCount > 0) {
+            this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+          }
+        } catch (error) {
+          this.logger.error(logbase, `Lỗi khi đăng ký topic ${topic.topicCode}: ${error.message}`);
         }
-        if (response.successCount > 0) {
-          this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
-        }
-      }
+      }));
     } else {
       if (missingTopics.length === 0) {
         this.logger.log(logbase, `Người dùng  ${userCode} đã subscribe đủ topic rồi`);
@@ -339,15 +343,19 @@ export class FirebaseService implements OnModuleInit {
         this.logger.log(logbase, `Bỏ qua subscribeToTopic (missingTopics) cho user(${userCode}) vì deviceToken trống`);
       } else {
         // Chỉ subscribe những topic còn thiếu ( FCM )
-        for (const topic of missingTopics) {
-          const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
-          if (response.failureCount > 0) {
-            this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+        await Promise.all(missingTopics.map(async (topic) => {
+          try {
+            const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+            if (response.failureCount > 0) {
+              this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+            }
+            if (response.successCount > 0) {
+              this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+            }
+          } catch (error) {
+            this.logger.error(logbase, `Lỗi khi đăng ký topic ${topic.topicCode}: ${error.message}`);
           }
-          if (response.successCount > 0) {
-            this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
-          }
-        }
+        }));
       }
     }
 
@@ -370,15 +378,19 @@ export class FirebaseService implements OnModuleInit {
       return;
     }
 
-    for (const topic of existingSubs) {
-      const response = await admin.messaging().unsubscribeFromTopic(deviceToken, topic.topicCode);
-      if (response.failureCount > 0) {
-        this.logger.error(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thất bại --> ${JSON.stringify(response.errors[0].error)}`);
+    await Promise.all(existingSubs.map(async (topic) => {
+      try {
+        const response = await admin.messaging().unsubscribeFromTopic(deviceToken, topic.topicCode);
+        if (response.failureCount > 0) {
+          this.logger.error(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thất bại --> ${JSON.stringify(response.errors[0].error)}`);
+        }
+        if (response.successCount > 0) {
+          this.logger.log(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thành công`);
+        }
+      } catch (error) {
+        this.logger.error(logbase, `Lỗi khi hủy đăng ký topic ${topic.topicCode}: ${error.message}`);
       }
-      if (response.successCount > 0) {
-        this.logger.log(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thành công`);
-      }
-    }
+    }));
   }
 
 }
