@@ -75,7 +75,7 @@ export class UserAppRepository {
   async getUserPackageInfo(userCode: string): Promise<UserPackageAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
-      IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay
+      IF(B.endDate IS NOT NULL, GREATEST(0, CEIL(TIMESTAMPDIFF(SECOND, NOW(), B.endDate) / 86400)), 0) AS packageRemainDay
       FROM ${this.table} A 
       LEFT JOIN ${this.tableUserPackage} B
         ON A.userCode = B.userCode
@@ -91,7 +91,7 @@ export class UserAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode,
       B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
-      IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,  B.startDate, B.endDate,  
+      IF(B.endDate IS NOT NULL, GREATEST(0, CEIL(TIMESTAMPDIFF(SECOND, NOW(), B.endDate) / 86400)), 0) AS packageRemainDay,  B.startDate, B.endDate,  
       COUNT(D.seq) AS homesTotal, E.userTypeCode, E.userTypeKeyWord, E.userTypeName
       FROM ${this.table} A 
       LEFT JOIN ${this.tableUserPackage} B

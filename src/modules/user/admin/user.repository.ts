@@ -74,7 +74,7 @@ export class UserAdminRepository {
     try {
       let query = ` SELECT A.seq, A.userCode, A.userName, A.userPhone,  A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
-     IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,
+     IF(B.endDate IS NOT NULL, GREATEST(0, CEIL(TIMESTAMPDIFF(SECOND, NOW(), B.endDate) / 86400)), 0) AS packageRemainDay,
      IFNULL(D.store, 'ADMIN') AS paymentMethod
      FROM ${this.tableApp} A 
      LEFT JOIN ${this.tableUserPackage} B
@@ -120,7 +120,7 @@ export class UserAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.createdAt, A.updatedAt,
      B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
-     IF(B.endDate IS NOT NULL, DATEDIFF(B.endDate, CURDATE()), 0) AS packageRemainDay,
+     IF(B.endDate IS NOT NULL, GREATEST(0, CEIL(TIMESTAMPDIFF(SECOND, NOW(), B.endDate) / 86400)), 0) AS packageRemainDay,
      IFNULL(D.store, 'ADMIN') AS paymentMethod
      FROM ${this.tableApp} A 
      LEFT JOIN ${this.tableUserPackage} B
