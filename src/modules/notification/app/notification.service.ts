@@ -137,4 +137,10 @@ export class NotificationAppService {
   async subscribeToTopic(userCode: string, topicCode: string): Promise<number> {
     return await this.notificationAppRepository.subscribeToTopic(userCode, topicCode);
   }
+
+  async clearInvalidDeviceToken(deviceToken: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/clearInvalidDeviceToken`;
+    this.logger.log(logbase, `Xóa token không hợp lệ khỏi DB: ${deviceToken}`);
+    return await this.userAppService.clearDuplicateDeviceToken(deviceToken);
+  }
 }

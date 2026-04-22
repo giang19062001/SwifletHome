@@ -132,7 +132,8 @@ export class FirebaseService implements OnModuleInit {
       console.log(error);
       // bắt các lỗi FCM phổ biến
       if (error.code === 'messaging/registration-token-not-registered' || error.code === 'messaging/invalid-registration-token') {
-        this.logger.log(logbase, `Token không hợp lệ hoặc đã bị thu hồi: ${deviceToken}`);
+        this.logger.log(logbase, `Token không hợp lệ hoặc đã bị thu hồi, đang tiến hành xóa khỏi DB: ${deviceToken}`);
+        await this.notificationAppService.clearInvalidDeviceToken(deviceToken);
         return 0;
       } else if (error.code === 'messaging/unregistered') {
         this.logger.log(logbase, `Token chưa được đăng ký: ${deviceToken}`);
@@ -255,15 +256,21 @@ export class FirebaseService implements OnModuleInit {
         totalFailureCount += batchResponse.failureCount;
 
         if (batchResponse.failureCount > 0) {
-          batchResponse.responses.forEach((resp, index) => {
+          const cleanupPromises = batchResponse.responses.map(async (resp, index) => {
             if (!resp.success && resp.error) {
               const failedToken = tokenBatch[index];
               const errorCode = resp.error.code || 'unknown';
               const errorMessage = resp.error.message || 'No message';
 
+              // Tự động xóa token nếu bị báo không tồn tại hoặc không hợp lệ
+              if (errorCode === 'messaging/registration-token-not-registered' || errorCode === 'messaging/invalid-registration-token') {
+                await this.notificationAppService.clearInvalidDeviceToken(failedToken);
+              }
+
               this.logger.error(logbase, `Token thất bại [${i + index}] | Token: ${failedToken.substring(0, 30)}... | Error: ${errorCode} - ${errorMessage}`);
             }
           });
+          await Promise.all(cleanupPromises);
         }
       } catch (error) {
         this.logger.error(logbase, `Gửi thông báo batch ${i / BATCH_SIZE + 1} multicast thất bại: (${JSON.stringify(error)}) `);
