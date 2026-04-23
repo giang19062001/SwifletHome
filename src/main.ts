@@ -28,11 +28,9 @@ async function bootstrap() {
 
 
   //CORS
+  const corsOrigins = configService.get<string>('CORS_ORIGINS') || '';
   app.enableCors({
-    origin: [
-      'https://3fam.ai',
-      'https://3fam.vn',
-    ],
+    origin: corsOrigins.split(',').map((origin) => origin.trim()),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });

@@ -12,7 +12,7 @@ import { Throttle } from '@nestjs/throttler';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { AUTH_CONFIG } from '../auth.config';
-import { LoginAdminDto } from './auth.dto';
+import { GeneratePasswordDto, LoginAdminDto } from './auth.dto';
 import { AuthAdminService } from './auth.service';
 
 @ApiTags('admin/auth')
@@ -52,5 +52,12 @@ export class AuthAdminController {
       // Redirect về trang login
       res.redirect('/');
     });
+  }
+
+  @Post('generatePassword')
+  @HttpCode(HttpStatus.OK)
+  async generatePassword(@Body() dto: GeneratePasswordDto) {
+    const hashedPassword = await this.authAdminService.hashPassword(dto.text);
+    return { password: hashedPassword };
   }
 }

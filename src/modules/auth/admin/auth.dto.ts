@@ -36,3 +36,12 @@ export class TokenUserAdminResDto {
     @ApiProperty({ example: 0 })
     exp!: number;
 }
+
+export class GeneratePasswordDto {
+  @ApiProperty({
+    example: '123456',
+  })
+  @IsString()
+  @IsNotEmpty()
+  text: string;
+}
