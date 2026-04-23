@@ -21,7 +21,7 @@ export class GuestController {
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   @Post('requestConsulation')
-  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
+  @Throttle({ sensitive: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async requestConsulation(@Body() dto: CreateGuestConsulationDto) {
     const result = await this.guestService.requestConsulation(dto);

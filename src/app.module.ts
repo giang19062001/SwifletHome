@@ -16,6 +16,7 @@ import { DatabaseModule } from './database/database.module';
 import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
 import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
 import { IpMiddleware } from './middleware/ip.middleware';
+import { CustomThrottlerGuard } from './common/guards/throttler.guard';
 import { AnswerAdminModule } from './modules/answer/admin/answer.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { AuthAdminModule } from './modules/auth/admin/auth.module';
@@ -65,12 +66,12 @@ import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
       {
         name: 'default',
         ttl: 60000, // 1 phút
-        limit: 100, // tối đa 100 request / 1 phút
+        limit: 200, // tối đa 200 request / 1 phút
       },
       {
         name: 'sensitive',
         ttl: 60000, // 1 phút
-        limit: 5, // tối đa 5 request / 1 phút cho các API nhạy cảm
+        limit: 20, // tối đa 20 request / 1 phút cho các API nhạy cảm
       }
     ]),
     PrometheusModule.register({
@@ -163,7 +164,7 @@ import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
     },
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard, // rate limit
+      useClass: CustomThrottlerGuard, // rate limit
     },
   ],
 })

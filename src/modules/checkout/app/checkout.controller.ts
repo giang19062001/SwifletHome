@@ -19,7 +19,7 @@ export class CheckoutAppController {
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   @UseGuards(ApiKeyGuard)
-  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
+  @Throttle({ sensitive: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async checkoutPay(@Body() dto: CheckoutPayDto) {
     return await this.checkoutAppService.checkoutPay(dto);

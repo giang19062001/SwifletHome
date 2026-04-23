@@ -45,7 +45,7 @@ export class AuthAppController {
   @ApiBody({
     type: LoginAppDto,
   })
-  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
+  @Throttle({ sensitive: { limit: 10, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(LoginResDto) })
@@ -59,7 +59,7 @@ export class AuthAppController {
   @ApiBody({
     type: RegisterUserAppDto,
   })
-  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
+  @Throttle({ sensitive: { limit: 10, ttl: 60000 } })
   @Post('register')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
@@ -152,7 +152,7 @@ export class AuthAppController {
 
   @ApiParam({ name: 'userPhone', type: String })
   @ApiBody({ type: UpdatePasswordDto })
-  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
+  @Throttle({ sensitive: { limit: 10, ttl: 60000 } })
   @Put('updatePassword/:userPhone')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
@@ -185,7 +185,7 @@ export class AuthAppController {
     description: '**purpose:** `REGISTER`, `FORGOT_PASSWORD`',
     type: RequestOtpDto,
   })
-  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
+  @Throttle({ sensitive: { limit: 10, ttl: 60000 } })
   @Post('requestOtp')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(RequestOtpResDto) })
@@ -201,7 +201,7 @@ export class AuthAppController {
     description: '**purpose:** `REGISTER`, `FORGOT_PASSWORD`',
     type: VerifyOtpDto,
   })
-  @Throttle({ sensitive: { limit: 10, ttl: 60000 } })
+  @Throttle({ sensitive: { limit: 15, ttl: 60000 } })
   @Post('verifyOtp')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
