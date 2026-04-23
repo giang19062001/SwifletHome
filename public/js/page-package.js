@@ -142,7 +142,7 @@ const renderAllPackage = (data, objElement) => {
     data?.list.forEach((ele) => {
       const rowHtml = `
          <tr class="text-center">
-            <td><p>${page * i++}</p></td>
+            <td><p>${(page - 1) * limit + i++}</p></td>
             <td><p>${ele.packageName}</p></td>
             <td><p>${ele.packageDescription}</p></td>
             <td><p>${ele.packagePrice}</p></td>

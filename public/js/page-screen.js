@@ -24,7 +24,7 @@ const renderAllScreen = (data, objElement) => {
     data?.list.forEach((ele) => {
       const rowHtml = `
          <tr class="text-center">
-            <td><p>${page * i++}</p></td>
+            <td><p>${(page - 1) * limit + i++}</p></td>
             <td><p>${ele.screenName}</p></td>
             <td><p>${ele.screenDescription}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>

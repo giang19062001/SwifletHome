@@ -289,7 +289,7 @@ const renderAllInfo = (data, objElement) => {
     data?.list.forEach((ele) => {
       const rowHtml = `
          <tr class="text-center">
-            <td><p>${page * i++}</p></td>
+            <td><p>${(page - 1) * limit + i++}</p></td>
             <td><p>${ele.infoName}</p></td>
             <td><p>${ele.infoDescription}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>

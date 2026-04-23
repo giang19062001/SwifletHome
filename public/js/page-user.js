@@ -124,7 +124,7 @@ function renderAllUser(data, objElement) {
     data?.list.forEach((ele) => {
       const rowHtml = `
          <tr class="text-center">
-            <td><p>${page * i++}</p></td>
+            <td><p>${(page - 1) * limit + i++}</p></td>
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userPhone}</p></td>
             <td><p>${ele.packageName} ${ele.packageDescription ? `(${ele.packageDescription})` : ''}</p></td>

@@ -78,7 +78,7 @@ function renderAllHomeSightseeing(data, objElement) {
     data?.list.forEach((ele) => {
       const rowHtml = `
          <tr class="text-center">
-            <td><p>${page * i++}</p></td>
+            <td><p>${(page - 1) * limit + i++}</p></td>
             <td style="max-width: 150px;">
               <a target="_blank" href="/dashboard/home/sale/update/${ele.homeCode}">
                 ${ele.homeName}

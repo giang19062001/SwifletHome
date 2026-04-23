@@ -29,7 +29,7 @@ function renderAllHome(data, objElement) {
     data?.list.forEach((ele) => {
       const rowHtml = `
          <tr class="text-center">
-            <td><p>${page * i++}</p></td>
+            <td><p>${(page - 1) * limit + i++}</p></td>
             <td class="p-3"><img class="home-img" src="${CURRENT_URL}/${ele.homeImage}"></img></td>
             <td><p>${ele.homeName}</p></td>
             <td><p>${ele.homeAddress}</p></td>
