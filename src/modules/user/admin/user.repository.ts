@@ -179,9 +179,13 @@ export class UserAdminRepository {
     const sql = ` SELECT A.userCode, A.userName, A.userPhone
          FROM ${this.tableApp} A
          WHERE A.isActive = 'Y' 
-         ${dto.pageType === "create" ? ` AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = '${dto.userTypeCode}' )` : ""}
+         ${dto.pageType === "create" ? ` AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = ? )` : ""}
       `;
-    const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
+    const params: any[] = [];
+    if (dto.pageType === "create") {
+      params.push(dto.userTypeCode);
+    }
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
     return rows as UserForTeamByTypeResDto[];
   }
 }

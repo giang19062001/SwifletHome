@@ -8,6 +8,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { AUTH_CONFIG } from '../auth.config';
@@ -23,6 +24,7 @@ export class AuthAdminController {
     description: `**cookies:** ${AUTH_CONFIG.TOKEN_NAME}`,
     type: LoginAdminDto,
   })
+  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(

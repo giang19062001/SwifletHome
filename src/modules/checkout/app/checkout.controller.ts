@@ -1,4 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiBadRequestResponse, ApiHeader, ApiOkResponse, ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
@@ -18,6 +19,7 @@ export class CheckoutAppController {
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   @UseGuards(ApiKeyGuard)
+  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async checkoutPay(@Body() dto: CheckoutPayDto) {
     return await this.checkoutAppService.checkoutPay(dto);

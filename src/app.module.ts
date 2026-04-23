@@ -63,8 +63,14 @@ import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
     }),
     ThrottlerModule.forRoot([
       {
+        name: 'default',
         ttl: 60000, // 1 phút
         limit: 100, // tối đa 100 request / 1 phút
+      },
+      {
+        name: 'sensitive',
+        ttl: 60000, // 1 phút
+        limit: 5, // tối đa 5 request / 1 phút cho các API nhạy cảm
       }
     ]),
     PrometheusModule.register({
@@ -141,7 +147,11 @@ import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
     },
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe, // bật bắt lỗi tự động dựa vào cấu hình DTO
+      useValue: new ValidationPipe({
+        whitelist: true, // tự động loại bỏ các field không được khai báo trong DTO
+        forbidNonWhitelisted: true, // báo lỗi nếu có field không được khai báo trong DTO
+        transform: true, // tự động chuyển đổi kiểu dữ liệu dựa trên DTO
+      }),
     },
     {
       provide: APP_FILTER,

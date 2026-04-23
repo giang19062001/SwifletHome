@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import expressLayouts from 'express-ejs-layouts';
 import session from 'express-session';
@@ -14,13 +15,23 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
+  // security headers
+  app.use(helmet());
+
   // bắt lỗi toàn cục
   const logger = app.get(LoggingService);
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
 
   //CORS
-  app.enableCors();
+  app.enableCors({
+    origin: [
+      'https://3fam.ai',
+      'https://3fam.vn',
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   // IP -> trust NGINX
   app.set('trust proxy', true);

@@ -1,4 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseInterceptors } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiBadRequestResponse, ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { CreateGuestConsulationDto } from './guest.dto';
@@ -20,6 +21,7 @@ export class GuestController {
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   @Post('requestConsulation')
+  @Throttle({ sensitive: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async requestConsulation(@Body() dto: CreateGuestConsulationDto) {
     const result = await this.guestService.requestConsulation(dto);
