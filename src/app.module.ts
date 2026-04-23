@@ -17,6 +17,8 @@ import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
 import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
 import { IpMiddleware } from './middleware/ip.middleware';
 import { CustomThrottlerGuard } from './common/guards/throttler.guard';
+import { BlacklistModule } from './common/blacklist/blacklist.module';
+import { BlacklistGuard } from './common/blacklist/blacklist.guard';
 import { AnswerAdminModule } from './modules/answer/admin/answer.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { AuthAdminModule } from './modules/auth/admin/auth.module';
@@ -88,6 +90,7 @@ import { ReportAdminModule } from './modules/report/admin/report.module';
     MailModule,
     MqttModule,
     // commmon
+    BlacklistModule,
     OptionModule,
     ProvinceModule,
     PhoneCodeModule,
@@ -159,6 +162,10 @@ import { ReportAdminModule } from './modules/report/admin/report.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: RequestLoggerInterceptor, // log cho các request gửi đến server
+    },
+    {
+      provide: APP_GUARD,
+      useClass: BlacklistGuard, // block IP blacklist
     },
     {
       provide: APP_GUARD,
