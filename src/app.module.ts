@@ -148,11 +148,7 @@ import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
     },
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true, // tự động loại bỏ các field không được khai báo trong DTO
-        forbidNonWhitelisted: true, // báo lỗi nếu có field không được khai báo trong DTO
-        transform: true, // tự động chuyển đổi kiểu dữ liệu dựa trên DTO
-      }),
+      useClass: ValidationPipe, // bật bắt lỗi tự động dựa vào cấu hình DTO
     },
     {
       provide: APP_FILTER,
