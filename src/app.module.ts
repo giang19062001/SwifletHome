@@ -66,12 +66,12 @@ import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
       {
         name: 'default',
         ttl: 60000, // 1 phút
-        limit: 200, // tối đa 200 request / 1 phút
+        limit: 300, // tối đa 300 request / 1 phút
       },
       {
         name: 'sensitive',
         ttl: 60000, // 1 phút
-        limit: 20, // tối đa 20 request / 1 phút cho các API nhạy cảm
+        limit: 30, // tối đa 30 request / 1 phút cho các API nhạy cảm
       }
     ]),
     PrometheusModule.register({
