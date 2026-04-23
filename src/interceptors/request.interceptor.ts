@@ -21,7 +21,6 @@ export class RequestLoggerInterceptor implements NestInterceptor {
     const logObj: any = {
       url: url,
       method: method,
-      accessToken: accessToken,
     };
 
     // Params nếu có
@@ -38,6 +37,8 @@ export class RequestLoggerInterceptor implements NestInterceptor {
     if (contentType.includes('application/json') && req.body) {
       logObj.body = req.body;
     }
+
+    logObj.accessToken = accessToken;
 
     this.logger.log(`[REQUEST] ${method} ${url}`, logObj);
 
