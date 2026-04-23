@@ -34,7 +34,7 @@ const sparkConfig = {
     x: { show: false },
     y: { title: { formatter: () => '' } }
   },
-  grid: { padding: { top: 20, bottom: 10, left: 110 } }
+  grid: { padding: { top: 20, bottom: 30, left: 110 } }
 };
 
 var spark1 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark1' }, series: [{ data: [25, 66, 41, 59, 25, 44, 12, 36, 9, 21] }] };
@@ -209,4 +209,4 @@ async function fetchOverview() {
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchOverview();
-});
+});
