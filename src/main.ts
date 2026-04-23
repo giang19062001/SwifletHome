@@ -16,7 +16,11 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // security headers
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // Tắt CSP để tránh chặn các thẻ script và sự kiện inline trong EJS
+    }),
+  );
 
   // bắt lỗi toàn cục
   const logger = app.get(LoggingService);

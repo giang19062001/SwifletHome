@@ -192,3 +192,21 @@ var optionsArea = {
 
 var chartArea = new ApexCharts(document.querySelector("#areachart"), optionsArea);
 chartArea.render();
+
+async function fetchOverview() {
+  try {
+    const res = await axios.get('/api/admin/report/getOverview', axiosAuth());
+    if (res.data) {
+      document.getElementById('totalUser').innerText = res.data.totalUser;
+      document.getElementById('totalUserHome').innerText = res.data.totalUserHome;
+      document.getElementById('totalGuestConsulation').innerText = res.data.totalGuestConsulation;
+      document.getElementById('totalConsignment').innerText = res.data.totalConsignment;
+    }
+  } catch (error) {
+    console.error("Failed to fetch overview data", error);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchOverview();
+});

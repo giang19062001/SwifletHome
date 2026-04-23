@@ -54,6 +54,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { GuestModule } from './modules/guest/front/guest.module';
 import { GuestAdminModule } from './modules/guest/admin/guest.module';
 import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
+import { ReportAdminModule } from './modules/report/admin/report.module';
 
 @Module({
   imports: [
@@ -127,6 +128,7 @@ import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
     TeamAdminModule,
     ConsignmentAdminModule,
     GuestAdminModule,
+    ReportAdminModule,
   ],
   controllers: [AppController],
   providers: [
