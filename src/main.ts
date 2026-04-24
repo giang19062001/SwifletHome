@@ -22,7 +22,7 @@ async function bootstrap() {
     }),
   );
 
-  // bắt lỗi toàn cục
+  // Ghi log lỗi toàn cục
   const logger = app.get(LoggingService);
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
