@@ -64,5 +64,7 @@ async function bootstrap() {
 
   // port
   await app.listen(process.env.PORT ?? '', '0.0.0.0');
+  console.log('NODE_ENV', process.env.NODE_ENV);
+
 }
 bootstrap();
