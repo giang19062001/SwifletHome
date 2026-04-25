@@ -8,7 +8,7 @@ export class ProvinceRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAll(): Promise<ProvinceResDto[]> {
-    let query = `  SELECT seq, provinceCode, provinceName FROM ${this.table} `;
+    let query = `  SELECT seq, provinceCode, provinceName FROM ${this.table} ORDER BY provinceName ASC `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
     return rows as ProvinceResDto[];

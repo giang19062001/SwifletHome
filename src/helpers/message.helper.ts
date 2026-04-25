@@ -63,7 +63,8 @@ export const Msg = {
     'Những vấn đề kỹ thuật chuyên sâu cần độ chính xác cao. Vui lòng liên hệ qua Zalo hoặc Số điện thoại : 0966222612',
 
   // File
-  UuidNotFound: 'Chưa từng có file nào được upload cùng với uuid này',
+  // UuidNotFound: 'Chưa từng có file nào được upload cùng với uuid này',
+  UuidNotFound: 'Vui lòng tải ảnh hoặc video đính kèm',
   FileEmpty: 'Không có file nào được upload',
   FileAudioRequire: 'Bắt buộc nhập 2 file audio',
   FileOvertake: 'Số file upload đã vượt quá số lượng tối đa',
