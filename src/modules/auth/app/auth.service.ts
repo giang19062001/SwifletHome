@@ -94,21 +94,14 @@ export class AuthAppService extends AbAuthService {
       ));
     }
 
-    // Chỉnh sửa lại device token mỗi lần đăng nhập (nếu khác)
-    if (String(user.deviceToken) !== String(dto.deviceToken)) {
-      // cập nhập token mới
-      await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
-      // Chạy song song: unscribe topic cho token cũ và subscribe topic cho token mới
-      const isNewOrChange = true;
-      await Promise.all([
-        this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
-        this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken, isNewOrChange)
-      ]);
-    } else {
-      // kiểm tra va đăng ký thêm ~ topic mới nếu có
-      const isNewOrChange = false;
-      await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken, isNewOrChange);
-    }
+    // Luôn cập nhật device token mỗi lần đăng nhập (kể cả token không thay đổi)
+    // → bắt buộc Firebase xác nhận token còn sống, tránh trường hợp token bị Firebase
+    // invalidate mà server không biết dẫn đến lỗi registration-token-not-registered
+    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
+    await Promise.all([
+      this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
+      this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken),
+    ]);
 
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
