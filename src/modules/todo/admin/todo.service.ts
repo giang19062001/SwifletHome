@@ -47,8 +47,6 @@ export class TodoAdminService {
   }
   async setTaskAlarmByAdmin(dto: SetTaskAlarmByAdminDto, createdId: string): Promise<ApiMutationResponse> {
     const logbase = `${this.SERVICE_NAME}/setTaskAlarmByAdmin:`;
-    console.log('SetTaskAlarmByAdminDto ----------> ', dto);
-
     try {
       if (dto.sendType == SentTypeEnum.ALL) {
         // lấy danh sách nhà của tất cả user

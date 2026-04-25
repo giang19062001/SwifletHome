@@ -104,7 +104,7 @@ export class UserHomeAppRepository {
       dto.userHomeDescription,
       userHomeImage,
       dto.userHomeLength,
-      dto.userHomeLength,
+      dto.userHomeWidth,
       dto.userHomeFloor,
       dto.isIntegateTempHum,
       dto.isIntegateCurrent,

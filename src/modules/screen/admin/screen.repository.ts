@@ -25,7 +25,6 @@ export class ScreenAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    console.log(rows);
     return rows as ScreenResDto[];
   }
   async getDetail(screenKeyword: string): Promise<ScreenResDto | null> {
