@@ -196,7 +196,7 @@ export class SetTaskMedicineDto {
     example: '',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: MsgDto.CannotNull('medicineOptionCode') })
   medicineOptionCode: string;
 
   @ApiProperty({
