@@ -143,6 +143,7 @@ const convertFiledName = (filedName: string): string => {
     nestType: 'Loại yến',
     receiverName: 'Tên người nhận',
     receiverPhone: 'SĐT người nhận',
+    review:'Đánh giá',
     app_user_id: 'ID người dùng',
   };
   return map[filedName] ?? filedName;

@@ -4,6 +4,7 @@ import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, Min } 
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { IUserTeamTypeEnum } from '../../user/app/user.interface';
+import { MsgDto } from 'src/helpers/message.helper';
 
 export class GetAllTeamDto extends PagingDto {
   @ApiProperty({
@@ -83,7 +84,7 @@ export class ReviewTeamDto {
     example: '',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: MsgDto.CannotNull('review') })
   review: string;
 
   @ApiProperty({
