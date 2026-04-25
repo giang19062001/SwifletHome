@@ -98,10 +98,15 @@ export class AuthAppService extends AbAuthService {
     // → bắt buộc Firebase xác nhận token còn sống, tránh trường hợp token bị Firebase
     // invalidate mà server không biết dẫn đến lỗi registration-token-not-registered
     await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
-    await Promise.all([
-      this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
-      this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken),
-    ]);
+
+    // Unsubscribe token CŨ (chỉ khi token cũ KHÁC token mới, tức user đổi thiết bị)
+    // Nếu cùng token → subscribeToTopic đã xử lý unsubscribeAll rồi, không cần gọi lại
+    if (user.deviceToken && String(user.deviceToken) !== String(dto.deviceToken)) {
+      await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
+    }
+
+    // Subscribe token hiện tại vào topics (bên trong đã unsubscribeAll trước khi subscribe)
+    await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken);
 
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;

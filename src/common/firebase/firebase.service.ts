@@ -133,9 +133,11 @@ export class FirebaseService implements OnModuleInit {
       // bắt các lỗi FCM phổ biến
       if (error.code === 'messaging/registration-token-not-registered' || error.code === 'messaging/invalid-registration-token') {
         this.logger.log(logbase, `Token không hợp lệ hoặc đã bị thu hồi, đang tiến hành xóa khỏi DB: ${deviceToken}`);
+        await this.notificationAppService.clearInvalidDeviceToken(deviceToken);
         return 0;
       } else if (error.code === 'messaging/unregistered') {
-        this.logger.log(logbase, `Token chưa được đăng ký: ${deviceToken}`);
+        this.logger.log(logbase, `Token chưa được đăng ký, xóa khỏi DB: ${deviceToken}`);
+        await this.notificationAppService.clearInvalidDeviceToken(deviceToken);
         return 0;
       } else {
         // lỗi
@@ -262,6 +264,13 @@ export class FirebaseService implements OnModuleInit {
               const errorMessage = resp.error.message || 'No message';
 
               this.logger.error(logbase, `Token thất bại [${i + index}] | Token: ${failedToken.substring(0, 30)}... | Error: ${errorCode} - ${errorMessage}`);
+
+              // Nếu token không hợp lệ hoặc đã bị thu hồi → xóa khỏi DB để lần sau không gửi lại
+              const invalidCodes = ['messaging/registration-token-not-registered', 'messaging/invalid-registration-token'];
+              if (invalidCodes.includes(errorCode)) {
+                this.logger.log(logbase, `Xóa token invalid khỏi DB: ${failedToken.substring(0, 20)}...`);
+                await this.notificationAppService.clearInvalidDeviceToken(failedToken);
+              }
             }
           });
           await Promise.all(cleanupPromises);
@@ -339,11 +348,20 @@ export class FirebaseService implements OnModuleInit {
     const existingSubs = await this.notificationAppService.getUserSubscribedTopics(userCode);
 
     // Bước 2: Subscribe toàn bộ topic cho user hiện tại
+    // Nếu Firebase báo token không hợp lệ → xóa ngay khỏi DB để tránh gửi thông báo thất bại sau này
+    let isTokenInvalid = false;
     await Promise.all(allTopics.map(async (topic) => {
       try {
         const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
         if (response.failureCount > 0) {
-          this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+          const invalidCodes = ['messaging/registration-token-not-registered', 'messaging/invalid-registration-token'];
+          const hasInvalidToken = response.errors?.some(e => invalidCodes.includes(e.error?.code));
+          if (hasInvalidToken) {
+            isTokenInvalid = true;
+            this.logger.error(logbase, `Token không hợp lệ khi subscribe topic(${topic.topicName}) cho user(${userCode}) → sẽ xóa khỏi DB`);
+          } else {
+            this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+          }
         }
         if (response.successCount > 0) {
           this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
@@ -352,6 +370,13 @@ export class FirebaseService implements OnModuleInit {
         this.logger.error(logbase, `Lỗi khi đăng ký topic ${topic.topicCode}: ${error.message}`);
       }
     }));
+
+    // Nếu phát hiện token invalid → xóa khỏi DB để admin gửi notify không bị lỗi
+    if (isTokenInvalid) {
+      this.logger.error(logbase, `Phát hiện token invalid, xóa deviceToken(${deviceToken.substring(0, 20)}...) của user(${userCode}) khỏi DB`);
+      await this.notificationAppService.clearInvalidDeviceToken(deviceToken);
+      return; // không cần sync DB topic nữa vì token đã bị xóa
+    }
 
     // Bước 3: Sync DB - chỉ insert những topic còn thiếu
     const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: UserNotificationTopicResDto) => sub.topicCode === topic.topicCode));
