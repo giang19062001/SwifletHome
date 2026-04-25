@@ -113,6 +113,7 @@ export class QrSellAppRepository {
         LEFT JOIN ${this.tableInteract} E
         ON A.requestCode = E.requestCode AND E.userCode = ?
         WHERE A.isActive = 'Y'  ${whereSql}
+        ORDER BY A.seq DESC
      `;
 
     if (dto.limit > 0 && dto.page > 0) {
