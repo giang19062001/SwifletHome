@@ -6,6 +6,10 @@ import { LoggingService } from 'src/common/logger/logger.service';
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly logger: LoggingService) { }
 
+  private isRequestAppPath(path: string): boolean {
+    return path.startsWith('/api/app/');
+  }
+
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -25,16 +29,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = exception.message || message;
     }
 
-    // GHI LOG
-    this.logger.error(
-      `[EXCEPTION] ${request.method} ${request.url} - Status: ${status} - Message: ${message}`,
-      {
-        status,
-        path: request.url,
-        method: request.method,
-        error: errorResponse,
-      },
-    );
+    const requestPath = request.url || '';
+    const shouldLogError = this.isRequestAppPath(requestPath);
+
+    if (shouldLogError) {
+      this.logger.error(
+        `[EXCEPTION] ${request.method} ${request.url} - Status: ${status} - Message: ${message}`,
+        {
+          status,
+          path: request.url,
+          method: request.method,
+          error: errorResponse,
+        },
+      );
+    }
 
     response.status(status).json({
       success: false,
