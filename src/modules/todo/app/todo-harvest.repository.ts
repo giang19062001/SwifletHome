@@ -146,6 +146,19 @@ export class TodoHarvestAppRepository {
     return rows as HarvestDataRowInputDto[];
   }
 
+  async getMultipleTaskHarvestRows(seqHarvestPhases: number[], isOnlyActive: boolean): Promise<HarvestDataRowInputDto[]> {
+    if (!seqHarvestPhases || seqHarvestPhases.length === 0) return [];
+    const placeholders = seqHarvestPhases.map(() => '?').join(',');
+    const sql = `
+      SELECT B.seqHarvestPhase, B.userCode, B.userHomeCode, B.floor, B.cell, B.cellCollected, B.cellRemain
+      FROM ${this.tableTaskHarvestPhase} A
+      LEFT JOIN ${this.tableTaskHarvest} B ON A.seq = B.seqHarvestPhase
+      WHERE A.seq IN (${placeholders})
+      ${isOnlyActive ? `AND B.isActive = 'Y'` : ''}`;
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, seqHarvestPhases);
+    return rows as HarvestDataRowInputDto[];
+  }
+
   async insertTaskHarvestRows(dto: HarvestDataRowInputDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableTaskHarvest} (seqHarvestPhase, userCode, userHomeCode, floor, cell, cellCollected, cellRemain, createdId)
@@ -155,6 +168,19 @@ export class TodoHarvestAppRepository {
       dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode,
     ]);
     return result.insertId;
+  }
+
+  async insertMultipleTaskHarvestRows(dtos: HarvestDataRowInputDto[]): Promise<number> {
+    if (!dtos || !dtos.length) return 0;
+    const sql = `
+      INSERT INTO ${this.tableTaskHarvest} (seqHarvestPhase, userCode, userHomeCode, floor, cell, cellCollected, cellRemain, createdId)
+      VALUES ${dtos.map(() => '(?, ?, ?, ?, ?, ?, ?, ?)').join(', ')}
+    `;
+    const params = dtos.flatMap(dto => [
+      dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode,
+    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, params);
+    return result.affectedRows;
   }
 
   async updateTaskHarvestRows(dto: HarvestDataRowInputDto): Promise<number> {
@@ -175,6 +201,22 @@ export class TodoHarvestAppRepository {
       SET isActive = 'N', updatedId = ?, updatedAt = NOW()
       WHERE seqHarvestPhase = ? AND userCode = ? AND userHomeCode = ? AND floor = ? AND cell = ? AND isActive = 'Y'`;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqHarvestPhase, userCode, userHomeCode, floor, cell]);
+    return result.affectedRows;
+  }
+
+  async deleteMultipleTaskHarvestRows(dtos: HarvestDataRowInputDto[]): Promise<number> {
+    if (!dtos || !dtos.length) return 0;
+    const placeholders = dtos.map(() => '(seqHarvestPhase = ? AND userCode = ? AND userHomeCode = ? AND floor = ? AND cell = ? AND isActive = \'Y\')').join(' OR ');
+    const sql = `
+      UPDATE ${this.tableTaskHarvest}
+      SET isActive = 'N', updatedId = ?, updatedAt = NOW()
+      WHERE ${placeholders}
+    `;
+    const params: (string | number)[] = [dtos[0].userCode];
+    for (const dto of dtos) {
+      params.push(dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell);
+    }
+    const [result] = await this.db.execute<ResultSetHeader>(sql, params);
     return result.affectedRows;
   }
 

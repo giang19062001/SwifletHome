@@ -71,9 +71,9 @@ export class TodoHarvestAppService {
         }
       }
 
-      await Promise.all(toInsert.map((row) => this.todoHarvestAppRepository.insertTaskHarvestRows(row)));
-      await Promise.all(toUpdate.map((row) => this.todoHarvestAppRepository.updateTaskHarvestRows(row)));
-      await Promise.all(toDelete.map((row) => this.todoHarvestAppRepository.deleteTaskHarvestRows(row.seqHarvestPhase, row.floor, row.cell, userCode, userHomeCode)));
+      if (toInsert.length) await this.todoHarvestAppRepository.insertMultipleTaskHarvestRows(toInsert);
+      if (toUpdate.length) await Promise.all(toUpdate.map((row) => this.todoHarvestAppRepository.updateTaskHarvestRows(row)));
+      if (toDelete.length) await this.todoHarvestAppRepository.deleteMultipleTaskHarvestRows(toDelete);
     } else {
       if (harvestData.length) {
         let harvestDataRows: HarvestDataRowInputDto[] = [];
@@ -91,7 +91,7 @@ export class TodoHarvestAppService {
           }
         }
         if (harvestDataRows.length) {
-          await Promise.all(harvestDataRows.map((row) => this.todoHarvestAppRepository.insertTaskHarvestRows(row)));
+          await this.todoHarvestAppRepository.insertMultipleTaskHarvestRows(harvestDataRows);
         }
       }
     }
@@ -121,6 +121,52 @@ export class TodoHarvestAppService {
       }
     }
     return harvestData;
+  }
+
+  async arrangeMultipleHarvestRows(seqHarvestPhases: number[], userHomeFloor: number): Promise<{ seq: number; harvestData: HarvestDataInputDto[] }[]> {
+    if (!seqHarvestPhases || !seqHarvestPhases.length) return [];
+    const allRows = await this.todoHarvestAppRepository.getMultipleTaskHarvestRows(seqHarvestPhases, true);
+    
+    // Group rows by seqHarvestPhase
+    const rowsByPhase = new Map<number, typeof allRows>();
+    for (const row of allRows) {
+      if (!row.seqHarvestPhase) continue;
+      if (!rowsByPhase.has(row.seqHarvestPhase)) {
+        rowsByPhase.set(row.seqHarvestPhase, []);
+      }
+      rowsByPhase.get(row.seqHarvestPhase)!.push(row);
+    }
+
+    const result: { seq: number; harvestData: HarvestDataInputDto[] }[] = [];
+    
+    for (const seq of seqHarvestPhases) {
+      const harvestRows = rowsByPhase.get(seq) || [];
+      const existingDataMap = new Map<number, FloorDataInputDto[]>();
+      
+      for (const row of harvestRows) {
+        if (!existingDataMap.has(row.floor)) {
+          existingDataMap.set(row.floor, []);
+        }
+        existingDataMap.get(row.floor)!.push({
+          cell: row.cell,
+          cellCollected: row.cellCollected,
+          cellRemain: row.cellRemain,
+        });
+      }
+
+      const harvestData: HarvestDataInputDto[] = [];
+      for (let i = 1; i <= userHomeFloor; i++) {
+        if (existingDataMap.has(i)) {
+          harvestData.push({ floor: i, floorData: existingDataMap.get(i)! });
+        } else {
+          harvestData.push({ floor: i, floorData: [{ cell: 1, cellCollected: 0, cellRemain: 0 }] });
+        }
+      }
+      
+      result.push({ seq, harvestData });
+    }
+    
+    return result;
   }
 
   // ─── SET TASK HARVEST ─────────────────────────────────────────────────────

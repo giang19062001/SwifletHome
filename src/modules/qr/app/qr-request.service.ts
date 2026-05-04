@@ -87,14 +87,18 @@ export class QrRequestAppService {
     //? harvestPhase = 0 --> lấy tất cả các đợt để làm SelectBox cho Form yêu cầu Qr
     //? harvestPhase > 0 --> Chọn đợt và insert cho Qr table
     let taskHarvestCompleteList = await this.todoHarvestAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
-    const taskHarvestList: TaskHarvestQrResDto[] = await Promise.all(
-      taskHarvestCompleteList.map(async (ele) => ({
-        harvestTaskAlarmCode: ele.harvestTaskAlarmCode,
-        harvestPhase: ele.harvestPhase,
-        harvestYear: ele.harvestYear,
-        harvestData: await this.todoHarvestAppService.arrangeHarvestRows(ele.seq, homeInfo.userHomeFloor),
-      })),
-    );
+    
+    // Lấy toàn bộ data một lần thay vì lặp qua từng phần tử
+    const seqs = taskHarvestCompleteList.map((ele) => ele.seq);
+    const arrangedData = await this.todoHarvestAppService.arrangeMultipleHarvestRows(seqs, homeInfo.userHomeFloor);
+    const arrangedDataMap = new Map(arrangedData.map((item) => [item.seq, item.harvestData]));
+
+    const taskHarvestList: TaskHarvestQrResDto[] = taskHarvestCompleteList.map((ele) => ({
+      harvestTaskAlarmCode: ele.harvestTaskAlarmCode,
+      harvestPhase: ele.harvestPhase,
+      harvestYear: ele.harvestYear,
+      harvestData: arrangedDataMap.get(ele.seq) || [],
+    }));
 
     return {
       userName: user.userName,
