@@ -115,27 +115,19 @@ export class QrRequestAppService {
   async validateHarvestBeforeRequestQr(userCode: string) {
     const logbase = `${this.SERVICE_NAME}/validateHarvestBeforeRequestQr:`;
 
-    // get all homes of user
-    const homes = await this.userHomeAppService.getAll({ page: 0, limit: 0, keyword: '' } as any, userCode);
-
-    if (!homes.list || homes.list.length === 0) {
-      return { total: 0, list: [] };
-    }
-
-    const list = await Promise.all(
-      homes.list.map(async (home) => {
-        const unusedHarvests = await this.todoHarvestAppService.getTaskHarvestCompleteAndNotUseList(home.userHomeCode, 0);
-        return {
-          userHomeCode: home.userHomeCode,
-          userHomeName: home.userHomeName,
-          isHarvestAvaliable: unusedHarvests.length > 0 ? true : false,
-          harvestAvaliableList: unusedHarvests,
-        };
-      }),
-    );
+    const result = await this.qrRequestAppRepository.validateHarvestBeforeRequestQr(userCode);
+    const list = result.map((item) => {
+      const harvestAvaliableList = typeof item.harvestAvaliableList === 'string' ? JSON.parse(item.harvestAvaliableList) : (item.harvestAvaliableList || []);
+      return {
+        userHomeCode: item.userHomeCode,
+        userHomeName: item.userHomeName,
+        isHarvestAvaliable: harvestAvaliableList.length > 0,
+        harvestAvaliableList: harvestAvaliableList,
+      };
+    });
 
     return {
-      total: homes.total,
+      total: list.length,
       list: list,
     };
   }

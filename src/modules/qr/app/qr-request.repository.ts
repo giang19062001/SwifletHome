@@ -282,4 +282,34 @@ export class QrRequestAppRepository {
 
     return result.affectedRows;
   }
+
+  async validateHarvestBeforeRequestQr(userCode: string): Promise<any[]> {
+    const query = `
+      SELECT 
+        H.userHomeCode, 
+        H.userHomeName,
+        COALESCE(
+          (SELECT JSON_ARRAYAGG(
+              JSON_OBJECT(
+                'harvestPhase', P.harvestPhase,
+                'harvestYear', P.harvestYear
+              )
+            )
+           FROM ${this.tableHarvestPhase} P
+           WHERE P.userHomeCode = H.userHomeCode 
+             AND P.taskStatus = 'COMPLETE' 
+             AND P.isDone = 'Y' 
+             AND P.harvestYear = YEAR(CURDATE())
+             AND NOT EXISTS (SELECT 1 FROM ${this.table} Q WHERE Q.seqHarvestPhase = P.seq AND Q.isActive = 'Y')
+          ),
+          JSON_ARRAY()
+        ) AS harvestAvaliableList
+      FROM ${this.tableHome} H
+      WHERE H.userCode = ? AND H.isActive = 'Y'
+      GROUP BY H.userHomeCode, H.userHomeName
+    `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
+    return rows;
+  }
 }

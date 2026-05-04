@@ -318,15 +318,6 @@ export class GetRequestSellListResDto {
 class HarvestAvaliableItemResDto {
   @ApiProperty({ example: 0 })
   @IsNumber()
-  seq: number;
-
-  @ApiProperty({ example: 0 })
-  @IsNumber()
-  seqHarvestPhase: number;
-
-
-  @ApiProperty({ example: 0 })
-  @IsNumber()
   harvestPhase: number;
 
   @ApiProperty({ example: 0 })
