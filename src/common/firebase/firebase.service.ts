@@ -70,6 +70,8 @@ export class FirebaseService implements OnModuleInit {
       return APP_SCREENS.NOTIFICATION_SCREEN;
     } else if (notificationType === 'ADMIN_QR') {
       return APP_SCREENS.QR_SCREEN;
+    } else if (notificationType === 'ADMIN_CONSIGNMENT') {
+      return APP_SCREENS.CONSIGNMENT_SCREEN;
     }
     return APP_SCREENS.NOTIFICATION_SCREEN;
   }

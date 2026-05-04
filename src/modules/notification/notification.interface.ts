@@ -16,6 +16,10 @@ export const NOTIFICATION_CONST = {
       value: 'ADMIN_QR',
       text: 'Thông tin QRcode',
     },
+    ADMIN_CONSIGNMENT: {
+      value: 'ADMIN_CONSIGNMENT',
+      text: 'Thông tin ký gửi',
+    }
   },
 };
 
@@ -29,5 +33,4 @@ export enum NotificationTypeEnum {
   TODO = 'TODO',
   ADMIN_QR = 'ADMIN_QR',
   ADMIN_CONSIGNMENT = 'ADMIN_CONSIGNMENT',
-
 }
