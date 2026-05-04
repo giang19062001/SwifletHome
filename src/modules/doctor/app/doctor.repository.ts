@@ -56,6 +56,15 @@ export class DoctorAppRepository {
     return result.affectedRows;
   }
 
+  async updateSeqFilesByUniqueId(doctorSeq: number, uniqueId: string, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableFile} SET doctorSeq = ?, updatedId = ?, updatedAt = NOW()
+      WHERE uniqueId = ? AND doctorSeq = 0 AND isActive = 'Y'
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [doctorSeq, updatedId, uniqueId]);
+    return result.affectedRows;
+  }
+
   async getFilesNotUse(): Promise<DoctorFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.doctorSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A

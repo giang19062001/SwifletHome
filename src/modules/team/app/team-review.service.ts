@@ -50,10 +50,7 @@ export class TeamReviewAppService {
       if (filesUploaded.length) {
         // mặc định là chờ
         const seq = await this.teamReviewAppRepository.insertReview(userCode, dto);
-        for (const file of filesUploaded) {
-          // cập nhập reviewSeq của các file đã tìm cùng uniqueId
-          await this.teamReviewAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId, userCode);
-        }
+        await this.teamReviewAppRepository.updateSeqFilesByUniqueId(seq, dto.uniqueId, dto.teamCode, userCode);
       } else {
         // không có file ảnh nào được upload của đơn khám bệnh này -> báo lỗi
         result = -1;

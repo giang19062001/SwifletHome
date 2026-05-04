@@ -27,10 +27,8 @@ export class DoctorAppService {
       if (filesUploaded.length) {
         // mặc định là chờ
         const seq = await this.doctorAppRepository.create(userCode, dto, DoctorStatusEnum.WAITING);
-        for (const file of filesUploaded) {
-          // cập nhập doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created
-          await this.doctorAppRepository.updateSeqFiles(seq, file.seq, dto.uniqueId, userCode);
-        }
+        // cập nhập doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created bằng 1 query duy nhất
+        await this.doctorAppRepository.updateSeqFilesByUniqueId(seq, dto.uniqueId, userCode);
       } else {
         // không có file ảnh nào được upload của đơn khám bệnh này -> báo lỗi
         result = -1;

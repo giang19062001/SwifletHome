@@ -15,7 +15,19 @@ export class AnswerAppRepository {
           WHERE A.answerCode = ? AND A.isActive = 'Y' `,
         [answerCode],
       );
-      return rows ? (rows[0] as AnswerResDto) : null;
+      return rows.length ? (rows[0] as AnswerResDto) : null;
+    }
+
+    async getAnswersByCodes(answerCodes: string[]): Promise<AnswerResDto[]> {
+      if (!answerCodes || !answerCodes.length) return [];
+      const placeholders = answerCodes.map(() => '?').join(',');
+      const [rows] = await this.db.query<RowDataPacket[]>(
+        ` SELECT A.answerCode, A.answerContent, A.isFree
+          FROM ${this.table} A
+          WHERE A.answerCode IN (${placeholders}) AND A.isActive = 'Y' `,
+        answerCodes,
+      );
+      return rows as AnswerResDto[];
     }
 
 }

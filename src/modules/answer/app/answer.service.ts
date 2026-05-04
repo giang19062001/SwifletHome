@@ -26,13 +26,8 @@ export class AnswerAppService {
     let answers: AnswerResDto[] = [];
 
     if (questions.length) {
-      for (const ques of questions) {
-        // get answer
-        const answer = await this.answerAppRepository.getAnswerReply(ques.answerCode);
-        if (answer) {
-          answers.push(answer);
-        }
-      }
+      const answerCodes = [...new Set(questions.map((q) => q.answerCode).filter(Boolean))];
+      answers = await this.answerAppRepository.getAnswersByCodes(answerCodes);
     }
 
     const questionMap = new Map<string, string[]>();

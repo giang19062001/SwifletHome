@@ -99,6 +99,15 @@ export class TeamReviewAppRepository {
     return result.affectedRows;
   }
 
+  async updateSeqFilesByUniqueId(reviewSeq: number, uniqueId: string, teamCode: string, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableReviewImg} SET reviewSeq = ?, updatedId = ?, updatedAt = NOW()
+      WHERE uniqueId = ? AND teamCode = ? AND reviewSeq = 0 AND isActive = 'Y'
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [reviewSeq, updatedId, uniqueId, teamCode]);
+    return result.affectedRows;
+  }
+
   async getFilesNotUse(): Promise<TeamReviewFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.reviewSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableReviewImg} A
