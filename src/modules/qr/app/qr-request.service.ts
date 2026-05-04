@@ -22,7 +22,7 @@ export class QrRequestAppService {
     private readonly userHomeAppService: UserHomeAppService,
     private readonly qrRequestAppRepository: QrRequestAppRepository,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   async getRequestQrCocdeList(user: TokenUserAppResDto, dto: PagingDto): Promise<{ total: number; list: GetRequestQrCodeListResDto[] }> {
     const total = await this.qrRequestAppRepository.getRequestQrCocdeTotal(user.userCode);
     const rows = await this.qrRequestAppRepository.getRequestQrCocdeList(user.userCode, dto);
@@ -110,6 +110,34 @@ export class QrRequestAppService {
       taskHarvestList: taskHarvestList,
       seqHarvestPhase: taskHarvestCompleteList.length > 0 ? (taskHarvestCompleteList[0] as any).seqHarvestPhase : undefined,
     } as GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number };
+  }
+
+  async validateHarvestBeforeRequestQr(userCode: string) {
+    const logbase = `${this.SERVICE_NAME}/validateHarvestBeforeRequestQr:`;
+
+    // get all homes of user
+    const homes = await this.userHomeAppService.getAll({ page: 0, limit: 0, keyword: '' } as any, userCode);
+
+    if (!homes.list || homes.list.length === 0) {
+      return { total: 0, list: [] };
+    }
+
+    const list = await Promise.all(
+      homes.list.map(async (home) => {
+        const unusedHarvests = await this.todoHarvestAppService.getTaskHarvestCompleteAndNotUseList(home.userHomeCode, 0);
+        return {
+          userHomeCode: home.userHomeCode,
+          userHomeName: home.userHomeName,
+          isHarvestAvaliable: unusedHarvests.length > 0 ? true : false,
+          harvestAvaliableList: unusedHarvests,
+        };
+      }),
+    );
+
+    return {
+      total: homes.total,
+      list: list,
+    };
   }
   async requestQrCode(user: TokenUserAppResDto, dto: RequestQrCodeDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/requestQrCode:`;

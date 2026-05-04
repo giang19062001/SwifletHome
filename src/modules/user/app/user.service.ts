@@ -5,7 +5,7 @@ import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.dto";
 import { CreateUserPackageAppDto, UserAppResDto } from './user.dto';
 import { UserAppRepository } from './user.repository';
-import { AllowUserTypeResDto, UserTypeResDto } from './user.response';
+import { AllowUserTypeResDto, GetInfoUserAppResDto, UserTypeResDto } from './user.response';
 
 @Injectable()
 export class UserAppService {
@@ -32,7 +32,7 @@ export class UserAppService {
       return 0;
     }
   }
-  async getInfo(userCode: string): Promise<UserAppResDto | null> {
+  async getInfo(userCode: string): Promise<GetInfoUserAppResDto | null> {
     const info = await this.userAppRepository.getInfo(userCode);
     if ((info as any)?.packageCode && (info as any).packageRemainDay <= 0) {
       // gói hết hạn -> cho 'packageCode' là null

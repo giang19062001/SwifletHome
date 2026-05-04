@@ -313,3 +313,40 @@ export class GetRequestSellListResDto {
   @IsEnum(YnEnum)
   isSave: YnEnum;
 }
+
+
+class HarvestAvaliableItemResDto {
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  seq: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  seqHarvestPhase: number;
+
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  harvestPhase: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  harvestYear: number;
+}
+
+export class ValidateHarvestItemResDto {
+  @ApiProperty({ example: 'HOM000024' })
+  @IsString()
+  userHomeCode: string;
+
+  @ApiProperty({ example: 'Nhà yến 01' })
+  @IsString()
+  userHomeName: string;
+
+  @ApiProperty({ example: true })
+  isHarvestAvaliable: boolean;
+
+  @ApiProperty({ type: () => [HarvestAvaliableItemResDto] })
+  @IsArray()
+  harvestAvaliableList: HarvestAvaliableItemResDto[];
+}

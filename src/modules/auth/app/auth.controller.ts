@@ -111,7 +111,7 @@ export class AuthAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetInfoUserAppResDto) })
   async getInfo(@GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.authAppService.getInfo(user.userCode);
+    const result = await this.authAppService.getInfo(user.userCode, user.userTypeCode);
     return {
       message: result ? Msg.GetOk : Msg.GetErr,
       data: result,

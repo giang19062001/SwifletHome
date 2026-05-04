@@ -22,6 +22,7 @@ import {
   GetRequestSellDetailResDto,
   GetRequestSellListResDto,
   UploadRequestVideoResDto,
+  ValidateHarvestItemResDto,
 } from './qr.response';
 
 @ApiTags('app/qr')
@@ -80,6 +81,19 @@ export default class QrAppController {
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getInfoToRequestQrcode(@Param('userHomeCode') userHomeCode: string, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.qrRequestAppService.getInfoToRequestQrcode(userHomeCode, user, 0);
+    return result;
+  }
+
+  @ApiOperation({
+    summary: 'Kiểm tra số lượng đợt thu hoạch avaliable của các nhà yến trước khi yêu cầu QR',
+    description: ``,
+  })
+  @Get('validateHarvestBeforeRequestQr')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(ValidateHarvestItemResDto)) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async validateHarvestBeforeRequestQr(@GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.qrRequestAppService.validateHarvestBeforeRequestQr(user.userCode);
     return result;
   }
 

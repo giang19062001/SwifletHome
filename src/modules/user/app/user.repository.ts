@@ -8,7 +8,7 @@ import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from '../../auth/app/auth.dto';
 import { CreateUserPackageAppDto, UserAppResDto, UserPackageAppResDto } from './user.dto';
 import { USER_CONST } from './user.interface';
-import { AllowUserTypeResDto, UserTypeResDto } from './user.response';
+import { AllowUserTypeResDto, GetInfoUserAppResDto, UserTypeResDto } from './user.response';
 
 @Injectable()
 export class UserAppRepository {
@@ -87,7 +87,7 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as UserPackageAppResDto) : null;
   }
-  async getInfo(userCode: string): Promise<UserAppResDto | null> {
+  async getInfo(userCode: string): Promise<GetInfoUserAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode,
       B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
@@ -110,7 +110,7 @@ export class UserAppRepository {
        LIMIT 1`,
       [userCode],
     );
-    return rows.length ? (rows[0] as UserAppResDto) : null;
+    return rows.length ? (rows[0] as GetInfoUserAppResDto) : null;
   }
 
   async register(dto: RegisterUserAppDto): Promise<number> {

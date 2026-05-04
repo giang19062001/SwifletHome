@@ -15,6 +15,7 @@ import { AbAuthService } from '../auth.abstract';
 import { AUTH_CONFIG } from '../auth.config';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, TokenUserAppResDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { BadRequestExceptionNumData } from 'src/filter/badRequestNumber.exception';
+import { GetInfoUserAppResDto } from 'src/modules/user/app/user.response';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -253,13 +254,29 @@ export class AuthAppService extends AbAuthService {
     const result = await this.userAppService.findByCode(userCode);
     return result;
   }
-  async getInfo(userCode: string): Promise<UserAppResDto | null> {
+
+  async getInfo(userCode: string, userTypeCode?: string): Promise<GetInfoUserAppResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getInfo`;
 
-    const result = await this.userAppService.getInfo(userCode);
-    this.logger.log(logbase, `Thông tin người dùng: ${result && JSON.stringify({ userName: result.userName, packageName: result.packageName, packageRemainDay: result.packageRemainDay })}`);
+    const userResult = await this.userAppService.getInfo(userCode);
+    if (!userResult) {
+      this.logger.error(logbase, `${userCode} -> Không tìm thấy thông tin user`);
+      return null
+    }
+    
+    this.logger.log(logbase, `Thông tin người dùng: ${userResult && JSON.stringify({ userName: userResult.userName, packageName: userResult.packageName, packageRemainDay: userResult.packageRemainDay })}`);
 
-    return result;
+    if (userTypeCode) {
+      const typeResult = await this.userAppService.getOneUserType(userTypeCode);
+      return {
+        ...userResult,
+        userTypeCode: userTypeCode,
+        userTypeKeyWord: typeResult?.userTypeKeyWord,
+        userTypeName: typeResult?.userTypeName,
+      } as GetInfoUserAppResDto;
+    }
+
+    return userResult;
   }
 
   async deleteAccount(userCode: string): Promise<number> {
