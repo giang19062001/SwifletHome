@@ -87,21 +87,10 @@ export class AuthAppService extends AbAuthService {
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
 
-    // Xóa device token trùng lặp ở các record khác nếu có và unsubscribe token đó khỏi topics
-    const duplicatedUsers = await this.userAppService.clearDuplicateDeviceToken(dto.deviceToken, dto.userPhone);
-    if (duplicatedUsers && duplicatedUsers.length > 0) {
-      await Promise.all(duplicatedUsers.map(u => 
-        this.firebaseService.unsubscribeFromTopic(u.userCode, dto.deviceToken)
-      ));
-    }
-
     // Luôn cập nhật device token mỗi lần đăng nhập (kể cả token không thay đổi)
-    // → bắt buộc Firebase xác nhận token còn sống, tránh trường hợp token bị Firebase
-    // invalidate mà server không biết dẫn đến lỗi registration-token-not-registered
     await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
 
     // Unsubscribe token CŨ (chỉ khi token cũ KHÁC token mới, tức user đổi thiết bị)
-    // Nếu cùng token → subscribeToTopic đã xử lý unsubscribeAll rồi, không cần gọi lại
     if (user.deviceToken && String(user.deviceToken) !== String(dto.deviceToken)) {
       await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
     }
