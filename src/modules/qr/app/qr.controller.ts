@@ -134,12 +134,12 @@ export default class QrAppController {
     }
     if (result === 0) {
       throw new BadRequestException({
-        message: Msg.CreateErr,
+        message: Msg.createQrRequestErr,
         data: 0,
       });
     }
     return {
-      message: Msg.CreateOk,
+      message: Msg.createQrRequestOk,
       data: result,
     };
   }

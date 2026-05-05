@@ -110,6 +110,10 @@ export const Msg = {
     'Nhà yến chưa có dữ liệu của đợt thu hoạch này, không thể yêu cầu mã Qrcode',
   RequestCannotCancelNotWaiting: cannotDo('chỉ có thể hủy các yêu cầu đang ở chế độ chờ'),
 
+  // QR
+  createQrRequestOk: ok('Gửi yêu cầu tạo mã QR Code'),
+  createQrRequestErr: err('Gửi yêu cầu tạo mã QR Code'),
+
   // Phân quyền / Mua bán yến
   OnlyPurcharseCanFetch: onlyCan('tài khoản người mua', 'lấy danh sách yến được bán'),
   OnlyOwnerCanFetch: onlyCan('tài khoản chủ nhà yến', 'lấy danh sách yến được bán'),
@@ -143,7 +147,7 @@ const convertFiledName = (filedName: string): string => {
     nestType: 'Loại yến',
     receiverName: 'Tên người nhận',
     receiverPhone: 'SĐT người nhận',
-    review:'Đánh giá',
+    review:'Nội dung đánh giá',
     app_user_id: 'ID người dùng',
   };
   return map[filedName] ?? filedName;

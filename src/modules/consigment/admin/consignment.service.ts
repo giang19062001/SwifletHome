@@ -35,7 +35,8 @@ export class ConsignmentAdminService {
     // send thông báo
     const user = await this.userAdminService.getDetailUserApp(dto.userCode);
     if (!user) return 0;
-    this.firebaseService.sendNotification(user.userCode, user.deviceToken, NOTIFICATIONS.UPDATE_STATUS_CONSIGNMENT().TITLE, dto.noticeContent, null, NotificationTypeEnum.ADMIN_CONSIGNMENT);
+    const notify = NOTIFICATIONS.UPDATE_STATUS_CONSIGNMENT(consignmentCode, dto.noticeContent);
+    this.firebaseService.sendNotification(user.userCode, user.deviceToken, notify.TITLE, notify.BODY, null, NotificationTypeEnum.ADMIN_CONSIGNMENT);
     // cập nhập trạng thái, và xóa/ thêm địa chỉ tracking nếu có
     const result = await this.consignmentAdminRepository.update(consignmentCode, dto);
     return result;

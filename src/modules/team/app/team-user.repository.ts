@@ -62,7 +62,8 @@ export class TeamUserAppRepository {
       params.push(`%${dto.txtSearch}%`);
     }
 
-    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress, A.provinceCode `;
+    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress, A.provinceCode  `;
+    query += ` ORDER BY A.seq DESC`;
 
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
