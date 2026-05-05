@@ -1,4 +1,3 @@
-
 export const NOTIFICATION_CONST = {
   TOPIC: {
     COMMON: 'COMMON',
@@ -10,16 +9,19 @@ export const NOTIFICATION_CONST = {
     },
     TODO: {
       value: 'TODO',
-      text: 'Việc cần làm',
+      // text: 'Việc cần làm',
+      text: 'Admin',
     },
     ADMIN_QR: {
       value: 'ADMIN_QR',
-      text: 'Thông tin QRcode',
+      // text: 'Thông tin QRcode',
+      text: 'Admin',
     },
     ADMIN_CONSIGNMENT: {
       value: 'ADMIN_CONSIGNMENT',
-      text: 'Thông tin ký gửi',
-    }
+      // text: 'Thông tin ký gửi',
+      text: 'Admin',
+    },
   },
 };
 
