@@ -11,7 +11,7 @@ export const NOTIFICATIONS = {
   }),
   UPDATE_PACKAGE_TIMES: (packageData?: PackageResDto | null, startDate?: string, endDate?: string) => ({
     TITLE: 'Thông báo gia hạn gói',
-    BODY: !packageData ? 'Gói Miễn phí được gia hạn thành công' : `${packageData.packageName} đã được gia hạn thành công, có hiệu lực từ ${startDate} đến ${endDate}`,
+    BODY: !packageData ? 'Gói Miễn phí được gia hạn thành công' : `Cảm ơn bạn đã sử dụng dịch vụ 3FAM của chúng tôi. Tài khoản của bạn (${packageData.packageName} đã được kích hoạt thành công, có hiệu lực từ ${startDate} đến ${endDate})`,
   }),
   TODO_TASK_DAILY: (userHomeName: string, taskName: string, daysLeft: number) => ({
     TITLE: `${userHomeName} - ${taskName}`,
