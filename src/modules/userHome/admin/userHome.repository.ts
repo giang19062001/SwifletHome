@@ -139,11 +139,12 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvince
        SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId, B.macId, B.wifiId, B.wifiPassword
-          FROM  ${this.table} A 
-          LEFT JOIN ${this.tableSensor} B
-          ON A.userHomeCode = B.userHomeCode
-          WHERE A.userHomeCode = ? AND A.isActive = 'Y'
-          LIMIT 1 `,
+           FROM  ${this.table} A 
+           INNER JOIN ${this.tableUser} U ON A.userCode = U.userCode
+           LEFT JOIN ${this.tableSensor} B
+           ON A.userHomeCode = B.userHomeCode
+           WHERE A.userHomeCode = ? AND A.isActive = 'Y'
+           LIMIT 1 `,
       [userHomeCode],
     );
     return rows ? (rows[0] as UserHomeSensorResDto) : null;

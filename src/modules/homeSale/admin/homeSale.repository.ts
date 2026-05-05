@@ -132,7 +132,8 @@ export class HomeSaleAdminRepository {
   async getTotalSightseeing(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableSightseeing} A  
           INNER JOIN ${this.tableUserApp} AU
-          ON A.userCode = AU.userCode`);
+          ON A.userCode = AU.userCode
+          WHERE A.isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllSightseeing(dto: PagingDto): Promise<HomeSaleSightSeeingResDto[]> {
@@ -145,7 +146,8 @@ export class HomeSaleAdminRepository {
           ON A.homeCode = B.homeCode
           LEFT JOIN tbl_option_common C
           ON A.numberAttendCode = C.code 
-          ORDER BY createdAt DESC`;
+          WHERE A.isActive = 'Y'
+          ORDER BY A.createdAt DESC`;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -162,11 +164,12 @@ export class HomeSaleAdminRepository {
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.status, A.note, A.cancelReason, A.createdAt,
           B.homeName, B.homeImage, C.valueOption AS numberAttend
           FROM ${this.tableSightseeing} A 
+          INNER JOIN ${this.tableUserApp} AU ON A.userCode = AU.userCode
           LEFT JOIN tbl_home_sale B
           ON A.homeCode = B.homeCode
           LEFT JOIN tbl_option_common C
           ON A.numberAttendCode = C.code
-          WHERE A.SEQ = ? 
+          WHERE A.SEQ = ? AND A.isActive = 'Y'
           LIMIT 1 `,
       [seq],
     );

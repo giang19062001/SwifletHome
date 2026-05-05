@@ -37,7 +37,7 @@ export class TeamAdminRepository {
     let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCode,
      A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, C.provinceName, D.userTypeKeyWord, D.userTypeName
         FROM ${this.table} A  
-          LEFT JOIN ${this.tableUser} B
+          INNER JOIN ${this.tableUser} B
           ON A.userCode = B.userCode 
           LEFT JOIN ${this.tableProvince} C
           ON A.provinceCode = C.provinceCode
@@ -198,7 +198,7 @@ export class TeamAdminRepository {
             JSON_ARRAY()
           ) AS reviewImages
           FROM ${this.tableReview} A 
-          LEFT JOIN ${this.tableUser} B
+          INNER JOIN ${this.tableUser} B
             ON A.reviewBy = B.userCode
           LEFT JOIN ${this.table} C
             ON A.teamCode = C.teamCode
@@ -234,7 +234,7 @@ export class TeamAdminRepository {
             JSON_ARRAY()
           ) AS reviewImages
           FROM ${this.tableReview} A 
-          LEFT JOIN ${this.tableUser} B
+          INNER JOIN ${this.tableUser} B
             ON A.reviewBy = B.userCode
           LEFT JOIN ${this.table} C
             ON A.teamCode = C.teamCode

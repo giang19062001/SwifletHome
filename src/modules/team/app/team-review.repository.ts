@@ -38,7 +38,7 @@ export class TeamReviewAppRepository {
           JSON_ARRAY()
         ) AS reviewImages
         FROM ${this.tableReview} A 
-        LEFT JOIN ${this.tableUser} B
+        INNER JOIN ${this.tableUser} B
         ON A.reviewBy = B.userCode
         WHERE A.isActive = 'Y' AND A.isDisplay = 'Y' AND A.teamCode = ?
         ORDER BY A.seq DESC
