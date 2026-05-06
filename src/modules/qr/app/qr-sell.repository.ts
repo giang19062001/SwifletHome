@@ -16,7 +16,6 @@ export class QrSellAppRepository {
   private readonly tableHome = 'tbl_user_home';
   private readonly tableInteract = 'tbl_qr_request_sell_interact';
   private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase';
-  private readonly tableUserApp = 'tbl_user_app';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   // TODO: SELL
@@ -67,7 +66,6 @@ export class QrSellAppRepository {
 
     let query = ` SELECT COUNT(A.seq) AS TOTAL 
         FROM ${this.tableSell}  A
-            INNER JOIN ${this.tableUserApp} UA ON A.userCode = UA.userCode
             LEFT JOIN ${this.table} B
         ON A.requestCode = B.requestCode  
         LEFT JOIN ${this.tableHome} C
@@ -106,7 +104,6 @@ export class QrSellAppRepository {
         END AS priceOptionLabel, A.pricePerKg, A.volumeForSell, A.nestQuantity,
         A.ingredientNestOptionCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
         FROM ${this.tableSell}  A
-            INNER JOIN ${this.tableUserApp} UA ON A.userCode = UA.userCode
             LEFT JOIN ${this.table} B
         ON A.requestCode = B.requestCode  
         LEFT JOIN ${this.tableHome} C

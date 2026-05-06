@@ -140,7 +140,6 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvince
        A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
        A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId, B.macId, B.wifiId, B.wifiPassword
            FROM  ${this.table} A 
-           INNER JOIN ${this.tableUser} U ON A.userCode = U.userCode
            LEFT JOIN ${this.tableSensor} B
            ON A.userHomeCode = B.userHomeCode
            WHERE A.userHomeCode = ? AND A.isActive = 'Y'

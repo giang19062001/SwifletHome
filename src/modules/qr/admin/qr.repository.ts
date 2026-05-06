@@ -12,16 +12,13 @@ export class QrAdminRepository {
   private readonly tableFile = 'tbl_qr_request_file';
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
   private readonly tableSell = 'tbl_qr_request_sell';
-  private readonly tableUserApp = 'tbl_user_app';
   private readonly tableUserHome = 'tbl_user_home';
   private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase'
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A
-      INNER JOIN ${this.tableUserApp} U ON A.userCode = U.userCode
-      WHERE A.isActive = 'Y'`);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<GetInfoRequestQrCodeAdminResDto[]> {
@@ -29,7 +26,6 @@ export class QrAdminRepository {
         A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
         IFNULL(JSON_LENGTH(A.taskMedicineList), 0) AS taskMedicineCount, A.createdAt
         FROM ${this.table}  A
-        INNER JOIN ${this.tableUserApp} U ON A.userCode = U.userCode
         LEFT JOIN ${this.tableUserHome} B
         ON A.userHomeCode = B.userHomeCode  
         LEFT JOIN ${this.tableHarvestPhase} F

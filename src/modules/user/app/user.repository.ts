@@ -208,46 +208,17 @@ export class UserAppRepository {
     try {
       await conn.beginTransaction();
 
-      // 1. Lưu lịch sử user bị xóa
+      // Lưu lịch sử user bị xóa
       await conn.query(
         ` INSERT INTO ${this.tableDel} (userCode, userName, userPassword, userPhone, countryCode, deviceToken)
           VALUES (?, ?, ?, ?, ?, ?) `,
         [(user as any).userCode, user.userName, user.userPassword, user.userPhone, (user as any).countryCode, (user as any).deviceToken],
       );
 
-      // 2. Soft-delete tất cả dữ liệu liên quan 
-      await Promise.all([
-        // QR
-        conn.query(`UPDATE tbl_qr_request_sell SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_qr_request_file SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_qr_request SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`DELETE FROM tbl_qr_request_sell_interact WHERE userCode = ?`, [userCode]),
-        // Consignment
-        conn.query(`UPDATE tbl_consignment SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        // Doctor
-        conn.query(`UPDATE tbl_doctor SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_doctor_file SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        // Team
-        conn.query(`UPDATE tbl_team_user SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_team_review SET isActive = 'N', updatedAt = NOW() WHERE reviewBy = ?`, [userCode]),
-        // User Home
-        conn.query(`UPDATE tbl_user_home SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_user_home_img SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_user_home_sensor SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        // User Package
-        conn.query(`UPDATE tbl_user_package SET packageCode = NULL, startDate = NULL, endDate = NULL, checkout_seq = NULL, isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        // Notification
-        conn.query(`UPDATE tbl_user_notification_topics SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_notifications_user SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        // Home Sale Sightseeing
-        conn.query(`UPDATE tbl_home_sale_sightseeing SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        // Todo
-        conn.query(`UPDATE tbl_todo_task_alarm SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_todo_task_harvest SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-        conn.query(`UPDATE tbl_todo_task_medicine SET isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]),
-      ]);
+      // User Package
+      // await conn.query(`UPDATE tbl_user_package SET packageCode = NULL, startDate = NULL, endDate = NULL, checkout_seq = NULL, isActive = 'N', updatedAt = NOW() WHERE userCode = ?`, [userCode]);
 
-      // 3. Xóa user khỏi bảng chính
+      // Xóa user khỏi bảng chính
       const [deleteResult]: any = await conn.query(` DELETE FROM ${this.table} WHERE userCode = ? LIMIT 1`, [userCode]);
       if (deleteResult.affectedRows !== 1) {
         return 0;

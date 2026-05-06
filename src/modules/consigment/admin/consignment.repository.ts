@@ -11,14 +11,11 @@ export class ConsignmentAdminRepository {
   private readonly tableDelivering = 'tbl_consignment_delivering';
   private readonly tableOption = 'tbl_option_common';
   private readonly tableHistory = 'tbl_consignment_history';
-  private readonly tableUserApp = 'tbl_user_app';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A
-      INNER JOIN ${this.tableUserApp} U ON A.userCode = U.userCode
-      WHERE A.isActive = 'Y'`);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<GetAllConsignmentResDto[]> {
@@ -26,7 +23,6 @@ export class ConsignmentAdminRepository {
      A.receiverName, A.receiverPhone, A.consignmentStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') as createdAt,
      C.valueOption AS nestTypeLabel
         FROM ${this.table} A  
-        INNER JOIN ${this.tableUserApp} U ON A.userCode = U.userCode
         INNER JOIN ${this.tableOption} C
           ON A.nestType = C.code
         WHERE A.isActive = 'Y'
@@ -53,7 +49,6 @@ export class ConsignmentAdminRepository {
               )
         END AS deliveringAddressList 
         FROM ${this.table} A  
-        INNER JOIN ${this.tableUserApp} U ON A.userCode = U.userCode
         INNER JOIN ${this.tableOption} C
           ON A.nestType = C.code
         LEFT JOIN ${this.tableDelivering} B

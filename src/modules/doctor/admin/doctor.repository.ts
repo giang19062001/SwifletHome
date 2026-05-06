@@ -8,20 +8,16 @@ import { UpdateDoctorDto } from './doctor.dto';
 export class DoctorAdminRepository {
   private readonly table = 'tbl_doctor';
   private readonly tableFile = 'tbl_doctor_file';
-  private readonly tableUserApp = 'tbl_user_app';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getTotal(): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A  INNER JOIN ${this.tableUserApp} B
-        ON A.userCode = B.userCode`);
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<DoctorResDto[]> {
     let query = `  SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
         FROM ${this.table} A  
-        INNER JOIN ${this.tableUserApp} B
-        ON A.userCode = B.userCode
         ORDER BY A.createdAt DESC `;
 
     const params: any[] = [];
@@ -38,7 +34,6 @@ export class DoctorAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
         FROM ${this.table} A 
-        INNER JOIN ${this.tableUserApp} B ON A.userCode = B.userCode
         WHERE A.SEQ = ? AND A.isActive = 'Y'
         LIMIT 1 `,
       [seq],
