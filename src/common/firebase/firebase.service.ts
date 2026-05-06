@@ -142,7 +142,7 @@ export class FirebaseService implements OnModuleInit {
     };
     await this.notificationAppService.createNotification(notificationDto);
 
-    return 1;
+    return messageId !== 'push_failed' && messageId !== 'no_push' ? 1 : 0;
   }
 
   //  Gửi theo topic
@@ -197,7 +197,7 @@ export class FirebaseService implements OnModuleInit {
     };
     await this.notificationAppService.createNotification(notificationDto);
 
-    return 1;
+    return messageId !== 'push_failed' && messageId !== 'no_push' ? 1 : 0;
   }
 
   //  Gửi cho nhiều device tokens (multicast)
@@ -213,6 +213,8 @@ export class FirebaseService implements OnModuleInit {
     const tokens = [...new Set(userDeviceTokens.map((ele) => ele.deviceToken).filter(token => !!token))]; // BỎ TRÙNG LẶP VÀ TOKEN TRỐNG
     const notificationId = uuidv4();
     let messageId = 'multicast';
+    let totalSuccessCount = 0;
+    let totalFailureCount = 0;
 
     if (tokens.length === 0) {
       this.logger.log(logbase, `Không có token hợp lệ để gửi multicast, chỉ lưu thông báo vào DB`);
@@ -229,8 +231,6 @@ export class FirebaseService implements OnModuleInit {
         count: '0',
       };
 
-      let totalSuccessCount = 0;
-      let totalFailureCount = 0;
       const BATCH_SIZE = 500; // FCM giới hạn gửi tối đa 500 token mỗi lần
 
       // Chia mảng token lớn thành từng khối (chunk) nhỏ
@@ -293,7 +293,7 @@ export class FirebaseService implements OnModuleInit {
       await this.notificationAppService.createNotification(notificationDto);
     }
     
-    return 1;
+    return totalSuccessCount;
   }
 
 
