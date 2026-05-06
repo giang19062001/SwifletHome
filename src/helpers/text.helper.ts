@@ -19,11 +19,11 @@ export const NOTIFICATIONS = {
   }),
   QR_CODE_APPROVED: (requestCode: string) => ({
     TITLE: `Thông báo trạng thái yêu cầu Qr code`,
-    BODY: `Yêu cầu tạo mã QR Code - ${requestCode} của bạn đã được duyệt`,
+    BODY: `Yêu cầu tạo mã QR Code #${requestCode} của bạn đã được duyệt`,
   }),
     QR_CODE_REFUSE: (requestCode: string) => ({
     TITLE: `Thông báo trạng thái yêu cầu Qr code`,
-    BODY: `Yêu cầu tạo mã QR Code - ${requestCode} của bạn đã bị từ chối`,
+    BODY: `Yêu cầu tạo mã QR Code #${requestCode} của bạn đã bị từ chối`,
   }),
 };
 
