@@ -244,6 +244,7 @@ function initSubmitForm() {
       if (response.data && response.data.data) {
         showResultModal(response.data.data);
       } else if (response.data && !response.data.success) {
+        // Trường hợp lỗi cụ thể như không có người dùng ở tỉnh thành đó thì dùng toast
         toastErr(response.data.message);
       }
     } catch (error) {
