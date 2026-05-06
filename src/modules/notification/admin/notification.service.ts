@@ -24,18 +24,17 @@ export class NotificationAdminService {
         // lấy danh sách topic dùng cho tất cả user
         const topicCommon = await this.notificationAdminRepository.getDetailTopic(NOTIFICATION_CONST.TOPIC.COMMON);
         // gửi thông báo chung
-        await this.firebaseService.sendNotificationToTopic(topicCommon?.topicCode ?? '', dto.title, dto.body);
+        const result = await this.firebaseService.sendNotificationToTopic(topicCommon?.topicCode ?? '', dto.title, dto.body);
+        return { success: !!result, message: result ? MsgAdmin.pushNotifyOk : MsgAdmin.pushNotifyErr, data: { totalCount: 'Topic', successCount: result ? 1 : 0 } };
       } else if (dto.sendType == SentTypeEnum.USER) {
         const userDeviceTokens = await this.userAdminService.getDeviceTokensByUsers(dto.userCodesMuticast);
-        if (userDeviceTokens.length) {
-          // gửi thông báo cho 1 vài user cụ thể
-          const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body);
-          if (result) {
-            return { success: true, message: MsgAdmin.pushNotifyOk };
-          } else {
-            return { success: false, message: MsgAdmin.pushNotifyErr };
-          }
-        }
+        // gửi thông báo cho 1 vài user cụ thể
+        const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body, null, undefined, dto.userCodesMuticast);
+        return {
+          success: result.successCount > 0,
+          message: result.successCount > 0 ? MsgAdmin.pushNotifyOk : MsgAdmin.pushNotifyErr,
+          data: result,
+        };
       } else if (dto.sendType == SentTypeEnum.PROVINCE) {
         const userHomes = await this.userHomeAdminService.getUserHomesByProvinces(dto.provinceCodesMuticast);
         // lọc các userCode duy nhất để chống trùng lặp có trong mảng
@@ -45,14 +44,15 @@ export class NotificationAdminService {
         }));
 
         // gửi thông báo
-        if (userDeviceTokens.length) {
+        if (userDeviceTokens.length || dto.provinceCodesMuticast.length) {
           // gửi thông báo cho 1 vài user cụ thể
-          const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body);
-          if (result) {
-            return { success: true, message: MsgAdmin.pushNotifyOk };
-          } else {
-            return { success: false, message: MsgAdmin.pushNotifyErr };
-          }
+          const intendedUserCodes = Array.from(new Set(userHomes.map(item => item.userCode)));
+          const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body, null, undefined, intendedUserCodes);
+          return {
+            success: result.successCount > 0,
+            message: result.successCount > 0 ? MsgAdmin.pushNotifyOk : MsgAdmin.pushNotifyErr,
+            data: result,
+          };
         } else {
           return { success: false, message: MsgAdmin.pushProvinceEmpty };
         }

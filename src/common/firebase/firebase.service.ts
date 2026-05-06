@@ -10,8 +10,17 @@ import { NotificationAppService } from 'src/modules/notification/app/notificatio
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { UserNotificationTopicResDto } from "../../modules/notification/notification.response";
+import { MsgAdmin } from 'src/helpers/message.helper';
 
 const serviceAccount = serviceAccountJson as any;
+
+export interface MulticastResult {
+  totalCount: number;
+  successCount: number;
+  failureCount: number;
+  successItems: string[]; // userCodes
+  failureItems: { userCode: string; error: string }[];
+}
 
 @Injectable()
 export class FirebaseService implements OnModuleInit {
@@ -50,8 +59,6 @@ export class FirebaseService implements OnModuleInit {
     this.IMAGE = {
       LOGO: `${currentUrl}/images/favicon.ico`, // ảnh nhỏ logo
       DETAIL: `${currentUrl}/images/favicon.ico`, // ảnh nội dung mở rộng
-      // LOGO: `https://3fam.ai/images/favicon.ico`,
-      // DETAIL: `https://3fam.ai/images/favicon.ico`,
     };
   }
   onModuleInit() {
@@ -207,14 +214,25 @@ export class FirebaseService implements OnModuleInit {
     body: string,
     data?: any,
     notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN,
-  ): Promise<number> {
+    intendedUserCodes: string[] = [],
+  ): Promise<MulticastResult> {
     const logbase = `${this.SERVICE_NAME}/sendNotificationToMulticast`;
     const userCodes = userDeviceTokens.map((ele) => ele.userCode);
     const tokens = [...new Set(userDeviceTokens.map((ele) => ele.deviceToken).filter(token => !!token))]; // BỎ TRÙNG LẶP VÀ TOKEN TRỐNG
     const notificationId = uuidv4();
     let messageId = 'multicast';
+    
+    // Tìm các user không có token
+    const usersWithTokens = new Set(userDeviceTokens.map(u => u.userCode));
+    const usersMissingTokens = intendedUserCodes.filter(code => !usersWithTokens.has(code));
+    
     let totalSuccessCount = 0;
-    let totalFailureCount = 0;
+    let totalFailureCount = usersMissingTokens.length;
+    const successItems: string[] = [];
+    const failureItems: { userCode: string; error: string }[] = usersMissingTokens.map(userCode => ({
+      userCode,
+      error: MsgAdmin.deviceTokenNotBelongToThisUser
+    }));
 
     if (tokens.length === 0) {
       this.logger.log(logbase, `Không có token hợp lệ để gửi multicast, chỉ lưu thông báo vào DB`);
@@ -250,12 +268,16 @@ export class FirebaseService implements OnModuleInit {
 
           if (batchResponse.failureCount > 0) {
             const cleanupPromises = batchResponse.responses.map(async (resp, index) => {
+              const currentTokenInfo = userDeviceTokens.find(ut => ut.deviceToken === tokenBatch[index]);
+              const userCode = currentTokenInfo?.userCode || 'Unknown';
+              
               if (!resp.success && resp.error) {
                 const failedToken = tokenBatch[index];
                 const errorCode = resp.error.code || 'unknown';
                 const errorMessage = resp.error.message || 'No message';
 
                 this.logger.error(logbase, `Token thất bại [${i + index}] | Token: ${failedToken.substring(0, 30)}... | Error: ${errorCode} - ${errorMessage}`);
+                failureItems.push({ userCode, error: errorMessage });
 
                 // Nếu token không hợp lệ hoặc đã bị thu hồi → xóa khỏi DB để lần sau không gửi lại
                 const invalidCodes = ['messaging/registration-token-not-registered', 'messaging/invalid-registration-token'];
@@ -263,9 +285,17 @@ export class FirebaseService implements OnModuleInit {
                   this.logger.log(logbase, `Xóa token invalid khỏi DB: ${failedToken.substring(0, 20)}...`);
                   await this.notificationAppService.clearInvalidDeviceToken(failedToken);
                 }
+              } else if (resp.success) {
+                successItems.push(userCode);
               }
             });
             await Promise.all(cleanupPromises);
+          } else {
+            // Tất cả đều thành công trong batch này
+            tokenBatch.forEach(token => {
+              const userCode = userDeviceTokens.find(ut => ut.deviceToken === token)?.userCode || 'Unknown';
+              successItems.push(userCode);
+            });
           }
         } catch (error) {
           this.logger.error(logbase, `Gửi thông báo batch ${i / BATCH_SIZE + 1} multicast thất bại: (${JSON.stringify(error)}) `);
@@ -293,7 +323,13 @@ export class FirebaseService implements OnModuleInit {
       await this.notificationAppService.createNotification(notificationDto);
     }
     
-    return totalSuccessCount;
+    return {
+      totalCount: intendedUserCodes.length || tokens.length,
+      successCount: totalSuccessCount,
+      failureCount: totalFailureCount,
+      successItems: [...new Set(successItems)],
+      failureItems
+    };
   }
 
 

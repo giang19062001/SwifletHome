@@ -7,8 +7,8 @@ const taskAlarmConstraints = {
   body: {
     presence: { allowEmpty: false, message: '^Vui lòng nội dung thông báo.' },
   },
-  taskCode: {
-    presence: { allowEmpty: false, message: '^Vui lòng chọn công việc.' },
+  taskName: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập tên công việc.' },
   },
 };
 
@@ -23,48 +23,40 @@ document.addEventListener('DOMContentLoaded', function () {
 // TODO: FUNC
 function initDate() {
   const input = document.getElementById('taskDate');
-
+  if (!input) return;
   const today = new Date();
-
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
-
   const todayStr = `${yyyy}-${mm}-${dd}`;
-
   input.value = todayStr; // set value = hôm nay
   input.min = todayStr;   // set min = hôm nay
 }
 
 function resetForm() {
-  // Clear text inputs
   const titleEl = document.getElementById('title');
   const bodyEl = document.getElementById('body');
-  const taskCodeEl = document.getElementById('taskCode');
+  const taskNameEl = document.getElementById('taskName');
 
   if (titleEl) titleEl.value = '';
   if (bodyEl) bodyEl.value = '';
-  if (taskCodeEl) taskCodeEl.value = '';
+  if (taskNameEl) taskNameEl.value = '';
 
-  // Set radio sendType = ALL
   const sendTypeAll = document.querySelector('input[name="sendType"][value="ALL"]');
   if (sendTypeAll) sendTypeAll.checked = true;
 
-  // Uncheck all provinceCode checkboxes
   document.querySelectorAll('input[name="provinceCode"]').forEach((cb) => {
     cb.checked = false;
   });
 
-  // Uncheck all userCode checkboxes
   document.querySelectorAll('input[name="userCode"]').forEach((cb) => {
     cb.checked = false;
   });
 
-  // ẩn user, province box
   const userBox = document.getElementById('user-box');
   const provinceBox = document.getElementById('province-box');
-  provinceBox.classList.add('d-none');
-  userBox.classList.add('d-none');
+  if (provinceBox) provinceBox.classList.add('d-none');
+  if (userBox) userBox.classList.add('d-none');
 }
 
 function initSendTypeEvent() {
@@ -74,92 +66,123 @@ function initSendTypeEvent() {
       const userBox = document.getElementById('user-box');
       const provinceBox = document.getElementById('province-box');
 
-      // GỬI TẤT CẢ
       if (sendType == 'ALL') {
-        userBox.classList.add('d-none');
+        if (userBox) userBox.classList.add('d-none');
+        if (provinceBox) provinceBox.classList.add('d-none');
       }
-      // GỬI 1 VÀI USER
       if (sendType == 'USER') {
-        provinceBox.classList.add('d-none');
-        userBox.classList.remove('d-none');
-
-        if (userList.length) {
-          renderUserCheckbox();
-        }
+        if (provinceBox) provinceBox.classList.add('d-none');
+        if (userBox) userBox.classList.remove('d-none');
+        if (userList.length) renderUserCheckbox();
       }
-      // GỬI THEO TỈNH
       if (sendType == 'PROVINCE') {
-        userBox.classList.add('d-none');
-        provinceBox.classList.remove('d-none');
+        if (userBox) userBox.classList.add('d-none');
+        if (provinceBox) provinceBox.classList.remove('d-none');
       }
     });
   });
 }
 
-// TODO: RENDER
 function renderUserCheckbox() {
   const list = document.getElementById('user-codes-list');
+  if (!list) return;
   list.innerHTML = '';
-
   if (!userList.length) {
     list.innerHTML = '<div class="text-muted">Không có người dùng</div>';
     return;
   }
-
   userList.forEach((user) => {
     const div = document.createElement('div');
     div.className = 'form-check';
-
     div.innerHTML = `
-        <input
-          class="form-check-input"
-          type="checkbox"
-          name="userCode"
-          value="${user.userCode}"
-          id="user-${user.userCode}"
-        />
-        <label class="form-check-label" for="user-${user.userCode}">
-          ${user.userName}
-        </label>
+        <input class="form-check-input" type="checkbox" name="userCode" value="${user.userCode}" id="user-${user.userCode}"/>
+        <label class="form-check-label" for="user-${user.userCode}">${user.userName}</label>
       `;
-
     list.appendChild(div);
   });
 }
 
-// TODO: API
-async function getAllUser(page, limit) {
-  await axios
-    .post(
-      CURRENT_URL + '/api/admin/user/getAllUser',
-      {
-        page: page, // lấy tất cả ko paging
-        limit: limit, // lấy tất cả ko paging
-        type: 'APP',
-      },
-      axiosAuth(),
-    )
-    .then(function (response) {
-      console.log('response', response);
-      if (response.status === 200 && response.data) {
-        userList = response.data?.list ?? [];
-        console.log(userList);
+/**
+ * Hiển thị Modal báo cáo kết quả gửi thông báo
+ * @param {Object} data - Dữ liệu từ API trả về (MulticastResult)
+ */
+function showResultModal(data) {
+  try {
+    if (!data) return;
+
+    const elTotal = document.getElementById('res-total');
+    const elSuccess = document.getElementById('res-success');
+    const elFailure = document.getElementById('res-failure');
+
+    if (elTotal) elTotal.innerText = data.totalCount || 0;
+    if (elSuccess) elSuccess.innerText = data.successCount || 0;
+    if (elFailure) elFailure.innerText = data.failureCount || 0;
+
+    const successUl = document.querySelector('#res-success-list ul');
+    if (successUl) {
+      successUl.innerHTML = '';
+      if (data.successItems && data.successItems.length > 0) {
+        data.successItems.forEach((userCode) => {
+          const user = userList.find(u => u.userCode === userCode);
+          const displayName = user ? user.userName : userCode;
+          const li = document.createElement('li');
+          li.className = 'list-group-item  py-1';
+          li.innerHTML = `<i class="fas fa-check-circle me-2"></i><strong>${displayName}</strong>`;
+          successUl.appendChild(li);
+        });
+      } else {
+        successUl.innerHTML = '<li class="list-group-item text-muted text-center py-2">Trống</li>';
       }
-    })
-    .catch(function (error) {
-      console.log('error', error);
-    });
+    }
+
+    const failureUl = document.querySelector('#res-failure-list ul');
+    if (failureUl) {
+      failureUl.innerHTML = '';
+      if (data.failureItems && data.failureItems.length > 0) {
+        data.failureItems.forEach((item) => {
+          const user = userList.find(u => u.userCode === item.userCode);
+          const displayName = user ? user.userName : item.userCode;
+          const li = document.createElement('li');
+          li.className = 'list-group-item  py-1';
+          li.innerHTML = `
+                <div class="fw-bold">${displayName}</div>
+                <div class="text-wrap" style="word-break: break-all;">${item.error}</div>
+            `;
+          failureUl.appendChild(li);
+        });
+      } else {
+        failureUl.innerHTML = '<li class="list-group-item text-muted text-center py-2">Trống</li>';
+      }
+    }
+
+    const modalEl = document.getElementById('notificationResultModal');
+    if (modalEl) {
+      const myModal = new bootstrap.Modal(modalEl);
+      myModal.show();
+    }
+  } catch (err) {
+    console.error("Lỗi hiển thị Modal:", err);
+  }
+}
+
+async function getAllUser(page, limit) {
+  try {
+    const response = await axios.post(CURRENT_URL + '/api/admin/user/getAllUser', { page, limit, type: 'APP' }, axiosAuth());
+    if (response.status === 200 && response.data) {
+      userList = response.data?.list ?? [];
+    }
+  } catch (error) {
+    console.log('error', error);
+  }
 }
 
 function initSubmitForm() {
   const form = document.getElementById('push-task-alarm-form');
-
-  // validate realtime
+  if (!form) return;
   form.querySelectorAll('input, textarea, select').forEach((el) => el.addEventListener('input', () => validateField(taskAlarmConstraints, el)));
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const sendType = form.querySelector('input[name="sendType"]:checked').value;
     const userCodesMuticast = [...form.querySelectorAll('input[name="userCode"]:checked')].map((cb) => cb.value);
     const provinceCodesMuticast = [...form.querySelectorAll('input[name="provinceCode"]:checked')].map((cb) => cb.value);
@@ -167,15 +190,13 @@ function initSubmitForm() {
     const formData = {
       title: form.title.value,
       body: form.body.value,
-      taskCode: form.taskCode.value,
-      taskName:  form.querySelector("#taskCode").selectedOptions[0].text,
+      taskName: form.taskName.value,
       taskDate: form.taskDate.value,
       sendType,
       userCodesMuticast,
       provinceCodesMuticast,
     };
 
-    // kiêm lỗi
     const errors = validate(formData, taskAlarmConstraints);
     if (errors) return displayErrors(errors);
 
@@ -188,30 +209,30 @@ function initSubmitForm() {
       provinceCodesMuticast: sendType === 'PROVINCE' ? provinceCodesMuticast : [],
     };
 
-    console.log("payload", payload);
-
-    // disable nút summit
     let btn = form.querySelector('button');
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
 
-    // gửi thông báo
     try {
       const response = await axios.post(CURRENT_URL + '/api/admin/todo/setTaskAlarmByAdmin', payload, axiosAuth());
-      if (response.data && response.data.success) {
-        toastOk(response.data.message);
-      } else {
-        toastErr(response.data.message);
+      // Luôn hiển thị modal nếu có dữ liệu chi tiết
+      if (response.data && response.data.data) {
+        showResultModal(response.data.data);
       }
     } catch (error) {
-      console.error(`error:`, error);
-      if (error.response.data) {
-        toastErr(error.response.data.message);
-      }
+      console.error(`Lỗi API đặt lịch nhắc:`, error);
+      // Hiển thị lỗi hệ thống thông qua modal thay vì toast
+      showResultModal({
+        totalCount: 'Lỗi',
+        successCount: 0,
+        failureCount: 1,
+        successItems: [],
+        failureItems: [{ 
+            userCode: 'Hệ thống', 
+            error: error.response?.data?.message || 'Lỗi kết nối hoặc xử lý phía Server' 
+        }]
+      });
     } finally {
-      // bật lại nút
-      btn.disabled = false;
-
-      // reset form
+      if (btn) btn.disabled = false;
       resetForm();
     }
   });

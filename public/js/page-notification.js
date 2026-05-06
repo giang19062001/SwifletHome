@@ -42,8 +42,8 @@ function resetForm() {
   // ẩn user, province box
   const userBox = document.getElementById('user-box');
   const provinceBox = document.getElementById('province-box');
-  provinceBox.classList.add('d-none');
-  userBox.classList.add('d-none');
+  if (provinceBox) provinceBox.classList.add('d-none');
+  if (userBox) userBox.classList.add('d-none');
 }
 
 function initSendTypeEvent() {
@@ -55,12 +55,13 @@ function initSendTypeEvent() {
 
       // GỬI TẤT CẢ
       if (sendType == 'ALL') {
-        userBox.classList.add('d-none');
+        if (userBox) userBox.classList.add('d-none');
+        if (provinceBox) provinceBox.classList.add('d-none');
       }
       // GỬI 1 VÀI USER
       if (sendType == 'USER') {
-        provinceBox.classList.add('d-none');
-        userBox.classList.remove('d-none');
+        if (provinceBox) provinceBox.classList.add('d-none');
+        if (userBox) userBox.classList.remove('d-none');
 
         if (userList.length) {
           renderUserCheckbox();
@@ -68,8 +69,8 @@ function initSendTypeEvent() {
       }
       // GỬI THEO TỈNH
       if (sendType == 'PROVINCE') {
-        userBox.classList.add('d-none');
-        provinceBox.classList.remove('d-none');
+        if (userBox) userBox.classList.add('d-none');
+        if (provinceBox) provinceBox.classList.remove('d-none');
       }
     });
   });
@@ -78,6 +79,7 @@ function initSendTypeEvent() {
 // TODO: RENDER
 function renderUserCheckbox() {
   const list = document.getElementById('user-codes-list');
+  if (!list) return;
   list.innerHTML = '';
 
   if (!userList.length) {
@@ -106,32 +108,98 @@ function renderUserCheckbox() {
   });
 }
 
+/**
+ * Hiển thị Modal báo cáo kết quả gửi thông báo
+ * @param {Object} data - Dữ liệu từ API trả về (MulticastResult)
+ */
+function showResultModal(data) {
+  try {
+    if (!data) return;
+
+    // Cập nhật các con số tổng quát
+    const elTotal = document.getElementById('res-total');
+    const elSuccess = document.getElementById('res-success');
+    const elFailure = document.getElementById('res-failure');
+
+    if (elTotal) elTotal.innerText = data.totalCount || 0;
+    if (elSuccess) elSuccess.innerText = data.successCount || 0;
+    if (elFailure) elFailure.innerText = data.failureCount || 0;
+
+    // Render danh sách thành công
+    const successUl = document.querySelector('#res-success-list ul');
+    if (successUl) {
+      successUl.innerHTML = '';
+      if (data.successItems && data.successItems.length > 0) {
+        data.successItems.forEach((userCode) => {
+          const user = userList.find(u => u.userCode === userCode);
+          const displayName = user ? user.userName : userCode;
+          const li = document.createElement('li');
+          li.className = 'list-group-item  py-1';
+          li.innerHTML = `<i class="fas fa-check-circle me-2"></i><strong>${displayName}</strong>`;
+          successUl.appendChild(li);
+        });
+      } else {
+        successUl.innerHTML = '<li class="list-group-item text-muted text-center py-2">Trống</li>';
+      }
+    }
+
+    // Render danh sách thất bại
+    const failureUl = document.querySelector('#res-failure-list ul');
+    if (failureUl) {
+      failureUl.innerHTML = '';
+      if (data.failureItems && data.failureItems.length > 0) {
+        data.failureItems.forEach((item) => {
+          const user = userList.find(u => u.userCode === item.userCode);
+          const displayName = user ? user.userName : item.userCode;
+          const li = document.createElement('li');
+          li.className = 'list-group-item  py-1';
+          li.innerHTML = `
+                <div class="fw-bold">${displayName}</div>
+                <div class="text-wrap" style="word-break: break-all;">${item.error}</div>
+            `;
+          failureUl.appendChild(li);
+        });
+      } else {
+        failureUl.innerHTML = '<li class="list-group-item text-muted text-center py-2">Trống</li>';
+      }
+    }
+
+    // Hiển thị modal
+    const modalEl = document.getElementById('notificationResultModal');
+    if (modalEl) {
+      const myModal = new bootstrap.Modal(modalEl);
+      myModal.show();
+    } else {
+      console.error("Không tìm thấy phần tử #notificationResultModal");
+    }
+  } catch (err) {
+    console.error("Lỗi khi hiển thị Modal kết quả:", err);
+  }
+}
+
 // TODO: API
 async function getAllUser(page, limit) {
-  await axios
-    .post(
+  try {
+    const response = await axios.post(
       CURRENT_URL + '/api/admin/user/getAllUser',
       {
-        page: page, // lấy tất cả ko paging
-        limit: limit, // lấy tất cả ko paging
+        page: page,
+        limit: limit,
         type: 'APP',
       },
       axiosAuth(),
-    )
-    .then(function (response) {
-      console.log('response', response);
-      if (response.status === 200 && response.data) {
-        userList = response.data?.list ?? [];
-        console.log(userList);
-      }
-    })
-    .catch(function (error) {
-      console.log('error', error);
-    });
+    );
+    if (response.status === 200 && response.data) {
+      userList = response.data?.list ?? [];
+    }
+  } catch (error) {
+    console.log('error', error);
+  }
 }
 
 function initSubmitForm() {
   const form = document.getElementById('push-notification-form');
+  if (!form) return;
 
   // validate realtime
   form.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('input', () => validateField(notificationConstraints, el)));
@@ -151,7 +219,7 @@ function initSubmitForm() {
       provinceCodesMuticast,
     };
 
-    // kiêm lỗi
+    // kiểm lỗi
     const errors = validate(formData, notificationConstraints);
     if (errors) return displayErrors(errors);
 
@@ -164,30 +232,25 @@ function initSubmitForm() {
       provinceCodesMuticast: sendType === 'PROVINCE' ? provinceCodesMuticast : [],
     };
 
-    console.log(payload);
-
-    // disable nút summit
+    // disable nút submit
     let btn = form.querySelector('button');
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
 
     // gửi thông báo
     try {
       const response = await axios.post(CURRENT_URL + '/api/admin/notification/pushNotifycationByAdmin', payload, axiosAuth());
-      if (response.data && response.data.success) {
-        toastOk(response.data.message);
-      } else {
+      
+      // Luôn hiển thị modal nếu có dữ liệu chi tiết
+      if (response.data && response.data.data) {
+        showResultModal(response.data.data);
+      } else if (response.data && !response.data.success) {
         toastErr(response.data.message);
       }
     } catch (error) {
-      console.error(`error:`, error);
-      if (error.response.data) {
-        toastErr(error.response.data.message);
-      }
+      console.error(`Lỗi API gửi thông báo:`, error);
+      toastErr('Lỗi hệ thống khi gửi thông báo');
     } finally {
-      // bật lại nút
-      btn.disabled = false;
-
-      // reset form
+      if (btn) btn.disabled = false;
       resetForm();
     }
   });

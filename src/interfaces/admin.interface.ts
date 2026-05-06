@@ -12,4 +12,5 @@ export enum YnEnum {
 export interface ApiMutationResponse {
   success: boolean;
   message: string;
+  data?: any;
 }

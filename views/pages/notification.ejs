@@ -91,5 +91,57 @@
         </div>
     </div>
 </div>
+
+<!-- Modal kết quả gửi thông báo -->
+<div class="modal fade" id="notificationResultModal" tabindex="-1" aria-labelledby="notificationResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="notificationResultModalLabel">Kết quả gửi thông báo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3 text-center">
+                    <div class="col-4">
+                        <div class="p-2 border rounded bg-light">
+                            <div class="text-muted small">Tổng cộng</div>
+                            <div class="h4 mb-0 fw-bold" id="res-total">0</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 border rounded bg-light">
+                            <div class="text-muted small text-success">Thành công</div>
+                            <div class="h4 mb-0 fw-bold text-success" id="res-success">0</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 border rounded bg-light">
+                            <div class="text-muted small text-danger">Thất bại</div>
+                            <div class="h4 mb-0 fw-bold text-danger" id="res-failure">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success border-bottom pb-2">Danh sách thành công</h6>
+                        <div id="res-success-list" class="overflow-auto" style="max-height: 300px;">
+                            <ul class="list-group list-group-flush small"></ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6 border-start">
+                        <h6 class="fw-bold text-danger border-bottom pb-2">Danh sách thất bại</h6>
+                        <div id="res-failure-list" class="overflow-auto" style="max-height: 300px;">
+                            <ul class="list-group list-group-flush small"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/js/common-validate.js"></script>
 <script src="/js/page-notification.js"></script>

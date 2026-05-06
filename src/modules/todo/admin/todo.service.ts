@@ -78,12 +78,8 @@ export class TodoAdminService {
             }
           }
           // gửi thông báo cho 1 vài user cụ thể
-          const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body);
-          if (result) {
-            return { success: true, message: MsgAdmin.pushAlarmOk };
-          } else {
-            return { success: false, message: MsgAdmin.pushAlarmErr };
-          }
+          const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body, null, undefined, dto.userCodesMuticast);
+          return { success: result.successCount > 0, message: result.successCount > 0 ? MsgAdmin.pushAlarmOk : MsgAdmin.pushAlarmErr, data: result };
         }
       } else if (dto.sendType == SentTypeEnum.PROVINCE) {
         const userHomes = await this.userHomeAdminService.getUserHomesByProvinces(dto.provinceCodesMuticast);
@@ -106,12 +102,9 @@ export class TodoAdminService {
             }
           }
           // gửi thông báo cho 1 vài user cụ thể
-          const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body);
-          if (result) {
-            return { success: true, message: MsgAdmin.pushAlarmOk };
-          } else {
-            return { success: false, message: MsgAdmin.pushAlarmErr };
-          }
+          const intendedUserCodes = Array.from(new Set(userHomes.map(item => item.userCode)));
+          const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body, null, undefined, intendedUserCodes);
+          return { success: result.successCount > 0, message: result.successCount > 0 ? MsgAdmin.pushAlarmOk : MsgAdmin.pushAlarmErr, data: result };
         } else {
           return { success: false, message: MsgAdmin.pushProvinceEmpty };
         }
