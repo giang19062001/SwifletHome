@@ -160,7 +160,7 @@ export const MsgAdmin = {
   pushNotifyOk: ok('Gửi thông báo'),
   pushNotifyErr: err('Gửi thông báo'),
   pushProvinceEmpty: 'Không có người dùng nào có nhà yến thuộc những tỉnh thành này',
-  deviceTokenNotBelongToThisUser: 'Token thiết bị của tài khoản người dùng này đã được dùng cho tài khoản người dùng khác',
+  deviceTokenNotBelongToThisUser: 'Người dùng đã đăng xuất khỏi thiết bị hoặc Token thiết bị của tài khoản người dùng này đã được dùng cho tài khoản người dùng khác',
   userAlreadyCreateThisTeam: alreadyDone('Người dùng hiện tại đã đăng ký đội công xưởng này'),
 };
 
