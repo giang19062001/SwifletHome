@@ -182,10 +182,10 @@ export const MsgDto = {
 export const MsgAdmin = {
   pushAlarmOk: 'Tạo lịch nhắc và gửi thông báo thành công',
   pushAlarmErr: 'Tạo lịch nhắc thành công nhưng gửi thông báo thất bại',
-  pushNotifyOk: ok('Gửi thông báo'),
-  pushNotifyErr: err('Gửi thông báo'),
+  pushNotifyOk: 'Gửi thông báo thành công',
+  pushNotifyErr: 'Gửi thông báo thất bại',
   pushProvinceEmpty: 'Không có người dùng nào có nhà yến thuộc những tỉnh thành này',
   deviceTokenNotBelongToThisUser: 'Người dùng đã đăng xuất khỏi thiết bị hoặc Token thiết bị của tài khoản người dùng này đã được dùng cho tài khoản người dùng khác',
-  userAlreadyCreateThisTeam: alreadyDone('Người dùng hiện tại đã đăng ký đội công xưởng này'),
+  userAlreadyCreateThisTeam: 'Người dùng hiện tại đã đăng ký đội công xưởng này rồi',
 };
 

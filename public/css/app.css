@@ -19994,9 +19994,6 @@ select {
   height: 85%;
   margin-bottom: 10px;
 }
-.component-editor .ql-insertHTML {
-  margin-top: -10px;
-}
 .component-editor .html-editor {
   width: 100%;
   height: 85%;
