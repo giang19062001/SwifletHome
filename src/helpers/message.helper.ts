@@ -52,6 +52,8 @@ export const Msg = {
   PasswordChangeErr: err('Đổi mật khẩu'),
   AccountLoginWrong: invalid('Tài khoản hoặc mật khẩu'),
   AccountLoginBlock: 'Tài khoản đã bị vô hiệu hóa',
+  LogoutOk: ok('Đăng xuất'),
+  LogoutErr: err('Đăng xuất'),
 
   // Người dùng / Nhà yến
   UserNotFound: notFound('Người dùng'),
@@ -128,6 +130,12 @@ export const Msg = {
   // Checkout
   CheckoutTransactionExist: alreadyDone('Giao dịch thanh toán này'),
   CheckoutPackageNotFound: notFound('Gói cước mặc định'),
+
+  // Chung
+  Success: 'Success',
+  ApiKeyMissing: 'Vui lòng cung cấp API Key',
+  ApiKeyInvalid: 'Mã API Key không hợp lệ',
+  Blacklisted: 'Địa chỉ IP của bạn đã bị đưa vào danh sách chặn',
 };
 
 // ─── Helpers dùng nội bộ ───────────────────────────────────────────────────────
@@ -149,8 +157,25 @@ const convertFiledName = (filedName: string): string => {
     receiverPhone: 'SĐT người nhận',
     review:'Nội dung đánh giá',
     app_user_id: 'ID người dùng',
+    harvestNextDate: 'Ngày thu hoạch tiếp theo',
+    medicineNextDate: 'Ngày lăn thuốc tiếp theo',
   };
   return map[filedName] ?? filedName;
+};
+
+// ─── MsgDto ───────────────────────────────────────────────────────────────────
+export const MsgDto = {
+  InvalidPhone: invalid('Số điện thoại'),
+  CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
+  MustBeGreaterZero: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn 0`,
+  InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
+  InvalidRange: (filedName: string, range: string) =>
+    `${convertFiledName(filedName)} phải nằm trong giá trị cho phép (${range})`,
+  MustBeGreaterThanAndEqualNow: (filedName: string) =>
+    `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
+  IsRequired: (filedName: string) => `${convertFiledName(filedName)} là bắt buộc`,
+  MustBeDate: (filedName: string) => `${convertFiledName(filedName)} phải là định dạng ngày hợp lệ`,
+  MustBeTodayOrLater: (filedName: string) => `${convertFiledName(filedName)} phải từ ngày hiện tại trở đi`,
 };
 
 // ─── MsgAdmin ─────────────────────────────────────────────────────────────────
@@ -164,14 +189,3 @@ export const MsgAdmin = {
   userAlreadyCreateThisTeam: alreadyDone('Người dùng hiện tại đã đăng ký đội công xưởng này'),
 };
 
-// ─── MsgDto ───────────────────────────────────────────────────────────────────
-export const MsgDto = {
-  InvalidPhone: invalid('Số điện thoại'),
-  CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
-  MustBeGreaterZero: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn 0`,
-  InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
-  InvalidRange: (filedName: string, range: string) =>
-    `${convertFiledName(filedName)} phải nằm trong giá trị cho phép (${range})`,
-  MustBeGreaterThanAndEqualNow: (filedName: string) =>
-    `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
-};

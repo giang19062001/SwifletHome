@@ -23,4 +23,6 @@ export class PhoneCodeResDto {
     countryCode: string;
     @ApiProperty({ example: '' })
     isoCode: string;
+    @ApiProperty({ example: '' })
+    languageCode: string;
 }

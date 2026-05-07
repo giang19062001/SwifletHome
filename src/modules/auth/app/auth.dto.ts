@@ -155,6 +155,8 @@ export class TokenUserAppResDto {
     userTypeKeyWord: string;
     @ApiProperty({ example: '' })
     countryCode: string;
+    @ApiProperty({ example: 'vi' })
+    languageCode: string;
     @ApiProperty({ example: YnEnum.N })
     isActive: YnEnum;
     @ApiProperty({ example: 0, required: false })
@@ -182,6 +184,8 @@ export class TokenUserAppWithPasswordResDto {
     userTypeKeyWord!: string;
     @ApiProperty({ example: '' })
     countryCode!: string;
+    @ApiProperty({ example: 'vi' })
+    languageCode!: string;
     @ApiProperty({ example: YnEnum.N })
     isActive!: YnEnum;
 }

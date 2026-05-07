@@ -46,10 +46,10 @@ export class SetTaskAlarmDto {
     format: 'date',
     required: true,
   })
-  @IsDefined({ message: 'specificValue is required' })
-  @IsNotEmpty({ message: 'specificValue cannot be null or empty' })
+  @IsDefined({ message: MsgDto.IsRequired('specificValue') })
+  @IsNotEmpty({ message: MsgDto.CannotNull('specificValue') })
   @Transform(({ value }) => new Date(value + 'T00:00:00'))
-  @IsDate({ message: 'specificValue must be a valid date' })
+  @IsDate({ message: MsgDto.MustBeDate('specificValue') })
   specificValue: Date;
 
   @ApiProperty({
@@ -72,11 +72,11 @@ export class SetHarvestTaskDto {
     format: 'date',
     required: true,
   })
-  @IsDefined({ message: 'harvestNextDate is required' })
-  @IsNotEmpty({ message: 'harvestNextDate cannot be null or empty' })
+  @IsDefined({ message: MsgDto.IsRequired('harvestNextDate') })
+  @IsNotEmpty({ message: MsgDto.CannotNull('harvestNextDate') })
   @Transform(({ value }) => new Date(value + 'T00:00:00'))
-  @IsDate({ message: 'harvestNextDate must be a valid date' })
-  @IsTodayOrAfter({ message: 'harvestNextDate must be today or later' })
+  @IsDate({ message: MsgDto.MustBeDate('harvestNextDate') })
+  @IsTodayOrAfter({ message: MsgDto.MustBeTodayOrLater('harvestNextDate') })
   harvestNextDate: Date;
 
   @ApiProperty({ example: 0 })
@@ -220,11 +220,11 @@ export class SetTaskMedicineDto {
     format: 'date',
     required: true,
   })
-  @IsDefined({ message: 'medicineNextDate is required' })
-  @IsNotEmpty({ message: 'medicineNextDate cannot be null or empty' })
+  @IsDefined({ message: MsgDto.IsRequired('medicineNextDate') })
+  @IsNotEmpty({ message: MsgDto.CannotNull('medicineNextDate') })
   @Transform(({ value }) => new Date(value + 'T00:00:00'))
-  @IsDate({ message: 'medicineNextDate must be a valid date' })
-  @IsTodayOrAfter({ message: 'medicineNextDate must be today or later' })
+  @IsDate({ message: MsgDto.MustBeDate('medicineNextDate') })
+  @IsTodayOrAfter({ message: MsgDto.MustBeTodayOrLater('medicineNextDate') })
   medicineNextDate: Date;
 }
 

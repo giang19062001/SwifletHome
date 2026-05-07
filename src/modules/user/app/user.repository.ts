@@ -21,6 +21,7 @@ export class UserAppRepository {
   private readonly tableTeam = 'tbl_team_user';
   private readonly tablePackage = 'tbl_package';
   private readonly tableCheckout = 'tbl_checkout';
+  private readonly tablePhoneCode = 'tbl_phone_code';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAllUserCode(): Promise<TokenUserAppResDto[]> {
@@ -30,10 +31,10 @@ export class UserAppRepository {
   }
   async findByPhoneWithoutCountry(userPhone: string): Promise<TokenUserAppWithPasswordResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode, C.languageCode
      FROM ${this.table} A
-     LEFT JOIN ${this.tableType} B
-     ON A.userTypeCode = B.userTypeCode
+     LEFT JOIN ${this.tableType} B ON A.userTypeCode = B.userTypeCode
+     LEFT JOIN ${this.tablePhoneCode} C ON A.countryCode = C.countryCode
      WHERE A.userPhone = ? AND A.isActive = 'Y' LIMIT 1`,
       [userPhone],
     );
@@ -41,10 +42,10 @@ export class UserAppRepository {
   }
   async findByPhone(userPhone: string, countryCode: string): Promise<TokenUserAppWithPasswordResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode, C.languageCode
      FROM ${this.table} A
-     LEFT JOIN ${this.tableType} B
-     ON A.userTypeCode = B.userTypeCode
+     LEFT JOIN ${this.tableType} B ON A.userTypeCode = B.userTypeCode
+     LEFT JOIN ${this.tablePhoneCode} C ON A.countryCode = C.countryCode
      WHERE A.userPhone = ? AND A.countryCode = ? AND A.isActive = 'Y' LIMIT 1`,
       [userPhone, countryCode],
     );
@@ -52,21 +53,21 @@ export class UserAppRepository {
   }
   async findBySeq(seq: number): Promise<TokenUserAppWithPasswordResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
-    FROM ${this.table} A
-    LEFT JOIN ${this.tableType} B
-    ON A.userTypeCode = B.userTypeCode
-      WHERE A.seq = ? LIMIT 1`,
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode, C.languageCode
+     FROM ${this.table} A
+     LEFT JOIN ${this.tableType} B ON A.userTypeCode = B.userTypeCode
+     LEFT JOIN ${this.tablePhoneCode} C ON A.countryCode = C.countryCode
+       WHERE A.seq = ? LIMIT 1`,
       [seq],
     );
     return rows.length ? (rows[0] as TokenUserAppWithPasswordResDto) : null;
   }
   async findByCode(userCode: string): Promise<TokenUserAppWithPasswordResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode, C.languageCode
       FROM ${this.table} A
-      LEFT JOIN ${this.tableType} B
-      ON A.userTypeCode = B.userTypeCode
+      LEFT JOIN ${this.tableType} B ON A.userTypeCode = B.userTypeCode
+      LEFT JOIN ${this.tablePhoneCode} C ON A.countryCode = C.countryCode
         WHERE A.userCode = ? LIMIT 1`,
       [userCode],
     );
@@ -89,7 +90,7 @@ export class UserAppRepository {
   }
   async getInfo(userCode: string): Promise<GetInfoUserAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode,
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode, F.languageCode,
       B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, GREATEST(0, CEIL(TIMESTAMPDIFF(SECOND, NOW(), B.endDate) / 86400)), 0) AS packageRemainDay,  B.startDate, B.endDate,  
       COUNT(D.seq) AS homesTotal, E.userTypeCode, E.userTypeKeyWord, E.userTypeName
@@ -102,9 +103,11 @@ export class UserAppRepository {
         ON D.userCode = A.userCode AND D.isActive = 'Y' 
       LEFT JOIN ${this.tableType} E
         ON A.userTypeCode = E.userTypeCode
+      LEFT JOIN ${this.tablePhoneCode} F
+        ON A.countryCode = F.countryCode
       WHERE A.userCode = ? AND A.isActive = 'Y' 
       GROUP BY 
-      A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken,
+      A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode, F.languageCode,
       B.startDate, B.endDate, B.packageCode,
       C.packageName, C.packageDescription
        LIMIT 1`,

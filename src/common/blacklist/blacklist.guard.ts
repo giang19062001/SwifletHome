@@ -1,5 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException, Logger } from '@nestjs/common';
 import { BlacklistService } from './blacklist.service';
+import { Msg } from 'src/helpers/message.helper';
 
 @Injectable()
 export class BlacklistGuard implements CanActivate {
@@ -22,7 +23,7 @@ export class BlacklistGuard implements CanActivate {
 
     if (this.blacklistService.isBlacklisted(clientIp)) {
       this.logger.log(`Blocked request from blacklisted IP: ${clientIp} to ${request.url}`);
-      throw new ForbiddenException('Your IP address has been blacklisted.');
+      throw new ForbiddenException(Msg.Blacklisted);
     }
 
     return true;

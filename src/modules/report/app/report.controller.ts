@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiOkResponse, ApiOperation, Ap
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
+import { Msg } from 'src/helpers/message.helper';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetHarvertReportDto } from './report.dto';
@@ -42,7 +43,7 @@ export default class ReportAppController {
           'Reponse of Summary': {
             value: {
               success: true,
-              message: 'Success',
+              message: Msg.Success,
               statusCode: 200,
               data: [GetHarvertReportSummaryResDto.mock()],
             },
@@ -50,7 +51,7 @@ export default class ReportAppController {
           'Reponse of Detail': {
             value: {
               success: true,
-              message: 'Success',
+              message: Msg.Success,
               statusCode: 200,
               data: [GetHarvertReportDetailResDto.mock()],
             },

@@ -98,7 +98,7 @@ export class AuthAppController {
   async logout(@GetUserApp() user: TokenUserAppResDto) {
     const result = await this.authAppService.logout(user);
     return {
-      message: result ? 'Đăng xuất thành công' : 'Đăng xuất thất bại',
+      message: result ? Msg.LogoutOk : Msg.LogoutErr,
       data: result,
     };
   }

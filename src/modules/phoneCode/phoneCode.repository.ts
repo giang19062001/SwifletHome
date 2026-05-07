@@ -8,14 +8,14 @@ export class PhoneCodeRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAll(): Promise<PhoneCodeResDto[]> {
-    let query = `  SELECT seq, countryName, countryCode, isoCode FROM ${this.table} `;
+    let query = `  SELECT seq, countryName, countryCode, isoCode, languageCode FROM ${this.table} `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
     return rows as PhoneCodeResDto[];
   }
 
   async getDetail(countryCode: string): Promise<PhoneCodeResDto | null> {
-    let query = `  SELECT seq, countryName, countryCode, isoCode FROM ${this.table} WHERE countryCode = ? `;
+    let query = `  SELECT seq, countryName, countryCode, isoCode, languageCode FROM ${this.table} WHERE countryCode = ? `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [countryCode]);
     return rows.length ? rows[0] as PhoneCodeResDto : null;
