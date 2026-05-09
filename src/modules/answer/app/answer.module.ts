@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
-import { SearchModule } from 'src/common/search/search.module';
+import { ChatModule } from 'src/common/chat/chat.module';
 import { AuthAppModule } from 'src/modules/auth/app/auth.module';
 import { QuestionAppModule } from 'src/modules/question/app/question.module';
 import { AnswerAppController } from './answer.controller';
+import { AnswerAppV2Controller } from './answer.controller.v2';
 import { AnswerAppRepository } from './answer.repository';
 import { AnswerAppService } from './answer.service';
 @Module({
-  imports: [AuthAppModule, QuestionAppModule, SearchModule],
-  controllers: [AnswerAppController],
+  imports: [AuthAppModule, QuestionAppModule, ChatModule],
+  controllers: [AnswerAppController, AnswerAppV2Controller],
   providers: [AnswerAppService, AnswerAppRepository],
 })
 export class AnswerAppModule {}

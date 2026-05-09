@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { SearchService } from 'src/common/search/search.service';
+import { ChatService } from 'src/common/chat/chat.service';
 import { QuestionAppService } from 'src/modules/question/app/question.service';
 import { QuestionResDto } from "../../question/question.response";
 import { AnswerResDto } from "../answer.response";
@@ -13,16 +13,12 @@ export class AnswerAppService {
   constructor(
     private readonly answerAppRepository: AnswerAppRepository,
     private readonly questionAppService: QuestionAppService,
-    private readonly searchService: SearchService,
-
+    private readonly chatService: ChatService,
     private readonly logger: LoggingService,
   ) { }
 
   async reply(question: string, userCode: string): Promise<string> {
-    const logbase = `${this.SERVICE_NAME}/reply`;
-    // get question
     const questions: QuestionResDto[] = await this.questionAppService.getQuestionReplied();
-
     let answers: AnswerResDto[] = [];
 
     if (questions.length) {
@@ -57,8 +53,46 @@ export class AnswerAppService {
       };
     });
 
-    // gọi search service
-    const result = await this.searchService.reply(question, userCode, answerMapQuestionsResult);
-    return result;
+    return await this.chatService.reply(question, userCode, answerMapQuestionsResult);
+  }
+
+  async replyV2(question: string, userCode: string, currentChatHistories: any[] = []): Promise<{ answer: string; answerCode: string | null }> {
+    const questions: QuestionResDto[] = await this.questionAppService.getQuestionReplied();
+    let answers: AnswerResDto[] = [];
+
+    if (questions.length) {
+      const answerCodes = [...new Set(questions.map((q) => q.answerCode).filter(Boolean))];
+      answers = await this.answerAppRepository.getAnswersByCodes(answerCodes);
+    }
+
+    const questionMap = new Map<string, string[]>();
+    const answerMap = new Map<string, { isFree: string; answerContent: string }>();
+
+    questions.forEach((ques) => {
+      if (!questionMap.has(ques.answerCode)) {
+        questionMap.set(ques.answerCode, []);
+      }
+      questionMap.get(ques.answerCode)!.push(ques.questionContent);
+    });
+
+    answers.forEach((answer) => {
+      const answerCode = (answer as any).answerCode;
+      if (answerCode && !answerMap.has(answerCode)) {
+        answerMap.set(answerCode, {
+          isFree: answer.isFree,
+          answerContent: answer.answerContent,
+        });
+      }
+    });
+
+    const answerMapQuestionsResult = Array.from(questionMap.entries()).map(([answerCode, questionContents]) => {
+      return {
+        answerCode,
+        questions: questionContents,
+        answer: answerMap.get(answerCode),
+      };
+    });
+
+    return await this.chatService.replyV2(question, userCode, answerMapQuestionsResult, questions, currentChatHistories);
   }
 }

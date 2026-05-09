@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { SearchService } from 'src/common/search/search.service';
+import { ChatService } from 'src/common/chat/chat.service';
 import { BlogAdppRepository } from './blog.repository';
 
 @Injectable()
@@ -9,13 +9,13 @@ export class BlogAppService {
 
   constructor(
     private readonly blogAppRepository: BlogAdppRepository,
-    private readonly searchService: SearchService,
+    private readonly chatService: ChatService,
     private readonly logger: LoggingService,
   ) { }
   async getContent(userCode: string): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/getContent`;
     const blog = await this.blogAppRepository.getOneContent();
-    const result = blog ? this.searchService.replyBaseOnUserPackage(blog?.blogContent, blog?.isFree, userCode) : '';
+    const result = blog ? this.chatService.replyBaseOnUserPackage(blog?.blogContent, blog?.isFree, userCode) : '';
 
     return result;
   }

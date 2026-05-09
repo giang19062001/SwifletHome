@@ -3,16 +3,18 @@ import Fuse, { IFuseOptions } from 'fuse.js';
 import { Msg } from 'src/helpers/message.helper';
 import { UploadAppService } from 'src/modules/upload/app/upload.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { FileUploadResDto } from "../../modules/upload/upload.response";
+import { QuestionResDto } from 'src/modules/question/question.response';
+import { FileUploadResDto } from '../../modules/upload/upload.response';
 import { LoggingService } from '../logger/logger.service';
-import { ISearchItem } from './search.interface';
+import { IChatItem, IChatItemV2, IChatHistory } from './chat.interface';
+import { LlmService } from '../llm/llm.service';
 
 @Injectable()
-export class SearchService {
-  private readonly fuseOptions: IFuseOptions<ISearchItem> = {
+export class ChatService {
+  private readonly fuseOptions: IFuseOptions<IChatItem> = {
     keys: [{ name: 'questions', weight: 1 }],
-    threshold: 0.15,
-    distance: 10,  // cho phép lệch vị trí
+    threshold: 0.4,
+    distance: 10, // cho phép lệch vị trí
     minMatchCharLength: 5, // tránh match quá ngắn
     includeScore: true,
     ignoreLocation: true,
@@ -21,11 +23,12 @@ export class SearchService {
     useExtendedSearch: false,
   };
 
-  private readonly SERVICE_NAME = 'SearchService';
+  private readonly SERVICE_NAME = 'ChatService';
 
   constructor(
     private readonly uploadAppService: UploadAppService,
     private readonly userAppService: UserAppService,
+    private readonly llmService: LlmService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -109,7 +112,7 @@ export class SearchService {
     return content;
   }
 
-  async reply(question: string, userCode: string, data: ISearchItem[]): Promise<string> {
+  async reply(question: string, userCode: string, data: IChatItem[]): Promise<string> {
     if (!data?.length) {
       return Msg.CannotReply;
     }
@@ -133,5 +136,52 @@ export class SearchService {
 
     // Lấy kết quả phù hợp nhất
     return results[0].item.answer ? await this.replyBaseOnUserPackage(results[0].item.answer.answerContent, results[0].item.answer.isFree, userCode) : Msg.CannotReply;
+  }
+  async replyV2(question: string, userCode: string, data: IChatItemV2[], allQuestions: QuestionResDto[], chatHistories: IChatHistory[] = []): Promise<{ answer: string; answerCode: string | null }> {
+    const logbase = `${this.SERVICE_NAME}/reply`;
+
+    // 1. Phân loại bằng Fuse.js trước (tìm kiếm tương đương tuyệt đối)
+    const normalizedQuestion = this.normalizeText(question);
+
+    // Nếu là "nhắc lại", "tóm tắt" etc. thì Fuse.js có thể không match tốt,
+    // nhưng ta vẫn nên chuẩn bị data cho nó.
+    const normalizedData = data.map((item) => ({
+      ...item,
+      questions: item.questions.map((q) => this.normalizeText(q)),
+    }));
+
+    const fuse = new Fuse<IChatItemV2>(normalizedData, this.fuseOptions);
+    const results = fuse.search(normalizedQuestion);
+
+    // Nếu tìm thấy kết quả bằng Fuse.js Trả về luôn
+    const bestResult = results[0];
+    if (bestResult && bestResult.score !== undefined && bestResult.item.answer) {
+      this.logger.log(logbase, `Bot trả lời thông qua Fusejs`);
+      const answer = await this.replyBaseOnUserPackage(bestResult.item.answer.answerContent, bestResult.item.answer.isFree, userCode);
+      return { answer, answerCode: bestResult.item.answerCode };
+    }
+
+    // 2. Sử dụng LLM để phân tích ý định và ngữ cảnh
+    const { answerCode: llmAnswerCode, intent } = await this.llmService.replyWithLLM(question, allQuestions, chatHistories);
+
+    if (llmAnswerCode) {
+      const matchedItem = data.find((item) => item.answerCode === llmAnswerCode);
+      if (matchedItem && matchedItem.answer) {
+        this.logger.log(logbase, `Bot trả lời thông qua LLM (Code: ${llmAnswerCode}, Intent: ${intent})`);
+
+        let finalContent = matchedItem.answer.answerContent;
+
+        // Nếu intent là tóm tắt hoặc giải thích, gọi LLM để xử lý lại nội dung
+        if (intent === 'SUMMARIZE' || intent === 'CLARIFY') {
+          finalContent = await this.llmService.generateRefinedResponse(finalContent, intent);
+        }
+
+        const answer = await this.replyBaseOnUserPackage(finalContent, matchedItem.answer.isFree, userCode);
+        return { answer, answerCode: llmAnswerCode };
+      }
+    }
+
+    this.logger.log(logbase, `Không tìm thấy câu trả lời phù hợp cho cả Fusejs và LLM`);
+    return { answer: Msg.CannotReply, answerCode: null };
   }
 }

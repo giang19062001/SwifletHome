@@ -30,4 +30,12 @@ export class AnswerAppRepository {
       return rows as AnswerResDto[];
     }
 
+    async getAnswersAll(): Promise<AnswerResDto[]> {
+      const [rows] = await this.db.query<RowDataPacket[]>(
+        ` SELECT A.answerCode, A.answerContent, A.isFree
+          FROM ${this.table} A
+          WHERE A.isActive = 'Y' `,
+      );
+      return rows as AnswerResDto[];
+    }
 }
