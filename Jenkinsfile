@@ -39,10 +39,9 @@ pipeline {
                     
                     sh 'yarn build'
 
-                    // withCredentials([string(credentialsId: 'SSH_SERVER_REMOTE', variable: 'SERVER')]) {
-                    //     sh 'ssh -o StrictHostKeyChecking=no $SERVER "cd $DEPLOY_DIR && pm2 reload SWIFLETHOME --update-env"'
-                    // }
-                    sh 'touch restart.txt'
+                    withCredentials([string(credentialsId: 'SSH_SERVER_REMOTE', variable: 'SERVER')]) {
+                        sh 'ssh -o StrictHostKeyChecking=no $SERVER "cd $DEPLOY_DIR && pm2 reload SWIFLETHOME --update-env"'
+                    }
 
                 }
             }
