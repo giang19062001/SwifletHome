@@ -39,7 +39,7 @@ export class TeamUserAppService {
       subOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.subOption,
     });
     if (result.teamDescriptionSpecial !== null) {
-      const optionMap = Object.fromEntries(technicalTypes.map((o) => [o.keyOption.toLowerCase(), o.valueOption]));
+      const optionMap = Object.fromEntries(technicalTypes.map((o) => [o.keyOption, o.valueOption]));
       result.teamDescriptionSpecial = Object.fromEntries(
         Object.entries(result.teamDescriptionSpecial).map(([key, value]) => [
           key,

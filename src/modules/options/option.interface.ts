@@ -28,6 +28,10 @@ export const OPTION_CONST = {
       mainOption: 'USER_TEAM',
       subOption: 'TECHNICAL_TYPE',
     },
+    FACTORY_TYPE:{
+      mainOption: 'USER_TEAM',
+      subOption: 'FACTORY_TYPE',
+    }
   },
   CONSIGNMENT_NEST: {
     NEST_TYPE: {

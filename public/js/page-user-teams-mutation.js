@@ -206,8 +206,8 @@ async function assignForm(teamData) {
           if (typeof technicalTypes !== 'undefined' && Array.isArray(technicalTypes)) {
             technicalTypes.forEach((item) => {
               const textareaElement = document.getElementById(item.keyOption);
-              if (textareaElement && specialData[item.keyOption.toLowerCase()] !== undefined) {
-                textareaElement.value = specialData[item.keyOption.toLowerCase()];
+              if (textareaElement && specialData[item.keyOption] !== undefined) {
+                textareaElement.value = specialData[item.keyOption];
               }
             });
           }
@@ -334,7 +334,7 @@ async function submitTeam(formData, url, method, successMessage) {
       technicalTypes.forEach(function (item) {
         const textareaElement = document.getElementById(item.keyOption);
         if (textareaElement) {
-          teamDescriptionSpecial[item.keyOption.toLowerCase()] = textareaElement.value;
+          teamDescriptionSpecial[item.keyOption] = textareaElement.value;
         }
       });
     }
