@@ -42,7 +42,7 @@ export class GetDetailTeamResDto {
   @ApiProperty({ example: '' })
   teamAddress: string;
 
-  @ApiProperty({ example: ['79', '82', '96','92'] })
+  @ApiProperty({ example: ['79', '82', '96','91'] })
   provinceCodes: any;
 
   @ApiProperty({ example: 5.0 })
