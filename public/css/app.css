@@ -18712,6 +18712,7 @@ select {
     transform: rotate(360deg);
   }
 }
+/* Custom Select2 Styles for WOW effect */
 .page-login {
   display: flex;
   justify-content: center;

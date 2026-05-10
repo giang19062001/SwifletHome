@@ -25,11 +25,10 @@ export class CreateTeamDto {
   teamName: string;
 
   @ApiProperty({
-    example: '0',
+    example: ['79', '82'],
   })
-  @IsString()
   @IsNotEmpty()
-  provinceCode: string;
+  provinceCodes: any;
 
   @ApiProperty({
     example: '',
@@ -100,8 +99,8 @@ export class TeamResDto {
     teamDescription: string;
     @ApiProperty({ example: '' })
     teamDescriptionSpecial: Record<string, any> | null;
-    @ApiProperty({ example: '' })
-    provinceCode: string;
+    @ApiProperty({ example: ['79', '82'] })
+    provinceCodes: any;
     @ApiProperty({ example: '' })
     provinceName!: string;
     @ApiProperty({ example: YnEnum.N })

@@ -35,8 +35,8 @@
 
 
                                             <div class="col-md-12 form-group mb-3">
-                                                <label for="provinceCode" class="form-label">Tỉnh / Thành phố</label>
-                                                <select class="form-select" id="provinceCode" name="provinceCode">
+                                                <label for="provinceCodes" class="form-label">Tỉnh / Thành phố</label>
+                                                <select class="form-select" id="provinceCodes" name="provinceCodes" multiple>
                                                     <option value="">-- Chọn tỉnh/thành --</option>
                                                     <% if (values?.provinces && values.provinces.length> 0) { %>
                                                         <% values.provinces.forEach(function(province) { %>
@@ -46,7 +46,7 @@
                                                         <% }) %>
                                                     <% } %>
                                                 </select>
-                                                <div class="error-message" data-error="provinceCode"></div>
+                                                <div class="error-message" data-error="provinceCodes"></div>
                                             </div>
 
                                             <div class="col-md-12 form-group mb-3">

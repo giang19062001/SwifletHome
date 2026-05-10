@@ -34,14 +34,14 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     });
 
     this.client.on('connect', () => {
-      console.log(this.SERVICE_NAME, `Kết nối MQTT ${this.brokerUrl} thành công!`);
+      console.log(this.SERVICE_NAME, ` ==> Connect ${this.brokerUrl} successfully`);
 
       // Đăng ký cả 2 topic
       this.client.subscribe([this.dataTopic, this.statusTopic], (err) => {
         if (!err) {
-          console.log(this.SERVICE_NAME, `Đã đăng ký: ${this.dataTopic} và ${this.statusTopic}`);
+          console.log(this.SERVICE_NAME, ` ==> Subscribed: ${this.dataTopic} and ${this.statusTopic}`);
         } else {
-          this.logger.error(this.SERVICE_NAME, `Lỗi subscribe topic: ${err}`);
+          this.logger.error(this.SERVICE_NAME, ` ==> Subscribe topic error: ${err}`);
         }
       });
     });

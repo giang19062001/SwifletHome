@@ -34,13 +34,12 @@ export class TeamAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<TeamResDto[]> {
-    let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCode,
-     A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, C.provinceName, D.userTypeKeyWord, D.userTypeName
+    let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCodes,
+     A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, D.userTypeKeyWord, D.userTypeName,
+     (SELECT GROUP_CONCAT(C.provinceName SEPARATOR ', ') FROM ${this.tableProvince} C WHERE JSON_CONTAINS(A.provinceCodes, JSON_QUOTE(C.provinceCode))) AS provinceName
         FROM ${this.table} A  
           INNER JOIN ${this.tableUser} B
           ON A.userCode = B.userCode 
-          LEFT JOIN ${this.tableProvince} C
-          ON A.provinceCode = C.provinceCode
           LEFT JOIN ${this.tableUserType} D
           ON A.userTypeCode = D.userTypeCode
         WHERE A.isActive = 'Y'
@@ -52,18 +51,25 @@ export class TeamAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as TeamResDto[];
+    return (rows as TeamResDto[]).map((row) => ({
+      ...row,
+      provinceCodes: typeof row.provinceCodes === 'string' ? JSON.parse(row.provinceCodes) : row.provinceCodes,
+    }));
   }
   async getDetail(teamCode: string): Promise<TeamResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial,
-      A.provinceCode, A.isActive
+      A.provinceCodes, A.isActive
           FROM ${this.table} A 
           WHERE A.teamCode = ? AND A.isActive = 'Y'
           LIMIT 1 `,
       [teamCode],
     );
-    return rows ? (rows[0] as TeamResDto) : null;
+    let result = rows ? (rows[0] as TeamResDto) : null;
+    if (result) {
+      result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
+    }
+    return result;
   }
   async create(dto: CreateTeamDto, teamImagePath: string, createdId: string): Promise<number> {
     const sqlLast = ` SELECT teamCode FROM ${this.table} ORDER BY teamCode DESC LIMIT 1`;
@@ -72,9 +78,8 @@ export class TeamAdminRepository {
     if (rows.length > 0) {
       teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
     }
-    console.log(dto);
     const sql = `
-      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCode, createdId) 
+      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
@@ -86,7 +91,7 @@ export class TeamAdminRepository {
       teamImagePath,
       dto.teamDescription,
       dto.teamDescriptionSpecial,
-      dto.provinceCode,
+      typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
       createdId,
     ]);
 
@@ -94,7 +99,7 @@ export class TeamAdminRepository {
   }
   async update(dto: UpdateTeamDto, teamImagePath: string, updatedId: string, teamCode: string): Promise<number> {
     const sql = `
-        UPDATE ${this.table} SET teamName = ?, teamAddress = ?, teamDescription = ?, teamDescriptionSpecial = ?, provinceCode = ?, teamImage = ?,
+        UPDATE ${this.table} SET teamName = ?, teamAddress = ?, teamDescription = ?, teamDescriptionSpecial = ?, provinceCodes = ?, teamImage = ?,
         updatedId = ?, updatedAt = ?
         WHERE teamCode = ?
       `;
@@ -103,7 +108,7 @@ export class TeamAdminRepository {
       dto.teamAddress,
       dto.teamDescription,
       dto.teamDescriptionSpecial,
-      dto.provinceCode,
+      typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
       teamImagePath,
       updatedId,
       new Date(),

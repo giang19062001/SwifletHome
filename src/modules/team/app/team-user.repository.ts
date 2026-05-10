@@ -27,7 +27,7 @@ export class TeamUserAppRepository {
 
     const params: any[] = [userCode, dto.userTypeKeyWord];
     if (dto.provinceCode) {
-      query += ` AND A.provinceCode = ? `;
+      query += ` AND JSON_CONTAINS(A.provinceCodes, JSON_QUOTE(?)) `;
       params.push(dto.provinceCode);
     }
     if (dto.txtSearch) {
@@ -44,7 +44,7 @@ export class TeamUserAppRepository {
   }
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<GetAllTeamResDto[]> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress,
-    A.provinceCode, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage
+    A.provinceCodes, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage
     FROM ${this.table} A 
     LEFT JOIN ${this.tableUserType} B
     ON A.userTypeCode = B.userTypeCode
@@ -54,7 +54,7 @@ export class TeamUserAppRepository {
 
     const params: any[] = [userCode, dto.userTypeKeyWord];
     if (dto.provinceCode) {
-      query += ` AND A.provinceCode = ? `;
+      query += ` AND JSON_CONTAINS(A.provinceCodes, JSON_QUOTE(?)) `;
       params.push(dto.provinceCode);
     }
     if (dto.txtSearch) {
@@ -62,7 +62,7 @@ export class TeamUserAppRepository {
       params.push(`%${dto.txtSearch}%`);
     }
 
-    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress, A.provinceCode  `;
+    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress, A.provinceCodes  `;
     query += ` ORDER BY A.seq DESC`;
 
     if (dto.limit > 0 && dto.page > 0) {
@@ -71,12 +71,15 @@ export class TeamUserAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as GetAllTeamResDto[];
+    return (rows as GetAllTeamResDto[]).map((row) => ({
+      ...row,
+      provinceCodes: typeof row.provinceCodes === 'string' ? JSON.parse(row.provinceCodes) : row.provinceCodes,
+    }));
   }
 
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
-            A.teamCode, A.teamName, A.teamAddress,A.provinceCode,
+            A.teamCode, A.teamName, A.teamAddress,A.provinceCodes,
             IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial,
              A.teamImage,
             COALESCE(
@@ -113,6 +116,7 @@ export class TeamUserAppRepository {
     let result = rows ? (rows[0] as GetDetailTeamResDto) : null;
     if (result) {
       result.teamImages = typeof result.teamImages === 'string' ? JSON.parse(result.teamImages) : result.teamImages;
+      result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
     }
     return result;
   }

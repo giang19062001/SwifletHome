@@ -7,7 +7,7 @@ const teamMutationConstraints = {
     presence: { allowEmpty: false, message: '^Vui lòng nhập địa chỉ.' },
     length: { minimum: 5, message: '^Địa chỉ phải có ít nhất 5 ký tự.' },
   },
-  provinceCode: {
+  provinceCodes: {
     presence: { allowEmpty: false, message: '^Vui lòng chọn tỉnh thành.' },
   },
   userTypeCode: {
@@ -85,6 +85,31 @@ function initializeForm() {
   const teamImagesPreview = form.querySelector('#teamImagesPreview');
   const teamImageInput = form.querySelector('#teamImage');
   const teamImagesInput = form.querySelector('#teamImages');
+  const provinceSelect = form.querySelector('#provinceCodes');
+
+  // khởi tạo Select2 
+  if (typeof $ !== 'undefined' && $.fn.select2) {
+    $(provinceSelect).select2({
+      placeholder: '-- Chọn tỉnh/thành --',
+      allowClear: false,
+      width: '100%',
+    }).on('change', function() {
+      // kiểm tra validation cho provinceCodes khi Select2 thay đổi giá trị
+      const fieldName = 'provinceCodes';
+      const errorElement = form.querySelector(`[data-error="${fieldName}"]`);
+      if (errorElement) {
+        const values = $(this).val();
+        if (values && values.length > 0) {
+          errorElement.textContent = '';
+          errorElement.style.display = 'none';
+        } else {
+          // hiện lỗi nếu provinceCodes rỗng
+          errorElement.textContent = teamMutationConstraints.provinceCodes.presence.message.replace('^', '');
+          errorElement.style.display = 'block';
+        }
+      }
+    });
+  }
 
   // gắn submit event cho form
   form.addEventListener('submit', async (event) => {
@@ -93,7 +118,7 @@ function initializeForm() {
     const formData = {
       teamName: form.querySelector('#teamName').value,
       teamAddress: form.querySelector('#teamAddress').value,
-      provinceCode: form.querySelector('#provinceCode').value,
+      provinceCodes: Array.from(form.querySelector('#provinceCodes').selectedOptions).map((option) => option.value),
       userTypeCode: form.querySelector('#userTypeCode').value,
       userCode: form.querySelector('#userCode').value,
       teamDescription: quillGlobal.root.innerHTML,
@@ -166,7 +191,23 @@ async function assignForm(teamData) {
   // điền giá trị các input bằng dữ liệu từ API
   form.querySelector('#teamName').value = teamData.teamName || '';
   form.querySelector('#teamAddress').value = teamData.teamAddress || '';
-  form.querySelector('#provinceCode').value = teamData.provinceCode || '';
+  const provinceSelect = form.querySelector('#provinceCodes');
+  if (teamData.provinceCodes) {
+    const provinceCodes = typeof teamData.provinceCodes === 'string' ? JSON.parse(teamData.provinceCodes) : teamData.provinceCodes;
+    if (Array.isArray(provinceCodes)) {
+      Array.from(provinceSelect.options).forEach((option) => {
+        option.selected = provinceCodes.includes(option.value);
+      });
+    } else {
+      provinceSelect.value = provinceCodes;
+    }
+  } else {
+    provinceSelect.value = '';
+  }
+  // Nếu có dùng Select2 thì trigger change
+  if (typeof $ !== 'undefined' && $(provinceSelect).data('select2')) {
+    $(provinceSelect).trigger('change');
+  }
 
   // điền giá trị userTypeCode
   const userTypeCodeSelect = form.querySelector('#userTypeCode');
@@ -323,8 +364,14 @@ async function updateTeam(formData) {
 async function submitTeam(formData, url, method, successMessage) {
   // add dự liệu input vào formData
   const postData = new FormData();
-  const fields = ['teamName', 'teamAddress', 'provinceCode', 'userTypeCode', 'userCode', 'teamDescription'];
-  fields.forEach((field) => postData.append(field, formData[field]));
+  const fields = ['teamName', 'teamAddress', 'provinceCodes', 'userTypeCode', 'userCode', 'teamDescription'];
+  fields.forEach((field) => {
+    let value = formData[field];
+    if (field === 'provinceCodes' && Array.isArray(value)) {
+      value = JSON.stringify(value);
+    }
+    postData.append(field, value);
+  });
 
   // add dữ liệu chuyên môn của xưởng kỹ thuật
   const userTypeKeyWord = document.querySelector('#userTypeCode option:checked')?.dataset.keyword;
