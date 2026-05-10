@@ -41,6 +41,8 @@ pipeline {
                     
                     // Tạo cú hích file để kích hoạt theo dõi (watch) bên ngoài và để pm2 tự động reload
                     sh 'touch restart.txt'
+                    sh 'pm2 reload SWIFLETHOME --update-env'
+
                 }
             }
         }
