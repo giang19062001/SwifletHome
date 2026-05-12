@@ -61,3 +61,7 @@ pids
 # devops
 .current_deps_hash
 .last_deps_hash
+
+
+# image/video/audio
+uploads/*

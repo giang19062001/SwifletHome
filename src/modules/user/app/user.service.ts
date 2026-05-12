@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { TEXTS } from 'src/helpers/text.helper';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.dto";
+import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from '../../auth/app/auth.dto';
 import { CreateUserPackageAppDto, UserAppResDto } from './user.dto';
 import { UserAppRepository } from './user.repository';
 import { AllowUserTypeResDto, GetInfoUserAppResDto, UserTypeResDto } from './user.response';
+import { YnEnum } from 'src/interfaces/admin.interface';
+import { USER_CONST } from './user.interface';
 
 @Injectable()
 export class UserAppService {
@@ -79,7 +81,7 @@ export class UserAppService {
     return await this.userAppRepository.updateDeviceToken(deviceToken, userPhone);
   }
 
-  async clearDuplicateDeviceToken(deviceToken: string, excludeUserPhone?: string): Promise<{userCode: string}[]> {
+  async clearDuplicateDeviceToken(deviceToken: string, excludeUserPhone?: string): Promise<{ userCode: string }[]> {
     return await this.userAppRepository.clearDuplicateDeviceToken(deviceToken, excludeUserPhone);
   }
 
@@ -103,7 +105,14 @@ export class UserAppService {
   async getAllowTypesOfUser(userCode: string, userTypeKeyWord: string): Promise<AllowUserTypeResDto[]> {
     // loại bỏ type đang active hiện tại
     const result = await this.userAppRepository.getAllowTypesOfUser(userCode);
-    return result.filter((ele : AllowUserTypeResDto) => ele.userTypeKeyWord !== userTypeKeyWord)
+    return result.filter((ele: AllowUserTypeResDto) => ele.userTypeKeyWord !== userTypeKeyWord);
+  }
+
+  async checkAllowTypeOfUser(userCode: string, userTypeKeyWord: string): Promise<{ isSetted: YnEnum } | null> {
+    if (userTypeKeyWord == USER_CONST.USER_TYPE.OWNER.value || userTypeKeyWord == USER_CONST.USER_TYPE.PURCHASER.value) {
+      return { isSetted: YnEnum.Y };
+    }
+    return await this.userAppRepository.checkAllowTypeOfUser(userCode, userTypeKeyWord);
   }
 
   async getUserPackageInfo(userCode: string) {
