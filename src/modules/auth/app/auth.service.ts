@@ -306,11 +306,13 @@ export class AuthAppService extends AbAuthService {
       // loại bỏ  iat, exp
       const { iat, exp, ...cleanPayload } = payload;
 
+      const rsCheckType =  await this.userAppService.checkAllowTypeOfUser(payload.userCode, isUserTypeValid.userTypeKeyWord);
       // ghi đè userTypeCode và userTypeKeyWord
       const newPayload = {
         ...cleanPayload,
         userTypeCode: dto.userTypeCode,
         userTypeKeyWord: isUserTypeValid.userTypeKeyWord,
+        isSetted: rsCheckType?.isSetted
       };
       this.logger.log(logbase, `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của user(${payload.userCode})`);
 

@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class AnswerReplyDto {
   @ApiProperty({
-    example: 'Thử chim như thế nào?',
+    example: 'Chim yến bay đi không chịu ở hay ngủ lại nhà yến ?',
   })
   @IsString()
   @IsNotEmpty()
@@ -12,7 +12,7 @@ export class AnswerReplyDto {
 
 export class AnswerReplyDtoV2 {
   @ApiProperty({
-    example: 'Thử chim như thế nào?',
+    example: 'Chim yến bay đi không chịu ở hay ngủ lại nhà yến ?',
   })
   @IsString()
   @IsNotEmpty()

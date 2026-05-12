@@ -9,6 +9,7 @@ import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from '../../auth/a
 import { CreateUserPackageAppDto, UserAppResDto, UserPackageAppResDto } from './user.dto';
 import { USER_CONST } from './user.interface';
 import { AllowUserTypeResDto, GetInfoUserAppResDto, UserTypeResDto } from './user.response';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class UserAppRepository {
@@ -308,5 +309,18 @@ export class UserAppRepository {
             WHERE A.isActive = 'Y' `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode, userCode]);
     return rows as AllowUserTypeResDto[];
+  }
+  
+  async checkAllowTypeOfUser(userCode: string, userTypeKeyWord: string): Promise<{isSetted: YnEnum} | null> {
+    // chỉ kiểm tra FACTORY,TECHNICAL
+    // isSetted luôn là 'Y' cho OWNER, PURCHASER
+    const sql = `  SELECT IF(COUNT(teamCode) > 0, 'Y', 'N') as isSetted
+          FROM tbl_team_user A
+          LEFT JOIN tbl_user_type B
+          ON B.userTypeCode = A.userTypeCode
+          WHERE B.userTypeKeyWord = ?
+            AND A.userCode = ? `;
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userTypeKeyWord, userCode]);
+    return rows.length ? (rows[0] as {isSetted: YnEnum}) : null;
   }
 }

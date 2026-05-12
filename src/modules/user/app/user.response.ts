@@ -86,3 +86,9 @@ export class LoginResDto extends UserAppResDto {
   @ApiProperty({ example: '' })
   accessToken: string;
 }
+
+
+export class ChangeTypeTokenAppResDto extends LoginResDto {
+  @ApiProperty({ example: 'Y' })
+  isSetted: string;
+}

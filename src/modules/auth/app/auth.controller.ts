@@ -10,7 +10,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { RequestOtpResDto } from 'src/modules/otp/otp.response';
-import { GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
+import { ChangeTypeTokenAppResDto, GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { ApiAuthAppGuard } from './auth.guard';
 import { AuthAppService } from './auth.service';
@@ -33,7 +33,7 @@ export class AuthAppController {
   })
   @Post('changeTypeToken')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(LoginResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(ChangeTypeTokenAppResDto) })
   async changeTypeToken(@Body() dto: ChangeTypeTokenDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.authAppService.changeTypeToken(user, dto);
     return {
