@@ -40,6 +40,9 @@ export class GetDetailTeamResDto {
   teamName: string;
 
   @ApiProperty({ example: '' })
+  teamPhone: string;
+
+  @ApiProperty({ example: '' })
   teamAddress: string;
 
   @ApiProperty({ example: ['79', '82', '96','91'] })
@@ -55,13 +58,11 @@ export class GetDetailTeamResDto {
     type: Object,
     nullable: true,
     example: {
-      BUILD_RAW: { text: '', value: '' },
-      BUILD_FULL: { text: '', value: '' },
-      SOUND: { text: '', value: '' },
-      ROCK: { text: '', value: '' },
+      monthlyVolumn: 0,
+      minimunQuantity: 0,
     },
   })
-  teamDescriptionSpecial: Record<string, any> | null;
+  teamDescriptionSpecial: Record<string, number> | null;
 
   @ApiProperty({ example: 'uploads/images/***/***.jpg' })
   teamImage: string;
@@ -70,10 +71,10 @@ export class GetDetailTeamResDto {
     type: () => TeamImgResDto,
     isArray: true,
   })
-  teamImages: TeamImgResDto[];
+  teamFiles: TeamImgResDto[];
 }
 
-export class GetAllTeamResDto extends OmitType(GetDetailTeamResDto, ['teamDescription', 'teamDescriptionSpecial', 'teamImages'] as const) {}
+export class GetAllTeamResDto extends OmitType(GetDetailTeamResDto, ['teamDescription', 'teamDescriptionSpecial', 'teamFiles'] as const) {}
 
 export class GetReviewListOfTeamResDto {
   @ApiProperty({ example: 1 })
@@ -115,4 +116,45 @@ export class UploadReviewFilesResDto {
 
   @ApiProperty({ example: '' })
   filename: string;
+}
+
+export class TeamFileTypeResDto {
+  @ApiProperty({ example: 'FILE_TYPE_01' })
+  fileTypeCode: string;
+
+  @ApiProperty({ example: 'Giấy tờ pháp lý' })
+  fileTypeText: string;
+}
+
+export class TeamServiceOptionResDto {
+  @ApiProperty({ example: 'BUILD_RAW' })
+  serviceTypeCode: string;
+
+  @ApiProperty({ example: 'nội dung' })
+  serviceDescription: string;
+
+  @ApiProperty({ example: '*****' })
+  uniqueId: string;
+}
+
+export class ProvinceResDto {
+  @ApiProperty({ example: 'PRV001' })
+  provinceCode: string;
+
+  @ApiProperty({ example: 'Hà Nội' })
+  provinceName: string;
+}
+
+export class InitFormCreateTeamAppResDto {
+  @ApiProperty({ example: 'uuid-string' })
+  uniqueId: string;
+
+  @ApiProperty({ type: [TeamFileTypeResDto] })
+  teamFileTypes: TeamFileTypeResDto[];
+
+  @ApiProperty({ type: [TeamServiceOptionResDto] })
+  services: TeamServiceOptionResDto[];
+
+  @ApiProperty({ type: [ProvinceResDto] })
+  provinces: ProvinceResDto[];
 }

@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { Pool, RowDataPacket } from 'mysql2/promise';
+import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { CODES } from 'src/helpers/const.helper';
+import { generateCode } from 'src/helpers/func.helper';
 import { GetAllTeamDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto } from './team.response';
 
@@ -9,6 +11,8 @@ export class TeamUserAppRepository {
   private readonly tableUserType = 'tbl_user_type';
   private readonly tableTeamImg = 'tbl_team_img';
   private readonly tableReview = 'tbl_team_review';
+  private readonly tableService = 'tbl_team_service';
+  private readonly tableServiceImg = 'tbl_team_service_img';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   // TODO: TEAM
@@ -43,7 +47,7 @@ export class TeamUserAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<GetAllTeamResDto[]> {
-    let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress,
+    let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamPhone, A.teamAddress,
     A.provinceCodes, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage
     FROM ${this.table} A 
     LEFT JOIN ${this.tableUserType} B
@@ -62,7 +66,7 @@ export class TeamUserAppRepository {
       params.push(`%${dto.txtSearch}%`);
     }
 
-    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamAddress, A.provinceCodes  `;
+    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamPhone, A.teamAddress, A.provinceCodes  `;
     query += ` ORDER BY A.seq DESC`;
 
     if (dto.limit > 0 && dto.page > 0) {
@@ -79,7 +83,7 @@ export class TeamUserAppRepository {
 
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
-            A.teamCode, A.teamName, A.teamAddress,A.provinceCodes,
+            A.teamCode, A.teamName, A.teamPhone, A.teamAddress,A.provinceCodes,
             IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial,
              A.teamImage,
             COALESCE(
@@ -95,7 +99,7 @@ export class TeamUserAppRepository {
                 WHERE D.teamSeq = A.seq AND D.filename <> A.teamImage
               ),
               JSON_ARRAY()
-            ) AS teamImages
+            ) AS teamFiles
 
           FROM ${this.table} A 
           LEFT JOIN ${this.tableUserType} B
@@ -115,9 +119,157 @@ export class TeamUserAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode]);
     let result = rows ? (rows[0] as GetDetailTeamResDto) : null;
     if (result) {
-      result.teamImages = typeof result.teamImages === 'string' ? JSON.parse(result.teamImages) : result.teamImages;
+      result.teamFiles = typeof result.teamFiles === 'string' ? JSON.parse(result.teamFiles) : result.teamFiles;
       result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
+      result.teamDescriptionSpecial = typeof result.teamDescriptionSpecial === 'string' ? JSON.parse(result.teamDescriptionSpecial) : result.teamDescriptionSpecial;
+
+      // Lấy danh sách dịch vụ và ảnh dịch vụ
+      const [services] = await this.db.query<RowDataPacket[]>(`
+        SELECT seq, userTypeCode, serviceTypeCode, serviceDescription
+        FROM tbl_team_service WHERE seqTeam = ?
+      `, [result.seq]);
+
+      for (const svc of services) {
+        const [svcImages] = await this.db.query<RowDataPacket[]>(`
+          SELECT seq, filename, mimetype
+          FROM tbl_team_service_img WHERE seqService = ?
+        `, [svc.seq]);
+        svc.images = svcImages;
+      }
+      (result as any).services = services;
     }
     return result;
+  }
+
+  // TODO: TEAM REGISTRATION
+  async checkDuplicateTeam(userCode: string, userTypeCode: string): Promise<boolean> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT seq FROM ${this.table} WHERE userCode = ? AND userTypeCode = ?`,
+      [userCode, userTypeCode],
+    );
+    return rows.length > 0;
+  }
+
+  async create(dto: any, userCode: string, teamImagePath: string, createdId: string): Promise<number> {
+    const sqlLast = `SELECT teamCode FROM ${this.table} ORDER BY teamCode DESC LIMIT 1`;
+    const [rows] = await this.db.execute<any[]>(sqlLast);
+    let teamCode = CODES.teamCode.FRIST_CODE;
+    if (rows.length > 0) {
+      teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
+    }
+    const sql = `
+      INSERT INTO ${this.table} (teamCode, userCode, userTypeCode, teamName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      teamCode,
+      userCode,
+      dto.userTypeCode,
+      dto.teamName,
+      dto.teamPhone || null,
+      dto.teamAddress,
+      teamImagePath,
+      dto.teamDescription,
+      dto.teamDescriptionSpecial ? JSON.stringify(dto.teamDescriptionSpecial) : null,
+      typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
+      createdId,
+      dto.uniqueId,
+    ]);
+    return result.insertId;
+  }
+
+  async createImages(seq: number, createdId: string, filenamePath: string, file: any, fileTypeCode?: string): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableTeamImg} (filename, originalname, size, mimetype, teamSeq, createdId, fileTypeCode)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, seq, createdId, fileTypeCode || null]);
+    return result.insertId;
+  }
+
+  async findMainImageByUniqueId(uniqueId: string): Promise<any | null> {
+    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableTeamImg} WHERE uniqueId = ? AND fileTypeCode IS NULL AND teamSeq = 0 LIMIT 1`, [uniqueId]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  async uploadFileTeam(uniqueId: string, createdId: string, filenamePath: string, file: Express.Multer.File, fileTypeCode?: string): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableTeamImg} (filename, originalname, size, mimetype, uniqueId, teamSeq, createdId, fileTypeCode)
+      VALUES (?, ?, ?, ?, ?, 0, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, uniqueId, createdId, fileTypeCode || null]);
+    return result.insertId;
+  }
+
+  async uploadFileService(uniqueId: string, createdId: string, filenamePath: string, file: Express.Multer.File): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableServiceImg} (filename, originalname, size, mimetype, uniqueId, seqService, createdId)
+      VALUES (?, ?, ?, ?, ?, 0, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, uniqueId, createdId]);
+    return result.insertId;
+  }
+
+  async updateSeqFilesTeam(teamSeq: number, uniqueId: string, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableTeamImg} SET teamSeq = ?, updatedId = ?, updatedAt = NOW()
+      WHERE uniqueId = ? AND teamSeq = 0 AND isActive = 'Y'
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [teamSeq, updatedId, uniqueId]);
+    return result.affectedRows;
+  }
+
+  async createTeamService(seqTeam: number, userTypeCode: string, serviceTypeCode: string, serviceDescription: string, uniqueId?: string): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableService} (seqTeam, userTypeCode, serviceTypeCode, serviceDescription, uniqueId)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqTeam, userTypeCode, serviceTypeCode, serviceDescription, uniqueId || null]);
+    return result.insertId;
+  }
+
+  async updateSeqFilesService(seqService: number, uniqueId: string, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableServiceImg} SET seqService = ?, updatedId = ?, updatedAt = NOW()
+      WHERE uniqueId = ? AND isActive = 'Y'
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqService, updatedId, uniqueId]);
+    return result.affectedRows;
+  }
+
+  async getFileTeamBySeq(seq: number): Promise<any | null> {
+    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableTeamImg} WHERE seq = ?`, [seq]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  async deleteFileTeam(seq: number): Promise<number> {
+    const sql = `DELETE FROM ${this.tableTeamImg} WHERE seq = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
+    return result.affectedRows;
+  }
+
+  async getFileServiceBySeq(seq: number): Promise<any | null> {
+    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableServiceImg} WHERE seq = ?`, [seq]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  async deleteFileService(seq: number): Promise<number> {
+    const sql = `DELETE FROM ${this.tableServiceImg} WHERE seq = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
+    return result.affectedRows;
+  }
+
+  async clearTeamMainImage(teamSeq: number): Promise<number> {
+    const sql = `UPDATE ${this.table} SET teamImage = '' WHERE seq = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [teamSeq]);
+    return result.affectedRows;
+  }
+
+  async getTeamFileTypes(userTypeCode: string): Promise<any[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT fileTypeCode, fileTypeText FROM tbl_team_file_type WHERE userTypeCode = ?`,
+      [userTypeCode],
+    );
+    return rows;
   }
 }

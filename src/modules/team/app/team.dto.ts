@@ -110,6 +110,111 @@ export class TeamReviewFileStrResDto {
     filename: string;
 }
 
+// ─── Team Registration DTOs (App) ───────────────────────────────────────────
+export class CreateTeamAppDto {
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
+  teamName: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsOptional()
+  teamPhone: string;
+
+  @ApiProperty({ example: ['79', '82'] })
+  @IsNotEmpty()
+  provinceCodes: any;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
+  teamAddress: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  @IsNotEmpty()
+  teamDescription: string;
+
+  @ApiProperty({
+    example: { monthlyVolumn: 1000, minimunQuantity: 10 },
+    description: 'Thông tin đặc thù của xưởng gia công (Sản lượng tháng, Số lượng tối thiểu) - giá trị này sẽ là null của đội kỹ thuật',
+  })
+  @IsOptional()
+  teamDescriptionSpecial: any | null;
+
+  @ApiProperty({
+    example: [{ serviceTypeCode: 'BUILD_RAW', serviceDescription: 'nội dung', uniqueId: '*****' }],
+    description: 'Mảng dịch vụ đăng ký',
+  })
+  @Type(() => Array<{
+    serviceTypeCode: string;
+    serviceDescription: string;
+    uniqueId: string;
+  }>)
+  @IsOptional()
+  servicesData: any;
+
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', format: 'uuid' })
+  @IsUUID()
+  @IsNotEmpty()
+  uniqueId: string;
+}
+
+export class UploadTeamMainImageAppDto {
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', format: 'uuid' })
+  @IsUUID()
+  @IsNotEmpty()
+  uniqueId: string;
+
+  @ApiProperty({ type: 'string', format: 'binary', description: 'Ảnh chính của team' })
+  teamImage: any;
+}
+
+export class UploadTeamFilesAppDto {
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', format: 'uuid' })
+  @IsUUID()
+  @IsNotEmpty()
+  uniqueId: string;
+
+  @ApiProperty({ example: 'FILE_FAC_LEGAL' })
+  @IsOptional()
+  @IsString()
+  fileTypeCode?: string;
+
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    description: 'Tối đa 5 file (ảnh/video phụ)',
+  })
+  teamFiles: any[];
+}
+
+export class UploadServiceFilesAppDto {
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', format: 'uuid' })
+  @IsUUID()
+  @IsNotEmpty()
+  uniqueId: string;
+
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    description: 'Tối đa 5 file (ảnh/video dịch vụ)',
+  })
+  teamServiceFiles: any[];
+}
+
+export class DeleteFileAppDto {
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  seq: number;
+
+  @ApiProperty({ example: 'teamFiles' })
+  @IsString()
+  @IsNotEmpty()
+  uploadType: 'teamFiles' | 'teamServiceFiles' | 'teamImage';
+}
+
 export class TeamReviewFileResDto {
     @ApiProperty({ example: 0 })
     seq: number;

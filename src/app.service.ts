@@ -162,29 +162,45 @@ export class AppService {
   async renderTeamCreate(): Promise<any> {
     const provinces = await this.provinceService.getAll();
     const userTypes = await this.userAdminService.getTypesForTeam();
-    const technicalTypes = await this.optionService.getAll({
+    const teamFileTypes = await this.teamAdminService.getTeamFileTypes();
+    const serviceOptionsFactory = await this.optionService.getAll({
       mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.subOption,
+      subOption: 'FACTORY_TYPE',
     });
+    const serviceOptionsTechnical = await this.optionService.getAll({
+      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
+      subOption: 'TECHNICAL_TYPE',
+    });
+    
     return {
       provinces: provinces,
       userTypes: userTypes,
-      technicalTypes: technicalTypes,
+      teamFileTypes: teamFileTypes,
+      serviceOptionsFactory: serviceOptionsFactory,
+      serviceOptionsTechnical: serviceOptionsTechnical,
     };
   }
   async renderTeamUpdate(teamCode: string): Promise<any> {
     const teamData = await this.teamAdminService.getDetail(teamCode);
     const provinces = await this.provinceService.getAll();
     const userTypes = await this.userAdminService.getTypesForTeam();
-    const technicalTypes = await this.optionService.getAll({
+    const teamFileTypes = await this.teamAdminService.getTeamFileTypes();
+    const serviceOptionsFactory = await this.optionService.getAll({
       mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.subOption,
+      subOption: 'FACTORY_TYPE',
     });
+    const serviceOptionsTechnical = await this.optionService.getAll({
+      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
+      subOption: 'TECHNICAL_TYPE',
+    });
+    
     return {
       teamData: teamData,
       provinces: provinces,
       userTypes: userTypes,
-      technicalTypes: technicalTypes,
+      teamFileTypes: teamFileTypes,
+      serviceOptionsFactory: serviceOptionsFactory,
+      serviceOptionsTechnical: serviceOptionsTechnical,
     };
   }
 }

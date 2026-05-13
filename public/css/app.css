@@ -19804,6 +19804,119 @@ select {
   border-radius: 5px;
 }
 
+.page-user-teams-mutation .file-label {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border: 1px dashed #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+.page-user-teams-mutation .file-label:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+.page-user-teams-mutation .file-label .file-button {
+  color: #007bff;
+  font-weight: 500;
+}
+.page-user-teams-mutation input[type=file].dynamic-team-files, .page-user-teams-mutation input[type=file].service-images-input, .page-user-teams-mutation input[type=file]#teamImage {
+  display: none !important;
+}
+.page-user-teams-mutation .image-preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+  min-height: 20px;
+}
+.page-user-teams-mutation .image-preview-container .image-preview {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.2s;
+  width: 200px;
+  height: 120px;
+}
+.page-user-teams-mutation .image-preview-container .image-preview:hover {
+  transform: translateY(-2px);
+}
+.page-user-teams-mutation .image-preview-container .image-preview img, .page-user-teams-mutation .image-preview-container .image-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid #fff;
+}
+.page-user-teams-mutation .image-preview-container .image-preview .delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #dc3545;
+  color: white;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  line-height: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 99;
+}
+.page-user-teams-mutation .image-preview-container .image-preview .delete-btn:hover {
+  background: #c82333;
+  transform: scale(1.1);
+}
+.page-user-teams-mutation .image-preview-container .image-preview .delete-btn::after {
+  content: "×";
+  margin-top: -2px;
+}
+.page-user-teams-mutation .service-block {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+.page-user-teams-mutation .service-block .card-body {
+  padding: 1.5rem;
+}
+.page-user-teams-mutation .error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+.page-user-teams-mutation #btnAddService {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+.page-user-teams-mutation #editor {
+  height: 200px !important;
+  margin-bottom: 10px;
+}
+
 .component-upload {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
   border-radius: 15px;

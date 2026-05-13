@@ -3,8 +3,7 @@ import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
-import { diffByTwoArr } from 'src/helpers/func.helper';
-import { ChangDisplayReviewDto, CreateTeamDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto } from './team.dto';
+import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
 import { TeamAdminRepository } from './team.repository';
 
 @Injectable()
@@ -14,51 +13,153 @@ export class TeamAdminService {
     private readonly teamAdminRepository: TeamAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: TeamResDto[] }> {
     const total = await this.teamAdminRepository.getTotal();
     const list = await this.teamAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(teamCode: string): Promise<TeamResDto | null> {
-    let result = await this.teamAdminRepository.getDetail(teamCode);
+  async getTeamFileTypes(): Promise<any[]> {
+    return await this.teamAdminRepository.getTeamFileTypes();
+  }
+
+  async getDetail(teamCode: string): Promise<any | null> {
+    let result: any = await this.teamAdminRepository.getDetail(teamCode);
     if (result) {
-      let teamImages = await this.teamAdminRepository.getImages(result ? result?.seq : 0);
+      let teamFiles = await this.teamAdminRepository.getImages(result ? result?.seq : 0);
       // tách biệt ảnh chính và danh sách ảnh phụ
-      let teamImagesExceptMain: TeamImgResDto[] = [];
-      for (const img of teamImages) {
+      let teamFilesExceptMain: any[] = [];
+      for (const img of teamFiles) {
         if (img.filename == result.teamImage) {
           result.teamImage = img;
         } else {
-          teamImagesExceptMain.push(img);
+          teamFilesExceptMain.push(img);
         }
       }
-      result.teamImages = teamImagesExceptMain;
+      // góm nhóm các ảnh phụ theo loại ảnh của chúng
+      const allFileTypes = await this.getTeamFileTypes();
+      const structuredTeamFiles: any[] = [];
+      
+      for (const img of teamFilesExceptMain) {
+        let typeGroup = structuredTeamFiles.find(g => g.fileTypeCode === img.fileTypeCode);
+        if (!typeGroup) {
+          const typeInfo = allFileTypes.find(t => t.fileTypeCode === img.fileTypeCode) || {};
+          typeGroup = {
+            fileTypeCode: img.fileTypeCode,
+            fileTypeText: typeInfo.fileTypeText || '',
+            images: []
+          };
+          structuredTeamFiles.push(typeGroup);
+        }
+        typeGroup.images.push(img);
+      }
+      
+      result.teamFiles = structuredTeamFiles;
+
+      // get services
+      const services = await this.teamAdminRepository.getTeamServices(result.seq);
+      for (const svc of services) {
+        const svcImages = await this.teamAdminRepository.getTeamServiceImages(svc.seq);
+        svc.images = svcImages;
+      }
+      result.services = services;
+
       return result;
     } else {
       return null;
     }
   }
+  async uploadTeamMainImage(dto: UploadTeamMainImageDto, file: Express.Multer.File, createdId: string): Promise<{ seq: number; url: string; mimetype: string }> {
+    const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+    const seq = await this.teamAdminRepository.uploadFileTeam(dto.uniqueId, createdId, filenamePath, file);
+    return { seq, url: filenamePath, mimetype: file.mimetype };
+  }
+
+  async uploadTeamFiles(dto: UploadTeamFilesDto, files: Express.Multer.File[], createdId: string): Promise<{ seq: number; url: string; mimetype: string }[]> {
+    const result: { seq: number; url: string; mimetype: string }[] = [];
+    for (const file of files) {
+      const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+      const seq = await this.teamAdminRepository.uploadFileTeam(dto.uniqueId, createdId, filenamePath, file, dto.fileTypeCode);
+      result.push({ seq, url: filenamePath, mimetype: file.mimetype });
+    }
+    return result;
+  }
+
+  async uploadServiceFiles(dto: UploadServiceFilesDto, files: Express.Multer.File[], createdId: string): Promise<{ seq: number; url: string; mimetype: string }[]> {
+    const result: { seq: number; url: string; mimetype: string }[] = [];
+    for (const file of files) {
+      const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+      const seq = await this.teamAdminRepository.uploadFileService(dto.uniqueId, createdId, filenamePath, file);
+      result.push({ seq, url: filenamePath, mimetype: file.mimetype });
+    }
+    return result;
+  }
+
+  async deleteFile(dto: DeleteFileDto, updatedId: string): Promise<number> {
+    let fileInfo: any = null;
+    if (dto.uploadType === 'teamFiles') {
+      fileInfo = await this.teamAdminRepository.getFileTeamBySeq(dto.seq);
+    } else if (dto.uploadType === 'teamServiceFiles') {
+      fileInfo = await this.teamAdminRepository.getFileServiceBySeq(dto.seq);
+    } else if (dto.uploadType === 'teamImage') {
+      fileInfo = await this.teamAdminRepository.getFileTeamBySeq(dto.seq);
+    }
+
+    // delete trong thư mục local
+    if (fileInfo && fileInfo.filename) {
+      await this.fileLocalService.deleteLocalFile(fileInfo.filename);
+    }
+
+    // delete khỏi database
+    if (dto.uploadType === 'teamFiles') {
+      return await this.teamAdminRepository.deleteFileTeam(dto.seq);
+    } else if (dto.uploadType === 'teamServiceFiles') {
+      return await this.teamAdminRepository.deleteFileService(dto.seq);
+    } else if (dto.uploadType === 'teamImage') {
+      if (fileInfo && fileInfo.teamSeq > 0) {
+        await this.teamAdminRepository.clearTeamMainImage(fileInfo.teamSeq);
+      }
+      return await this.teamAdminRepository.deleteFileTeam(dto.seq);
+    }
+    return 0;
+  }
+
   async create(dto: CreateTeamDto, createdId: string): Promise<number> {
     try {
-      // kiểm tra trùng lặp
       const isDuplicate = await this.teamAdminRepository.checkDuplicateTeam(dto.userCode, dto.userTypeCode);
       if (isDuplicate) {
         return -1;
       }
-      const teamImagePath = dto.teamImage ? `${getFileLocation(dto.teamImage.mimetype, dto.teamImage.fieldname)}/${dto.teamImage.filename}` : '';
+      const existingMainImg = await this.teamAdminRepository.findMainImageByUniqueId(dto.uniqueId);
+      const teamImagePath = existingMainImg 
+        ? existingMainImg.filename 
+        : (dto.teamImage && dto.teamImage.filename
+            ? `${getFileLocation(dto.teamImage.mimetype, dto.teamImage.fieldname)}/${dto.teamImage.filename}`
+            : typeof dto.teamImage === 'string'
+              ? dto.teamImage
+              : '');
+
       const seq = await this.teamAdminRepository.create(dto, teamImagePath, createdId);
       if (seq) {
-        //teamImage
-        if (dto.teamImage) {
+        // Chỉ lưu ảnh chính nếu chưa được upload trước đó qua uniqueId
+        if (!existingMainImg && dto.teamImage && dto.teamImage.filename) {
           await this.teamAdminRepository.createImages(seq, createdId, teamImagePath, dto.teamImage);
         }
-        //teamImages
-        if (dto.teamImages.length > 0) {
-          for (const file of dto.teamImages) {
-            const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
-            await this.teamAdminRepository.createImages(seq, createdId, filenamePath, file);
-          }
+
+        await this.teamAdminRepository.updateSeqFilesTeam(seq, dto.uniqueId, createdId);
+
+        if (dto.servicesData) {
+          try {
+            const services = JSON.parse(dto.servicesData);
+            for (let i = 0; i < services.length; i++) {
+              const svc = services[i];
+              const seqService = await this.teamAdminRepository.createTeamService(seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceDescription, svc.uniqueId);
+
+              if (svc.uniqueId) {
+                await this.teamAdminRepository.updateSeqFilesService(seqService, svc.uniqueId, createdId);
+              }
+            }
+          } catch (e) {}
         }
       }
       return seq;
@@ -69,47 +170,54 @@ export class TeamAdminService {
   }
 
   async update(dto: UpdateTeamDto, updatedId: string, teamCode: string): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/update`;
-
     const home = await this.getDetail(teamCode);
-    let teamImagePath = (home?.teamImage as TeamImgResDto).filename;
+    let teamImagePath = home ? (home?.teamImage as TeamImgResDto).filename : '';
     if (home) {
-      // teamImage bị thay đổi -> xóa ảnh hiện tại của nó
-      if (dto.teamImage.filename !== (home.teamImage as TeamImgResDto).filename) {
-        // xóa file local
-        await this.fileLocalService.deleteLocalFile((home.teamImage as TeamImgResDto).filename);
-
-        // xóa trong db
-        await this.teamAdminRepository.deleteHomeImagesOne((home.teamImage as TeamImgResDto).seq);
-
-        // instart file mới vào db
+      if (dto.teamImage && dto.teamImage.filename && dto.teamImage.filename !== (home.teamImage as TeamImgResDto)?.filename) {
+        if (home.teamImage) {
+          await this.fileLocalService.deleteLocalFile((home.teamImage as TeamImgResDto).filename);
+          await this.teamAdminRepository.deleteHomeImagesOne((home.teamImage as TeamImgResDto).seq);
+        }
         teamImagePath = `${getFileLocation(dto.teamImage.mimetype, dto.teamImage.fieldname)}/${dto.teamImage.filename}`;
         await this.teamAdminRepository.createImages(home.seq, 'admin', teamImagePath, dto.teamImage);
+      } else if (typeof dto.teamImage === 'string') {
+        teamImagePath = dto.teamImage;
       }
 
-      const fileNeedDeletes: TeamImgResDto[] = diffByTwoArr(dto.teamImages, home.teamImages, 'filename');
-      this.logger.log(logbase, `Danh sách file cần xóa --> ${JSON.stringify(fileNeedDeletes.map((fi) => fi.filename))}`);
+      await this.teamAdminRepository.updateSeqFilesTeam(home.seq, dto.uniqueId, updatedId);
 
-      const fileNeedCreates: TeamImgResDto[] = diffByTwoArr(home.teamImages, dto.teamImages, 'filename');
-      this.logger.log(logbase, `Danh sách file cần thêm mới --> ${JSON.stringify(fileNeedCreates.map((fi) => fi.filename))}`);
-
-      // teamImages bị thay đổi -> xóa ~ ảnh hiện tại của nó
-      if (fileNeedDeletes.length) {
-        // xóa ~ file local
-        await this.teamAdminRepository.deleteHomeImagesMulti(fileNeedDeletes.map((ele) => ele.seq));
-        // xóa ~ trong db
-        for (const file of fileNeedDeletes) {
-          await this.fileLocalService.deleteLocalFile(file.filename);
+      const oldServices = await this.teamAdminRepository.getTeamServices(home.seq);
+      for (const svc of oldServices) {
+        if (dto.servicesData) {
+          try {
+            const newServices = JSON.parse(dto.servicesData);
+            const found = newServices.find((ns: any) => ns.uniqueId === svc.uniqueId);
+            if (!found) {
+              const oldSvcImages = await this.teamAdminRepository.getTeamServiceImages(svc.seq);
+              for (const img of oldSvcImages) {
+                await this.fileLocalService.deleteLocalFile(img.filename);
+              }
+            }
+          } catch (e) {}
         }
       }
-      if (fileNeedCreates.length) {
-        // instart ~ file mới vào db
-        for (const file of fileNeedCreates) {
-          const filenamePath = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
-          const insertImgResult = await this.teamAdminRepository.createImages(home.seq, 'admin', filenamePath, file);
-          this.logger.log(logbase, `Thêm file mới --> file(${file.filename}) --> result: ${insertImgResult}`);
-        }
+
+      await this.teamAdminRepository.deleteTeamServicesByTeam(home.seq);
+
+      if (dto.servicesData) {
+        try {
+          const services = JSON.parse(dto.servicesData);
+          for (let i = 0; i < services.length; i++) {
+            const svc = services[i];
+            const seqService = await this.teamAdminRepository.createTeamService(home.seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceDescription, svc.uniqueId);
+
+            if (svc.uniqueId) {
+              await this.teamAdminRepository.updateSeqFilesService(seqService, svc.uniqueId, updatedId);
+            }
+          }
+        } catch (e) {}
       }
+
       const result = await this.teamAdminRepository.update(dto, teamImagePath, updatedId, teamCode);
       return result;
     } else {
@@ -119,7 +227,6 @@ export class TeamAdminService {
   async delete(teamCode: string): Promise<number> {
     const home = await this.teamAdminRepository.getDetail(teamCode);
     if (home) {
-      // const images = await this.teamAdminRepository.getImages(home?.seq ?? 0);
       const resultHome = await this.teamAdminRepository.delete(teamCode);
       return resultHome;
     } else {

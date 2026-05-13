@@ -7,6 +7,9 @@ const teamMutationConstraints = {
     presence: { allowEmpty: false, message: '^Vui lòng nhập địa chỉ.' },
     length: { minimum: 5, message: '^Địa chỉ phải có ít nhất 5 ký tự.' },
   },
+  teamPhone: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập số điện thoại.' },
+  },
   provinceCodes: {
     presence: { allowEmpty: false, message: '^Vui lòng chọn tỉnh thành.' },
   },
@@ -22,20 +25,24 @@ const teamMutationConstraints = {
   teamImage: {
     filePresence: { message: '^Vui lòng chọn ảnh chính.' },
   },
-  teamImages: {
-    filePresence: { message: '^Vui lòng chọn ít nhất một ảnh phụ.' },
-  },
 };
-let teamImagesFiles = [];
 
-// TODO: INIT
+// Lưu trữ thông tin metadata của các ảnh/video phụ theo từng loại (fileTypeCode)
+let dynamicImagesFiles = {}; // { [typeCode]: File[] }
+// Lưu trữ thông tin metadata của các ảnh/video theo từng dịch vụ (Service ID)
+let serviceImagesFiles = {}; // { [serviceId]: File[] }
+// số thứ tự dịch vụ
+let serviceCounter = 0;
+
+// ID duy nhất cho Team dùng để liên kết các tệp tin được upload bất đồng bộ
+let teamUniqueId = typeof teamData !== 'undefined' && teamData.uniqueId ? teamData.uniqueId : generateUUID();
+let isMainImageUploading = false;
+
 document.addEventListener('DOMContentLoaded', () => {
   if (pageType === 'update') {
-    // cho trạng thái chỉnh sửa
     initializeForm();
     assignForm(teamData);
   } else if (pageType === 'create') {
-    // cho trạng thái thêm
     initializeForm();
   }
 });
@@ -43,20 +50,31 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('userTypeCode').addEventListener('change', async function () {
   const userTypeCode = this.value;
   const selectedOption = this.options[this.selectedIndex];
-  const userTypeKeyWord = selectedOption.dataset.keyword;
+  const userTypeKeyWord = selectedOption?.dataset?.keyword;
   const userSelect = document.getElementById('userCode');
 
   userSelect.value = '';
   userSelect.innerHTML = '<option value="">-- Chọn khách hàng sở hữu --</option>';
-
   userSelect.disabled = true;
-  if (userTypeCode) {
-    // render danh sách người dùng theo type
-    const userList = await getUsersForTeamByType(userTypeCode);
 
+  // Reset các dịch vụ và ảnh phụ đã tải lên trước đó
+  document.getElementById('servicesContainer').innerHTML = '';
+  serviceImagesFiles = {};
+
+  document.querySelectorAll('.dynamic-team-images').forEach((input) => {
+    const typeCode = input.dataset.typecode;
+    if (dynamicImagesFiles[typeCode]) {
+      dynamicImagesFiles[typeCode] = [];
+    }
+    const preview = document.getElementById(`teamFilesPreview_${typeCode}`);
+    if (preview) preview.innerHTML = '';
+    input.value = '';
+  });
+
+  if (userTypeCode) {
+    const userList = await getUsersForTeamByType(userTypeCode);
     if (userList && userList.length > 0) {
       userSelect.disabled = false;
-
       userList.forEach((user) => {
         const option = document.createElement('option');
         option.value = user.userCode;
@@ -66,72 +84,204 @@ document.getElementById('userTypeCode').addEventListener('change', async functio
     }
   }
 
-  // ẩn/ hiện form thông tin chuyên môn cho type kỹ thuật
-  const technicalDiv = document.querySelector('.last-box > div:first-child');
-  const descriptionDiv = document.querySelector('.last-box > div:nth-child(2)');
-  if (technicalDiv) {
-    if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
-      technicalDiv.style.display = 'block';
-      if (descriptionDiv) descriptionDiv.className = 'col-lg-6';
+  // Ẩn hiện các danh mục ảnh theo userTypeCode
+  document.querySelectorAll('.img-type-block').forEach((block) => {
+    if (block.dataset.usertypecode === userTypeCode) {
+      block.classList.remove('d-none');
     } else {
-      technicalDiv.style.display = 'none';
-      if (descriptionDiv) descriptionDiv.className = 'col-lg-12';
+      block.classList.add('d-none');
     }
+  });
+
+  // Cập nhật trạng thái nút Thêm dịch vụ
+  const btnAddService = document.getElementById('btnAddService');
+  if (userTypeCode) {
+    btnAddService.disabled = false;
+    btnAddService.style.opacity = '1';
+    btnAddService.style.cursor = 'pointer';
+  } else {
+    btnAddService.disabled = true;
+    btnAddService.style.opacity = '0.5';
+    btnAddService.style.cursor = 'not-allowed';
+
+    // Nếu người dùng bỏ chọn loại công xưởng, xóa hết dịch vụ đã thêm
+    document.getElementById('servicesContainer').innerHTML = '';
+    serviceImagesFiles = {};
   }
+
+  // Cập nhật lại danh sách option cho các dịch vụ đã thêm (nếu có)
+  const serviceSelects = document.querySelectorAll('.service-type-code');
+  let currentOptions = [];
+  if (userTypeKeyWord === 'FACTORY') {
+    currentOptions = serviceOptionsFactory;
+    document.getElementById('factorySpecialFields').classList.remove('d-none');
+    teamMutationConstraints.monthlyVolumn = {
+      presence: { allowEmpty: false, message: '^Vui lòng nhập sản lượng trên 1 tháng.' },
+    };
+    teamMutationConstraints.minimunQuantity = {
+      presence: { allowEmpty: false, message: '^Vui lòng nhập số lượng tối thiểu.' },
+    };
+  } else if (userTypeKeyWord === 'TECHNICAL') {
+    currentOptions = serviceOptionsTechnical;
+    document.getElementById('factorySpecialFields').classList.add('d-none');
+    delete teamMutationConstraints.monthlyVolumn;
+    delete teamMutationConstraints.minimunQuantity;
+  }
+
+  serviceSelects.forEach((select) => {
+    const currentValue = select.value;
+    let optionsHtml = '<option value="">-- Chọn dịch vụ --</option>';
+    currentOptions.forEach((opt) => {
+      optionsHtml += `<option value="${opt.keyOption}" ${currentValue === opt.keyOption ? 'selected' : ''}>${opt.valueOption}</option>`;
+    });
+    select.innerHTML = optionsHtml;
+  });
 });
+
+/**
+ * API Upload ảnh chính cho xưởng
+ */
+async function uploadTeamMainImageApi(file, uniqueId) {
+  const formData = new FormData();
+  formData.append('teamImage', file);
+  formData.append('uniqueId', uniqueId);
+
+  try {
+    const res = await axios.post('/api/admin/team/uploadTeamMainImage', formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    return res.data; // { seq, url }
+  } catch (e) {
+    console.error(e);
+    toastErr('Upload lỗi');
+    return null;
+  }
+}
+
+/**
+ * API Upload các tệp tin phụ (ảnh/video) cho xưởng
+ */
+async function uploadTeamFilesApi(files, uniqueId, fileTypeCode) {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('teamFiles', file);
+  }
+  formData.append('uniqueId', uniqueId);
+  if (fileTypeCode) formData.append('fileTypeCode', fileTypeCode);
+
+  try {
+    const res = await axios.post('/api/admin/team/uploadTeamFiles', formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    return res.data; // Array of results
+  } catch (e) {
+    console.error(e);
+    toastErr('Upload lỗi');
+    return null;
+  }
+}
+
+
+/**
+ * API Upload tệp tin cho từng dịch vụ của xưởng
+ */
+async function uploadServiceFilesApi(files, uniqueId) {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('teamServiceFiles', file);
+  }
+  formData.append('uniqueId', uniqueId);
+
+  try {
+    const res = await axios.post('/api/admin/team/uploadServiceFiles', formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    return res.data; // Array of results
+  } catch (e) {
+    console.error(e);
+    toastErr('Upload lỗi');
+    return null;
+  }
+}
+
+/**
+ * API Xóa tệp tin đã upload trên server
+ * @param {number} seq - ID của file
+ * @param {string} uploadType - Loại file để backend xác định bảng cần xóa
+ */
+async function deleteFileApi(seq, uploadType) {
+  if (!seq) return;
+  try {
+    await axios.post('/api/admin/team/deleteFile', { seq, uploadType }, axiosAuth());
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/**
+ * Khởi tạo các sự kiện và cấu hình cho Form
+ */
 function initializeForm() {
   const form = document.getElementById(pageType === 'create' ? 'team-create-form' : 'team-update-form');
   const teamImagePreview = form.querySelector('#teamImagePreview');
-  const teamImagesPreview = form.querySelector('#teamImagesPreview');
   const teamImageInput = form.querySelector('#teamImage');
-  const teamImagesInput = form.querySelector('#teamImages');
   const provinceSelect = form.querySelector('#provinceCodes');
 
-  // khởi tạo Select2 
   if (typeof $ !== 'undefined' && $.fn.select2) {
-    $(provinceSelect).select2({
-      placeholder: '-- Chọn tỉnh/thành --',
-      allowClear: false,
-      width: '100%',
-    }).on('change', function() {
-      // kiểm tra validation cho provinceCodes khi Select2 thay đổi giá trị
-      const fieldName = 'provinceCodes';
-      const errorElement = form.querySelector(`[data-error="${fieldName}"]`);
-      if (errorElement) {
-        const values = $(this).val();
-        if (values && values.length > 0) {
-          errorElement.textContent = '';
-          errorElement.style.display = 'none';
-        } else {
-          // hiện lỗi nếu provinceCodes rỗng
-          errorElement.textContent = teamMutationConstraints.provinceCodes.presence.message.replace('^', '');
-          errorElement.style.display = 'block';
+    $(provinceSelect)
+      .select2({
+        placeholder: '-- Chọn tỉnh/thành --',
+        allowClear: false,
+        width: '100%',
+      })
+      .on('change', function () {
+        const fieldName = 'provinceCodes';
+        const errorElement = form.querySelector(`[data-error="${fieldName}"]`);
+        if (errorElement) {
+          const values = $(this).val();
+          if (values && values.length > 0) {
+            errorElement.textContent = '';
+            errorElement.classList.add('d-none');
+          } else {
+            errorElement.textContent = teamMutationConstraints.provinceCodes.presence.message.replace('^', '');
+            errorElement.classList.remove('d-none');
+          }
         }
-      }
-    });
+      });
   }
 
-  // gắn submit event cho form
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const formData = {
       teamName: form.querySelector('#teamName').value,
       teamAddress: form.querySelector('#teamAddress').value,
+      teamPhone: form.querySelector('#teamPhone').value,
       provinceCodes: Array.from(form.querySelector('#provinceCodes').selectedOptions).map((option) => option.value),
       userTypeCode: form.querySelector('#userTypeCode').value,
       userCode: form.querySelector('#userCode').value,
       teamDescription: quillGlobal.root.innerHTML,
       teamImage: form.querySelector('#teamImage').files,
-      teamImages: form.querySelector('#teamImages').files,
       teamCode: pageType === 'update' ? teamData.teamCode : undefined,
     };
 
-    // kiểm tra errors
+    const userTypeCodeSelect = form.querySelector('#userTypeCode');
+    const userTypeKeyWord = userTypeCodeSelect.options[userTypeCodeSelect.selectedIndex]?.dataset?.keyword;
+
+    if (userTypeKeyWord === 'FACTORY') {
+      formData.monthlyVolumn = form.querySelector('#monthlyVolumn').value;
+      formData.minimunQuantity = form.querySelector('#minimunQuantity').value;
+    }
+
     const isOk = checkingErrors(formData, teamMutationConstraints);
     if (!isOk) return;
 
-    // submit
+    if (userTypeKeyWord === 'FACTORY') {
+      formData.teamDescriptionSpecial = {
+        monthlyVolumn: Number(formData.monthlyVolumn),
+        minimunQuantity: Number(formData.minimunQuantity),
+      };
+    } else {
+      formData.teamDescriptionSpecial = null;
+    }
+
+    delete formData.monthlyVolumn;
+    delete formData.minimunQuantity;
+
     if (pageType === 'update') {
       await updateTeam(formData);
     } else if (pageType === 'create') {
@@ -139,58 +289,189 @@ function initializeForm() {
     }
   });
 
-  //  gắn validate event cho các input
   attachValidateForm(form, teamMutationConstraints);
-
-  // gắn validate  cho các editor nếu có
   attachValidateEditor(form, 'teamDescription', teamMutationConstraints.teamDescription.quillPresence.message);
 
-  teamImagesInput.addEventListener('change', () => {
-    // thêm các file mới vào biến global 'teamImagesFiles'
-    const addedFiles = Array.from(teamImagesInput.files);
-    teamImagesFiles = teamImagesFiles.concat(addedFiles);
+  teamImageInput.addEventListener('change', async () => {
+    if (isMainImageUploading) return;
 
-    // cập nhập lại FileList
-    const dataTransfer = new DataTransfer();
-    teamImagesFiles.forEach((file) => dataTransfer.items.add(file));
-    teamImagesInput.files = dataTransfer.files;
-
-    // re-render ảnh preview
-    teamImagesPreview.innerHTML = '';
-    teamImagesFiles.forEach((file, index) => renderImagePreview(file, index, teamImagesInput, teamImagesPreview, 'teamImages'));
-
-    // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
-    validateField(teamMutationConstraints, teamImagesInput);
-  });
-
-  teamImageInput.addEventListener('change', () => {
-    // re-render ảnh preview
-    teamImagePreview.innerHTML = '';
     if (teamImageInput.files.length > 0) {
-      renderImagePreview(teamImageInput.files[0], 0, teamImageInput, teamImagePreview, 'teamImage');
+      isMainImageUploading = true;
+      showPageLoader();
+
+      const file = teamImageInput.files[0];
+      const res = await uploadTeamMainImageApi(file, teamUniqueId);
+
+      isMainImageUploading = false;
+      hidePageLoader();
+      teamImagePreview.innerHTML = '';
+
+      if (res) {
+        // Thêm khoảng trễ nhỏ tương tự ảnh phụ để tránh lỗi 404
+        setTimeout(() => {
+          renderImagePreview(res, 0, teamImageInput, teamImagePreview, 'teamImage');
+        }, 300);
+      }
+    } else {
+      teamImagePreview.innerHTML = '';
     }
-    // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
     validateField(teamMutationConstraints, teamImageInput);
   });
+
+  // Liên kết hình ảnh động
+  document.querySelectorAll('.dynamic-team-files').forEach((input) => {
+    const typeCode = input.dataset.typecode;
+    dynamicImagesFiles[typeCode] = [];
+    input.addEventListener('change', async () => {
+      const addedFiles = Array.from(input.files);
+      if (addedFiles.length === 0) return;
+
+      const preview = document.getElementById(`teamFilesPreview_${typeCode}`);
+
+      showPageLoader();
+      const results = await uploadTeamFilesApi(addedFiles, teamUniqueId, typeCode);
+      if (results && Array.isArray(results)) {
+        for (const res of results) {
+          const item = { seq: res.seq, url: res.url };
+          dynamicImagesFiles[typeCode].push(item);
+          const currentIndex = dynamicImagesFiles[typeCode].length - 1;
+          // Thêm một khoảng trễ nhỏ để đảm bảo file đã sẵn sàng trên đĩa 
+          setTimeout(() => {
+            renderImagePreview(item, currentIndex, input, preview, `teamFiles_${typeCode}`);
+          }, 300);
+        }
+      }
+      hidePageLoader();
+      input.value = ''; // reset input
+    });
+  });
+
+  // Liên kết dịch vụ
+  const btnAddService = document.getElementById('btnAddService');
+  if (btnAddService) {
+    // Trạng thái ban đầu của nút Thêm dịch vụ
+    const userTypeCode = document.getElementById('userTypeCode').value;
+    if (!userTypeCode) {
+      btnAddService.disabled = true;
+      btnAddService.style.opacity = '0.5';
+      btnAddService.style.cursor = 'not-allowed';
+    }
+
+    btnAddService.addEventListener('click', () => {
+      addServiceBlock();
+    });
+  }
 }
 
-// TODO: FUNC
+/**
+ * Thêm một khối nhập liệu dịch vụ mới
+ * @param {Object} svcData - Dữ liệu dịch vụ cũ (nếu có - dùng cho Update)
+ */
+function addServiceBlock(svcData = null) {
+  const container = document.getElementById('servicesContainer');
+  const serviceId = serviceCounter++;
+  serviceImagesFiles[serviceId] = [];
+
+  // Xác định bộ option dựa trên userTypeCode hiện tại
+  const userTypeSelect = document.getElementById('userTypeCode');
+  const userTypeKeyWord = userTypeSelect.options[userTypeSelect.selectedIndex]?.dataset?.keyword;
+
+  let currentOptions = [];
+  if (userTypeKeyWord === 'FACTORY') {
+    currentOptions = serviceOptionsFactory;
+  } else if (userTypeKeyWord === 'TECHNICAL') {
+    currentOptions = serviceOptionsTechnical;
+  }
+
+  let optionsHtml = '<option value="">-- Chọn dịch vụ --</option>';
+  currentOptions.forEach((opt) => {
+    optionsHtml += `<option value="${opt.keyOption}" ${svcData && svcData.serviceTypeCode === opt.keyOption ? 'selected' : ''}>${opt.valueOption}</option>`;
+  });
+
+  const html = `
+    <div class="card mb-3 service-block" data-uniqueid="${svcData && svcData.uniqueId ? svcData.uniqueId : generateUUID()}"  id="serviceBlock_${serviceId}" data-id="${serviceId}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <label class="form-label font-weight-bold text-primary">Dịch vụ #${serviceId + 1}</label>
+          <button type="button" class="btn btn-sm btn-danger btn-remove-service" data-id="${serviceId}">Xóa</button>
+        </div>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Chọn dịch vụ</label>
+            <select class="form-select service-type-code" required>
+              ${optionsHtml}
+            </select>
+          </div>
+          <div class="col-md-8 mb-3">
+            <label class="form-label">Mô tả dịch vụ</label>
+            <textarea class="form-control service-desc" rows="3">${svcData ? svcData.serviceDescription : ''}</textarea>
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Ảnh/Video mô tả dịch vụ</label><br/>
+            <label for="serviceImages_${serviceId}" class="file-label">
+                <span class="file-button">Chọn ảnh/video dịch vụ</span>
+            </label>
+            <input type="file" class="form-control service-images-input" id="serviceImages_${serviceId}"
+                name="serviceImages_${serviceId}" multiple accept=".png, .jpg, .jpeg, .mp4, .mov, .avi"
+                data-id="${serviceId}" />
+            <div class="image-preview-container mt-2" id="serviceImagesPreview_${serviceId}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', html);
+
+  // Liên kết các sự kiện
+  const block = document.getElementById(`serviceBlock_${serviceId}`);
+  block.querySelector('.btn-remove-service').addEventListener('click', function () {
+    delete serviceImagesFiles[serviceId];
+    block.remove();
+  });
+
+  const input = block.querySelector('.service-images-input');
+  const preview = block.querySelector(`#serviceImagesPreview_${serviceId}`);
+
+  input.addEventListener('change', async () => {
+    const addedFiles = Array.from(input.files);
+    if (addedFiles.length === 0) return;
+
+    const uniqueId = block.dataset.uniqueid;
+
+    showPageLoader();
+    const results = await uploadServiceFilesApi(addedFiles, uniqueId);
+    if (results && Array.isArray(results)) {
+      for (const res of results) {
+        const item = { seq: res.seq, url: res.url };
+        serviceImagesFiles[serviceId].push(item);
+        const currentIndex = serviceImagesFiles[serviceId].length - 1;
+        setTimeout(() => {
+          renderImagePreview(item, currentIndex, input, preview, `serviceImages_${serviceId}`);
+        }, 300);
+      }
+    }
+    hidePageLoader();
+    input.value = ''; // reset input
+  });
+
+  return { input, preview, serviceId };
+}
+
+/**
+ * Đổ dữ liệu từ TeamData vào Form khi ở trang Update
+ */
 async function assignForm(teamData) {
   const form = document.getElementById('team-update-form');
   const teamImagePreview = form.querySelector('#teamImagePreview');
-  const teamImagesPreview = form.querySelector('#teamImagesPreview');
   const teamImageInput = form.querySelector('#teamImage');
-  const teamImagesInput = form.querySelector('#teamImages');
 
-  // reset các biến
   clearErrors();
-  teamImagesFiles = [];
   teamImageInput.value = '';
-  teamImagesInput.value = '';
 
-  // điền giá trị các input bằng dữ liệu từ API
   form.querySelector('#teamName').value = teamData.teamName || '';
   form.querySelector('#teamAddress').value = teamData.teamAddress || '';
+  form.querySelector('#teamPhone').value = teamData.teamPhone || '';
+
   const provinceSelect = form.querySelector('#provinceCodes');
   if (teamData.provinceCodes) {
     const provinceCodes = typeof teamData.provinceCodes === 'string' ? JSON.parse(teamData.provinceCodes) : teamData.provinceCodes;
@@ -204,21 +485,55 @@ async function assignForm(teamData) {
   } else {
     provinceSelect.value = '';
   }
-  // Nếu có dùng Select2 thì trigger change
   if (typeof $ !== 'undefined' && $(provinceSelect).data('select2')) {
     $(provinceSelect).trigger('change');
   }
 
-  // điền giá trị userTypeCode
   const userTypeCodeSelect = form.querySelector('#userTypeCode');
   userTypeCodeSelect.value = teamData.userTypeCode || '';
   userTypeCodeSelect.disabled = true;
+
+  const selectedOption = userTypeCodeSelect.options[userTypeCodeSelect.selectedIndex];
+  const userTypeKeyWord = selectedOption?.dataset?.keyword;
+
+  if (userTypeKeyWord === 'FACTORY') {
+    document.getElementById('factorySpecialFields').classList.remove('d-none');
+    if (teamData.teamDescriptionSpecial) {
+      form.querySelector('#monthlyVolumn').value = teamData.teamDescriptionSpecial.monthlyVolumn || '';
+      form.querySelector('#minimunQuantity').value = teamData.teamDescriptionSpecial.minimunQuantity || '';
+    }
+    teamMutationConstraints.monthlyVolumn = {
+      presence: { allowEmpty: false, message: '^Vui lòng nhập sản lượng trên 1 tháng.' },
+    };
+    teamMutationConstraints.minimunQuantity = {
+      presence: { allowEmpty: false, message: '^Vui lòng nhập số lượng tối thiểu.' },
+    };
+  }
+
+  // Cập nhật trạng thái nút Thêm dịch vụ và hiển thị các khối ảnh phụ
+  const btnAddService = document.getElementById('btnAddService');
+  if (teamData.userTypeCode) {
+    if (btnAddService) {
+      btnAddService.disabled = false;
+      btnAddService.style.opacity = '1';
+      btnAddService.style.cursor = 'pointer';
+    }
+
+    // Hiển thị các danh mục ảnh theo userTypeCode
+    document.querySelectorAll('.img-type-block').forEach((block) => {
+      if (block.dataset.usertypecode === teamData.userTypeCode) {
+        block.classList.remove('d-none');
+      } else {
+        block.classList.add('d-none');
+      }
+    });
+  }
+
   if (teamData.userTypeCode) {
     const userSelect = form.querySelector('#userCode');
     userSelect.innerHTML = '<option value="">-- Chọn khách hàng sở hữu --</option>';
     userSelect.disabled = true;
 
-    // điền giá trị userCode
     const userList = await getUsersForTeamByType(teamData.userTypeCode);
     if (userList && userList.length > 0) {
       userList.forEach((user) => {
@@ -230,129 +545,137 @@ async function assignForm(teamData) {
       userSelect.value = teamData.userCode || '';
     }
 
-    // dựa giá trị userTypeKeyWord mà hiện/ ẩn component
-    const userTypeCodeSelected = userTypeCodeSelect.options[userTypeCodeSelect.selectedIndex];
-    if (userTypeCodeSelected) {
-      const userTypeKeyWord = userTypeCodeSelected.dataset.keyword;
-      const technicalDiv = document.querySelector('.last-box > div:first-child');
-      const descriptionDiv = document.querySelector('.last-box > div:nth-child(2)');
-      if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
-        // hiện form chuyên môn cho xưởng kỹ thuật / chia đôi chiều rộng của editor
-        technicalDiv.style.display = 'block';
-        descriptionDiv.className = 'col-lg-6';
-
-        // điền giá trị teamDescriptionSpecial vào từng Textarea
-        if (teamData.teamDescriptionSpecial) {
-          const specialData = typeof teamData.teamDescriptionSpecial === 'string' ? JSON.parse(teamData.teamDescriptionSpecial) : teamData.teamDescriptionSpecial;
-          if (typeof technicalTypes !== 'undefined' && Array.isArray(technicalTypes)) {
-            technicalTypes.forEach((item) => {
-              const textareaElement = document.getElementById(item.keyOption);
-              if (textareaElement && specialData[item.keyOption] !== undefined) {
-                textareaElement.value = specialData[item.keyOption];
-              }
-            });
-          }
-        }
+    document.querySelectorAll('.img-type-block').forEach((block) => {
+      if (block.dataset.usertypecode === teamData.userTypeCode) {
+        block.classList.remove('d-none');
       } else {
-        // ẩn form chuyên môn cho xưởng kỹ thuật / bật chiều rộng full cho editor
-        technicalDiv.style.display = 'none';
-        descriptionDiv.className = 'col-lg-12';
+        block.classList.add('d-none');
       }
-    }
+    });
   }
 
   quillGlobal.root.innerHTML = quillGlobal && teamData.teamDescription ? teamData.teamDescription : '';
 
-  // teamImage
   if (pageType === 'update' && teamData.teamImage) {
     const file = await ChangeUrlToFile(teamData.teamImage.filename);
     if (file) {
-      // cập nhập FileList cho teamImage
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
       teamImageInput.files = dataTransfer.files;
-
-      // re-render ảnh preview
-      renderImagePreview(file, 0, teamImageInput, teamImagePreview, 'teamImage');
-
-      // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
+      renderImagePreview({ seq: teamData.teamImage.seq, url: teamData.teamImage.filename }, 0, teamImageInput, teamImagePreview, 'teamImage');
       validateField(teamMutationConstraints, teamImageInput);
     }
   }
 
-  // teamImages
-  if (pageType === 'update' && teamData.teamImages && Array.isArray(teamData.teamImages)) {
-    const files = await Promise.all(teamData.teamImages.map((img) => ChangeUrlToFile(img.filename)));
-    teamImagesFiles = files.filter((file) => file !== null);
+  if (pageType === 'update' && teamData.teamFiles && Array.isArray(teamData.teamFiles)) {
+    for (const group of teamData.teamFiles) {
+      if (!group.fileTypeCode) continue;
+      const typeCode = group.fileTypeCode;
 
-    if (teamImagesFiles.length > 0) {
-      // cập nhập FileList cho teamImages
-      const dataTransfer = new DataTransfer();
-      teamImagesFiles.forEach((file) => dataTransfer.items.add(file));
-      teamImagesInput.files = dataTransfer.files;
-      teamImagesPreview.innerHTML = '';
+      if (group.images && Array.isArray(group.images)) {
+        for (const img of group.images) {
+          const file = await ChangeUrlToFile(img.filename);
+          if (file) {
+            if (!dynamicImagesFiles[typeCode]) dynamicImagesFiles[typeCode] = [];
+            dynamicImagesFiles[typeCode].push({ seq: img.seq, url: img.filename, file: file });
+          }
+        }
+      }
+    }
 
-      // re-render ảnh preview
-      teamImagesFiles.forEach((file, index) => renderImagePreview(file, index, teamImagesInput, teamImagesPreview, 'teamImages'));
+    Object.keys(dynamicImagesFiles).forEach((typeCode) => {
+      const input = document.getElementById(`teamFiles_${typeCode}`);
+      const preview = document.getElementById(`teamFilesPreview_${typeCode}`);
+      if (input && dynamicImagesFiles[typeCode].length > 0) {
+        preview.innerHTML = '';
+        dynamicImagesFiles[typeCode].forEach((file, index) => renderImagePreview(file, index, input, preview, `teamFiles_${typeCode}`));
+      }
+    });
+  }
 
-      // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
-      validateField(teamMutationConstraints, teamImagesInput);
+  if (pageType === 'update' && teamData.services && Array.isArray(teamData.services)) {
+    for (const svc of teamData.services) {
+      const { input, preview, serviceId } = addServiceBlock(svc);
+      if (svc.images && Array.isArray(svc.images)) {
+        for (const img of svc.images) {
+          const file = await ChangeUrlToFile(img.filename);
+          if (file) {
+            serviceImagesFiles[serviceId].push({ seq: img.seq, url: img.filename, file: file });
+          }
+        }
+        if (serviceImagesFiles[serviceId].length > 0) {
+          preview.innerHTML = '';
+          serviceImagesFiles[serviceId].forEach((file, index) => renderImagePreview(file, index, input, preview, `serviceImages_${serviceId}`));
+        }
+      }
     }
   }
 }
 
-// TODO: RENDER
-function renderImagePreview(file, index, input, preview, field) {
-  // tạo preview hộp
+/**
+ * Hiển thị hình ảnh hoặc video preview sau khi đã upload xong
+ * @param {Object} item - Đối tượng chứa thông tin file ({seq, url, mimetype})
+ */
+function renderImagePreview(item, index, input, preview, field) {
+  // Xác định xem file có phải là video hay không dựa trên URL hoặc mimetype
+  const isVideo = (item.url && /\.(mp4|mov|avi)$/i.test(item.url)) || (item.mimetype && item.mimetype.startsWith('video/'));
+
+  const mediaTag = isVideo ? `<video src="" controls></video>` : `<img src="" alt="Preview ${index + 1}">`;
+
   const previewHtml = `
     <div class="image-preview" data-index="${index}">
-      <img src="" alt="Preview ${index + 1}">
-      <button class="delete-btn" type="button" data-index="${index}">x</button>
+      ${mediaTag}
+      <button class="delete-btn" type="button" data-index="${index}"></button>
     </div>
   `;
   preview.insertAdjacentHTML('beforeend', previewHtml);
 
-  // gán src cho ảnh preview
   const previewElement = preview.querySelector(`[data-index="${index}"]`);
-  const imgElement = previewElement.querySelector('img');
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    imgElement.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  const mediaElement = previewElement.querySelector(isVideo ? 'video' : 'img');
 
-  // tạo nút delete ảnh preview
+  // Xử lý URL hiển thị
+  let displayUrl = item.url || '';
+  if (displayUrl) {
+    if (!displayUrl.startsWith('blob:') && !displayUrl.startsWith('http') && !displayUrl.startsWith('uploads/')) {
+      displayUrl = 'uploads/' + displayUrl;
+    }
+    mediaElement.src = displayUrl.startsWith('blob:') || displayUrl.startsWith('http') ? displayUrl : CURRENT_URL + '/' + displayUrl;
+  }
+
   const deleteBtn = previewElement.querySelector('.delete-btn');
-  deleteBtn.addEventListener('click', () => {
+  deleteBtn.addEventListener('click', async () => {
     const idx = parseInt(previewElement.dataset.index);
 
-    if (field === 'teamImages') {
-      // xóa file ra khỏi teamImagesFiles
-      // cập nhập lại FileList cho 'teamImages'
-      // gán dữ liệu  FileList mới vào 'teamImagesInput'
-
-      teamImagesFiles.splice(idx, 1);
-      const dataTransfer = new DataTransfer();
-      teamImagesFiles.forEach((file) => dataTransfer.items.add(file));
-      input.files = dataTransfer.files;
-    } else if (field === 'teamImage') {
+    if (field === 'teamImage') {
+      if (item && item.seq) await deleteFileApi(item.seq, 'teamImage');
       input.value = '';
+    } else if (field.startsWith('teamFiles_')) {
+      const typeCode = field.replace('teamFiles_', '');
+      const delItem = dynamicImagesFiles[typeCode][idx];
+      if (delItem && delItem.seq) await deleteFileApi(delItem.seq, 'teamFiles');
+      dynamicImagesFiles[typeCode].splice(idx, 1);
+    } else if (field.startsWith('serviceImages_')) {
+      const sId = parseInt(field.replace('serviceImages_', ''));
+      const delItem = serviceImagesFiles[sId][idx];
+      if (delItem && delItem.seq) await deleteFileApi(delItem.seq, 'teamServiceFiles');
+      serviceImagesFiles[sId].splice(idx, 1);
     }
 
-    // re-render ảnh preview
     preview.innerHTML = '';
-    if (field === 'teamImages') {
-      teamImagesFiles.forEach((file, i) => renderImagePreview(file, i, input, preview, field));
-    } else if (field === 'teamImage' && input.files.length > 0) {
-      renderImagePreview(input.files[0], 0, input, preview, field);
+    if (field === 'teamImage') {
+      // Sau khi xóa ảnh chính, không hiển thị gì
+    } else if (field.startsWith('teamFiles_')) {
+      const typeCode = field.replace('teamFiles_', '');
+      dynamicImagesFiles[typeCode].forEach((f, i) => renderImagePreview(f, i, input, preview, field));
+    } else if (field.startsWith('serviceImages_')) {
+      const sId = parseInt(field.replace('serviceImages_', ''));
+      serviceImagesFiles[sId].forEach((f, i) => renderImagePreview(f, i, input, preview, field));
     }
 
-    // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
-    validateField(teamMutationConstraints, input);
+    if (field === 'teamImage') validateField(teamMutationConstraints, input);
   });
 }
 
-// TODO: API
 async function createTeam(formData) {
   await submitTeam(formData, '/api/admin/team/create', 'post', 'Thêm thành công');
 }
@@ -361,47 +684,62 @@ async function updateTeam(formData) {
   await submitTeam(formData, `/api/admin/team/update/${formData.teamCode}`, 'put', 'Chỉnh sửa thành công');
 }
 
+/**
+ * Xử lý gửi dữ liệu Form lên server (Create/Update)
+ */
 async function submitTeam(formData, url, method, successMessage) {
-  // add dự liệu input vào formData
   const postData = new FormData();
-  const fields = ['teamName', 'teamAddress', 'provinceCodes', 'userTypeCode', 'userCode', 'teamDescription'];
+  const fields = ['teamName', 'teamAddress', 'teamPhone', 'provinceCodes', 'userTypeCode', 'userCode', 'teamDescription', 'teamDescriptionSpecial'];
+  postData.append('uniqueId', teamUniqueId);
   fields.forEach((field) => {
     let value = formData[field];
-    if (field === 'provinceCodes' && Array.isArray(value)) {
+    if ((field === 'provinceCodes' || field === 'teamDescriptionSpecial') && value && typeof value === 'object') {
       value = JSON.stringify(value);
     }
-    postData.append(field, value);
+    postData.append(field, value || '');
   });
 
-  // add dữ liệu chuyên môn của xưởng kỹ thuật
-  const userTypeKeyWord = document.querySelector('#userTypeCode option:checked')?.dataset.keyword;
-  if (userTypeKeyWord == VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
-    let teamDescriptionSpecial = {};
-    if (typeof technicalTypes !== 'undefined' && Array.isArray(technicalTypes)) {
-      technicalTypes.forEach(function (item) {
-        const textareaElement = document.getElementById(item.keyOption);
-        if (textareaElement) {
-          teamDescriptionSpecial[item.keyOption] = textareaElement.value;
-        }
-      });
+  // Thu thập dịch vụ
+  const servicesData = [];
+  const serviceBlocks = document.querySelectorAll('.service-block');
+
+  if (serviceBlocks.length === 0) {
+    toastErr('Vui lòng đăng ký ít nhất một dịch vụ.');
+    return;
+  }
+
+  const serviceTypes = new Set();
+  let hasError = false;
+
+  serviceBlocks.forEach((block, index) => {
+    const sId = block.dataset.id;
+    const sType = block.querySelector('.service-type-code').value;
+    const sDesc = block.querySelector('.service-desc').value;
+
+    if (!sType) {
+      toastErr(`Vui lòng chọn loại dịch vụ cho dịch vụ #${index + 1}.`);
+      hasError = true;
+      return;
     }
 
-    postData.append('teamDescriptionSpecial', JSON.stringify(teamDescriptionSpecial));
-  } else {
-    postData.append('teamDescriptionSpecial', null);
-  }
+    if (serviceTypes.has(sType)) {
+      toastErr(`Dịch vụ #${index + 1} bị trùng lặp. Mỗi loại dịch vụ chỉ được chọn một lần.`);
+      hasError = true;
+      return;
+    }
+    serviceTypes.add(sType);
 
-  // đẩy teamImage, teamImages vào formData nếu có thay đổi
-  if (formData.teamImage?.length) {
-    postData.append('teamImage', formData.teamImage[0]);
-  }
-  if (formData.teamImages?.length) {
-    Array.from(formData.teamImages).forEach((file) => {
-      postData.append('teamImages', file);
+    servicesData.push({
+      serviceTypeCode: sType,
+      serviceDescription: sDesc,
+      uniqueId: block.dataset.uniqueid || '',
     });
-  }
+  });
 
-  // disable button
+  if (hasError) return;
+
+  postData.append('servicesData', JSON.stringify(servicesData));
+
   const submitBtn = document.querySelector('.btn-submit-lg');
   submitBtn.disabled = true;
 
@@ -413,7 +751,7 @@ async function submitTeam(formData, url, method, successMessage) {
     }
   } catch (error) {
     console.error(`error:`, error);
-    if (error.response.data) {
+    if (error.response?.data) {
       toastErr(error.response.data.message);
     }
     submitBtn.disabled = false;
@@ -431,7 +769,6 @@ async function getUsersForTeamByType(userTypeCode) {
       axiosAuth(),
     )
     .then(function (response) {
-      console.log('getUsersForTeamByType -- ', response);
       return response.data;
     })
     .catch(function (error) {

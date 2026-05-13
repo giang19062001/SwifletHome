@@ -123,6 +123,10 @@ export const Msg = {
   // Đội gia công
   TeamNotFound: notFound('Đội gia công - kỹ thuật'),
   YouAlreadyReview: alreadyDone('Đội gia công - kỹ thuật này đã được bạn đánh giá'),
+  TeamAlreadyRegistered: 'Người dùng hiện tại đã đăng ký đội công xưởng này rồi',
+  TeamServiceRequired: 'Phải đăng ký ít nhất 1 dịch vụ',
+  TeamServiceDuplicate: 'Không được đăng ký dịch vụ trùng nhau',
+  TeamServiceDataInvalid: 'Dữ liệu dịch vụ không hợp lệ',
 
   // Captcha
   CapchaInvalid: err('Xác thực reCAPTCHA'),

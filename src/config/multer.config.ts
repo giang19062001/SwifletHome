@@ -26,7 +26,7 @@ export const validateImgExt = (originalname) => {
 };
 
 export const getFileLocation = (mimetype: string, fieldname: string) => {
-  console.log('getFileLocation ---> ', mimetype, fieldname);
+  // console.log('getFileLocation ---> ', mimetype, fieldname);
   let result = '';
   if (mimetype.startsWith('image/')) {
     // image
@@ -50,10 +50,14 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'images/requestQrcodes';
     }
 
-    if (fieldname === 'teamImage' || fieldname.includes('teamImage') || fieldname === 'teamImages' || fieldname.includes('teamImages')) {
+    // team
+    if (fieldname === 'teamImage' || fieldname.includes('teamImage') 
+    ||  fieldname === 'teamFiles' || fieldname.includes('teamFiles')
+    || fieldname === 'teamServiceFiles' ||fieldname.includes('teamServiceFiles')) {
       result = 'images/teams';
     }
 
+    // team review
     if (fieldname === 'reviewImg' || fieldname.includes('reviewImg')) {
       result = 'images/reviews';
     }
@@ -71,6 +75,12 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     if (fieldname === 'requestQrcodeFiles' || fieldname.includes('requestQrcodeFiles')) {
       result = 'videos/requestQrcodes';
     }
+      // team
+    if ( fieldname === 'teamFiles' || fieldname.includes('teamFiles')
+    || fieldname === 'teamServiceFiles' ||fieldname.includes('teamServiceFiles')) {
+      result = 'videos/teams';
+    }
+
   }
   if (mimetype.startsWith('audio/')) {
     //audio

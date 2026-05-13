@@ -1,6 +1,6 @@
-export const IMG_TYPES = ['.png', '.jpg', '.jpeg', '.heic'];
+export const IMG_TYPES = ['.png', '.jpg', '.jpeg'];
 export const AUDIO_TYPES = ['.mp3'];
-export const VIDEO_TYPES = ['.mp4', '.mov', '.hevc'];
+export const VIDEO_TYPES = ['.mp4', '.mov', '.avi'];
 
 export const APP_SCREENS = {
   QR_SCREEN: 'QR_SCREEN',

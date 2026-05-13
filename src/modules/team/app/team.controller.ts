@@ -1,20 +1,30 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UploadedFiles, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UploadedFile, UploadedFiles, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { multerImgConfig } from 'src/config/multer.config';
+import { getImgVideoMulterConfig, multerImgConfig } from 'src/config/multer.config';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { TeamReviewAppService } from './team-review.service';
 import { TeamUserAppService } from './team-user.service';
-import { GetAllTeamDto, GetReviewListOfTeamDto, ReviewTeamDto, UploadReviewFilesDto } from './team.dto';
-import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, UploadReviewFilesResDto } from './team.response';
+import {
+  CreateTeamAppDto,
+  DeleteFileAppDto,
+  GetAllTeamDto,
+  GetReviewListOfTeamDto,
+  ReviewTeamDto,
+  UploadReviewFilesDto,
+  UploadServiceFilesAppDto,
+  UploadTeamFilesAppDto,
+  UploadTeamMainImageAppDto,
+} from './team.dto';
+import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, InitFormCreateTeamAppResDto, UploadReviewFilesResDto } from './team.response';
 
 @ApiTags('app/team')
 @Controller('/api/app/team')
@@ -22,11 +32,21 @@ import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, Uploa
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class TeamAppController {
-  constructor(private readonly teamUserAppService: TeamUserAppService,
-    private readonly teamReviewAppService: TeamReviewAppService
+  constructor(
+    private readonly teamUserAppService: TeamUserAppService,
+    private readonly teamReviewAppService: TeamReviewAppService,
   ) {}
 
   // TODO: TEAM
+  @ApiOperation({ summary: 'Lấy thông tin khởi tạo form đăng ký team' })
+  @Get('getInitFormCreateTeam')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(InitFormCreateTeamAppResDto) })
+  async getInitFormCreateTeam(@GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.teamUserAppService.getInitFormCreateTeam(user.userTypeCode, user.userTypeKeyWord);
+    return result;
+  }
+
   @ApiOperation({
     summary: 'Lấy danh sách các đội kỹ thuật - thi công',
     description: `
@@ -53,7 +73,7 @@ export class TeamAppController {
     summary: 'Lấy thông tin chi tiết 1 đội kỹ thuật - thi công ( mô tả, danh sách ảnh ) ngoại trừ danh sách Review',
     description: `
 **teamDescription** là Html,
-**teamDescriptionSpecial** có thể là 'Object <key: string>' hoặc 'null'`,
+**teamDescriptionSpecial** { monthlyVolumn: number, minimunQuantity: number,} hoặc 'null'`,
   })
   @Get('getDetailTeam/:teamCode')
   @HttpCode(HttpStatus.OK)
@@ -62,6 +82,108 @@ export class TeamAppController {
   async getInfoToRequestQrcode(@Param('teamCode') teamCode: string, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.teamUserAppService.getDetailTeam(teamCode);
     return result;
+  }
+
+  // TODO: TEAM REGISTRATION
+  @ApiOperation({
+    summary: 'Đăng ký đội kỹ thuật / xưởng gia công mới',
+    description: `
+**servicesData**: Mảng dịch vụ [{"serviceTypeCode": "BUILD_RAW", "serviceDescription": "nội dung", "uniqueId": "****"}] \n
+**teamDescriptionSpecial**: 
+- Dành cho xưởng gia công: {"monthlyVolumn": 1000, "minimunQuantity": 10} \n
+- Dành cho đội kỹ thuật: null \n
+**uniqueId**: uuid này phải đồng nhất với uuid của uploadTeamMainImage, uploadTeamFiles`,
+  })
+  @Post('createTeam')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: CreateTeamAppDto })
+  async createTeam(@Body() dto: CreateTeamAppDto, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.teamUserAppService.createTeam(dto, user.userCode, user.userTypeCode);
+    if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.RegisterErr,
+        data: 0,
+      });
+    } else if (result === -1) {
+      throw new BadRequestException({
+        message: Msg.TeamAlreadyRegistered,
+        data: 0,
+      });
+    } else if (result === -2) {
+      throw new BadRequestException({
+        message: Msg.TeamServiceRequired,
+        data: 0,
+      });
+    } else if (result === -3) {
+      throw new BadRequestException({
+        message: Msg.TeamServiceDuplicate,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.RegisterOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({ summary: 'Upload ảnh chính cho team', description:'uuid này phải đồng nhất với uuid của createTeam, uploadTeamFiles' })
+  @Post('uploadTeamMainImage')
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadTeamMainImageAppDto })
+  @UseInterceptors(FileInterceptor('teamImage', multerImgConfig))
+  async uploadTeamMainImage(@Body() dto: UploadTeamMainImageAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
+    const result = await this.teamUserAppService.uploadTeamMainImage(dto, file, user.userCode);
+    return {
+      message: Msg.UploadOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({ summary: 'Upload ảnh/video phụ cho team', description:'uuid này phải đồng nhất với uuid của createTeam, uploadTeamMainImage'  })
+  @Post('uploadTeamFiles')
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadTeamFilesAppDto })
+  @UseInterceptors(FilesInterceptor('teamFiles', 20, getImgVideoMulterConfig(20)))
+  async uploadTeamFiles(@Body() dto: UploadTeamFilesAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFiles() files: Express.Multer.File[]) {
+    if (!files || files.length === 0) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
+    const result = await this.teamUserAppService.uploadTeamFiles(dto, files, user.userCode);
+    return {
+      message: Msg.UploadOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({ summary: 'Upload ảnh/video cho dịch vụ', description:'uuid này chỉ đồng nhất với uuid của service hiện tại'  })
+  @Post('uploadServiceFiles')
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadServiceFilesAppDto })
+  @UseInterceptors(FilesInterceptor('teamServiceFiles', 20, getImgVideoMulterConfig(20)))
+  async uploadServiceFiles(@Body() dto: UploadServiceFilesAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFiles() files: Express.Multer.File[]) {
+    if (!files || files.length === 0) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
+    const result = await this.teamUserAppService.uploadServiceFiles(dto, files, user.userCode);
+    return {
+      message: Msg.UploadOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({ summary: 'Xóa file ảnh/video đã upload', description: `**uploadType**: 
+  - teamImage: xóa ảnh chính \n 
+  - teamFiles: xóa ảnh/video phụ  \n
+  - teamServiceFiles: xóa ảnh/video dịch vụ` })
+  @Post('deleteFile')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: DeleteFileAppDto })
+  async deleteFile(@Body() dto: DeleteFileAppDto, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.teamUserAppService.deleteFile(dto, user.userCode);
+    return {
+      message: result > 0 ? Msg.DeleteOk : Msg.DeleteErr,
+      data: result,
+    };
   }
 
   // TODO: REVIEW
@@ -107,13 +229,13 @@ export class TeamAppController {
         data: 0,
       });
     }
-      if (result === -3) {
+    if (result === -3) {
       throw new BadRequestException({
         message: Msg.YouAlreadyReview,
         data: 0,
       });
     }
-    
+
     if (result === 0) {
       throw new BadRequestException({
         message: Msg.RegisterErr,

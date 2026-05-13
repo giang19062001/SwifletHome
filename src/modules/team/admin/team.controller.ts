@@ -8,20 +8,22 @@ import {
   Param,
   Post,
   Put,
+  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import { multerImgConfig } from 'src/config/multer.config';
+import { getImgVideoMulterConfig, multerImgConfig } from 'src/config/multer.config';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
-import { ChangDisplayReviewDto, CreateTeamDto, TeamResDto, TeamReviewResDto, UpdateTeamDto } from './team.dto';
+import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, TeamResDto, TeamReviewResDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
 import { TeamAdminService } from './team.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/team')
@@ -56,32 +58,15 @@ export class TeamAdminController {
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateTeamDto })
-  // @UseInterceptors(AnyFilesInterceptor(multerImgConfig))
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'teamImage', maxCount: 1 },
-        { name: 'teamImages', maxCount: 10 },
-      ],
-      multerImgConfig,
-    ),
-  )
+  @UseInterceptors(FileInterceptor('teamImage', multerImgConfig))
   async create(
     @Body() createTeamDto: CreateTeamDto,
     @GetUserAdmin() admin: TokenUserAdminResDto,
-    // @UploadedFiles() files: Express.Multer.File[],
-    @UploadedFiles()
-    files: {
-      teamImage?: Express.Multer.File[];
-      teamImages?: Express.Multer.File[];
-    },
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const teamImage = files.teamImage?.[0] || null;
-    const teamImages = files.teamImages || [];
     const body = {
       ...createTeamDto,
-      teamImage,
-      teamImages,
+      teamImage: file || createTeamDto.teamImage,
     };
 
     const result = await this.teamAdminService.create(body, admin.userId);
@@ -99,37 +84,78 @@ export class TeamAdminController {
   @ApiParam({ name: 'teamCode', type: String })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateTeamDto })
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'teamImage', maxCount: 1 },
-        { name: 'teamImages', maxCount: 10 },
-      ],
-      multerImgConfig,
-    ),
-  )
+  @UseInterceptors(FileInterceptor('teamImage', multerImgConfig))
   async update(
     @Body() updateTeamDto: UpdateTeamDto,
     @Param('teamCode') teamCode: string,
     @GetUserAdmin() admin: TokenUserAdminResDto,
-    @UploadedFiles()
-    files: {
-      teamImage?: Express.Multer.File[];
-      teamImages?: Express.Multer.File[];
-    },
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const teamImage = files.teamImage?.[0] || null;
-    const teamImages = files.teamImages || [];
     const dto = {
       ...updateTeamDto,
-      teamImage,
-      teamImages,
+      teamImage: file || updateTeamDto.teamImage,
     };
 
     const result = await this.teamAdminService.update(dto, admin.userId, teamCode);
     if (result === 0) {
       throw new BadRequestException();
     }
+    return result;
+  }
+
+  @Post('uploadTeamMainImage')
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadTeamMainImageDto })
+  @UseInterceptors(FileInterceptor('teamImage', multerImgConfig))
+  async uploadTeamMainImage(
+    @Body() dto: UploadTeamMainImageDto,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) throw new BadRequestException('No file provided');
+    const result = await this.teamAdminService.uploadTeamMainImage(dto, file, admin.userId);
+    return result;
+  }
+
+  @Post('uploadTeamFiles')
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadTeamFilesDto })
+  @UseInterceptors(FilesInterceptor('teamFiles', 20, getImgVideoMulterConfig(20)))
+  async uploadTeamFiles(
+    @Body() dto: UploadTeamFilesDto,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    if (!files || files.length === 0) throw new BadRequestException('No files provided');
+    const result = await this.teamAdminService.uploadTeamFiles(dto, files, admin.userId);
+    return result;
+  }
+
+  @Post('uploadServiceFiles')
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadServiceFilesDto })
+  @UseInterceptors(FilesInterceptor('teamServiceFiles', 20, getImgVideoMulterConfig(20)))
+  async uploadServiceFiles(
+    @Body() dto: UploadServiceFilesDto,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    if (!files || files.length === 0) throw new BadRequestException('No files provided');
+    const result = await this.teamAdminService.uploadServiceFiles(dto, files, admin.userId);
+    return result;
+  }
+
+  @Post('deleteFile')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: DeleteFileDto })
+  async deleteFile(
+    @Body() dto: DeleteFileDto,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
+  ) {
+    const result = await this.teamAdminService.deleteFile(dto, admin.userId);
     return result;
   }
 
