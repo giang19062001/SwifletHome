@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkRespon
 import { getImgVideoMulterConfig, multerImgConfig } from 'src/config/multer.config';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
+import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
@@ -24,7 +24,7 @@ import {
   UploadTeamFilesAppDto,
   UploadTeamMainImageAppDto,
 } from './team.dto';
-import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, InitFormCreateTeamAppResDto, UploadReviewFilesResDto } from './team.response';
+import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, InitFormCreateTeamAppResDto, UploadReviewFilesResDto, UploadTeamFileResDto } from './team.response';
 
 @ApiTags('app/team')
 @Controller('/api/app/team')
@@ -97,6 +97,8 @@ export class TeamAppController {
   @Post('createTeam')
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: CreateTeamAppDto })
+  @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async createTeam(@Body() dto: CreateTeamAppDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.teamUserAppService.createTeam(dto, user.userCode, user.userTypeCode);
     if (result === 0) {
@@ -126,11 +128,13 @@ export class TeamAppController {
     };
   }
 
-  @ApiOperation({ summary: 'Upload ảnh chính cho team', description:'uuid này phải đồng nhất với uuid của createTeam, uploadTeamFiles' })
+  @ApiOperation({ summary: 'Upload ảnh chính cho team', description: 'uuid này phải đồng nhất với uuid của createTeam, uploadTeamFiles' })
   @Post('uploadTeamMainImage')
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadTeamMainImageAppDto })
+  @ApiOkResponse({ type: ApiAppResponseDto(UploadTeamFileResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
   @UseInterceptors(FileInterceptor('teamImage', multerImgConfig))
   async uploadTeamMainImage(@Body() dto: UploadTeamMainImageAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFile() file: Express.Multer.File) {
     if (!file) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
@@ -141,11 +145,13 @@ export class TeamAppController {
     };
   }
 
-  @ApiOperation({ summary: 'Upload ảnh/video phụ cho team', description:'uuid này phải đồng nhất với uuid của createTeam, uploadTeamMainImage'  })
+  @ApiOperation({ summary: 'Upload ảnh/video phụ cho team', description: 'uuid này phải đồng nhất với uuid của createTeam, uploadTeamMainImage' })
   @Post('uploadTeamFiles')
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadTeamFilesAppDto })
+  @ApiOkResponse({ type: ApiAppResponseDto([UploadTeamFileResDto]) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
   @UseInterceptors(FilesInterceptor('teamFiles', 20, getImgVideoMulterConfig(20)))
   async uploadTeamFiles(@Body() dto: UploadTeamFilesAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
@@ -156,11 +162,13 @@ export class TeamAppController {
     };
   }
 
-  @ApiOperation({ summary: 'Upload ảnh/video cho dịch vụ', description:'uuid này chỉ đồng nhất với uuid của service hiện tại'  })
+  @ApiOperation({ summary: 'Upload ảnh/video cho dịch vụ', description: 'uuid này chỉ đồng nhất với uuid của service hiện tại' })
   @Post('uploadServiceFiles')
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadServiceFilesAppDto })
+  @ApiOkResponse({ type: ApiAppResponseDto([UploadTeamFileResDto]) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
   @UseInterceptors(FilesInterceptor('teamServiceFiles', 20, getImgVideoMulterConfig(20)))
   async uploadServiceFiles(@Body() dto: UploadServiceFilesAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
@@ -171,13 +179,18 @@ export class TeamAppController {
     };
   }
 
-  @ApiOperation({ summary: 'Xóa file ảnh/video đã upload', description: `**uploadType**: 
+  @ApiOperation({
+    summary: 'Xóa file ảnh/video đã upload',
+    description: `**uploadType**: 
   - teamImage: xóa ảnh chính \n 
   - teamFiles: xóa ảnh/video phụ  \n
-  - teamServiceFiles: xóa ảnh/video dịch vụ` })
+  - teamServiceFiles: xóa ảnh/video dịch vụ`,
+  })
   @Post('deleteFile')
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: DeleteFileAppDto })
+  @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async deleteFile(@Body() dto: DeleteFileAppDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.teamUserAppService.deleteFile(dto, user.userCode);
     return {

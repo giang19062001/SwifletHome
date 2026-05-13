@@ -118,6 +118,17 @@ export class UploadReviewFilesResDto {
   filename: string;
 }
 
+export class UploadTeamFileResDto {
+  @ApiProperty({ example: 1 })
+  seq: number;
+
+  @ApiProperty({ example: 'uploads/images/***/***.jpg' })
+  url: string;
+
+  @ApiProperty({ example: 'image/jpeg' })
+  mimetype: string;
+}
+
 export class TeamFileTypeResDto {
   @ApiProperty({ example: 'FILE_TYPE_01' })
   fileTypeCode: string;
