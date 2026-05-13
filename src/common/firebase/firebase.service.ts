@@ -83,7 +83,7 @@ export class FirebaseService implements OnModuleInit {
     return APP_SCREENS.NOTIFICATION_SCREEN;
   }
   // Single device token (của bạn)
-  async sendNotification(userCode: string, deviceToken: string | null, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
+  async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
     const notificationId = uuidv4();
     let messageId = 'no_push';
