@@ -14,6 +14,6 @@ import { TeamAppController } from './team.controller';
   imports: [AuthAppModule, UserAppModule, FileLocalModule, ProvinceModule, OptionModule],
   controllers: [TeamAppController],
   providers: [TeamUserAppService, TeamReviewAppService, TeamUserAppRepository, TeamReviewAppRepository],
-  exports: [TeamReviewAppService],
+  exports: [TeamReviewAppService, TeamUserAppService],
 })
 export class TeamAppModule {}

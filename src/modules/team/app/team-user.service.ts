@@ -210,4 +210,20 @@ export class TeamUserAppService {
       return 0;
     }
   }
+
+  async getFilesNotUseTeam() {
+    return await this.teamUserAppRepository.getFilesNotUseTeam();
+  }
+
+  async getFilesNotUseService() {
+    return await this.teamUserAppRepository.getFilesNotUseService();
+  }
+
+  async deleteFileTeam(seq: number) {
+    return await this.teamUserAppRepository.deleteFileTeam(seq);
+  }
+
+  async deleteFileService(seq: number) {
+    return await this.teamUserAppRepository.deleteFileService(seq);
+  }
 }

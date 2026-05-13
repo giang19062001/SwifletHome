@@ -119,7 +119,7 @@ document.getElementById('userTypeCode').addEventListener('change', async functio
   // Cập nhật lại danh sách option cho các dịch vụ đã thêm (nếu có)
   const serviceSelects = document.querySelectorAll('.service-type-code');
   let currentOptions = [];
-  if (userTypeKeyWord === 'FACTORY') {
+  if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.FACTORY) {
     currentOptions = serviceOptionsFactory;
     document.getElementById('factorySpecialFields').classList.remove('d-none');
     teamMutationConstraints.monthlyVolumn = {
@@ -128,7 +128,7 @@ document.getElementById('userTypeCode').addEventListener('change', async functio
     teamMutationConstraints.minimunQuantity = {
       presence: { allowEmpty: false, message: '^Vui lòng nhập số lượng tối thiểu.' },
     };
-  } else if (userTypeKeyWord === 'TECHNICAL') {
+  } else if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
     currentOptions = serviceOptionsTechnical;
     document.getElementById('factorySpecialFields').classList.add('d-none');
     delete teamMutationConstraints.monthlyVolumn;
@@ -273,7 +273,7 @@ function initializeForm() {
     const userTypeCodeSelect = form.querySelector('#userTypeCode');
     const userTypeKeyWord = userTypeCodeSelect.options[userTypeCodeSelect.selectedIndex]?.dataset?.keyword;
 
-    if (userTypeKeyWord === 'FACTORY') {
+    if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.FACTORY) {
       formData.monthlyVolumn = form.querySelector('#monthlyVolumn').value;
       formData.minimunQuantity = form.querySelector('#minimunQuantity').value;
     }
@@ -281,7 +281,7 @@ function initializeForm() {
     const isOk = checkingErrors(formData, teamMutationConstraints);
     if (!isOk) return;
 
-    if (userTypeKeyWord === 'FACTORY') {
+    if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.FACTORY) {
       formData.teamDescriptionSpecial = {
         monthlyVolumn: Number(formData.monthlyVolumn),
         minimunQuantity: Number(formData.minimunQuantity),
@@ -393,9 +393,9 @@ function addServiceBlock(svcData = null) {
   const userTypeKeyWord = userTypeSelect.options[userTypeSelect.selectedIndex]?.dataset?.keyword;
 
   let currentOptions = [];
-  if (userTypeKeyWord === 'FACTORY') {
+  if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.FACTORY) {
     currentOptions = serviceOptionsFactory;
-  } else if (userTypeKeyWord === 'TECHNICAL') {
+  } else if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
     currentOptions = serviceOptionsTechnical;
   }
 
@@ -530,7 +530,7 @@ async function assignForm(teamData) {
   const selectedOption = userTypeCodeSelect.options[userTypeCodeSelect.selectedIndex];
   const userTypeKeyWord = selectedOption?.dataset?.keyword;
 
-  if (userTypeKeyWord === 'FACTORY') {
+  if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.FACTORY) {
     document.getElementById('factorySpecialFields').classList.remove('d-none');
     if (teamData.teamDescriptionSpecial) {
       form.querySelector('#monthlyVolumn').value = teamData.teamDescriptionSpecial.monthlyVolumn || '';
@@ -814,12 +814,12 @@ async function getUsersForTeamByType(userTypeCode) {
 }
 
 async function updateTeamStatus(status) {
-  const confirmed = window.confirm(`Bạn có chắc chắn muốn ${status === 'APPROVE' ? 'Duyệt' : 'Từ chối'} đội này không?`);
+  const confirmed = window.confirm(`Bạn có chắc chắn muốn ${status === VARIABLE_ENUM.TEAM_STATUS.APPROVE ? 'Duyệt' : 'Từ chối'} đội này không?`);
   if (!confirmed) return;
 
   // Disable buttons
-  const approveBtn = document.querySelector('button[onclick="updateTeamStatus(\'APPROVE\')"]');
-  const refuseBtn = document.querySelector('button[onclick="updateTeamStatus(\'REFUSE\')"]');
+  const approveBtn = document.querySelector(`button[onclick="updateTeamStatus('${VARIABLE_ENUM.TEAM_STATUS.APPROVE}')"]`);
+  const refuseBtn = document.querySelector(`button[onclick="updateTeamStatus('${VARIABLE_ENUM.TEAM_STATUS.REFUSE}')"]`);
   if (approveBtn) approveBtn.disabled = true;
   if (refuseBtn) refuseBtn.disabled = true;
 

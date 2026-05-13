@@ -277,4 +277,14 @@ export class TeamUserAppRepository {
     );
     return rows;
   }
+
+  async getFilesNotUseTeam(): Promise<any[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq, filename FROM ${this.tableTeamImg} WHERE teamSeq = 0`);
+    return rows;
+  }
+
+  async getFilesNotUseService(): Promise<any[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq, filename FROM ${this.tableServiceImg} WHERE seqService = 0`);
+    return rows;
+  }
 }

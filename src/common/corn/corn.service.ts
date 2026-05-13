@@ -7,6 +7,7 @@ import { DoctorAppService } from 'src/modules/doctor/app/doctor.service';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { QrRequestAppService } from 'src/modules/qr/app/qr-request.service';
 import { TeamReviewAppService } from 'src/modules/team/app/team-review.service';
+import { TeamUserAppService } from 'src/modules/team/app/team-user.service';
 import { TodoAlarmAppService } from 'src/modules/todo/app/todo-alarm.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
@@ -19,6 +20,7 @@ export class CornService implements OnModuleInit {
 
   constructor(
     private readonly doctorAppService: DoctorAppService,
+    private readonly teamUserAppService: TeamUserAppService,
     private readonly teamReviewAppService: TeamReviewAppService,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly todoAlarmAppService: TodoAlarmAppService,
@@ -36,6 +38,7 @@ export class CornService implements OnModuleInit {
       await this.deleteUserHomeFilesNotUse();
       await this.deleteQrRequestFilesNotUse();
       await this.deleteReviewFilesNotUse();
+      await this.deleteTeamFilesNotUse();
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();
@@ -69,6 +72,7 @@ export class CornService implements OnModuleInit {
     // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.MONTH);
     // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
     // await this.deleteReviewFilesNotUse();
+    // await this.deleteTeamFilesNotUse();
   }
 
   async pushNotificationsByTaskAlarms() {
@@ -180,6 +184,38 @@ export class CornService implements OnModuleInit {
       }
     } catch (error) {
       this.logger.error(logbase, `Có lỗi khi xóa file video yêu cầu Qrcode dư thừa theo lịch trình: ${JSON.stringify(error)}`);
+    }
+  }
+
+  async deleteTeamFilesNotUse() {
+    const logbase = `${this.SERVICE_NAME}/deleteTeamFilesNotUse`;
+    this.logger.log(logbase, `Chuẩn bị xóa các file đội gia công - đội kỹ thuật không dùng theo lịch trình....`);
+    try {
+      // 1. Xóa trong tbl_team_img
+      const teamFilesNotUse = await this.teamUserAppService.getFilesNotUseTeam();
+      if (teamFilesNotUse.length) {
+        for (const file of teamFilesNotUse) {
+          await this.teamUserAppService.deleteFileTeam(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file trong tbl_team_img không dùng đã được xóa thành công`);
+      }
+
+      // 2. Xóa trong tbl_team_service_img
+      const serviceFilesNotUse = await this.teamUserAppService.getFilesNotUseService();
+      if (serviceFilesNotUse.length) {
+        for (const file of serviceFilesNotUse) {
+          await this.teamUserAppService.deleteFileService(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file trong tbl_team_service_img không dùng đã được xóa thành công`);
+      }
+
+      if (!teamFilesNotUse.length && !serviceFilesNotUse.length) {
+        this.logger.log(logbase, `Không có file đội gia công - đội kỹ thuật nào cần được xóa`);
+      }
+    } catch (error) {
+      this.logger.error(logbase, `Có lỗi khi xóa các file đội gia công - đội kỹ thuật không dùng theo lịch trình : ${JSON.stringify(error)}`);
     }
   }
 }
