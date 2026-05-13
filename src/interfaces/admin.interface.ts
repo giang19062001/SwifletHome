@@ -9,6 +9,12 @@ export enum YnEnum {
   N = 'N',
 }
 
+export enum TeamStatus {
+  APPROVE = 'APPROVE',
+  REFUSE = 'REFUSE',
+  WAITING = 'WAITING',
+}
+
 export interface ApiMutationResponse {
   success: boolean;
   message: string;

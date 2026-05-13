@@ -198,7 +198,7 @@ export class TeamUserAppService {
         // 5. Tạo services
         for (let i = 0; i < services.length; i++) {
           const svc = services[i];
-          const seqService = await this.teamUserAppRepository.createTeamService(seq, userTypeCode, svc.serviceTypeCode, svc.serviceDescription, svc.uniqueId);
+          const seqService = await this.teamUserAppRepository.createTeamService(seq, userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
           if (svc.uniqueId) {
             await this.teamUserAppRepository.updateSeqFilesService(seqService, svc.uniqueId, userCode);
           }

@@ -203,5 +203,19 @@ export class TeamAdminController {
       }
       return result;
     }
-  
+
+    @Put('updateStatus/:teamCode')
+    @ApiParam({ name: 'teamCode', type: String })
+    @ApiBody({ schema: { properties: { status: { type: 'string', enum: ['APPROVE', 'REFUSE', 'WAITING'] } } } })
+    async updateStatus(
+      @Param('teamCode') teamCode: string,
+      @Body('status') status: any,
+      @GetUserAdmin() admin: TokenUserAdminResDto,
+    ) {
+      const result = await this.teamAdminService.updateStatus(teamCode, status, admin.userId);
+      if (result === 0) {
+        throw new BadRequestException();
+      }
+      return result;
+    }
 }

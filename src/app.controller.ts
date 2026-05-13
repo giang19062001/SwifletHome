@@ -225,6 +225,19 @@ export class AppController {
     };
   }
 
+  @Get('/dashboard/user-teams/detail/:id')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/user-teams-detail')
+  async renderTeamDetail(@Req() req: Request) {
+    const values = await this.appService.renderTeamDetail(req.params.id);
+    return {
+      title: 'Chi tiết xưởng gia công - kỹ thuật',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
   // team - review
   @Get('/dashboard/user-teams/reviews')
   @UseGuards(PageAuthAdminGuard)

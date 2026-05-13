@@ -1,4 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
+import { TeamStatus } from 'src/interfaces/admin.interface';
 
 export class TeamImgResDto {
   @ApiProperty({ example: 1 })
@@ -78,6 +80,9 @@ export class GetDetailTeamResDto {
   })
   teamDescriptionSpecial: Record<string, number> | null;
 
+  @ApiProperty({ example: TeamStatus.WAITING, enum: TeamStatus })
+  status: TeamStatus;
+
   @ApiProperty({ example: 'uploads/images/***/***.jpg' })
   teamImage: string;
 
@@ -154,7 +159,7 @@ export class TeamServiceOptionResDto {
   @ApiProperty({ example: 'BUILD_RAW' })
   serviceTypeCode: string;
 
-  @ApiProperty({ example: 'nội dung' })
+  @ApiProperty({ example: 'Xây dựng phần thô nhà yến' })
   serviceDescription: string;
 
   @ApiProperty({ example: 'uuid của service này' })

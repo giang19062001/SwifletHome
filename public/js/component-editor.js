@@ -36,7 +36,7 @@ const quillGlobal = new Quill('#editor', {
       ],
     },
   },
-  placeholder: 'Nhập nội dung của bạn...',
+  placeholder: '',
 });
 
 // lắng nghe sự kiện copy/paste

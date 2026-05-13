@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
+import { NOTIFICATIONS } from 'src/helpers/text.helper';
+import { TeamStatus } from 'src/interfaces/admin.interface';
+import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
 import { TeamAdminRepository } from './team.repository';
 
@@ -13,6 +17,7 @@ export class TeamAdminService {
     private readonly teamAdminRepository: TeamAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
+    private readonly firebaseService: FirebaseService,
   ) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: TeamResDto[] }> {
     const total = await this.teamAdminRepository.getTotal();
@@ -153,7 +158,7 @@ export class TeamAdminService {
             const services = JSON.parse(dto.servicesData);
             for (let i = 0; i < services.length; i++) {
               const svc = services[i];
-              const seqService = await this.teamAdminRepository.createTeamService(seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceDescription, svc.uniqueId);
+              const seqService = await this.teamAdminRepository.createTeamService(seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
 
               if (svc.uniqueId) {
                 await this.teamAdminRepository.updateSeqFilesService(seqService, svc.uniqueId, createdId);
@@ -209,7 +214,7 @@ export class TeamAdminService {
           const services = JSON.parse(dto.servicesData);
           for (let i = 0; i < services.length; i++) {
             const svc = services[i];
-            const seqService = await this.teamAdminRepository.createTeamService(home.seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceDescription, svc.uniqueId);
+            const seqService = await this.teamAdminRepository.createTeamService(home.seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
 
             if (svc.uniqueId) {
               await this.teamAdminRepository.updateSeqFilesService(seqService, svc.uniqueId, updatedId);
@@ -248,6 +253,36 @@ export class TeamAdminService {
 
   async changeDisplay(dto: ChangDisplayReviewDto, updatedId: string, seq: number): Promise<number> {
     const result = await this.teamAdminRepository.changeDisplay(dto.isDisplay, updatedId, seq);
+    return result;
+  }
+
+  async updateStatus(teamCode: string, status: TeamStatus, updatedId: string): Promise<number> {
+    const team = await this.teamAdminRepository.getDetail(teamCode);
+    if (!team) return 0;
+
+    const result = await this.teamAdminRepository.updateStatus(teamCode, status, updatedId);
+    if (result > 0) {
+      const deviceToken = await this.teamAdminRepository.getUserDeviceToken(team.userCode);
+      if (deviceToken) {
+      let notification;
+      if (status === TeamStatus.APPROVE) {
+        notification = NOTIFICATIONS.TEAM_REGISTER_APPROVED(teamCode);
+      } else if (status === TeamStatus.REFUSE) {
+        notification = NOTIFICATIONS.TEAM_REGISTER_REFUSE(teamCode);
+      }
+
+      if (notification) {
+        await this.firebaseService.sendNotification(
+          team.userCode,
+          deviceToken,
+          notification.TITLE,
+          notification.BODY,
+          { teamCode },
+          NotificationTypeEnum.ADMIN,
+        );
+      }
+    }
+    }
     return result;
   }
 }

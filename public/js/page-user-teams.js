@@ -14,6 +14,9 @@ function gotoTeamCreate() {
 function gotoTeamUpdate(teamCode) {
   gotoPage('/dashboard/user-teams/update/' + teamCode);
 }
+function gotoTeamDetail(teamCode) {
+  gotoPage('/dashboard/user-teams/detail/' + teamCode);
+}
 function changePage(p) {
   page = p;
   document.getElementById('privacy-main-pager').innerHTML = '';
@@ -27,6 +30,18 @@ function renderAllTeam(data, objElement) {
   if (data?.list?.length) {
     let i = 1;
     data?.list.forEach((ele) => {
+      let actionBtn = '';
+      if (ele.status === 'WAITING' || ele.status === 'REFUSE') {
+        actionBtn = `<button class="btn btn-primary" onclick="gotoTeamDetail('${ele.teamCode}')">Xem chi tiết</button>`;
+      } else {
+        actionBtn = `<button class="btn-edit" onclick="gotoTeamUpdate('${ele.teamCode}')">Chỉnh sửa</button>`;
+      }
+
+      let statusBadge = '';
+      if (ele.status === 'APPROVE') statusBadge = `<span class="badge bg-success">${ele.status}</span>`;
+      else if (ele.status === 'REFUSE') statusBadge = `<span class="badge bg-danger">${ele.status}</span>`;
+      else statusBadge = `<span class="badge bg-warning text-dark">${ele.status}</span>`;
+
       const rowHtml = `
          <tr class="text-center">
             <td><p>${(page - 1) * limit + i++}</p></td>
@@ -35,10 +50,11 @@ function renderAllTeam(data, objElement) {
             <td><b>${ele.userTypeName}</b></td>
             <td><p>${ele.teamUserName}</p></td>
             <td><p>${ele.provinceName}</p></td>
+            <td><p>${statusBadge}</p></td>
             <td><p>${ele.teamAddress}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
-               <button class="btn-edit" onclick="gotoTeamUpdate('${ele.teamCode}')">Chỉnh sửa</button> 
+               ${actionBtn}
             </td>
          </tr>`;
       HTML += rowHtml;

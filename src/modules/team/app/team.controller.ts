@@ -88,7 +88,7 @@ export class TeamAppController {
   @ApiOperation({
     summary: 'Đăng ký đội kỹ thuật / xưởng gia công mới',
     description: `
-**servicesData**: Mảng dịch vụ [{"serviceTypeCode": "BUILD_RAW", "serviceDescription": "nội dung", "uniqueId": "****"}] \n
+**servicesData**: Mảng dịch vụ [{"serviceTypeCode": "BUILD_RAW", "serviceTextInput": "nội dung", "uniqueId": "****"}] \n
 **teamDescriptionSpecial**: 
 - Dành cho xưởng gia công: {"monthlyVolumn": 1000, "minimunQuantity": 10} \n
 - Dành cho đội kỹ thuật: null \n

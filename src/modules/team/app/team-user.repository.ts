@@ -49,7 +49,7 @@ export class TeamUserAppRepository {
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<GetAllTeamResDto[]> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName,
     A.teamUserName, A.teamPhone, A.teamAddress,
-    A.provinceCodes, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage
+    A.provinceCodes, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage, A.status
     FROM ${this.table} A 
     LEFT JOIN ${this.tableUserType} B
     ON A.userTypeCode = B.userTypeCode
@@ -85,7 +85,7 @@ export class TeamUserAppRepository {
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
             A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress,A.provinceCodes,
-            IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial,
+            IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial, A.status,
              A.teamImage,
             COALESCE(
               (
@@ -127,7 +127,7 @@ export class TeamUserAppRepository {
 
       // Lấy danh sách dịch vụ và ảnh dịch vụ
       const [services] = await this.db.query<RowDataPacket[]>(`
-        SELECT seq, userTypeCode, serviceTypeCode, serviceDescription
+        SELECT seq, userTypeCode, serviceTypeCode, serviceTextInput
         FROM tbl_team_service WHERE seqTeam = ?
       `, [result.seq]);
 
@@ -160,8 +160,8 @@ export class TeamUserAppRepository {
       teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
     }
     const sql = `
-      INSERT INTO ${this.table} (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.table} (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId, status) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       teamCode,
@@ -177,6 +177,7 @@ export class TeamUserAppRepository {
       typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
       createdId,
       dto.uniqueId,
+      'WAITING',
     ]);
     return result.insertId;
   }
@@ -222,12 +223,12 @@ export class TeamUserAppRepository {
     return result.affectedRows;
   }
 
-  async createTeamService(seqTeam: number, userTypeCode: string, serviceTypeCode: string, serviceDescription: string, uniqueId?: string): Promise<number> {
+  async createTeamService(seqTeam: number, userTypeCode: string, serviceTypeCode: string, serviceTextInput: string, uniqueId?: string): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableService} (seqTeam, userTypeCode, serviceTypeCode, serviceDescription, uniqueId)
+      INSERT INTO ${this.tableService} (seqTeam, userTypeCode, serviceTypeCode, serviceTextInput, uniqueId)
       VALUES (?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqTeam, userTypeCode, serviceTypeCode, serviceDescription, uniqueId || null]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqTeam, userTypeCode, serviceTypeCode, serviceTextInput, uniqueId || null]);
     return result.insertId;
   }
 

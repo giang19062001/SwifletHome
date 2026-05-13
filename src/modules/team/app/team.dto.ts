@@ -149,12 +149,12 @@ export class CreateTeamAppDto {
   teamDescriptionSpecial: any | null;
 
   @ApiProperty({
-    example: [{ serviceTypeCode: 'BUILD_RAW', serviceDescription: 'nội dung', uniqueId: 'uuid của service này' }],
+    example: [{ serviceTypeCode: 'BUILD_RAW', serviceTextInput: 'nội dung', uniqueId: 'uuid của service này' }],
     description: 'Mảng dịch vụ đăng ký',
   })
   @Type(() => Array<{
     serviceTypeCode: string;
-    serviceDescription: string;
+    serviceTextInput: string;
     uniqueId: string;
   }>)
   @IsOptional()

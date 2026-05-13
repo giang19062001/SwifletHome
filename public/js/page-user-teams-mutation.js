@@ -1,4 +1,5 @@
-const pageType = window.location.pathname.includes('/update') ? 'update' : 'create';
+const isDetailMode = typeof IS_DETAIL !== 'undefined' && IS_DETAIL;
+const pageType = isDetailMode ? 'detail' : (window.location.pathname.includes('/update') ? 'update' : 'create');
 const teamMutationConstraints = {
   teamName: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên xưởng công xưởng.' },
@@ -42,9 +43,12 @@ let teamUniqueId = typeof teamData !== 'undefined' && teamData.uniqueId ? teamDa
 let isMainImageUploading = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (pageType === 'update') {
+  if (pageType === 'update' || pageType === 'detail') {
     initializeForm();
     assignForm(teamData);
+    if (isDetailMode && typeof quillGlobal !== 'undefined') {
+      quillGlobal.disable();
+    }
   } else if (pageType === 'create') {
     initializeForm();
   }
@@ -219,10 +223,12 @@ async function deleteFileApi(seq, uploadType) {
  * Khởi tạo các sự kiện và cấu hình cho Form
  */
 function initializeForm() {
-  const form = document.getElementById(pageType === 'create' ? 'team-create-form' : 'team-update-form');
+  const formId = pageType === 'create' ? 'team-create-form' : (pageType === 'update' ? 'team-update-form' : 'team-detail-form');
+  const form = document.getElementById(formId);
   const teamImagePreview = form.querySelector('#teamImagePreview');
   const teamImageInput = form.querySelector('#teamImage');
   const provinceSelect = form.querySelector('#provinceCodes');
+  const btnAddService = document.getElementById('btnAddService');
 
   if (typeof $ !== 'undefined' && $.fn.select2) {
     $(provinceSelect)
@@ -247,7 +253,8 @@ function initializeForm() {
       });
   }
 
-  form.addEventListener('submit', async (event) => {
+  if (form) {
+    form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const formData = {
@@ -291,19 +298,24 @@ function initializeForm() {
     } else if (pageType === 'create') {
       await createTeam(formData);
     }
-  });
+    });
+  }
 
-  attachValidateForm(form, teamMutationConstraints);
-  attachValidateEditor(form, 'teamDescription', teamMutationConstraints.teamDescription.quillPresence.message);
+  if (form) {
+    attachValidateForm(form, teamMutationConstraints);
+    attachValidateEditor(form, 'teamDescription', teamMutationConstraints.teamDescription.quillPresence.message);
+  }
 
-  teamImageInput.addEventListener('change', async () => {
+  if (teamImageInput) {
+    teamImageInput.addEventListener('change', async () => {
     if (isMainImageUploading) return;
 
     if (teamImageInput.files.length > 0) {
       isMainImageUploading = true;
       showPageLoader();
 
-      const file = teamImageInput.files[0];
+      const fileOrig = teamImageInput.files[0];
+      const file = new File([await fileOrig.arrayBuffer()], fileOrig.name, { type: fileOrig.type });
       const res = await uploadTeamMainImageApi(file, teamUniqueId);
 
       isMainImageUploading = false;
@@ -321,6 +333,7 @@ function initializeForm() {
     }
     validateField(teamMutationConstraints, teamImageInput);
   });
+  }
 
   // Liên kết hình ảnh động
   document.querySelectorAll('.dynamic-team-files').forEach((input) => {
@@ -351,7 +364,6 @@ function initializeForm() {
   });
 
   // Liên kết dịch vụ
-  const btnAddService = document.getElementById('btnAddService');
   if (btnAddService) {
     // Trạng thái ban đầu của nút Thêm dịch vụ
     const userTypeCode = document.getElementById('userTypeCode').value;
@@ -408,7 +420,7 @@ function addServiceBlock(svcData = null) {
           </div>
           <div class="col-md-8 mb-3">
             <label class="form-label">Mô tả dịch vụ</label>
-            <textarea class="form-control service-desc" rows="3">${svcData ? svcData.serviceDescription : ''}</textarea>
+            <textarea class="form-control service-text-input" rows="3">${svcData ? svcData.serviceTextInput : ''}</textarea>
           </div>
           <div class="col-md-12">
             <label class="form-label">Ảnh/Video mô tả dịch vụ</label><br/>
@@ -428,15 +440,30 @@ function addServiceBlock(svcData = null) {
 
   // Liên kết các sự kiện
   const block = document.getElementById(`serviceBlock_${serviceId}`);
-  block.querySelector('.btn-remove-service').addEventListener('click', function () {
-    delete serviceImagesFiles[serviceId];
-    block.remove();
-  });
+  const btnRemove = block.querySelector('.btn-remove-service');
+  if (btnRemove) {
+    btnRemove.addEventListener('click', function () {
+      delete serviceImagesFiles[serviceId];
+      block.remove();
+    });
+  }
+
+  if (isDetailMode) {
+    const btnRem = block.querySelector('.btn-remove-service');
+    if (btnRem) btnRem.remove();
+    block.querySelector('.service-type-code').disabled = true;
+    block.querySelector('.service-text-input').readOnly = true;
+    const uploadLabel = block.querySelector('.file-label');
+    if (uploadLabel) uploadLabel.remove();
+    const uploadInput = block.querySelector('.service-images-input');
+    if (uploadInput) uploadInput.remove();
+  }
 
   const input = block.querySelector('.service-images-input');
   const preview = block.querySelector(`#serviceImagesPreview_${serviceId}`);
 
-  input.addEventListener('change', async () => {
+  if (input) {
+    input.addEventListener('change', async () => {
     const addedFiles = Array.from(input.files);
     if (addedFiles.length === 0) return;
 
@@ -457,6 +484,7 @@ function addServiceBlock(svcData = null) {
     hidePageLoader();
     input.value = ''; // reset input
   });
+  }
 
   return { input, preview, serviceId };
 }
@@ -465,12 +493,13 @@ function addServiceBlock(svcData = null) {
  * Đổ dữ liệu từ TeamData vào Form khi ở trang Update
  */
 async function assignForm(teamData) {
-  const form = document.getElementById('team-update-form');
+  const formId = pageType === 'create' ? 'team-create-form' : (pageType === 'update' ? 'team-update-form' : 'team-detail-form');
+  const form = document.getElementById(formId);
   const teamImagePreview = form.querySelector('#teamImagePreview');
   const teamImageInput = form.querySelector('#teamImage');
 
   clearErrors();
-  teamImageInput.value = '';
+  if (teamImageInput) teamImageInput.value = '';
 
   form.querySelector('#teamName').value = teamData.teamName || '';
   form.querySelector('#teamUserName').value = teamData.teamUserName || '';
@@ -561,18 +590,18 @@ async function assignForm(teamData) {
 
   quillGlobal.root.innerHTML = quillGlobal && teamData.teamDescription ? teamData.teamDescription : '';
 
-  if (pageType === 'update' && teamData.teamImage) {
+  if ((pageType === 'update' || pageType === 'detail') && teamData.teamImage) {
     const file = await ChangeUrlToFile(teamData.teamImage.filename);
     if (file) {
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
-      teamImageInput.files = dataTransfer.files;
+      if (teamImageInput) teamImageInput.files = dataTransfer.files;
       renderImagePreview({ seq: teamData.teamImage.seq, url: teamData.teamImage.filename }, 0, teamImageInput, teamImagePreview, 'teamImage');
-      validateField(teamMutationConstraints, teamImageInput);
+      if (teamImageInput) validateField(teamMutationConstraints, teamImageInput);
     }
   }
 
-  if (pageType === 'update' && teamData.teamFiles && Array.isArray(teamData.teamFiles)) {
+  if ((pageType === 'update' || pageType === 'detail') && teamData.teamFiles && Array.isArray(teamData.teamFiles)) {
     for (const group of teamData.teamFiles) {
       if (!group.fileTypeCode) continue;
       const typeCode = group.fileTypeCode;
@@ -591,14 +620,14 @@ async function assignForm(teamData) {
     Object.keys(dynamicImagesFiles).forEach((typeCode) => {
       const input = document.getElementById(`teamFiles_${typeCode}`);
       const preview = document.getElementById(`teamFilesPreview_${typeCode}`);
-      if (input && dynamicImagesFiles[typeCode].length > 0) {
-        preview.innerHTML = '';
+      if (dynamicImagesFiles[typeCode].length > 0) {
+        if (preview) preview.innerHTML = '';
         dynamicImagesFiles[typeCode].forEach((file, index) => renderImagePreview(file, index, input, preview, `teamFiles_${typeCode}`));
       }
     });
   }
 
-  if (pageType === 'update' && teamData.services && Array.isArray(teamData.services)) {
+  if ((pageType === 'update' || pageType === 'detail') && teamData.services && Array.isArray(teamData.services)) {
     for (const svc of teamData.services) {
       const { input, preview, serviceId } = addServiceBlock(svc);
       if (svc.images && Array.isArray(svc.images)) {
@@ -630,7 +659,7 @@ function renderImagePreview(item, index, input, preview, field) {
   const previewHtml = `
     <div class="image-preview" data-index="${index}">
       ${mediaTag}
-      <button class="delete-btn" type="button" data-index="${index}"></button>
+      ${isDetailMode ? '' : '<button class="delete-btn" type="button" data-index="${index}"></button>'}
     </div>
   `;
   preview.insertAdjacentHTML('beforeend', previewHtml);
@@ -648,7 +677,8 @@ function renderImagePreview(item, index, input, preview, field) {
   }
 
   const deleteBtn = previewElement.querySelector('.delete-btn');
-  deleteBtn.addEventListener('click', async () => {
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
     const idx = parseInt(previewElement.dataset.index);
 
     if (field === 'teamImage') {
@@ -679,6 +709,7 @@ function renderImagePreview(item, index, input, preview, field) {
 
     if (field === 'teamImage') validateField(teamMutationConstraints, input);
   });
+  }
 }
 
 async function createTeam(formData) {
@@ -719,7 +750,7 @@ async function submitTeam(formData, url, method, successMessage) {
   serviceBlocks.forEach((block, index) => {
     const sId = block.dataset.id;
     const sType = block.querySelector('.service-type-code').value;
-    const sDesc = block.querySelector('.service-desc').value;
+    const sText = block.querySelector('.service-text-input').value;
 
     if (!sType) {
       toastErr(`Vui lòng chọn loại dịch vụ cho dịch vụ #${index + 1}.`);
@@ -736,7 +767,7 @@ async function submitTeam(formData, url, method, successMessage) {
 
     servicesData.push({
       serviceTypeCode: sType,
-      serviceDescription: sDesc,
+      serviceTextInput: sText,
       uniqueId: block.dataset.uniqueid || '',
     });
   });
@@ -780,4 +811,29 @@ async function getUsersForTeamByType(userTypeCode) {
       console.error('getUsersForTeamByType --', error);
       return [];
     });
+}
+
+async function updateTeamStatus(status) {
+  const confirmed = window.confirm(`Bạn có chắc chắn muốn ${status === 'APPROVE' ? 'Duyệt' : 'Từ chối'} đội này không?`);
+  if (!confirmed) return;
+
+  // Disable buttons
+  const approveBtn = document.querySelector('button[onclick="updateTeamStatus(\'APPROVE\')"]');
+  const refuseBtn = document.querySelector('button[onclick="updateTeamStatus(\'REFUSE\')"]');
+  if (approveBtn) approveBtn.disabled = true;
+  if (refuseBtn) refuseBtn.disabled = true;
+
+  try {
+    const response = await axios.put(`/api/admin/team/updateStatus/${teamData.teamCode}`, { status }, axiosAuth());
+    if (response.data) {
+      toastOk('Cập nhật trạng thái thành công');
+      reloadPage('/dashboard/user-teams');
+    }
+  } catch (error) {
+    console.error(error);
+    toastErr('Cập nhật trạng thái thất bại');
+    // Re-enable buttons if failed
+    if (approveBtn) approveBtn.disabled = false;
+    if (refuseBtn) refuseBtn.disabled = false;
+  }
 }

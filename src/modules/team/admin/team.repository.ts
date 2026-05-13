@@ -38,7 +38,7 @@ export class TeamAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<TeamResDto[]> {
     let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCodes,
-     A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, D.userTypeKeyWord, D.userTypeName,
+     A.status, A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, D.userTypeKeyWord, D.userTypeName,
      (SELECT GROUP_CONCAT(C.provinceName SEPARATOR ', ') FROM ${this.tableProvince} C WHERE JSON_CONTAINS(A.provinceCodes, JSON_QUOTE(C.provinceCode))) AS provinceName
         FROM ${this.table} A  
           INNER JOIN ${this.tableUser} B
@@ -63,7 +63,7 @@ export class TeamAdminRepository {
   async getDetail(teamCode: string): Promise<TeamResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial,
-      A.provinceCodes, A.isActive
+      A.provinceCodes, A.isActive, A.status
           FROM ${this.table} A 
           WHERE A.teamCode = ? AND A.isActive = 'Y'
           LIMIT 1 `,
@@ -84,8 +84,8 @@ export class TeamAdminRepository {
       teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
     }
     const sql = `
-      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId, status) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       teamCode,
@@ -101,6 +101,7 @@ export class TeamAdminRepository {
       typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
       createdId,
       dto.uniqueId,
+      'APPROVE',
     ]);
 
     return result.insertId;
@@ -197,12 +198,12 @@ export class TeamAdminRepository {
   }
 
   // TODO: SERVICE
-  async createTeamService(seqTeam: number, userTypeCode: string, serviceTypeCode: string, serviceDescription: string, uniqueId?: string): Promise<number> {
+  async createTeamService(seqTeam: number, userTypeCode: string, serviceTypeCode: string, serviceTextInput: string, uniqueId?: string): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableService} (seqTeam, userTypeCode, serviceTypeCode, serviceDescription, uniqueId)
+      INSERT INTO ${this.tableService} (seqTeam, userTypeCode, serviceTypeCode, serviceTextInput, uniqueId)
       VALUES (?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqTeam, userTypeCode, serviceTypeCode, serviceDescription, uniqueId || null]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [seqTeam, userTypeCode, serviceTypeCode, serviceTextInput, uniqueId || null]);
     return result.insertId;
   }
 
@@ -247,7 +248,7 @@ export class TeamAdminRepository {
   async getTeamServices(seqTeam: number): Promise<any[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `
-      SELECT seq, seqTeam, uniqueId, userTypeCode, serviceTypeCode, serviceDescription
+      SELECT seq, seqTeam, uniqueId, userTypeCode, serviceTypeCode, serviceTextInput
       FROM ${this.tableService} WHERE seqTeam = ?
     `,
       [seqTeam],
@@ -393,5 +394,16 @@ export class TeamAdminRepository {
     const sql = `UPDATE ${this.table} SET teamImage = '' WHERE seq = ?`;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [teamSeq]);
     return result.affectedRows;
+  }
+
+  async updateStatus(teamCode: string, status: string, updatedId: string): Promise<number> {
+    const sql = `UPDATE ${this.table} SET status = ?, updatedId = ?, updatedAt = NOW() WHERE teamCode = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [status, updatedId, teamCode]);
+    return result.affectedRows;
+  }
+
+  async getUserDeviceToken(userCode: string): Promise<string | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT deviceToken FROM ${this.tableUser} WHERE userCode = ?`, [userCode]);
+    return rows.length > 0 ? rows[0].deviceToken : null;
   }
 }
