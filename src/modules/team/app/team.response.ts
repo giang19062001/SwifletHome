@@ -17,6 +17,17 @@ export class TeamImgResDto {
   height?: number;
 }
 
+export class StructuredTeamFilesResDto {
+  @ApiProperty({ example: 'FILE_TYPE_01' })
+  fileTypeCode: string;
+
+  @ApiProperty({ example: 'Giấy tờ pháp lý' })
+  fileTypeText: string;
+
+  @ApiProperty({ type: [TeamImgResDto] })
+  images: TeamImgResDto[];
+}
+
 export class GetDetailTeamResDto {
   @ApiProperty({ example: 1 })
   seq: number;
@@ -64,14 +75,13 @@ export class GetDetailTeamResDto {
   })
   teamDescriptionSpecial: Record<string, number> | null;
 
-  @ApiProperty({ example: 'uploads/images/***/***.jpg' })
-  teamImage: string;
+  @ApiProperty({ type: TeamImgResDto })
+  teamImage: TeamImgResDto;
 
   @ApiProperty({
-    type: () => TeamImgResDto,
-    isArray: true,
+    type: [StructuredTeamFilesResDto],
   })
-  teamFiles: TeamImgResDto[];
+  teamFiles: StructuredTeamFilesResDto[];
 }
 
 export class GetAllTeamResDto extends OmitType(GetDetailTeamResDto, ['teamDescription', 'teamDescriptionSpecial', 'teamFiles'] as const) {}

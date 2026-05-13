@@ -60,14 +60,19 @@ export class TeamUserAppService {
 
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetailTeam:`;
-    let result = await this.teamUserAppRepository.getDetailTeam(teamCode);
+    let result: any = await this.teamUserAppRepository.getDetailTeam(teamCode);
 
-    if (!result || !result.teamFiles?.length) {
-      return result;
+    if (!result) {
+      return null;
     }
 
-    // Duyệt qua từng ảnh để thêm width, height
-    for (const img of result.teamFiles) {
+    // Group teamFiles by fileTypeCode
+    const teamFiles = result.teamFiles || [];
+    const allFileTypes = await this.teamUserAppRepository.getTeamFileTypes(result.userTypeCode);
+    const structuredTeamFiles: any[] = [];
+
+    for (const img of teamFiles) {
+      // Thêm width, height
       const dimensions = await this.fileLocalService.getImageDimensions(img.filename);
       if (dimensions) {
         img.width = dimensions.width;
@@ -76,7 +81,21 @@ export class TeamUserAppService {
         img.width = 0;
         img.height = 0;
       }
+
+      let typeGroup = structuredTeamFiles.find((g) => g.fileTypeCode === img.fileTypeCode);
+      if (!typeGroup) {
+        const typeInfo = allFileTypes.find((t) => t.fileTypeCode === img.fileTypeCode) || {};
+        typeGroup = {
+          fileTypeCode: img.fileTypeCode,
+          fileTypeText: typeInfo.fileTypeText || '',
+          images: [],
+        };
+        structuredTeamFiles.push(typeGroup);
+      }
+      typeGroup.images.push(img);
     }
+
+    result.teamFiles = structuredTeamFiles;
     return result;
   }
 

@@ -85,14 +85,27 @@ export class TeamUserAppRepository {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
             A.teamCode, A.teamName, A.teamPhone, A.teamAddress,A.provinceCodes,
             IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial,
-             A.teamImage,
+             COALESCE(
+              (
+                SELECT JSON_OBJECT(
+                  'seq', E.seq,
+                  'filename', E.filename,
+                  'mimetype', E.mimetype
+                )
+                FROM ${this.tableTeamImg} E
+                WHERE E.teamSeq = A.seq AND E.filename = A.teamImage
+                LIMIT 1
+              ),
+              NULL
+            ) AS teamImage,
             COALESCE(
               (
                 SELECT JSON_ARRAYAGG(
                   JSON_OBJECT(
                     'seq', D.seq,
                     'filename', D.filename,
-                    'mimetype', D.mimetype
+                    'mimetype', D.mimetype,
+                    'fileTypeCode', D.fileTypeCode
                   )
                 )
                 FROM ${this.tableTeamImg} D
@@ -120,6 +133,7 @@ export class TeamUserAppRepository {
     let result = rows ? (rows[0] as GetDetailTeamResDto) : null;
     if (result) {
       result.teamFiles = typeof result.teamFiles === 'string' ? JSON.parse(result.teamFiles) : result.teamFiles;
+      result.teamImage = typeof result.teamImage === 'string' ? JSON.parse(result.teamImage) : result.teamImage;
       result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
       result.teamDescriptionSpecial = typeof result.teamDescriptionSpecial === 'string' ? JSON.parse(result.teamDescriptionSpecial) : result.teamDescriptionSpecial;
 

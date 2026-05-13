@@ -54,7 +54,7 @@ document.getElementById('userTypeCode').addEventListener('change', async functio
   const userSelect = document.getElementById('userCode');
 
   userSelect.value = '';
-  userSelect.innerHTML = '<option value="">-- Chọn khách hàng sở hữu --</option>';
+  userSelect.innerHTML = '<option value="">-- Chọn người đại diện --</option>';
   userSelect.disabled = true;
 
   // Reset các dịch vụ và ảnh phụ đã tải lên trước đó
@@ -531,7 +531,7 @@ async function assignForm(teamData) {
 
   if (teamData.userTypeCode) {
     const userSelect = form.querySelector('#userCode');
-    userSelect.innerHTML = '<option value="">-- Chọn khách hàng sở hữu --</option>';
+    userSelect.innerHTML = '<option value="">-- Chọn người đại diện --</option>';
     userSelect.disabled = true;
 
     const userList = await getUsersForTeamByType(teamData.userTypeCode);
