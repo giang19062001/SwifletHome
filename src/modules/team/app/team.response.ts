@@ -75,8 +75,8 @@ export class GetDetailTeamResDto {
   })
   teamDescriptionSpecial: Record<string, number> | null;
 
-  @ApiProperty({ type: TeamImgResDto })
-  teamImage: TeamImgResDto;
+  @ApiProperty({ example: 'uploads/images/***/***.jpg' })
+  teamImage: string;
 
   @ApiProperty({
     type: [StructuredTeamFilesResDto],
