@@ -2,7 +2,6 @@
 /dist
 /node_modules
 /build
-/public/css/*
 /public/uploads/*
 /note/**
 # firebase

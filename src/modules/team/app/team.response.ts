@@ -133,7 +133,7 @@ export class TeamServiceOptionResDto {
   @ApiProperty({ example: 'nội dung' })
   serviceDescription: string;
 
-  @ApiProperty({ example: '*****' })
+  @ApiProperty({ example: 'uuid của service này' })
   uniqueId: string;
 }
 

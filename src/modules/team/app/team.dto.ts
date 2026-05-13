@@ -41,7 +41,7 @@ export class GetReviewListOfTeamDto extends PagingDto {
 
 export class UploadReviewFilesDto {
   @ApiProperty({
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid chính lấy từ getInitFormCreateTeam',
     format: 'uuid',
     description: 'Luôn được generate phía app (uuid)',
   })
@@ -95,7 +95,7 @@ export class ReviewTeamDto {
   teamCode: string;
 
   @ApiProperty({
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid chính lấy từ getInitFormCreateTeam',
     format: 'uuid',
   })
   @IsUUID()
@@ -144,7 +144,7 @@ export class CreateTeamAppDto {
   teamDescriptionSpecial: any | null;
 
   @ApiProperty({
-    example: [{ serviceTypeCode: 'BUILD_RAW', serviceDescription: 'nội dung', uniqueId: '*****' }],
+    example: [{ serviceTypeCode: 'BUILD_RAW', serviceDescription: 'nội dung', uniqueId: 'uuid của service này' }],
     description: 'Mảng dịch vụ đăng ký',
   })
   @Type(() => Array<{
@@ -155,14 +155,14 @@ export class CreateTeamAppDto {
   @IsOptional()
   servicesData: any;
 
-  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', format: 'uuid' })
+  @ApiProperty({ example: 'uuid chính lấy từ getInitFormCreateTeam', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
 }
 
 export class UploadTeamMainImageAppDto {
-  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', format: 'uuid' })
+  @ApiProperty({ example: 'uuid chính lấy từ getInitFormCreateTeam', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
@@ -172,7 +172,7 @@ export class UploadTeamMainImageAppDto {
 }
 
 export class UploadTeamFilesAppDto {
-  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', format: 'uuid' })
+  @ApiProperty({ example: 'uuid chính lấy từ getInitFormCreateTeam', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
