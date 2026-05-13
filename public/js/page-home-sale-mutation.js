@@ -248,7 +248,7 @@ async function submitHome(formData, url, method, successMessage) {
   submitBtn.disabled = true;
 
   try {
-    const response = await axios[method](url, postData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    const response = await axios[method](url, postData, axiosAuth());
     if (response.data) {
       toastOk(successMessage);
       reloadPage('/dashboard/home/sale');

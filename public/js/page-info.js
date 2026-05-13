@@ -369,7 +369,7 @@ async function updateInfo(infoKeyword, btn) {
   btn.disabled = true;
 
   try {
-    const response = await axios.put(CURRENT_URL + '/api/admin/info/update/' + infoKeyword, formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    const response = await axios.put(CURRENT_URL + '/api/admin/info/update/' + infoKeyword, formData, axiosAuth());
     if (response.data) {
       toastOk('Chỉnh sửa thành công');
       // đóng modal

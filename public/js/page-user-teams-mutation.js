@@ -150,7 +150,7 @@ async function uploadTeamMainImageApi(file, uniqueId) {
   formData.append('uniqueId', uniqueId);
 
   try {
-    const res = await axios.post('/api/admin/team/uploadTeamMainImage', formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    const res = await axios.post('/api/admin/team/uploadTeamMainImage', formData, axiosAuth());
     return res.data; // { seq, url }
   } catch (e) {
     console.error(e);
@@ -171,7 +171,7 @@ async function uploadTeamFilesApi(files, uniqueId, fileTypeCode) {
   if (fileTypeCode) formData.append('fileTypeCode', fileTypeCode);
 
   try {
-    const res = await axios.post('/api/admin/team/uploadTeamFiles', formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    const res = await axios.post('/api/admin/team/uploadTeamFiles', formData, axiosAuth());
     return res.data; // Array of results
   } catch (e) {
     console.error(e);
@@ -192,7 +192,7 @@ async function uploadServiceFilesApi(files, uniqueId) {
   formData.append('uniqueId', uniqueId);
 
   try {
-    const res = await axios.post('/api/admin/team/uploadServiceFiles', formData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    const res = await axios.post('/api/admin/team/uploadServiceFiles', formData, axiosAuth());
     return res.data; // Array of results
   } catch (e) {
     console.error(e);
@@ -749,7 +749,7 @@ async function submitTeam(formData, url, method, successMessage) {
   submitBtn.disabled = true;
 
   try {
-    const response = await axios[method](url, postData, axiosAuth({ 'Content-Type': 'multipart/form-data' }));
+    const response = await axios[method](url, postData, axiosAuth());
     if (response.data) {
       toastOk(successMessage);
       reloadPage('/dashboard/user-teams');

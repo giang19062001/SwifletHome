@@ -19,6 +19,9 @@ async function bootstrap() {
   app.use(
     helmet({
       contentSecurityPolicy: false, // Tắt CSP để tránh chặn các thẻ script và sự kiện inline trong EJS
+      crossOriginResourcePolicy: false,
+      crossOriginEmbedderPolicy: false,
+      crossOriginOpenerPolicy: false, 
     }),
   );
 
@@ -32,6 +35,7 @@ async function bootstrap() {
   app.enableCors({
     origin: corsOrigins.split(',').map((origin) => origin.trim()),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With, Origin',
     credentials: true,
   });
 
