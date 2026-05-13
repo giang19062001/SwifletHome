@@ -21,9 +21,9 @@ const VARIABLE_ENUM = {
     FACTORY: 'FACTORY',
     TECHNICAL: 'TECHNICAL',
   },
-    QR_REQUEST_STATUS: {
+  QR_REQUEST_STATUS: {
     WAITING: 'Đang chờ duyệt',
-    APPROVED: 'Đã chấp thuận QrCode',
+    APPROVED: 'Đã chấp thuận',
     REFUSE: 'Từ chối duyệt',
     CANCEL: 'Đã hủy',
   },
@@ -46,8 +46,8 @@ const VARIABLE_ENUM = {
     RETURN: { TEXT: 'Đã hoàn trả', VALUE: 'RETURN' },
   },
   TEAM_STATUS: {
-    APPROVE: 'APPROVE',
-    REFUSE: 'REFUSE',
-    WAITING: 'WAITING',
+    APPROVE: { TEXT: 'Đã duyệt', VALUE: 'APPROVE' },
+    REFUSE: { TEXT: 'Từ chối duyệt', VALUE: 'REFUSE' },
+    WAITING: { TEXT: 'Đang chờ duyệt', VALUE: 'WAITING' },
   },
 };

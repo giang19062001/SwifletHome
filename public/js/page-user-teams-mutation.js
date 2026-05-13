@@ -814,12 +814,12 @@ async function getUsersForTeamByType(userTypeCode) {
 }
 
 async function updateTeamStatus(status) {
-  const confirmed = window.confirm(`Bạn có chắc chắn muốn ${status === VARIABLE_ENUM.TEAM_STATUS.APPROVE ? 'Duyệt' : 'Từ chối'} đội này không?`);
+  const confirmed = window.confirm(`Bạn có chắc chắn muốn ${status === VARIABLE_ENUM.TEAM_STATUS.APPROVE.VALUE ? VARIABLE_ENUM.TEAM_STATUS.APPROVE.TEXT : VARIABLE_ENUM.TEAM_STATUS.REFUSE.TEXT} đội này không?`);
   if (!confirmed) return;
 
   // Disable buttons
-  const approveBtn = document.querySelector(`button[onclick="updateTeamStatus('${VARIABLE_ENUM.TEAM_STATUS.APPROVE}')"]`);
-  const refuseBtn = document.querySelector(`button[onclick="updateTeamStatus('${VARIABLE_ENUM.TEAM_STATUS.REFUSE}')"]`);
+  const approveBtn = document.querySelector(`button[onclick="updateTeamStatus('${VARIABLE_ENUM.TEAM_STATUS.APPROVE.VALUE}')"]`);
+  const refuseBtn = document.querySelector(`button[onclick="updateTeamStatus('${VARIABLE_ENUM.TEAM_STATUS.REFUSE.VALUE}')"]`);
   if (approveBtn) approveBtn.disabled = true;
   if (refuseBtn) refuseBtn.disabled = true;
 

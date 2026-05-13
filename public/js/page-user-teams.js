@@ -31,16 +31,16 @@ function renderAllTeam(data, objElement) {
     let i = 1;
     data?.list.forEach((ele) => {
       let actionBtn = '';
-      if (ele.status === VARIABLE_ENUM.TEAM_STATUS.WAITING || ele.status === VARIABLE_ENUM.TEAM_STATUS.REFUSE) {
+      if (ele.status === VARIABLE_ENUM.TEAM_STATUS.WAITING.VALUE || ele.status === VARIABLE_ENUM.TEAM_STATUS.REFUSE.VALUE) {
         actionBtn = `<button class="btn btn-info" onclick="gotoTeamDetail('${ele.teamCode}')">Xem chi tiết</button>`;
       } else {
         actionBtn = `<button class="btn-edit" onclick="gotoTeamUpdate('${ele.teamCode}')">Chỉnh sửa</button>`;
       }
 
       let statusBadge = '';
-      if (ele.status === VARIABLE_ENUM.TEAM_STATUS.APPROVE) statusBadge = `<span class="badge bg-success">${ele.status}</span>`;
-      else if (ele.status === VARIABLE_ENUM.TEAM_STATUS.REFUSE) statusBadge = `<span class="badge bg-danger">${ele.status}</span>`;
-      else statusBadge = `<span class="badge bg-warning text-dark">${ele.status}</span>`;
+      if (ele.status === VARIABLE_ENUM.TEAM_STATUS.APPROVE.VALUE) statusBadge = `<span class="badge bg-success">${VARIABLE_ENUM.TEAM_STATUS.APPROVE.TEXT}</span>`;
+      else if (ele.status === VARIABLE_ENUM.TEAM_STATUS.REFUSE.VALUE) statusBadge = `<span class="badge bg-danger">${VARIABLE_ENUM.TEAM_STATUS.REFUSE.TEXT}</span>`;
+      else statusBadge = `<span class="badge bg-warning text-dark">${VARIABLE_ENUM.TEAM_STATUS.WAITING.TEXT}</span>`;
 
       const rowHtml = `
          <tr class="text-center">

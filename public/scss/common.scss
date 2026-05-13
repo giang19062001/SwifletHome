@@ -207,24 +207,63 @@
   }
 }
 
+.badge {
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
+
+  &.bg-waiting, &.bg-delivering, &.bg-warning {
+    background-color: #fff4e5 !important;
+    color: #ffa117 !important;
+    border: 1px solid #ffe8cc;
+  }
+  
+  &.bg-answered, &.bg-approved, &.bg-delivered, &.bg-confirmed, &.bg-free, &.bg-ok, &.bg-success {
+    background-color: #e6f7ed !important;
+    color: #26a65b !important;
+    border: 1px solid #d3f2e0;
+  }
+
+  &.bg-cancel, &.bg-refuse, &.bg-pay, &.bg-not-ok, &.bg-error, &.bg-danger {
+    background-color: #feecef !important;
+    color: #f75270 !important;
+    border: 1px solid #fdd8de;
+  }
+
+  &.bg-secondary {
+    background-color: #f1f5f9 !important;
+    color: #64748b !important;
+    border: 1px solid #e2e8f0;
+  }
+}
+
 .txt-status-waiting,
 .txt-status-delivering {
-  color: #ffc50f;
+  @extend .badge;
+  @extend .bg-waiting;
 }
 .txt-status-answered,
 .txt-status-approved,
 .txt-status-delivered,
 .txt-status-confirmed,
+.txt-status-return,
 .txt-free,
 .txt-ok {
-  color: #59ac77;
+  @extend .badge;
+  @extend .bg-ok;
 }
 .txt-status-cancel,
 .txt-status-refuse,
 .txt-pay,
 .txt-not-ok {
-  color: #f75270;
+  @extend .badge;
+  @extend .bg-pay;
 }
 .txt-error{
-    color: #f75270;
+  @extend .badge;
+  @extend .bg-error;
 }

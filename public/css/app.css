@@ -4743,7 +4743,17 @@ textarea.form-control-lg {
   --bs-pagination-border-radius: var(--bs-border-radius-sm);
 }
 
-.badge {
+.badge, .txt-error, .txt-status-cancel,
+.txt-status-refuse,
+.txt-pay,
+.txt-not-ok, .txt-status-answered,
+.txt-status-approved,
+.txt-status-delivered,
+.txt-status-confirmed,
+.txt-status-return,
+.txt-free,
+.txt-ok, .txt-status-waiting,
+.txt-status-delivering {
   --bs-badge-padding-x: 0.65em;
   --bs-badge-padding-y: 0.35em;
   --bs-badge-font-size: 0.75em;
@@ -4761,11 +4771,31 @@ textarea.form-control-lg {
   vertical-align: baseline;
   border-radius: var(--bs-badge-border-radius);
 }
-.badge:empty {
+.badge:empty, .txt-error:empty, .txt-status-cancel:empty,
+.txt-status-refuse:empty,
+.txt-pay:empty,
+.txt-not-ok:empty, .txt-status-answered:empty,
+.txt-status-approved:empty,
+.txt-status-delivered:empty,
+.txt-status-confirmed:empty,
+.txt-status-return:empty,
+.txt-free:empty,
+.txt-ok:empty, .txt-status-waiting:empty,
+.txt-status-delivering:empty {
   display: none;
 }
 
-.btn .badge {
+.btn .badge, .btn .txt-error, .btn .txt-status-cancel,
+.btn .txt-status-refuse,
+.btn .txt-pay,
+.btn .txt-not-ok, .btn .txt-status-answered,
+.btn .txt-status-approved,
+.btn .txt-status-delivered,
+.btn .txt-status-confirmed,
+.btn .txt-status-return,
+.btn .txt-free,
+.btn .txt-ok, .btn .txt-status-waiting,
+.btn .txt-status-delivering {
   position: relative;
   top: -1px;
 }
@@ -18501,29 +18531,226 @@ select {
   color: #ffffff;
 }
 
-.txt-status-waiting,
-.txt-status-delivering {
-  color: #ffc50f;
-}
-
-.txt-status-answered,
+.badge, .txt-error, .txt-status-cancel,
+.txt-status-refuse,
+.txt-pay,
+.txt-not-ok, .txt-status-answered,
 .txt-status-approved,
 .txt-status-delivered,
 .txt-status-confirmed,
+.txt-status-return,
 .txt-free,
-.txt-ok {
-  color: #59ac77;
+.txt-ok, .txt-status-waiting,
+.txt-status-delivering {
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
 }
-
-.txt-status-cancel,
+.badge.bg-waiting, .bg-waiting.txt-error, .bg-waiting.txt-status-cancel,
+.bg-waiting.txt-status-refuse,
+.bg-waiting.txt-pay,
+.bg-waiting.txt-not-ok, .bg-waiting.txt-status-answered,
+.bg-waiting.txt-status-approved,
+.bg-waiting.txt-status-delivered,
+.bg-waiting.txt-status-confirmed,
+.bg-waiting.txt-status-return,
+.bg-waiting.txt-free,
+.bg-waiting.txt-ok, .txt-status-waiting,
+.txt-status-delivering, .badge.bg-delivering, .bg-delivering.txt-error, .bg-delivering.txt-status-cancel,
+.bg-delivering.txt-status-refuse,
+.bg-delivering.txt-pay,
+.bg-delivering.txt-not-ok, .bg-delivering.txt-status-answered,
+.bg-delivering.txt-status-approved,
+.bg-delivering.txt-status-delivered,
+.bg-delivering.txt-status-confirmed,
+.bg-delivering.txt-status-return,
+.bg-delivering.txt-free,
+.bg-delivering.txt-ok, .badge.bg-warning, .bg-warning.txt-error, .bg-warning.txt-status-cancel,
+.bg-warning.txt-status-refuse,
+.bg-warning.txt-pay,
+.bg-warning.txt-not-ok, .bg-warning.txt-status-answered,
+.bg-warning.txt-status-approved,
+.bg-warning.txt-status-delivered,
+.bg-warning.txt-status-confirmed,
+.bg-warning.txt-status-return,
+.bg-warning.txt-free,
+.bg-warning.txt-ok {
+  background-color: #fff4e5 !important;
+  color: #ffa117 !important;
+  border: 1px solid #ffe8cc;
+}
+.badge.bg-answered, .bg-answered.txt-error, .bg-answered.txt-status-cancel,
+.bg-answered.txt-status-refuse,
+.bg-answered.txt-pay,
+.bg-answered.txt-not-ok, .bg-answered.txt-status-waiting,
+.bg-answered.txt-status-delivering, .badge.bg-approved, .bg-approved.txt-error, .bg-approved.txt-status-cancel,
+.bg-approved.txt-status-refuse,
+.bg-approved.txt-pay,
+.bg-approved.txt-not-ok, .bg-approved.txt-status-waiting,
+.bg-approved.txt-status-delivering, .badge.bg-delivered, .bg-delivered.txt-error, .bg-delivered.txt-status-cancel,
+.bg-delivered.txt-status-refuse,
+.bg-delivered.txt-pay,
+.bg-delivered.txt-not-ok, .bg-delivered.txt-status-waiting,
+.bg-delivered.txt-status-delivering, .badge.bg-confirmed, .bg-confirmed.txt-error, .bg-confirmed.txt-status-cancel,
+.bg-confirmed.txt-status-refuse,
+.bg-confirmed.txt-pay,
+.bg-confirmed.txt-not-ok, .bg-confirmed.txt-status-waiting,
+.bg-confirmed.txt-status-delivering, .badge.bg-free, .bg-free.txt-error, .bg-free.txt-status-cancel,
+.bg-free.txt-status-refuse,
+.bg-free.txt-pay,
+.bg-free.txt-not-ok, .bg-free.txt-status-waiting,
+.bg-free.txt-status-delivering, .badge.bg-ok, .bg-ok.txt-error, .bg-ok.txt-status-cancel,
+.bg-ok.txt-status-refuse,
+.bg-ok.txt-pay,
+.bg-ok.txt-not-ok, .txt-status-answered,
+.txt-status-approved,
+.txt-status-delivered,
+.txt-status-confirmed,
+.txt-status-return,
+.txt-free,
+.txt-ok, .bg-ok.txt-status-waiting,
+.bg-ok.txt-status-delivering, .badge.bg-success, .bg-success.txt-error, .bg-success.txt-status-cancel,
+.bg-success.txt-status-refuse,
+.bg-success.txt-pay,
+.bg-success.txt-not-ok, .bg-success.txt-status-waiting,
+.bg-success.txt-status-delivering {
+  background-color: #e6f7ed !important;
+  color: #26a65b !important;
+  border: 1px solid #d3f2e0;
+}
+.badge.bg-cancel, .bg-cancel.txt-error, .bg-cancel.txt-status-cancel,
+.bg-cancel.txt-status-refuse,
+.bg-cancel.txt-pay,
+.bg-cancel.txt-not-ok, .bg-cancel.txt-status-answered,
+.bg-cancel.txt-status-approved,
+.bg-cancel.txt-status-delivered,
+.bg-cancel.txt-status-confirmed,
+.bg-cancel.txt-status-return,
+.bg-cancel.txt-free,
+.bg-cancel.txt-ok, .bg-cancel.txt-status-waiting,
+.bg-cancel.txt-status-delivering, .badge.bg-refuse, .bg-refuse.txt-error, .bg-refuse.txt-status-cancel,
+.bg-refuse.txt-status-refuse,
+.bg-refuse.txt-pay,
+.bg-refuse.txt-not-ok, .bg-refuse.txt-status-answered,
+.bg-refuse.txt-status-approved,
+.bg-refuse.txt-status-delivered,
+.bg-refuse.txt-status-confirmed,
+.bg-refuse.txt-status-return,
+.bg-refuse.txt-free,
+.bg-refuse.txt-ok, .bg-refuse.txt-status-waiting,
+.bg-refuse.txt-status-delivering, .badge.bg-pay, .bg-pay.txt-error, .badge.txt-status-cancel, .txt-status-cancel.txt-error,
+.badge.txt-status-refuse,
+.txt-status-refuse.txt-error,
+.badge.txt-pay,
+.txt-pay.txt-error,
+.badge.txt-not-ok,
+.txt-not-ok.txt-error, .txt-status-cancel,
 .txt-status-refuse,
 .txt-pay,
-.txt-not-ok {
-  color: #f75270;
+.txt-not-ok, .bg-pay.txt-status-answered, .txt-status-answered.txt-status-cancel,
+.txt-status-answered.txt-status-refuse,
+.txt-status-answered.txt-pay,
+.txt-status-answered.txt-not-ok,
+.bg-pay.txt-status-approved,
+.txt-status-approved.txt-status-cancel,
+.txt-status-approved.txt-status-refuse,
+.txt-status-approved.txt-pay,
+.txt-status-approved.txt-not-ok,
+.bg-pay.txt-status-delivered,
+.txt-status-delivered.txt-status-cancel,
+.txt-status-delivered.txt-status-refuse,
+.txt-status-delivered.txt-pay,
+.txt-status-delivered.txt-not-ok,
+.bg-pay.txt-status-confirmed,
+.txt-status-confirmed.txt-status-cancel,
+.txt-status-confirmed.txt-status-refuse,
+.txt-status-confirmed.txt-pay,
+.txt-status-confirmed.txt-not-ok,
+.bg-pay.txt-status-return,
+.txt-status-return.txt-status-cancel,
+.txt-status-return.txt-status-refuse,
+.txt-status-return.txt-pay,
+.txt-status-return.txt-not-ok,
+.bg-pay.txt-free,
+.txt-free.txt-status-cancel,
+.txt-free.txt-status-refuse,
+.txt-free.txt-pay,
+.txt-free.txt-not-ok,
+.bg-pay.txt-ok,
+.txt-ok.txt-status-cancel,
+.txt-ok.txt-status-refuse,
+.txt-ok.txt-pay,
+.txt-ok.txt-not-ok, .bg-pay.txt-status-waiting, .txt-status-waiting.txt-status-cancel,
+.txt-status-waiting.txt-status-refuse,
+.txt-status-waiting.txt-pay,
+.txt-status-waiting.txt-not-ok,
+.bg-pay.txt-status-delivering,
+.txt-status-delivering.txt-status-cancel,
+.txt-status-delivering.txt-status-refuse,
+.txt-status-delivering.txt-pay,
+.txt-status-delivering.txt-not-ok, .badge.bg-not-ok, .bg-not-ok.txt-error, .bg-not-ok.txt-status-cancel,
+.bg-not-ok.txt-status-refuse,
+.bg-not-ok.txt-pay,
+.bg-not-ok.txt-not-ok, .bg-not-ok.txt-status-answered,
+.bg-not-ok.txt-status-approved,
+.bg-not-ok.txt-status-delivered,
+.bg-not-ok.txt-status-confirmed,
+.bg-not-ok.txt-status-return,
+.bg-not-ok.txt-free,
+.bg-not-ok.txt-ok, .bg-not-ok.txt-status-waiting,
+.bg-not-ok.txt-status-delivering, .badge.bg-error, .badge.txt-error, .txt-error, .bg-error.txt-status-cancel, .txt-status-cancel.txt-error,
+.bg-error.txt-status-refuse,
+.txt-status-refuse.txt-error,
+.bg-error.txt-pay,
+.txt-pay.txt-error,
+.bg-error.txt-not-ok,
+.txt-not-ok.txt-error, .bg-error.txt-status-answered, .txt-status-answered.txt-error,
+.bg-error.txt-status-approved,
+.txt-status-approved.txt-error,
+.bg-error.txt-status-delivered,
+.txt-status-delivered.txt-error,
+.bg-error.txt-status-confirmed,
+.txt-status-confirmed.txt-error,
+.bg-error.txt-status-return,
+.txt-status-return.txt-error,
+.bg-error.txt-free,
+.txt-free.txt-error,
+.bg-error.txt-ok,
+.txt-ok.txt-error, .bg-error.txt-status-waiting, .txt-status-waiting.txt-error,
+.bg-error.txt-status-delivering,
+.txt-status-delivering.txt-error, .badge.bg-danger, .bg-danger.txt-error, .bg-danger.txt-status-cancel,
+.bg-danger.txt-status-refuse,
+.bg-danger.txt-pay,
+.bg-danger.txt-not-ok, .bg-danger.txt-status-answered,
+.bg-danger.txt-status-approved,
+.bg-danger.txt-status-delivered,
+.bg-danger.txt-status-confirmed,
+.bg-danger.txt-status-return,
+.bg-danger.txt-free,
+.bg-danger.txt-ok, .bg-danger.txt-status-waiting,
+.bg-danger.txt-status-delivering {
+  background-color: #feecef !important;
+  color: #f75270 !important;
+  border: 1px solid #fdd8de;
 }
-
-.txt-error {
-  color: #f75270;
+.badge.bg-secondary, .bg-secondary.txt-error, .bg-secondary.txt-status-cancel,
+.bg-secondary.txt-status-refuse,
+.bg-secondary.txt-pay,
+.bg-secondary.txt-not-ok, .bg-secondary.txt-status-answered,
+.bg-secondary.txt-status-approved,
+.bg-secondary.txt-status-delivered,
+.bg-secondary.txt-status-confirmed,
+.bg-secondary.txt-status-return,
+.bg-secondary.txt-free,
+.bg-secondary.txt-ok, .bg-secondary.txt-status-waiting,
+.bg-secondary.txt-status-delivering {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  border: 1px solid #e2e8f0;
 }
 
 .common-table-container .table {
