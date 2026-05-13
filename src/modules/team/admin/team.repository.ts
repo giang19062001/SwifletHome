@@ -37,7 +37,7 @@ export class TeamAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<TeamResDto[]> {
-    let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCodes,
+    let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCodes,
      A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, D.userTypeKeyWord, D.userTypeName,
      (SELECT GROUP_CONCAT(C.provinceName SEPARATOR ', ') FROM ${this.tableProvince} C WHERE JSON_CONTAINS(A.provinceCodes, JSON_QUOTE(C.provinceCode))) AS provinceName
         FROM ${this.table} A  
@@ -62,7 +62,7 @@ export class TeamAdminRepository {
   }
   async getDetail(teamCode: string): Promise<TeamResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial,
+      ` SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial,
       A.provinceCodes, A.isActive
           FROM ${this.table} A 
           WHERE A.teamCode = ? AND A.isActive = 'Y'
@@ -84,14 +84,15 @@ export class TeamAdminRepository {
       teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
     }
     const sql = `
-      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       teamCode,
       dto.userCode,
       dto.userTypeCode,
       dto.teamName,
+      dto.teamUserName,
       dto.teamPhone || null,
       dto.teamAddress,
       teamImagePath,
@@ -106,12 +107,13 @@ export class TeamAdminRepository {
   }
   async update(dto: UpdateTeamDto, teamImagePath: string, updatedId: string, teamCode: string): Promise<number> {
     const sql = `
-        UPDATE ${this.table} SET teamName = ?, teamPhone = ?, teamAddress = ?, teamDescription = ?, teamDescriptionSpecial = ?, provinceCodes = ?, teamImage = ?,
+        UPDATE ${this.table} SET teamName = ?, teamUserName = ?, teamPhone = ?, teamAddress = ?, teamDescription = ?, teamDescriptionSpecial = ?, provinceCodes = ?, teamImage = ?,
         updatedId = ?, updatedAt = ?
         WHERE teamCode = ?
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       dto.teamName,
+      dto.teamUserName,
       dto.teamPhone || null,
       dto.teamAddress,
       dto.teamDescription,

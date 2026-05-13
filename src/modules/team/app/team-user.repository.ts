@@ -47,7 +47,8 @@ export class TeamUserAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<GetAllTeamResDto[]> {
-    let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamPhone, A.teamAddress,
+    let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName,
+    A.teamUserName, A.teamPhone, A.teamAddress,
     A.provinceCodes, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage
     FROM ${this.table} A 
     LEFT JOIN ${this.tableUserType} B
@@ -83,7 +84,7 @@ export class TeamUserAppRepository {
 
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
-            A.teamCode, A.teamName, A.teamPhone, A.teamAddress,A.provinceCodes,
+            A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress,A.provinceCodes,
             IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial,
              A.teamImage,
             COALESCE(
@@ -159,14 +160,15 @@ export class TeamUserAppRepository {
       teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
     }
     const sql = `
-      INSERT INTO ${this.table} (teamCode, userCode, userTypeCode, teamName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.table} (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       teamCode,
       userCode,
       dto.userTypeCode,
       dto.teamName,
+      dto.teamUserName,
       dto.teamPhone || null,
       dto.teamAddress,
       teamImagePath,

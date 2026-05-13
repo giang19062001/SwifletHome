@@ -51,6 +51,9 @@ export class GetDetailTeamResDto {
   teamName: string;
 
   @ApiProperty({ example: '' })
+  teamUserName: string;
+
+  @ApiProperty({ example: '' })
   teamPhone: string;
 
   @ApiProperty({ example: '' })

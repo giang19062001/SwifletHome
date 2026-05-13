@@ -119,6 +119,11 @@ export class CreateTeamAppDto {
 
   @ApiProperty({ example: '' })
   @IsString()
+  @IsNotEmpty()
+  teamUserName: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
   @IsOptional()
   teamPhone: string;
 

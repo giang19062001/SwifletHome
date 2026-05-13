@@ -3,6 +3,9 @@ const teamMutationConstraints = {
   teamName: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập tên xưởng công xưởng.' },
   },
+  teamUserName: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập tên người đại diện.' },
+  },
   teamAddress: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập địa chỉ.' },
     length: { minimum: 5, message: '^Địa chỉ phải có ít nhất 5 ký tự.' },
@@ -249,6 +252,7 @@ function initializeForm() {
 
     const formData = {
       teamName: form.querySelector('#teamName').value,
+      teamUserName: form.querySelector('#teamUserName').value,
       teamAddress: form.querySelector('#teamAddress').value,
       teamPhone: form.querySelector('#teamPhone').value,
       provinceCodes: Array.from(form.querySelector('#provinceCodes').selectedOptions).map((option) => option.value),
@@ -469,6 +473,7 @@ async function assignForm(teamData) {
   teamImageInput.value = '';
 
   form.querySelector('#teamName').value = teamData.teamName || '';
+  form.querySelector('#teamUserName').value = teamData.teamUserName || '';
   form.querySelector('#teamAddress').value = teamData.teamAddress || '';
   form.querySelector('#teamPhone').value = teamData.teamPhone || '';
 
@@ -689,7 +694,7 @@ async function updateTeam(formData) {
  */
 async function submitTeam(formData, url, method, successMessage) {
   const postData = new FormData();
-  const fields = ['teamName', 'teamAddress', 'teamPhone', 'provinceCodes', 'userTypeCode', 'userCode', 'teamDescription', 'teamDescriptionSpecial'];
+  const fields = ['teamName', 'teamUserName', 'teamAddress', 'teamPhone', 'provinceCodes', 'userTypeCode', 'userCode', 'teamDescription', 'teamDescriptionSpecial'];
   postData.append('uniqueId', teamUniqueId);
   fields.forEach((field) => {
     let value = formData[field];

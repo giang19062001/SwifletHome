@@ -28,6 +28,13 @@ export class CreateTeamDto {
     example: '',
   })
   @IsString()
+  @IsNotEmpty()
+  teamUserName: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
   @IsOptional()
   teamPhone: string;
 
@@ -147,6 +154,9 @@ export class TeamResDto {
   
   @ApiProperty({ example: '' })
   teamName: string;
+
+  @ApiProperty({ example: '' })
+  teamUserName!: string;
 
   @ApiProperty({ example: '' })
   teamPhone: string;

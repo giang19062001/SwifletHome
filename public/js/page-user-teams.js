@@ -33,7 +33,7 @@ function renderAllTeam(data, objElement) {
             <td class="p-3"><img class="team-img" src="${CURRENT_URL}/${ele.teamImage}"></img></td>
             <td><p>${ele.teamName}</p></td>
             <td><b>${ele.userTypeName}</b></td>
-            <td><p>${ele.userName}</p></td>
+            <td><p>${ele.teamUserName}</p></td>
             <td><p>${ele.provinceName}</p></td>
             <td><p>${ele.teamAddress}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
