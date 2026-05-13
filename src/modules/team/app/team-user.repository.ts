@@ -4,6 +4,7 @@ import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { GetAllTeamDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto } from './team.response';
+import { TeamStatus } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class TeamUserAppRepository {
@@ -55,7 +56,7 @@ export class TeamUserAppRepository {
     ON A.userTypeCode = B.userTypeCode
     LEFT JOIN ${this.tableReview} C
     ON A.teamCode = C.teamCode AND C.isDisplay = 'Y'
-    WHERE A.isActive = 'Y'  AND A.userCode != ? AND B.userTypeKeyWord = ? `;
+    WHERE A.isActive = 'Y'  AND A.userCode != ? AND B.userTypeKeyWord = ?  AND A.status = '${TeamStatus.APPROVE}'`;
 
     const params: any[] = [userCode, dto.userTypeKeyWord];
     if (dto.provinceCode) {
@@ -115,7 +116,7 @@ export class TeamUserAppRepository {
               GROUP BY teamCode
           ) R ON A.teamCode = R.teamCode
           WHERE A.isActive = 'Y'
-          AND A.teamCode = ?
+          AND A.teamCode = ? AND A.status = '${TeamStatus.APPROVE}'
           LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode]);
