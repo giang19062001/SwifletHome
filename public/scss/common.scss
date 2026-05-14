@@ -282,3 +282,47 @@ img, video {
       }
   }
 }
+
+// dùng cho  link điều hướng
+.link-premium {
+  color: $main-color;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 500;
+
+  i {
+    font-size: 13px;
+    margin-right: 4px;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    color: $main-color-hover;
+    
+    i {
+      transform: scale(1.15) translateX(2px);
+    }
+  }
+}
+
+// icon Styles
+.icon-box {
+  width: 42px;
+  height: 42px;
+  background: #f1f5f9; // Light gray background
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  color: #64748b; // Slate/Gray color for icon
+}
+
+.last-border-0:last-child {
+  border-bottom: none !important;
+}
+

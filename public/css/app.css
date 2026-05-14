@@ -18764,6 +18764,44 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   transform: translateY(-2px);
 }
 
+.link-premium {
+  color: #0175ff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 500;
+}
+.link-premium i {
+  font-size: 13px;
+  margin-right: 4px;
+  transition: transform 0.3s ease;
+}
+.link-premium:hover {
+  color: #0760ce;
+}
+.link-premium:hover i {
+  transform: scale(1.15) translateX(2px);
+}
+
+.icon-box {
+  width: 42px;
+  height: 42px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.last-border-0:last-child {
+  border-bottom: none !important;
+}
+
 .common-table-container .table {
   border: 1px solid #dee2e6;
   border-radius: 15px;
@@ -19362,6 +19400,30 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
 
 #page-doctor .note {
   max-width: 400px;
+}
+
+.doctor-update-modal .modal-content {
+  border-radius: 24px;
+  border: none;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+.doctor-update-modal .modal-header {
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 1.25rem 2rem;
+}
+.doctor-update-modal .modal-header .modal-header-title {
+  font-size: 1.25rem;
+  font-family: "PretendardBold";
+  margin-bottom: 0;
+  color: #1e293b;
+}
+.doctor-update-modal .modal-body {
+  background: #fff;
+}
+.doctor-update-modal .card.bg-light {
+  background-color: #f8fafc !important;
 }
 
 .page-main .content-area {
@@ -20134,6 +20196,79 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
 .page-user-teams-mutation #editor {
   height: 200px !important;
   margin-bottom: 10px;
+}
+
+.page-qrcode-update .card {
+  border-radius: 15px;
+  transition: all 0.3s ease;
+}
+.page-qrcode-update .card-header {
+  font-family: "PretendardBold";
+}
+.page-qrcode-update h5, .page-qrcode-update .h5 {
+  color: #565c66 !important;
+}
+
+.consignment-update-modal .modal-content {
+  border-radius: 24px;
+  border: none;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+.consignment-update-modal .modal-header {
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 1.25rem 2rem;
+}
+.consignment-update-modal .modal-header .modal-header-title {
+  font-size: 1.25rem;
+  font-family: "PretendardBold";
+  margin-bottom: 0;
+  color: #1e293b;
+}
+.consignment-update-modal .modal-body {
+  background: #fff;
+}
+.consignment-update-modal .card.bg-light {
+  background-color: #f8fafc !important;
+}
+.consignment-update-modal #deliveringAddressList .border {
+  border-color: #f1f5f9 !important;
+  transition: all 0.2s ease;
+}
+.consignment-update-modal #deliveringAddressList .border:hover {
+  background-color: #fff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.home-sightseeing-update-modal .modal-content {
+  border-radius: 24px;
+  border: none;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+.home-sightseeing-update-modal .modal-header {
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 1.25rem 2rem;
+}
+.home-sightseeing-update-modal .modal-header .modal-header-title {
+  font-size: 1.25rem;
+  font-family: "PretendardBold";
+  margin-bottom: 0;
+  color: #1e293b;
+}
+.home-sightseeing-update-modal .modal-body {
+  background: #fff;
+}
+.home-sightseeing-update-modal .card.bg-light {
+  background-color: #f8fafc !important;
+}
+.home-sightseeing-update-modal .homeImage {
+  transition: transform 0.3s ease;
+}
+.home-sightseeing-update-modal .homeImage:hover {
+  transform: scale(1.02);
 }
 
 .component-upload {

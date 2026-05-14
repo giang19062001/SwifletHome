@@ -1,32 +1,4 @@
-.doctor-update-modal {
-  #doctorFiles-images,
-  #doctorFiles-videos {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .file-item {
-    display: inline-block;
-    img {
-      width: 200px;
-      min-height: 150px;
-    }
-    video {
-      width: 250px;
-      height: 150px;
-    }
-  }
-}
-#page-doctor {
-  .note {
-    max-width: 400px;
-  }
-}
-
-
-.doctor-update-modal {
+.home-sightseeing-update-modal {
   .modal-content {
     border-radius: 24px;
     border: none;
@@ -53,5 +25,12 @@
 
   .card.bg-light {
     background-color: #f8fafc !important;
+  }
+
+  .homeImage {
+    transition: transform 0.3s ease;
+    &:hover {
+      transform: scale(1.02);
+    }
   }
 }

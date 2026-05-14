@@ -62,7 +62,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <p class="modal-header-title">Chỉnh sửa trạng thái</p>
+                <p class="modal-header-title">Chi tiết khám bệnh</p>
                 <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
@@ -70,49 +70,64 @@
                     </svg>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form>
                     <input type="hidden" id="seq" value="">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="row mb-2">
-                                <label class="col-5">Tên khách hàng:</label>
-                                <p class="col-7" id="userName"></p>
-                            </div>
-                            <div class="row mb-2">
-                                <label class="col-5">Số điện thoại:</label>
-                                <p class="col-7" id="userPhone"></p>
-                            </div>
-                            <div class="row mb-2">
-                                <label class="col-5">Triệu chứng nhà yến:</label>
-                                <p class="col-7" id="note"></p>
-                            </div>
-
-                            <div class="row mb-2">
-                                <label class="col-5">Trạng thái:</label>
-                                <div class="col-7">
-
-                                    <select class="form-select w-50" id="status"></select>
+                    
+                    <!-- Thông tin khách hàng -->
+                    <div class="card border-0 bg-light rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <h6 class="mb-4" style="color: #565c66;"><i class="fa fa-user-circle me-2" style="color: #505050;"></i>Thông tin yêu cầu hỗ trợ</h6>
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <label class="text-muted small d-block mb-1">Tên khách hàng</label>
+                                    <p class=" mb-0" id="userName"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="text-muted small d-block mb-1">Số điện thoại</label>
+                                    <p class=" mb-0" id="userPhone"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="text-muted small d-block mb-1">Trạng thái xử lý</label>
+                                    <div id="status-container">
+                                        <select class="form-select form-select-md" id="status"></select>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <label class="text-muted small d-block mb-2">Triệu chứng nhà yến mô tả</label>
+                                    <div class="bg-white p-3 rounded-3 border">
+                                        <p class="mb-0 text-dark" id="note" style="line-height: 1.6;"></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
+
                     <div class="row mb-3 d-none">
                         <div class="col-md-12">
-                            <label class="mb-2">Phản hồi:</label>
-                            <textarea class="form-control" id="noteAnswered" rows="3"></textarea>
-                            <div class="err-noteAnswered">Vui lòng nhập nội dung phản hồi.</div>
+                            <label class="mb-2 ">Phản hồi của bác sĩ:</label>
+                            <textarea class="form-control rounded-3" id="noteAnswered" rows="3" placeholder="Nhập nội dung phản hồi..."></textarea>
+                            <div class="err-noteAnswered text-danger small mt-1">Vui lòng nhập nội dung phản hồi.</div>
                         </div>
                     </div>
-                    <div class="row mb-2">
-                        <h6>Danh sách hình ảnh mô tả triệu chứng</h6>
-                        <div id="doctorFiles-images" class="mb-3">
 
+                    <!-- Danh sách hình ảnh -->
+                    <div class="mb-4">
+                        <h6 class=" mb-3 d-flex align-items-center" style="color: #565c66;">
+                            <i class="fa fa-images me-2" style="color: #505050;"></i> Hình ảnh mô tả triệu chứng
+                        </h6>
+                        <div id="doctorFiles-images" class="row g-3">
+                            <!-- JS render -->
                         </div>
-                        <h6>Danh sách video mô tả triệu chứng</h6>
-                        <div id="doctorFiles-videos">
+                    </div>
 
+                    <!-- Danh sách video -->
+                    <div>
+                        <h6 class=" mb-3 d-flex align-items-center" style="color: #565c66;">
+                            <i class="fa fa-video me-2" style="color: #505050;"></i> Video mô tả triệu chứng
+                        </h6>
+                        <div id="doctorFiles-videos" class="row g-3">
+                            <!-- JS render -->
                         </div>
                     </div>
                 </form>

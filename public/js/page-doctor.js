@@ -57,8 +57,12 @@ async function openModal(doctorData) {
       .map((file) => {
         const fileUrl = `/${file.filename}`;
         return `
-        <div class="file-item">
-          <img src="${fileUrl}" alt="${file.filename}">
+        <div class="col-12 mb-3">
+          <div class="card border-0 shadow-sm overflow-hidden d-inline-block">
+            <a href="${fileUrl}" target="_blank">
+              <img src="${fileUrl}" class="img-fluid rounded" style="max-height: 800px; width: auto;" alt="${file.filename}">
+            </a>
+          </div>
         </div>
       `;
       })
@@ -70,18 +74,20 @@ async function openModal(doctorData) {
       .map((file) => {
         const fileUrl = `/${file.filename}`;
         return `
-        <div class="file-item">
-          <video controls>
-            <source src="${fileUrl}" type="${file.mimetype}">
-            Trình duyệt không hỗ trợ video.
-          </video>
+        <div class="col-12 mb-3">
+          <div class="card border-0 shadow-sm overflow-hidden bg-dark d-inline-block w-100" style="max-width: 800px;">
+            <video controls class="w-100 d-block">
+              <source src="${fileUrl}" type="${file.mimetype}">
+              Trình duyệt không hỗ trợ video.
+            </video>
+          </div>
         </div>
       `;
       })
       .join('');
 
-    imageContainer.innerHTML = imageHTML || '<p>Không có hình ảnh.</p>';
-    videoContainer.innerHTML = videoHTML || '<p>Không có video.</p>';
+    imageContainer.innerHTML = imageHTML || '<div class="col-12"><p class="text-muted small">Không có hình ảnh mô tả.</p></div>';
+    videoContainer.innerHTML = videoHTML || '<div class="col-12"><p class="text-muted small">Không có video mô tả.</p></div>';
   }
 
   // render danh sách status

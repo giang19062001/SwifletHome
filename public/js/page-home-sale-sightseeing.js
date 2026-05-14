@@ -79,9 +79,9 @@ function renderAllHomeSightseeing(data, objElement) {
       const rowHtml = `
          <tr class="text-center">
             <td><p>${(page - 1) * limit + i++}</p></td>
-            <td style="max-width: 150px;">
-              <a target="_blank" href="/dashboard/home/sale/update/${ele.homeCode}">
-                ${ele.homeName}
+            <td style="max-width: 200px;">
+               <a class="link-premium" target="_blank" href="/dashboard/home/sale/update/${ele.homeCode}">
+                <i class="fa fa-external-link-alt me-1"></i> ${ele.homeName}
               </a>
             </td>
             <td><p>${ele.userName}</p></td>
