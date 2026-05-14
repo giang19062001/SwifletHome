@@ -38,10 +38,11 @@ export class TeamAppController {
   ) {}
 
   // TODO: TEAM
-  @ApiOperation({ summary: 'Kiểm tra trạng thái team của user' })
+  @ApiOperation({ summary: 'Kiểm tra trạng thái đăng ký nhóm ( chỉ trả ra giá trị teamCode khi nhóm này đã được duyệt)' })
   @Get('checkAvailable')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(CheckAvailableTeamResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
   async checkAvailable(@GetUserApp() user: TokenUserAppResDto) {
     const result = await this.teamUserAppService.checkAvailableTeam(user.userCode, user.userTypeCode);
     return result;

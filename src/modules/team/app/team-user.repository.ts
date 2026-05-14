@@ -156,7 +156,8 @@ export class TeamUserAppRepository {
   }
 
   async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<{ teamCode: string, status: TeamStatusEnum } | null> {
-    const query = ` SELECT teamCode, status FROM ${this.table} WHERE userCode = ? AND userTypeCode = ? AND isActive = 'Y' LIMIT 1 `;
+    const query = ` SELECT teamCode, status FROM ${this.table} 
+    WHERE userCode = ? AND userTypeCode = ? AND isActive = 'Y' LIMIT 1 `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeCode]);
     return rows.length ? (rows[0] as { teamCode: string, status: TeamStatusEnum }) : null;
   }
