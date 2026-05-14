@@ -38,7 +38,7 @@ export class TeamAppController {
   ) {}
 
   // TODO: TEAM
-  @ApiOperation({ summary: 'Kiểm tra trạng thái đăng ký nhóm ( chỉ trả ra giá trị teamCode khi nhóm này đã được duyệt)' })
+  @ApiOperation({ summary: 'Kiểm tra trạng thái đăng ký nhóm ( CHƯA DĂNG KÝ SẼ TRẢ VỀ null )' })
   @Get('checkAvailable')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(CheckAvailableTeamResDto) })
