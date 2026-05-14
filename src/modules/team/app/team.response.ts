@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { TeamStatus } from 'src/interfaces/admin.interface';
+import { TeamStatusEnum } from 'src/interfaces/admin.interface';
 
 export class TeamImgResDto {
   @ApiProperty({ example: 1 })
@@ -97,8 +97,8 @@ export class GetDetailTeamResDto {
   })
   teamDescriptionSpecial: Record<string, number> | null;
 
-  @ApiProperty({ example: TeamStatus.WAITING, enum: TeamStatus })
-  status: TeamStatus;
+  @ApiProperty({ example: TeamStatusEnum.WAITING, enum: TeamStatusEnum })
+  status: TeamStatusEnum;
 
   @ApiProperty({ example: 'uploads/images/***/***.jpg' })
   teamImage: string;
@@ -208,4 +208,12 @@ export class InitFormCreateTeamAppResDto {
 
   @ApiProperty({ type: [ProvinceResDto] })
   provinces: ProvinceResDto[];
+}
+
+export class CheckAvailableTeamResDto {
+  @ApiProperty({ example: 'TEA000001' })
+  teamCode: string;
+
+  @ApiProperty({ example: TeamStatusEnum.APPROVE, enum: TeamStatusEnum })
+  status: TeamStatusEnum;
 }

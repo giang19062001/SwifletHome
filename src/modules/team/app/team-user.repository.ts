@@ -4,7 +4,7 @@ import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { GetAllTeamDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto } from './team.response';
-import { TeamStatus } from 'src/interfaces/admin.interface';
+import { TeamStatusEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class TeamUserAppRepository {
@@ -56,7 +56,7 @@ export class TeamUserAppRepository {
     ON A.userTypeCode = B.userTypeCode
     LEFT JOIN ${this.tableReview} C
     ON A.teamCode = C.teamCode AND C.isDisplay = 'Y'
-    WHERE A.isActive = 'Y'  AND A.userCode != ? AND B.userTypeKeyWord = ?  AND A.status = '${TeamStatus.APPROVE}'`;
+    WHERE A.isActive = 'Y'  AND A.userCode != ? AND B.userTypeKeyWord = ?  AND A.status = '${TeamStatusEnum.APPROVE}'`;
 
     const params: any[] = [userCode, dto.userTypeKeyWord];
     if (dto.provinceCode) {
@@ -116,7 +116,7 @@ export class TeamUserAppRepository {
               GROUP BY teamCode
           ) R ON A.teamCode = R.teamCode
           WHERE A.isActive = 'Y'
-          AND A.teamCode = ? AND A.status = '${TeamStatus.APPROVE}'
+          AND A.teamCode = ? AND A.status = '${TeamStatusEnum.APPROVE}'
           LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode]);
@@ -153,6 +153,12 @@ export class TeamUserAppRepository {
       [userCode, userTypeCode],
     );
     return rows.length > 0;
+  }
+
+  async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<{ teamCode: string, status: TeamStatusEnum } | null> {
+    const query = ` SELECT teamCode, status FROM ${this.table} WHERE userCode = ? AND userTypeCode = ? AND isActive = 'Y' LIMIT 1 `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeCode]);
+    return rows.length ? (rows[0] as { teamCode: string, status: TeamStatusEnum }) : null;
   }
 
   async create(dto: any, userCode: string, teamImagePath: string, createdId: string): Promise<number> {

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { TeamStatus, YnEnum } from 'src/interfaces/admin.interface';
+import { TeamStatusEnum, YnEnum } from 'src/interfaces/admin.interface';
 
 export class CreateTeamDto {
   @ApiProperty({
@@ -179,8 +179,8 @@ export class TeamResDto {
   @ApiProperty({ example: YnEnum.N })
   isActive: YnEnum;
 
-  @ApiProperty({ example: TeamStatus.WAITING, enum: TeamStatus })
-  status: TeamStatus;
+  @ApiProperty({ example: TeamStatusEnum.WAITING, enum: TeamStatusEnum })
+  status: TeamStatusEnum;
 
   @ApiProperty({ example: new Date() })
   createdAt: Date;

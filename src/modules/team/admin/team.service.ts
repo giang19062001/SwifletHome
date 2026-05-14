@@ -5,7 +5,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
-import { TeamStatus } from 'src/interfaces/admin.interface';
+import { TeamStatusEnum } from 'src/interfaces/admin.interface';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
 import { TeamAdminRepository } from './team.repository';
@@ -279,7 +279,7 @@ export class TeamAdminService {
     return result;
   }
 
-  async updateStatus(teamCode: string, status: TeamStatus, updatedId: string): Promise<number> {
+  async updateStatus(teamCode: string, status: TeamStatusEnum, updatedId: string): Promise<number> {
     const team = await this.teamAdminRepository.getDetail(teamCode);
     if (!team) return 0;
 
@@ -288,9 +288,9 @@ export class TeamAdminService {
       const deviceToken = await this.teamAdminRepository.getUserDeviceToken(team.userCode);
       if (deviceToken) {
       let notification;
-      if (status === TeamStatus.APPROVE) {
+      if (status === TeamStatusEnum.APPROVE) {
         notification = NOTIFICATIONS.TEAM_REGISTER_APPROVED(teamCode);
-      } else if (status === TeamStatus.REFUSE) {
+      } else if (status === TeamStatusEnum.REFUSE) {
         notification = NOTIFICATIONS.TEAM_REGISTER_REFUSE(teamCode);
       }
 

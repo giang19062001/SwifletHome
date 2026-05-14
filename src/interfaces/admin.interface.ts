@@ -9,7 +9,7 @@ export enum YnEnum {
   N = 'N',
 }
 
-export enum TeamStatus {
+export enum TeamStatusEnum {
   APPROVE = 'APPROVE',
   REFUSE = 'REFUSE',
   WAITING = 'WAITING',

@@ -1,4 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { TeamStatusEnum } from 'src/interfaces/admin.interface';
+
 import { v4 as uuidv4 } from 'uuid';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { LoggingService } from 'src/common/logger/logger.service';
@@ -10,7 +12,7 @@ import { ProvinceService } from 'src/modules/province/province.service';
 import { TeamUserAppRepository } from './team-user.repository';
 import { CreateTeamAppDto, DeleteFileAppDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto } from './team.dto';
 import { GetAllTeamDto } from './team.dto';
-import { GetAllTeamResDto, GetDetailTeamResDto, InitFormCreateTeamAppResDto } from './team.response';
+import { CheckAvailableTeamResDto, GetAllTeamResDto, GetDetailTeamResDto, InitFormCreateTeamAppResDto } from './team.response';
 
 @Injectable()
 export class TeamUserAppService {
@@ -24,6 +26,13 @@ export class TeamUserAppService {
     private readonly logger: LoggingService,
   ) { }
   // TODO: TEAM
+  async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<CheckAvailableTeamResDto | null> {
+    const result = await this.teamUserAppRepository.checkAvailableTeam(userCode, userTypeCode);
+    if (result && result.status === TeamStatusEnum.APPROVE) {
+      return result;
+    }
+    return null;
+  }
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<{ total: number; list: GetAllTeamResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.teamUserAppRepository.getTotalTeams(dto, userCode);

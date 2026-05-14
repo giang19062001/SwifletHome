@@ -24,7 +24,7 @@ import {
   UploadTeamFilesAppDto,
   UploadTeamMainImageAppDto,
 } from './team.dto';
-import { GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, InitFormCreateTeamAppResDto, UploadReviewFilesResDto, UploadTeamFileResDto } from './team.response';
+import { CheckAvailableTeamResDto, GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, InitFormCreateTeamAppResDto, UploadReviewFilesResDto, UploadTeamFileResDto } from './team.response';
 
 @ApiTags('app/team')
 @Controller('/api/app/team')
@@ -38,6 +38,15 @@ export class TeamAppController {
   ) {}
 
   // TODO: TEAM
+  @ApiOperation({ summary: 'Kiểm tra trạng thái team của user' })
+  @Get('checkAvailable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(CheckAvailableTeamResDto) })
+  async checkAvailable(@GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.teamUserAppService.checkAvailableTeam(user.userCode, user.userTypeCode);
+    return result;
+  }
+
   @ApiOperation({ summary: 'Lấy thông tin khởi tạo form đăng ký team' })
   @Get('getInitFormCreateTeam')
   @HttpCode(HttpStatus.OK)
