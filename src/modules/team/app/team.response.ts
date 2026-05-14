@@ -30,6 +30,23 @@ export class StructuredTeamFilesResDto {
   images: TeamImgResDto[];
 }
 
+export class TeamServiceResDto {
+  @ApiProperty({ example: 1 })
+  seq: number;
+
+  @ApiProperty({ example: 'SERVICE_TYPE_01' })
+  serviceTypeCode: string;
+
+  @ApiProperty({ example: 'Tên dịch vụ' })
+  serviceTypeText: string;
+
+  @ApiProperty({ example: 'Mô tả dịch vụ' })
+  serviceTextInput: string;
+
+  @ApiProperty({ type: [TeamImgResDto] })
+  images: TeamImgResDto[];
+}
+
 export class GetDetailTeamResDto {
   @ApiProperty({ example: 1 })
   seq: number;
@@ -90,6 +107,11 @@ export class GetDetailTeamResDto {
     type: [StructuredTeamFilesResDto],
   })
   teamFiles: StructuredTeamFilesResDto[];
+
+  @ApiProperty({
+    type: [TeamServiceResDto],
+  })
+  services: TeamServiceResDto[];
 }
 
 export class GetAllTeamResDto extends OmitType(GetDetailTeamResDto, ['teamDescription', 'teamDescriptionSpecial', 'teamFiles'] as const) {}

@@ -128,18 +128,20 @@ export class TeamUserAppRepository {
 
       // Lấy danh sách dịch vụ và ảnh dịch vụ
       const [services] = await this.db.query<RowDataPacket[]>(`
-        SELECT seq, userTypeCode, serviceTypeCode, serviceTextInput
-        FROM tbl_team_service WHERE seqTeam = ?
+        SELECT S.seq, S.userTypeCode, S.serviceTypeCode, S.serviceTextInput, O.valueOption as serviceTypeText
+        FROM ${this.tableService} S
+        LEFT JOIN tbl_option_common O ON S.serviceTypeCode = O.keyOption AND O.mainOption = 'USER_TEAM'
+        WHERE S.seqTeam = ?
       `, [result.seq]);
 
       for (const svc of services) {
         const [svcImages] = await this.db.query<RowDataPacket[]>(`
           SELECT seq, filename, mimetype
-          FROM tbl_team_service_img WHERE seqService = ?
+          FROM ${this.tableServiceImg} WHERE seqService = ?
         `, [svc.seq]);
         svc.images = svcImages;
       }
-      (result as any).services = services;
+      result.services = services as any;
     }
     return result;
   }

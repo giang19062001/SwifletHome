@@ -315,7 +315,7 @@ export class UserAppRepository {
     // chỉ kiểm tra FACTORY,TECHNICAL
     // isSetted luôn là 'Y' cho OWNER, PURCHASER
     const sql = `  SELECT IF(COUNT(teamCode) > 0, 'Y', 'N') as isSetted
-          FROM tbl_team_user A
+          FROM ${this.tableTeam} A
           LEFT JOIN tbl_user_type B
           ON B.userTypeCode = A.userTypeCode
           WHERE B.userTypeKeyWord = ?
