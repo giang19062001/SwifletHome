@@ -9,7 +9,7 @@ import { requestContextStorage } from 'src/middleware/ip.middleware';
 // CHỈ HANDLE CASE SUCCESS
 @Injectable()
 export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppResponse<T>> {
-  constructor(private readonly logger: LoggingService) { }
+  constructor(private readonly logger: LoggingService) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<ApiAppResponse<T>> {
     const ctx = context.switchToHttp();
     const response = ctx.getResponse();
@@ -70,15 +70,21 @@ export class ResponseAppInterceptor<T> implements NestInterceptor<T, ApiAppRespo
           };
         }
 
+        // Chỉ bóc tách trường .data nếu đối tượng trả về là một wrapper (có kèm message hoặc success)
+        let finalData = data;
+        if (data && typeof data === 'object' && ('message' in data || 'success' in data)) {
+          finalData = data?.data ?? data;
+        }
+
         // Trường hợp SUCCESS mặc định
+
         return {
           success: true,
           message: data?.message || getOkDefaultMessage(request.method, request.url),
-          data: data?.data ?? data,
+          data: finalData,
           statusCode: response.statusCode,
         };
       }),
     );
   }
 }
-
