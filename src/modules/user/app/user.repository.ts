@@ -21,7 +21,6 @@ export class UserAppRepository {
   private readonly tableHome = 'tbl_user_home';
   private readonly tableTeam = 'tbl_team_user';
   private readonly tablePackage = 'tbl_package';
-  private readonly tableCheckout = 'tbl_checkout';
   private readonly tablePhoneCode = 'tbl_phone_code';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -292,7 +291,7 @@ export class UserAppRepository {
                 A.userTypeName,
                 B.teamCode,
                 IF(
-                    A.userTypeKeyWord IN ('${USER_CONST.USER_TYPE.OWNER.value}', '${USER_CONST.USER_TYPE.PURCHASER.value}')
+                    A.userTypeKeyWord IN ('${USER_CONST.USER_TYPE.OWNER.value}', '${USER_CONST.USER_TYPE.PURCHASER.value}', '${USER_CONST.USER_TYPE.EATER.value}')
                     OR (
                         A.userTypeKeyWord IN ('${USER_CONST.USER_TYPE.FACTORY.value}', '${USER_CONST.USER_TYPE.TECHNICAL.value}')
                         AND EXISTS (
@@ -312,11 +311,9 @@ export class UserAppRepository {
   }
   
   async checkAllowTypeOfUser(userCode: string, userTypeKeyWord: string): Promise<{isSetted: YnEnum} | null> {
-    // chỉ kiểm tra FACTORY,TECHNICAL
-    // isSetted luôn là 'Y' cho OWNER, PURCHASER
     const sql = `  SELECT IF(COUNT(teamCode) > 0, 'Y', 'N') as isSetted
           FROM ${this.tableTeam} A
-          LEFT JOIN tbl_user_type B
+          LEFT JOIN ${this.tableType} B
           ON B.userTypeCode = A.userTypeCode
           WHERE B.userTypeKeyWord = ?
             AND A.userCode = ? `;

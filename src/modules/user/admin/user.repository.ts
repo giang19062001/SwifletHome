@@ -4,9 +4,9 @@ import { RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
 import { TEXTS } from 'src/helpers/text.helper';
-import { TokenUserAdminResDto } from "../../auth/admin/auth.dto";
-import { UserAppResDto } from "../app/user.dto";
-import { USER_CONST } from "../app/user.interface";
+import { TokenUserAdminResDto } from '../../auth/admin/auth.dto';
+import { UserAppResDto } from '../app/user.dto';
+import { USER_CONST } from '../app/user.interface';
 import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserForTeamByTypeResDto, UserPackageFilterEnum, UserTypeResDto } from './user.dto';
 
 @Injectable()
@@ -171,7 +171,9 @@ export class UserAdminRepository {
   async getTypesForTeam(): Promise<UserTypeResDto[]> {
     const sql = ` SELECT userTypeCode, userTypeKeyWord, userTypeName
          FROM ${this.tableType} WHERE isActive = 'Y' 
-         AND userTypeKeyWord != '${USER_CONST.USER_TYPE.OWNER.value}'  AND  userTypeKeyWord != '${USER_CONST.USER_TYPE.PURCHASER.value}' `;
+         AND userTypeKeyWord != '${USER_CONST.USER_TYPE.OWNER.value}'  
+         AND userTypeKeyWord != '${USER_CONST.USER_TYPE.PURCHASER.value}' 
+         AND userTypeKeyWord != '${USER_CONST.USER_TYPE.EATER.value}'`;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
     return rows as UserTypeResDto[];
   }
@@ -179,10 +181,11 @@ export class UserAdminRepository {
     const sql = ` SELECT A.userCode, A.userName, A.userPhone
          FROM ${this.tableApp} A
          WHERE A.isActive = 'Y' 
-         ${dto.pageType === "create" ? ` AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = ? )` : ""}
+         ${dto.pageType === 'create' ? ` 
+        AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = ? )` : ''}
       `;
     const params: any[] = [];
-    if (dto.pageType === "create") {
+    if (dto.pageType === 'create') {
       params.push(dto.userTypeCode);
     }
     const [rows] = await this.db.query<RowDataPacket[]>(sql, params);

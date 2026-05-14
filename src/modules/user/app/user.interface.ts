@@ -18,6 +18,10 @@ export const USER_CONST = {
       value: 'TECHNICAL',
       text: 'Đội kỹ thuật',
     },
+    EATER:{
+      value: 'EATER',
+      text: 'Người ăn yến',
+    }
   },
 }
 

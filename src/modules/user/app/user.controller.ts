@@ -31,7 +31,7 @@ export class UserAppController {
   @ApiOperation({
     summary: 'Lấy danh sách LOẠI USER được cấp phép chuyển đổi - ngoại trừ LOẠI USER đang đăng nhập hiện tại',
     description:`
-**isSetted** có giá trị bằng 'Y' là user này đã đăng ký thông tin loại người dùng này rồi, 'N' là chưa có đăng ký - **OWNER** hoặc **PURCHASER** sẽ luôn là 'Y' \n
+**isSetted** có giá trị bằng 'Y' là user này đã đăng ký thông tin loại người dùng này rồi, 'N' là chưa có đăng ký - **OWNER** hoặc **PURCHASER** hoặc **EATER** sẽ luôn là 'Y' \n
 **teamCode**: (string | null) **teamCode* sẽ khác null khi **userTypeKeyWord** là **'FACTORY'** hoặc **'TECHNICAL'** và **isSetted** = 'Y' `
    })
   @Get('getAllowTypesOfUser')

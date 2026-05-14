@@ -109,7 +109,9 @@ export class UserAppService {
   }
 
   async checkAllowTypeOfUser(userCode: string, userTypeKeyWord: string): Promise<{ isSetted: YnEnum } | null> {
-    if (userTypeKeyWord == USER_CONST.USER_TYPE.OWNER.value || userTypeKeyWord == USER_CONST.USER_TYPE.PURCHASER.value) {
+    // chỉ kiểm tra FACTORY,TECHNICAL
+    // isSetted luôn là 'Y' cho OWNER, PURCHASER, EATER
+    if (userTypeKeyWord == USER_CONST.USER_TYPE.OWNER.value || userTypeKeyWord == USER_CONST.USER_TYPE.PURCHASER.value || userTypeKeyWord == USER_CONST.USER_TYPE.EATER.value) {
       return { isSetted: YnEnum.Y };
     }
     return await this.userAppRepository.checkAllowTypeOfUser(userCode, userTypeKeyWord);

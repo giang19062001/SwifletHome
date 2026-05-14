@@ -27,9 +27,9 @@ export class AuthAppController {
   })
   @UseGuards(ApiAuthAppGuard)
   @ApiOperation({
-    summary: `Đổi accessToken theo vai trò: Chủ nhà yến, nhà thu mua, xưởng gia công, đội kỹ thuật `,
+    summary: `Đổi accessToken theo vai trò: Chủ nhà yến, nhà thu mua, xưởng gia công, đội kỹ thuật, người ăn yến `,
     description:`
-  **isSetted** luôn là 'Y' nếu userTypeKeyWord là 'Chủ nhà yến'/'Nhà thu mua' hoặc user đã đăng ký 'Xưởng gia công'/'Đội kỹ thuật'`
+  **isSetted** luôn là 'Y' nếu userTypeKeyWord là 'OWNER/PURCHASER/EATER' hoặc user đã đăng ký 'FACTORY'/'TECHNICAL'`
   })
   @Post('changeTypeToken')
   @HttpCode(HttpStatus.OK)
