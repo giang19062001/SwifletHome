@@ -9,8 +9,7 @@ import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dt
 import { OtpService } from 'src/modules/otp/otp.service';
 import { PhoneCodeService } from 'src/modules/phoneCode/phoneCode.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { UserAppResDto } from "../../user/app/user.dto";
-import { USER_CONST } from "../../user/app/user.interface";
+import { USER_CONST } from '../../user/app/user.interface';
 import { AbAuthService } from '../auth.abstract';
 import { AUTH_CONFIG } from '../auth.config';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, TokenUserAppResDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
@@ -90,13 +89,17 @@ export class AuthAppService extends AbAuthService {
     // Luôn cập nhật device token mỗi lần đăng nhập (kể cả token không thay đổi)
     await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
 
-    // Unsubscribe token CŨ (chỉ khi token cũ KHÁC token mới, tức user đổi thiết bị)
-    if (user.deviceToken && String(user.deviceToken) !== String(dto.deviceToken)) {
-      await this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken);
-    }
+    Promise.all([
+      // Unsubscribe token CŨ (chỉ khi token cũ KHÁC token mới, tức user đổi thiết bị)
+      user.deviceToken && String(user.deviceToken) !== String(dto.deviceToken)
+        ? this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken)
+        : Promise.resolve(),
 
-    // Subscribe token hiện tại vào topics (bên trong đã unsubscribeAll trước khi subscribe)
-    await this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken);
+      // Subscribe token hiện tại vào topics (bên trong đã unsubscribeAll trước khi subscribe)
+      this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken),
+    ]).catch((err) => {
+      this.logger.error(`${logbase}/firebase-bg`, err.message);
+    });
 
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
@@ -250,10 +253,13 @@ export class AuthAppService extends AbAuthService {
     const userResult = await this.userAppService.getInfo(userCode);
     if (!userResult) {
       this.logger.error(logbase, `${userCode} -> Không tìm thấy thông tin user`);
-      return null
+      return null;
     }
-    
-    this.logger.log(logbase, `Thông tin người dùng: ${userResult && JSON.stringify({ userName: userResult.userName, packageName: userResult.packageName, packageRemainDay: userResult.packageRemainDay })}`);
+
+    this.logger.log(
+      logbase,
+      `Thông tin người dùng: ${userResult && JSON.stringify({ userName: userResult.userName, packageName: userResult.packageName, packageRemainDay: userResult.packageRemainDay })}`,
+    );
 
     if (userTypeCode) {
       const typeResult = await this.userAppService.getOneUserType(userTypeCode);
@@ -278,7 +284,7 @@ export class AuthAppService extends AbAuthService {
         this.logger.log(logbase, `Hủy topic và reset OTP cho người dùng: ${user.userCode}...`);
         await Promise.all([
           this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
-          this.otpService.resetOtp(user.userPhone, '0000', new Date(), PurposeEnum.REGISTER, user.countryCode)
+          this.otpService.resetOtp(user.userPhone, '0000', new Date(), PurposeEnum.REGISTER, user.countryCode),
         ]);
 
         // xóa user ở bảng chính, insert user đó vào bảng xóa
@@ -306,19 +312,19 @@ export class AuthAppService extends AbAuthService {
       // loại bỏ  iat, exp
       const { iat, exp, ...cleanPayload } = payload;
 
-      const rsCheckType =  await this.userAppService.checkAllowTypeOfUser(payload.userCode, isUserTypeValid.userTypeKeyWord);
+      const rsCheckType = await this.userAppService.checkAllowTypeOfUser(payload.userCode, isUserTypeValid.userTypeKeyWord);
       // ghi đè userTypeCode và userTypeKeyWord
       const newPayload = {
         ...cleanPayload,
         userTypeCode: dto.userTypeCode,
         userTypeKeyWord: isUserTypeValid.userTypeKeyWord,
-        isSetted: rsCheckType?.isSetted
+        isSetted: rsCheckType?.isSetted,
       };
       this.logger.log(logbase, `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của user(${payload.userCode})`);
 
       // ky lại token mới
       const accessToken = this.signToken(newPayload, YnEnum.Y);
-      return { ...newPayload, accessToken: accessToken }
+      return { ...newPayload, accessToken: accessToken };
     } catch (err) {
       this.logger.error(logbase, err.message);
       throw new UnauthorizedException(Msg.TokenInvalid);
@@ -374,12 +380,11 @@ export class AuthAppService extends AbAuthService {
     const logbase = `${this.SERVICE_NAME}/logout`;
     try {
       this.logger.log(logbase, `Người dùng ${user.userCode} đăng xuất. Xóa deviceToken và unsubscribe topics.`);
-      
-      // Chạy song song: unsubscribe topic và xóa deviceToken trong DB
-      await Promise.all([
-        this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
-        this.userAppService.clearDuplicateDeviceToken(user.deviceToken)
-      ]);
+
+      //  unsubscribe topic và xóa deviceToken trong DB để trả về kết quả ngay lập tức
+      Promise.all([this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken), this.userAppService.clearDuplicateDeviceToken(user.deviceToken)]).catch((error) => {
+        this.logger.error(`${logbase}/background-tasks`, error.message);
+      });
 
       return 1;
     } catch (error) {
