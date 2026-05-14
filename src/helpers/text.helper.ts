@@ -29,13 +29,13 @@ export const NOTIFICATIONS = {
     TITLE: `Thông báo trạng thái yêu cầu Qr code`,
     BODY: `Yêu cầu tạo mã QR Code #${requestCode} của bạn đã bị từ chối`,
   }),
-  TEAM_REGISTER_APPROVED: (teamCode: string) => ({
-    TITLE: `Thông báo trạng thái đăng ký đội kỹ thuật / xưởng gia công`,
-    BODY: `Yêu cầu đăng ký đội kỹ thuật / xưởng gia công #${teamCode} của bạn đã được duyệt`,
+  TEAM_REGISTER_APPROVED: (teamCode: string, typeName: string) => ({
+    TITLE: `Thông báo trạng thái đăng ký ${typeName}`,
+    BODY: `Yêu cầu đăng ký ${typeName} #${teamCode} của bạn đã được duyệt`,
   }),
-  TEAM_REGISTER_REFUSE: (teamCode: string) => ({
-    TITLE: `Thông báo trạng thái đăng ký đội kỹ thuật / xưởng gia công`,
-    BODY: `Yêu cầu đăng ký đội kỹ thuật / xưởng gia công #${teamCode} của bạn đã bị từ chối`,
+  TEAM_REGISTER_REFUSE: (teamCode: string, typeName: string) => ({
+    TITLE: `Thông báo trạng thái đăng ký ${typeName}`,
+    BODY: `Yêu cầu đăng ký ${typeName} #${teamCode} của bạn đã bị từ chối`,
   }),
 };
 

@@ -287,24 +287,26 @@ export class TeamAdminService {
     if (result > 0) {
       const deviceToken = await this.teamAdminRepository.getUserDeviceToken(team.userCode);
       if (deviceToken) {
-      let notification;
-      if (status === TeamStatusEnum.APPROVE) {
-        notification = NOTIFICATIONS.TEAM_REGISTER_APPROVED(teamCode);
-      } else if (status === TeamStatusEnum.REFUSE) {
-        notification = NOTIFICATIONS.TEAM_REGISTER_REFUSE(teamCode);
-      }
+        let notification;
+        const typeName = (team as any).userTypeName || '-';
 
-      if (notification) {
-        await this.firebaseService.sendNotification(
-          team.userCode,
-          deviceToken,
-          notification.TITLE,
-          notification.BODY,
-          { teamCode },
-          NotificationTypeEnum.ADMIN,
-        );
+        if (status === TeamStatusEnum.APPROVE) {
+          notification = NOTIFICATIONS.TEAM_REGISTER_APPROVED(teamCode, typeName);
+        } else if (status === TeamStatusEnum.REFUSE) {
+          notification = NOTIFICATIONS.TEAM_REGISTER_REFUSE(teamCode, typeName);
+        }
+
+        if (notification) {
+          await this.firebaseService.sendNotification(
+            team.userCode,
+            deviceToken,
+            notification.TITLE,
+            notification.BODY,
+            { teamCode },
+            NotificationTypeEnum.ADMIN,
+          );
+        }
       }
-    }
     }
     return result;
   }

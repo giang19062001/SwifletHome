@@ -63,8 +63,9 @@ export class TeamAdminRepository {
   async getDetail(teamCode: string): Promise<TeamResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial,
-      A.provinceCodes, A.isActive, A.status
+      A.provinceCodes, A.isActive, A.status, B.userTypeKeyWord, B.userTypeName
           FROM ${this.table} A 
+          LEFT JOIN ${this.tableUserType} B ON A.userTypeCode = B.userTypeCode
           WHERE A.teamCode = ? AND A.isActive = 'Y'
           LIMIT 1 `,
       [teamCode],
