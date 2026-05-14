@@ -28,10 +28,7 @@ export class TeamUserAppService {
   // TODO: TEAM
   async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<CheckAvailableTeamResDto | null> {
     const result = await this.teamUserAppRepository.checkAvailableTeam(userCode, userTypeCode);
-    if (result && result.status === TeamStatusEnum.APPROVE) {
-      return result;
-    }
-    return null;
+    return result;
   }
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<{ total: number; list: GetAllTeamResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;

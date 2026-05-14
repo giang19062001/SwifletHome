@@ -29,12 +29,14 @@ export class UserAppController {
 
   @UseGuards(ApiAuthAppGuard)
   @ApiOperation({
-    summary: 'Lấy danh sách loại user được cấp phép chuyển đổi cho user đăng nhập hiện tại',
-  })
+    summary: 'Lấy danh sách LOẠI USER được cấp phép chuyển đổi - ngoại trừ LOẠI USER đang đăng nhập hiện tại',
+    description:`
+**isSetted** có giá trị bằng 'Y' là user này đã đăng ký thông tin loại người dùng này rồi, 'N' là chưa có đăng ký - **OWNER** hoặc **PURCHASER** sẽ luôn là 'Y' \n
+**teamCode**: (string | null) **teamCode* sẽ khác null khi **userTypeKeyWord** là **'FACTORY'** hoặc **'TECHNICAL'** và **isSetted** = 'Y' `
+   })
   @Get('getAllowTypesOfUser')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([AllowUserTypeResDto]), description:`**isSetted** có giá trị bằng 'Y' là user này đã đăng ký thông tin loại người dùng này rồi, 'N' là chưa có thông tin \n
-**teamCode**: (string | null) teamCode sẽ != null khi userTypeKeyWord là ('FACTORY' or 'TECHNICAL') và  (isSetted = 'Y') ` })
+  @ApiOkResponse({ type: ApiAppResponseDto([AllowUserTypeResDto]), })
   async getAllowTypesOfUser(@GetUserApp() user: TokenUserAppResDto): Promise<AllowUserTypeResDto[]> {
     const result = await this.userAppService.getAllowTypesOfUser(user.userCode, user.userTypeKeyWord);
     return result;
