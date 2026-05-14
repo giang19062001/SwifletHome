@@ -1,4 +1,4 @@
-<div class="page-home-sale-mutaion">
+<div class="page-home-sale-mutation">
     <div class="row">
         <div class="col-12">
             <div class="row mb-3">
@@ -12,95 +12,106 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row g-4">
                 <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="home-update-form" novalidate>
-                               <div class="row">
-                                    <div class="col-lg-4">
-                                        <div class="row">
-                                            <div class="col-md-12 form-group mb-3">
-                                                <label for="homeName" class="form-label">Tên nhà yến</label>
-                                                <input type="text" class="form-control" id="homeName" name="homeName" />
-                                                <div class="error-message" data-error="homeName"></div>
-                                            </div>
+                    <form id="home-update-form" novalidate>
+                        <div class="row g-4">
+                            <!-- Section: Thông tin cơ bản -->
+                            <div class="col-lg-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-header bg-white py-3">
+                                        <h6 class="mb-0 fw-bold card-title-custom">Thông tin cơ bản</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group mb-3">
+                                            <label for="homeName" class="form-label small text-muted">Tên nhà yến</label>
+                                            <input type="text" class="form-control" id="homeName" name="homeName" placeholder="Nhập tên nhà yến..." />
+                                            <div class="error-message" data-error="homeName"></div>
+                                        </div>
 
-                                            <div class="col-md-12 form-group mb-3">
-                                                <label for="homeAddress" class="form-label">Vị trí</label>
-                                                <input type="text" class="form-control" id="homeAddress"
-                                                    name="homeAddress" />
-                                                <div class="error-message" data-error="homeAddress"></div>
-                                            </div>
+                                        <div class="form-group mb-3">
+                                            <label for="homeAddress" class="form-label small text-muted">Vị trí / Địa chỉ</label>
+                                            <input type="text" class="form-control" id="homeAddress" name="homeAddress" placeholder="Địa chỉ chi tiết..." />
+                                            <div class="error-message" data-error="homeAddress"></div>
+                                        </div>
 
-                                            <div class="col-md-12 form-group mb-3">
-                                                <label for="latitude" class="form-label">Vĩ độ</label>
-                                                <input type="text" class="form-control" id="latitude" name="latitude" />
+                                        <div class="row g-2">
+                                            <div class="col-6 form-group mb-3">
+                                                <label for="latitude" class="form-label small text-muted">Vĩ độ</label>
+                                                <input type="text" class="form-control" id="latitude" name="latitude" placeholder="0.0000" />
                                                 <div class="error-message" data-error="latitude"></div>
                                             </div>
 
-                                            <div class="col-md-12 form-group mb-3">
-                                                <label for="longitude" class="form-label">Kinh độ</label>
-                                                <input type="text" class="form-control" id="longitude"
-                                                    name="longitude" />
+                                            <div class="col-6 form-group mb-3">
+                                                <label for="longitude" class="form-label small text-muted">Kinh độ</label>
+                                                <input type="text" class="form-control" id="longitude" name="longitude" placeholder="0.0000" />
                                                 <div class="error-message" data-error="longitude"></div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
 
-                                    <div class="col-lg-8">
-                                        <div class="row">
-                                            <div class="col-md-3 form-group">
-                                                <label for="homeImage" class="form-label">Ảnh chính</label>
-                                                <br />
-                                                <label for="homeImage" class="file-label">
-                                                    <span class="file-button">Chọn ảnh chính</span>
-                                                </label>
-                                                <input type="file" class="form-control" id="homeImage" name="homeImage"
-                                                    accept=".png, .jpg, .jpeg" style="display: none;" />
-                                                <div class="error-message mt-2" data-error="homeImage"></div>
-                                                <div class="mt-3 mb-2" id="homeImagePreview"></div>
+                            <!-- Section: Hình ảnh -->
+                            <div class="col-lg-8">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-header bg-white py-3">
+                                        <h6 class="mb-0 fw-bold card-title-custom">Hình ảnh & Video</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-4">
+                                            <div class="col-md-5">
+                                                <div class="upload-zone p-4 border-dashed rounded-4 text-center bg-light mb-3">
+                                                    <label for="homeImage" class="form-label d-block fw-bold mb-3">Ảnh đại diện chính</label>
+                                                    <label for="homeImage" class="btn btn-outline-primary btn-sm px-4 rounded-pill">
+                                                        <i class="fa fa-cloud-upload-alt me-2"></i>Thay đổi ảnh chính
+                                                    </label>
+                                                    <input type="file" id="homeImage" name="homeImage" accept=".png, .jpg, .jpeg" style="display: none;" />
+                                                    <div class="error-message mt-2" data-error="homeImage"></div>
+                                                    <div class="image-preview-container mt-3" id="homeImagePreview"></div>
+                                                </div>
                                             </div>
 
-                                            <div class="col-md-9 form-group">
-                                                <label for="homeImages" class="form-label">Ảnh phụ</label>
-                                                <br />
-                                                <label for="homeImages" class="file-label">
-                                                    <span class="file-button">Chọn ảnh phụ</span>
-                                                </label>
-                                                <input type="file" class="form-control" id="homeImages"
-                                                    name="homeImages" multiple accept=".png, .jpg, .jpeg"
-                                                    style="display: none;" />
-                                                <div class="error-message mt-2" data-error="homeImages"></div>
-
-                                                <div class="image-preview-container" id="homeImagesPreview"></div>
+                                            <div class="col-md-7">
+                                                <div class="upload-zone p-4 border-dashed rounded-4 bg-light h-100">
+                                                    <label for="homeImages" class="form-label d-block fw-bold mb-3">Bộ sưu tập ảnh phụ</label>
+                                                    <label for="homeImages" class="btn btn-outline-secondary btn-sm px-4 rounded-pill">
+                                                        <i class="fa fa-plus-circle me-2"></i>Thêm ảnh phụ mới
+                                                    </label>
+                                                    <input type="file" id="homeImages" name="homeImages" multiple accept=".png, .jpg, .jpeg" style="display: none;" />
+                                                    <div class="error-message mt-2" data-error="homeImages"></div>
+                                                    <div class="image-preview-container mt-3" id="homeImagesPreview"></div>
+                                                </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="row mt-2">
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label for="homeDescription" class="form-label">Mô tả</label>
-                                            <!-- <textarea type="text" class="form-control" id="homeDescription"
-                                                name="homeDescription" rows="10"></textarea> -->
-                                            <%- include('./component-editor', { content: "" }) %>
-                                                <div class="error-message" data-error="homeDescription"></div>
-                                        </div>
+                            <!-- Section: Mô tả chi tiết -->
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white py-3">
+                                        <h6 class="mb-0 fw-bold card-title-custom">Mô tả chi tiết</h6>
                                     </div>
-
-
-
-                                    <div class="col-12 form-group d-flex justify-content-center mt-4">
-                                        <button type="submit" class="btn-submit-lg">Lưu</button>
+                                    <div class="card-body">
+                                        <%- include('./component-editor', { content: "" }) %>
+                                        <div class="error-message mt-2" data-error="homeDescription"></div>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
+
+                            <!-- Action Button -->
+                            <div class="col-12 text-center mt-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-bold btn-submit-lg">
+                                    Lưu thay đổi thông tin
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
+            </div>
+        </div>
             </div>
         </div>
     </div>

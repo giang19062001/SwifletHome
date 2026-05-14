@@ -136,13 +136,7 @@ export class TeamAdminService {
         return -1;
       }
       const existingMainImg = await this.teamAdminRepository.findMainImageByUniqueId(dto.uniqueId);
-      const teamImagePath = existingMainImg 
-        ? existingMainImg.filename 
-        : (dto.teamImage && dto.teamImage.filename
-            ? `${getFileLocation(dto.teamImage.mimetype, dto.teamImage.fieldname)}/${dto.teamImage.filename}`
-            : typeof dto.teamImage === 'string'
-              ? dto.teamImage
-              : '');
+      const teamImagePath = existingMainImg ? existingMainImg.filename : '';
 
       const seq = await this.teamAdminRepository.create(dto, teamImagePath, createdId);
       if (seq) {
@@ -174,60 +168,89 @@ export class TeamAdminService {
     }
   }
 
+  /**
+   * Cập nhật thông tin Team
+   * @param dto Dữ liệu cập nhật
+   * @param updatedId ID người thực hiện cập nhật
+   * @param teamCode Mã Team cần cập nhật
+   */
   async update(dto: UpdateTeamDto, updatedId: string, teamCode: string): Promise<number> {
+    // 1. Lấy thông tin chi tiết hiện tại của Team
     const home = await this.getDetail(teamCode);
-    let teamImagePath = home ? (home?.teamImage as TeamImgResDto).filename : '';
-    if (home) {
-      if (dto.teamImage && dto.teamImage.filename && dto.teamImage.filename !== (home.teamImage as TeamImgResDto)?.filename) {
-        if (home.teamImage) {
-          await this.fileLocalService.deleteLocalFile((home.teamImage as TeamImgResDto).filename);
-          await this.teamAdminRepository.deleteHomeImagesOne((home.teamImage as TeamImgResDto).seq);
-        }
-        teamImagePath = `${getFileLocation(dto.teamImage.mimetype, dto.teamImage.fieldname)}/${dto.teamImage.filename}`;
-        await this.teamAdminRepository.createImages(home.seq, 'admin', teamImagePath, dto.teamImage);
-      } else if (typeof dto.teamImage === 'string') {
-        teamImagePath = dto.teamImage;
-      }
+    if (!home) return 0;
 
-      await this.teamAdminRepository.updateSeqFilesTeam(home.seq, dto.uniqueId, updatedId);
+    // 2. Xác định đường dẫn ảnh đại diện hiện tại
+    let teamImagePath = '';
+    if (home.teamImage) {
+      teamImagePath = typeof home.teamImage === 'string' ? home.teamImage : (home.teamImage as TeamImgResDto).filename;
+    }
 
-      const oldServices = await this.teamAdminRepository.getTeamServices(home.seq);
-      for (const svc of oldServices) {
-        if (dto.servicesData) {
-          try {
-            const newServices = JSON.parse(dto.servicesData);
-            const found = newServices.find((ns: any) => ns.uniqueId === svc.uniqueId);
-            if (!found) {
-              const oldSvcImages = await this.teamAdminRepository.getTeamServiceImages(svc.seq);
-              for (const img of oldSvcImages) {
-                await this.fileLocalService.deleteLocalFile(img.filename);
-              }
-            }
-          } catch (e) {}
+    // 3. Xử lý ảnh đại diện (Main Image)
+    // Ưu tiên tìm ảnh mới đã được upload tức thì thông qua uniqueId
+    const existingMainImg = await this.teamAdminRepository.findMainImageByUniqueId(dto.uniqueId);
+
+    if (existingMainImg) {
+      // Nếu tìm thấy ảnh mới: Thực hiện xóa ảnh cũ (file vật lý và DB) trước khi cập nhật
+      if (home.teamImage) {
+        const oldFilename = typeof home.teamImage === 'string' ? home.teamImage : (home.teamImage as TeamImgResDto).filename;
+        const oldSeq = typeof home.teamImage === 'string' ? 0 : (home.teamImage as TeamImgResDto).seq;
+        
+        if (oldFilename && oldFilename !== existingMainImg.filename) {
+          await this.fileLocalService.deleteLocalFile(oldFilename);
+          if (oldSeq > 0) {
+            await this.teamAdminRepository.deleteHomeImagesOne(oldSeq);
+          }
         }
       }
+      // Gán đường dẫn ảnh mới
+      teamImagePath = existingMainImg.filename;
+    }
+    // Nếu không có ảnh mới từ uniqueId, teamImagePath sẽ giữ nguyên giá trị ảnh cũ đã lấy ở Bước 2
 
-      await this.teamAdminRepository.deleteTeamServicesByTeam(home.seq);
+    // 4. Liên kết các file (ảnh/video phụ) đã upload tức thì với Team này
+    await this.teamAdminRepository.updateSeqFilesTeam(home.seq, dto.uniqueId, updatedId);
 
+    // 5. Xử lý các dịch vụ (Services)
+    // Bước 5.1: Kiểm tra các dịch vụ cũ, nếu không còn trong danh sách mới thì xóa file vật lý của dịch vụ đó
+    const oldServices = await this.teamAdminRepository.getTeamServices(home.seq);
+    for (const svc of oldServices) {
       if (dto.servicesData) {
         try {
-          const services = JSON.parse(dto.servicesData);
-          for (let i = 0; i < services.length; i++) {
-            const svc = services[i];
-            const seqService = await this.teamAdminRepository.createTeamService(home.seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
-
-            if (svc.uniqueId) {
-              await this.teamAdminRepository.updateSeqFilesService(seqService, svc.uniqueId, updatedId);
+          const newServices = JSON.parse(dto.servicesData);
+          const found = newServices.find((ns: any) => ns.uniqueId === svc.uniqueId);
+          if (!found) {
+            const oldSvcImages = await this.teamAdminRepository.getTeamServiceImages(svc.seq);
+            for (const img of oldSvcImages) {
+              await this.fileLocalService.deleteLocalFile(img.filename);
             }
           }
         } catch (e) {}
       }
-
-      const result = await this.teamAdminRepository.update(dto, teamImagePath, updatedId, teamCode);
-      return result;
-    } else {
-      return 0;
     }
+
+    // Bước 5.2: Xóa toàn bộ liên kết dịch vụ cũ trong DB (sẽ tạo lại danh sách mới)
+    await this.teamAdminRepository.deleteTeamServicesByTeam(home.seq);
+
+    // Bước 5.3: Tạo mới các dịch vụ và liên kết file của từng dịch vụ
+    if (dto.servicesData) {
+      try {
+        const services = JSON.parse(dto.servicesData);
+        for (let i = 0; i < services.length; i++) {
+          const svc = services[i];
+          // Lưu thông tin dịch vụ
+          const seqService = await this.teamAdminRepository.createTeamService(home.seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
+
+          // Nếu dịch vụ có ảnh đi kèm (đã upload qua uniqueId), thực hiện liên kết
+          if (svc.uniqueId) {
+            await this.teamAdminRepository.updateSeqFilesService(seqService, svc.uniqueId, updatedId);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 6. Cập nhật thông tin chính của Team vào database
+    const result = await this.teamAdminRepository.update(dto, teamImagePath, updatedId, teamCode);
+    return result;
   }
   async delete(teamCode: string): Promise<number> {
     const home = await this.teamAdminRepository.getDetail(teamCode);

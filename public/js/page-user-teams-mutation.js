@@ -408,8 +408,8 @@ function addServiceBlock(svcData = null) {
     <div class="card mb-3 service-block" data-uniqueid="${svcData && svcData.uniqueId ? svcData.uniqueId : generateUUID()}"  id="serviceBlock_${serviceId}" data-id="${serviceId}">
       <div class="card-body">
         <div class="d-flex justify-content-between mb-2">
-          <label class="form-label font-weight-bold text-primary">Dịch vụ #${serviceId + 1}</label>
-          <button type="button" class="btn btn-sm btn-danger btn-remove-service" data-id="${serviceId}">Xóa</button>
+          <label class="form-label font-weight-bold card-title-custom">Dịch vụ #${serviceId + 1}</label>
+          <button type="button" class="btn btn-md btn-danger btn-remove-service" data-id="${serviceId}">Xóa</button>
         </div>
         <div class="row">
           <div class="col-md-4 mb-3">
@@ -424,10 +424,10 @@ function addServiceBlock(svcData = null) {
           </div>
           <div class="col-md-12">
             <label class="form-label">Ảnh/Video mô tả dịch vụ</label><br/>
-            <label for="serviceImages_${serviceId}" class="file-label">
-                <span class="file-button">Chọn ảnh/video dịch vụ</span>
+            <label for="serviceImages_${serviceId}" class="btn btn-sm btn-outline-primary rounded-pill px-3 mb-2">
+                <i class="fa fa-plus-circle me-1"></i> Chọn ảnh/video dịch vụ
             </label>
-            <input type="file" class="form-control service-images-input" id="serviceImages_${serviceId}"
+            <input type="file" class="d-none service-images-input" id="serviceImages_${serviceId}"
                 name="serviceImages_${serviceId}" multiple accept=".png, .jpg, .jpeg, .mp4, .mov, .avi"
                 data-id="${serviceId}" />
             <div class="image-preview-container mt-2" id="serviceImagesPreview_${serviceId}"></div>
@@ -654,12 +654,12 @@ function renderImagePreview(item, index, input, preview, field) {
   // Xác định xem file có phải là video hay không dựa trên URL hoặc mimetype
   const isVideo = (item.url && /\.(mp4|mov|avi)$/i.test(item.url)) || (item.mimetype && item.mimetype.startsWith('video/'));
 
-  const mediaTag = isVideo ? `<video src="" controls></video>` : `<img src="" alt="Preview ${index + 1}">`;
+  const mediaTag = isVideo ? `<video src="" controls class="no-premium-style"></video>` : `<img src="" alt="Preview ${index + 1}" class="no-premium-style">`;
 
   const previewHtml = `
     <div class="image-preview" data-index="${index}">
       ${mediaTag}
-      ${isDetailMode ? '' : '<button class="delete-btn" type="button" data-index="${index}"></button>'}
+      ${isDetailMode ? '' : '<button class="delete-btn" type="button" data-index="${index}">x</button>'}
     </div>
   `;
   preview.insertAdjacentHTML('beforeend', previewHtml);

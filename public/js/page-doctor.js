@@ -57,10 +57,10 @@ async function openModal(doctorData) {
       .map((file) => {
         const fileUrl = `/${file.filename}`;
         return `
-        <div class="col-12 mb-3">
-          <div class="card border-0 shadow-sm overflow-hidden d-inline-block">
+        <div class="col-md-3 col-sm-4 col-6">
+          <div class="card border-0 shadow-sm h-100 overflow-hidden">
             <a href="${fileUrl}" target="_blank">
-              <img src="${fileUrl}" class="img-fluid rounded" style="max-height: 800px; width: auto;" alt="${file.filename}">
+              <img src="${fileUrl}" class="card-img-top w-100 object-fit-cover" style="height: 140px;" alt="${file.filename}">
             </a>
           </div>
         </div>
@@ -74,9 +74,9 @@ async function openModal(doctorData) {
       .map((file) => {
         const fileUrl = `/${file.filename}`;
         return `
-        <div class="col-12 mb-3">
-          <div class="card border-0 shadow-sm overflow-hidden bg-dark d-inline-block w-100" style="max-width: 800px;">
-            <video controls class="w-100 d-block">
+        <div class="col-md-6 col-12">
+          <div class="card border-0 shadow-sm overflow-hidden bg-dark">
+            <video controls class="w-100 d-block" style="height: 200px; object-fit: cover;">
               <source src="${fileUrl}" type="${file.mimetype}">
               Trình duyệt không hỗ trợ video.
             </video>

@@ -204,7 +204,7 @@
                                     <% values.qrData.taskHarvestList.forEach(harvest => { %>
                                         <div class="card mb-4 border-0 shadow-sm">
                                             <div class="card-header text-white py-2" style="background-color: #121927b3;">
-                                                <i class="fa fa-layer-group me-2"></i> Đợt <%= harvest.harvestPhase %> - Năm <%= harvest.harvestYear %>
+                                                Đợt <%= harvest.harvestPhase %> - Năm <%= harvest.harvestYear %>
                                             </div>
                                             <div class="card-body bg-light bg-opacity-10">
                                                 <div class="row g-3">
@@ -291,9 +291,9 @@
                     if (file.mimetype && file.mimetype.startsWith('video/')) {
                         // Video - Hiển thị tỷ lệ nguyên bản
                         mediaHTML += `
-                            <div class="col-12 mb-3">
-                                <div class="bg-dark rounded shadow-sm overflow-hidden">
-                                    <video controls preload="metadata" class="w-100 d-block" style="max-height: 600px;">
+                            <div class="col-md-4 col-sm-6 mb-3">
+                                <div class="bg-dark rounded shadow-sm overflow-hidden h-100 d-flex align-items-center">
+                                    <video controls preload="metadata" class="w-100 d-block" style="max-height: 300px;">
                                         <source src="${fullUrl}" type="${file.mimetype}">
                                         Trình duyệt không hỗ trợ phát video.
                                     </video>
@@ -303,11 +303,11 @@
                     } else if (file.mimetype && file.mimetype.startsWith('image/')) {
                         // Hình ảnh - Hiển thị tỷ lệ nguyên bản
                         mediaHTML += `
-                            <div class="col-12 mb-3">
-                                <a href="${fullUrl}" target="_blank" class="d-block w-100">
+                            <div class="col-md-4 col-sm-6 mb-3">
+                                <a href="${fullUrl}" target="_blank" class="d-block w-100 h-100">
                                     <img src="${fullUrl}" 
-                                         class="img-fluid w-100 rounded shadow-sm" 
-                                         style="height: auto; max-height: 800px; object-fit: contain;" 
+                                         class="img-fluid rounded shadow-sm w-100" 
+                                         style="height: 200px; object-fit: cover;" 
                                          alt="Hình ảnh sơ chế"
                                          loading="lazy">
                                 </a>

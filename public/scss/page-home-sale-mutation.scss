@@ -1,4 +1,4 @@
-.page-user-teams-mutation {
+.page-home-sale-mutation {
     $primary-color: #0d6efd;
     $text-muted: #6c757d;
     $border-color: #e9ecef;
@@ -73,8 +73,8 @@
 
         .image-preview, .preview-item {
             position: relative;
-            width: 180px;
-            height: 120px;
+            width: 200px;
+            height: 140px;
             border-radius: 8px;
             overflow: visible;
             background: #fff;
@@ -120,7 +120,7 @@
             }
         }
 
-        &#teamImagePreview {
+        &#homeImagePreview {
             display: block;
             width: 100%;
             max-width: 100%;
@@ -150,35 +150,6 @@
         font-weight: 400;
     }
 
-    // Special for Team Services
-    #servicesContainer {
-        .service-input-group, .service-block {
-            background: #fdfdfd;
-            padding: 1.25rem;
-            border-radius: 10px;
-            border: 1px solid $border-color;
-            position: relative;
-            transition: all 0.3s ease;
-
-            &:hover {
-                border-color: #dee2e6;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.02);
-            }
-
-            .btn-remove-service {
-                position: absolute;
-                top: 0.75rem;
-                right: 0.75rem;
-                color: hsl(0, 0%, 100%);
-                cursor: pointer;
-                padding: 5px 20px;
-                font-size: 1.1rem;
-                border-radius: 15px;
-                font-size: 14px;
-            }
-        }
-    }
-
     .btn-primary.rounded-pill {
         padding-left: 2rem;
         padding-right: 2rem;
@@ -200,14 +171,4 @@
         height: 350px !important;
         margin-bottom: 10px;
     }
-}
-
-// Animations
-@keyframes slideUpTeam {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.img-type-block:not(.d-none) {
-    animation: slideUpTeam 0.4s ease forwards;
 }
