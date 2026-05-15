@@ -239,7 +239,8 @@ export default class QrAppController {
   **volumeForSell** (Number) là khối lượng cần bán\n
   **nestQuantity** (Number) là Số lượng tổ\n
   **humidity** (Number) là Độ ẩm tổ Yến\n
-  **ingredientNestOptionCode**  là mã Code lấy từ API api/app/options/getAll {"mainOption": "REQUSET_SELL", "subOption": "INGREDIENT_NEST"} - Chỉ chọn 1 
+  **ingredientNestOptionCode**  là mã Code lấy từ API api/app/options/getAll {"mainOption": "REQUSET_SELL", "subOption": "INGREDIENT_NEST"} - Chỉ chọn 1 \n
+  **tradeTypeCode**  là mã Code lấy từ API api/app/options/getAll {"mainOption": "REQUSET_SELL", "subOption": "TRADE_TYPE"} - Chỉ chọn 1 
     `,
   })
   @HttpCode(HttpStatus.OK)
