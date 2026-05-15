@@ -122,12 +122,12 @@ export class InsertRequestSellDto {
   ingredientNestOptionCode: string;
 
   @ApiProperty({
-    example: 'COD000033',
+    example: '',
     required: false,
-    default: 'COD000033',
   })
   @IsString()
   @IsOptional()
+  // @IsNotEmpty()
   tradeTypeCode: string;
 }
 

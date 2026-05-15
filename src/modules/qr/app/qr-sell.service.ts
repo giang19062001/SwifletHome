@@ -86,6 +86,11 @@ export class QrSellAppService {
       }
 
       // Kiểm tra tradeTypeCode
+      // ! hardcode
+      if (!dto.tradeTypeCode) {
+        dto.tradeTypeCode = 'COD000033';
+      }
+
       if (!tradeTypeOptionCodes.map((c) => c.code).includes(dto.tradeTypeCode)) {
         this.logger.error(logbase, `${Msg.CodeInvalid} ---- tradeTypeCode(${dto.tradeTypeCode})`);
         return -2;
