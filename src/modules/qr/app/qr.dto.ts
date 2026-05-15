@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { GetTypeEnum, MarkTypeEnum } from '../qr.interface';
 
@@ -122,10 +122,12 @@ export class InsertRequestSellDto {
   ingredientNestOptionCode: string;
 
   @ApiProperty({
-    example: '',
+    example: 'COD000033',
+    required: false,
+    default: 'COD000033',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   tradeTypeCode: string;
 }
 
