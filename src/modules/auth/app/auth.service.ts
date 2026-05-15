@@ -99,8 +99,7 @@ export class AuthAppService extends AbAuthService {
     });
 
     // Luôn cập nhật device token mỗi lần đăng nhập (kể cả token không thay đổi)
-    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
-
+    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);  
 
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
@@ -339,12 +338,15 @@ export class AuthAppService extends AbAuthService {
         userTypeCode: dto.userTypeCode,
         userTypeKeyWord: isUserTypeValid.userTypeKeyWord,
         isSetted: rsCheckType?.isSetted,
-      };
-      this.logger.log(logbase, `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của user(${payload.userCode})`);
+      };      
+      // cập nhật loại user đang hoạt động
+      const msgForward =  `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của user(${payload.userCode})`
+      this.userAppService.upsertUserTypeLive(payload.userCode, dto.userTypeCode, msgForward);
 
       // ky lại token mới
       const accessToken = this.signToken(newPayload, YnEnum.Y);
       return { ...newPayload, accessToken: accessToken };
+
     } catch (err) {
       this.logger.error(logbase, err.message);
       throw new UnauthorizedException(Msg.TokenInvalid);

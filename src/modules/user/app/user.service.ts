@@ -127,4 +127,10 @@ export class UserAppService {
   async getAllUserCode() {
     return await this.userAppRepository.getAllUserCode();
   }
+
+  async upsertUserTypeLive(userCode: string, userTypeCode: string, msgForward: string): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/upsertUserTypeLive`;
+    this.logger.log(logbase, msgForward);
+    return await this.userAppRepository.upsertUserTypeLive(userCode, userTypeCode);
+  }
 }

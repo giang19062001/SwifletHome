@@ -22,6 +22,8 @@ export class UserAppRepository {
   private readonly tableTeam = 'tbl_team_user';
   private readonly tablePackage = 'tbl_package';
   private readonly tablePhoneCode = 'tbl_phone_code';
+  private readonly tableUserTypeLive = 'tbl_user_type_live';
+
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAllUserCode(): Promise<TokenUserAppResDto[]> {
@@ -316,5 +318,15 @@ export class UserAppRepository {
             AND A.userCode = ? `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userTypeKeyWord, userCode]);
     return rows.length ? (rows[0] as {isSetted: YnEnum}) : null;
+  }
+
+  async upsertUserTypeLive(userCode: string, userTypeCode: string): Promise<number> {
+    const sql = `
+        INSERT INTO ${this.tableUserTypeLive} (userCode, userTypeCode, updatedAt)
+        VALUES (?, ?, NOW())
+        ON DUPLICATE KEY UPDATE userTypeCode = VALUES(userTypeCode), updatedAt = NOW()
+      `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, userTypeCode]);
+    return result.affectedRows;
   }
 }
