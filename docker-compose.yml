@@ -1,50 +1,27 @@
 services:
   loki:
-    image: grafana/loki:3.0.0        
+    image: grafana/loki:latest
     ports:
       - "3100:3100"
-    command: >
-      -config.file=/etc/loki/local-config.yaml
-      -limits.ingestion-rate-mb=4
-      -limits.ingestion-burst-size-mb=6
-      -compactor.retention-enabled=true
-      -limits.retention-period=168h     # Giữ log 7 ngày thay vì mãi mãi
+    command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - loki_data:/loki
     networks:
       - swiflethome-network
-    mem_limit: 256m                     # Giới hạn RAM cứng
-    mem_reservation: 128m
-    restart: unless-stopped
-    logging: &default-logging           # Dùng YAML anchor để tái sử dụng logging config
-      driver: "json-file"
-      options:
-        max-size: "20m"                 # Mỗi file log tối đa 20MB
-        max-file: "3"                   # Giữ tối đa 3 file log xoay vòng → tổng tối đa 30MB/service
-        compress: "true"
 
   grafana:
-    image: grafana/grafana:11.0.0
+    image: grafana/grafana:latest
     ports:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_ANALYTICS_REPORTING_ENABLED=false    # Tắt gửi telemetry về Grafana Labs
-      - GF_ANALYTICS_CHECK_FOR_UPDATES=false    # Tắt check update tự động
-      - GF_LOG_LEVEL=warn                       # Chỉ log warning trở lên, giảm 70-80% log noise
-      - GF_LOG_MODE=console
-      - GF_USERS_DEFAULT_THEME=dark
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
       - swiflethome-network
-    mem_limit: 1g                     
-    mem_reservation: 512m
-    restart: unless-stopped
-    logging: *default-logging
 
   mosquitto:
-    image: eclipse-mosquitto:2.0
+    image: eclipse-mosquitto:latest
     container_name: mosquitto_broker
     restart: unless-stopped
     ports:
@@ -55,35 +32,22 @@ services:
       - ./tools/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
       - swiflethome-network
-    mem_limit: 64m                      # Mosquitto rất nhẹ, 64MB là đủ
-    mem_reservation: 32m
-    logging: *default-logging
 
   prometheus:
-    image: prom/prometheus:v2.53.0
+    image: prom/prometheus:latest
     container_name: prometheus
     ports:
       - "9090:9090"
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.retention.time=15d'     # Giữ metric 15 ngày (mặc định 15d nhưng nên khai báo rõ)
-      - '--storage.tsdb.retention.size=512MB'   # Giới hạn dung lượng TSDB trên disk
-      - '--storage.tsdb.wal-compression'        # Nén WAL, tiết kiệm ~50% disk write
-      - '--web.enable-admin-api=false'
     volumes:
-      - ./tools/prometheus.yml:/etc/prometheus/prometheus.yml:ro  # :ro = read-only, an toàn hơn
+      - ./tools/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       - swiflethome-network
-    mem_limit: 512m
-    mem_reservation: 256m
-    restart: unless-stopped
-    logging: *default-logging
 
   node-exporter:
-    image: prom/node-exporter:v1.8.0
+    image: prom/node-exporter:latest
     container_name: node-exporter
     restart: unless-stopped
     volumes:
@@ -95,46 +59,27 @@ services:
       - '--path.rootfs=/rootfs'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-      - '--collector.disable-defaults'          # Tắt toàn bộ collector mặc định
-      - '--collector.cpu'                        # Chỉ bật các collector thực sự cần
-      - '--collector.meminfo'
-      - '--collector.filesystem'
-      - '--collector.netdev'
-      - '--collector.loadavg'
-      - '--collector.diskstats'
     ports:
       - "9100:9100"
     networks:
       - swiflethome-network
-    mem_limit: 64m
-    mem_reservation: 32m
-    logging: *default-logging
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk21   # jdk21 LTS nhẹ hơn, tốt hơn jdk11
+    image: jenkins/jenkins:lts
     container_name: jenkins
+    # Jenkins cần quyền chạy yarn, build, access thư mục Mount ( Ko set mặc định dùng user 'jenkins')
     user: root
     restart: unless-stopped
     ports:
       - "8080:8080"
-    environment:
-      - JAVA_OPTS=-Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxMetaspaceSize=256m -Djenkins.install.runSetupWizard=false
-      # Giới hạn heap JVM: mặc định Jenkins có thể ngốn 1-2GB RAM
-      # G1GC phù hợp hơn cho container so với GC mặc định
     volumes:
       - jenkins_data:/var/jenkins_home
+      # cho phép Jenskin trong container có thể điều kiển chính Docker chứa nó
       - /var/run/docker.sock:/var/run/docker.sock
+      # Mount thư mục nguồn với thư mục bên trong jenskin, build code và ghi đè mã nguồn được build vào thư mục nguồn
       - /var/www/SwifletHome:/var/www/SwifletHome
     networks:
       - swiflethome-network
-    mem_limit: 1g                       # Giới hạn RAM tối đa cứng mà container được phép dùng -> 1GB
-    mem_reservation: 512m               # Mức RAM "dành chỗ trước" cho container này
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "20m"                
-        max-file: "3"
-        compress: "true"
 
   yenhome-landing-page:
     image: giangdev196/yenhome-landing:latest
