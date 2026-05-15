@@ -341,7 +341,7 @@ export class AuthAppService extends AbAuthService {
       };      
       // cập nhật loại user đang hoạt động - chỉ cập nhập khi type cũ và type mới khác nhau
       if(payload.userTypeKeyWord !== isUserTypeValid.userTypeKeyWord){
-        const msgForward =  `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của user(${payload.userCode})`
+        const msgForward =  `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của USER(${payload.userCode})`
         this.userAppService.upsertUserTypeLive(payload.userCode, dto.userTypeCode, msgForward);
       }
       // ky lại token mới
