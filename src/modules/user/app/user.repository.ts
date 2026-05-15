@@ -73,6 +73,20 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as TokenUserAppWithPasswordResDto) : null;
   }
+  
+  async findByDeviceToken(deviceToken: string): Promise<TokenUserAppWithPasswordResDto | null> {
+    if (!deviceToken || deviceToken === '') return null;
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.userTypeCode, B.userTypeKeyWord, A.userPassword, A.countryCode, C.languageCode
+      FROM ${this.table} A
+      LEFT JOIN ${this.tableType} B ON A.userTypeCode = B.userTypeCode
+      LEFT JOIN ${this.tablePhoneCode} C ON A.countryCode = C.countryCode
+        WHERE A.deviceToken = ? AND A.isActive = 'Y' LIMIT 1`,
+      [deviceToken],
+    );
+    return rows.length ? (rows[0] as TokenUserAppWithPasswordResDto) : null;
+  }
+
   async getUserPackageInfo(userCode: string): Promise<UserPackageAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.userCode, B.startDate, B.endDate,  B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
@@ -179,31 +193,14 @@ export class UserAppRepository {
     return result.affectedRows;
   }
 
-  async clearDuplicateDeviceToken(deviceToken: string, excludeUserPhone?: string): Promise<{userCode: string}[]> {
-    if (!deviceToken || deviceToken === '') return [];
-    
-    // Lấy danh sách user cũ dùng token này
-    let selectSql = `SELECT userCode FROM ${this.table} WHERE deviceToken = ?`;
-    const selectParams: any[] = [deviceToken];
-    if (excludeUserPhone) {
-      selectSql += ` AND userPhone != ? `;
-      selectParams.push(excludeUserPhone);
-    }
-    const [users] = await this.db.query<RowDataPacket[]>(selectSql, selectParams);
-
-    let sql = `
+  async clearDeviceToken(deviceToken: string): Promise<number> {
+    if (!deviceToken || deviceToken === '') return 0;
+    const sql = `
         UPDATE ${this.table} SET deviceToken = '', updatedAt = NOW(), updatedId = ?
         WHERE deviceToken = ?
       `;
-    const params: any[] = [UPDATOR, deviceToken];
-
-    if (excludeUserPhone) {
-      sql += ` AND userPhone != ? `;
-      params.push(excludeUserPhone);
-    }
-
-    await this.db.execute<ResultSetHeader>(sql, params);
-    return users as {userCode: string}[];
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [UPDATOR, deviceToken]);
+    return result.affectedRows;
   }
 
   async deleteAccount(userCode: string, user: TokenUserAppWithPasswordResDto): Promise<number> {

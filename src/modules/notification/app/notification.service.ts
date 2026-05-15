@@ -141,7 +141,7 @@ export class NotificationAppService {
   async clearInvalidDeviceToken(deviceToken: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/clearInvalidDeviceToken`;
     this.logger.log(logbase, `Xóa token không hợp lệ khỏi DB: ${deviceToken}`);
-    const users = await this.userAppService.clearDuplicateDeviceToken(deviceToken);
-    return users ? users.length : 0;
+    await this.userAppService.clearDeviceToken(deviceToken);
+    return 1
   }
 }

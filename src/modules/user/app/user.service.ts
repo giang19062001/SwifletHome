@@ -20,6 +20,9 @@ export class UserAppService {
   async findByCode(userCode: string): Promise<TokenUserAppWithPasswordResDto | null> {
     return await this.userAppRepository.findByCode(userCode);
   }
+  async findByDeviceToken(deviceToken: string): Promise<TokenUserAppWithPasswordResDto | null> {
+    return await this.userAppRepository.findByDeviceToken(deviceToken);
+  }
 
   async findByPhoneWithoutCountry(userPhone: string): Promise<TokenUserAppWithPasswordResDto | null> {
     return await this.userAppRepository.findByPhoneWithoutCountry(userPhone);
@@ -81,8 +84,8 @@ export class UserAppService {
     return await this.userAppRepository.updateDeviceToken(deviceToken, userPhone);
   }
 
-  async clearDuplicateDeviceToken(deviceToken: string, excludeUserPhone?: string): Promise<{ userCode: string }[]> {
-    return await this.userAppRepository.clearDuplicateDeviceToken(deviceToken, excludeUserPhone);
+  async clearDeviceToken(deviceToken: string): Promise<number> {
+    return await this.userAppRepository.clearDeviceToken(deviceToken);
   }
 
   // TODO: PACKAGE

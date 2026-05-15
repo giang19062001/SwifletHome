@@ -36,7 +36,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-muted small">Mã định danh:</div>
-                                                            <div class="fw-bold text-break"><%= values.qrData.requestCode %></div>
+                                                            <div class="text-break"><%= values.qrData.requestCode %></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -49,7 +49,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-muted small">Chủ sở hữu:</div>
-                                                            <div class="fw-bold"><%= values.qrData.userName %></div>
+                                                            <div class=""><%= values.qrData.userName %></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -60,7 +60,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-muted small">Tên nhà yến:</div>
-                                                            <div class="fw-bold"><%= values.qrData.userHomeName %></div>
+                                                            <div class=""><%= values.qrData.userHomeName %></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -73,7 +73,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-muted small">Địa chỉ sản xuất:</div>
-                                                            <div class="fw-bold"><%= values.qrData.userHomeAddress %></div>
+                                                            <div class=""><%= values.qrData.userHomeAddress %></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -84,7 +84,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-muted small">Quy mô nhà yến:</div>
-                                                            <div class="fw-bold">
+                                                            <div class="">
                                                                 <%= values.qrData.userHomeLength %>m × <%= values.qrData.userHomeWidth %>m × <%= values.qrData.userHomeFloor %> tầng
                                                             </div>
                                                         </div>
@@ -99,7 +99,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-muted small">Điều kiện môi trường:</div>
-                                                            <div class="fw-bold"><%= values.qrData.temperature %>°C / <%= values.qrData.humidity %>%</div>
+                                                            <div class=""><%= values.qrData.temperature %>°C / <%= values.qrData.humidity %>%</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -110,7 +110,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-muted small">Trạng thái xác thực:</div>
-                                                            <div class="fw-bold">
+                                                            <div class="">
                                                                 <span class="txt-status-<%= values.qrData.requestStatus.toLowerCase() %>">
                                                                     <%= values.qrData.requestStatusLabel %>
                                                                 </span>
@@ -127,7 +127,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-muted small">Thời điểm khởi tạo:</div>
-                                                            <div class="fw-bold">
+                                                            <div class="">
                                                                 <%= new Date(values.qrData.createdAt).toLocaleString('vi-VN') %>
                                                             </div>
                                                         </div>

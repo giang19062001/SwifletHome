@@ -86,20 +86,21 @@ export class AuthAppService extends AbAuthService {
       throw new ForbiddenException(Msg.AccountLoginBlock);
     }
 
-    // Luôn cập nhật device token mỗi lần đăng nhập (kể cả token không thay đổi)
-    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
-
     Promise.all([
-      // Unsubscribe token CŨ (chỉ khi token cũ KHÁC token mới, tức user đổi thiết bị)
+      // Unsubscribe topic cho token CŨ (chỉ khi token cũ KHÁC token mới, tức user đổi thiết bị)
       user.deviceToken && String(user.deviceToken) !== String(dto.deviceToken)
         ? this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken)
         : Promise.resolve(),
 
-      // Subscribe token hiện tại vào topics (bên trong đã unsubscribeAll trước khi subscribe)
+      // Luôn Subscribe token hiện tại vào topics 
       this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken),
     ]).catch((err) => {
       this.logger.error(`${logbase}/firebase-bg`, err.message);
     });
+
+    // Luôn cập nhật device token mỗi lần đăng nhập (kể cả token không thay đổi)
+    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
+
 
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
@@ -116,6 +117,25 @@ export class AuthAppService extends AbAuthService {
       ...userWithoutPassword,
       accessToken,
     };
+  }
+
+  async logout(user: TokenUserAppResDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/logout`;
+    try {
+      this.logger.log(logbase, `Người dùng ${user.userCode} đăng xuất. Xóa deviceToken và unsubscribe topics.`);
+
+      //  unsubscribe topic và xóa deviceToken trong DB để trả về kết quả ngay lập tức
+      Promise.all([
+        this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
+        this.userAppService.clearDeviceToken(user.deviceToken)]).catch((error) => {
+        this.logger.error(`${logbase}/background-tasks`, error.message);
+      });
+
+      return 1;
+    } catch (error) {
+      this.logger.error(logbase, error.message);
+      return 0;
+    }
   }
 
   async register(dto: RegisterUserAppDto): Promise<number> {
@@ -220,7 +240,7 @@ export class AuthAppService extends AbAuthService {
     }
 
     // Xóa deviceToken trùng lặp nếu có
-    await this.userAppService.clearDuplicateDeviceToken(dto.deviceToken);
+    await this.userAppService.clearDeviceToken(dto.deviceToken);
 
     const result = await this.userAppService.updateDeviceToken(dto.deviceToken, userPhone);
     return result;
@@ -376,20 +396,4 @@ export class AuthAppService extends AbAuthService {
     return hashed;
   }
 
-  async logout(user: TokenUserAppResDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/logout`;
-    try {
-      this.logger.log(logbase, `Người dùng ${user.userCode} đăng xuất. Xóa deviceToken và unsubscribe topics.`);
-
-      //  unsubscribe topic và xóa deviceToken trong DB để trả về kết quả ngay lập tức
-      Promise.all([this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken), this.userAppService.clearDuplicateDeviceToken(user.deviceToken)]).catch((error) => {
-        this.logger.error(`${logbase}/background-tasks`, error.message);
-      });
-
-      return 1;
-    } catch (error) {
-      this.logger.error(logbase, error.message);
-      return 0;
-    }
-  }
 }
