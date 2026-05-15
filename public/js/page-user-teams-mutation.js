@@ -419,7 +419,7 @@ function addServiceBlock(svcData = null) {
           </div>
           <div class="col-md-12">
             <label class="form-label">Ảnh/Video mô tả dịch vụ</label><br/>
-            <label for="serviceImages_${serviceId}" class="btn btn-sm btn-outline-primary rounded-pill px-3 mb-2">
+            <label for="serviceImages_${serviceId}" class="btn btn-sm btn-outline-primary rounded-pill px-3 mb-2 file-label">
                 <i class="fa fa-plus-circle me-1"></i> Chọn ảnh/video dịch vụ
             </label>
             <input type="file" class="d-none service-images-input" id="serviceImages_${serviceId}"
