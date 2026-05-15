@@ -51,12 +51,23 @@ export class QrSellAppService {
         return -3;
       }
 
-      // kiểm tra priceOptionCode
-      const priceOptionCodes = await this.optionService.getAll({
-        mainOption: OPTION_CONST.REQUSET_SELL.PRICE_OPTION.mainOption,
-        subOption: OPTION_CONST.REQUSET_SELL.PRICE_OPTION.subOption,
-      });
+      // Lấy tất cả các loại option cần thiết song song
+      const [priceOptionCodes, ingredientNestOptionCodes, tradeTypeOptionCodes] = await Promise.all([
+        this.optionService.getAll({
+          mainOption: OPTION_CONST.REQUSET_SELL.PRICE_OPTION.mainOption,
+          subOption: OPTION_CONST.REQUSET_SELL.PRICE_OPTION.subOption,
+        }),
+        this.optionService.getAll({
+          mainOption: OPTION_CONST.REQUSET_SELL.INGREDIENT_NEST.mainOption,
+          subOption: OPTION_CONST.REQUSET_SELL.INGREDIENT_NEST.subOption,
+        }),
+        this.optionService.getAll({
+          mainOption: OPTION_CONST.REQUSET_SELL.TRADE_TYPE.mainOption,
+          subOption: OPTION_CONST.REQUSET_SELL.TRADE_TYPE.subOption,
+        }),
+      ]);
 
+      // Kiểm tra priceOptionCode
       const priceOption = priceOptionCodes.find((c) => c.code.includes(dto.priceOptionCode));
       if (!priceOption) {
         this.logger.error(logbase, `${Msg.CodeInvalid} ---- priceOptionCode(${dto.priceOptionCode})`);
@@ -68,18 +79,19 @@ export class QrSellAppService {
         dto.pricePerKg = 0;
       }
 
-      // kiểm tra ingredientNestOptionCode
-      const ingredientNestOptionCodes = await this.optionService.getAll({
-        mainOption: OPTION_CONST.REQUSET_SELL.INGREDIENT_NEST.mainOption,
-        subOption: OPTION_CONST.REQUSET_SELL.INGREDIENT_NEST.subOption,
-      });
-
+      // Kiểm tra ingredientNestOptionCode
       if (!ingredientNestOptionCodes.map((c) => c.code).includes(dto.ingredientNestOptionCode)) {
         this.logger.error(logbase, `${Msg.CodeInvalid} ---- ingredientNestOptionCode(${dto.ingredientNestOptionCode})`);
         return -2;
       }
-      const result = await this.qrSellAppRepository.insertRequestSell(user.userCode, dto);
 
+      // Kiểm tra tradeTypeCode
+      if (!tradeTypeOptionCodes.map((c) => c.code).includes(dto.tradeTypeCode)) {
+        this.logger.error(logbase, `${Msg.CodeInvalid} ---- tradeTypeCode(${dto.tradeTypeCode})`);
+        return -2;
+      }
+
+      const result = await this.qrSellAppRepository.insertRequestSell(user.userCode, dto);
       return result;
     } catch (error) {
       this.logger.error(logbase, error);

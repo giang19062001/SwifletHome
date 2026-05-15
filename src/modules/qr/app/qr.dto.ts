@@ -120,6 +120,13 @@ export class InsertRequestSellDto {
   @IsString()
   @IsNotEmpty()
   ingredientNestOptionCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  tradeTypeCode: string;
 }
 
 export class MaskRequestSellDto {

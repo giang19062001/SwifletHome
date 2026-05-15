@@ -37,13 +37,13 @@ export class QrSellAppRepository {
   async insertRequestSell(userCode: string, dto: InsertRequestSellDto): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableSell}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, volumeForSell,
-        nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        nestQuantity, humidity, ingredientNestOptionCode, tradeTypeCode, requestSellStatus, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     // prettier-ignore
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       userCode, dto.requestCode, dto.userName,  dto.userPhone, dto.priceOptionCode, dto.pricePerKg, dto.volumeForSell,
-      dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, RequestSellStatusEnum.WAITING, userCode,
+      dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, dto.tradeTypeCode, RequestSellStatusEnum.WAITING, userCode,
     ]);
 
     return result.insertId;
@@ -102,7 +102,7 @@ export class QrSellAppRepository {
             THEN '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.text}'
             ELSE  CONCAT(FORMAT(A.pricePerKg, 0), ' đ/ Kg')
         END AS priceOptionLabel, A.pricePerKg, A.volumeForSell, A.nestQuantity,
-        A.ingredientNestOptionCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
+        A.ingredientNestOptionCode, A.tradeTypeCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
         FROM ${this.tableSell}  A
             LEFT JOIN ${this.table} B
         ON A.requestCode = B.requestCode  
@@ -162,6 +162,7 @@ export class QrSellAppRepository {
             ELSE  CONCAT(FORMAT(D.pricePerKg, 0), ' đ/ Kg')
         END AS priceOptionLabel, D.pricePerKg, D.volumeForSell, D.nestQuantity, D.humidity, 
         D.ingredientNestOptionCode, G.valueOption AS ingredientNestOptionLabel,
+        D.tradeTypeCode, I.valueOption AS tradeTypeLabel,
         CASE
             WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
             ELSE 'N'
@@ -177,6 +178,8 @@ export class QrSellAppRepository {
         ON D.priceOptionCode = F.code
         LEFT JOIN ${this.tableOption} G
         ON D.ingredientNestOptionCode = G.code
+        LEFT JOIN ${this.tableOption} I
+        ON D.tradeTypeCode = I.code
         LEFT JOIN ${this.tableHarvestPhase} H
         ON A.seqHarvestPhase = H.seq
         WHERE A.requestCode = ? AND A.isActive = 'Y' 

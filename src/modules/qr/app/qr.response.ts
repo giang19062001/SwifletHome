@@ -196,6 +196,14 @@ export class GetRequestSellDetailResDto extends GetApprovedRequestQrCodeResDto {
   @ApiProperty({ example: '' })
   @IsString()
   ingredientNestOptionLabel?: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  tradeTypeCode: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  tradeTypeLabel?: string;
 }
 
 export class UploadRequestVideoResDto {
@@ -298,6 +306,10 @@ export class GetRequestSellListResDto {
   @ApiProperty({ example: '' })
   @IsString()
   ingredientNestOptionCode: string;
+
+  @ApiProperty({ example: '' })
+  @IsString()
+  tradeTypeCode: string;
 
   @ApiProperty({
     example: YnEnum.N,
