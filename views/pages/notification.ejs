@@ -55,6 +55,12 @@
                                 Gửi theo khu vực
                             </label>
                         </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sendType" id="sendType-user-type" value="USER_TYPE" />
+                            <label class="form-check-label" for="sendType-user-type">
+                                Gửi theo vai trò
+                            </label>
+                        </div>
                     </div>
                     <!-- User checkbox list -->
                     <div class="mb-3 d-none" id="user-box">
@@ -79,6 +85,24 @@
                            <% }); %>
                         </div>
                     </div>
+
+                    <!-- User Type checkbox list -->
+                    <div class="mb-3 d-none" id="user-type-box">
+                        <label class="form-label">Chọn vai trò</label>
+
+                        <div id="user-type-codes-list" class="border rounded p-2 d-flex flex-wrap gap-3"
+                            style="max-height: 220px; overflow-y: auto;">
+                           <% values.userTypes.forEach(function(type) { %>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="userTypeCode" value="<%= type.userTypeCode %>" id="user-type-<%= type.userTypeCode %>">
+                                <label class="form-check-label" for="user-type-<%= type.userTypeCode %>">
+                                <%= type.userTypeName %>
+                                </label>
+                            </div>
+                           <% }); %>
+                        </div>
+                    </div>
+
 
                     <div class="text-center">
                         <button type="submit" class="btn-submit px-4">

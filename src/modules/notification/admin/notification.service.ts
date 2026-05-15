@@ -56,6 +56,22 @@ export class NotificationAdminService {
         } else {
           return { success: false, message: MsgAdmin.pushProvinceEmpty };
         }
+      } else if (dto.sendType == SentTypeEnum.USER_TYPE) {
+        const userDeviceTokens = await this.userAdminService.getDeviceTokensByActiveTypes(dto.userTypeCodesMuticast);
+
+        // gửi thông báo
+
+        if (userDeviceTokens.length) {
+          const intendedUserCodes = Array.from(new Set(userDeviceTokens.map((item) => item.userCode)));
+          const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body, null, undefined, intendedUserCodes);
+          return {
+            success: result.successCount > 0,
+            message: result.successCount > 0 ? MsgAdmin.pushNotifyOk : MsgAdmin.pushNotifyErr,
+            data: result,
+          };
+        } else {
+          return { success: false, message: MsgAdmin.pushTypeEmpty }; // Note: Need to add MsgAdmin.pushTypeEmpty or use generic
+        }
       }
       return { success: true, message: MsgAdmin.pushNotifyOk };
     } catch (error) {

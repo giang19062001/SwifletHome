@@ -135,10 +135,13 @@ export class AppService {
   // notification
   async renderNotification(): Promise<any> {
     const provinces = await this.provinceService.getAll();
+    const userTypes = await this.userAdminService.getAllUserType();
     return {
       provinces: provinces,
+      userTypes: userTypes,
     };
   }
+
   // TaskAlarm
   async renderTaskAlarm(): Promise<any> {
     const provinces = await this.provinceService.getAll();

@@ -19,6 +19,7 @@ export class UserAdminRepository {
   private readonly tableTeam = 'tbl_team_user';
   private readonly tablePackage = 'tbl_package';
   private readonly tableCheckout = 'tbl_checkout';
+  private readonly tableUserTypeLive = 'tbl_user_type_live';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -40,6 +41,25 @@ export class UserAdminRepository {
             AND deviceToken IS NOT NULL 
             AND deviceToken != '';`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, userCodesMuticast);
+    return rows as { userCode: string; deviceToken: string }[];
+  }
+
+  async getDeviceTokensByActiveTypes(userTypeCodes: string[]): Promise<{ userCode: string; deviceToken: string }[]> {
+    if (!userTypeCodes || userTypeCodes.length === 0) {
+      return [];
+    }
+
+    const placeholders = userTypeCodes.map(() => '?').join(', ');
+    const query = `
+      SELECT A.userCode, B.deviceToken
+      FROM ${this.tableUserTypeLive} A
+      JOIN ${this.tableApp} B ON A.userCode = B.userCode
+      WHERE A.userTypeCode IN (${placeholders})
+        AND B.isActive = 'Y'
+        AND B.deviceToken IS NOT NULL 
+        AND B.deviceToken != '';
+    `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, userTypeCodes);
     return rows as { userCode: string; deviceToken: string }[];
   }
 
@@ -190,5 +210,12 @@ export class UserAdminRepository {
     }
     const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
     return rows as UserForTeamByTypeResDto[];
+  }
+
+  async getAllUserType(): Promise<UserTypeResDto[]> {
+    const sql = ` SELECT userTypeCode, userTypeKeyWord, userTypeName
+         FROM ${this.tableType} WHERE isActive = 'Y' `;
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, []);
+    return rows as UserTypeResDto[];
   }
 }

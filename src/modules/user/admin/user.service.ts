@@ -100,11 +100,20 @@ export class UserAdminService {
     return await this.userAdminRepository.getUsersForTeamByType(dto);
   }
 
+  async getAllUserType(): Promise<UserTypeResDto[]> {
+    return await this.userAdminRepository.getAllUserType();
+  }
+
   async getDeviceTokensByUsers(userCodes: string[]) {
     return await this.userAdminRepository.getDeviceTokensByUsers(userCodes);
   }
 
+  async getDeviceTokensByActiveTypes(userTypeCodes: string[]) {
+    return await this.userAdminRepository.getDeviceTokensByActiveTypes(userTypeCodes);
+  }
+
   async getDetailUserApp(userCode: string) {
+
     return await this.userAdminRepository.getDetailUserApp(userCode);
   }
 }

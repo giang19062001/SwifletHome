@@ -39,11 +39,18 @@ function resetForm() {
     cb.checked = false;
   });
 
-  // ẩn user, province box
+  // Uncheck all userTypeCode checkboxes
+  document.querySelectorAll('input[name="userTypeCode"]').forEach((cb) => {
+    cb.checked = false;
+  });
+
+  // ẩn user, province, user-type box
   const userBox = document.getElementById('user-box');
   const provinceBox = document.getElementById('province-box');
+  const userTypeBox = document.getElementById('user-type-box');
   if (provinceBox) provinceBox.classList.add('d-none');
   if (userBox) userBox.classList.add('d-none');
+  if (userTypeBox) userTypeBox.classList.add('d-none');
 }
 
 function initSendTypeEvent() {
@@ -52,15 +59,18 @@ function initSendTypeEvent() {
       const sendType = document.querySelector('input[name="sendType"]:checked').value;
       const userBox = document.getElementById('user-box');
       const provinceBox = document.getElementById('province-box');
+      const userTypeBox = document.getElementById('user-type-box');
 
       // GỬI TẤT CẢ
       if (sendType == 'ALL') {
         if (userBox) userBox.classList.add('d-none');
         if (provinceBox) provinceBox.classList.add('d-none');
+        if (userTypeBox) userTypeBox.classList.add('d-none');
       }
       // GỬI 1 VÀI USER
       if (sendType == 'USER') {
         if (provinceBox) provinceBox.classList.add('d-none');
+        if (userTypeBox) userTypeBox.classList.add('d-none');
         if (userBox) userBox.classList.remove('d-none');
 
         if (userList.length) {
@@ -70,7 +80,14 @@ function initSendTypeEvent() {
       // GỬI THEO TỈNH
       if (sendType == 'PROVINCE') {
         if (userBox) userBox.classList.add('d-none');
+        if (userTypeBox) userTypeBox.classList.add('d-none');
         if (provinceBox) provinceBox.classList.remove('d-none');
+      }
+      // GỬI THEO VAI TRÒ
+      if (sendType == 'USER_TYPE') {
+        if (userBox) userBox.classList.add('d-none');
+        if (provinceBox) provinceBox.classList.add('d-none');
+        if (userTypeBox) userTypeBox.classList.remove('d-none');
       }
     });
   });
@@ -210,6 +227,7 @@ function initSubmitForm() {
     const sendType = form.querySelector('input[name="sendType"]:checked').value;
     const userCodesMuticast = [...form.querySelectorAll('input[name="userCode"]:checked')].map((cb) => cb.value);
     const provinceCodesMuticast = [...form.querySelectorAll('input[name="provinceCode"]:checked')].map((cb) => cb.value);
+    const userTypeCodesMuticast = [...form.querySelectorAll('input[name="userTypeCode"]:checked')].map((cb) => cb.value);
 
     const formData = {
       title: form.title.value,
@@ -217,6 +235,7 @@ function initSubmitForm() {
       sendType,
       userCodesMuticast,
       provinceCodesMuticast,
+      userTypeCodesMuticast,
     };
 
     // kiểm lỗi
@@ -225,12 +244,15 @@ function initSubmitForm() {
 
     if (sendType === 'USER' && !userCodesMuticast.length) return toastErr('Vui lòng chọn ít nhất 1 người dùng');
     if (sendType === 'PROVINCE' && !provinceCodesMuticast.length) return toastErr('Vui lòng chọn ít nhất 1 tỉnh thành');
+    if (sendType === 'USER_TYPE' && !userTypeCodesMuticast.length) return toastErr('Vui lòng chọn ít nhất 1 vai trò');
 
     const payload = {
       ...formData,
       userCodesMuticast: sendType === 'USER' ? userCodesMuticast : [],
       provinceCodesMuticast: sendType === 'PROVINCE' ? provinceCodesMuticast : [],
+      userTypeCodesMuticast: sendType === 'USER_TYPE' ? userTypeCodesMuticast : [],
     };
+
 
     // disable nút submit
     let btn = form.querySelector('button');

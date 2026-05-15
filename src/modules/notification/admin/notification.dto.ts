@@ -5,6 +5,7 @@ export enum SentTypeEnum {
   PROVINCE = 'PROVINCE',
   USER = 'USER',
   ALL = 'ALL',
+  USER_TYPE = 'USER_TYPE',
 }
 export class PushNotifycationByAdminDto {
   @ApiProperty({
@@ -38,6 +39,14 @@ export class PushNotifycationByAdminDto {
   provinceCodesMuticast: string[];
 
   @ApiProperty({
+    example: [],
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  userTypeCodesMuticast: string[];
+
+  @ApiProperty({
     example: 'N',
     enum: SentTypeEnum,
   })
@@ -45,3 +54,4 @@ export class PushNotifycationByAdminDto {
   @IsEnum(SentTypeEnum)
   sendType: SentTypeEnum;
 }
+

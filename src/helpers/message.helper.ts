@@ -189,6 +189,7 @@ export const MsgAdmin = {
   pushNotifyOk: 'Gửi thông báo thành công',
   pushNotifyErr: 'Gửi thông báo thất bại',
   pushProvinceEmpty: 'Không có người dùng nào có nhà yến thuộc những tỉnh thành này',
+  pushTypeEmpty: 'Không có người dùng nào đang hoạt động với vai trò này',
   deviceTokenNotBelongToThisUser: 'Người dùng đã đăng xuất khỏi thiết bị hoặc Token thiết bị của tài khoản người dùng này đã được dùng cho tài khoản người dùng khác',
   userAlreadyCreateThisTeam: 'Người dùng hiện tại đã đăng ký đội công xưởng này rồi',
 };
