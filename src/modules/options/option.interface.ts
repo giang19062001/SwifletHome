@@ -22,16 +22,10 @@ export const OPTION_CONST = {
       mainOption: 'REQUSET_SELL',
       subOption: 'INGREDIENT_NEST',
     },
-  },
-  USER_TEAM: {
-    TECHNICAL_TYPE: {
-      mainOption: 'USER_TEAM',
-      subOption: 'TECHNICAL_TYPE',
+    TRADE_TYPE: {
+      mainOption: 'REQUSET_SELL',
+      subOption: 'TRADE_TYPE',
     },
-    FACTORY_TYPE:{
-      mainOption: 'USER_TEAM',
-      subOption: 'FACTORY_TYPE',
-    }
   },
   CONSIGNMENT_NEST: {
     NEST_TYPE: {

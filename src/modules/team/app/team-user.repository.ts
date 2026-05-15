@@ -14,6 +14,7 @@ export class TeamUserAppRepository {
   private readonly tableReview = 'tbl_team_review';
   private readonly tableService = 'tbl_team_service';
   private readonly tableServiceImg = 'tbl_team_service_img';
+  private readonly tableServiceType = 'tbl_team_service_type';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   // TODO: TEAM
@@ -128,9 +129,9 @@ export class TeamUserAppRepository {
 
       // Lấy danh sách dịch vụ và ảnh dịch vụ
       const [services] = await this.db.query<RowDataPacket[]>(`
-        SELECT S.seq, S.userTypeCode, S.serviceTypeCode, S.serviceTextInput, O.valueOption as serviceTypeText
+        SELECT S.seq, S.userTypeCode, S.serviceTypeCode, S.serviceTextInput, O.serviceTypeName as serviceTypeText
         FROM ${this.tableService} S
-        LEFT JOIN tbl_option_common O ON S.serviceTypeCode = O.keyOption AND O.mainOption = 'USER_TEAM'
+        LEFT JOIN ${this.tableServiceType} O ON S.serviceTypeCode = O.serviceTypeCode
         WHERE S.seqTeam = ?
       `, [result.seq]);
 
@@ -282,6 +283,14 @@ export class TeamUserAppRepository {
   async getTeamFileTypes(userTypeCode: string): Promise<any[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT fileTypeCode, fileTypeText FROM tbl_team_file_type WHERE userTypeCode = ?`,
+      [userTypeCode],
+    );
+    return rows;
+  }
+
+  async getTeamServiceTypes(userTypeCode: string): Promise<any[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT serviceTypeCode, serviceTypeName FROM ${this.tableServiceType} WHERE userTypeCode = ? AND isActive = 'Y' ORDER BY sortOrder ASC`,
       [userTypeCode],
     );
     return rows;

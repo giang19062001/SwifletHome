@@ -42,14 +42,10 @@ export class TeamUserAppService {
     const teamFileTypes = await this.teamUserAppRepository.getTeamFileTypes(userTypeCode);
     const provinces = await this.provinceService.getAll();
 
-    const serviceOptions = await this.optionService.getAll({
-      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: userTypeKeyWord === 'FACTORY' ? 'FACTORY_TYPE' :  userTypeKeyWord === 'TECHNICAL' ? 'TECHNICAL_TYPE' : '',
-    });
-
+    const serviceOptions = await this.teamUserAppRepository.getTeamServiceTypes(userTypeCode);
     const services = serviceOptions.map(opt => ({
-      serviceTypeCode: opt.keyOption,
-      serviceDescription: opt.valueOption,
+      serviceTypeCode: opt.serviceTypeCode,
+      serviceDescription: opt.serviceTypeName,
       uniqueId: uuidv4(),
     }));
 

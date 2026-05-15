@@ -18,6 +18,7 @@ export class TeamAdminRepository {
   private readonly tableReviewImg = 'tbl_team_review_img';
   private readonly tableService = 'tbl_team_service';
   private readonly tableServiceImg = 'tbl_team_service_img';
+  private readonly tableServiceType = 'tbl_team_service_type';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -141,6 +142,18 @@ export class TeamAdminRepository {
   }
   async getTeamFileTypes(): Promise<any[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT * FROM ${this.tableFileType}`);
+    return rows;
+  }
+
+  async getTeamServiceTypes(userTypeCode?: string): Promise<any[]> {
+    let query = `SELECT seq, userTypeCode, serviceTypeCode, serviceTypeName FROM ${this.tableServiceType} WHERE isActive = 'Y'`;
+    const params: any[] = [];
+    if (userTypeCode) {
+      query += ` AND userTypeCode = ?`;
+      params.push(userTypeCode);
+    }
+    query += ` ORDER BY sortOrder ASC`;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows;
   }
 

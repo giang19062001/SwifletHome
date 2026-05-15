@@ -67,6 +67,7 @@ document.getElementById('userTypeCode').addEventListener('change', async functio
   // Reset các dịch vụ và ảnh phụ đã tải lên trước đó
   document.getElementById('servicesContainer').innerHTML = '';
   serviceImagesFiles = {};
+  serviceCounter = 0;
 
   document.querySelectorAll('.dynamic-team-images').forEach((input) => {
     const typeCode = input.dataset.typecode;
@@ -118,9 +119,9 @@ document.getElementById('userTypeCode').addEventListener('change', async functio
 
   // Cập nhật lại danh sách option cho các dịch vụ đã thêm (nếu có)
   const serviceSelects = document.querySelectorAll('.service-type-code');
-  let currentOptions = [];
+  let currentOptions = teamServiceTypes.filter(opt => opt.userTypeCode === userTypeCode);
+
   if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.FACTORY) {
-    currentOptions = serviceOptionsFactory;
     document.getElementById('factorySpecialFields').classList.remove('d-none');
     teamMutationConstraints.monthlyVolumn = {
       presence: { allowEmpty: false, message: '^Vui lòng nhập sản lượng trên 1 tháng.' },
@@ -129,7 +130,6 @@ document.getElementById('userTypeCode').addEventListener('change', async functio
       presence: { allowEmpty: false, message: '^Vui lòng nhập số lượng tối thiểu.' },
     };
   } else if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
-    currentOptions = serviceOptionsTechnical;
     document.getElementById('factorySpecialFields').classList.add('d-none');
     delete teamMutationConstraints.monthlyVolumn;
     delete teamMutationConstraints.minimunQuantity;
@@ -139,7 +139,7 @@ document.getElementById('userTypeCode').addEventListener('change', async functio
     const currentValue = select.value;
     let optionsHtml = '<option value="">-- Chọn dịch vụ --</option>';
     currentOptions.forEach((opt) => {
-      optionsHtml += `<option value="${opt.keyOption}" ${currentValue === opt.keyOption ? 'selected' : ''}>${opt.valueOption}</option>`;
+      optionsHtml += `<option value="${opt.serviceTypeCode}" ${currentValue === opt.serviceTypeCode ? 'selected' : ''}>${opt.serviceTypeName}</option>`;
     });
     select.innerHTML = optionsHtml;
   });
@@ -390,18 +390,13 @@ function addServiceBlock(svcData = null) {
 
   // Xác định bộ option dựa trên userTypeCode hiện tại
   const userTypeSelect = document.getElementById('userTypeCode');
-  const userTypeKeyWord = userTypeSelect.options[userTypeSelect.selectedIndex]?.dataset?.keyword;
-
-  let currentOptions = [];
-  if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.FACTORY) {
-    currentOptions = serviceOptionsFactory;
-  } else if (userTypeKeyWord === VARIABLE_ENUM.USER_TEAM_TYPE.TECHNICAL) {
-    currentOptions = serviceOptionsTechnical;
-  }
+  const userTypeCode = userTypeSelect.value;
+  
+  let currentOptions = teamServiceTypes.filter(opt => opt.userTypeCode === userTypeCode);
 
   let optionsHtml = '<option value="">-- Chọn dịch vụ --</option>';
   currentOptions.forEach((opt) => {
-    optionsHtml += `<option value="${opt.keyOption}" ${svcData && svcData.serviceTypeCode === opt.keyOption ? 'selected' : ''}>${opt.valueOption}</option>`;
+    optionsHtml += `<option value="${opt.serviceTypeCode}" ${svcData && svcData.serviceTypeCode === opt.serviceTypeCode ? 'selected' : ''}>${opt.serviceTypeName}</option>`;
   });
 
   const html = `

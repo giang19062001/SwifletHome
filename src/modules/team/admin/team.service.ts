@@ -28,6 +28,10 @@ export class TeamAdminService {
     return await this.teamAdminRepository.getTeamFileTypes();
   }
 
+  async getTeamServiceTypes(userTypeCode?: string): Promise<any[]> {
+    return await this.teamAdminRepository.getTeamServiceTypes(userTypeCode);
+  }
+
   async getDetail(teamCode: string): Promise<any | null> {
     let result: any = await this.teamAdminRepository.getDetail(teamCode);
     if (result) {

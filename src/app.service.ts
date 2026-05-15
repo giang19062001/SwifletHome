@@ -163,21 +163,13 @@ export class AppService {
     const provinces = await this.provinceService.getAll();
     const userTypes = await this.userAdminService.getTypesForTeam();
     const teamFileTypes = await this.teamAdminService.getTeamFileTypes();
-    const serviceOptionsFactory = await this.optionService.getAll({
-      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: 'FACTORY_TYPE',
-    });
-    const serviceOptionsTechnical = await this.optionService.getAll({
-      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: 'TECHNICAL_TYPE',
-    });
+    const teamServiceTypes = await this.teamAdminService.getTeamServiceTypes();
     
     return {
       provinces: provinces,
       userTypes: userTypes,
       teamFileTypes: teamFileTypes,
-      serviceOptionsFactory: serviceOptionsFactory,
-      serviceOptionsTechnical: serviceOptionsTechnical,
+      teamServiceTypes: teamServiceTypes,
     };
   }
   async renderTeamUpdate(teamCode: string): Promise<any> {
@@ -185,22 +177,14 @@ export class AppService {
     const provinces = await this.provinceService.getAll();
     const userTypes = await this.userAdminService.getTypesForTeam();
     const teamFileTypes = await this.teamAdminService.getTeamFileTypes();
-    const serviceOptionsFactory = await this.optionService.getAll({
-      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: 'FACTORY_TYPE',
-    });
-    const serviceOptionsTechnical = await this.optionService.getAll({
-      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: 'TECHNICAL_TYPE',
-    });
+    const teamServiceTypes = await this.teamAdminService.getTeamServiceTypes();
     
     return {
       teamData: teamData,
       provinces: provinces,
       userTypes: userTypes,
       teamFileTypes: teamFileTypes,
-      serviceOptionsFactory: serviceOptionsFactory,
-      serviceOptionsTechnical: serviceOptionsTechnical,
+      teamServiceTypes: teamServiceTypes,
     };
   }
   async renderTeamDetail(teamCode: string): Promise<any> {
@@ -208,22 +192,14 @@ export class AppService {
     const provinces = await this.provinceService.getAll();
     const userTypes = await this.userAdminService.getTypesForTeam();
     const teamFileTypes = await this.teamAdminService.getTeamFileTypes();
-    const serviceOptionsFactory = await this.optionService.getAll({
-      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: 'FACTORY_TYPE',
-    });
-    const serviceOptionsTechnical = await this.optionService.getAll({
-      mainOption: OPTION_CONST.USER_TEAM.TECHNICAL_TYPE.mainOption,
-      subOption: 'TECHNICAL_TYPE',
-    });
+    const teamServiceTypes = await this.teamAdminService.getTeamServiceTypes();
 
     return {
       teamData: teamData,
       provinces: provinces,
       userTypes: userTypes,
       teamFileTypes: teamFileTypes,
-      serviceOptionsFactory: serviceOptionsFactory,
-      serviceOptionsTechnical: serviceOptionsTechnical,
+      teamServiceTypes: teamServiceTypes,
     };
   }
 }

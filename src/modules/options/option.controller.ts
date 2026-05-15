@@ -22,11 +22,12 @@ export default class OptionController {
 
 
 **subOption:**
-  - **NUMBER_ATTEND**: số lượng người đăng ký tham quan nhà yến\n
-  - **MEDICINE**: Danh sách thuốc
-  - **PRICE_OPTION**: Kiểu thiết lập giá
-  - **INGREDIENT_NEST**: Loại thanh làm tổ
-  - **NEST_TYPE**: Loại yến để ký gửi
+  - **NUMBER_ATTEND**: số lượng người đăng ký tham quan nhà yến (**SIGHTSEEING**)\n
+  - **MEDICINE**: Danh sách thuốc (**TODO_TASK**)\n
+  - **PRICE_OPTION**: Kiểu thiết lập giá (**REQUSET_SELL**)\n
+  - **INGREDIENT_NEST**: Loại thanh làm tổ (**REQUSET_SELL**)\n
+  - **TRADE_TYPE**: Bán sỉ hoặc lẻ (**REQUSET_SELL**)\n
+  - **NEST_TYPE**: Loại yến để ký gửi (**CONSIGNMENT_NEST**)\n
 
 `,
     type: GetOptionDto,
