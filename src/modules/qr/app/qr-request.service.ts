@@ -84,26 +84,45 @@ export class QrRequestAppService {
     // lấy thông tin lăn thuốc nhà yến này
     const taskMedicineList = await this.todoMedicineAppService.getTaskMedicineCompleteAndNotUseList(userHomeCode);
 
-    // lấy thông tin thu hoạc nhà yến này
-    //? harvestPhase = 0 --> lấy tất cả các đợt để làm SelectBox cho Form yêu cầu Qr
-    //? harvestPhase > 0 --> Chọn đợt và insert cho Qr table
-    let taskHarvestCompleteList = await this.todoHarvestAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
-    
-    // Lấy toàn bộ data một lần thay vì lặp qua từng phần tử
-    const seqs = taskHarvestCompleteList.map((ele) => ele.seq);
+    // BƯỚC QUAN TRỌNG: LUÔN LẤY TẤT CẢ CÁC ĐỢT THU HOẠCH (harvestPhase = 0) ĐỂ TÍNH TOÁN TIMELINE CHÍNH XÁC
+    let allTaskHarvestCompleteList = await this.todoHarvestAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, 0);
+
+    // Sắp xếp các đợt thu hoạch theo thứ tự thời gian tăng dần (ASC)
+    allTaskHarvestCompleteList.sort((a, b) => moment(a.timestamp).valueOf() - moment(b.timestamp).valueOf());
+    // Sắp xếp lăn thuốc theo thứ tự thời gian tăng dần (ASC)
+    taskMedicineList.sort((a, b) => moment(a.timestamp).valueOf() - moment(b.timestamp).valueOf());
+
+    // Lấy toàn bộ data chi tiết tầng/ô một lần
+    const seqs = allTaskHarvestCompleteList.map((ele) => ele.seq);
     const arrangedData = await this.todoHarvestAppService.arrangeMultipleHarvestRows(seqs, homeInfo.userHomeFloor);
     const arrangedDataMap = new Map(arrangedData.map((item) => [item.seq, item.harvestData]));
 
-    const taskHarvestList: TaskHarvestQrResDto[] = taskHarvestCompleteList.map((ele) => ({
-      harvestTaskAlarmCode: ele.harvestTaskAlarmCode,
-      harvestPhase: ele.harvestPhase,
-      harvestYear: ele.harvestYear,
-      harvestData: arrangedDataMap.get(ele.seq) || [],
-      timestamp: moment(ele.timestamp).format('DD-MM-YYYY HH:mm:ss'),
-      medicinesFollowHarvest: taskMedicineList
-        .filter((med) => moment(med.timestamp).isSameOrBefore(moment(ele.timestamp)))
-        .map((med) => med.medicineTaskAlarmCode),
-    }));
+    // THỰC THI THUẬT TOÁN GÁN DUY NHẤT THEO TIMELINE
+    const assignedMedicineCodes = new Set<string>();
+    let allTaskHarvestList: TaskHarvestQrResDto[] = allTaskHarvestCompleteList.map((ele) => {
+      // Lọc các lăn thuốc hoàn thành trước đợt thu hoạch này và chưa được gán cho đợt nào trước đó
+      const currentMedicines = taskMedicineList.filter((med) => 
+        moment(med.timestamp).isSameOrBefore(moment(ele.timestamp)) && !assignedMedicineCodes.has(med.medicineTaskAlarmCode)
+      );
+
+      // Đánh dấu các lăn thuốc này đã được gán
+      currentMedicines.forEach((med) => assignedMedicineCodes.add(med.medicineTaskAlarmCode));
+
+      return {
+        harvestTaskAlarmCode: ele.harvestTaskAlarmCode,
+        harvestPhase: ele.harvestPhase,
+        harvestYear: ele.harvestYear,
+        harvestData: arrangedDataMap.get(ele.seq) || [],
+        timestamp: moment(ele.timestamp).format('DD-MM-YYYY HH:mm:ss'),
+        medicinesFollowHarvest: currentMedicines.map((med) => med.medicineTaskAlarmCode),
+      } as any;
+    });
+
+    // NẾU CÓ PARAM harvestPhase > 0, LỌC LẠI CHỈ LẤY ĐỢT ĐƯỢC CHỌN
+    let finalTaskHarvestList = allTaskHarvestList;
+    if (harvestPhase > 0) {
+      finalTaskHarvestList = allTaskHarvestList.filter((h) => h.harvestPhase === harvestPhase);
+    }
 
     return {
       userName: user.userName,
@@ -119,8 +138,8 @@ export class QrRequestAppService {
         ...med,
         timestamp: moment(med.timestamp).format('DD-MM-YYYY HH:mm:ss'),
       })),
-      taskHarvestList: taskHarvestList,
-      seqHarvestPhase: taskHarvestCompleteList.length > 0 ? (taskHarvestCompleteList[0] as any).seqHarvestPhase : undefined,
+      taskHarvestList: finalTaskHarvestList,
+      seqHarvestPhase: finalTaskHarvestList.length > 0 ? (finalTaskHarvestList[0] as any).seqHarvestPhase : undefined,
     } as GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number };
   }
 
