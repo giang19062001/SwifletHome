@@ -298,9 +298,8 @@ export class QrRequestAppRepository {
            FROM ${this.tableHarvestPhase} P
            WHERE P.userHomeCode = H.userHomeCode 
              AND P.taskStatus = 'COMPLETE' 
-             AND P.isDone = 'Y' 
+             AND P.isUse = 'N' 
              AND P.harvestYear = YEAR(CURDATE())
-             AND NOT EXISTS (SELECT 1 FROM ${this.table} Q WHERE Q.seqHarvestPhase = P.seq AND Q.isActive = 'Y')
           ),
           JSON_ARRAY()
         ) AS harvestAvaliableList

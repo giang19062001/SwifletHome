@@ -178,7 +178,11 @@ export class TodoMedicineAppService {
     return await this.todoMedicineAppRepository.getTaskMedicineCompleteAndNotUseList(userHomeCode);
   }
 
-  async useOrUnuseTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string, isUsed: YnEnum) {
-    return await this.todoMedicineAppRepository.useOrUnuseTaskMedicineForQr(userCode, userHomeCode, medicineCode, isUsed);
+  async useTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string) {
+    return await this.todoMedicineAppRepository.useTaskMedicineForQr(userCode, userHomeCode, medicineCode);
+  }
+
+  async unuseTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string) {
+    return await this.todoMedicineAppRepository.unuseTaskMedicineForQr(userCode, userHomeCode, medicineCode);
   }
 }

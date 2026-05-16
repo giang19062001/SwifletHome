@@ -19,7 +19,7 @@ export class ReportAppRepository {
           ON C.seq = D.seqHarvestPhase
         WHERE C.userHomeCode = ?
           AND C.userCode = ? AND C.harvestYear = ?
-          AND C.isDone = 'Y'
+          AND C.taskStatus = 'COMPLETE'
         GROUP BY C.harvestPhase, C.harvestYear
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
@@ -46,7 +46,7 @@ export class ReportAppRepository {
           ON C.seq = D.seqHarvestPhase
         WHERE C.userHomeCode = ?
           AND C.userCode = ? AND C.harvestYear = ?
-          AND C.isDone = 'Y'
+          AND C.taskStatus = 'COMPLETE'
         GROUP BY C.harvestPhase, C.harvestYear
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);

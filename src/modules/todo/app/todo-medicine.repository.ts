@@ -88,12 +88,21 @@ export class TodoMedicineAppRepository {
     return result.affectedRows;
   }
 
-  async useOrUnuseTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string, isUse: YnEnum): Promise<number> {
+  async useTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableTaskMedicine}
-      SET isUse = ?, updatedId = ?, updatedAt = NOW()
+      SET isUse = 'Y', updatedId = ?
       WHERE medicineCode = ? AND userCode = ? AND userHomeCode = ?`;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [isUse, userCode, medicineCode, userCode, userHomeCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, medicineCode, userCode, userHomeCode]);
+    return result.affectedRows;
+  }
+
+  async unuseTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableTaskMedicine}
+      SET isUse = 'N', updatedId = ?
+      WHERE medicineCode = ? AND userCode = ? AND userHomeCode = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, medicineCode, userCode, userHomeCode]);
     return result.affectedRows;
   }
 
@@ -122,7 +131,7 @@ export class TodoMedicineAppRepository {
           WHEN C.keyOption != '${TODO_CONST.TASK_OPTION_MEDICINE.OTHER.value}' THEN C.valueOption
           ELSE A.medicineOther
         END AS medicineName,
-        DATE_FORMAT(COALESCE(A.updatedAt, A.createdAt),'%Y-%m-%d %H:%i:%s') AS timestamp
+        COALESCE(A.updatedAt, A.createdAt) AS timestamp
       FROM ${this.tableTaskMedicine} A
       LEFT JOIN ${this.tableOption} C ON A.medicineOptionCode = C.code
       WHERE A.userHomeCode = ?

@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import moment from 'moment';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
@@ -98,6 +99,10 @@ export class QrRequestAppService {
       harvestPhase: ele.harvestPhase,
       harvestYear: ele.harvestYear,
       harvestData: arrangedDataMap.get(ele.seq) || [],
+      timestamp: moment(ele.timestamp).format('DD-MM-YYYY HH:mm:ss'),
+      medicinesFollowHarvest: taskMedicineList
+        .filter((med) => moment(med.timestamp).isSameOrBefore(moment(ele.timestamp)))
+        .map((med) => med.medicineTaskAlarmCode),
     }));
 
     return {
@@ -110,7 +115,10 @@ export class QrRequestAppService {
       userHomeAddress: homeInfo.userHomeAddress,
       temperature: 0,
       humidity: 0,
-      taskMedicineList: taskMedicineList,
+      taskMedicineList: taskMedicineList.map((med) => ({
+        ...med,
+        timestamp: moment(med.timestamp).format('DD-MM-YYYY HH:mm:ss'),
+      })),
       taskHarvestList: taskHarvestList,
       seqHarvestPhase: taskHarvestCompleteList.length > 0 ? (taskHarvestCompleteList[0] as any).seqHarvestPhase : undefined,
     } as GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number };
@@ -164,15 +172,24 @@ export class QrRequestAppService {
         return result;
       }
 
+      // Lấy đợt thu hoạch đã chọn ( đã được lọc bởi param harvestPhase ở hàm getInfoToRequestQrcode)
+      const targetHarvest = dataInsertDto.taskHarvestList[0];
+      const medicineCodesToMark = targetHarvest.medicinesFollowHarvest || [];
+
+      // Chỉ giữ lại những lần lăn thuốc thuộc đợt thu hoạch này để lưu vào DB và đánh dấu isUse = 'Y'
+      dataInsertDto.taskMedicineList = dataInsertDto.taskMedicineList.filter((m) => medicineCodesToMark.includes(m.medicineTaskAlarmCode));
+
       // tìm tất cả file đã upload cùng uniqueId
       const filesUploaded = await this.qrRequestAppRepository.findFilesByUniqueId(dto.uniqueId);
       if (filesUploaded.length) {
         // dánh đấu các lăn thuốc là đã dùng
         if (dataInsertDto.taskMedicineList.length) {
           for (const med of dataInsertDto.taskMedicineList) {
-            await this.todoMedicineAppService.useOrUnuseTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode, YnEnum.Y);
+            await this.todoMedicineAppService.useTaskMedicineForQr(user.userCode, dataInsertDto.userHomeCode, med.medicineTaskAlarmCode);
           }
         }
+        // dánh dấu đợt thu hoạch là đã dùng
+        await this.todoHarvestAppService.useTaskHarvestForQr(user.userCode, dataInsertDto.userHomeCode, dataInsertDto.seqHarvestPhase);
 
         // insert dữ liệu yêu cầu QR
         const seq = await this.qrRequestAppRepository.insertRequestQrCode(user.userCode, {
@@ -222,11 +239,13 @@ export class QrRequestAppService {
         data: 0,
       });
     }
+    // cập nhập lại isUse = 'N' cho đợt thu hoạch của requestQr này
+    await this.todoHarvestAppService.unuseTaskHarvestForQr(userCode, requestInfo.userHomeCode, requestInfo.seqHarvestPhase);
     // cập nhập lại isUse = 'N' cho các lần lăn thuốc của requestQr này
     const taskMedicineList = requestInfo.taskMedicineList as any;
     if (taskMedicineList?.length) {
       for (const med of taskMedicineList) {
-        await this.todoMedicineAppService.useOrUnuseTaskMedicineForQr(userCode, requestInfo.userHomeCode, med.medicineTaskAlarmCode, YnEnum.N);
+        await this.todoMedicineAppService.unuseTaskMedicineForQr(userCode, requestInfo.userHomeCode, med.medicineTaskAlarmCode);
       }
     }
 

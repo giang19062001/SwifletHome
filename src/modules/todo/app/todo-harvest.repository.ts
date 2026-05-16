@@ -23,7 +23,7 @@ export class TodoHarvestAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT MAX(harvestPhase) AS PHASE
        FROM ${this.tableTaskHarvestPhase}
-       WHERE userHomeCode = ? AND harvestYear = ? AND isDone = 'Y'`,
+       WHERE userHomeCode = ? AND harvestYear = ? AND taskStatus = '${TaskStatusEnum.COMPLETE}'`,
       [userHomeCode, currentYear],
     );
     return rows.length ? Number(rows[0].PHASE + 1) : 1;
@@ -33,7 +33,7 @@ export class TodoHarvestAppRepository {
     userCode: string,
     userHomeCode: string,
     harvestPhase: number,
-    isDone: YnEnum,
+    isUse: YnEnum,
     taskDate: Date,
     taskStatus: TaskStatusEnum,
   ): Promise<number> {
@@ -60,20 +60,20 @@ export class TodoHarvestAppRepository {
       // 3. Ghi đè (update) record hiện tại
       const sqlUpdate = `
         UPDATE ${this.tableTaskHarvestPhase}
-        SET isDone = ?, taskDate = ?, taskStatus = ?, updatedId = ?, updatedAt = NOW()
+        SET isUse = ?, taskDate = ?, taskStatus = ?, updatedId = ?, updatedAt = NOW()
         WHERE seq = ?
       `;
-      await this.db.execute(sqlUpdate, [isDone, taskDate, taskStatus, userCode, seq]);
+      await this.db.execute(sqlUpdate, [isUse, taskDate, taskStatus, userCode, seq]);
 
       return seq;
     } else {
       // 4. Nếu không có, thêm mới như bình thường
       const sqlInsert = `
-        INSERT INTO ${this.tableTaskHarvestPhase} (userCode, userHomeCode, harvestPhase, isDone, harvestYear, taskDate, taskStatus, createdId)
+        INSERT INTO ${this.tableTaskHarvestPhase} (userCode, userHomeCode, harvestPhase, isUse, harvestYear, taskDate, taskStatus, createdId)
         VALUES(?, ?, ?, ?, ?, ?, ?, ?)
       `;
       const [result] = await this.db.execute<ResultSetHeader>(sqlInsert, [
-        userCode, userHomeCode, harvestPhase, isDone, currentYear, taskDate, taskStatus, userCode,
+        userCode, userHomeCode, harvestPhase, isUse, currentYear, taskDate, taskStatus, userCode,
       ]);
       return result.insertId;
     }
@@ -83,9 +83,27 @@ export class TodoHarvestAppRepository {
     const currentYear = moment().year();
     const sql = `
       UPDATE ${this.tableTaskHarvestPhase}
-      SET isDone = ?, taskStatus = ?, updatedId = ?, updatedAt = NOW()
+      SET taskStatus = ?, updatedId = ?, updatedAt = NOW()
       WHERE seq = ? AND harvestYear = ? AND harvestPhase = ? AND userHomeCode = ?`;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [YnEnum.Y, TaskStatusEnum.COMPLETE, userCode, seqHarvestPhase, currentYear, harvestPhase, userHomeCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [TaskStatusEnum.COMPLETE, userCode, seqHarvestPhase, currentYear, harvestPhase, userHomeCode]);
+    return result.affectedRows;
+  }
+
+  async useTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableTaskHarvestPhase}
+      SET isUse = 'Y', updatedId = ?
+      WHERE seq = ? AND userHomeCode = ? AND userCode = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqHarvestPhase, userHomeCode, userCode]);
+    return result.affectedRows;
+  }
+
+  async unuseTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableTaskHarvestPhase}
+      SET isUse = 'N', updatedId = ?
+      WHERE seq = ? AND userHomeCode = ? AND userCode = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqHarvestPhase, userHomeCode, userCode]);
     return result.affectedRows;
   }
 
@@ -124,7 +142,7 @@ export class TodoHarvestAppRepository {
 
   async getOneTaskHarvestPhase(seqHarvestPhase: number): Promise<GetHarvestTaskPhaseResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT seq, userCode, userHomeCode, harvestPhase, harvestYear, isDone,
+      `SELECT seq, userCode, userHomeCode, harvestPhase, harvestYear, isUse,
               DATE_FORMAT(taskDate,'%Y-%m-%d') AS taskDate, taskStatus
        FROM ${this.tableTaskHarvestPhase}
        WHERE seq = ? LIMIT 1`,
@@ -226,10 +244,7 @@ export class TodoHarvestAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT COUNT(A.seq) AS TOTAL
        FROM ${this.tableTaskHarvestPhase} A
-       WHERE A.userHomeCode = ? AND A.userCode = ? AND A.isDone = 'Y'
-         AND NOT EXISTS (
-           SELECT 1 FROM ${this.tableQr} D WHERE D.seqHarvestPhase = A.seq AND D.isActive = 'Y'
-         ) `,
+       WHERE A.userHomeCode = ? AND A.userCode = ? AND A.taskStatus = '${TaskStatusEnum.COMPLETE}' AND A.isUse = 'N'`,
       [dto.userHomeCode, userCode],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
@@ -251,34 +266,29 @@ export class TodoHarvestAppRepository {
       FROM ${this.tableTaskHarvestPhase} A
       INNER JOIN ${this.tableUserHome} E ON A.userHomeCode = E.userHomeCode
       LEFT JOIN ${this.tableTaskHarvest} D ON A.seq = D.seqHarvestPhase
-      WHERE A.userHomeCode = ? AND A.userCode = ? AND A.isDone = 'Y'
-        AND NOT EXISTS (
-          SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = A.seq AND Q.isActive = 'Y'
-        )
+      WHERE A.userHomeCode = ? AND A.userCode = ? AND A.taskStatus = '${TaskStatusEnum.COMPLETE}' AND A.isUse = 'N'
       GROUP BY A.seq, A.userHomeCode, A.harvestPhase, A.harvestYear, E.userHomeFloor
       ${offsetQuery}`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as GetListTaskHarvestResDto[];
   }
 
-  async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number })[]> {
+  async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number; timestamp: Date })[]> {
     const currentYear = moment().year();
     const query = `
-      SELECT A.seq AS seq, A.seq AS seqHarvestPhase, A.harvestPhase, A.harvestYear
+      SELECT A.seq AS seq, A.seq AS seqHarvestPhase, A.harvestPhase, A.harvestYear, COALESCE(A.updatedAt, A.createdAt) AS timestamp
       FROM ${this.tableTaskHarvestPhase} A
-      WHERE A.userHomeCode = ? AND A.taskStatus = '${TaskStatusEnum.COMPLETE}' AND A.isDone = 'Y'
+      WHERE A.userHomeCode = ? AND A.taskStatus = '${TaskStatusEnum.COMPLETE}' AND A.isUse = 'N'
         AND A.harvestYear = ?
-        AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = A.seq AND Q.isActive = 'Y')
       ${harvestPhase != 0 ? 'AND A.harvestPhase = ?' : ''}`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, harvestPhase != 0 ? [userHomeCode, currentYear, harvestPhase] : [userHomeCode, currentYear]);
-    return rows as (TaskHarvestQrResDto & { seq: number })[];
+    return rows as (TaskHarvestQrResDto & { seq: number; timestamp: Date })[];
   }
 
   async checkTaskHarvestCompleteAndNotUse(seqHarvestPhase: number): Promise<boolean> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT seq FROM ${this.tableTaskHarvestPhase}
-       WHERE seq = ? AND isDone = 'Y'
-         AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = seq AND Q.isActive = 'Y')
+       WHERE seq = ? AND taskStatus = '${TaskStatusEnum.COMPLETE}' AND isUse = 'N'
        LIMIT 1`,
       [seqHarvestPhase],
     );
@@ -289,12 +299,12 @@ export class TodoHarvestAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT seq AS seq, seq AS seqHarvestPhase, harvestPhase, harvestYear
        FROM ${this.tableTaskHarvestPhase}
-       WHERE userHomeCode = ? AND taskStatus = '${TaskStatusEnum.COMPLETE}' AND isDone = 'Y'
+       WHERE userHomeCode = ? AND taskStatus = '${TaskStatusEnum.COMPLETE}' AND isUse = 'N'
          AND harvestYear = ? AND harvestPhase = ?
-         AND NOT EXISTS (SELECT 1 FROM ${this.tableQr} Q WHERE Q.seqHarvestPhase = seq AND Q.isActive = 'Y')
        LIMIT 1`,
       [userHomeCode, harvestYear, harvestPhase],
     );
     return rows.length ? (rows[0] as TaskHarvestQrResDto & { seq: number }) : null;
   }
+
 }

@@ -100,6 +100,14 @@ export class TaskHarvestQrResDto {
   @ApiProperty({ type: () => [HarvestDataInputDto] })
   @IsArray()
   harvestData: HarvestDataInputDto[];
+
+  @ApiProperty({ example: ['MED000001'] })
+  @IsOptional()
+  @IsArray()
+  medicinesFollowHarvest: string[];
+
+  @ApiProperty({ example: '' })
+  timestamp: string;
 }
 
 export class RequestQrCodeResDto extends GetInfoToRequestQrcodeResDto {

@@ -38,10 +38,10 @@ export class GetHarvestTaskPhaseResDto {
   taskStatus: TaskStatusEnum;
 
   @ApiProperty({
-    example: YnEnum.Y,
+    example: YnEnum.N,
     enum: YnEnum,
   })
-  isDone: YnEnum;
+  isUse: YnEnum;
 }
 
 export class GetTaskAlarmResDto {

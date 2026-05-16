@@ -202,13 +202,13 @@ export class TodoHarvestAppService {
       // ─── KHỞI TẠO MỚI (Trường hợp taskAlarmCode trống) ─────────────────────────────────────────────────
       if (!dto.taskAlarmCode || String(dto.taskAlarmCode).trim() === '') {
         // Xác định trạng thái dựa trên flag isComplete
-        const isDone = dto.isComplete === YnEnum.Y ? YnEnum.Y : YnEnum.N;
+        const isUse = YnEnum.N;
         const taskStatus = dto.isComplete === YnEnum.Y ? TaskStatusEnum.COMPLETE : TaskStatusEnum.WAITING;
         const taskDate = moment(dto.harvestNextDate).toDate();
 
         // Chèn bản ghi đợt thu hoạch mới vào DB
         const seqHarvestPhase = await this.todoHarvestAppRepository.insertTaskHarvestPhase(
-          userCode, mainHomeOfUser.userHomeCode, dto.harvestPhase, isDone, taskDate, taskStatus,
+          userCode, mainHomeOfUser.userHomeCode, dto.harvestPhase, isUse, taskDate, taskStatus,
         );
         this.logger.log(logbase, `Tạo đợt thu hoạch mới seqHarvestPhase(${seqHarvestPhase})`);
 
@@ -325,7 +325,7 @@ export class TodoHarvestAppService {
       throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
     }
 
-    // Tìm kiếm đợt thu hoạch đã hoàn thành (isDone = 'Y') và chưa liên kết với mã QR nào
+    // Tìm kiếm đợt thu hoạch đã hoàn thành (taskStatus = 'COMPLETE') và chưa liên kết với mã QR nào
     let taskHarvestComplete = await this.todoHarvestAppRepository.getTaskHarvestCompleteAndNotUseOne(dto.userHomeCode, dto.harvestPhase, dto.harvestYear);
     
     // Nếu tìm thấy, lấy chi tiết tầng/ô, nếu không trả về mảng trống
@@ -375,6 +375,14 @@ export class TodoHarvestAppService {
 
   async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number) {
     return await this.todoHarvestAppRepository.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
+  }
+
+  async useTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
+    return await this.todoHarvestAppRepository.useTaskHarvestForQr(userCode, userHomeCode, seqHarvestPhase);
+  }
+
+  async unuseTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
+    return await this.todoHarvestAppRepository.unuseTaskHarvestForQr(userCode, userHomeCode, seqHarvestPhase);
   }
 
 }
