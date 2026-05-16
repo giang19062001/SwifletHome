@@ -120,8 +120,10 @@ export class QrRequestAppService {
 
     // NẾU CÓ PARAM harvestPhase > 0, LỌC LẠI CHỈ LẤY ĐỢT ĐƯỢC CHỌN
     let finalTaskHarvestList = allTaskHarvestList;
+    let targetHarvestComplete = allTaskHarvestCompleteList;
     if (harvestPhase > 0) {
       finalTaskHarvestList = allTaskHarvestList.filter((h) => h.harvestPhase === harvestPhase);
+      targetHarvestComplete = allTaskHarvestCompleteList.filter((h) => h.harvestPhase === harvestPhase);
     }
 
     return {
@@ -139,7 +141,7 @@ export class QrRequestAppService {
         timestamp: moment(med.timestamp).format('DD-MM-YYYY HH:mm:ss'),
       })),
       taskHarvestList: finalTaskHarvestList,
-      seqHarvestPhase: finalTaskHarvestList.length > 0 ? (finalTaskHarvestList[0] as any).seqHarvestPhase : undefined,
+      seqHarvestPhase: targetHarvestComplete.length > 0 ? targetHarvestComplete[0].seq : undefined,
     } as GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number };
   }
 
@@ -179,6 +181,7 @@ export class QrRequestAppService {
       // lấy thông tin lăn thuốc, thu hoạch,.. từ DB để insert
       const dataInsertDto = await this.getInfoToRequestQrcode(dto.userHomeCode, user, dto.harvestPhase);
 
+      console.log({ dataInsertDto }); 
       if (!dataInsertDto || !dataInsertDto.seqHarvestPhase) {
         this.logger.error(logbase, `Không thê lấy thông tin yêu cầu mã Qr từ cơ sở dữ liệu của người dùng (${user.userCode}) và nhà yến (${dto.userHomeCode})`);
         result = 0;
