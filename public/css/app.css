@@ -19194,24 +19194,55 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   margin-top: 20px;
 }
 
-@media (max-width: 768px) {
-  .container-login {
+@media (max-width: 992px) {
+  .container {
+    max-width: 85%;
+    width: 85%;
+  }
+  .page-login {
     align-items: start;
     background-color: #ffffff;
+    padding: 0px;
   }
-  .container-login .box-login {
-    margin-top: 15%;
+  .page-login .box-login {
+    margin-top: 30%;
     border: none;
     background-color: transparent;
     border-radius: 0px;
     width: 100%;
-    padding: 22px;
+    max-width: 100%;
+    padding: 40px;
+    border: 1px solid #e9ecef;
+    border-radius: 24px;
+    background-color: #ffffff;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
   }
-  .container-login .box-login .txt-title {
+  .page-login .box-login .txt-title {
+    text-align: center;
+    font-size: 38px;
+    margin-bottom: 30px !important;
+  }
+  .page-login .box-login .txt-subtitle {
     text-align: center;
   }
-  .container-login .box-login .txt-subtitle {
-    text-align: center;
+  .page-login .box-login #form-login {
+    margin-top: 30px;
+  }
+  .page-login .box-login #form-login .label-id,
+  .page-login .box-login #form-login .label-password {
+    font-size: 16px;
+    margin-bottom: 8px !important;
+  }
+  .page-login .box-login #form-login #userId,
+  .page-login .box-login #form-login #userPassword {
+    height: 54px;
+    font-size: 16px;
+  }
+  .page-login .box-login #form-login #btn-login {
+    padding: 15px 0px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 10px;
   }
   #alert-login-modal .modal-content {
     padding: 45px 25px 25px;
