@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, Matches, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, ValidateNested } from 'class-validator';
 import { SentTypeEnum } from 'src/modules/notification/admin/notification.dto';
 
 export class UpdateBoxTaskDto {
@@ -46,8 +46,16 @@ export class SetTaskAlarmByAdminDto {
     example: '',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   taskName: string;
+
+  @ApiProperty({
+    example: 'LURING',
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  taskNameSpecific?: string | null;
 
   @ApiProperty({
     example: '2025-12-30',

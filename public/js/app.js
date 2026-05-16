@@ -17,6 +17,23 @@ document.addEventListener('DOMContentLoaded', () => {
             iconEl.innerHTML  = `<i class="fa fa-chevron-down"></i>`;   // when closed
         });
     }
+
+    // Toggle mobile menu
+    const verticalMenuBtn = document.getElementById('vertical-menu-btn');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    if (verticalMenuBtn) {
+        verticalMenuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.body.classList.toggle('sidebar-enable');
+        });
+    }
+
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', () => {
+            document.body.classList.remove('sidebar-enable');
+        });
+    }
 });
 
 function initMenu() {

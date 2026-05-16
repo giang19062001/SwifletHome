@@ -1,9 +1,22 @@
 <header id="page-topbar">
    <div class="navbar-header">
       <div class="navbar-brand-container">
-         <!-- LOGO -->
-         <div class="navbar-brand-box topbar-box">
-            <p class="topbar-title">3Fam.ai</p>
+         <div class="topbar-left-container d-flex align-items-center">
+            <!-- Nút toggle menu mobile -->
+            <div class="topbar-mobile-menu-btn d-lg-none">
+               <button type="button" class="btn" id="vertical-menu-btn" aria-label="Toggle navigation">
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <rect x="5" y="8" width="22" height="3" rx="1.5" fill="#212529" />
+                     <rect x="5" y="15" width="22" height="3" rx="1.5" fill="#212529" />
+                     <rect x="5" y="22" width="22" height="3" rx="1.5" fill="#212529" />
+                  </svg>
+               </button>
+            </div>
+
+            <!-- LOGO -->
+            <div class="navbar-brand-box topbar-box">
+               <p class="topbar-title">3Fam.ai</p>
+            </div>
          </div>
 
          <div class="topbar-info topbar-box">
@@ -42,11 +55,9 @@
 
          <div class="topbar-icon-menu">
             <div class="dropdown">
-               <button type="button" class="btn" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                     <rect x="7" y="9" width="17.999" height="2.99983" rx="1.49992" fill="#212529" />
-                     <rect x="7.1001" y="15" width="17.999" height="2.99983" rx="1.49992" fill="#212529" />
-                     <rect x="7.00049" y="20.999" width="17.999" height="2.99983" rx="1.49992" fill="#212529" />
+               <button type="button" class="btn" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#212529"/>
                   </svg>
                </button>
                <div class="dropdown-menu dropdown-menu-end" data-popper-placement="right">

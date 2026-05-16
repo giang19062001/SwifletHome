@@ -45,3 +45,52 @@
     }
   }
 }
+
+// Responsive cho mobile
+@media (max-width: 992px) {
+  .modal,
+  .common-modal {
+    --bs-modal-width: 95% !important;
+    --bs-modal-margin: 10px !important;
+  }
+
+  .modal-dialog,
+  .modal-dialog.modal-sm,
+  .modal-dialog.modal-md,
+  .modal-dialog.modal-lg,
+  .modal-dialog.modal-xl,
+  .modal-dialog.modal-xxl {
+    --bs-modal-width: 95% !important;
+    margin: 10px auto !important;
+    max-width: 95% !important;
+    width: 95% !important;
+  }
+
+  .common-modal {
+    .modal-content {
+      padding: 15px 16px !important;
+      border-radius: 18px !important;
+
+      .modal-header {
+        .modal-header-title {
+          font-size: 20px !important;
+          line-height: 28px !important;
+        }
+      }
+
+      .modal-title {
+        font-size: 20px !important;
+        line-height: 28px !important;
+      }
+
+      .modal-body {
+        max-height: calc(100vh - 150px) !important;
+        padding: 10px 0 !important;
+
+        p, label, span, input, select, textarea {
+          font-size: 15px !important;
+        }
+      }
+    }
+  }
+}

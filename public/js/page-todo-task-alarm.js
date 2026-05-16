@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initSendTypeEvent();
   initSubmitForm();
   initDate();
+  initTaskNameSpecificEvent();
 });
 
 // TODO: FUNC
@@ -33,6 +34,26 @@ function initDate() {
   input.min = todayStr;   // set min = hôm nay
 }
 
+function initTaskNameSpecificEvent() {
+  const checkbox = document.getElementById('taskNameSpecific');
+  const taskNameInput = document.getElementById('taskName');
+  if (!checkbox || !taskNameInput) return;
+
+  checkbox.addEventListener('change', () => {
+    if (checkbox.checked) {
+      taskNameInput.value = '';
+      taskNameInput.disabled = true;
+      const errorElement = document.querySelector('[data-error="taskName"]');
+      if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.style.display = 'none';
+      }
+    } else {
+      taskNameInput.disabled = false;
+    }
+  });
+}
+
 function resetForm() {
   const titleEl = document.getElementById('title');
   const bodyEl = document.getElementById('body');
@@ -40,7 +61,13 @@ function resetForm() {
 
   if (titleEl) titleEl.value = '';
   if (bodyEl) bodyEl.value = '';
-  if (taskNameEl) taskNameEl.value = '';
+  if (taskNameEl) {
+    taskNameEl.value = '';
+    taskNameEl.disabled = false;
+  }
+
+  const taskNameSpecificEl = document.getElementById('taskNameSpecific');
+  if (taskNameSpecificEl) taskNameSpecificEl.checked = false;
 
   const sendTypeAll = document.querySelector('input[name="sendType"][value="ALL"]');
   if (sendTypeAll) sendTypeAll.checked = true;
@@ -187,10 +214,13 @@ function initSubmitForm() {
     const userCodesMuticast = [...form.querySelectorAll('input[name="userCode"]:checked')].map((cb) => cb.value);
     const provinceCodesMuticast = [...form.querySelectorAll('input[name="provinceCode"]:checked')].map((cb) => cb.value);
 
+    const isLuring = form.taskNameSpecific && form.taskNameSpecific.checked;
+    const taskNameSpecific = isLuring ? VARIABLE_ENUM.TODO_TASK.LURING : null;
+
     const formData = {
       title: form.title.value,
       body: form.body.value,
-      taskName: form.taskName.value,
+      taskName: isLuring ? VARIABLE_ENUM.TODO_TASK.LURING : form.taskName.value,
       taskDate: form.taskDate.value,
       sendType,
       userCodesMuticast,
@@ -205,6 +235,8 @@ function initSubmitForm() {
 
     const payload = {
       ...formData,
+      taskName: form.taskName.value,
+      taskNameSpecific: taskNameSpecific,
       userCodesMuticast: sendType === 'USER' ? userCodesMuticast : [],
       provinceCodesMuticast: sendType === 'PROVINCE' ? provinceCodesMuticast : [],
     };

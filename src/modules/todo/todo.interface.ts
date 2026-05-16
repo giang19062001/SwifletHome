@@ -33,6 +33,10 @@ export const TODO_CONST = {
       value: 'MEDICINE',
       text: 'Ghi chú',
     },
+    LURING: {
+      value: 'LURING',
+      text: 'Dẫn dụ chim đêm',
+    },
   },
   TASK_EVENT: {
     CANCEL: {

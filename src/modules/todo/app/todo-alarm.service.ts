@@ -50,7 +50,7 @@ export class TodoAlarmAppService {
       boxTasks.map(async (ele) => {
         let data: { taskDate: string; taskAlarmCode?: string; medicineCode?: string; taskStatus: string } | null = null;
 
-        if (ele.taskKeyword === TODO_CONST.TASK_EVENT.HARVEST.value) {
+        if (ele.taskKeyword === TODO_CONST.TASK_BOX.HARVEST.value) {
           const harvestData = await this.todoHarvestAppRepository.getNextHarvestSchedule(userCode, home.userHomeCode, today);
           if (harvestData) {
             data = {
@@ -59,7 +59,7 @@ export class TodoAlarmAppService {
               taskStatus: harvestData.taskStatus,
             };
           }
-        } else if (ele.taskKeyword === TODO_CONST.TASK_EVENT.MEDICINE.value) {
+        } else if (ele.taskKeyword === TODO_CONST.TASK_BOX.MEDICINE.value) {
           const medicineData = await this.todoMedicineAppRepository.getNextMedicineSchedule(userCode, home.userHomeCode, today);
           if (medicineData) {
             data = {
@@ -68,9 +68,8 @@ export class TodoAlarmAppService {
               taskStatus: medicineData.taskStatus,
             };
           }
-        } else {
-          // Custom alarm
-          const alarmData = await this.todoAlarmAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, ele.taskName, today);
+        } else if (ele.taskKeyword === TODO_CONST.TASK_BOX.LURING.value) {
+          const alarmData = await this.todoAlarmAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, TODO_CONST.TASK_BOX.LURING.value, today)
           if (alarmData) {
             data = {
               taskDate: alarmData.taskDate as any,
@@ -79,6 +78,17 @@ export class TodoAlarmAppService {
             };
           }
         }
+        //  else {
+        //   // Custom alarm
+        //   const alarmData = await this.todoAlarmAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, ele.taskName, today);
+        //   if (alarmData) {
+        //     data = {
+        //       taskDate: alarmData.taskDate as any,
+        //       taskAlarmCode: alarmData.taskAlarmCode,
+        //       taskStatus: alarmData.taskStatus,
+        //     };
+        //   }
+        // }
 
         this.logger.log(logbase, `taskData of (userCode:${userCode}, userHomeCode:${home.userHomeCode}, taskCode:${ele.taskCode}, taskName:${ele.taskName}) --> ${data?.taskDate ?? ' _ / _ '}`);
 

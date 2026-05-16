@@ -8,6 +8,11 @@ console.log('CURRENT_URL', CURRENT_URL);
 console.log('CURRENT_PARAMS', CURRENT_PARAMS);
 
 const VARIABLE_ENUM = {
+  TODO_TASK:{
+    MEDICINE: 'MEDICINE',
+    HARVEST: 'HARVEST',
+    LURING: 'LURING',
+  },
   MEDIA_BADGE: {
     NEW: 'NEW',
     NORMAL: 'NORMAL',

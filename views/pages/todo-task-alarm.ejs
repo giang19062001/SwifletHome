@@ -14,7 +14,7 @@
             </div>
         </div>
     </div>
-        <div class="row mb-3">
+        <div class="mb-3">
             <div class="col-12">
                 <form id="push-task-alarm-form" class="card shadow-sm p-4 rounded-3">
                     <div class="mb-3">
@@ -34,7 +34,15 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="taskName" class="form-label d-block">Tên công việc</label>
-                            <input type="text" class="form-control" id="taskName" name="taskName" placeholder="Nhập tên công việc" maxlength="200"/>
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="text" class="form-control" id="taskName" name="taskName" placeholder="Nhập tên công việc" maxlength="200" style="flex: 1;"/>
+                                <div class="form-check mb-0 text-nowrap">
+                                    <input class="form-check-input" type="checkbox" id="taskNameSpecific" name="taskNameSpecific" value="LURING">
+                                    <label class="form-check-label" for="taskNameSpecific">
+                                        Dẫn dụ chim đêm
+                                    </label>
+                                </div>
+                            </div>
                             <div class="error-message mt-2" data-error="taskName"></div>
                         </div>
                         <div class="col-md-6 mb-3">
