@@ -58,7 +58,11 @@ export class TodoAlarmAppRepository {
   }
 
   async getOneTaskAlarm(taskAlarmCode: string): Promise<GetTaskAlarmResDto | null> {
-    let query = ` SELECT A.seq, A.taskAlarmCode, NULL AS taskCode, '' AS taskKeyword, A.taskName, A.taskDate, A.taskStatus,
+    let query = ` SELECT A.seq, A.taskAlarmCode, NULL AS taskCode, '' AS taskKeyword, 
+      CASE 
+          WHEN A.taskName = '${TODO_CONST.TASK_BOX.LURING.value}' THEN '${TODO_CONST.TASK_BOX.LURING.text}'
+          ELSE A.taskName 
+      END AS taskName, A.taskDate, A.taskStatus,
       A.userCode, A.userHomeCode, A.taskNote
       FROM ${this.tableTaskAlarm}  A
       WHERE A.taskAlarmCode  = ? 
@@ -70,7 +74,11 @@ export class TodoAlarmAppRepository {
 
   async getOneTaskAlarmsNearly(userCode: string, userHomeCode: string, taskName: string, today: string): Promise<GetTaskAlarmResDto | null> {
     let query = `
-        SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode, A.taskName,
+        SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode, 
+              CASE 
+                  WHEN A.taskName = '${TODO_CONST.TASK_BOX.LURING.value}' THEN '${TODO_CONST.TASK_BOX.LURING.text}'
+                  ELSE A.taskName 
+              END AS taskName,
               DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskStatus, A.taskNote, A.isActive
         FROM ${this.tableTaskAlarm} A
         WHERE A.isActive = 'Y'
@@ -117,7 +125,11 @@ export class TodoAlarmAppRepository {
       params.push((dto.page - 1) * dto.limit);
     }
     let query = `
-            SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode, A.taskName,
+            SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode, 
+            CASE 
+                WHEN A.taskName = '${TODO_CONST.TASK_BOX.LURING.value}' THEN '${TODO_CONST.TASK_BOX.LURING.text}'
+                ELSE A.taskName 
+            END AS taskName,
             DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, A.taskNote, A.isActive,  A.taskStatus, 
             CASE
                   WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.WAITING.value}' THEN '${TODO_CONST.TASK_STATUS.WAITING.text}'
@@ -146,7 +158,10 @@ export class TodoAlarmAppRepository {
     const query = `
         SELECT 
               A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode,
-              A.taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, 
+              CASE 
+                  WHEN A.taskName = '${TODO_CONST.TASK_BOX.LURING.value}' THEN '${TODO_CONST.TASK_BOX.LURING.text}'
+                  ELSE A.taskName 
+              END AS taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, 
               A.taskStatus, A.taskNote, A.isActive, B.deviceToken
         FROM ${this.tableTaskAlarm} A
         INNER JOIN ${this.tableUserApp} B
