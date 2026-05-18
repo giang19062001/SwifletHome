@@ -57,6 +57,7 @@ import { GuestModule } from './modules/guest/front/guest.module';
 import { GuestAdminModule } from './modules/guest/admin/guest.module';
 import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
 import { ReportAdminModule } from './modules/report/admin/report.module';
+import { EaterAppModule } from './modules/eater/app/eater.module';
 import { ROUTER } from './helpers/const.helper';
 
 @Module({
@@ -90,8 +91,8 @@ import { ROUTER } from './helpers/const.helper';
     FirebaseModule,
     MailModule,
     MqttModule,
-    // commmon
     BlacklistModule,
+    // commmon
     OptionModule,
     ProvinceModule,
     PhoneCodeModule,
@@ -108,9 +109,11 @@ import { ROUTER } from './helpers/const.helper';
     TeamAppModule,
     ConsignmentAppModile,
     ReportAppModule,
-    GuestModule,
     CheckoutAppModule,
-
+    // front
+    GuestModule,
+    // eater - app
+    EaterAppModule,
     //admin
     AuthAdminModule,
     UserAdminModule,
@@ -178,6 +181,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(IpMiddleware)
-      .forRoutes(`${ROUTER.APP}/*`, `${ROUTER.GUEST}/*`, `${ROUTER.PURCHASER}/*`); // bắt ip cho các route api cụ thể
+      .forRoutes(`${ROUTER.APP}/*`, `${ROUTER.FRONT}/*`, `${ROUTER.EATER_APP}/*`); // bắt ip cho các route api cụ thể
   }
 }

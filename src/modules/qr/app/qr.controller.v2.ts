@@ -7,7 +7,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { QrSellAppService } from './qr-sell.service';
-import { InsertRequestSellV2Dto } from './qr.dto';
+import { InsertRequestSellDto } from './qr.dto';
 
 @ApiTags('app/qr')
 @Controller('/api/app/v2/qr')
@@ -22,7 +22,7 @@ export default class QrAppV2Controller {
   })
   @Post('requestSell')
   @ApiBody({
-    type: InsertRequestSellV2Dto,
+    type: InsertRequestSellDto,
     description: `
   **requestCode**  Mã code của yêu cầu QrCode ở màn hình hiện tại\n
   **userName** là tên chủ\n
@@ -39,7 +39,7 @@ export default class QrAppV2Controller {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async requestSellV2(@GetUserApp() user: TokenUserAppResDto, @Body() dto: InsertRequestSellV2Dto) {
+  async requestSellV2(@GetUserApp() user: TokenUserAppResDto, @Body() dto: InsertRequestSellDto) {
     const result = await this.qrSellAppService.requestSellV2(user, dto);
     if (result === -1) {
       throw new BadRequestException({

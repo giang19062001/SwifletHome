@@ -47,23 +47,31 @@ export const initSwagger = (app) => {
 
     return a.name.localeCompare(b.name);
   });
-  SwaggerModule.setup('api-docs', app, document, {
-    swaggerOptions: {
-      operationsSorter: 'alpha',
-    },
-    customCss: `
-    .opblock-tag[data-tag^="app/"] {
+SwaggerModule.setup('api-docs', app, document, {
+  swaggerOptions: {
+    operationsSorter: 'alpha',
+  },
+  customCss: `
+    .opblock-tag[data-tag^="app/"],
+    .opblock-tag[data-tag^="front/"],
+    .opblock-tag[data-tag^="eater-app/"] {
       position: relative;
       padding-left: 30px;
     }
 
-    .opblock-tag[data-tag^="app/"]::before {
-      content: "✨";
+    .opblock-tag[data-tag^="app/"]::before,
+    .opblock-tag[data-tag^="front/"]::before,
+    .opblock-tag[data-tag^="eater-app/"]::before {
       position: absolute;
       left: 0;
       top: 0;
       font-size: 20px;
     }
+
+    /* Khai báo riêng nội dung (emoji) cho từng thẻ */
+    .opblock-tag[data-tag^="app/"]::before { content: "✨"; }
+    .opblock-tag[data-tag^="front/"]::before { content: "🌐"; }
+    .opblock-tag[data-tag^="eater-app/"]::before { content: "🛒"; }
   `,
-  });
+});
 };

@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { RequestSellStatusEnum } from '../qr.interface';
 import { GetTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
-import { GetRequestSellListDto, InsertRequestSellDto, InsertRequestSellV2Dto } from './qr.dto';
+import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
 import { GetRequestSellDetailResDto, GetRequestSellListResDto } from './qr.response';
 
 @Injectable()
@@ -34,22 +34,7 @@ export class QrSellAppRepository {
     return rows.length ? (rows[0] as { seq: number; isSold: YnEnum }) : null;
   }
 
-  async insertRequestSell(userCode: string, dto: InsertRequestSellDto): Promise<number> {
-    const sql = `
-        INSERT INTO ${this.tableSell}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, volumeForSell,
-        nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-    // prettier-ignore
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      userCode, dto.requestCode, dto.userName,  dto.userPhone, dto.priceOptionCode, dto.pricePerKg, dto.volumeForSell,
-      dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, RequestSellStatusEnum.WAITING, userCode,
-    ]);
-
-    return result.insertId;
-  }
-
-  async insertRequestSellV2(userCode: string, dto: InsertRequestSellV2Dto): Promise<number> {
+  async insertRequestSellV2(userCode: string, dto: InsertRequestSellDto): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableSell}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, priceForPurchaser, priceForEater, volumeForSell,
         nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 

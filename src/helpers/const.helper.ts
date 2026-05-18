@@ -1,8 +1,8 @@
 export const ROUTER = {
    APP: '/api/app',
    ADMIN: '/api/admin',
-   GUEST: '/api/guest',
-   PURCHASER: '/api/purchaser',
+   FRONT: '/api/front',
+   EATER_APP: '/api/eater-app',
 }
 
 export const IMG_TYPES = ['.png', '.jpg', '.jpeg'];
@@ -34,6 +34,11 @@ export const QUERY_HELPER = {
 export const UPDATOR = 'SYSTEM';
 
 export const CODES = {
+  eaterCode:{
+    PRE: 'EAT',
+    LEN: 6,
+    FRIST_CODE: 'EAT000001',
+  },
   answerCode: {
     PRE: 'ANS',
     LEN: 6,

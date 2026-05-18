@@ -14,7 +14,7 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { QrRequestAppService } from './qr-request.service';
 import { QrSellAppService } from './qr-sell.service';
-import { GetRequestSellListDto, InsertRequestSellDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
+import { GetRequestSellListDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import {
   GetApprovedRequestQrCodeResDto,
   GetInfoToRequestQrcodeResDto,
@@ -187,7 +187,7 @@ export default class QrAppController {
   // TODO: SELL
   @ApiOperation({
     summary: `Lấy chi tiết yêu cầu bán sản lượng yến  liên kết với mã Qrcode`,
-     description: `
+    description: `
   **priceForPurchaser** (Number | null) Giá bán dành cho nhà thu mua\n
   **priceForEater** (Number | null) Giá bán dành cho người ăn yến\n
     `,
@@ -225,58 +225,6 @@ export default class QrAppController {
     }
     const result = await this.qrSellAppService.getRequestSellList(dto, user.userCode);
     return result;
-  }
-
-  @ApiOperation({
-    summary: 'Tạo yêu cầu cần bán sản lượng yến sau khi mã QRcode đã được tạo và được ADMIN duyệt ⚠️ SẼ BỊ KHAI TỬ',
-  })
-  @Post('requestSell')
-  @ApiBody({
-    type: InsertRequestSellDto,
-    description: `
-  **requestCode**  Mã code của yêu cầu QrCode ở màn hình hiện tại\n
-  **userName** là tên chủ\n
-  **userPhone** là Số Điện Thoại\n
-  **priceOptionCode** là mã Code lấy từ API api/app/options/getAll {"mainOption": "REQUSET_SELL", "subOption": "PRICE_OPTION"} - Chỉ chọn 1 \n
-  **pricePerKg** (Number) là đơn giá theo kg ⚠️ SẼ BỊ KHAI TỬ - GIÁ TRỊ NÀY TỪ GIỜ SẼ ĐƯỢC SET CỨNG LÀ 0 \n
-  **volumeForSell** (Number) là khối lượng cần bán\n
-  **nestQuantity** (Number) là Số lượng tổ\n
-  **humidity** (Number) là Độ ẩm tổ Yến\n
-  **ingredientNestOptionCode**  là mã Code lấy từ API api/app/options/getAll {"mainOption": "REQUSET_SELL", "subOption": "INGREDIENT_NEST"} - Chỉ chọn 1 \n
-    `,
-  })
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: NumberOkResponseDto })
-  async requestSell(@GetUserApp() user: TokenUserAppResDto, @Body() dto: InsertRequestSellDto) {
-    const result = await this.qrSellAppService.requestSell(user, dto);
-    if (result === -1) {
-      throw new BadRequestException({
-        message: Msg.RequestQrcodeNotFound,
-        data: 0,
-      });
-    }
-    if (result === -2) {
-      throw new BadRequestException({
-        message: Msg.CodeInvalid,
-        data: 0,
-      });
-    }
-    if (result === -3) {
-      throw new BadRequestException({
-        message: Msg.RequestInfoAlreadySold,
-        data: 0,
-      });
-    }
-    if (result === 0) {
-      throw new BadRequestException({
-        message: Msg.CreateErr,
-        data: 0,
-      });
-    }
-    return {
-      message: Msg.CreateOk,
-      data: result,
-    };
   }
 
   // TODO: SELL-INTERACT

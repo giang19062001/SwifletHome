@@ -94,64 +94,6 @@ export class InsertRequestSellDto {
   @IsNotEmpty()
   priceOptionCode: string;
 
-  @ApiProperty({ example: 0 })
-  @IsNumber()
-  @IsNotEmpty()
-  pricePerKg: number;
-  
-
-  @ApiProperty({ example: 0 })
-  @IsNumber()
-  @IsNotEmpty()
-  volumeForSell: number;
-
-  @ApiProperty({ example: 0 })
-  @IsNumber()
-  @IsNotEmpty()
-  nestQuantity: number;
-
-  @ApiProperty({ example: 0 })
-  @IsNumber()
-  @IsNotEmpty()
-  humidity: number;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  ingredientNestOptionCode: string;
-}
-
-export class InsertRequestSellV2Dto {
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  requestCode: string;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userName: string;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userPhone: string;
-
-  @ApiProperty({
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  priceOptionCode: string;
-
   @ApiProperty({ example: 0, required: false, nullable: true })
   @IsNumber()
   @IsOptional()

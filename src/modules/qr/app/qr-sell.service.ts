@@ -7,7 +7,7 @@ import { OptionService } from 'src/modules/options/option.service';
 import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { MarkTypeEnum, RequestSellPriceOptionEnum } from '../qr.interface';
 import { QrSellAppRepository } from './qr-sell.repository';
-import { GetRequestSellListDto, InsertRequestSellDto, InsertRequestSellV2Dto } from './qr.dto';
+import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
 import { GetRequestSellDetailResDto, GetRequestSellListResDto } from './qr.response';
 
 @Injectable()
@@ -35,59 +35,7 @@ export class QrSellAppService {
     return result;
   }
 
-  async requestSell(user: TokenUserAppResDto, dto: InsertRequestSellDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/insertRequestSell:`;
-
-    try {
-      // kiểm tra thông tin qr
-      const getRequestQrInfo = await this.qrSellAppRepository.checkIsApprovedAndIsSold(dto.requestCode);
-      if (!getRequestQrInfo) {
-        this.logger.error(logbase, `${Msg.RequestQrcodeNotFound} ---- requestCode(${dto.requestCode})`);
-        return -1;
-      }
-
-      if (getRequestQrInfo.isSold === YnEnum.Y) {
-        this.logger.error(logbase, `${Msg.RequestInfoAlreadySold} ---- requestCode(${dto.requestCode})`);
-        return -3;
-      }
-
-      // Lấy tất cả các loại option cần thiết song song
-      const [priceOptionCodes, ingredientNestOptionCodes] = await Promise.all([
-        this.optionService.getAll({
-          mainOption: OPTION_CONST.REQUSET_SELL.PRICE_OPTION.mainOption,
-          subOption: OPTION_CONST.REQUSET_SELL.PRICE_OPTION.subOption,
-        }),
-        this.optionService.getAll({
-          mainOption: OPTION_CONST.REQUSET_SELL.INGREDIENT_NEST.mainOption,
-          subOption: OPTION_CONST.REQUSET_SELL.INGREDIENT_NEST.subOption,
-        }),
-      ]);
-
-      // Kiểm tra priceOptionCode
-      const priceOption = priceOptionCodes.find((c) => c.code.includes(dto.priceOptionCode));
-      if (!priceOption) {
-        this.logger.error(logbase, `${Msg.CodeInvalid} ---- priceOptionCode(${dto.priceOptionCode})`);
-        return -2;
-      }
-
-      // vì không dùng nữa nên pricePerKg luôn hardcord giá trị luôn là 0
-      dto.pricePerKg = 0;
-
-      // Kiểm tra ingredientNestOptionCode
-      if (!ingredientNestOptionCodes.map((c) => c.code).includes(dto.ingredientNestOptionCode)) {
-        this.logger.error(logbase, `${Msg.CodeInvalid} ---- ingredientNestOptionCode(${dto.ingredientNestOptionCode})`);
-        return -2;
-      }
-
-      const result = await this.qrSellAppRepository.insertRequestSell(user.userCode, dto);
-      return result;
-    } catch (error) {
-      this.logger.error(logbase, error);
-      return 0;
-    }
-  }
-
-  async requestSellV2(user: TokenUserAppResDto, dto: InsertRequestSellV2Dto): Promise<number> {
+  async requestSellV2(user: TokenUserAppResDto, dto: InsertRequestSellDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/insertRequestSellV2:`;
 
     try {
