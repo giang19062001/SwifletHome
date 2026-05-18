@@ -9,7 +9,7 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { initSwagger } from './config/swagger.config';
 import { LoggingService } from './common/logger/logger.service';
-import { AllExceptionsFilter } from './filter/allException.filter';
+import { ServerExceptionsFilter } from './filter/serverException.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -18,7 +18,7 @@ async function bootstrap() {
   // security headers
   app.use(
     helmet({
-      contentSecurityPolicy: false, // Tắt CSP để tránh chặn các thẻ script và sự kiện inline trong EJS
+      contentSecurityPolicy: false,
       crossOriginResourcePolicy: false,
       crossOriginEmbedderPolicy: false,
       crossOriginOpenerPolicy: false, 
@@ -27,7 +27,7 @@ async function bootstrap() {
 
   // Ghi log lỗi toàn cục
   const logger = app.get(LoggingService);
-  app.useGlobalFilters(new AllExceptionsFilter(logger));
+  app.useGlobalFilters(new ServerExceptionsFilter(logger));
 
 
   //CORS

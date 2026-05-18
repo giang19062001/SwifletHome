@@ -2,6 +2,7 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nes
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { ROUTER } from 'src/helpers/const.helper';
 
 @Injectable()
 export class RequestLoggerInterceptor implements NestInterceptor {
@@ -13,7 +14,7 @@ export class RequestLoggerInterceptor implements NestInterceptor {
     const url = req.url;
 
     // Chỉ bắt log các API của APP
-    if (!url.includes('/api/app/')) {
+    if (!url.includes(ROUTER.APP)) {
       return next.handle();
     }
     const contentType = req.headers['content-type'] || '';

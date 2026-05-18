@@ -57,6 +57,7 @@ import { GuestModule } from './modules/guest/front/guest.module';
 import { GuestAdminModule } from './modules/guest/admin/guest.module';
 import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
 import { ReportAdminModule } from './modules/report/admin/report.module';
+import { ROUTER } from './helpers/const.helper';
 
 @Module({
   imports: [
@@ -175,6 +176,8 @@ import { ReportAdminModule } from './modules/report/admin/report.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(IpMiddleware).forRoutes('*'); // bắt ip cho toàn server
+    consumer
+      .apply(IpMiddleware)
+      .forRoutes(`${ROUTER.APP}/*`, `${ROUTER.GUEST}/*`, `${ROUTER.PURCHASER}/*`); // bắt ip cho các route api cụ thể
   }
 }

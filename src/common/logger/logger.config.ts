@@ -62,8 +62,8 @@ export const getWinstonConfig = () => {
     }),
   ];
 
+  // chỉ ghi log cho LOKI khi ở Production
   if(process.env.NODE_ENV != "local"){
-    // ghi log cho loki
     const lokiHost = process.env.LOKI_HOST;
     if (lokiHost && lokiHost.startsWith("http")) {
       transportsList.push(

@@ -1,3 +1,10 @@
+export const ROUTER = {
+   APP: '/api/app',
+   ADMIN: '/api/admin',
+   GUEST: '/api/guest',
+   PURCHASER: '/api/purchaser',
+}
+
 export const IMG_TYPES = ['.png', '.jpg', '.jpeg'];
 export const AUDIO_TYPES = ['.mp3'];
 export const VIDEO_TYPES = ['.mp4', '.mov', '.avi'];

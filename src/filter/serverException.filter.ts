@@ -1,14 +1,12 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { ROUTER } from 'src/helpers/const.helper';
 
+// Ném và xử lý các lỗi
 @Catch()
-export class AllExceptionsFilter implements ExceptionFilter {
+export class ServerExceptionsFilter implements ExceptionFilter {
   constructor(private readonly logger: LoggingService) { }
-
-  private isRequestAppPath(path: string): boolean {
-    return path.startsWith('/api/app/');
-  }
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -30,7 +28,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     const requestPath = request.url || '';
-    const shouldLogError = this.isRequestAppPath(requestPath);
+    const shouldLogError = requestPath.startsWith(ROUTER.APP);
 
     if (shouldLogError) {
       this.logger.error(
@@ -44,6 +42,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       );
     }
 
+    // CHỈ HANDLE CASE FAIL
     response.status(status).json({
       success: false,
       statusCode: status,

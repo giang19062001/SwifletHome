@@ -1,5 +1,6 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { ROUTER } from 'src/helpers/const.helper';
 
 @Injectable()
 export class CustomThrottlerGuard extends ThrottlerGuard {
@@ -8,7 +9,7 @@ export class CustomThrottlerGuard extends ThrottlerGuard {
     const url = request.url;
 
     // Chỉ tính rate limit cho các request API (có /api trong URL)
-    if (!url.toLowerCase().includes('/api/app')) {
+    if (!url.toLowerCase().includes(ROUTER.APP)) {
       return true;
     }
 
