@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { YnEnum } from './../../../interfaces/admin.interface';
+import { TeamStatusEnum, YnEnum } from './../../../interfaces/admin.interface';
 import { CreateTeamDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto } from './team.dto';
 
 @Injectable()
@@ -39,7 +39,7 @@ export class TeamAdminRepository {
   }
   async getAll(dto: PagingDto): Promise<TeamResDto[]> {
     let query = ` SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCodes,
-     A.status, A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, D.userTypeKeyWord, D.userTypeName,
+     A.status, A.isSeleted, A.createdAt, A.updatedAt, A.createdId, A.updatedId , B.userName, D.userTypeKeyWord, D.userTypeName,
      (SELECT GROUP_CONCAT(C.provinceName SEPARATOR ', ') FROM ${this.tableProvince} C WHERE JSON_CONTAINS(A.provinceCodes, JSON_QUOTE(C.provinceCode))) AS provinceName
         FROM ${this.table} A  
           INNER JOIN ${this.tableUser} B
@@ -64,7 +64,7 @@ export class TeamAdminRepository {
   async getDetail(teamCode: string): Promise<TeamResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userTypeCode, A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial,
-      A.provinceCodes, A.isActive, A.status, B.userTypeKeyWord, B.userTypeName
+      A.provinceCodes, A.isActive, A.status, A.isSeleted, B.userTypeKeyWord, B.userTypeName
           FROM ${this.table} A 
           LEFT JOIN ${this.tableUserType} B ON A.userTypeCode = B.userTypeCode
           WHERE A.teamCode = ? AND A.isActive = 'Y'
@@ -86,15 +86,15 @@ export class TeamAdminRepository {
       teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
     }
     const sql = `
-      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId, status) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.table}  (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId, status, isSeleted) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       teamCode,
       dto.userCode,
       dto.userTypeCode,
       dto.teamName,
-      dto.teamPhone || "",
+      dto.teamUserName || "",
       dto.teamPhone || "",
       dto.teamAddress,
       teamImagePath || "",
@@ -103,14 +103,15 @@ export class TeamAdminRepository {
       typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
       createdId,
       dto.uniqueId,
-      'APPROVE',
+      TeamStatusEnum.APPROVE,
+      dto.isSeleted || 'N',
     ]);
 
     return result.insertId;
   }
   async update(dto: UpdateTeamDto, teamImagePath: string, updatedId: string, teamCode: string): Promise<number> {
     const sql = `
-        UPDATE ${this.table} SET teamName = ?, teamUserName = ?, teamPhone = ?, teamAddress = ?, teamDescription = ?, teamDescriptionSpecial = ?, provinceCodes = ?, teamImage = ?,
+        UPDATE ${this.table} SET teamName = ?, teamUserName = ?, teamPhone = ?, teamAddress = ?, teamDescription = ?, teamDescriptionSpecial = ?, provinceCodes = ?, teamImage = ?, isSeleted = ?,
         updatedId = ?, updatedAt = ?
         WHERE teamCode = ?
       `;
@@ -123,6 +124,7 @@ export class TeamAdminRepository {
       dto.teamDescriptionSpecial ? JSON.stringify(dto.teamDescriptionSpecial) : null,
       typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
       teamImagePath,
+      dto.isSeleted || 'N',
       updatedId,
       new Date(),
       teamCode,

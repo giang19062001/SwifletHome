@@ -42,6 +42,10 @@ function renderAllTeam(data, objElement) {
       else if (ele.status === VARIABLE_ENUM.TEAM_STATUS.REFUSE.VALUE) statusBadge = `<span class="badge bg-danger">${VARIABLE_ENUM.TEAM_STATUS.REFUSE.TEXT}</span>`;
       else statusBadge = `<span class="badge bg-warning text-dark">${VARIABLE_ENUM.TEAM_STATUS.WAITING.TEXT}</span>`;
 
+      let selectedBadge = '';
+      if (ele.isSeleted === 'Y') selectedBadge = `<span class="badge bg-primary">Được chọn lọc</span>`;
+      else selectedBadge = `<span class="badge bg-secondary">Không chọn lọc</span>`;
+
       const rowHtml = `
          <tr class="text-center">
             <td><p>${(page - 1) * limit + i++}</p></td>
@@ -51,6 +55,7 @@ function renderAllTeam(data, objElement) {
             <td><p>${ele.teamUserName}</p></td>
             <td><p>${ele.provinceName}</p></td>
             <td><p>${statusBadge}</p></td>
+            <td><p>${selectedBadge}</p></td>
             <td><p>${ele.teamAddress}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
@@ -66,7 +71,7 @@ function renderAllTeam(data, objElement) {
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     // dữ liệu trống
-    renderEmptyRowTable(objElement, 8);
+    renderEmptyRowTable(objElement, 11);
   }
 
   // xóa skeleton
@@ -77,7 +82,7 @@ function renderAllTeam(data, objElement) {
 async function getAllTeam(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
-  showSkeleton(objElement, limit, 8);
+  showSkeleton(objElement, limit, 11);
 
   await axios
     .post(

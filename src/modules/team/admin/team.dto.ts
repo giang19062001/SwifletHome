@@ -85,6 +85,14 @@ export class CreateTeamDto {
   })
   @IsOptional()
   teamImage: any;
+
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+  })
+  @IsEnum(YnEnum)
+  @IsOptional()
+  isSeleted?: YnEnum;
 }
 
 export class UploadTeamMainImageDto {
@@ -181,6 +189,9 @@ export class TeamResDto {
 
   @ApiProperty({ example: TeamStatusEnum.WAITING, enum: TeamStatusEnum })
   status: TeamStatusEnum;
+
+  @ApiProperty({ example: YnEnum.N, enum: YnEnum })
+  isSeleted: YnEnum;
 
   @ApiProperty({ example: new Date() })
   createdAt: Date;

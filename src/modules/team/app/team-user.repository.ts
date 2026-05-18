@@ -4,7 +4,7 @@ import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { GetAllTeamDto } from './team.dto';
 import { GetAllTeamResDto, GetDetailTeamResDto } from './team.response';
-import { TeamStatusEnum } from 'src/interfaces/admin.interface';
+import { TeamStatusEnum, YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class TeamUserAppRepository {
@@ -51,7 +51,7 @@ export class TeamUserAppRepository {
   async getAllTeams(dto: GetAllTeamDto, userCode: string): Promise<GetAllTeamResDto[]> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName,
     A.teamUserName, A.teamPhone, A.teamAddress,
-    A.provinceCodes, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage, A.status
+    A.provinceCodes, IFNULL(CAST(ROUND(AVG(C.star),1) AS DOUBLE), 0) AS star, A.teamImage, A.status, A.isSeleted
     FROM ${this.table} A 
     LEFT JOIN ${this.tableUserType} B
     ON A.userTypeCode = B.userTypeCode
@@ -69,7 +69,7 @@ export class TeamUserAppRepository {
       params.push(`%${dto.txtSearch}%`);
     }
 
-    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamPhone, A.teamAddress, A.provinceCodes  `;
+    query += ` GROUP BY  A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.provinceCodes, A.teamImage, A.status, A.isSeleted  `;
     query += ` ORDER BY A.seq DESC`;
 
     if (dto.limit > 0 && dto.page > 0) {
@@ -87,7 +87,7 @@ export class TeamUserAppRepository {
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
             A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress,A.provinceCodes,
-            IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial, A.status,
+            IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial, A.status, A.isSeleted,
              A.teamImage,
             COALESCE(
               (
@@ -171,8 +171,8 @@ export class TeamUserAppRepository {
       teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
     }
     const sql = `
-      INSERT INTO ${this.table} (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId, status) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.table} (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId, status, isSeleted) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       teamCode,
@@ -188,7 +188,8 @@ export class TeamUserAppRepository {
       typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
       createdId,
       dto.uniqueId,
-      'WAITING',
+      TeamStatusEnum.WAITING,
+      YnEnum.N,
     ]);
     return result.insertId;
   }

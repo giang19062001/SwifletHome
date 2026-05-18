@@ -268,6 +268,7 @@ function initializeForm() {
       teamDescription: quillGlobal.root.innerHTML,
       teamImage: form.querySelector('#teamImage').files,
       teamCode: pageType === 'update' ? teamData.teamCode : undefined,
+      isSeleted: form.querySelector('#isSeleted') ? (form.querySelector('#isSeleted').checked ? 'Y' : 'N') : 'N',
     };
 
     const userTypeCodeSelect = form.querySelector('#userTypeCode');
@@ -500,6 +501,10 @@ async function assignForm(teamData) {
   form.querySelector('#teamUserName').value = teamData.teamUserName || '';
   form.querySelector('#teamAddress').value = teamData.teamAddress || '';
   form.querySelector('#teamPhone').value = teamData.teamPhone || '';
+  const isSeletedInput = form.querySelector('#isSeleted');
+  if (isSeletedInput) {
+    isSeletedInput.checked = teamData.isSeleted === 'Y';
+  }
 
   const provinceSelect = form.querySelector('#provinceCodes');
   if (teamData.provinceCodes) {
@@ -720,7 +725,7 @@ async function updateTeam(formData) {
  */
 async function submitTeam(formData, url, method, successMessage) {
   const postData = new FormData();
-  const fields = ['teamName', 'teamUserName', 'teamAddress', 'teamPhone', 'provinceCodes', 'userTypeCode', 'userCode', 'teamDescription', 'teamDescriptionSpecial'];
+  const fields = ['teamName', 'teamUserName', 'teamAddress', 'teamPhone', 'provinceCodes', 'userTypeCode', 'userCode', 'teamDescription', 'teamDescriptionSpecial', 'isSeleted'];
   postData.append('uniqueId', teamUniqueId);
   fields.forEach((field) => {
     let value = formData[field];

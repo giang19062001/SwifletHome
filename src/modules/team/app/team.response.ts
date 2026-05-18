@@ -100,6 +100,9 @@ export class GetDetailTeamResDto {
   @ApiProperty({ example: TeamStatusEnum.WAITING, enum: TeamStatusEnum })
   status: TeamStatusEnum;
 
+  @ApiProperty({ example: 'N' })
+  isSeleted: string;
+
   @ApiProperty({ example: 'uploads/images/***/***.jpg' })
   teamImage: string;
 
