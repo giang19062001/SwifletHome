@@ -1,9 +1,3 @@
-
-export enum RequestSellPriceOptionEnum {
-  SELLER = 'SELLER',
-  NEGOTIATE = 'NEGOTIATE',
-}
-
 export const OPTION_CONST = {
   SIGHTSEEING: {
     mainOption: 'SIGHTSEEING',
@@ -21,10 +15,6 @@ export const OPTION_CONST = {
     INGREDIENT_NEST: {
       mainOption: 'REQUSET_SELL',
       subOption: 'INGREDIENT_NEST',
-    },
-    TRADE_TYPE: {
-      mainOption: 'REQUSET_SELL',
-      subOption: 'TRADE_TYPE',
     },
   },
   CONSIGNMENT_NEST: {

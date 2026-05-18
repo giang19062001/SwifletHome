@@ -44,7 +44,7 @@ export default class TodoAppController {
   ) {}
 
   @ApiOperation({
-    summary: 'Lấy danh sách các lịch nhắc có sẵn của hệ thống: Thu hoạch, lăn thuốc, vệ sinh,.. ⚠️ TẠM THỜI KO DÙNG NỮA',
+    summary: 'Lấy danh sách các lịch nhắc có sẵn của hệ thống: Thu hoạch, lăn thuốc, vệ sinh,.. ⚠️ HIỆN TAI KHÔNG DÙNG NỮA',
   })
   @Get('getTasks')
   @HttpCode(HttpStatus.OK)

@@ -98,6 +98,7 @@ export class InsertRequestSellDto {
   @IsNumber()
   @IsNotEmpty()
   pricePerKg: number;
+  
 
   @ApiProperty({ example: 0 })
   @IsNumber()
@@ -120,15 +121,68 @@ export class InsertRequestSellDto {
   @IsString()
   @IsNotEmpty()
   ingredientNestOptionCode: string;
+}
+
+export class InsertRequestSellV2Dto {
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  requestCode: string;
 
   @ApiProperty({
     example: '',
-    required: false,
   })
   @IsString()
+  @IsNotEmpty()
+  userName: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userPhone: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  priceOptionCode: string;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
   @IsOptional()
-  // @IsNotEmpty()
-  tradeTypeCode: string;
+  priceForPurchaser: number | null;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  priceForEater: number | null;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  volumeForSell: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  nestQuantity: number;
+
+  @ApiProperty({ example: 0 })
+  @IsNumber()
+  @IsNotEmpty()
+  humidity: number;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  ingredientNestOptionCode: string;
 }
 
 export class MaskRequestSellDto {

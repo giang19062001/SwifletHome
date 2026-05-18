@@ -30,6 +30,7 @@ export const Msg = {
 
   // Token / Code
   CodeInvalid: invalid('Mã code'),
+  InvalidPrice: invalid('Giá bán'),
   TokenMissing: 'Vui lòng xác thực token',
   TokenInvalid: invalid('Token'),
 
@@ -163,6 +164,9 @@ const convertFiledName = (filedName: string): string => {
     app_user_id: 'ID người dùng',
     harvestNextDate: 'Ngày thu hoạch tiếp theo',
     medicineNextDate: 'Ngày lăn thuốc tiếp theo',
+    priceForEater: 'Giá bán cho người ăn yến',
+    priceForPurchaser: 'Giá bán cho nhà thu mua',
+    priceForPurchaser_priceForEater: 'Giá bán cho người ăn yến và nhà thu mua'
   };
   return map[filedName] ?? filedName;
 };

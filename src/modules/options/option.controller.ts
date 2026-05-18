@@ -26,7 +26,6 @@ export default class OptionController {
   - **MEDICINE**: Danh sách thuốc (**TODO_TASK**)\n
   - **PRICE_OPTION**: Kiểu thiết lập giá (**REQUSET_SELL**)\n
   - **INGREDIENT_NEST**: Loại thanh làm tổ (**REQUSET_SELL**)\n
-  - **TRADE_TYPE**: Bán sỉ hoặc lẻ (**REQUSET_SELL**)\n
   - **NEST_TYPE**: Loại yến để ký gửi (**CONSIGNMENT_NEST**)\n
 
 `,

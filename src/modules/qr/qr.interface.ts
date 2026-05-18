@@ -1,9 +1,17 @@
 
 export const QR_CODE_CONST = {
   PRICE_OPTION: {
-    NEGOTIATE: {
-      value: 'NEGOTIATE',
-      text: 'Giá thương lượng',
+    SELL_FOR_PURCHASER: {
+      value: 'SELL_FOR_PURCHASER',
+      text: 'Giá bán dành cho nhà thu mua',
+    },
+    SELL_FOR_EATER: {
+      value: 'SELL_FOR_EATER',
+      text: 'Giá bán dành cho người ăn yến',
+    },
+    BOTH: {
+      value: 'BOTH',
+      text: 'Cả hai',
     },
   },
   REQUEST_STATUS: {
@@ -29,6 +37,12 @@ export const QR_CODE_CONST = {
     },
   },
 };
+
+export enum RequestSellPriceOptionEnum {
+  SELL_FOR_PURCHASER = 'SELL_FOR_PURCHASER',
+  SELL_FOR_EATER = 'SELL_FOR_EATER',
+  BOTH = 'BOTH',
+}
 
 export enum GetTypeEnum {
   ALL = 'ALL',

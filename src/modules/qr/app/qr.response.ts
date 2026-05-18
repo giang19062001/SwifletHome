@@ -111,14 +111,6 @@ export class TaskHarvestQrResDto {
 }
 
 export class RequestQrCodeResDto extends GetInfoToRequestQrcodeResDto {
-  // @ApiProperty({ example: 1 })
-  // @IsNumber()
-  // harvestPhase: number;
-
-  // @ApiProperty({ example: 2025 })
-  // @IsNumber()
-  // harvestYear: number;
-
   @ApiProperty({ example: 1 })
   seqHarvestPhase: number;
 
@@ -185,6 +177,16 @@ export class GetRequestSellDetailResDto extends GetApprovedRequestQrCodeResDto {
   @IsNumber()
   pricePerKg: number;
 
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  priceForPurchaser: number | null;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  priceForEater: number | null;
+
   @ApiProperty({ example: 0 })
   @IsNumber()
   volumeForSell: number;
@@ -204,14 +206,6 @@ export class GetRequestSellDetailResDto extends GetApprovedRequestQrCodeResDto {
   @ApiProperty({ example: '' })
   @IsString()
   ingredientNestOptionLabel?: string;
-
-  @ApiProperty({ example: '' })
-  @IsString()
-  tradeTypeCode: string;
-
-  @ApiProperty({ example: '' })
-  @IsString()
-  tradeTypeLabel?: string;
 }
 
 export class UploadRequestVideoResDto {
@@ -299,6 +293,16 @@ export class GetRequestSellListResDto {
   @IsNumber()
   pricePerKg: number;
 
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  priceForPurchaser: number | null;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  priceForEater: number | null;
+
   @ApiProperty({ example: 0 })
   @IsNumber()
   volumeForSell: number;
@@ -314,10 +318,6 @@ export class GetRequestSellListResDto {
   @ApiProperty({ example: '' })
   @IsString()
   ingredientNestOptionCode: string;
-
-  @ApiProperty({ example: '' })
-  @IsString()
-  tradeTypeCode: string;
 
   @ApiProperty({
     example: YnEnum.N,

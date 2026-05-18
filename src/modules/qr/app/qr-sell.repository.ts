@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { RequestSellStatusEnum } from '../qr.interface';
 import { GetTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
-import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
+import { GetRequestSellListDto, InsertRequestSellDto, InsertRequestSellV2Dto } from './qr.dto';
 import { GetRequestSellDetailResDto, GetRequestSellListResDto } from './qr.response';
 
 @Injectable()
@@ -37,13 +37,28 @@ export class QrSellAppRepository {
   async insertRequestSell(userCode: string, dto: InsertRequestSellDto): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableSell}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, volumeForSell,
-        nestQuantity, humidity, ingredientNestOptionCode, tradeTypeCode, requestSellStatus, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     // prettier-ignore
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       userCode, dto.requestCode, dto.userName,  dto.userPhone, dto.priceOptionCode, dto.pricePerKg, dto.volumeForSell,
-      dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, dto.tradeTypeCode, RequestSellStatusEnum.WAITING, userCode,
+      dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, RequestSellStatusEnum.WAITING, userCode,
+    ]);
+
+    return result.insertId;
+  }
+
+  async insertRequestSellV2(userCode: string, dto: InsertRequestSellV2Dto): Promise<number> {
+    const sql = `
+        INSERT INTO ${this.tableSell}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, priceForPurchaser, priceForEater, volumeForSell,
+        nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+    // prettier-ignore
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      userCode, dto.requestCode, dto.userName,  dto.userPhone, dto.priceOptionCode, 0, dto.priceForPurchaser, dto.priceForEater, dto.volumeForSell,
+      dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, RequestSellStatusEnum.WAITING, userCode,
     ]);
 
     return result.insertId;
@@ -97,12 +112,8 @@ export class QrSellAppRepository {
     }
 
     let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
-        CASE
-            WHEN D.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
-            THEN '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.text}'
-            ELSE  CONCAT(FORMAT(A.pricePerKg, 0), ' đ/ Kg')
-        END AS priceOptionLabel, A.pricePerKg, A.volumeForSell, A.nestQuantity,
-        A.ingredientNestOptionCode, A.tradeTypeCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
+        D.valueOption AS priceOptionLabel, A.pricePerKg, A.priceForPurchaser, A.priceForEater, A.volumeForSell, A.nestQuantity,
+        A.ingredientNestOptionCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
         FROM ${this.tableSell}  A
             LEFT JOIN ${this.table} B
         ON A.requestCode = B.requestCode  
@@ -122,7 +133,11 @@ export class QrSellAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as GetRequestSellListResDto[];
+    return rows.map((row) => ({
+      ...row,
+      priceForPurchaser: row.priceForPurchaser ? Number(row.priceForPurchaser) : null,
+      priceForEater: row.priceForEater ? Number(row.priceForEater) : null,
+    })) as GetRequestSellListResDto[];
   }
 
   async getRequestSellDetail(requestCode: string): Promise<GetRequestSellDetailResDto | null> {
@@ -156,13 +171,8 @@ export class QrSellAppRepository {
             JSON_ARRAY()
             ) AS requestQrcodeFiles, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
         D.priceOptionCode,
-        CASE
-            WHEN F.keyOption = '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.value}'
-            THEN '${QR_CODE_CONST.PRICE_OPTION.NEGOTIATE.text}'
-            ELSE  CONCAT(FORMAT(D.pricePerKg, 0), ' đ/ Kg')
-        END AS priceOptionLabel, D.pricePerKg, D.volumeForSell, D.nestQuantity, D.humidity, 
+        F.valueOption AS priceOptionLabel, D.pricePerKg, D.priceForPurchaser, D.priceForEater, D.volumeForSell, D.nestQuantity, D.humidity, 
         D.ingredientNestOptionCode, G.valueOption AS ingredientNestOptionLabel,
-        D.tradeTypeCode, I.valueOption AS tradeTypeLabel,
         CASE
             WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
             ELSE 'N'
@@ -178,15 +188,17 @@ export class QrSellAppRepository {
         ON D.priceOptionCode = F.code
         LEFT JOIN ${this.tableOption} G
         ON D.ingredientNestOptionCode = G.code
-        LEFT JOIN ${this.tableOption} I
-        ON D.tradeTypeCode = I.code
         LEFT JOIN ${this.tableHarvestPhase} H
         ON A.seqHarvestPhase = H.seq
         WHERE A.requestCode = ? AND A.isActive = 'Y' 
      `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
-    return rows[0] as GetRequestSellDetailResDto;
+    if (!rows.length) return null;
+    const row = rows[0];
+    row.priceForPurchaser = row.priceForPurchaser ? Number(row.priceForPurchaser) : null;
+    row.priceForEater = row.priceForEater ? Number(row.priceForEater) : null;
+    return row as GetRequestSellDetailResDto;
   }
 
   // TODO: SELL-INTERACT

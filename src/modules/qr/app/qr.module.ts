@@ -7,10 +7,11 @@ import { QrRequestAppService } from './qr-request.service';
 import { QrSellAppRepository } from './qr-sell.repository';
 import { QrSellAppService } from './qr-sell.service';
 import QrAppController from './qr.controller';
+import QrAppV2Controller from './qr.controller.v2';
 
 @Module({
   imports: [AuthAppModule, TodoAppModule ,UserHomeAppModule],
-  controllers: [QrAppController],
+  controllers: [QrAppController, QrAppV2Controller],
   providers: [QrRequestAppService, QrSellAppService, QrRequestAppRepository, QrSellAppRepository],
   exports: [QrRequestAppService],
 })

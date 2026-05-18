@@ -187,7 +187,10 @@ export default class QrAppController {
   // TODO: SELL
   @ApiOperation({
     summary: `Lấy chi tiết yêu cầu bán sản lượng yến  liên kết với mã Qrcode`,
-    description: ``,
+     description: `
+  **priceForPurchaser** (Number | null) Giá bán dành cho nhà thu mua\n
+  **priceForEater** (Number | null) Giá bán dành cho người ăn yến\n
+    `,
   })
   @Get('getRequestSellDetail/:requestCode')
   @HttpCode(HttpStatus.OK)
@@ -225,7 +228,7 @@ export default class QrAppController {
   }
 
   @ApiOperation({
-    summary: 'Tạo yêu cầu cần bán sản lượng yến sau khi mã QRcode đã được tạo và được ADMIN duyệt',
+    summary: 'Tạo yêu cầu cần bán sản lượng yến sau khi mã QRcode đã được tạo và được ADMIN duyệt ⚠️ SẼ BỊ KHAI TỬ',
   })
   @Post('requestSell')
   @ApiBody({
@@ -235,12 +238,11 @@ export default class QrAppController {
   **userName** là tên chủ\n
   **userPhone** là Số Điện Thoại\n
   **priceOptionCode** là mã Code lấy từ API api/app/options/getAll {"mainOption": "REQUSET_SELL", "subOption": "PRICE_OPTION"} - Chỉ chọn 1 \n
-  **pricePerKg** (Number) là đon giá theo kg\n
+  **pricePerKg** (Number) là đơn giá theo kg ⚠️ SẼ BỊ KHAI TỬ - GIÁ TRỊ NÀY TỪ GIỜ SẼ ĐƯỢC SET CỨNG LÀ 0 \n
   **volumeForSell** (Number) là khối lượng cần bán\n
   **nestQuantity** (Number) là Số lượng tổ\n
   **humidity** (Number) là Độ ẩm tổ Yến\n
   **ingredientNestOptionCode**  là mã Code lấy từ API api/app/options/getAll {"mainOption": "REQUSET_SELL", "subOption": "INGREDIENT_NEST"} - Chỉ chọn 1 \n
-  **tradeTypeCode**  là mã Code lấy từ API api/app/options/getAll {"mainOption": "REQUSET_SELL", "subOption": "TRADE_TYPE"} - Chỉ chọn 1 
     `,
   })
   @HttpCode(HttpStatus.OK)
