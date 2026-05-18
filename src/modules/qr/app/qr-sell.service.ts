@@ -5,7 +5,7 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { OptionService } from 'src/modules/options/option.service';
 import { TokenUserAppResDto } from '../../auth/app/auth.dto';
-import { MarkTypeEnum, RequestSellPriceOptionEnum } from '../qr.interface';
+import { FetchSellingByEnum, MarkTypeEnum, RequestSellPriceOptionEnum } from '../qr.interface';
 import { QrSellAppRepository } from './qr-sell.repository';
 import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
 import { GetRequestSellDetailResDto, GetRequestSellListResDto } from './qr.response';
@@ -17,26 +17,28 @@ export class QrSellAppService {
     private readonly qrSellAppRepository: QrSellAppRepository,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
 
   // TODO: SELL
-  async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<{ total: number; list: GetRequestSellListResDto[] }> {
+  // lấy danh sách đăng bán
+  async getRequestSellList(dto: GetRequestSellListDto, userCode: string, fetchBy: FetchSellingByEnum): Promise<{ total: number; list: GetRequestSellListResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
-    const total = await this.qrSellAppRepository.getRequestSellTotal(dto, userCode);
-    const rows = await this.qrSellAppRepository.getRequestSellList(dto, userCode);
+    const total = await this.qrSellAppRepository.getRequestSellTotal(dto, fetchBy, userCode);
+    const rows = await this.qrSellAppRepository.getRequestSellList(dto, fetchBy, userCode);
     return { total: total, list: rows };
   }
 
-  async getRequestSellDetail(requestCode: string, userCode: string): Promise<GetRequestSellDetailResDto | null> {
+  // lấy thông tin đăng bán chi tiết
+  async getRequestSellDetail(requestCode: string, userCode: string, fetchBy: FetchSellingByEnum): Promise<GetRequestSellDetailResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getRequestSellDetail:`;
     // đánh dầu đã xem
     await this.maskRequestSell(requestCode, userCode, MarkTypeEnum.VIEW);
-    const result = await this.qrSellAppRepository.getRequestSellDetail(requestCode);
+    const result = await this.qrSellAppRepository.getRequestSellDetail(requestCode, fetchBy);
     return result;
   }
 
-  async requestSellV2(user: TokenUserAppResDto, dto: InsertRequestSellDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/insertRequestSellV2:`;
+  async requestSell(user: TokenUserAppResDto, dto: InsertRequestSellDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/insertRequestSell:`;
 
     try {
       // kiểm tra thông tin qr
@@ -96,7 +98,7 @@ export class QrSellAppService {
         return -2;
       }
 
-      const result = await this.qrSellAppRepository.insertRequestSellV2(user.userCode, dto);
+      const result = await this.qrSellAppRepository.insertRequestSell(user.userCode, dto);
       return result;
     } catch (error) {
       this.logger.error(logbase, error);

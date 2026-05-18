@@ -12,6 +12,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
+import { FetchSellingByEnum } from '../qr.interface';
 import { QrRequestAppService } from './qr-request.service';
 import { QrSellAppService } from './qr-sell.service';
 import { GetRequestSellListDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
@@ -196,7 +197,7 @@ export default class QrAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetRequestSellDetailResDto) })
   async getRequestSellDetail(@GetUserApp() user: TokenUserAppResDto, @Param('requestCode') requestCode: string) {
-    const result = await this.qrSellAppService.getRequestSellDetail(requestCode, user.userCode);
+    const result = await this.qrSellAppService.getRequestSellDetail(requestCode, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
     return result;
   }
 
@@ -217,13 +218,13 @@ export default class QrAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetRequestSellListResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getRequestSellList(@Body() dto: GetRequestSellListDto, @GetUserApp() user: TokenUserAppResDto) {
-    if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
+    if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value && user.userTypeKeyWord !== USER_CONST.USER_TYPE.EATER.value) {
       throw new BadRequestException({
-        message: Msg.OnlyPurcharseCanFetch,
+        message: Msg.OnlyPurcharseOrEaterCanFetch,
         data: null,
       });
     }
-    const result = await this.qrSellAppService.getRequestSellList(dto, user.userCode);
+    const result = await this.qrSellAppService.getRequestSellList(dto, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
     return result;
   }
 

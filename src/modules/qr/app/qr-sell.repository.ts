@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { RequestSellStatusEnum } from '../qr.interface';
-import { GetTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
+import { FetchSellingByEnum, RequestSellStatusEnum } from '../qr.interface';
+import { GetSellingTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
 import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
 import { GetRequestSellDetailResDto, GetRequestSellListResDto } from './qr.response';
 
@@ -19,6 +19,17 @@ export class QrSellAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   // TODO: SELL
+  // hàm logic chung
+  private getPriceOptionWhereSql(fetchBy: FetchSellingByEnum, tableAlias: string): string {
+    if (fetchBy == FetchSellingByEnum.PURCHASER) {
+      return ` AND (${tableAlias}.keyOption = '${QR_CODE_CONST.PRICE_OPTION.SELL_FOR_PURCHASER.value}' OR ${tableAlias}.keyOption = '${QR_CODE_CONST.PRICE_OPTION.BOTH.value}') `;
+    } else if (fetchBy == FetchSellingByEnum.EATER) {
+      return ` AND (${tableAlias}.keyOption = '${QR_CODE_CONST.PRICE_OPTION.SELL_FOR_EATER.value}' OR ${tableAlias}.keyOption = '${QR_CODE_CONST.PRICE_OPTION.BOTH.value}') `;
+    }
+    return '';
+  }
+
+  // kiểm tra QR đã được duyệt và được user đăng bán chưa
   async checkIsApprovedAndIsSold(requestCode: string): Promise<{ seq: number; isSold: YnEnum } | null> {
     let query = ` SELECT A.seq,
          CASE
@@ -34,7 +45,7 @@ export class QrSellAppRepository {
     return rows.length ? (rows[0] as { seq: number; isSold: YnEnum }) : null;
   }
 
-  async insertRequestSellV2(userCode: string, dto: InsertRequestSellDto): Promise<number> {
+  async insertRequestSell(userCode: string, dto: InsertRequestSellDto): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableSell}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, priceForPurchaser, priceForEater, volumeForSell,
         nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 
@@ -49,18 +60,20 @@ export class QrSellAppRepository {
     return result.insertId;
   }
 
-  async getRequestSellTotal(dto: GetRequestSellListDto, userCode: string): Promise<number> {
+  async getRequestSellTotal(dto: GetRequestSellListDto, fetchBy: FetchSellingByEnum, userCode: string): Promise<number> {
     let whereSql = '';
     const params: any[] = [];
     params.push(userCode); // placeholder for the JOIN: ON ... AND E.userCode = ?
 
+    whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
+
     whereSql += ' AND A.userCode != ? ';
     params.push(userCode); // placeholder for the WHERE: AND A.userCode != ?
 
-    if (dto.getType == GetTypeEnum.VIEW) {
+    if (dto.getType == GetSellingTypeEnum.VIEW) {
       whereSql += ` AND E.isView = 'Y' `;
     }
-    if (dto.getType == GetTypeEnum.SAVE) {
+    if (dto.getType == GetSellingTypeEnum.SAVE) {
       whereSql += ` AND E.isSave = 'Y' `;
     }
 
@@ -81,18 +94,20 @@ export class QrSellAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 
-  async getRequestSellList(dto: GetRequestSellListDto, userCode: string): Promise<GetRequestSellListResDto[]> {
+  async getRequestSellList(dto: GetRequestSellListDto,  fetchBy: FetchSellingByEnum, userCode: string): Promise<GetRequestSellListResDto[]> {
     let whereSql = '';
     const params: any[] = [];
-    params.push(userCode); // placeholder for the JOIN: ON ... AND E.userCode = ?
+    params.push(userCode); 
 
-    whereSql += ' AND A.userCode != ? ';
-    params.push(userCode); // placeholder for the WHERE: AND A.userCode != ?
+    whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
 
-    if (dto.getType == GetTypeEnum.VIEW) {
+    whereSql += ` AND A.userCode != ? `;
+    params.push(userCode);  
+
+    if (dto.getType == GetSellingTypeEnum.VIEW) {
       whereSql += ` AND E.isView = 'Y' `;
     }
-    if (dto.getType == GetTypeEnum.SAVE) {
+    if (dto.getType == GetSellingTypeEnum.SAVE) {
       whereSql += ` AND E.isSave = 'Y' `;
     }
 
@@ -125,7 +140,9 @@ export class QrSellAppRepository {
     })) as GetRequestSellListResDto[];
   }
 
-  async getRequestSellDetail(requestCode: string): Promise<GetRequestSellDetailResDto | null> {
+  async getRequestSellDetail(requestCode: string, fetchBy: FetchSellingByEnum): Promise<GetRequestSellDetailResDto | null> {
+    const whereSql = this.getPriceOptionWhereSql(fetchBy, 'F');
+
     let query = `
         SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, H.harvestPhase, H.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
@@ -175,7 +192,7 @@ export class QrSellAppRepository {
         ON D.ingredientNestOptionCode = G.code
         LEFT JOIN ${this.tableHarvestPhase} H
         ON A.seqHarvestPhase = H.seq
-        WHERE A.requestCode = ? AND A.isActive = 'Y' 
+        WHERE A.requestCode = ? AND A.isActive = 'Y' ${whereSql}
      `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);

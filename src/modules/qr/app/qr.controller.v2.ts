@@ -39,8 +39,8 @@ export default class QrAppV2Controller {
   })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: NumberOkResponseDto })
-  async requestSellV2(@GetUserApp() user: TokenUserAppResDto, @Body() dto: InsertRequestSellDto) {
-    const result = await this.qrSellAppService.requestSellV2(user, dto);
+  async requestSell(@GetUserApp() user: TokenUserAppResDto, @Body() dto: InsertRequestSellDto) {
+    const result = await this.qrSellAppService.requestSell(user, dto);
     if (result === -1) {
       throw new BadRequestException({
         message: Msg.RequestQrcodeNotFound,

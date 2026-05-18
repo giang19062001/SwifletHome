@@ -14,7 +14,7 @@ export class EaterAppController {
   constructor(private readonly eaterAppService: EaterAppService) {}
 
   @ApiOperation({
-    summary: 'Đăng nhập / Đăng ký dành cho Eater App bằng Device Token',
+    summary: 'Đăng nhập / Đăng ký tự động bằng Device Token',
     description: 'Tự động kiểm tra deviceToken, nếu đã có thì trả về token, nếu chưa có thì tạo mới.',
   })
   @ApiBody({ type: EaterEntryDto })

@@ -44,7 +44,7 @@ export enum RequestSellPriceOptionEnum {
   BOTH = 'BOTH',
 }
 
-export enum GetTypeEnum {
+export enum GetSellingTypeEnum {
   ALL = 'ALL',
   VIEW = 'VIEW',
   SAVE = 'SAVE',
@@ -66,4 +66,10 @@ export enum RequestSellStatusEnum {
   WAITING = 'WAITING',
   APPROVED = 'APPROVED',
   REFUSE = 'REFUSE',
+}
+
+
+export enum FetchSellingByEnum {
+  PURCHASER = 'PURCHASER',
+  EATER = 'EATER',
 }

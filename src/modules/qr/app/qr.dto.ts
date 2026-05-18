@@ -1,16 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
-import { GetTypeEnum, MarkTypeEnum } from '../qr.interface';
+import { GetSellingTypeEnum, MarkTypeEnum } from '../qr.interface';
 
 export class GetRequestSellListDto extends PagingDto {
   @ApiProperty({
-    example: GetTypeEnum.ALL,
-    enum: GetTypeEnum,
+    example: GetSellingTypeEnum.ALL,
+    enum: GetSellingTypeEnum,
   })
-  @IsEnum(GetTypeEnum)
+  @IsEnum(GetSellingTypeEnum)
   @IsNotEmpty()
-  getType: GetTypeEnum;
+  getType: GetSellingTypeEnum;
 }
 
 export class UploadRequestVideoDto {
