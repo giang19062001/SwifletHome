@@ -15,12 +15,13 @@ export class InfoAppController {
   constructor(private readonly infoAppService: InfoAppService) {}
 
   @ApiOperation({
-    summary: 'Thông tin ngân hàng, chủ hệ thống..',
+    summary: 'Thông tin ngân hàng, chủ hệ thống, VAT..',
   })
   @ApiParam({
     description: `
 **BANK**: Thông tin ngân hàng chủ hệ thống,\n
-**OWNER**: Thông tin liên lạc chủ hệ thống`,
+**OWNER**: Thông tin liên lạc chủ hệ thống \n
+**VAT**: Thông tin phần trăm thuế của lô yến`,
     name: 'keyword',
     type: String,
   })

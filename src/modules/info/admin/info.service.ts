@@ -44,6 +44,9 @@ export class InfoAdminService {
   }
   async getDetail(infoKeyword: string): Promise<InfoResDto | null> {
     const result = await this.infoAdminRepository.getDetail(infoKeyword);
+    if (result && result.infoContent && typeof result.infoContent === 'object' && 'vat' in result.infoContent) {
+      result.infoContent.vat = Number(result.infoContent.vat);
+    }
     return result;
   }
 

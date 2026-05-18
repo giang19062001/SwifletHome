@@ -43,6 +43,13 @@ const InfoBankConstraints = {
   },
 };
 
+const InfoVatConstraints = {
+  vat: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập phần trăm thuế.' },
+    numericality: { message: '^Phần trăm thuế phải là số hợp lệ.' },
+  },
+};
+
 // TODO: FUNC
 function changePage(p) {
   page = p;
@@ -84,6 +91,9 @@ function showNameOfKey(key) {
     case 'ownerPhone':
       name = 'Số điện thoại';
       break;
+    case 'vat':
+      name = 'Phần trăm thuế %';
+      break;
     default:
       name = '';
   }
@@ -99,6 +109,9 @@ function mapConstraints(infoKeyword) {
       break;
     case 'OWNER':
       constraints = InfoOwnerConstraints;
+      break;
+    case 'VAT':
+      constraints = InfoVatConstraints;
       break;
     default:
       constraints = null;
@@ -127,6 +140,11 @@ function mapContentFileds(infoKeyword, infoName, infoDescription, data) {
       infoContent = {
         ownerName: data.ownerName ?? '',
         ownerPhone: data.ownerPhone ?? '',
+      };
+      break;
+     case 'VAT':
+      infoContent = {
+        vat: data.vat ?? 0,
       };
       break;
     default:
@@ -360,6 +378,12 @@ async function updateInfo(infoKeyword, btn) {
 
   // lấy giá trị form và đẩy vào formData
   const formData = getDataForm(modalBody);
+
+  // kiểm tra errors
+  const constraints = mapConstraints(infoKeyword);
+  const formValues = JSON.parse(formData.get('infoContent'));
+  const isOk = checkingErrors(formValues, constraints);
+  if (!isOk) return;
 
   for (let [key, value] of formData.entries()) {
     console.log(key, value);
