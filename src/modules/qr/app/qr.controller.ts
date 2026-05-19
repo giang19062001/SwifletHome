@@ -2,14 +2,14 @@ import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { getImgVideoMulterConfig } from 'src/config/multer.config';
-import { GetUserApp } from 'src/decorator/auth.decorator';
+import { GetEaterApp, GetUserApp } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
+import { TokenEaterAppResDto, TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { FetchSellingByEnum } from '../qr.interface';
@@ -218,12 +218,12 @@ export default class QrAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetRequestSellListResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getRequestSellList(@Body() dto: GetRequestSellListDto, @GetUserApp() user: TokenUserAppResDto) {
-    if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value && user.userTypeKeyWord !== USER_CONST.USER_TYPE.EATER.value) {
+    if ( 'userCode' in user && user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
       throw new BadRequestException({
         message: Msg.OnlyPurcharseOrEaterCanFetch,
         data: null,
       });
-    }
+    } 
     const result = await this.qrSellAppService.getRequestSellList(dto, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
     return result;
   }

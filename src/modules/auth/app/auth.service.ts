@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException, Inject, forwardRef } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
@@ -12,9 +12,10 @@ import { UserAppService } from 'src/modules/user/app/user.service';
 import { USER_CONST } from '../../user/app/user.interface';
 import { AbAuthService } from '../auth.abstract';
 import { AUTH_CONFIG } from '../auth.config';
-import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, TokenUserAppResDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, TokenEaterAppResDto, TokenUserAppResDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { BadRequestExceptionNumData } from 'src/filter/badRequestNumber.exception';
 import { GetInfoUserAppResDto } from 'src/modules/user/app/user.response';
+import { EaterAppService } from 'src/modules/eater/app/eater.service';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {
@@ -22,6 +23,7 @@ export class AuthAppService extends AbAuthService {
 
   constructor(
     private readonly userAppService: UserAppService,
+    @Inject(forwardRef(() => EaterAppService)) private readonly eaterAppService: EaterAppService,
     private readonly firebaseService: FirebaseService,
     private readonly phoneCodeService: PhoneCodeService,
     private readonly jwtService: JwtService,
@@ -263,6 +265,12 @@ export class AuthAppService extends AbAuthService {
   async findUser(userCode: string): Promise<TokenUserAppResDto | null> {
     const logbase = `${this.SERVICE_NAME}/findUser`;
     const result = await this.userAppService.findByCode(userCode);
+    return result;
+  }
+
+  async findEater(eaterCode: string): Promise<TokenEaterAppResDto | null> {
+    const logbase = `${this.SERVICE_NAME}/findEater`;
+    const result = await this.eaterAppService.findEaterByCode(eaterCode);
     return result;
   }
 

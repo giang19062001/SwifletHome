@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { OtpAppModule } from 'src/modules/otp/otp.module';
 import { PhoneCodeModule } from 'src/modules/phoneCode/phoneCode.module';
 import { UserAppModule } from 'src/modules/user/app/user.module';
+import { EaterAppModule } from 'src/modules/eater/app/eater.module';
 import { AuthAppController } from './auth.controller';
 import { AuthAppService } from './auth.service';
 
@@ -19,6 +20,7 @@ import { AuthAppService } from './auth.service';
     }),
     OtpAppModule,
     forwardRef(() => UserAppModule),
+    forwardRef(() => EaterAppModule),
     PhoneCodeModule,
   ],
   controllers: [AuthAppController],

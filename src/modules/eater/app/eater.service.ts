@@ -5,6 +5,7 @@ import { AUTH_CONFIG } from 'src/modules/auth/auth.config';
 import { EaterEntryDto } from './eater.dto';
 import { EaterAuthResDto } from './eater.response';
 import { EaterAppRepository } from './eater.repository';
+import { TokenEaterAppResDto } from 'src/modules/auth/app/auth.dto';
 
 @Injectable()
 export class EaterAppService {
@@ -16,19 +17,23 @@ export class EaterAppService {
     private readonly logger: LoggingService,
   ) {}
 
+  async findEaterByCode(eaterCode: string): Promise<TokenEaterAppResDto | null> {
+    return await this.eaterAppRepository.findEaterByCode(eaterCode);
+  }
+
   async entry(dto: EaterEntryDto): Promise<EaterAuthResDto> {
     const logbase = `${this.SERVICE_NAME}/entry`;
 
     const record = await this.eaterAppRepository.findByDeviceToken(dto.deviceToken);
 
     let eaterCode = '';
-    let userTypeCode = '';
+    let userTypeKeyWord = '';
 
     if (record) {
       this.logger.log(logbase, `DeviceToken đã tồn tại: ${dto.deviceToken}. Cập nhật entryTime.`);
       await this.eaterAppRepository.updateEntryTime(dto.deviceToken);
       eaterCode = record.eaterCode;
-      userTypeCode = record.userTypeCode;
+      userTypeKeyWord = record.userTypeKeyWord;
     } else {
       this.logger.log(logbase, `DeviceToken mới: ${dto.deviceToken}. Đang tạo mới eater.`);
       const newRecord = await this.eaterAppRepository.insertEater(dto.deviceToken);
@@ -37,13 +42,14 @@ export class EaterAppService {
         throw new BadRequestException('Không thể tạo mới tài khoản người ăn yến');
       }
       eaterCode = newRecord.eaterCode;
-      userTypeCode = newRecord.userTypeCode;
+      userTypeKeyWord = newRecord.userTypeKeyWord;
     }
 
-    // Ký token chứa eaterCode và userTypeCode
+    // Ký token chứa  eaterCode, deviceToken và userTypeKeyWord
     const payload = {
       eaterCode: eaterCode,
-      userTypeCode: userTypeCode,
+      deviceToken: dto.deviceToken,
+      userTypeKeyWord: userTypeKeyWord,
     };
 
     const expiresIn: JwtSignOptions['expiresIn'] = AUTH_CONFIG.EXPIRED_APP_SAVE;
@@ -51,7 +57,7 @@ export class EaterAppService {
 
     return {
       eaterCode: eaterCode,
-      userTypeCode: userTypeCode,
+      userTypeKeyWord: userTypeKeyWord,
       accessToken: accessToken,
     };
   }

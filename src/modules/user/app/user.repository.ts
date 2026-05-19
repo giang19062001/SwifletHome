@@ -75,7 +75,7 @@ export class UserAppRepository {
     );
     return rows.length ? (rows[0] as TokenUserAppWithPasswordResDto) : null;
   }
-  
+
   async findByDeviceToken(deviceToken: string): Promise<TokenUserAppWithPasswordResDto | null> {
     if (!deviceToken || deviceToken === '') return null;
     const [rows] = await this.db.query<RowDataPacket[]>(

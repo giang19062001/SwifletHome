@@ -8,7 +8,7 @@ import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { TodoTaskAlramResDto, TodoTaskResDto } from '../todo.response';
+import { TodoTaskAlramResDto } from '../todo.response';
 import { TodoAlarmAppService } from './todo-alarm.service';
 import { TodoHarvestAppService } from './todo-harvest.service';
 import { TodoMedicineAppService } from './todo-medicine.service';
@@ -42,17 +42,6 @@ export default class TodoAppController {
     private readonly todoHarvestAppService: TodoHarvestAppService,
     private readonly todoMedicineAppService: TodoMedicineAppService,
   ) {}
-
-  @ApiOperation({
-    summary: 'Lấy danh sách các lịch nhắc có sẵn của hệ thống: Thu hoạch, lăn thuốc, vệ sinh,.. ⚠️ HIỆN TAI KHÔNG DÙNG NỮA',
-  })
-  @Get('getTasks')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([GetTaskResDto]) })
-  async getTasks(): Promise<TodoTaskResDto[]> {
-    const result = await this.todoAlarmAppService.getTasks();
-    return result;
-  }
 
   @ApiOperation({
     summary: `Danh sách lịch nhắc việc của 1 nhà yến ( chỉ hiển thị lịch nhắc quá khứ, lịch nhắc trong ngày hiện tại nếu có, và ${QUERY_HELPER.MAX_DAY_GET_LIST_ALARM} ngày sắp tới )`,

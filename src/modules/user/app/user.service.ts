@@ -3,7 +3,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { TEXTS } from 'src/helpers/text.helper';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
 import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from '../../auth/app/auth.dto';
-import { CreateUserPackageAppDto, UserAppResDto } from './user.dto';
+import { CreateUserPackageAppDto } from './user.dto';
 import { UserAppRepository } from './user.repository';
 import { AllowUserTypeResDto, GetInfoUserAppResDto, UserTypeResDto } from './user.response';
 import { YnEnum } from 'src/interfaces/admin.interface';
