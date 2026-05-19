@@ -110,7 +110,7 @@ export class TeamAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async createTeam(@Body() dto: CreateTeamAppDto, @GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.teamUserAppService.createTeam(dto, user.userCode, user.userTypeCode);
+    const result = await this.teamUserAppService.createTeam(dto, user.userCode, user.userTypeCode, user.userTypeKeyWord);
     if (result === 0) {
       throw new BadRequestException({
         message: Msg.RegisterErr,

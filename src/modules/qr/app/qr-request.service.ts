@@ -4,7 +4,6 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { Msg } from 'src/helpers/message.helper';
-import { YnEnum } from 'src/interfaces/admin.interface';
 import { TodoHarvestAppService } from 'src/modules/todo/app/todo-harvest.service';
 import { TodoMedicineAppService } from 'src/modules/todo/app/todo-medicine.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
@@ -13,6 +12,7 @@ import { RequestStatusEnum } from '../qr.interface';
 import { QrRequestAppRepository } from './qr-request.repository';
 import { RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, QrRequestFileStrResDto, TaskHarvestQrResDto } from './qr.response';
+import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class QrRequestAppService {
@@ -23,6 +23,7 @@ export class QrRequestAppService {
     private readonly userHomeAppService: UserHomeAppService,
     private readonly qrRequestAppRepository: QrRequestAppRepository,
     private readonly logger: LoggingService,
+    private readonly mailService: MailService,
   ) {}
   async getRequestQrCocdeList(user: TokenUserAppResDto, dto: PagingDto): Promise<{ total: number; list: GetRequestQrCodeListResDto[] }> {
     const total = await this.qrRequestAppRepository.getRequestQrCocdeTotal(user.userCode);
@@ -235,6 +236,13 @@ export class QrRequestAppService {
 
       if (result == 1) {
         this.logger.log(logbase, `Yêu câu tạo mã Qrcode cho người dùng(${user.userCode}) thành công`);
+        // sendEmail
+        this.mailService.sendRequestQrEmail({
+          userHomeName: dataInsertDto.userHomeName,
+          userName: user.userName,
+          userPhone: user.userPhone,
+          harverstPhase: dto.harvestPhase,
+        });
       }
       return result;
     } catch (error) {

@@ -7,6 +7,7 @@ import { GetAllConsignmentDto, RequestConsigmentDto } from './consigment.dto';
 import { ConsignmentStatusEnum } from './consigment.interface';
 import { ConsignmentAppRepository } from './consigment.repository';
 import { GetAllConsignmentResDto, GetDetailConsignmentResDto } from './consignment.response';
+import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class ConsignmentAppService {
@@ -16,6 +17,7 @@ export class ConsignmentAppService {
     private readonly consignmentAppRepository: ConsignmentAppRepository,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
+    private readonly mailService: MailService,
   ) {}
 
   async requestConsigment(userCode: string, dto: RequestConsigmentDto): Promise<number> {
@@ -39,6 +41,15 @@ export class ConsignmentAppService {
 
         // ghi lịch sử
         await this.consignmentAppRepository.writeConsigmentHistory(userCode, newConsignmentCode, null, ConsignmentStatusEnum.WAITING);
+
+        // sendEmail
+        const matchedNestType = nestTypeCodes.find((c) => c.code === dto.nestType);
+        const nestTypeText = matchedNestType ? matchedNestType.valueOption : dto.nestType;
+        this.mailService.sendConsignmentEmail({
+          ...dto,
+          nestType: nestTypeText,
+        });
+
         return 1;
       } else {
         return 0;

@@ -48,7 +48,7 @@ export class GuestService {
 
       const result = await this.guestRepository.create(dto);
 
-      // Gửi email thông báo
+      // sendEmail
       if (result > 0) {
         this.mailService.sendGuestConsultationEmail(dto);
       }

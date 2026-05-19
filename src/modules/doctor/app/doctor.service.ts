@@ -6,6 +6,7 @@ import { DoctorStatusEnum } from '../doctor.interface';
 import { DoctorFileStrResDto } from "../doctor.response";
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
+import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class DoctorAppService {
@@ -14,6 +15,7 @@ export class DoctorAppService {
   constructor(
     private readonly doctorAppRepository: DoctorAppRepository,
     private readonly logger: LoggingService,
+    private readonly mailService: MailService,
   ) { }
 
   async requestDoctor(userCode: string, dto: CreateDoctorDto): Promise<number> {
@@ -37,6 +39,8 @@ export class DoctorAppService {
 
       if (result == 1) {
         this.logger.log(logbase, `Đăng ký khám bệnh thành công: ${JSON.stringify(dto)}`);
+        //sendEmail
+        this.mailService.sendDoctorEmail(dto);
       }
       return result;
     } catch (error) {

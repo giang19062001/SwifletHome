@@ -1,18 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { TeamStatusEnum } from 'src/interfaces/admin.interface';
-
+import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
-import { Msg } from 'src/helpers/message.helper';
-import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { OptionService } from 'src/modules/options/option.service';
 import { ProvinceService } from 'src/modules/province/province.service';
 import { TeamUserAppRepository } from './team-user.repository';
 import { CreateTeamAppDto, DeleteFileAppDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto } from './team.dto';
 import { GetAllTeamDto } from './team.dto';
 import { CheckAvailableTeamResDto, GetAllTeamResDto, GetDetailTeamResDto, InitFormCreateTeamAppResDto } from './team.response';
+import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class TeamUserAppService {
@@ -24,6 +21,7 @@ export class TeamUserAppService {
     private readonly provinceService: ProvinceService,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
+    private readonly mailService: MailService,
   ) { }
   // TODO: TEAM
   async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<CheckAvailableTeamResDto | null> {
@@ -164,7 +162,7 @@ export class TeamUserAppService {
    * - Số lượng dịch vụ >= 1
    * - Không có dịch vụ trùng nhau
    */
-  async createTeam(dto: CreateTeamAppDto, userCode: string, userTypeCode: string): Promise<number> {
+  async createTeam(dto: CreateTeamAppDto, userCode: string, userTypeCode: string, userTypeKeyWord: string): Promise<number> {
     // 1. Check duplicate team
     const isDuplicate = await this.teamUserAppRepository.checkDuplicateTeam(userCode, userTypeCode);
     if (isDuplicate) {
@@ -205,6 +203,9 @@ export class TeamUserAppService {
             await this.teamUserAppRepository.updateSeqFilesService(seqService, svc.uniqueId, userCode);
           }
         }
+
+        // sendEmail
+        this.mailService.sendTeamEmail({ ...dto, userTypeKeyWord });
       }
       return seq;
     } catch (error) {

@@ -7,6 +7,7 @@ import { HomeSaleSightSeeingStatusEnum } from '../homeSale.interface';
 import { HomeSaleIndexAppRepository } from './homeSale-index.repository';
 import { HomeSaleSightseeingAppRepository } from './homeSale-sightseeing.repository';
 import { CreateHomeSightSeeingDto } from './homeSale.dto';
+import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class HomeSaleSightseeingAppService {
@@ -16,6 +17,7 @@ export class HomeSaleSightseeingAppService {
     private readonly homeSaleIndexAppRepository: HomeSaleIndexAppRepository,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
+    private readonly mailService: MailService,
   ) { }
   // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string): Promise<number> {
@@ -39,6 +41,18 @@ export class HomeSaleSightseeingAppService {
     // mặc định status ban đầu là  'Đang chờ duyệt'
     const result = await this.homeSaleSightseeingAppRepository.registerSightSeeing(dto, userCode, HomeSaleSightSeeingStatusEnum.WAITING);
     this.logger.log(logbase, `Đăng ký tham quan homeCode(${dto.homeCode}) -> ${result ? Msg.RegisterOk : Msg.RegisterErr}`);
+
+    // sendEmail
+    if (result) {
+      const matchedAttend = attendCodes.find((c) => c.code === dto.numberAttendCode);
+      const numberAttendText = matchedAttend ? matchedAttend.valueOption : dto.numberAttendCode;
+      this.mailService.sendSightSeeingEmail({
+        homeName: home.homeName,
+        userName: dto.userName,
+        userPhone: dto.userPhone,
+        numberAttend: numberAttendText,
+      });
+    }
 
     return result;
   }
