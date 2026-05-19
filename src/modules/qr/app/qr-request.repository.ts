@@ -11,7 +11,7 @@ export class QrRequestAppRepository {
   private readonly table = 'tbl_qr_request';
   private readonly tableFile = 'tbl_qr_request_file';
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
-  private readonly tableSell = 'tbl_qr_request_sell';
+  private readonly tableSell = 'tbl_qr_request_selling';
   private readonly tableHome = 'tbl_user_home';
   private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}

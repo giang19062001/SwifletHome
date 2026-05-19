@@ -12,10 +12,10 @@ export class QrSellAppRepository {
   private readonly table = 'tbl_qr_request';
   private readonly tableFile = 'tbl_qr_request_file';
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
-  private readonly tableSelling = 'tbl_qr_request_sell';
+  private readonly tableSelling = 'tbl_qr_request_selling';
   private readonly tableOption = 'tbl_option_common';
   private readonly tableHome = 'tbl_user_home';
-  private readonly tableInteract = 'tbl_qr_request_sell_interact';
+  private readonly tableInteract = 'tbl_qr_request_selling_interact';
   private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
