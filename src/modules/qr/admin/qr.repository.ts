@@ -24,12 +24,19 @@ export class QrAdminRepository {
   async getAll(dto: PagingDto): Promise<GetInfoRequestQrCodeAdminResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
-        IFNULL(JSON_LENGTH(A.taskMedicineList), 0) AS taskMedicineCount, A.createdAt
+        IFNULL(JSON_LENGTH(A.taskMedicineList), 0) AS taskMedicineCount,
+        CASE
+          WHEN E.seq IS NOT NULL AND E.isActive = 'Y' THEN 'Y'
+          ELSE 'N'
+        END AS isSold,
+        A.createdAt
         FROM ${this.table}  A
         LEFT JOIN ${this.tableUserHome} B
         ON A.userHomeCode = B.userHomeCode  
         LEFT JOIN ${this.tableHarvestPhase} F
         ON A.seqHarvestPhase = F.seq
+        LEFT JOIN ${this.tableSelling} E
+        ON A.requestCode = E.requestCode
         WHERE  A.isActive = 'Y' 
         ORDER BY A.createdAt DESC `;
 
@@ -46,7 +53,7 @@ export class QrAdminRepository {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
          CASE
-        WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
+        WHEN E.seq IS NOT NULL AND E.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
           THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.value}'
@@ -57,6 +64,10 @@ export class QrAdminRepository {
           THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
         ELSE ''
       END AS requestStatusLabel,
+        CASE
+          WHEN E.seq IS NOT NULL AND E.isActive = 'Y' THEN 'Y'
+          ELSE 'N'
+        END AS isSold,
         A.taskMedicineList, A.taskHarvestList,
         
          COALESCE(

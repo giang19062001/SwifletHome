@@ -14,7 +14,7 @@ export class ContractService implements OnModuleInit {
   constructor(
     private readonly configService: ConfigService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
 
   onModuleInit() {
     const rpcUrl = this.configService.get<string>('RPC_URL')!;
@@ -25,7 +25,6 @@ export class ContractService implements OnModuleInit {
     this.wallet = new ethers.Wallet(privateKey, this.provider);
     this.contract = new ethers.Contract(contractAddress, contractABI, this.wallet);
   }
-
 
   async recordJson(data: any) {
     const logbase = `${this.SERVICE_NAME}/recordJson`;
@@ -39,21 +38,21 @@ export class ContractService implements OnModuleInit {
       const receipt = await tx.wait();
 
       this.logger.log(logbase, `Transaction mined in block: ${receipt.blockNumber}`);
-      this.logger.log(logbase, `Gas used:: ${receipt.gasUsed.toString()}`);
+      this.logger.log(logbase, `Gas used: ${receipt.gasUsed.toString()}`);
 
       const gasPrice = tx.gasPrice || (await this.provider.getFeeData()).gasPrice;
 
-      let transactionFee = "0"
+      let transactionFee = '0';
       if (gasPrice) {
-        const txFee = receipt.gasUsed * gasPrice;
-        transactionFee = txFee.toString()
-        this.logger.log(logbase, `Transaction fee: ${txFee.toString()}`);
+        const txFeeWei = receipt.gasUsed * gasPrice;
+        transactionFee = ethers.formatUnits(txFeeWei, 18);
+        this.logger.log(logbase, `Transaction fee: ${transactionFee} POL`);
       }
 
       return {
         transactionHash: tx.hash,
         blockNumber: receipt.blockNumber,
-        transactionFee: transactionFee
+        transactionFee: transactionFee,
       };
     } catch (error) {
       this.logger.log(logbase, `error: ${error.toString()}`);

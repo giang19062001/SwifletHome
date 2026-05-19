@@ -25,6 +25,9 @@ function renderRequestQrcode(data, objElement) {
   if (data?.list?.length) {
     let i = 1;
     data?.list.forEach((ele) => {
+      const isSoldBadge = ele.isSold === 'Y' 
+        ? `<span class="badge bg-success">Đã đăng bán</span>` 
+        : `<span class="badge bg-secondary">Chưa đăng bán</span>`;
       const rowHtml = `
          <tr class="text-center">
             <td><p>${(page - 1) * limit + i++}</p></td>
@@ -33,6 +36,7 @@ function renderRequestQrcode(data, objElement) {
             <td><p>${ele.taskMedicineCount}</p></td>
             <td><p>${ele.harvestPhase}</p></td>
             <td><b class="txt-status-${String(ele.requestStatus).toLocaleLowerCase()}">${VARIABLE_ENUM.QR_REQUEST_STATUS[ele.requestStatus] ?? ''}</b></td>
+            <td>${isSoldBadge}</td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                 <button class="btn-edit"  onclick="gotoQrcodeDetail('${ele.requestCode}')">Chi tiết</button>
@@ -47,7 +51,7 @@ function renderRequestQrcode(data, objElement) {
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     // dữ liệu trống
-    renderEmptyRowTable(objElement, 7);
+    renderEmptyRowTable(objElement, 8);
   }
   // xóa skeleton
   hideSkeleton(objElement);
@@ -56,7 +60,7 @@ function renderRequestQrcode(data, objElement) {
 async function getAllRequestQrcode(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
-  showSkeleton(objElement, limit, 7);
+  showSkeleton(objElement, limit, 8);
 
   await axios
     .post(
