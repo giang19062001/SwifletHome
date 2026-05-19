@@ -4,14 +4,15 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { FetchSellingByEnum, RequestSellStatusEnum } from '../qr.interface';
 import { GetSellingTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
 import { GetSellingForPurchaserListDto, InsertRequestSellDto } from './qr.dto';
-import { GetSellingForPurchaserDetailResDto, GetSellingForPurchaserListResDto } from './qr.response';
+import { GetSellingDetailResDto, GetSellingListResDto } from './qr.response';
+import { PagingDto } from 'src/dto/admin.dto';
 
 @Injectable()
 export class QrSellAppRepository {
   private readonly table = 'tbl_qr_request';
   private readonly tableFile = 'tbl_qr_request_file';
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
-  private readonly tableSell = 'tbl_qr_request_sell';
+  private readonly tableSelling = 'tbl_qr_request_sell';
   private readonly tableOption = 'tbl_option_common';
   private readonly tableHome = 'tbl_user_home';
   private readonly tableInteract = 'tbl_qr_request_sell_interact';
@@ -19,7 +20,7 @@ export class QrSellAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   // TODO: SELL
-  // hàm logic chung
+  // hàm logic chung phân biết 'nhà thu mua' với 'người ăn yến'
   private getPriceOptionWhereSql(fetchBy: FetchSellingByEnum, tableAlias: string): string {
     if (fetchBy == FetchSellingByEnum.PURCHASER) {
       return ` AND (${tableAlias}.keyOption = '${QR_CODE_CONST.PRICE_OPTION.SELL_FOR_PURCHASER.value}' OR ${tableAlias}.keyOption = '${QR_CODE_CONST.PRICE_OPTION.BOTH.value}') `;
@@ -37,7 +38,7 @@ export class QrSellAppRepository {
             ELSE 'N'
         END AS isSold
         FROM ${this.table}  A 
-         LEFT JOIN ${this.tableSell} D
+         LEFT JOIN ${this.tableSelling} D
          ON A.requestCode = D.requestCode  
         WHERE A.requestCode  = ? AND A.isActive = 'Y'  AND A.requestStatus = ?
         LIMIT 1 `;
@@ -47,7 +48,7 @@ export class QrSellAppRepository {
 
   async insertRequestSell(userCode: string, dto: InsertRequestSellDto): Promise<number> {
     const sql = `
-        INSERT INTO ${this.tableSell}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, priceForPurchaser, priceForEater, volumeForSell,
+        INSERT INTO ${this.tableSelling}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, priceForPurchaser, priceForEater, volumeForSell,
         nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
@@ -60,87 +61,7 @@ export class QrSellAppRepository {
     return result.insertId;
   }
 
-  async getSellingForPurchaserTotal(dto: GetSellingForPurchaserListDto, fetchBy: FetchSellingByEnum, userCode: string): Promise<number> {
-    let whereSql = '';
-    const params: any[] = [];
-    params.push(userCode); // placeholder for the JOIN: ON ... AND E.userCode = ?
-
-    whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
-
-    whereSql += ' AND A.userCode != ? ';
-    params.push(userCode); // placeholder for the WHERE: AND A.userCode != ?
-
-    if (dto.getType == GetSellingTypeEnum.VIEW) {
-      whereSql += ` AND E.isView = 'Y' `;
-    }
-    if (dto.getType == GetSellingTypeEnum.SAVE) {
-      whereSql += ` AND E.isSave = 'Y' `;
-    }
-
-    let query = ` SELECT COUNT(A.seq) AS TOTAL 
-        FROM ${this.tableSell}  A
-            LEFT JOIN ${this.table} B
-        ON A.requestCode = B.requestCode  
-        LEFT JOIN ${this.tableHome} C
-        ON B.userHomeCode = C.userHomeCode  
-        LEFT JOIN ${this.tableOption} D
-        ON A.priceOptionCode = D.code
-        LEFT JOIN ${this.tableInteract} E
-        ON A.requestCode = E.requestCode AND E.userCode = ?
-        WHERE A.isActive = 'Y' ${whereSql} 
-     `;
-
-    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows.length ? (rows[0].TOTAL as number) : 0;
-  }
-
-  async getSellingForPurchaserList(dto: GetSellingForPurchaserListDto,  fetchBy: FetchSellingByEnum, userCode: string): Promise<GetSellingForPurchaserListResDto[]> {
-    let whereSql = '';
-    const params: any[] = [];
-    params.push(userCode); 
-
-    whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
-
-    whereSql += ` AND A.userCode != ? `;
-    params.push(userCode);  
-
-    if (dto.getType == GetSellingTypeEnum.VIEW) {
-      whereSql += ` AND E.isView = 'Y' `;
-    }
-    if (dto.getType == GetSellingTypeEnum.SAVE) {
-      whereSql += ` AND E.isSave = 'Y' `;
-    }
-
-    let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
-        D.valueOption AS priceOptionLabel, A.pricePerKg, A.priceForPurchaser, A.priceForEater, A.volumeForSell, A.nestQuantity,
-        A.ingredientNestOptionCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
-        FROM ${this.tableSell}  A
-            LEFT JOIN ${this.table} B
-        ON A.requestCode = B.requestCode  
-        LEFT JOIN ${this.tableHome} C
-        ON B.userHomeCode = C.userHomeCode  
-        LEFT JOIN ${this.tableOption} D
-        ON A.priceOptionCode = D.code
-        LEFT JOIN ${this.tableInteract} E
-        ON A.requestCode = E.requestCode AND E.userCode = ?
-        WHERE A.isActive = 'Y'  ${whereSql}
-        ORDER BY A.seq DESC
-     `;
-
-    if (dto.limit > 0 && dto.page > 0) {
-      query += ` LIMIT ? OFFSET ?`;
-      params.push(dto.limit, (dto.page - 1) * dto.limit);
-    }
-
-    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows.map((row) => ({
-      ...row,
-      priceForPurchaser: row.priceForPurchaser ? Number(row.priceForPurchaser) : null,
-      priceForEater: row.priceForEater ? Number(row.priceForEater) : null,
-    })) as GetSellingForPurchaserListResDto[];
-  }
-
-  async getSellingForPurchaserDetail(requestCode: string, fetchBy: FetchSellingByEnum): Promise<GetSellingForPurchaserDetailResDto | null> {
+  async GetSellingDetail(requestCode: string, fetchBy: FetchSellingByEnum): Promise<GetSellingDetailResDto | null> {
     const whereSql = this.getPriceOptionWhereSql(fetchBy, 'F');
 
     let query = `
@@ -182,7 +103,7 @@ export class QrSellAppRepository {
         FROM ${this.table}  A
         LEFT JOIN ${this.tableBlockChain} C
         ON A.requestCode = C.requestCode  
-        LEFT JOIN ${this.tableSell} D
+        LEFT JOIN ${this.tableSelling} D
         ON A.requestCode = D.requestCode  
         LEFT JOIN ${this.tableHome} E
         ON A.userHomeCode = E.userHomeCode  
@@ -200,16 +121,148 @@ export class QrSellAppRepository {
     const row = rows[0];
     row.priceForPurchaser = row.priceForPurchaser ? Number(row.priceForPurchaser) : null;
     row.priceForEater = row.priceForEater ? Number(row.priceForEater) : null;
-    return row as GetSellingForPurchaserDetailResDto;
+    return row as GetSellingDetailResDto;
+  }
+
+  // TODO: SELL FOR PUCHASER
+  async getSellingForPurchaserTotal(dto: GetSellingForPurchaserListDto, fetchBy: FetchSellingByEnum, userCode: string): Promise<number> {
+    let whereSql = '';
+    const params: any[] = [];
+    params.push(userCode); // placeholder for the JOIN: ON ... AND E.userCode = ?
+
+    whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
+
+    whereSql += ' AND A.userCode != ? ';
+    params.push(userCode); // placeholder for the WHERE: AND A.userCode != ?
+
+    if (dto.getType == GetSellingTypeEnum.VIEW) {
+      whereSql += ` AND E.isView = 'Y' `;
+    }
+    if (dto.getType == GetSellingTypeEnum.SAVE) {
+      whereSql += ` AND E.isSave = 'Y' `;
+    }
+
+    let query = ` SELECT COUNT(A.seq) AS TOTAL 
+        FROM ${this.tableSelling}  A
+            LEFT JOIN ${this.table} B
+        ON A.requestCode = B.requestCode  
+        LEFT JOIN ${this.tableHome} C
+        ON B.userHomeCode = C.userHomeCode  
+        LEFT JOIN ${this.tableOption} D
+        ON A.priceOptionCode = D.code
+        LEFT JOIN ${this.tableInteract} E
+        ON A.requestCode = E.requestCode AND E.userCode = ?
+        WHERE A.isActive = 'Y' ${whereSql} 
+     `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+
+  async getSellingForPurchaserList(dto: GetSellingForPurchaserListDto, fetchBy: FetchSellingByEnum, userCode: string): Promise<GetSellingListResDto[]> {
+    let whereSql = '';
+    const params: any[] = [];
+    params.push(userCode);
+
+    whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
+
+    whereSql += ` AND A.userCode != ? `;
+    params.push(userCode);
+
+    if (dto.getType == GetSellingTypeEnum.VIEW) {
+      whereSql += ` AND E.isView = 'Y' `;
+    }
+    if (dto.getType == GetSellingTypeEnum.SAVE) {
+      whereSql += ` AND E.isSave = 'Y' `;
+    }
+
+    let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
+        D.valueOption AS priceOptionLabel, A.pricePerKg, A.priceForPurchaser, A.priceForEater, A.volumeForSell, A.nestQuantity,
+        A.ingredientNestOptionCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
+        FROM ${this.tableSelling}  A
+            LEFT JOIN ${this.table} B
+        ON A.requestCode = B.requestCode  
+        LEFT JOIN ${this.tableHome} C
+        ON B.userHomeCode = C.userHomeCode  
+        LEFT JOIN ${this.tableOption} D
+        ON A.priceOptionCode = D.code
+        LEFT JOIN ${this.tableInteract} E
+        ON A.requestCode = E.requestCode AND E.userCode = ?
+        WHERE A.isActive = 'Y'  ${whereSql}
+        ORDER BY A.seq DESC
+     `;
+
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows.map((row) => ({
+      ...row,
+      priceForPurchaser: row.priceForPurchaser ? Number(row.priceForPurchaser) : null,
+      priceForEater: row.priceForEater ? Number(row.priceForEater) : null,
+    })) as GetSellingListResDto[];
+  }
+
+  // TODO: SELL FOR EATER
+  async getSellingForEaterTotal(fetchBy: FetchSellingByEnum): Promise<number> {
+    let whereSql = '';
+    const params: any[] = [];
+    whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
+
+    let query = ` SELECT COUNT(A.seq) AS TOTAL 
+        FROM ${this.tableSelling}  A
+            LEFT JOIN ${this.table} B
+        ON A.requestCode = B.requestCode  
+        LEFT JOIN ${this.tableHome} C
+        ON B.userHomeCode = C.userHomeCode  
+        LEFT JOIN ${this.tableOption} D
+        ON A.priceOptionCode = D.code
+        WHERE A.isActive = 'Y' ${whereSql} 
+     `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+  async getSellingForEaterList(dto: PagingDto, fetchBy: FetchSellingByEnum): Promise<GetSellingListResDto[]> {
+    let whereSql = '';
+    const params: any[] = [];
+    whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
+
+    let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
+        D.valueOption AS priceOptionLabel, A.pricePerKg, A.priceForPurchaser, A.priceForEater, A.volumeForSell, A.nestQuantity,
+        A.ingredientNestOptionCode, A.humidity
+        FROM ${this.tableSelling}  A
+            LEFT JOIN ${this.table} B
+        ON A.requestCode = B.requestCode  
+        LEFT JOIN ${this.tableHome} C
+        ON B.userHomeCode = C.userHomeCode  
+        LEFT JOIN ${this.tableOption} D
+        ON A.priceOptionCode = D.code
+        WHERE A.isActive = 'Y'  ${whereSql}
+        ORDER BY A.seq DESC
+     `;
+
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows.map((row) => ({
+      ...row,
+      priceForPurchaser: row.priceForPurchaser ? Number(row.priceForPurchaser) : null,
+      priceForEater: row.priceForEater ? Number(row.priceForEater) : null,
+      isView: 'N', // hardcode vì 'người ăn yến' không có liên kết với tableInteract
+      isSave: 'N', // hardcode vì 'người ăn yến' không có liên kết với tableInteract
+    })) as GetSellingListResDto[];
   }
 
   // TODO: SELL-INTERACT
   async maskRequestSell(requestCode: string, userCode: string, markType: MarkTypeEnum): Promise<number> {
     // 1. Kiểm tra xem đã có bản ghi tương tác chưa
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT seq, isView, isSave FROM ${this.tableInteract} WHERE requestCode = ? AND userCode = ? LIMIT 1`,
-      [requestCode, userCode],
-    );
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq, isView, isSave FROM ${this.tableInteract} WHERE requestCode = ? AND userCode = ? LIMIT 1`, [requestCode, userCode]);
 
     if (rows.length > 0) {
       // 2. Nếu đã có, tiến hành UPDATE

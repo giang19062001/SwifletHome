@@ -8,7 +8,8 @@ import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { FetchSellingByEnum, MarkTypeEnum, RequestSellPriceOptionEnum } from '../qr.interface';
 import { QrSellAppRepository } from './qr-sell.repository';
 import { GetSellingForPurchaserListDto, InsertRequestSellDto } from './qr.dto';
-import { GetSellingForPurchaserDetailResDto, GetSellingForPurchaserListResDto } from './qr.response';
+import { GetSellingDetailResDto, GetSellingListResDto } from './qr.response';
+import { PagingDto } from 'src/dto/admin.dto';
 
 @Injectable()
 export class QrSellAppService {
@@ -19,9 +20,9 @@ export class QrSellAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  // TODO: SELL
+  // TODO: SELL FOR PURCHASER
   // lấy danh sách đăng bán
-  async getSellingForPurchaserList(dto: GetSellingForPurchaserListDto, userCode: string, fetchBy: FetchSellingByEnum): Promise<{ total: number; list: GetSellingForPurchaserListResDto[] }> {
+  async getSellingForPurchaserList(dto: GetSellingForPurchaserListDto, userCode: string, fetchBy: FetchSellingByEnum): Promise<{ total: number; list: GetSellingListResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getSellingForPurchaserList:`;
     const total = await this.qrSellAppRepository.getSellingForPurchaserTotal(dto, fetchBy, userCode);
     const rows = await this.qrSellAppRepository.getSellingForPurchaserList(dto, fetchBy, userCode);
@@ -29,14 +30,31 @@ export class QrSellAppService {
   }
 
   // lấy thông tin đăng bán chi tiết
-  async getSellingForPurchaserDetail(requestCode: string, userCode: string, fetchBy: FetchSellingByEnum): Promise<GetSellingForPurchaserDetailResDto | null> {
+  async getSellingForPurchaserDetail(requestCode: string, userCode: string, fetchBy: FetchSellingByEnum): Promise<GetSellingDetailResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getSellingForPurchaserDetail:`;
     // đánh dầu đã xem
     await this.maskRequestSell(requestCode, userCode, MarkTypeEnum.VIEW);
-    const result = await this.qrSellAppRepository.getSellingForPurchaserDetail(requestCode, fetchBy);
+    const result = await this.qrSellAppRepository.GetSellingDetail(requestCode, fetchBy);
     return result;
   }
 
+  // TODO: SELL FOR EATER
+  // lấy danh sách đăng bán
+  async getSellingForEaterList(dto: PagingDto, fetchBy: FetchSellingByEnum): Promise<{ total: number; list: GetSellingListResDto[] }> {
+    const logbase = `${this.SERVICE_NAME}/getSellingForEaterList:`;
+    const total = await this.qrSellAppRepository.getSellingForEaterTotal(fetchBy);
+    const rows = await this.qrSellAppRepository.getSellingForEaterList(dto, fetchBy);
+    return { total: total, list: rows };
+  }
+
+  // lấy thông tin đăng bán chi tiết
+  async getSellingForEaterDetail(requestCode: string, fetchBy: FetchSellingByEnum): Promise<GetSellingDetailResDto | null> {
+    const logbase = `${this.SERVICE_NAME}/getSellingForEaterDetail:`;
+    const result = await this.qrSellAppRepository.GetSellingDetail(requestCode, fetchBy);
+    return result;
+  }
+
+  // TODO: SELL
   async requestSell(user: TokenUserAppResDto, dto: InsertRequestSellDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/insertRequestSell:`;
 

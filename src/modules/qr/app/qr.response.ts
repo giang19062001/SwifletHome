@@ -164,7 +164,7 @@ export class GetApprovedRequestQrCodeResDto extends OmitType(RequestQrCodeResDto
   isSold: YnEnum;
 }
 
-export class GetSellingForPurchaserDetailResDto extends GetApprovedRequestQrCodeResDto {
+export class GetSellingDetailResDto extends GetApprovedRequestQrCodeResDto {
   @ApiProperty({ example: '' })
   @IsString()
   priceOptionCode: string;
@@ -260,7 +260,7 @@ export class GetRequestQrCodeListResDto {
   totalCellCollected: number;
 }
 
-export class GetSellingForPurchaserListResDto {
+export class GetSellingListResDto {
   @ApiProperty({ example: 0 })
   @IsNumber()
   seq: number;

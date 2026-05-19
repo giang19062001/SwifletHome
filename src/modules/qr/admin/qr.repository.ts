@@ -11,7 +11,7 @@ export class QrAdminRepository {
   private readonly table = 'tbl_qr_request';
   private readonly tableFile = 'tbl_qr_request_file';
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
-  private readonly tableSell = 'tbl_qr_request_sell';
+  private readonly tableSelling = 'tbl_qr_request_sell';
   private readonly tableUserHome = 'tbl_user_home';
   private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase'
 
@@ -83,7 +83,7 @@ export class QrAdminRepository {
         ON A.userHomeCode = B.userHomeCode  
          LEFT JOIN ${this.tableBlockChain} D
         ON A.requestCode = D.requestCode  
-         LEFT JOIN ${this.tableSell} E
+         LEFT JOIN ${this.tableSelling} E
       ON A.requestCode = E.requestCode  
         LEFT JOIN  ${this.tableHarvestPhase} F
       ON A.seqHarvestPhase = F.seq

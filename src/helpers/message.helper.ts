@@ -118,7 +118,8 @@ export const Msg = {
   createQrRequestErr: err('Gửi yêu cầu tạo mã QR Code'),
 
   // Phân quyền / Mua bán yến
-  OnlyPurcharseOrEaterCanFetch: onlyCan('tài khoản nhà thu mua hoặc người ăn yến', 'lấy danh sách yến được bán'),
+  OnlyPurcharseCanFetch: onlyCan('tài khoản nhà thu mua', 'lấy danh sách yến được bán'),
+  OnlyEaterCanFetch: onlyCan('tài khoản người ăn yến', 'lấy danh sách yến được bán'),
   OnlyOwnerCanFetch: onlyCan('tài khoản chủ nhà yến', 'lấy danh sách yến được bán'),
 
   // Đội gia công

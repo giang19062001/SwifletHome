@@ -20,8 +20,8 @@ import {
   GetApprovedRequestQrCodeResDto,
   GetInfoToRequestQrcodeResDto,
   GetRequestQrCodeListResDto,
-  GetSellingForPurchaserDetailResDto,
-  GetSellingForPurchaserListResDto,
+  GetSellingDetailResDto,
+  GetSellingListResDto,
   UploadRequestVideoResDto,
   ValidateHarvestItemResDto,
 } from './qr.response';
@@ -37,8 +37,10 @@ export default class QrAppController {
     private readonly qrSellAppService: QrSellAppService,
   ) {}
 
+  // TODO: QR FETCH
+  // Lấy danh sách yêu cầu cung cấp mã QR 
   @ApiOperation({
-    summary: 'Lấy danh sách yêu cầu lấy mã QRcode của user hiện tại',
+    summary: 'Lấy danh sách yêu cầu cung cấp mã QR',
     description: ``,
   })
   @Post('getRequestQrCocdeList')
@@ -53,6 +55,7 @@ export default class QrAppController {
     return result;
   }
 
+  // Lấy thông tin Qrcode đã được ADMIN chấp thuận
   @ApiOperation({
     summary: 'Lấy thông tin Qrcode đã được ADMIN chấp thuận',
     description: ``,
@@ -72,8 +75,9 @@ export default class QrAppController {
     return result;
   }
 
+  // Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để yêu cầu tạo mã Qrcode cho 1 nhà yến cụ thể
   @ApiOperation({
-    summary: 'Lấy thông tin ( LĂN THUỐC, THU HOẠCH ) để yêu cầu tạo mã Qrcode cho 1 nhà yến cụ thể',
+    summary: 'Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để yêu cầu tạo mã Qrcode cho 1 nhà yến cụ thể',
     description: ``,
   })
   @Get('getInfoToRequestQrcode/:userHomeCode')
@@ -85,8 +89,9 @@ export default class QrAppController {
     return result;
   }
 
+  // Kiểm tra số lượng đợt thu hoạch khả dụng của các nhà yến trước vào màn hình khi yêu cầu QR
   @ApiOperation({
-    summary: 'Kiểm tra số lượng đợt thu hoạch avaliable của các nhà yến trước khi yêu cầu QR',
+    summary: 'Kiểm tra số lượng đợt thu hoạch khả dụng của các nhà yến trước vào màn hình khi yêu cầu QR',
     description: ``,
   })
   @Get('validateHarvestBeforeRequestQr')
@@ -98,8 +103,10 @@ export default class QrAppController {
     return result;
   }
 
+  // TODO: QR CRUD
+  // Tạo yêu cầu cung cấp mã QR
   @ApiOperation({
-    summary: 'Tạo yêu cầu tạo mã Qrcode',
+    summary: 'Tạo yêu cầu cung cấp mã Qrcode',
   })
   @Post('requestQrCode')
   @ApiBody({
@@ -145,8 +152,9 @@ export default class QrAppController {
     };
   }
 
+  // Hủy yêu cầu cung cấp mã QR
   @ApiOperation({
-    summary: 'Hủy yêu cầu lấy QRcode',
+    summary: 'Hủy yêu cầu cung cấp mã Qrcode',
   })
   @Put('cancelRequest/:requestCode')
   @HttpCode(HttpStatus.OK)
@@ -164,9 +172,10 @@ export default class QrAppController {
     return result;
   }
 
-  // TODO: FILE
+  // TODO: QR FILE
+  // Upload files quy trình chế biến đóng gói
   @ApiOperation({
-    summary: 'Dùng cho nút UPLOAD quy trình chế biến đóng gói ',
+    summary: 'Upload files quy trình chế biến đóng gói',
   })
   @Post('uploadRequestFile')
   @ApiConsumes('multipart/form-data')
@@ -185,9 +194,9 @@ export default class QrAppController {
     };
   }
 
-  // TODO: SELL
+  // TODO: SELL FOR PURCHASER
   @ApiOperation({
-    summary: `Lấy chi tiết yêu cầu bán sản lượng yến  liên kết với mã Qrcode`,
+    summary: `Lấy chi tiết yêu cầu bán sản lượng yến liên kết với mã Qrcode - dành cho nhà thu mua`,
     description: `
   **priceForPurchaser** (Number | null) Giá bán dành cho nhà thu mua\n
   **priceForEater** (Number | null) Giá bán dành cho người ăn yến\n
@@ -195,14 +204,14 @@ export default class QrAppController {
   })
   @Get('getSellingForPurchaserDetail/:requestCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetSellingForPurchaserDetailResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetSellingDetailResDto) })
   async getSellingForPurchaserDetail(@GetUserApp() user: TokenUserAppResDto, @Param('requestCode') requestCode: string) {
     const result = await this.qrSellAppService.getSellingForPurchaserDetail(requestCode, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
     return result;
   }
 
   @ApiOperation({
-    summary: 'Lấy danh sách yêu cầu bán sản lượng yến liên kết với mã Qrcode',
+    summary: 'Lấy danh sách yêu cầu bán sản lượng yến liên kết với mã Qrcode - dành cho nhà thu mua',
     description: `
   **getType**: enum('ALL', 'VIEW', 'SAVE')\n
   *ALL*: lấy tất cả \n
@@ -215,22 +224,60 @@ export default class QrAppController {
   @ApiBody({
     type: GetSellingForPurchaserListDto,
   })
-  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetSellingForPurchaserListResDto)) })
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetSellingListResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getSellingForPurchaserList(@Body() dto: GetSellingForPurchaserListDto, @GetUserApp() user: TokenUserAppResDto) {
-    if ( 'userCode' in user && user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
+    if (user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
       throw new BadRequestException({
-        message: Msg.OnlyPurcharseOrEaterCanFetch,
+        message: Msg.OnlyPurcharseCanFetch,
         data: null,
       });
-    } 
+    }
     const result = await this.qrSellAppService.getSellingForPurchaserList(dto, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
+    return result;
+  }
+
+  // TODO: SELL FOR PURCHASER
+  @ApiOperation({
+    summary: `Lấy chi tiết yêu cầu bán sản lượng yến liên kết với mã Qrcode - dành cho người ăn yến`,
+    description: `
+  **priceForPurchaser** (Number | null) Giá bán dành cho nhà thu mua\n
+  **priceForEater** (Number | null) Giá bán dành cho người ăn yến\n
+    `,
+  })
+  @Get('getSellingForEaterDetail/:requestCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetSellingDetailResDto) })
+  async getSellingForEaterDetail(@GetEaterApp() eater: TokenEaterAppResDto, @Param('requestCode') requestCode: string) {
+    const result = await this.qrSellAppService.getSellingForEaterDetail(requestCode, eater.userTypeKeyWord as FetchSellingByEnum);
+    return result;
+  }
+
+  @ApiOperation({
+    summary: 'Lấy danh sách yêu cầu bán sản lượng yến liên kết với mã Qrcode - dành cho người ăn yến',
+    description: ``,
+  })
+  @Post('getSellingForEaterList')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({
+    type: PagingDto,
+  })
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetSellingListResDto)) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getSellingForEaterList(@Body() dto: PagingDto, @GetEaterApp() eater: TokenEaterAppResDto) {
+    if (eater.userTypeKeyWord !== USER_CONST.USER_TYPE.EATER.value) {
+      throw new BadRequestException({
+        message: Msg.OnlyEaterCanFetch,
+        data: null,
+      });
+    }
+    const result = await this.qrSellAppService.getSellingForEaterList(dto, eater.userTypeKeyWord as FetchSellingByEnum);
     return result;
   }
 
   // TODO: SELL-INTERACT
   @ApiOperation({
-    summary: `Đánh dấu 1 'yêu cầu bán sản lượng yến liên kết với mã Qrcode' là đã 'XEM' hay là 'LƯU' `,
+    summary: `Đánh dấu 1 'đơn đăng bán bán sản lượng yến liên kết với mã QR' là đã 'XEM' hay là 'LƯU' `,
     description: `
   **markType**: enum('VIEW', 'SAVE')\n
   *VIEW*: dùng khi click vào 1 'yêu cầu bán sản lượng yến' nào đó  \n
