@@ -7,8 +7,8 @@ import { OptionService } from 'src/modules/options/option.service';
 import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { FetchSellingByEnum, MarkTypeEnum, RequestSellPriceOptionEnum } from '../qr.interface';
 import { QrSellAppRepository } from './qr-sell.repository';
-import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
-import { GetRequestSellDetailResDto, GetRequestSellListResDto } from './qr.response';
+import { GetSellingForPurchaserListDto, InsertRequestSellDto } from './qr.dto';
+import { GetSellingForPurchaserDetailResDto, GetSellingForPurchaserListResDto } from './qr.response';
 
 @Injectable()
 export class QrSellAppService {
@@ -21,19 +21,19 @@ export class QrSellAppService {
 
   // TODO: SELL
   // lấy danh sách đăng bán
-  async getRequestSellList(dto: GetRequestSellListDto, userCode: string, fetchBy: FetchSellingByEnum): Promise<{ total: number; list: GetRequestSellListResDto[] }> {
-    const logbase = `${this.SERVICE_NAME}/getRequestSellList:`;
-    const total = await this.qrSellAppRepository.getRequestSellTotal(dto, fetchBy, userCode);
-    const rows = await this.qrSellAppRepository.getRequestSellList(dto, fetchBy, userCode);
+  async getSellingForPurchaserList(dto: GetSellingForPurchaserListDto, userCode: string, fetchBy: FetchSellingByEnum): Promise<{ total: number; list: GetSellingForPurchaserListResDto[] }> {
+    const logbase = `${this.SERVICE_NAME}/getSellingForPurchaserList:`;
+    const total = await this.qrSellAppRepository.getSellingForPurchaserTotal(dto, fetchBy, userCode);
+    const rows = await this.qrSellAppRepository.getSellingForPurchaserList(dto, fetchBy, userCode);
     return { total: total, list: rows };
   }
 
   // lấy thông tin đăng bán chi tiết
-  async getRequestSellDetail(requestCode: string, userCode: string, fetchBy: FetchSellingByEnum): Promise<GetRequestSellDetailResDto | null> {
-    const logbase = `${this.SERVICE_NAME}/getRequestSellDetail:`;
+  async getSellingForPurchaserDetail(requestCode: string, userCode: string, fetchBy: FetchSellingByEnum): Promise<GetSellingForPurchaserDetailResDto | null> {
+    const logbase = `${this.SERVICE_NAME}/getSellingForPurchaserDetail:`;
     // đánh dầu đã xem
     await this.maskRequestSell(requestCode, userCode, MarkTypeEnum.VIEW);
-    const result = await this.qrSellAppRepository.getRequestSellDetail(requestCode, fetchBy);
+    const result = await this.qrSellAppRepository.getSellingForPurchaserDetail(requestCode, fetchBy);
     return result;
   }
 

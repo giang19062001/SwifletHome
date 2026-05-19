@@ -3,7 +3,7 @@ import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from 
 import { PagingDto } from 'src/dto/admin.dto';
 import { GetSellingTypeEnum, MarkTypeEnum } from '../qr.interface';
 
-export class GetRequestSellListDto extends PagingDto {
+export class GetSellingForPurchaserListDto extends PagingDto {
   @ApiProperty({
     example: GetSellingTypeEnum.ALL,
     enum: GetSellingTypeEnum,

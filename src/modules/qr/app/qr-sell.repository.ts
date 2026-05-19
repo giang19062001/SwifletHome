@@ -3,8 +3,8 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { FetchSellingByEnum, RequestSellStatusEnum } from '../qr.interface';
 import { GetSellingTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
-import { GetRequestSellListDto, InsertRequestSellDto } from './qr.dto';
-import { GetRequestSellDetailResDto, GetRequestSellListResDto } from './qr.response';
+import { GetSellingForPurchaserListDto, InsertRequestSellDto } from './qr.dto';
+import { GetSellingForPurchaserDetailResDto, GetSellingForPurchaserListResDto } from './qr.response';
 
 @Injectable()
 export class QrSellAppRepository {
@@ -60,7 +60,7 @@ export class QrSellAppRepository {
     return result.insertId;
   }
 
-  async getRequestSellTotal(dto: GetRequestSellListDto, fetchBy: FetchSellingByEnum, userCode: string): Promise<number> {
+  async getSellingForPurchaserTotal(dto: GetSellingForPurchaserListDto, fetchBy: FetchSellingByEnum, userCode: string): Promise<number> {
     let whereSql = '';
     const params: any[] = [];
     params.push(userCode); // placeholder for the JOIN: ON ... AND E.userCode = ?
@@ -94,7 +94,7 @@ export class QrSellAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 
-  async getRequestSellList(dto: GetRequestSellListDto,  fetchBy: FetchSellingByEnum, userCode: string): Promise<GetRequestSellListResDto[]> {
+  async getSellingForPurchaserList(dto: GetSellingForPurchaserListDto,  fetchBy: FetchSellingByEnum, userCode: string): Promise<GetSellingForPurchaserListResDto[]> {
     let whereSql = '';
     const params: any[] = [];
     params.push(userCode); 
@@ -137,10 +137,10 @@ export class QrSellAppRepository {
       ...row,
       priceForPurchaser: row.priceForPurchaser ? Number(row.priceForPurchaser) : null,
       priceForEater: row.priceForEater ? Number(row.priceForEater) : null,
-    })) as GetRequestSellListResDto[];
+    })) as GetSellingForPurchaserListResDto[];
   }
 
-  async getRequestSellDetail(requestCode: string, fetchBy: FetchSellingByEnum): Promise<GetRequestSellDetailResDto | null> {
+  async getSellingForPurchaserDetail(requestCode: string, fetchBy: FetchSellingByEnum): Promise<GetSellingForPurchaserDetailResDto | null> {
     const whereSql = this.getPriceOptionWhereSql(fetchBy, 'F');
 
     let query = `
@@ -200,7 +200,7 @@ export class QrSellAppRepository {
     const row = rows[0];
     row.priceForPurchaser = row.priceForPurchaser ? Number(row.priceForPurchaser) : null;
     row.priceForEater = row.priceForEater ? Number(row.priceForEater) : null;
-    return row as GetRequestSellDetailResDto;
+    return row as GetSellingForPurchaserDetailResDto;
   }
 
   // TODO: SELL-INTERACT

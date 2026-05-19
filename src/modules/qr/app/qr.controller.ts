@@ -15,13 +15,13 @@ import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { FetchSellingByEnum } from '../qr.interface';
 import { QrRequestAppService } from './qr-request.service';
 import { QrSellAppService } from './qr-sell.service';
-import { GetRequestSellListDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
+import { GetSellingForPurchaserListDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import {
   GetApprovedRequestQrCodeResDto,
   GetInfoToRequestQrcodeResDto,
   GetRequestQrCodeListResDto,
-  GetRequestSellDetailResDto,
-  GetRequestSellListResDto,
+  GetSellingForPurchaserDetailResDto,
+  GetSellingForPurchaserListResDto,
   UploadRequestVideoResDto,
   ValidateHarvestItemResDto,
 } from './qr.response';
@@ -193,11 +193,11 @@ export default class QrAppController {
   **priceForEater** (Number | null) Giá bán dành cho người ăn yến\n
     `,
   })
-  @Get('getRequestSellDetail/:requestCode')
+  @Get('getSellingForPurchaserDetail/:requestCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetRequestSellDetailResDto) })
-  async getRequestSellDetail(@GetUserApp() user: TokenUserAppResDto, @Param('requestCode') requestCode: string) {
-    const result = await this.qrSellAppService.getRequestSellDetail(requestCode, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
+  @ApiOkResponse({ type: ApiAppResponseDto(GetSellingForPurchaserDetailResDto) })
+  async getSellingForPurchaserDetail(@GetUserApp() user: TokenUserAppResDto, @Param('requestCode') requestCode: string) {
+    const result = await this.qrSellAppService.getSellingForPurchaserDetail(requestCode, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
     return result;
   }
 
@@ -210,21 +210,21 @@ export default class QrAppController {
   *SAVE*: lấy các dữ liệu đã lưu \n
     `,
   })
-  @Post('getRequestSellList')
+  @Post('getSellingForPurchaserList')
   @HttpCode(HttpStatus.OK)
   @ApiBody({
-    type: GetRequestSellListDto,
+    type: GetSellingForPurchaserListDto,
   })
-  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetRequestSellListResDto)) })
+  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetSellingForPurchaserListResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getRequestSellList(@Body() dto: GetRequestSellListDto, @GetUserApp() user: TokenUserAppResDto) {
+  async getSellingForPurchaserList(@Body() dto: GetSellingForPurchaserListDto, @GetUserApp() user: TokenUserAppResDto) {
     if ( 'userCode' in user && user.userTypeKeyWord !== USER_CONST.USER_TYPE.PURCHASER.value) {
       throw new BadRequestException({
         message: Msg.OnlyPurcharseOrEaterCanFetch,
         data: null,
       });
     } 
-    const result = await this.qrSellAppService.getRequestSellList(dto, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
+    const result = await this.qrSellAppService.getSellingForPurchaserList(dto, user.userCode, user.userTypeKeyWord as FetchSellingByEnum);
     return result;
   }
 
