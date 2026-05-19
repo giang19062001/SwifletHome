@@ -32,6 +32,28 @@ export class QrRequestFileStrResDto {
     filename: string;
 }
 
+export class PriceVatHistoryDetailDto {
+  @ApiProperty({ example: 0 })
+  priceForPurchaser?: number;
+
+  @ApiProperty({ example: 0 })
+  priceForEater?: number;
+
+  @ApiProperty({ example: 8 })
+  vat: number;
+
+  @ApiProperty({ example: 0 })
+  finalPrice: number;
+}
+
+export class PriceVatHistoryDto {
+  @ApiProperty({ type: () => PriceVatHistoryDetailDto, required: false })
+  priceForPurchaser?: PriceVatHistoryDetailDto;
+
+  @ApiProperty({ type: () => PriceVatHistoryDetailDto, required: false })
+  priceForEater?: PriceVatHistoryDetailDto;
+}
+
 export class GetInfoToRequestQrcodeResDto {
   @ApiProperty({ example: '' })
   @IsOptional()
@@ -187,6 +209,10 @@ export class GetSellingDetailResDto extends GetApprovedRequestQrCodeResDto {
   @IsOptional()
   priceForEater: number | null;
 
+  @ApiProperty({ type: () => PriceVatHistoryDto, required: false, nullable: true })
+  @IsOptional()
+  priceVatHistory?: PriceVatHistoryDto | null;
+
   @ApiProperty({ example: 0 })
   @IsNumber()
   volumeForSell: number;
@@ -302,6 +328,10 @@ export class GetSellingListResDto {
   @IsNumber()
   @IsOptional()
   priceForEater: number | null;
+
+  @ApiProperty({ type: () => PriceVatHistoryDto, required: false, nullable: true })
+  @IsOptional()
+  priceVatHistory?: PriceVatHistoryDto | null;
 
   @ApiProperty({ example: 0 })
   @IsNumber()

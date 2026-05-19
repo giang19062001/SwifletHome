@@ -4,7 +4,7 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { FetchSellingByEnum, RequestSellStatusEnum } from '../qr.interface';
 import { GetSellingTypeEnum, MarkTypeEnum, QR_CODE_CONST, RequestStatusEnum } from './../qr.interface';
 import { GetSellingForPurchaserListDto, InsertRequestSellDto } from './qr.dto';
-import { GetSellingDetailResDto, GetSellingListResDto } from './qr.response';
+import { GetSellingDetailResDto, GetSellingListResDto, PriceVatHistoryDto } from './qr.response';
 import { PagingDto } from 'src/dto/admin.dto';
 
 @Injectable()
@@ -46,15 +46,15 @@ export class QrSellAppRepository {
     return rows.length ? (rows[0] as { seq: number; isSold: YnEnum }) : null;
   }
 
-  async insertRequestSell(userCode: string, dto: InsertRequestSellDto): Promise<number> {
+  async insertRequestSell(userCode: string, dto: InsertRequestSellDto, priceVatHistory: PriceVatHistoryDto): Promise<number> {
     const sql = `
-        INSERT INTO ${this.tableSelling}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, priceForPurchaser, priceForEater, volumeForSell,
+        INSERT INTO ${this.tableSelling}  (userCode, requestCode, userName, userPhone, priceOptionCode, pricePerKg, priceForPurchaser, priceForEater, priceVatHistory, volumeForSell,
         nestQuantity, humidity, ingredientNestOptionCode, requestSellStatus, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     // prettier-ignore
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      userCode, dto.requestCode, dto.userName,  dto.userPhone, dto.priceOptionCode, 0, dto.priceForPurchaser, dto.priceForEater, dto.volumeForSell,
+      userCode, dto.requestCode, dto.userName,  dto.userPhone, dto.priceOptionCode, 0, dto.priceForPurchaser, dto.priceForEater, priceVatHistory ? JSON.stringify(priceVatHistory) : null, dto.volumeForSell,
       dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, RequestSellStatusEnum.WAITING, userCode,
     ]);
 
@@ -94,7 +94,7 @@ export class QrSellAppRepository {
             JSON_ARRAY()
             ) AS requestQrcodeFiles, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
         D.priceOptionCode,
-        F.valueOption AS priceOptionLabel, D.pricePerKg, D.priceForPurchaser, D.priceForEater, D.volumeForSell, D.nestQuantity, D.humidity, 
+        F.valueOption AS priceOptionLabel, D.pricePerKg, D.priceForPurchaser, D.priceForEater, D.priceVatHistory, D.volumeForSell, D.nestQuantity, D.humidity, 
         D.ingredientNestOptionCode, G.valueOption AS ingredientNestOptionLabel,
         CASE
             WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
@@ -119,8 +119,9 @@ export class QrSellAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
     if (!rows.length) return null;
     const row = rows[0];
-    row.priceForPurchaser = row.priceForPurchaser ? Number(row.priceForPurchaser) : null;
-    row.priceForEater = row.priceForEater ? Number(row.priceForEater) : null;
+    row.priceForPurchaser = fetchBy == FetchSellingByEnum.PURCHASER ? (row.priceForPurchaser ? Number(row.priceForPurchaser) : null) : null;
+    row.priceForEater = fetchBy == FetchSellingByEnum.EATER ? (row.priceForEater ? Number(row.priceForEater) : null) : null;
+    row.priceVatHistory = row.priceVatHistory ? (typeof row.priceVatHistory === 'string' ? JSON.parse(row.priceVatHistory) : row.priceVatHistory) : null;
     return row as GetSellingDetailResDto;
   }
 
@@ -177,7 +178,7 @@ export class QrSellAppRepository {
     }
 
     let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
-        D.valueOption AS priceOptionLabel, A.pricePerKg, A.priceForPurchaser, A.priceForEater, A.volumeForSell, A.nestQuantity,
+        D.valueOption AS priceOptionLabel, A.pricePerKg, A.priceForPurchaser, A.priceForEater, A.priceVatHistory, A.volumeForSell, A.nestQuantity,
         A.ingredientNestOptionCode, A.humidity, IFNULL(E.isView,'N') AS isView, IFNULL(E.isSave,'N') AS isSave
         FROM ${this.tableSelling}  A
             LEFT JOIN ${this.table} B
@@ -201,7 +202,8 @@ export class QrSellAppRepository {
     return rows.map((row) => ({
       ...row,
       priceForPurchaser: row.priceForPurchaser ? Number(row.priceForPurchaser) : null,
-      priceForEater: row.priceForEater ? Number(row.priceForEater) : null,
+      priceForEater: null, // Purchaser sẽ không được thấy giá dành cho eater
+      priceVatHistory: row.priceVatHistory ? (typeof row.priceVatHistory === 'string' ? JSON.parse(row.priceVatHistory) : row.priceVatHistory) : null,
     })) as GetSellingListResDto[];
   }
 
@@ -231,7 +233,7 @@ export class QrSellAppRepository {
     whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
 
     let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userCode, A.userName, C.userHomeName, A.userPhone, A.priceOptionCode,
-        D.valueOption AS priceOptionLabel, A.pricePerKg, A.priceForPurchaser, A.priceForEater, A.volumeForSell, A.nestQuantity,
+        D.valueOption AS priceOptionLabel, A.pricePerKg, A.priceForPurchaser, A.priceForEater, A.priceVatHistory, A.volumeForSell, A.nestQuantity,
         A.ingredientNestOptionCode, A.humidity
         FROM ${this.tableSelling}  A
             LEFT JOIN ${this.table} B
@@ -252,8 +254,9 @@ export class QrSellAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows.map((row) => ({
       ...row,
-      priceForPurchaser: row.priceForPurchaser ? Number(row.priceForPurchaser) : null,
+      priceForPurchaser: null, // Eater sẽ không thấy giá của Purchaser
       priceForEater: row.priceForEater ? Number(row.priceForEater) : null,
+      priceVatHistory: row.priceVatHistory ? (typeof row.priceVatHistory === 'string' ? JSON.parse(row.priceVatHistory) : row.priceVatHistory) : null,
       isView: 'N', // hardcode vì 'người ăn yến' không có liên kết với tableInteract
       isSave: 'N', // hardcode vì 'người ăn yến' không có liên kết với tableInteract
     })) as GetSellingListResDto[];

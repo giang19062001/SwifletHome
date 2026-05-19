@@ -4,11 +4,12 @@ import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { OptionService } from 'src/modules/options/option.service';
+import { InfoAppService } from 'src/modules/info/app/info.service';
 import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { FetchSellingByEnum, MarkTypeEnum, RequestSellPriceOptionEnum } from '../qr.interface';
 import { QrSellAppRepository } from './qr-sell.repository';
 import { GetSellingForPurchaserListDto, InsertRequestSellDto } from './qr.dto';
-import { GetSellingDetailResDto, GetSellingListResDto } from './qr.response';
+import { GetSellingDetailResDto, GetSellingListResDto, PriceVatHistoryDto } from './qr.response';
 import { PagingDto } from 'src/dto/admin.dto';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class QrSellAppService {
   constructor(
     private readonly qrSellAppRepository: QrSellAppRepository,
     private readonly optionService: OptionService,
+    private readonly infoAppService: InfoAppService,
     private readonly logger: LoggingService,
   ) {}
 
@@ -116,7 +118,35 @@ export class QrSellAppService {
         return -2;
       }
 
-      const result = await this.qrSellAppRepository.insertRequestSell(user.userCode, dto);
+      // Lấy VAT từ InfoAppService
+      const vatInfo = await this.infoAppService.getDetail('VAT');
+      const vat = (vatInfo && vatInfo.infoContent && typeof vatInfo.infoContent === 'object' && 'vat' in vatInfo.infoContent)
+        ? Number(vatInfo.infoContent.vat)
+        : 0;
+
+      const priceVatHistory: PriceVatHistoryDto = {};
+
+      if (dto.priceForPurchaser !== null && dto.priceForPurchaser !== undefined) {
+        const finalPrice = dto.priceForPurchaser * (1 + vat / 100);
+        priceVatHistory.priceForPurchaser = {
+          priceForPurchaser: dto.priceForPurchaser,
+          vat: vat,
+          finalPrice: finalPrice,
+        };
+        dto.priceForPurchaser = finalPrice;
+      }
+
+      if (dto.priceForEater !== null && dto.priceForEater !== undefined) {
+        const finalPrice = dto.priceForEater * (1 + vat / 100);
+        priceVatHistory.priceForEater = {
+          priceForEater: dto.priceForEater,
+          vat: vat,
+          finalPrice: finalPrice,
+        };
+        dto.priceForEater = finalPrice;
+      }
+
+      const result = await this.qrSellAppRepository.insertRequestSell(user.userCode, dto, priceVatHistory);
       return result;
     } catch (error) {
       this.logger.error(logbase, error);
