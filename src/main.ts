@@ -18,9 +18,16 @@ async function bootstrap() {
   // security headers
   app.use(
     helmet({
-      contentSecurityPolicy: false,
-      crossOriginResourcePolicy: false,
-      crossOriginEmbedderPolicy: false,
+      // Tắt CSP để tránh chặn inline JS/CSS, CDN hoặc ảnh từ bên ngoài trên giao diện EJS Dashboard
+      contentSecurityPolicy: false, 
+
+      // Cho phép chia sẻ tài nguyên với các origin khác (Frontend Web, Mobile App, Webhook của Third-party)
+      crossOriginResourcePolicy: { policy: 'cross-origin' }, 
+
+      // Tắt COEP để tránh chặn load các tài nguyên (ảnh, script) từ domain khác trên Dashboard
+      crossOriginEmbedderPolicy: false, 
+
+      // Tắt COOP để tránh lỗi khi tương tác với các window popup cross-origin (như Oauth, payment)
       crossOriginOpenerPolicy: false, 
     }),
   );

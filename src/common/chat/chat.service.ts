@@ -6,7 +6,7 @@ import { UserAppService } from 'src/modules/user/app/user.service';
 import { QuestionResDto } from 'src/modules/question/question.response';
 import { FileUploadResDto } from '../../modules/upload/upload.response';
 import { LoggingService } from '../logger/logger.service';
-import { IChatItem, IChatItemV2, IChatHistory } from './chat.interface';
+import { IChatItem } from './chat.interface';
 import { LlmService } from '../llm/llm.service';
 
 @Injectable()
@@ -70,13 +70,12 @@ export class ChatService {
       return `[[audio-data=${audioSrc}]]`;
     });
   }
+  
   async replyBaseOnUserPackage(contentHtml: string, isFree: string, userCode: string): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/replyBaseOnUserPackage`;
     // lấy thông tin gói của user
     const userPackage = await this.userAppService.getUserPackageInfo(userCode);
     const remainDay = userPackage?.packageRemainDay ?? 0;
-
-    // this.logger.log(logbase, `Dữ liệu là miễn phí: ${isFree}; Số ngày hiệu lực còn lại của gói user:${remainDay}`);
 
     // LẤY DANH SÁCH AUDIO LIST
     const fileList = await this.uploadAppService.getAllAudioFile();
@@ -112,76 +111,45 @@ export class ChatService {
     return content;
   }
 
-  async reply(question: string, userCode: string, data: IChatItem[]): Promise<string> {
+  async reply(question: string, userCode: string, data: IChatItem[], allQuestions: QuestionResDto[] = []): Promise<string> {
+    const logbase = `${this.SERVICE_NAME}/reply`;
+
     if (!data?.length) {
       return Msg.CannotReply;
     }
 
-    // dữ liệu đã chuẩn hóa
-    const normalizedData = data.map((item) => ({
-      ...item,
-      questions: item.questions.map((q) => this.normalizeText(q)),
-    }));
-
-    // Khởi tạo fuse với dữ liệu đã chuẩn hóa
-    const fuse = new Fuse(normalizedData, this.fuseOptions);
-    const normalizedQuestion = this.normalizeText(question);
-
-    // tìm kiếm...
-    const results = fuse.search(normalizedQuestion);
-    // Nếu không tìm thấy kết quả phù hợp
-    if (results.length === 0) {
-      return Msg.CannotReply;
-    }
-
-    // Lấy kết quả phù hợp nhất
-    return results[0].item.answer ? await this.replyBaseOnUserPackage(results[0].item.answer.answerContent, results[0].item.answer.isFree, userCode) : Msg.CannotReply;
-  }
-  async replyV2(question: string, userCode: string, data: IChatItemV2[], allQuestions: QuestionResDto[], chatHistories: IChatHistory[] = []): Promise<{ answer: string; answerCode: string | null }> {
-    const logbase = `${this.SERVICE_NAME}/reply`;
-
     // 1. Phân loại bằng Fuse.js trước (tìm kiếm tương đương tuyệt đối)
-    const normalizedQuestion = this.normalizeText(question);
-
-    // Nếu là "nhắc lại", "tóm tắt" etc. thì Fuse.js có thể không match tốt,
-    // nhưng ta vẫn nên chuẩn bị data cho nó.
     const normalizedData = data.map((item) => ({
       ...item,
       questions: item.questions.map((q) => this.normalizeText(q)),
     }));
 
-    const fuse = new Fuse<IChatItemV2>(normalizedData, this.fuseOptions);
+    const fuse = new Fuse<IChatItem>(normalizedData, this.fuseOptions);
+    const normalizedQuestion = this.normalizeText(question);
+
     const results = fuse.search(normalizedQuestion);
 
     // Nếu tìm thấy kết quả bằng Fuse.js Trả về luôn
     const bestResult = results[0];
     if (bestResult && bestResult.score !== undefined && bestResult.item.answer) {
       this.logger.log(logbase, `Bot trả lời thông qua Fusejs`);
-      const answer = await this.replyBaseOnUserPackage(bestResult.item.answer.answerContent, bestResult.item.answer.isFree, userCode);
-      return { answer, answerCode: bestResult.item.answerCode };
+      return await this.replyBaseOnUserPackage(bestResult.item.answer.answerContent, bestResult.item.answer.isFree, userCode);
     }
 
-    // 2. Sử dụng LLM để phân tích ý định và ngữ cảnh
-    const { answerCode: llmAnswerCode, intent } = await this.llmService.replyWithLLM(question, allQuestions, chatHistories);
+    // 2. Sử dụng LLM để phân tích ngữ cảnh (Fallback)
+    if (allQuestions && allQuestions.length > 0) {
+      const { answerCode: llmAnswerCode } = await this.llmService.replyWithLLM(question, allQuestions);
 
-    if (llmAnswerCode) {
-      const matchedItem = data.find((item) => item.answerCode === llmAnswerCode);
-      if (matchedItem && matchedItem.answer) {
-        this.logger.log(logbase, `Bot trả lời thông qua LLM (Code: ${llmAnswerCode}, Intent: ${intent})`);
-
-        let finalContent = matchedItem.answer.answerContent;
-
-        // Nếu intent là tóm tắt hoặc giải thích, gọi LLM để xử lý lại nội dung
-        if (intent === 'SUMMARIZE' || intent === 'CLARIFY') {
-          finalContent = await this.llmService.generateRefinedResponse(finalContent, intent);
+      if (llmAnswerCode) {
+        const matchedItem = data.find((item) => item.answerCode === llmAnswerCode);
+        if (matchedItem && matchedItem.answer) {
+          this.logger.log(logbase, `Bot trả lời thông qua LLM (Code: ${llmAnswerCode})`);
+          return await this.replyBaseOnUserPackage(matchedItem.answer.answerContent, matchedItem.answer.isFree, userCode);
         }
-
-        const answer = await this.replyBaseOnUserPackage(finalContent, matchedItem.answer.isFree, userCode);
-        return { answer, answerCode: llmAnswerCode };
       }
     }
 
     this.logger.log(logbase, `Không tìm thấy câu trả lời phù hợp cho cả Fusejs và LLM`);
-    return { answer: Msg.CannotReply, answerCode: null };
+    return Msg.CannotReply;
   }
 }

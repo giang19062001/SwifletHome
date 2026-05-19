@@ -48,51 +48,12 @@ export class AnswerAppService {
 
     const answerMapQuestionsResult = Array.from(questionMap.entries()).map(([answerCode, questionContents]) => {
       return {
-        questions: questionContents,
-        answer: answerMap.get(answerCode),
-      };
-    });
-
-    return await this.chatService.reply(question, userCode, answerMapQuestionsResult);
-  }
-
-  async replyV2(question: string, userCode: string, currentChatHistories: any[] = []): Promise<{ answer: string; answerCode: string | null }> {
-    const questions: QuestionResDto[] = await this.questionAppService.getQuestionReplied();
-    let answers: AnswerResDto[] = [];
-
-    if (questions.length) {
-      const answerCodes = [...new Set(questions.map((q) => q.answerCode).filter(Boolean))];
-      answers = await this.answerAppRepository.getAnswersByCodes(answerCodes);
-    }
-
-    const questionMap = new Map<string, string[]>();
-    const answerMap = new Map<string, { isFree: string; answerContent: string }>();
-
-    questions.forEach((ques) => {
-      if (!questionMap.has(ques.answerCode)) {
-        questionMap.set(ques.answerCode, []);
-      }
-      questionMap.get(ques.answerCode)!.push(ques.questionContent);
-    });
-
-    answers.forEach((answer) => {
-      const answerCode = (answer as any).answerCode;
-      if (answerCode && !answerMap.has(answerCode)) {
-        answerMap.set(answerCode, {
-          isFree: answer.isFree,
-          answerContent: answer.answerContent,
-        });
-      }
-    });
-
-    const answerMapQuestionsResult = Array.from(questionMap.entries()).map(([answerCode, questionContents]) => {
-      return {
         answerCode,
         questions: questionContents,
         answer: answerMap.get(answerCode),
       };
     });
 
-    return await this.chatService.replyV2(question, userCode, answerMapQuestionsResult, questions, currentChatHistories);
+    return await this.chatService.reply(question, userCode, answerMapQuestionsResult, questions);
   }
 }
