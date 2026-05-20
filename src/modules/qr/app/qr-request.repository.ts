@@ -4,7 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { QR_CODE_CONST, RequestStatusEnum } from '../qr.interface';
-import { GetApprovedRequestQrCodeResDto, GetFullRequestQrCodeResDto, GetRequestQrCodeListResDto, QrRequestFileResDto, RequestQrCodeResDto } from './qr.response';
+import { GetApprovedRequestQrCodeResDto, GetRequestQrCodeDetailResDto, GetRequestQrCodeListResDto, QrRequestFileResDto, RequestQrCodeResDto } from './qr.response';
 
 @Injectable()
 export class QrRequestAppRepository {
@@ -161,7 +161,7 @@ export class QrRequestAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, RequestStatusEnum.APPROVED]);
     return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
-  async getFullRequestQrCode(requestCode: string, userCode: string): Promise<GetFullRequestQrCodeResDto | null> {
+  async getRequestQrCodeDetail(requestCode: string, userCode: string): Promise<GetRequestQrCodeDetailResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
       A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
          CASE
@@ -207,7 +207,7 @@ export class QrRequestAppRepository {
       LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
-    return rows.length ? (rows[0] as GetFullRequestQrCodeResDto) : null;
+    return rows.length ? (rows[0] as GetRequestQrCodeDetailResDto) : null;
   }
   async checkUsedThisHarvest(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     const currentYear = new Date().getFullYear(); // năm nay

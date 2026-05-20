@@ -18,8 +18,8 @@ import { QrSellAppService } from './qr-sell.service';
 import { GetSellingForPurchaserListDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import {
   GetApprovedRequestQrCodeResDto,
-  GetFullRequestQrCodeResDto,
   GetInfoToRequestQrcodeResDto,
+  GetRequestQrCodeDetailResDto,
   GetRequestQrCodeListResDto,
   GetSellingDetailResDto,
   GetSellingListResDto,
@@ -81,12 +81,12 @@ export default class QrAppController {
     summary: 'Lấy toàn bộ thông tin chi tiết Qrcode',
     description: ``,
   })
-  @Get('getFullRequestQrCode/:requestCode')
+  @Get('getRequestQrCodeDetail/:requestCode')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetFullRequestQrCodeResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetRequestQrCodeDetailResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getFullRequestQrCode(@Param('requestCode') requestCode: string, @GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.qrRequestAppService.getFullRequestQrCode(requestCode, user);
+  async getRequestQrCodeDetail(@Param('requestCode') requestCode: string, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.qrRequestAppService.getRequestQrCodeDetail(requestCode, user);
     if (!result) {
       throw new BadRequestException({
         message: Msg.ThisQrNotApproved,

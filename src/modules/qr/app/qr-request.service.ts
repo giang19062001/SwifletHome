@@ -12,7 +12,7 @@ import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { RequestStatusEnum } from '../qr.interface';
 import { QrRequestAppRepository } from './qr-request.repository';
 import { RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
-import { GetApprovedRequestQrCodeResDto, GetFullRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, QrRequestFileStrResDto, TaskHarvestQrResDto } from './qr.response';
+import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeDetailResDto, GetRequestQrCodeListResDto, QrRequestFileStrResDto, TaskHarvestQrResDto } from './qr.response';
 
 @Injectable()
 export class QrRequestAppService {
@@ -69,9 +69,9 @@ export class QrRequestAppService {
     const result = await this.qrRequestAppRepository.getApprovedRequestQrCocde(requestCode, user.userCode);
     return result;
   }
-  async getFullRequestQrCode(requestCode: string, user: TokenUserAppResDto): Promise<GetFullRequestQrCodeResDto | null> {
-    const logbase = `${this.SERVICE_NAME}/getFullRequestQrCode:`;
-    const result = await this.qrRequestAppRepository.getFullRequestQrCode(requestCode, user.userCode);
+  async getRequestQrCodeDetail(requestCode: string, user: TokenUserAppResDto): Promise<GetRequestQrCodeDetailResDto | null> {
+    const logbase = `${this.SERVICE_NAME}/getRequestQrCodeDetail:`;
+    const result = await this.qrRequestAppRepository.getRequestQrCodeDetail(requestCode, user.userCode);
     return result;
   }
   async getInfoToRequestQrcode(userHomeCode: string, user: TokenUserAppResDto, harvestPhase: number): Promise<(GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number }) | null> {
