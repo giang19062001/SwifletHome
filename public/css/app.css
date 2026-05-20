@@ -19335,6 +19335,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: -10px;
 }
 #page-answer-mutation .bottom-swtich {
   padding: 10px;
@@ -19423,6 +19424,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: -10px;
 }
 #page-blog-mutation .bottom-swtich {
   padding: 10px;
@@ -19621,6 +19623,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: -10px;
 }
 #page-screen-mutation .preview {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);

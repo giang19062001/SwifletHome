@@ -11,7 +11,7 @@ export class LlmService {
 
   async replyWithLLM(question: string, allQuestions: QuestionResDto[]): Promise<{ answerCode: string | null }> {
     const groqApiKey = process.env.LLM_GROQ_KEY;
-    const modelName = process.env.LLM_GROQ_MODEL || 'llama-3.3-70b-versatile';
+    const modelName = process.env.LLM_GROQ_MODEL;
     if (!groqApiKey || !allQuestions?.length) return { answerCode: null };
 
     try {
@@ -63,7 +63,7 @@ export class LlmService {
             content: prompt,
           },
         ],
-        model: modelName,
+        model: modelName!,
         temperature: 0.1,
         max_tokens: 500,
         response_format: { type: 'json_object' },

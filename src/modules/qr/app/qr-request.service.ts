@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import moment from 'moment';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { Msg } from 'src/helpers/message.helper';
@@ -11,8 +12,7 @@ import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { RequestStatusEnum } from '../qr.interface';
 import { QrRequestAppRepository } from './qr-request.repository';
 import { RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
-import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, QrRequestFileStrResDto, TaskHarvestQrResDto } from './qr.response';
-import { MailService } from 'src/common/mail/mail.service';
+import { GetApprovedRequestQrCodeResDto, GetFullRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeListResDto, QrRequestFileStrResDto, TaskHarvestQrResDto } from './qr.response';
 
 @Injectable()
 export class QrRequestAppService {
@@ -67,6 +67,11 @@ export class QrRequestAppService {
   async getApprovedRequestQrCocde(requestCode: string, user: TokenUserAppResDto): Promise<GetApprovedRequestQrCodeResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getApprovedRequestQrCocde:`;
     const result = await this.qrRequestAppRepository.getApprovedRequestQrCocde(requestCode, user.userCode);
+    return result;
+  }
+  async getFullRequestQrCode(requestCode: string, user: TokenUserAppResDto): Promise<GetFullRequestQrCodeResDto | null> {
+    const logbase = `${this.SERVICE_NAME}/getFullRequestQrCode:`;
+    const result = await this.qrRequestAppRepository.getFullRequestQrCode(requestCode, user.userCode);
     return result;
   }
   async getInfoToRequestQrcode(userHomeCode: string, user: TokenUserAppResDto, harvestPhase: number): Promise<(GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number }) | null> {

@@ -186,6 +186,8 @@ export class GetApprovedRequestQrCodeResDto extends OmitType(RequestQrCodeResDto
   isSold: YnEnum;
 }
 
+export class GetFullRequestQrCodeResDto extends GetApprovedRequestQrCodeResDto {}
+
 export class GetSellingDetailResDto extends GetApprovedRequestQrCodeResDto {
   @ApiProperty({ example: '' })
   @IsString()

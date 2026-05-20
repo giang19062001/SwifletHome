@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
 import { Msg } from 'src/helpers/message.helper';
+import { QuestionResDto } from 'src/modules/question/question.response';
 import { UploadAppService } from 'src/modules/upload/app/upload.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { QuestionResDto } from 'src/modules/question/question.response';
 import { FileUploadResDto } from '../../modules/upload/upload.response';
+import { LlmService } from '../llm/llm.service';
 import { LoggingService } from '../logger/logger.service';
 import { IChatItem } from './chat.interface';
-import { LlmService } from '../llm/llm.service';
 
 @Injectable()
 export class ChatService {
   private readonly fuseOptions: IFuseOptions<IChatItem> = {
     keys: [{ name: 'questions', weight: 1 }],
-    threshold: 0.4,
+    threshold: 0.3,
     distance: 10, // cho phép lệch vị trí
     minMatchCharLength: 5, // tránh match quá ngắn
     includeScore: true,

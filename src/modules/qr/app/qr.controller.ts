@@ -18,6 +18,7 @@ import { QrSellAppService } from './qr-sell.service';
 import { GetSellingForPurchaserListDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import {
   GetApprovedRequestQrCodeResDto,
+  GetFullRequestQrCodeResDto,
   GetInfoToRequestQrcodeResDto,
   GetRequestQrCodeListResDto,
   GetSellingDetailResDto,
@@ -75,9 +76,29 @@ export default class QrAppController {
     return result;
   }
 
-  // Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để yêu cầu tạo mã Qrcode cho 1 nhà yến cụ thể
+  // Lấy toàn bộ thông tin Qrcode
   @ApiOperation({
-    summary: 'Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để yêu cầu tạo mã Qrcode cho 1 nhà yến cụ thể',
+    summary: 'Lấy toàn bộ thông tin chi tiết Qrcode',
+    description: ``,
+  })
+  @Get('getFullRequestQrCode/:requestCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(GetFullRequestQrCodeResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async getFullRequestQrCode(@Param('requestCode') requestCode: string, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.qrRequestAppService.getFullRequestQrCode(requestCode, user);
+    if (!result) {
+      throw new BadRequestException({
+        message: Msg.ThisQrNotApproved,
+        data: null,
+      });
+    }
+    return result;
+  }
+
+  // Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để hiển thị thông tin lên màn hình trước khi yêu cầu tạo mã Qrcode CỦA 1 NHÀ YẾN
+  @ApiOperation({
+    summary: 'Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để hiển thị thông tin lên màn hình trước khi yêu cầu tạo mã Qrcode CỦA 1 NHÀ YẾN',
     description: ``,
   })
   @Get('getInfoToRequestQrcode/:userHomeCode')
@@ -196,7 +217,7 @@ export default class QrAppController {
 
   // TODO: SELL FOR PURCHASER
   @ApiOperation({
-    summary: `Lấy chi tiết yêu cầu bán sản lượng yến liên kết với mã Qrcode - dành cho nhà thu mua`,
+    summary: `Lấy toàn bộ thông tin Qrcode + thông tin đăng bán sản lượng yến liên kết với mã Qrcode - dành cho nhà thu mua`,
     description: `
   **priceForPurchaser** (Number | null) Giá bán dành cho nhà thu mua\n
   **priceForEater** (Number | null) Giá bán dành cho người ăn yến\n
@@ -239,7 +260,7 @@ export default class QrAppController {
 
   // TODO: SELL FOR PURCHASER
   @ApiOperation({
-    summary: `Lấy chi tiết yêu cầu bán sản lượng yến liên kết với mã Qrcode - dành cho người ăn yến`,
+    summary: `Lấy toàn bộ thông tin Qrcode + thông tin đăng bán sản lượng yến liên kết với mã Qrcode - dành cho nhà thu mua`,
     description: `
   **priceForPurchaser** (Number | null) Giá bán dành cho nhà thu mua\n
   **priceForEater** (Number | null) Giá bán dành cho người ăn yến\n

@@ -4,7 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { QR_CODE_CONST, RequestStatusEnum } from '../qr.interface';
-import { GetApprovedRequestQrCodeResDto, QrRequestFileResDto, RequestQrCodeResDto } from './qr.response';
+import { GetApprovedRequestQrCodeResDto, GetFullRequestQrCodeResDto, GetRequestQrCodeListResDto, QrRequestFileResDto, RequestQrCodeResDto } from './qr.response';
 
 @Injectable()
 export class QrRequestAppRepository {
@@ -35,7 +35,7 @@ export class QrRequestAppRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 
-  async getRequestQrCocdeList(userCode: string, dto: PagingDto): Promise<GetApprovedRequestQrCodeResDto[]> {
+  async getRequestQrCocdeList(userCode: string, dto: PagingDto): Promise<GetRequestQrCodeListResDto[]> {
     let query = ` SELECT DISTINCT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
       CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
@@ -76,7 +76,7 @@ export class QrRequestAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as GetApprovedRequestQrCodeResDto[];
+    return rows as GetRequestQrCodeListResDto[];
   }
   async getRequestQrCocde(requestCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.seqHarvestPhase, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
@@ -161,6 +161,54 @@ export class QrRequestAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode, RequestStatusEnum.APPROVED]);
     return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
+  async getFullRequestQrCode(requestCode: string, userCode: string): Promise<GetFullRequestQrCodeResDto | null> {
+    let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
+      A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+         CASE
+        WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.CANCEL.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.WAITING.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.WAITING.text}'
+        WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.value}'
+          THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
+        ELSE ''
+      END AS requestStatusLabel,
+         COALESCE(
+          (
+            SELECT JSON_ARRAYAGG(
+              JSON_OBJECT(
+                'seq', B.seq,
+                'filename', B.filename,
+                'mimetype', B.mimetype
+              )
+            )
+            FROM ${this.tableFile} B
+            WHERE B.qrRequestSeq = A.seq AND B.isActive = 'Y'
+          ),
+          JSON_ARRAY()
+        ) AS requestQrcodeFiles, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
+       CASE
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          ELSE 'N'
+      END AS isSold
+      FROM ${this.table}  A 
+      LEFT JOIN ${this.tableBlockChain} C
+      ON A.requestCode = C.requestCode  
+       LEFT JOIN ${this.tableSell} D
+      ON A.requestCode = D.requestCode  
+        LEFT JOIN ${this.tableHome} E
+      ON A.userHomeCode = E.userHomeCode 
+      LEFT JOIN ${this.tableHarvestPhase} F
+      ON A.seqHarvestPhase = F.seq
+      WHERE A.requestCode  = ? AND A.isActive = 'Y'
+      LIMIT 1 `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
+    return rows.length ? (rows[0] as GetFullRequestQrCodeResDto) : null;
+  }
   async checkUsedThisHarvest(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     const currentYear = new Date().getFullYear(); // năm nay
     let query = ` SELECT A.seq
@@ -194,16 +242,6 @@ export class QrRequestAppRepository {
 
     return result.insertId;
   }
-
-  // async cancelRequest(requestCode: string, updatedId: string): Promise<number> {
-  //   const sql = `
-  //     UPDATE ${this.table} SET requestStatus = ? , updatedId = ? , updatedAt = NOW()
-  //     WHERE requestCode = ?
-  //   `;
-  //   const [result] = await this.db.execute<ResultSetHeader>(sql, [RequestStatusEnum.CANCEL, updatedId, requestCode]);
-
-  //   return result.affectedRows;
-  // }
 
   async cancelRequest(seq: number, requestCode: string, userCode: string): Promise<number> {
     // đánh dấu file sẽ bị xóa
