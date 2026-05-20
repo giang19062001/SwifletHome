@@ -96,9 +96,9 @@ export default class QrAppController {
     return result;
   }
 
-  // Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để hiển thị thông tin lên màn hình trước khi yêu cầu tạo mã Qrcode CỦA 1 NHÀ YẾN
+  // Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để hiển thị dữ liệu lên màn hình trước khi yêu cầu tạo mã Qrcode
   @ApiOperation({
-    summary: 'Lấy thông tin ( NHÀ YẾN, LĂN THUỐC, THU HOẠCH ) để hiển thị thông tin lên màn hình trước khi yêu cầu tạo mã Qrcode CỦA 1 NHÀ YẾN',
+    summary: 'Lấy thông tin NHÀ YẾN, LĂN THUỐC, THU HOẠCH để hiển thị dữ liệu lên màn hình trước khi yêu cầu tạo mã Qrcode',
     description: ``,
   })
   @Get('getInfoToRequestQrcode/:userHomeCode')
