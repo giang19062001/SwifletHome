@@ -31,6 +31,8 @@ export class NotificationResDto {
     notificationStatus: NotificationStatusEnum;
     @ApiProperty({ example: YnEnum.N })
     isActive: YnEnum;
+    @ApiProperty({ example: 'SINGLE' })
+    notificationMethod!: string;
     @ApiProperty({ example: new Date() })
     createdAt: Date;
     @ApiProperty({ example: new Date() })

@@ -36,3 +36,17 @@ export enum NotificationTypeEnum {
   ADMIN_QR = 'ADMIN_QR',
   ADMIN_CONSIGNMENT = 'ADMIN_CONSIGNMENT',
 }
+
+export enum NotificationMethodEnum {
+  SINGLE = 'SINGLE',
+  MULTICAST = 'MULTICAST',
+  TOPIC = 'TOPIC',
+}
+
+export enum NotificationMessageIdEnum {
+  NO_PUSH = 'no_push',
+  PUSH_FAILED = 'push_failed',
+  MULTICAST = 'multicast',
+}
+
+

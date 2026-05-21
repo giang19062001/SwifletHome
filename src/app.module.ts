@@ -1,24 +1,26 @@
+import { BullModule } from '@nestjs/bullmq';
 import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { PrometheusModule, makeCounterProvider, makeHistogramProvider } from 'nestjs-prometheus';
-import { HttpMetricsInterceptor } from './interceptors/metrics.interceptor';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { BlacklistGuard } from './common/blacklist/blacklist.guard';
+import { BlacklistModule } from './common/blacklist/blacklist.module';
 import { CornModule } from './common/corn/corn.module';
 import { FirebaseModule } from './common/firebase/firebase.module';
+import { CustomThrottlerGuard } from './common/guards/throttler.guard';
 import { LoggerModule } from './common/logger/logger.module';
+import { MailModule } from './common/mail/mail.module';
 import { MqttModule } from './common/mqtt/mqtt.module';
 import { SocketModule } from './common/socket/socket.module';
-import { MailModule } from './common/mail/mail.module';
 import { DatabaseModule } from './database/database.module';
 import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
+import { ROUTER } from './helpers/const.helper';
+import { HttpMetricsInterceptor } from './interceptors/metrics.interceptor';
 import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
 import { IpMiddleware } from './middleware/ip.middleware';
-import { CustomThrottlerGuard } from './common/guards/throttler.guard';
-import { BlacklistModule } from './common/blacklist/blacklist.module';
-import { BlacklistGuard } from './common/blacklist/blacklist.guard';
 import { AnswerAdminModule } from './modules/answer/admin/answer.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { AuthAdminModule } from './modules/auth/admin/auth.module';
@@ -26,10 +28,14 @@ import { AuthAppModule } from './modules/auth/app/auth.module';
 import { BlogAdminModule } from './modules/blog/admin/blog.module';
 import { BlogAppModule } from './modules/blog/app/blog.module';
 import { CategoryAdminModule } from './modules/category/admin/category.module';
+import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
 import { ConsignmentAdminModule } from './modules/consigment/admin/consignment.module';
 import { ConsignmentAppModile } from './modules/consigment/app/consigment.module';
 import { DoctorAdminModule } from './modules/doctor/admin/doctor.module';
 import { DoctorAppModule } from './modules/doctor/app/doctor.module';
+import { EaterAppModule } from './modules/eater/app/eater.module';
+import { GuestAdminModule } from './modules/guest/admin/guest.module';
+import { GuestModule } from './modules/guest/front/guest.module';
 import { HomeSaleAdminModule } from './modules/homeSale/admin/homeSale.module';
 import { HomeSaleAppModule } from './modules/homeSale/app/homeSale.module';
 import { InfoAdminModule } from './modules/info/admin/info.module';
@@ -42,6 +48,7 @@ import { ProvinceModule } from './modules/province/province.module';
 import { QrAdminModule } from './modules/qr/admin/qr.module';
 import { QrAppModule } from './modules/qr/app/qr.module';
 import { QuestionAdminModule } from './modules/question/admin/question.module';
+import { ReportAdminModule } from './modules/report/admin/report.module';
 import { ReportAppModule } from './modules/report/app/report.module';
 import { ScreenAdminModule } from './modules/screen/admin/screen.module';
 import { ScreenAppModule } from './modules/screen/app/screen.module';
@@ -53,12 +60,6 @@ import { UploadAdminModule } from './modules/upload/admin/upload.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
-import { GuestModule } from './modules/guest/front/guest.module';
-import { GuestAdminModule } from './modules/guest/admin/guest.module';
-import { CheckoutAppModule } from './modules/checkout/app/checkout.module';
-import { ReportAdminModule } from './modules/report/admin/report.module';
-import { EaterAppModule } from './modules/eater/app/eater.module';
-import { ROUTER } from './helpers/const.helper';
 
 @Module({
   imports: [
@@ -66,6 +67,16 @@ import { ROUTER } from './helpers/const.helper';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`, // phân biệt local hay production
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>(('REDIS_PORT')),
+        },
+      }),
+      inject: [ConfigService],
     }),
     ThrottlerModule.forRoot([
       {

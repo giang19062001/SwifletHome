@@ -1,11 +1,13 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import admin from 'firebase-admin';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { NotificationAppService } from 'src/modules/notification/app/notification.service';
-import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NotificationTypeEnum, NotificationMethodEnum, NotificationMessageIdEnum } from 'src/modules/notification/notification.interface';
 import { v4 as uuidv4 } from 'uuid';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { UserNotificationTopicResDto } from "../../modules/notification/notification.response";
@@ -60,6 +62,7 @@ export class FirebaseService implements OnModuleInit {
     private readonly configService: ConfigService,
     private readonly notificationAppService: NotificationAppService,
     private readonly logger: LoggingService,
+    @InjectQueue('notification') private readonly notificationQueue: Queue,
   ) {
     const currentUrl = this.configService.get<string>('CURRENT_URL');
     this.IMAGE = {
@@ -92,7 +95,7 @@ export class FirebaseService implements OnModuleInit {
   async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
     const notificationId = uuidv4();
-    let messageId = 'no_push';
+    let messageId: string = NotificationMessageIdEnum.NO_PUSH;
 
     if (!deviceToken) {
       this.logger.log(logbase, `Bỏ qua gửi thông báo đẩy cho user(${userCode}) vì deviceToken trống, chỉ lưu vào DB`);
@@ -138,7 +141,7 @@ export class FirebaseService implements OnModuleInit {
         } else {
           this.logger.error(logbase, `Gửi thông báo đẩy cho ${deviceToken} thất bại ---> ${JSON.stringify(error)}`);
         }
-        messageId = 'push_failed';
+        messageId = NotificationMessageIdEnum.PUSH_FAILED;
       }
     }
 
@@ -154,17 +157,18 @@ export class FirebaseService implements OnModuleInit {
       userCodesMuticast: [],
       topicCode: null,
       notificationType: notificationType,
+      notificationMethod: NotificationMethodEnum.SINGLE,
     };
     await this.notificationAppService.createNotification(notificationDto);
 
-    return messageId !== 'push_failed' && messageId !== 'no_push' ? 1 : 0;
+    return messageId !== NotificationMessageIdEnum.PUSH_FAILED && messageId !== NotificationMessageIdEnum.NO_PUSH ? 1 : 0;
   }
 
   //  Gửi theo topic
   async sendNotificationToTopic(topic: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/sendNotificationToTopic`;
     const notificationId = uuidv4();
-    let messageId = 'no_push';
+    let messageId: string = NotificationMessageIdEnum.NO_PUSH;
 
     const dataPayload: PushDataPayload = {
       notificationId,
@@ -196,7 +200,7 @@ export class FirebaseService implements OnModuleInit {
       if (error.code === 'messaging/topic-not-found' || error.code === 'messaging/invalid-argument') {
         this.logger.error(logbase, `Topic không tồn tại: [${topic}] thất bại`);
       }
-      messageId = 'push_failed';
+      messageId = NotificationMessageIdEnum.PUSH_FAILED;
     }
 
     // Luôn Lưu vào DB
@@ -211,10 +215,11 @@ export class FirebaseService implements OnModuleInit {
       userCodesMuticast: [],
       topicCode: topic, // lưu lại topic để trace
       notificationType,
+      notificationMethod: NotificationMethodEnum.TOPIC,
     };
     await this.notificationAppService.createNotification(notificationDto);
 
-    return messageId !== 'push_failed' && messageId !== 'no_push' ? 1 : 0;
+    return messageId !== NotificationMessageIdEnum.PUSH_FAILED && messageId !== NotificationMessageIdEnum.NO_PUSH ? 1 : 0;
   }
 
   //  Gửi cho nhiều device tokens (multicast)
@@ -227,10 +232,36 @@ export class FirebaseService implements OnModuleInit {
     intendedUserCodes: string[] = [],
   ): Promise<MulticastResult> {
     const logbase = `${this.SERVICE_NAME}/sendNotificationToMulticast`;
+    
+    // Nếu số lượng userDeviceTokens < 50, dùng hàng đợi để xử lý đơn lẻ cho từng user
+    if (userDeviceTokens.length > 0 && userDeviceTokens.length < 50) {
+      this.logger.log(logbase, `Số lượng userDeviceTokens (${userDeviceTokens.length}) < 50. Sử dụng hàng đợi BullMQ để xử lý gửi lẻ từng user...`);
+      
+      const queuePromises = userDeviceTokens.map((ele) => 
+        this.notificationQueue.add('sendSingleNotification', {
+          userCode: ele.userCode,
+          deviceToken: ele.deviceToken,
+          title,
+          body,
+          data,
+          notificationType,
+        })
+      );
+      await Promise.all(queuePromises);
+
+      return {
+        totalCount: intendedUserCodes.length || userDeviceTokens.length,
+        successCount: userDeviceTokens.length,
+        failureCount: 0,
+        successItems: userDeviceTokens.map((ele) => ele.userCode),
+        failureItems: [],
+      };
+    }
+
     const userCodes = userDeviceTokens.map((ele) => ele.userCode);
     const tokens = [...new Set(userDeviceTokens.map((ele) => ele.deviceToken).filter(token => !!token))]; // BỎ TRÙNG LẶP VÀ TOKEN TRỐNG
     const notificationId = uuidv4();
-    let messageId = 'multicast';
+    let messageId: string = NotificationMessageIdEnum.MULTICAST;
     
     // Tìm các user không có token
     const usersWithTokens = new Set(userDeviceTokens.map(u => u.userCode));
@@ -246,7 +277,7 @@ export class FirebaseService implements OnModuleInit {
 
     if (tokens.length === 0) {
       this.logger.log(logbase, `Không có token hợp lệ để gửi multicast, chỉ lưu thông báo vào DB`);
-      messageId = 'no_push';
+      messageId = NotificationMessageIdEnum.NO_PUSH;
     } else {
       const dataPayload: PushDataPayload = {
         notificationId,
@@ -315,7 +346,7 @@ export class FirebaseService implements OnModuleInit {
       }
 
       this.logger.log(logbase, `Gửi thông báo multicast hoàn tất | Tổng ${tokens.length} | Thành công: ${totalSuccessCount} | Thất bại: ${totalFailureCount}`);
-      if (totalSuccessCount === 0) messageId = 'push_failed';
+      if (totalSuccessCount === 0) messageId = NotificationMessageIdEnum.PUSH_FAILED;
     }
 
     // LUÔN LƯU VÀO DB bất kể có gửi push thành công hay không
@@ -331,6 +362,7 @@ export class FirebaseService implements OnModuleInit {
         userCodesMuticast: [...new Set(userCodes)], // Tránh lưu danh sách user bị trùng lặp
         topicCode: null, // ko gửi bằng topic
         notificationType,
+        notificationMethod: NotificationMethodEnum.MULTICAST,
       };
       await this.notificationAppService.createNotification(notificationDto);
     }

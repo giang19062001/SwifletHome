@@ -29,7 +29,7 @@ export class NotificationAppRepository {
   async getAll(dto: PagingDto, userCode: string): Promise<NotificationResDto[]> {
     let query = `
     SELECT B.seq, B.notificationId, B.messageId, B.title, B.body, B.targetScreen, B.data, 
-    B.notificationType,
+    B.notificationType, B.notificationMethod,
       CASE
         WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN.text}'
         WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.TODO.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.TODO.text}'
@@ -61,7 +61,7 @@ export class NotificationAppRepository {
   async getDetail(notificationId: string, userCode: string): Promise<NotificationResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `   SELECT B.seq, B.notificationId, B.messageId, B.title, B.body, B.targetScreen, B.data, 
-           B.notificationType,
+           B.notificationType, B.notificationMethod,
       CASE
         WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.ADMIN.text}'
         WHEN B.notificationType = '${NOTIFICATION_CONST.NOTIFICATION_TYPE.TODO.value}' THEN '${NOTIFICATION_CONST.NOTIFICATION_TYPE.TODO.text}'
@@ -139,8 +139,8 @@ export class NotificationAppRepository {
   async insertNotification(dto: CreateNotificationDto): Promise<number> {
     const sql = `
         INSERT INTO ${this.table}  (notificationId, messageId, title, body, targetScreen, data, userCode, userCodesMuticast, topicCode,
-        notificationType, createdId) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        notificationType, notificationMethod, createdId) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       dto.notificationId,
@@ -153,6 +153,7 @@ export class NotificationAppRepository {
       dto.userCodesMuticast,
       dto.topicCode,
       dto.notificationType,
+      dto.notificationMethod,
       UPDATOR,
     ]);
 
