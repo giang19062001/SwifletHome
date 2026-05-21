@@ -109,6 +109,7 @@ export class FirebaseService implements OnModuleInit {
         image_detail: this.IMAGE.DETAIL,
         data: JSON.stringify(data) ?? "",
         count: String(count),
+        notificationMethod: 'SINGLE',
       };
 
       // gửi bằng token
@@ -174,6 +175,7 @@ export class FirebaseService implements OnModuleInit {
       image_detail: this.IMAGE.DETAIL,
       data: JSON.stringify(data) ?? "",
       count: '0',
+      notificationMethod: 'TOPIC',
     };
 
     const message: admin.messaging.Message = {
@@ -255,6 +257,7 @@ export class FirebaseService implements OnModuleInit {
         image_detail: this.IMAGE.DETAIL,
         data: JSON.stringify(data) ?? "",
         count: '0',
+        notificationMethod: 'MULTICAST',
       };
 
       const BATCH_SIZE = 500; // FCM giới hạn gửi tối đa 500 token mỗi lần

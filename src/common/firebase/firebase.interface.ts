@@ -8,5 +8,6 @@ export interface PushDataPayload {
   targetScreen: string; // custom
   notificationId: string; // custom
   data: string; // custom (stringfy)
+  notificationMethod: 'SINGLE' | 'MULTICAST' | 'TOPIC';
   [key: string]: string; 
 }
