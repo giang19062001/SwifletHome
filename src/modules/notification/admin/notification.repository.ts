@@ -5,7 +5,7 @@ import { NotificationTopicResDto } from "../notification.response";
 @Injectable()
 export class NotificationAdminRepository {
   private readonly tableTopic = 'tbl_notification_topics';
-  private readonly tableUserTopic = 'tbl_user_notification_topics';
+  private readonly tableUserTopic = 'tbl_notification_user_topics';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 

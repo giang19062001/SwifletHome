@@ -12,14 +12,27 @@ export class LoggingService implements LoggerService {
   }
 
 
-  private getLogMetadata(context?: any) {
+  private getLogMetadata(context?: any, caller?: string) {
     const requestContext = requestContextStorage.getStore();
     const redactedContext = this.redact(context);
 
     // Tự động stringify TOÀN BỘ context nếu nó là object để Loki dễ bắt
-    const logContext = (redactedContext && typeof redactedContext === 'object')
+    let logContext = (redactedContext && typeof redactedContext === 'object')
       ? JSON.stringify(redactedContext)
       : redactedContext;
+
+    if (caller && logContext !== undefined && logContext !== null) {
+      const contextStr = String(logContext);
+      if (!contextStr.includes('url') && !contextStr.includes('[CALLER]')) {
+        let callerName = caller;
+        if (callerName.includes('/')) {
+          const parts = callerName.split('/');
+          callerName = parts[parts.length - 1];
+        }
+        callerName = callerName.replace(/:$/, '').trim();
+        logContext = `[CALLER] ${callerName} :===: ${contextStr}`;
+      }
+    }
 
     return {
       context: logContext,
@@ -71,28 +84,28 @@ export class LoggingService implements LoggerService {
 
 
   log(message: string, context?: any) {
-    this.logger.info(message, this.getLogMetadata(context));
+    this.logger.info(message, this.getLogMetadata(context, message));
   }
 
   error(message: string, context?: any) {
-    this.logger.error(message, this.getLogMetadata(context));
+    this.logger.error(message, this.getLogMetadata(context, message));
   }
 
   warn(message: string, context?: any) {
-    this.logger.warn(message, this.getLogMetadata(context));
+    this.logger.warn(message, this.getLogMetadata(context, message));
   }
 
   debug(message: string, context?: any) {
-    this.logger.debug(message, this.getLogMetadata(context));
+    this.logger.debug(message, this.getLogMetadata(context, message));
   }
 
   verbose(message: string, context?: any) {
-    this.logger.verbose(message, this.getLogMetadata(context));
+    this.logger.verbose(message, this.getLogMetadata(context, message));
   }
 
   fatal(message: string, context?: any) {
     this.logger.error(`[FATAL] ${message}`, {
-      ...this.getLogMetadata(context),
+      ...this.getLogMetadata(context, message),
       severity: 'fatal',
     });
   }

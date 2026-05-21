@@ -12,7 +12,7 @@ export class NotificationAppRepository {
   private readonly table = 'tbl_notifications';
   private readonly tableUser = 'tbl_notifications_user';
   private readonly tableTopic = 'tbl_notification_topics';
-  private readonly tableUserTopic = 'tbl_user_notification_topics';
+  private readonly tableUserTopic = 'tbl_notification_user_topics';
   // private readonly theQueryCountCommon = `(A.userCode = ? OR JSON_CONTAINS(A.userCodesMuticast, JSON_QUOTE(?)) OR A.topicCode = ?)  AND A.isActive = 'Y'`;
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
