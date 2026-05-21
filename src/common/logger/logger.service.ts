@@ -30,7 +30,7 @@ export class LoggingService implements LoggerService {
           callerName = parts[parts.length - 1];
         }
         callerName = callerName.replace(/:$/, '').trim();
-        logContext = `[CALLER] ${callerName} :===: ${contextStr}`;
+        logContext = `[CALLER] ${callerName} /=/=> ${contextStr}`;
       }
     }
 

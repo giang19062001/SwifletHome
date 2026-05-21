@@ -100,8 +100,9 @@ export class FirebaseService implements OnModuleInit {
     if (!deviceToken) {
       this.logger.log(logbase, `Bỏ qua gửi thông báo đẩy cho user(${userCode}) vì deviceToken trống, chỉ lưu vào DB`);
     } else {
-      // lấy số lượng các notify chưa được đọc của user hiện tại
-      const count = await this.notificationAppService.getCntNotifyNotReadByUser(userCode);
+      // lấy số lượng các notify chưa được đọc của user hiện tại (sau đó +1 vì chúng ta đang chuẩn bị gửi thêm thông báo này)
+      const dbCount = await this.notificationAppService.getCntNotifyNotReadByUser(userCode);
+      const count = dbCount + 1;
 
       const dataPayload: PushDataPayload = {
         notificationId: notificationId,
