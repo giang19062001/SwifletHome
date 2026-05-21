@@ -1,13 +1,13 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import admin from 'firebase-admin';
-import { APP_SCREENS } from 'src/helpers/const.helper';
+import { GetAppScreen } from 'src/helpers/const.helper';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { NotificationAppService } from 'src/modules/notification/app/notification.service';
-import { NotificationTypeEnum, NotificationMethodEnum, NotificationMessageIdEnum } from 'src/modules/notification/notification.interface';
+import { NotificationMessageIdEnum, NotificationMethodEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { v4 as uuidv4 } from 'uuid';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { UserNotificationTopicResDto } from "../../modules/notification/notification.response";
@@ -70,7 +70,7 @@ export class FirebaseService implements OnModuleInit {
       DETAIL: `${currentUrl}/images/favicon.ico`, // ảnh nội dung mở rộng
     };
   }
-  onModuleInit() {
+  async onModuleInit() {
     if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
@@ -79,18 +79,6 @@ export class FirebaseService implements OnModuleInit {
     this.messaging = admin.messaging();
   }
 
-  getAppScreen(notificationType: NotificationTypeEnum): string {
-    if (notificationType === 'TODO') {
-      return APP_SCREENS.REMINDER_SCREEN;
-    } else if (notificationType === 'ADMIN') {
-      return APP_SCREENS.NOTIFICATION_SCREEN;
-    } else if (notificationType === 'ADMIN_QR') {
-      return APP_SCREENS.QR_SCREEN;
-    } else if (notificationType === 'ADMIN_CONSIGNMENT') {
-      return APP_SCREENS.CONSIGNMENT_SCREEN;
-    }
-    return APP_SCREENS.NOTIFICATION_SCREEN;
-  }
   // Single device token (của bạn)
   async sendNotification(userCode: string, deviceToken: string, title: string, body: string, data?: any, notificationType: NotificationTypeEnum = NotificationTypeEnum.ADMIN): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/sendNotification`;
@@ -108,7 +96,7 @@ export class FirebaseService implements OnModuleInit {
         notificationId: notificationId,
         title,
         body,
-        targetScreen: this.getAppScreen(notificationType),
+        targetScreen: GetAppScreen(notificationType),
         image_logo: this.IMAGE.LOGO,
         image_detail: this.IMAGE.DETAIL,
         data: JSON.stringify(data) ?? "",
@@ -152,7 +140,7 @@ export class FirebaseService implements OnModuleInit {
       messageId: messageId,
       title: title,
       body: body,
-      targetScreen: this.getAppScreen(notificationType),
+      targetScreen: GetAppScreen(notificationType),
       data: data ?? null,
       userCode: userCode,
       userCodesMuticast: [],
@@ -175,7 +163,7 @@ export class FirebaseService implements OnModuleInit {
       notificationId,
       title,
       body,
-      targetScreen: this.getAppScreen(notificationType),
+      targetScreen: GetAppScreen(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
       data: JSON.stringify(data) ?? "",
@@ -210,7 +198,7 @@ export class FirebaseService implements OnModuleInit {
       messageId,
       title,
       body,
-      targetScreen: this.getAppScreen(notificationType),
+      targetScreen: GetAppScreen(notificationType),
       data: data ?? null,
       userCode: null, // null vì gửi theo topic
       userCodesMuticast: [],
@@ -246,6 +234,9 @@ export class FirebaseService implements OnModuleInit {
           body,
           data,
           notificationType,
+        }, {
+          removeOnComplete: true, // xóa job sau khi hoàn thành khỏi redis
+          removeOnFail: true, // xóa job kể cả khi thất bại khỏi redis
         })
       );
       await Promise.all(queuePromises);
@@ -284,7 +275,7 @@ export class FirebaseService implements OnModuleInit {
         notificationId,
         title,
         body,
-        targetScreen: this.getAppScreen(notificationType),
+        targetScreen: GetAppScreen(notificationType),
         image_logo: this.IMAGE.LOGO,
         image_detail: this.IMAGE.DETAIL,
         data: JSON.stringify(data) ?? "",
@@ -357,7 +348,7 @@ export class FirebaseService implements OnModuleInit {
         messageId,
         title,
         body,
-        targetScreen: this.getAppScreen(notificationType),
+        targetScreen: GetAppScreen(notificationType),
         data: data ?? null,
         userCode: null, // null vì gửi theo multicast
         userCodesMuticast: [...new Set(userCodes)], // Tránh lưu danh sách user bị trùng lặp

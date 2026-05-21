@@ -10,6 +10,7 @@ import { BlacklistGuard } from './common/blacklist/blacklist.guard';
 import { BlacklistModule } from './common/blacklist/blacklist.module';
 import { CornModule } from './common/corn/corn.module';
 import { FirebaseModule } from './common/firebase/firebase.module';
+import { RedisModule } from './common/redis/redis.module';
 import { CustomThrottlerGuard } from './common/guards/throttler.guard';
 import { LoggerModule } from './common/logger/logger.module';
 import { MailModule } from './common/mail/mail.module';
@@ -100,6 +101,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     LoggerModule,
     SocketModule,
     FirebaseModule,
+    RedisModule,
     MailModule,
     MqttModule,
     BlacklistModule,

@@ -45,6 +45,7 @@ export function formatDecimal(val: any): number {
 
   return Number(num.toFixed(3)); // decimal(10,3)
 }
+
 export function replaceNbspToSpace(str: string) {
   if (typeof str !== 'string') return str;
   return str.replace(/&nbsp;/g, ' ');

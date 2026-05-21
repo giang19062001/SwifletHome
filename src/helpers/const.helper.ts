@@ -1,9 +1,11 @@
+import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+
 export const ROUTER = {
-   APP: '/api/app',
-   ADMIN: '/api/admin',
-   FRONT: '/api/front',
-   EATER_APP: '/api/eater-app',
-}
+  APP: '/api/app',
+  ADMIN: '/api/admin',
+  FRONT: '/api/front',
+  EATER_APP: '/api/eater-app',
+};
 
 export const IMG_TYPES = ['.png', '.jpg', '.jpeg'];
 export const AUDIO_TYPES = ['.mp3'];
@@ -22,6 +24,19 @@ export const APP_SCREENS = {
   USER_TYPE_NOT_REGISTER: 'USER_TYPE_NOT_REGISTER',
 };
 
+export const GetAppScreen = (notificationType: NotificationTypeEnum): string => {
+  if (notificationType === 'TODO') {
+    return APP_SCREENS.REMINDER_SCREEN;
+  } else if (notificationType === 'ADMIN') {
+    return APP_SCREENS.NOTIFICATION_SCREEN;
+  } else if (notificationType === 'ADMIN_QR') {
+    return APP_SCREENS.QR_SCREEN;
+  } else if (notificationType === 'ADMIN_CONSIGNMENT') {
+    return APP_SCREENS.CONSIGNMENT_SCREEN;
+  }
+  return APP_SCREENS.NOTIFICATION_SCREEN;
+};
+
 export const QUERY_HELPER = {
   // MAX_DAY_GET_LIST_ALARM: 5,
   MAX_DAY_GET_LIST_ALARM: 90,
@@ -34,7 +49,7 @@ export const QUERY_HELPER = {
 export const UPDATOR = 'SYSTEM';
 
 export const CODES = {
-  eaterCode:{
+  eaterCode: {
     PRE: 'EAT',
     LEN: 6,
     FRIST_CODE: 'EAT000001',
@@ -84,8 +99,8 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'TEM000001',
   },
-  consignmentCode:{
-     PRE: 'CSM',
+  consignmentCode: {
+    PRE: 'CSM',
     LEN: 6,
     FRIST_CODE: 'CSM000001',
   },
@@ -93,5 +108,5 @@ export const CODES = {
     PRE: 'MED',
     LEN: 6,
     FRIST_CODE: 'MED000001',
-  }
+  },
 };
