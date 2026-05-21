@@ -30,7 +30,7 @@ export class FirebaseService implements OnModuleInit {
     DETAIL: string;
   };
 
-  private fcmConfig(title: string, body: string) {
+  private fcmConfig(title: string, body: string, badgeCount = 0) {
     return {
       android: {
         priority: 'high' as const,
@@ -43,11 +43,17 @@ export class FirebaseService implements OnModuleInit {
               body,
             },
             sound: 'default' as const,
+            badge: badgeCount,
           },
         },
       },
     } as const;
   }
+
+  private logMessagePayload(logbase: string, payload: any) {
+    this.logger.log(logbase, `Payload gửi xuống app: ${JSON.stringify(payload)}`);
+  }
+
   private messaging: admin.messaging.Messaging;
 
   constructor(
@@ -110,9 +116,10 @@ export class FirebaseService implements OnModuleInit {
         token: deviceToken,
         notification: { title, body },
         data: dataPayload,
-        ...this.fcmConfig(title, body),
+        ...this.fcmConfig(title, body, Number(count) || 0),
       };
 
+      this.logMessagePayload(logbase, message);
       try {
         const response = await this.messaging.send(message);
         if (response) {
@@ -173,9 +180,10 @@ export class FirebaseService implements OnModuleInit {
       topic,
       notification: { title, body },
       data: dataPayload,
-      ...this.fcmConfig(title, body),
+      ...this.fcmConfig(title, body, Number(dataPayload.count) || 0),
     };
 
+    this.logMessagePayload(logbase, message);
     try {
       const response = await this.messaging.send(message);
       messageId = response.includes('/messages/') ? response.split('/messages/')[1] : response;
@@ -258,9 +266,10 @@ export class FirebaseService implements OnModuleInit {
           tokens: tokenBatch,
           notification: { title, body },
           data: dataPayload,
-          ...this.fcmConfig(title, body),
+          ...this.fcmConfig(title, body, Number(dataPayload.count) || 0),
         };
 
+        this.logMessagePayload(logbase, message);
         try {
           const batchResponse = await this.messaging.sendEachForMulticast(message);
           totalSuccessCount += batchResponse.successCount;
