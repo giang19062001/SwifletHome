@@ -3,7 +3,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bullmq';
 import admin from 'firebase-admin';
-import { GetAppScreen } from 'src/helpers/const.helper';
+import { GetAppScreen, QUERY_HELPER } from 'src/helpers/const.helper';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { NotificationAppService } from 'src/modules/notification/app/notification.service';
@@ -223,8 +223,8 @@ export class FirebaseService implements OnModuleInit {
     const logbase = `${this.SERVICE_NAME}/sendNotificationToMulticast`;
     
     // Nếu số lượng userDeviceTokens < 50, dùng hàng đợi để xử lý đơn lẻ cho từng user
-    if (userDeviceTokens.length > 0 && userDeviceTokens.length < 50) {
-      this.logger.log(logbase, `Số lượng userDeviceTokens (${userDeviceTokens.length}) < 50. Sử dụng hàng đợi BullMQ để xử lý gửi lẻ từng user...`);
+    if (userDeviceTokens.length > 0 && userDeviceTokens.length < QUERY_HELPER.MAXIMUM_TO_SEND_SINGLE_NOTIFICATION) {
+      this.logger.log(logbase, `Số lượng userDeviceTokens (${userDeviceTokens.length}) < ${QUERY_HELPER.MAXIMUM_TO_SEND_SINGLE_NOTIFICATION}. Sử dụng hàng đợi BullMQ để xử lý gửi lẻ từng user...`);
       
       const queuePromises = userDeviceTokens.map((ele) => 
         this.notificationQueue.add('sendSingleNotification', {
@@ -283,7 +283,8 @@ export class FirebaseService implements OnModuleInit {
         notificationMethod: 'MULTICAST',
       };
 
-      const BATCH_SIZE = 500; // FCM giới hạn gửi tối đa 500 token mỗi lần
+      // FCM giới hạn gửi tối đa 500 token mỗi lần
+      const BATCH_SIZE = QUERY_HELPER.BATCH_SIZE_FIREBASE_MULTICAST; 
 
       // Chia mảng token lớn thành từng khối (chunk) nhỏ
       for (let i = 0; i < tokens.length; i += BATCH_SIZE) {

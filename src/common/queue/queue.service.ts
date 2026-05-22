@@ -1,9 +1,12 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
+import { QUERY_HELPER } from 'src/helpers/const.helper';
 import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
 
-@Processor('notification')
+@Processor('notification', {
+  concurrency: QUERY_HELPER.JOB_CONCURRENCY, // chạy 5 job cùng lúc
+})
 export class QueueService extends WorkerHost {
   private readonly loggerName = 'QueueService';
 
