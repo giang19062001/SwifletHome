@@ -186,7 +186,56 @@ export class GetApprovedRequestQrCodeResDto extends OmitType(RequestQrCodeResDto
   isSold: YnEnum;
 }
 
-export class GetRequestQrCodeDetailResDto extends GetApprovedRequestQrCodeResDto {}
+export class GetRequestQrCodeDetailResDto extends GetApprovedRequestQrCodeResDto {
+  @ApiProperty({ example: '', required: false, nullable: true })
+  @IsString()
+  @IsOptional()
+  priceOptionCode?: string | null;
+
+  @ApiProperty({ example: '', required: false, nullable: true })
+  @IsString()
+  @IsOptional()
+  priceOptionLabel?: string | null;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  pricePerKg?: number | null;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  priceForPurchaser?: number | null;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  priceForEater?: number | null;
+
+  @ApiProperty({ type: () => PriceVatHistoryDto, required: false, nullable: true })
+  @IsOptional()
+  priceVatHistory?: PriceVatHistoryDto | null;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  volumeForSell?: number | null;
+
+  @ApiProperty({ example: 0, required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  nestQuantity?: number | null;
+
+  @ApiProperty({ example: '', required: false, nullable: true })
+  @IsString()
+  @IsOptional()
+  ingredientNestOptionCode?: string | null;
+
+  @ApiProperty({ example: '', required: false, nullable: true })
+  @IsString()
+  @IsOptional()
+  ingredientNestOptionLabel?: string | null;
+}
 
 export class GetSellingDetailResDto extends GetApprovedRequestQrCodeResDto {
   @ApiProperty({ example: '' })

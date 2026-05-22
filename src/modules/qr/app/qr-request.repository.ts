@@ -12,6 +12,7 @@ export class QrRequestAppRepository {
   private readonly tableFile = 'tbl_qr_request_file';
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
   private readonly tableSell = 'tbl_qr_request_selling';
+  private readonly tableOption = 'tbl_option_common';
   private readonly tableHome = 'tbl_user_home';
   private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -163,7 +164,7 @@ export class QrRequestAppRepository {
   }
   async getRequestQrCodeDetail(requestCode: string, userCode: string): Promise<GetRequestQrCodeDetailResDto | null> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-      A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+      A.userHomeAddress, A.temperature, COALESCE(D.humidity, A.humidity) AS humidity, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
          CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
@@ -193,7 +194,17 @@ export class QrRequestAppRepository {
        CASE
           WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
           ELSE 'N'
-      END AS isSold
+      END AS isSold,
+      D.priceOptionCode,
+      OP1.valueOption AS priceOptionLabel,
+      D.pricePerKg,
+      D.priceForPurchaser,
+      D.priceForEater,
+      D.priceVatHistory,
+      D.volumeForSell,
+      D.nestQuantity,
+      D.ingredientNestOptionCode,
+      OP2.valueOption AS ingredientNestOptionLabel
       FROM ${this.table}  A 
       LEFT JOIN ${this.tableBlockChain} C
       ON A.requestCode = C.requestCode  
@@ -203,11 +214,20 @@ export class QrRequestAppRepository {
       ON A.userHomeCode = E.userHomeCode 
       LEFT JOIN ${this.tableHarvestPhase} F
       ON A.seqHarvestPhase = F.seq
+      LEFT JOIN ${this.tableOption} OP1
+      ON D.priceOptionCode = OP1.code
+      LEFT JOIN ${this.tableOption} OP2
+      ON D.ingredientNestOptionCode = OP2.code
       WHERE A.requestCode  = ? AND A.isActive = 'Y'
       LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
-    return rows.length ? (rows[0] as GetRequestQrCodeDetailResDto) : null;
+    if (!rows.length) return null;
+    const row = rows[0];
+    row.priceForPurchaser = !row.priceForPurchaser ? Number(row.priceForPurchaser) : null;
+    row.priceForEater = !row.priceForEater ? Number(row.priceForEater) : null;
+    row.priceVatHistory = row.priceVatHistory ? (typeof row.priceVatHistory === 'string' ? JSON.parse(row.priceVatHistory) : row.priceVatHistory) : null;
+    return row as GetRequestQrCodeDetailResDto;
   }
   async checkUsedThisHarvest(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     const currentYear = new Date().getFullYear(); // năm nay

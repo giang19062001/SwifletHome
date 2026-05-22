@@ -76,9 +76,9 @@ export default class QrAppController {
     return result;
   }
 
-  // Lấy toàn bộ thông tin Qrcode
+  // Lấy toàn bộ thông tin Qrcode + thông tin đăng bán sản lượng yến liên kết với mã Qrcode - dành cho chủ nhà yến
   @ApiOperation({
-    summary: 'Lấy toàn bộ thông tin chi tiết Qrcode',
+    summary: 'Lấy toàn bộ thông tin Qrcode + thông tin đăng bán sản lượng yến liên kết với mã Qrcode - dành cho chủ nhà yến',
     description: ``,
   })
   @Get('getRequestQrCodeDetail/:requestCode')
