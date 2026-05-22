@@ -224,8 +224,8 @@ export class QrRequestAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [requestCode]);
     if (!rows.length) return null;
     const row = rows[0];
-    row.priceForPurchaser = !row.priceForPurchaser ? Number(row.priceForPurchaser) : null;
-    row.priceForEater = !row.priceForEater ? Number(row.priceForEater) : null;
+    row.priceForPurchaser = row.priceForPurchaser !== null && row.priceForPurchaser !== undefined ? Number(row.priceForPurchaser) : null;
+    row.priceForEater = row.priceForEater !== null && row.priceForEater !== undefined ? Number(row.priceForEater) : null;
     row.priceVatHistory = row.priceVatHistory ? (typeof row.priceVatHistory === 'string' ? JSON.parse(row.priceVatHistory) : row.priceVatHistory) : null;
     return row as GetRequestQrCodeDetailResDto;
   }
