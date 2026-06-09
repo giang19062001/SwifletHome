@@ -66,6 +66,9 @@ export class GetTaskAlarmResDto {
   @ApiProperty({ example: '' })
   userHomeCode: string;
 
+  @ApiProperty({ example: '' })
+  userHomeName: string;
+
   @ApiProperty({ example: '2026-01-01', type: String, format: 'date' })
   taskDate: Date;
 

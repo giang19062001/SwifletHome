@@ -169,7 +169,11 @@ export class TodoAlarmAppService {
     return 0;
   }
 
+  // TODO: CORN
   async getListTaskAlarmsToday(todayStr: string) {
     return await this.todoAlarmAppRepository.getListTaskAlarmsToday(todayStr);
+  }
+   async getListTaskMedicinesToday(todayStr: string) {
+    return await this.todoMedicineAppRepository.getListTaskMedicinesToday(todayStr);
   }
 }

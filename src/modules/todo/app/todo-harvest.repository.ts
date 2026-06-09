@@ -5,13 +5,13 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
 import { TaskStatusEnum } from '../todo.interface';
 import { GetListTaskHarvestForAdjustDto, HarvestDataRowInputDto } from './todo.dto';
-import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto, GetTaskAlarmResDto } from './todo.response';
+import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto } from './todo.response';
 
 @Injectable()
 export class TodoHarvestAppRepository {
   private readonly tableTaskHarvest = 'tbl_todo_task_harvest';
   private readonly tableTaskHarvestPhase = 'tbl_todo_task_harvest_phase';
-  private readonly tableQr = 'tbl_qr_request';
+  private readonly tableUserApp = 'tbl_user_app';
   private readonly tableUserHome = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}

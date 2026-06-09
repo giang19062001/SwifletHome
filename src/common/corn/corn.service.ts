@@ -84,24 +84,25 @@ export class CornService implements OnModuleInit {
     this.logger.log(logbase, `Chuẩn bị tìm các lịch nhắc hôm nay để gửi thông báo...`);
 
     const taskAlarmList = await this.todoAlarmAppService.getListTaskAlarmsToday(todayStr);
-    this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskAlarmList.length}`);
-    
-    if (taskAlarmList.length) {
+    const taskMedicinesList = await this.todoAlarmAppService.getListTaskMedicinesToday(todayStr);
+
+    const taskList = [...taskAlarmList, ...taskMedicinesList];
+
+    this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskList.length}`);
+
+    if (taskList.length) {
       const CHUNK_SIZE = 50; // Xử lý mỗi 50 task một lúc để tránh thắt cổ chai
-      
-      for (let i = 0; i < taskAlarmList.length; i += CHUNK_SIZE) {
-        const chunk = taskAlarmList.slice(i, i + CHUNK_SIZE);
-        
+
+      for (let i = 0; i < taskList.length; i += CHUNK_SIZE) {
+        const chunk = taskList.slice(i, i + CHUNK_SIZE);
+
         const promises = chunk.map(async (task) => {
           // insert thông và đẩy thông báo
           const taskDay = moment(task.taskDate, 'YYYY-MM-DD');
           const daysLeft = taskDay.diff(todayStr, 'days');
+          const notify = NOTIFICATIONS.TODO_TASK_DAILY(task.userHomeName ?? '', task.taskName, daysLeft);
 
-          // lấy thông tin nhà
-          const home = await this.userHomeAppService.getDetail(task.userHomeCode);
-          const notify = NOTIFICATIONS.TODO_TASK_DAILY(home?.userHomeName ?? '', task.taskName, daysLeft);
-          
-          this.logger.log(logbase, `sẽ gửi thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.taskAlarmCode}) cho user(${task.userCode})`);
+          this.logger.log(logbase, `sẽ gửi thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.seq}) cho user(${task.userCode})`);
 
           return this.firebaseService.sendNotification(task.userCode!!, task.deviceToken, notify.TITLE, notify.BODY, null, NotificationTypeEnum.TODO);
         });

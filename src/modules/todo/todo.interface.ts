@@ -31,7 +31,7 @@ export const TODO_CONST = {
     },
     MEDICINE: {
       value: 'MEDICINE',
-      text: 'Ghi chú',
+      text: 'Lăn thuốc',
     },
     LURING: {
       value: 'LURING',
@@ -53,7 +53,7 @@ export const TODO_CONST = {
     },
     MEDICINE: {
       value: 'MEDICINE',
-      text: 'Ghi chú',
+      text: 'Lăn thuốc',
     },
   },
 };

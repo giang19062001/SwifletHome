@@ -14,6 +14,7 @@ export class TodoAlarmAppRepository {
   private readonly tableTask = 'tbl_todo_tasks';
   private readonly tableBoxTask = 'tbl_todo_box_tasks';
   private readonly tableTaskAlarm = 'tbl_todo_task_alarm';
+  private readonly tableUserHome = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -157,15 +158,17 @@ export class TodoAlarmAppRepository {
   async getListTaskAlarmsToday(dateStr: string): Promise<(GetTaskAlarmResDto & { deviceToken: string })[]> {
     const query = `
         SELECT 
-              A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode,
+              A.seq, A.userCode, A.userHomeCode, C.userHomeName, A.taskAlarmCode, NULL AS taskCode,
               CASE 
                   WHEN A.taskName = '${TODO_CONST.TASK_BOX.LURING.value}' THEN '${TODO_CONST.TASK_BOX.LURING.text}'
                   ELSE A.taskName 
               END AS taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, 
               A.taskStatus, A.taskNote, A.isActive, B.deviceToken
         FROM ${this.tableTaskAlarm} A
-        INNER JOIN ${this.tableUserApp} B
+        INNER JOIN ${this.tableUserApp} B 
           ON A.userCode = B.userCode
+        INNER JOIN ${this.tableUserHome} C
+          ON A.userHomeCode = C.userHomeCode
         WHERE A.isActive = 'Y'
             AND A.taskDate >= ?
             AND A.taskDate <= DATE_ADD(?, INTERVAL ${QUERY_HELPER.MAX_DAY_SEND_NOTIFY} DAY)

@@ -1,19 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import moment from 'moment';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { CODES } from 'src/helpers/const.helper';
+import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskMedicineQrResDto } from 'src/modules/qr/app/qr.response';
 import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { SetTaskMedicineDto } from './todo.dto';
-import { GetTasksMedicineRowResDto } from './todo.response';
+import { GetTaskAlarmResDto, GetTasksMedicineRowResDto } from './todo.response';
 
 @Injectable()
 export class TodoMedicineAppRepository {
   private readonly tableTaskAlarm = 'tbl_todo_task_alarm';
   private readonly tableTaskMedicine = 'tbl_todo_task_medicine';
   private readonly tableOption = 'tbl_option_common';
+  private readonly tableUserApp = 'tbl_user_app';
+  private readonly tableUserHome = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -141,4 +142,28 @@ export class TodoMedicineAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, currentYear]);
     return rows as TaskMedicineQrResDto[];
   }
+
+  // CORN
+  async getListTaskMedicinesToday(dateStr: string): Promise<(GetTaskAlarmResDto & { deviceToken: string })[]> {
+    const query = `
+        SELECT 
+            A.seq, A.userCode, A.userHomeCode,  C.userHomeName, NULL AS taskAlarmCode, NULL AS taskCode,
+            '${TODO_CONST.TASK_BOX.MEDICINE.text}' AS taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate,  A.taskStatus,  '' AS taskNote, 
+            A.isActive, B.deviceToken
+        FROM ${this.tableTaskMedicine} A
+        INNER JOIN ${this.tableUserApp} B
+          ON A.userCode = B.userCode
+        INNER JOIN ${this.tableUserHome} C
+          ON A.userHomeCode = C.userHomeCode
+        WHERE A.isActive = 'Y'
+            AND A.taskDate >= ?
+            AND A.taskDate <= DATE_ADD(?, INTERVAL ${QUERY_HELPER.MAX_DAY_SEND_NOTIFY} DAY)
+            AND A.taskStatus = '${TaskStatusEnum.WAITING}'
+        ORDER BY A.taskDate DESC
+      `;
+      
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [dateStr, dateStr]);
+    return rows as (GetTaskAlarmResDto & { deviceToken: string })[];
+  }
+
 }
