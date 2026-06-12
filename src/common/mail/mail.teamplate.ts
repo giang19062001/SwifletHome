@@ -23,7 +23,7 @@ export function getDoctorTemplate(data: any) {
         <div style="background: #fff; padding: 15px; margin: 20px 0; border-radius: 4px;">
           <p style="margin: 15px 20px;"><strong>Họ và tên:</strong> ${data.userName}</p>
           <p style="margin: 15px 20px;"><strong>Số điện thoại:</strong> ${data.userPhone}</p>
-          <p style="margin: 15px 20px;"><strong>Mô tả chi tiết:</strong> ${data.note}</p>
+          <p style="margin: 15px 20px;"><strong>Địa chỉ khu vực:</strong> ${data.note}</p>
         </div>
         <p style="text-align: center; margin-top: -20px; margin-bottom: 50px;">
  <a href="tel:${data.userPhone}" style="display: inline-block; width: 280px; box-sizing: border-box; background-color: #1a73e8; color: #ffffff; padding: 12px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">GỌI NHANH CHO KHÁCH HÀNG</a>          </p>
