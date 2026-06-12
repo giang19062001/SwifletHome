@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
-import { Msg } from 'src/helpers/message.helper';
 import { DoctorStatusEnum } from '../doctor.interface';
 import { DoctorFileStrResDto } from "../doctor.response";
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
-import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class DoctorAppService {
@@ -24,17 +23,19 @@ export class DoctorAppService {
     try {
       let result = 1;
       // tìm tất cả file đã upload cùng uniqueId
-      const filesUploaded: { seq: number }[] = await this.doctorAppRepository.findFilesByUniqueId(dto.uniqueId);
+      // const filesUploaded: { seq: number }[] = await this.doctorAppRepository.findFilesByUniqueId(dto.uniqueId);
 
-      if (filesUploaded.length) {
+      // if (filesUploaded.length) {
+       if (true) {
         // mặc định là chờ
-        const seq = await this.doctorAppRepository.create(userCode, dto, DoctorStatusEnum.WAITING);
+        // const seq = await this.doctorAppRepository.create(userCode, dto, DoctorStatusEnum.WAITING);
+        await this.doctorAppRepository.create(userCode, dto, DoctorStatusEnum.WAITING);
         // cập nhập doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created bằng 1 query duy nhất
-        await this.doctorAppRepository.updateSeqFilesByUniqueId(seq, dto.uniqueId, userCode);
+        // await this.doctorAppRepository.updateSeqFilesByUniqueId(seq, dto.uniqueId, userCode);
       } else {
-        // không có file ảnh nào được upload của đơn khám bệnh này -> báo lỗi
-        result = -1;
-        this.logger.error(logbase, `${Msg.UuidNotFound} --> uniqueId: ${dto.uniqueId}`);
+        // // không có file ảnh nào được upload của đơn khám bệnh này -> báo lỗi
+        // result = -1;
+        // this.logger.error(logbase, `${Msg.UuidNotFound} --> uniqueId: ${dto.uniqueId}`);
       }
 
       if (result == 1) {
