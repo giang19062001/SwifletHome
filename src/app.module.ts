@@ -61,6 +61,7 @@ import { UploadAdminModule } from './modules/upload/admin/upload.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
+import { ShareAppModule } from './modules/share/app/share.module';
 
 @Module({
   imports: [
@@ -123,6 +124,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     ConsignmentAppModile,
     ReportAppModule,
     CheckoutAppModule,
+    ShareAppModule,
     // front
     GuestModule,
     // eater - app
