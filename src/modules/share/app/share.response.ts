@@ -7,10 +7,7 @@ export class GetShareLinkResDto {
   link: string;
 }
 
-export class GetShareDataResDto {
-  @ApiProperty({ example: ShareTypeEnum.HARVEST, enum: ShareTypeEnum })
-  shareType: ShareTypeEnum;
-
+class ShareDataHarvestDto {
   @ApiProperty({ example: 0 })
   seq: number;
 
@@ -19,4 +16,12 @@ export class GetShareDataResDto {
 
   @ApiPropertyOptional({ type: () => [HarvestDataInputDto] })
   harvestData?: HarvestDataInputDto[];
+}
+
+export class GetShareDataResDto {
+  @ApiProperty({ example: ShareTypeEnum.HARVEST, enum: ShareTypeEnum })
+  shareType: ShareTypeEnum;
+
+  @ApiPropertyOptional({ type: () => ShareDataHarvestDto })
+  shareData?: ShareDataHarvestDto;
 }

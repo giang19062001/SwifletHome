@@ -59,9 +59,11 @@ export class ShareAppService {
 
         return {
           shareType: shareMaster.shareType,
-          seq: harvestPhaseDetail.seq,
-          userHomeCode: harvestPhaseDetail.userHomeCode,
-          harvestData,
+          shareData: {
+            seq: harvestPhaseDetail.seq,
+            userHomeCode: harvestPhaseDetail.userHomeCode,
+            harvestData,
+          }
         };
       }
       
