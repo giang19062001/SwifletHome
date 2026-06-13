@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { ShareAppRepository } from './share.repository';
 import { GetShareLinkDto } from './share.dto';
 import { ShareTypeEnum } from './share.interface';
+import { GetShareDataResDto } from './share.response';
 import { TodoHarvestAppService } from 'src/modules/todo/app/todo-harvest.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 
@@ -36,7 +37,7 @@ export class ShareAppService {
     return `${host}/sharelink/${token}`;
   }
 
-  async getShareData(token: string): Promise<any> {
+  async getShareData(token: string): Promise<GetShareDataResDto> {
     const shareMaster = await this.shareRepository.getShareByToken(token);
     if (!shareMaster) {
       throw new BadRequestException({ message: 'Token không hợp lệ hoặc đã hết hạn', data: null });
@@ -57,6 +58,7 @@ export class ShareAppService {
         const harvestData = await this.todoHarvestAppService.arrangeHarvestRows(harvestPhaseDetail.seq, homeInfo.userHomeFloor);
 
         return {
+          shareType: shareMaster.shareType,
           seq: harvestPhaseDetail.seq,
           userHomeCode: harvestPhaseDetail.userHomeCode,
           harvestData,

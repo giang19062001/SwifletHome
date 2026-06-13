@@ -4,9 +4,8 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ShareAppService } from './share.service';
 import { GetShareLinkDto } from './share.dto';
-import { GetShareLinkResDto } from './share.response';
+import { GetShareLinkResDto, GetShareDataResDto } from './share.response';
 import { NullResponseDto } from 'src/dto/common.dto';
-import { GetInfoTaskHarvestForAdjustResDto } from 'src/modules/todo/app/todo.response';
 
 @ApiTags('app/share')
 @Controller('/api/app/share')
@@ -29,11 +28,13 @@ export default class ShareAppController {
 
   @ApiOperation({
     summary: 'Lấy dữ liệu chia sẻ qua token',
-    description: ``,
+    description: `
+    **shareType**: enum(HARVEST) hãy dựa vào trường này để quyết định màn hình hiển thị
+      `,
   })
   @Get('getData/:token')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(GetInfoTaskHarvestForAdjustResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetShareDataResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async getShareData(@Param('token') token: string) {
     const result = await this.shareService.getShareData(token);
