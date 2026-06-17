@@ -23,4 +23,34 @@ export const OPTION_CONST = {
       subOption: 'NEST_TYPE',
     },
   },
+  SALE_HOME: {
+    HOST_ROLE: {
+      mainOption: 'SALE_HOME',
+      subOption: 'HOST_ROLE',
+    },
+    HOME_MODEL: {
+      mainOption: 'SALE_HOME',
+      subOption: 'HOME_MODEL',
+    },
+    TOPICS_SHARE: {
+      mainOption: 'SALE_HOME',
+      subOption: 'TOPICS_SHARE',
+    },
+    SIGHTSEEING_AREAS: {
+      mainOption: 'SALE_HOME',
+      subOption: 'SIGHTSEEING_AREAS',
+    },
+    INCLUDED_SERVICES: {
+      mainOption: 'SALE_HOME',
+      subOption: 'INCLUDED_SERVICES',
+    },
+    AVAILABLE_DAYS: {
+      mainOption: 'SALE_HOME',
+      subOption: 'AVAILABLE_DAYS',
+    },
+    COMMITMENTS: {
+      mainOption: 'SALE_HOME',
+      subOption: 'COMMITMENTS',
+    },
+  },
 };

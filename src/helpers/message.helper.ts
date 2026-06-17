@@ -60,6 +60,7 @@ export const Msg = {
   UserNotFound: notFound('Người dùng'),
   HomeNotFound: notFound('Thông tin nhà yến'),
   HomeIsMainCannotDelete: cannotDo('nhà yến đang được chọn là chính'),
+  HomeAlreadyRegistered: 'Dữ liệu này đã được tạo trước đó',
 
   // Hỗ trợ
   CannotReply:
@@ -185,6 +186,7 @@ export const MsgDto = {
   IsRequired: (filedName: string) => `${convertFiledName(filedName)} là bắt buộc`,
   MustBeDate: (filedName: string) => `${convertFiledName(filedName)} phải là định dạng ngày hợp lệ`,
   MustBeTodayOrLater: (filedName: string) => `${convertFiledName(filedName)} phải từ ngày hiện tại trở đi`,
+  InvalidTimeframesFormat: 'Khung thời gian phải ở định dạng HH:mm - HH:mm, HH:mm - HH:mm',
 };
 
 // ─── MsgAdmin ─────────────────────────────────────────────────────────────────

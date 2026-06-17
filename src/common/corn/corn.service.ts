@@ -10,6 +10,7 @@ import { TeamReviewAppService } from 'src/modules/team/app/team-review.service';
 import { TeamUserAppService } from 'src/modules/team/app/team-user.service';
 import { TodoAlarmAppService } from 'src/modules/todo/app/todo-alarm.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
+import { SaleHomeAppService } from 'src/modules/saleHome/app/saleHome.service';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
@@ -23,6 +24,7 @@ export class CornService implements OnModuleInit {
     private readonly teamUserAppService: TeamUserAppService,
     private readonly teamReviewAppService: TeamReviewAppService,
     private readonly userHomeAppService: UserHomeAppService,
+    private readonly saleHomeAppService: SaleHomeAppService,
     private readonly todoAlarmAppService: TodoAlarmAppService,
     private readonly qrRequestAppService: QrRequestAppService,
     private readonly fileLocalService: FileLocalService,
@@ -39,6 +41,7 @@ export class CornService implements OnModuleInit {
       await this.deleteQrRequestFilesNotUse();
       await this.deleteReviewFilesNotUse();
       await this.deleteTeamFilesNotUse();
+      await this.deleteSaleHomeFilesNotUse();
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();
@@ -73,6 +76,7 @@ export class CornService implements OnModuleInit {
     // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
     // await this.deleteReviewFilesNotUse();
     // await this.deleteTeamFilesNotUse();
+    // this.deleteSaleHomeFilesNotUse();
   }
 
   async pushNotificationsByTaskAlarms() {
@@ -169,6 +173,26 @@ export class CornService implements OnModuleInit {
       this.logger.error(logbase, `Có lỗi khi xóa các file  ảnh nhà yến của khách hàng không dùng theo lịch trình: ${JSON.stringify(error)}`);
     }
   }
+
+  async deleteSaleHomeFilesNotUse() {
+    const logbase = `${this.SERVICE_NAME}/deleteSaleHomeFilesNotUse`;
+    this.logger.log(logbase, `Chuẩn bị xóa các file nhà yến sale không dùng theo lịch trình....`);
+    try {
+      const filesNotUse = await this.saleHomeAppService.getFilesNotUse();
+      if (filesNotUse.length) {
+        for (const file of filesNotUse) {
+          await this.saleHomeAppService.deleteFileCron(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file nhà yến sale không dùng đã được xóa theo lịch trình thành công`);
+      } else {
+        this.logger.log(logbase, `Không có file nhà yến sale nào cần được xóa`);
+      }
+    } catch (error) {
+      this.logger.error(logbase, `Có lỗi khi xóa các file nhà yến sale không dùng theo lịch trình: ${JSON.stringify(error)}`);
+    }
+  }
+
   async deleteQrRequestFilesNotUse() {
     const logbase = `${this.SERVICE_NAME}/deleteQrRequestFilesNotUse`;
     this.logger.log(logbase, `Chuẩn bị xóa các file video yêu cầu Qrcode dư thừa theo lịch trình....`);

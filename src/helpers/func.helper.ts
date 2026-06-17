@@ -50,3 +50,21 @@ export function replaceNbspToSpace(str: string) {
   if (typeof str !== 'string') return str;
   return str.replace(/&nbsp;/g, ' ');
 }
+
+
+export function safeParseArray(val: any): any[] {
+    if (!val) return [];
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') {
+      try {
+        if (val.trim().startsWith('[')) {
+          const parsed = JSON.parse(val);
+          return Array.isArray(parsed) ? parsed : [parsed];
+        }
+        return val.split(',').map(s => s.trim()).filter(s => s !== '');
+      } catch (e) {
+        return val.split(',').map(s => s.trim()).filter(s => s !== '');
+      }
+    }
+    return [val];
+  }

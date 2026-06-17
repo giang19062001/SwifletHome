@@ -36,11 +36,15 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     if (fieldname === 'homeImage' || fieldname.includes('homeImage') || fieldname === 'homeImages' || fieldname.includes('homeImages')) {
       result = 'images/homes';
     }
+
     if (fieldname === 'userHomeImage' || fieldname.includes('userHomeImage')) {
       result = 'images/userHomes';
     }
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
       result = 'images/doctors';
+    }
+    if (fieldname === 'saleHomeFiles' || fieldname.includes('saleHomeFiles')) {
+      result = 'images/saleHomes';
     }
     if (fieldname === 'configfiles' || fieldname.includes('configfiles')) {
       result = 'images/configs';
@@ -68,9 +72,12 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     }
   }
   if (mimetype.startsWith('video/')) {
-    //video
+    //doctor
     if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
       result = 'videos/doctors';
+    }
+    if (fieldname === 'saleHomeFiles' || fieldname.includes('saleHomeFiles')) {
+      result = 'videos/saleHomes';
     }
     if (fieldname === 'requestQrcodeFiles' || fieldname.includes('requestQrcodeFiles')) {
       result = 'videos/requestQrcodes';

@@ -16,6 +16,7 @@ import { LoggerModule } from './common/logger/logger.module';
 import { MailModule } from './common/mail/mail.module';
 import { MqttModule } from './common/mqtt/mqtt.module';
 import { SocketModule } from './common/socket/socket.module';
+import { GeoModule } from './common/geo/geo.module';
 import { DatabaseModule } from './database/database.module';
 import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
 import { ROUTER } from './helpers/const.helper';
@@ -39,6 +40,7 @@ import { GuestAdminModule } from './modules/guest/admin/guest.module';
 import { GuestModule } from './modules/guest/front/guest.module';
 import { HomeSaleAdminModule } from './modules/homeSale/admin/homeSale.module';
 import { HomeSaleAppModule } from './modules/homeSale/app/homeSale.module';
+import { SaleHomeAppModule } from './modules/saleHome/app/saleHome.module';
 import { InfoAdminModule } from './modules/info/admin/info.module';
 import { NotificationAdminModule } from './modules/notification/admin/notification.module';
 import { ObjectAdminModule } from './modules/object/admin/object.module';
@@ -106,6 +108,7 @@ import { ShareAppModule } from './modules/share/app/share.module';
     MailModule,
     MqttModule,
     BlacklistModule,
+    GeoModule,
     // commmon
     OptionModule,
     ProvinceModule,
@@ -115,6 +118,7 @@ import { ShareAppModule } from './modules/share/app/share.module';
     AnswerAppModule,
     DoctorAppModule,
     HomeSaleAppModule,
+    SaleHomeAppModule,
     ScreenAppModule,
     UserHomeAppModule,
     BlogAppModule,

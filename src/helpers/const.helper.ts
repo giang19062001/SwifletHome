@@ -112,4 +112,9 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'MED000001',
   },
+  saleHomeCode: {
+    PRE: 'SLH',
+    LEN: 6,
+    FRIST_CODE: 'SLH000001',
+  },
 };
