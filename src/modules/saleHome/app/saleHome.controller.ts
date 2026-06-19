@@ -13,6 +13,7 @@ import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { CreateSaleHomeAppDto, UploadFilesAppDto } from './saleHome.dto';
 import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto, GetInitFormMutationResDto, UploadSaleHomeFileResDto } from './saleHome.response';
 import { SaleHomeAppService } from './saleHome.service';
+import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { PagingDto } from 'src/dto/admin.dto';
 
 @ApiTags('app/saleHome')
@@ -41,7 +42,7 @@ export class SaleHomeAppController {
   @ApiBody({ type: UploadFilesAppDto })
   @ApiOkResponse({ type: ApiAppResponseDto([UploadSaleHomeFileResDto]) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  @UseInterceptors(FilesInterceptor('saleHomeFiles', 5, getImgVideoMulterConfig(5)))
+  @UseInterceptors(FilesInterceptor('saleHomeFiles', 5, getImgVideoMulterConfig(5)), VideoConverterInterceptor)
   async uploadFiles(@Body() dto: UploadFilesAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
     const result = await this.saleHomeAppService.uploadFiles(dto, files, user.userCode);

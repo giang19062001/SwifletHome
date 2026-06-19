@@ -13,6 +13,7 @@ import { getImgVideoMulterConfig } from './../../../config/multer.config';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { UploadFileDoctorResDto } from './doctor.response';
 import { DoctorAppService } from './doctor.service';
+import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 
 @ApiTags('app/doctor')
 @Controller('/api/app/doctor')
@@ -53,7 +54,7 @@ export class DoctorAppController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: DoctorFileDto })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('doctorFiles', 5, getImgVideoMulterConfig(5)))
+  @UseInterceptors(FilesInterceptor('doctorFiles', 5, getImgVideoMulterConfig(5)), VideoConverterInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadFileDoctorResDto]) })
   async uploadRequestFile(@GetUserApp() user: TokenUserAppResDto, @Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {

@@ -15,6 +15,7 @@ import { USER_CONST } from 'src/modules/user/app/user.interface';
 import { FetchSellingByEnum } from '../qr.interface';
 import { QrRequestAppService } from './qr-request.service';
 import { QrSellAppService } from './qr-sell.service';
+import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { GetSellingForPurchaserListDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import {
   GetApprovedRequestQrCodeResDto,
@@ -204,7 +205,7 @@ export default class QrAppController {
     type: UploadRequestVideoDto,
   })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('requestQrcodeFiles', 5, getImgVideoMulterConfig(5)))
+  @UseInterceptors(FilesInterceptor('requestQrcodeFiles', 5, getImgVideoMulterConfig(5)), VideoConverterInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadRequestVideoResDto]) })
   async uploadRequestFile(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadRequestVideoDto, @UploadedFiles() requestQrcodeFiles: Express.Multer.File[]) {

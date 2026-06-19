@@ -23,6 +23,7 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
 import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, TeamResDto, TeamReviewResDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
 import { TeamAdminService } from './team.service';
+import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiBearerAuth('admin-auth')
@@ -122,7 +123,7 @@ export class TeamAdminController {
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadTeamFilesDto })
-  @UseInterceptors(FilesInterceptor('teamFiles', 20, getImgVideoMulterConfig(20)))
+  @UseInterceptors(FilesInterceptor('teamFiles', 20, getImgVideoMulterConfig(20)), VideoConverterInterceptor)
   async uploadTeamFiles(
     @Body() dto: UploadTeamFilesDto,
     @GetUserAdmin() admin: TokenUserAdminResDto,
@@ -137,7 +138,7 @@ export class TeamAdminController {
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadServiceFilesDto })
-  @UseInterceptors(FilesInterceptor('teamServiceFiles', 20, getImgVideoMulterConfig(20)))
+  @UseInterceptors(FilesInterceptor('teamServiceFiles', 20, getImgVideoMulterConfig(20)), VideoConverterInterceptor)
   async uploadServiceFiles(
     @Body() dto: UploadServiceFilesDto,
     @GetUserAdmin() admin: TokenUserAdminResDto,
