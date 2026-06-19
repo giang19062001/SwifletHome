@@ -46,8 +46,8 @@ export class QrAdminService {
         if (!detail) return 0;
 
         // ghi blockchain
-        // const blockchainData = await this.contractService.recordJson({ userCode: detail.userCode!!, userHomeCode: detail.userHomeCode, qrTargetUrl: qrCode.qrTargetUrl });
-        const blockchainData = { transactionHash: "0x1", blockNumber: "123", transactionFee: "0.1" };
+        const blockchainData = await this.contractService.recordJson({ userCode: detail.userCode!!, userHomeCode: detail.userHomeCode, qrTargetUrl: qrCode.qrTargetUrl });
+        // const blockchainData = { transactionHash: "0x1", blockNumber: "123", transactionFee: "0.1" };
         const dto: WriteQrBlockchainDto = {
           userCode: detail.userCode!!,
           userHomeCode: detail.userHomeCode,

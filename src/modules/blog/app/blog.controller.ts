@@ -19,7 +19,7 @@ export class BlogAppController {
   ) {}
 
   @ApiOperation({
-    summary: 'Dẫn dụ chim đêm tab,..',
+    summary: 'Ngày có chim đêm tab,..',
   })
   @Get('getContent')
   @HttpCode(HttpStatus.OK)

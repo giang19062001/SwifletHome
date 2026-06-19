@@ -35,7 +35,7 @@ export const TODO_CONST = {
     },
     LURING: {
       value: 'LURING',
-      text: 'Dẫn dụ chim đêm',
+      text: 'Ngày có chim đêm',
     },
   },
   TASK_EVENT: {
