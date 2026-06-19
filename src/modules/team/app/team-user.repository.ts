@@ -13,7 +13,7 @@ export class TeamUserAppRepository {
   private readonly tableTeamImg = 'tbl_team_img';
   private readonly tableReview = 'tbl_team_review';
   private readonly tableService = 'tbl_team_service';
-  private readonly tableServiceImg = 'tbl_team_service_img';
+  private readonly tableServiceFile = 'tbl_team_service_file';
   private readonly tableServiceType = 'tbl_team_service_type';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -138,7 +138,7 @@ export class TeamUserAppRepository {
       for (const svc of services) {
         const [svcImages] = await this.db.query<RowDataPacket[]>(`
           SELECT seq, filename, mimetype
-          FROM ${this.tableServiceImg} WHERE seqService = ?
+          FROM ${this.tableServiceFile} WHERE seqService = ?
         `, [svc.seq]);
         svc.images = svcImages;
       }
@@ -219,7 +219,7 @@ export class TeamUserAppRepository {
 
   async uploadFileService(uniqueId: string, createdId: string, filenamePath: string, file: Express.Multer.File): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableServiceImg} (filename, originalname, size, mimetype, uniqueId, seqService, createdId)
+      INSERT INTO ${this.tableServiceFile} (filename, originalname, size, mimetype, uniqueId, seqService, createdId)
       VALUES (?, ?, ?, ?, ?, 0, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, uniqueId, createdId]);
@@ -246,7 +246,7 @@ export class TeamUserAppRepository {
 
   async updateSeqFilesService(seqService: number, uniqueId: string, updatedId: string): Promise<number> {
     const sql = `
-      UPDATE ${this.tableServiceImg} SET seqService = ?, updatedId = ?, updatedAt = NOW()
+      UPDATE ${this.tableServiceFile} SET seqService = ?, updatedId = ?, updatedAt = NOW()
       WHERE uniqueId = ? AND isActive = 'Y'
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seqService, updatedId, uniqueId]);
@@ -265,12 +265,12 @@ export class TeamUserAppRepository {
   }
 
   async getFileServiceBySeq(seq: number): Promise<any | null> {
-    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableServiceImg} WHERE seq = ?`, [seq]);
+    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableServiceFile} WHERE seq = ?`, [seq]);
     return rows.length > 0 ? rows[0] : null;
   }
 
   async deleteFileService(seq: number): Promise<number> {
-    const sql = `DELETE FROM ${this.tableServiceImg} WHERE seq = ?`;
+    const sql = `DELETE FROM ${this.tableServiceFile} WHERE seq = ?`;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
     return result.affectedRows;
   }
@@ -303,7 +303,7 @@ export class TeamUserAppRepository {
   }
 
   async getFilesNotUseService(): Promise<any[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq, filename FROM ${this.tableServiceImg} WHERE seqService = 0`);
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq, filename FROM ${this.tableServiceFile} WHERE seqService = 0`);
     return rows;
   }
 }

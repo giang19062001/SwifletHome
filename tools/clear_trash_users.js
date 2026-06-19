@@ -77,7 +77,7 @@ async function main() {
       reviewSeqs = reviewRows.map(r => r.seq);
     }
 
-    await deleteIn('tbl_team_service_img', 'seqService', seqServices);
+    await deleteIn('tbl_team_service_file', 'seqService', seqServices);
     await deleteIn('tbl_team_review_img', 'reviewSeq', reviewSeqs);
     await deleteIn('tbl_team_review', 'teamCode', teamCodes);
     await deleteIn('tbl_team_service', 'seqTeam', teamSeqs);

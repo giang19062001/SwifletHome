@@ -424,7 +424,7 @@ function addServiceBlock(svcData = null) {
                 <i class="fa fa-plus-circle me-1"></i> Chọn ảnh/video dịch vụ
             </label>
             <input type="file" class="d-none service-images-input" id="serviceImages_${serviceId}"
-                name="serviceImages_${serviceId}" multiple accept=".png, .jpg, .jpeg, .mp4, .mov, .avi"
+                name="serviceImages_${serviceId}" multiple accept=".png, .jpg, .jpeg, .mp4, .mov, .webm"
                 data-id="${serviceId}" />
             <div class="image-preview-container mt-2" id="serviceImagesPreview_${serviceId}"></div>
           </div>

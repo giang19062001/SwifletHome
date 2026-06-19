@@ -226,14 +226,14 @@ export class CornService implements OnModuleInit {
         this.logger.log(logbase, `Các file trong tbl_team_img không dùng đã được xóa thành công`);
       }
 
-      // 2. Xóa trong tbl_team_service_img
+      // 2. Xóa trong tbl_team_service_file
       const serviceFilesNotUse = await this.teamUserAppService.getFilesNotUseService();
       if (serviceFilesNotUse.length) {
         for (const file of serviceFilesNotUse) {
           await this.teamUserAppService.deleteFileService(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
-        this.logger.log(logbase, `Các file trong tbl_team_service_img không dùng đã được xóa thành công`);
+        this.logger.log(logbase, `Các file trong tbl_team_service_file không dùng đã được xóa thành công`);
       }
 
       if (!teamFilesNotUse.length && !serviceFilesNotUse.length) {

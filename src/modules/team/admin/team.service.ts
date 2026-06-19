@@ -68,7 +68,7 @@ export class TeamAdminService {
       // get services
       const services = await this.teamAdminRepository.getTeamServices(result.seq);
       for (const svc of services) {
-        const svcImages = await this.teamAdminRepository.getTeamServiceImages(svc.seq);
+        const svcImages = await this.teamAdminRepository.getTeamServiceFiles(svc.seq);
         svc.images = svcImages;
       }
       result.services = services;
@@ -202,7 +202,7 @@ export class TeamAdminService {
         if (oldFilename && oldFilename !== existingMainImg.filename) {
           await this.fileLocalService.deleteLocalFile(oldFilename);
           if (oldSeq > 0) {
-            await this.teamAdminRepository.deleteHomeImagesOne(oldSeq);
+            await this.teamAdminRepository.deleteTeamImageOne(oldSeq);
           }
         }
       }
@@ -223,7 +223,7 @@ export class TeamAdminService {
           const newServices = JSON.parse(dto.servicesData);
           const found = newServices.find((ns: any) => ns.uniqueId === svc.uniqueId);
           if (!found) {
-            const oldSvcImages = await this.teamAdminRepository.getTeamServiceImages(svc.seq);
+            const oldSvcImages = await this.teamAdminRepository.getTeamServiceFiles(svc.seq);
             for (const img of oldSvcImages) {
               await this.fileLocalService.deleteLocalFile(img.filename);
             }

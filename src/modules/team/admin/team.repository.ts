@@ -17,7 +17,7 @@ export class TeamAdminRepository {
   private readonly tableReview = 'tbl_team_review';
   private readonly tableReviewImg = 'tbl_team_review_img';
   private readonly tableService = 'tbl_team_service';
-  private readonly tableServiceImg = 'tbl_team_service_img';
+  private readonly tableServiceFile = 'tbl_team_service_file';
   private readonly tableServiceType = 'tbl_team_service_type';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -223,9 +223,9 @@ export class TeamAdminRepository {
     return result.insertId;
   }
 
-  async createTeamServiceImages(seqService: number, createdId: string, filenamePath: string, file: Express.Multer.File | TeamImgResDto): Promise<number> {
+  async createTeamServiceFiles(seqService: number, createdId: string, filenamePath: string, file: Express.Multer.File | TeamImgResDto): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableServiceImg} (seqService, filename, originalname, size, mimetype, createdId)
+      INSERT INTO ${this.tableServiceFile} (seqService, filename, originalname, size, mimetype, createdId)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seqService, filenamePath, file.originalname, file.size, file.mimetype, createdId]);
@@ -234,7 +234,7 @@ export class TeamAdminRepository {
 
   async uploadFileService(uniqueId: string, createdId: string, filenamePath: string, file: Express.Multer.File): Promise<number> {
     const sql = `
-      INSERT INTO ${this.tableServiceImg} (filename, originalname, size, mimetype, uniqueId, seqService, createdId)
+      INSERT INTO ${this.tableServiceFile} (filename, originalname, size, mimetype, uniqueId, seqService, createdId)
       VALUES (?, ?, ?, ?, ?, 0, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, uniqueId, createdId]);
@@ -242,19 +242,19 @@ export class TeamAdminRepository {
   }
 
   async deleteFileService(seq: number): Promise<number> {
-    const sql = `DELETE FROM ${this.tableServiceImg} WHERE seq = ?`;
+    const sql = `DELETE FROM ${this.tableServiceFile} WHERE seq = ?`;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
     return result.affectedRows;
   }
 
   async getFileServiceBySeq(seq: number): Promise<any | null> {
-    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableServiceImg} WHERE seq = ?`, [seq]);
+    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableServiceFile} WHERE seq = ?`, [seq]);
     return rows.length > 0 ? rows[0] : null;
   }
 
   async updateSeqFilesService(seqService: number, uniqueId: string, updatedId: string): Promise<number> {
     const sql = `
-      UPDATE ${this.tableServiceImg} SET seqService = ?, updatedId = ?, updatedAt = NOW()
+      UPDATE ${this.tableServiceFile} SET seqService = ?, updatedId = ?, updatedAt = NOW()
       WHERE uniqueId = ? AND isActive = 'Y'
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seqService, updatedId, uniqueId]);
@@ -272,11 +272,11 @@ export class TeamAdminRepository {
     return rows;
   }
 
-  async getTeamServiceImages(seqService: number): Promise<any[]> {
+  async getTeamServiceFiles(seqService: number): Promise<any[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `
       SELECT seq, seqService, filename, originalname, size, mimetype, isActive
-      FROM ${this.tableServiceImg} WHERE seqService = ?
+      FROM ${this.tableServiceFile} WHERE seqService = ?
     `,
       [seqService],
     );
@@ -291,16 +291,8 @@ export class TeamAdminRepository {
     return result.affectedRows;
   }
 
-  async deleteHomeImages(seq: number): Promise<number> {
-    const sql = `
-      DELETE FROM  ${this.tableImg}
-      WHERE teamSeq = ?
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
 
-    return result.affectedRows;
-  }
-  async deleteHomeImagesOne(seq: number): Promise<number> {
+  async deleteTeamImageOne(seq: number): Promise<number> {
     const sql = `
       DELETE FROM  ${this.tableImg}
       WHERE seq = ?
@@ -309,16 +301,7 @@ export class TeamAdminRepository {
 
     return result.affectedRows;
   }
-  async deleteHomeImagesMulti(seqList: number[]): Promise<number> {
-    const placeholders = seqList.map(() => '?').join(', ');
-    const sql = `
-    DELETE FROM ${this.tableImg}
-    WHERE seq IN (${placeholders})
-  `;
 
-    const [result] = await this.db.execute<ResultSetHeader>(sql, seqList);
-    return result.affectedRows;
-  }
   // TODO: REVIEW
   async getTotalReview(): Promise<number> {
     let query = ` 

@@ -9,7 +9,7 @@ export const ROUTER = {
 
 export const IMG_TYPES = ['.png', '.jpg', '.jpeg'];
 export const AUDIO_TYPES = ['.mp3'];
-export const VIDEO_TYPES = ['.mp4', '.mov', '.avi'];
+export const VIDEO_TYPES = ['.mp4', '.mov', '.webm'];
 
 export const APP_SCREENS = {
   QR_SCREEN: 'QR_SCREEN',
