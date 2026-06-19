@@ -282,34 +282,33 @@
             }
 
             if (Array.isArray(files) && files.length > 0) {
-                //  max-height và scrollbar 
-                let mediaHTML = `<div class="row g-2" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">`;
+                let mediaHTML = `<div class="ig-explore-grid">`;
 
                 files.forEach(file => {
                     const fullUrl = typeof CURRENT_URL !== 'undefined' ? `${CURRENT_URL}/${file.filename}` : `/${file.filename}`;
 
                     if (file.mimetype && file.mimetype.startsWith('video/')) {
-                        // Video - Hiển thị tỷ lệ nguyên bản
+                        // Fix cho trường hợp file .mp4 nhưng mimetype bị sai không phải là video/mp4
+                        let renderMimetype = file.mimetype;
+                        if (fullUrl.toLowerCase().endsWith('.mp4')) {
+                            renderMimetype = 'video/mp4';
+                        }
+                        
+                        // Video 
                         mediaHTML += `
-                            <div class="col-md-4 col-sm-6 mb-3">
-                                <div class="bg-dark rounded shadow-sm overflow-hidden h-100 d-flex align-items-center">
-                                    <video controls preload="metadata" class="w-100 d-block" style="max-height: 300px;">
-                                        <source src="${fullUrl}" type="${file.mimetype}">
-                                        Trình duyệt không hỗ trợ phát video.
-                                    </video>
-                                </div>
+                            <div class="ig-item is-video">
+                                <video controls preload="metadata">
+                                    <source src="${fullUrl}" type="${renderMimetype}">
+                                    Trình duyệt không hỗ trợ phát video.
+                                </video>
                             </div>
                         `;
                     } else if (file.mimetype && file.mimetype.startsWith('image/')) {
-                        // Hình ảnh - Hiển thị tỷ lệ nguyên bản
+                        // Hình ảnh 
                         mediaHTML += `
-                            <div class="col-md-4 col-sm-6 mb-3">
-                                <a href="${fullUrl}" target="_blank" class="d-block w-100 h-100">
-                                    <img src="${fullUrl}" 
-                                         class="img-fluid rounded shadow-sm w-100" 
-                                         style="height: 200px; object-fit: cover;" 
-                                         alt="Hình ảnh sơ chế"
-                                         loading="lazy">
+                            <div class="ig-item is-image">
+                                <a href="${fullUrl}" target="_blank">
+                                    <img src="${fullUrl}" alt="Hình ảnh sơ chế" loading="lazy">
                                 </a>
                             </div>
                         `;

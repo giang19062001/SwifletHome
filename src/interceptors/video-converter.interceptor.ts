@@ -43,8 +43,15 @@ export class VideoConverterInterceptor implements NestInterceptor {
 
   private async convertIfNeeded(file: any): Promise<void> {
     const ext = extname(file.originalname).toLowerCase();
-    // chỉ đổi sang .mp4 khi file là video và có .ext là .mov và .webm
-    if (ext === '.mov' || ext === '.webm') {
+
+    // Fix Safari bug: uploads .mp4 but sets mimetype to video/quicktime
+    if (ext === '.mp4' && file.mimetype !== 'video/mp4') {
+      file.mimetype = 'video/mp4';
+      return;
+    }
+
+    // chỉ đổi sang .mp4 khi file là video và có .ext là .mov và .webm hoặc mimetype tương ứng
+    if (ext === '.mov' || ext === '.webm' || file.mimetype === 'video/quicktime' || file.mimetype === 'video/webm') {
       const originalPath = file.path;
       const originalFilename = file.filename;
       
