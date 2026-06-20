@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { GetHomesAdminDto, TriggerUserHomeSensorDto, UserHomeSensorResDto } from './userHome.dto';
-import { YnEnum } from 'src/interfaces/admin.interface';
+import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
 import { UserHomeProvinceForPushResDto, UserHomeForPushResDto } from "../../notification/notification.response";
 import { UserHomeResDto } from "../app/userHome.dto";
 
@@ -133,7 +132,7 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvince
   }
 }
 
-  async getDetail(userHomeCode: string): Promise<UserHomeSensorResDto | null> {
+  async getDetail(userHomeCode: string): Promise<UserHomeResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `
        SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
@@ -146,7 +145,7 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvince
            LIMIT 1 `,
       [userHomeCode],
     );
-    return rows ? (rows[0] as UserHomeSensorResDto) : null;
+    return rows ? (rows[0] as UserHomeResDto) : null;
   }
   async triggerHome(userHomeCode: string, updatedId: string): Promise<number> {
     const sql = `

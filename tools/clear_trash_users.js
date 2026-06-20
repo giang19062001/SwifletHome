@@ -1,15 +1,7 @@
-const fs = require('fs');
 const mysql = require('mysql2/promise');
 
 async function main() {
-  // 1. Read userCodes from clear.md
-  const markdownPath = 'C:/WORKING/FREELANCER/YEN/clear.md';
-  if (!fs.existsSync(markdownPath)) {
-    console.error('File clear.md not found!');
-    return;
-  }
-  const content = fs.readFileSync(markdownPath, 'utf8');
-  const userCodeMatches = content.match(/USR\d+/g);
+  const userCodeMatches = []
   
   if (!userCodeMatches || userCodeMatches.length === 0) {
     console.log('No userCode found in clear.md.');
@@ -20,17 +12,12 @@ async function main() {
   const userCodes = [...new Set(userCodeMatches)];
   console.log(`Found ${userCodes.length} userCodes to delete:`, userCodes);
 
-  // 2. Connect to Database
+  // Connect to Database
   const connection = await mysql.createConnection({
-    // host: 'localhost',
-    // port: 3306,
-    // user: 'root',
-    // password: '123456',
-    // database: 'swiftlet'
-        host: '103.77.160.68',
+    host: 'localhost',
     port: 3306,
-    user: 'dev',
-    password: 'asdf',
+    user: 'root',
+    password: '123456',
     database: 'swiftlet'
   });
 

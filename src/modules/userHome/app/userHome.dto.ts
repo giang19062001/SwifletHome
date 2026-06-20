@@ -142,6 +142,8 @@ export class UserHomeResDto {
     @ApiProperty({ example: YnEnum.N })
     isTriggered: YnEnum;
     @ApiProperty({ example: YnEnum.N })
+    isMain: YnEnum;
+    @ApiProperty({ example: YnEnum.N })
     isActive: YnEnum;
     @ApiProperty({ example: new Date() })
     createdAt: Date;

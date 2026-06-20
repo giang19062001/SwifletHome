@@ -25,7 +25,7 @@ export class ScreenAppController {
 **REQUEST_DOCTOR**: Màn hình khám bệnh nhà yến\n
 **REQUEST_QR_GUIDE**: Popup hướng dẫn cho màn hình yêu cầu mã QR \n
 **CONSIGNMENT_GUIDE**: Popup hướng dẫn cho màn hình ký gửi\n
-**USER_TYPE_NOT_REGISTER**: Trang thông báo loại người dùng này chưa được đăng ký`,
+**USER_TYPE_NOT_REGISTER**: Màn hình thông báo loại người dùng này chưa được đăng ký`,
     name: 'keyword',
     type: String,
   })

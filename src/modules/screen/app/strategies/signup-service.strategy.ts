@@ -21,7 +21,7 @@ export class SignupServiceStrategy implements IScreenStrategy {
   }
 
   async execute(userCode: string, screen: any): Promise<GetContentScreenResDto | null> {
-    if (!screen.screenContent) return null;
+    if (!screen.contentStart) return null;
 
     // gói
     const packageActive = await this.packageAppService.getOne();
@@ -48,24 +48,24 @@ export class SignupServiceStrategy implements IScreenStrategy {
     // là vật phẩm -> ko hiện thông tin chuyển khoản
     if (packageActive?.packageOptionType == PackageOptionTypeEnum.ITEM) {
       result = {
-        contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
+        contentStart: replaceNbspToSpace(screen.contentStart),
         contentCenter: {
           packages: packages,
           bankInfo: null,
         },
-        contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
+        contentEnd: replaceNbspToSpace(screen.contentEnd ?? ''),
       };
     } else {
       // thông tin chuyển khoản
       const bankInfo = await this.infoAppService.getDetail('BANK');
       const infoContent: InfoBankResDto = bankInfo ? bankInfo.infoContent : null;
       result = {
-        contentStart: replaceNbspToSpace(screen.screenContent.contentStart),
+        contentStart: replaceNbspToSpace(screen.contentStart),
         contentCenter: {
           packages: packages,
           bankInfo: infoContent ? { ...infoContent, accountName: `${infoContent.accountNumber} - ${infoContent.accountName}` } : null,
         },
-        contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
+        contentEnd: replaceNbspToSpace(screen.contentEnd ?? ''),
       } as ScreenSignupServiceResDto;
     }
 

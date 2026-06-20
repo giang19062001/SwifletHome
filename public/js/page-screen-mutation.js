@@ -15,10 +15,8 @@ let keyActive = '';
 document.addEventListener('DOMContentLoaded', function () {
   console.log('screenData', screenData);
 
-  // kiểm tra danh sách fileds
-  if ('screenContent' in screenData) {
-    mapContentFileds(screenData.screenContent);
-  }
+  // map dữ liệu từ 3 cột riêng biệt
+  mapContentFileds(screenData);
 
   // mark active key đầu tiên
   markFristKeyActive();
@@ -64,27 +62,21 @@ function mapContentFileds(data) {
       screenContent = {
         contentStart: data.contentStart ?? '',
         contentCenter: data.contentCenter ?? '',
-        // contentEnd: data.contentEnd ?? '',
       };
       break;
     case 'REQUEST_QR_GUIDE':
       screenContent = {
         contentStart: data.contentStart ?? '',
-        // contentCenter: data.contentCenter ?? '',
-        // contentEnd: data.contentEnd ?? '',
       };
+      break;
     case 'CONSIGNMENT_GUIDE':
        screenContent = {
         contentStart: data.contentStart ?? '',
-        // contentCenter: data.contentCenter ?? '',
-        // contentEnd: data.contentEnd ?? '',
       };
       break;
     case 'USER_TYPE_NOT_REGISTER':
        screenContent = {
         contentStart: data.contentStart ?? '',
-        // contentCenter: data.contentCenter ?? '',
-        // contentEnd: data.contentEnd ?? '',
       };
       break;
     default:
@@ -206,7 +198,9 @@ async function updateScreen() {
         {
           screenName: formData.screenName,
           screenDescription: formData.screenDescription,
-          screenContent,
+          contentStart: screenContent.contentStart ?? null,
+          contentCenter: screenContent.contentCenter ?? null,
+          contentEnd: screenContent.contentEnd ?? null,
         },
         axiosAuth(),
       )

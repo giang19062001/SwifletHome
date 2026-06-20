@@ -17,12 +17,12 @@ export class RequestDoctorStrategy implements IScreenStrategy {
   }
 
   async execute(userCode: string, screen: any): Promise<GetContentScreenResDto | null> {
-    if (!screen.screenContent) return null;
+    if (!screen.contentStart) return null;
 
     // lấy thông tin gói của user
     const userPackage = await this.userAppService.getUserPackageInfo(userCode);
     const remainDay = userPackage?.packageRemainDay ?? 0;
-    let contentStart = replaceNbspToSpace(screen.screenContent.contentStart);
+    let contentStart = replaceNbspToSpace(screen.contentStart);
     if (remainDay > 0) {
       // người dùng đang xài gói nâng cấp và còn hạn → ẩn nút thanh toán
       contentStart = contentStart.replace(/\[\[payment\]\]/g, ``);
@@ -30,8 +30,8 @@ export class RequestDoctorStrategy implements IScreenStrategy {
 
     return {
       contentStart: contentStart,
-      contentCenter: screen.screenContent.contentCenter,
-      contentEnd: replaceNbspToSpace(screen.screenContent.contentEnd),
+      contentCenter: screen.contentCenter,
+      contentEnd: replaceNbspToSpace(screen.contentEnd ?? ''),
     } as ScreenSignupServiceResDto;
   }
 }

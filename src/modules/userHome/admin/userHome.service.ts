@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { UserHomeAdminRepository } from './userHome.repository';
-import { GetHomesAdminDto, TriggerUserHomeSensorDto, UserHomeSensorResDto } from './userHome.dto';
-import { ListResponseDto } from "src/dto/common.dto";
-import { UserHomeResDto, UserHomeImageStrResDto } from "../app/userHome.dto";
+import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
+import { UserHomeResDto } from "../app/userHome.dto";
 
 @Injectable()
 export class UserHomeAdminService {
@@ -19,7 +18,7 @@ export class UserHomeAdminService {
     const list = await this.userHomeAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(userHomeCode: string): Promise<UserHomeSensorResDto | null> {
+  async getDetail(userHomeCode: string): Promise<UserHomeResDto | null> {
     const result = await this.userHomeAdminRepository.getDetail(userHomeCode);
     return result;
   }

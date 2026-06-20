@@ -15,11 +15,11 @@ export class ShareAppService {
     private readonly configService: ConfigService,
     private readonly todoHarvestAppService: TodoHarvestAppService,
     private readonly userHomeAppService: UserHomeAppService
-  ) {}
+  ) { }
 
   async getShareLink(dto: GetShareLinkDto): Promise<string | null> {
     const { seq, userHomeCode, harvestPhase, harvestYear } = dto;
-    
+
     const isExistHarvestPhase = await this.shareRepository.checkHarvestPhaseExist(seq, userHomeCode, harvestPhase, harvestYear);
     if (!isExistHarvestPhase) return null;
 
@@ -50,23 +50,28 @@ export class ShareAppService {
           throw new BadRequestException({ message: 'Dữ liệu thu hoạch không còn tồn tại', data: null });
         }
 
-        const homeInfo = await this.userHomeAppService.getDetail(harvestPhaseDetail.userHomeCode);
-        if (!homeInfo) {
+        const homeData = await this.userHomeAppService.getDetail(harvestPhaseDetail.userHomeCode);
+        if (!homeData) {
           throw new BadRequestException({ message: 'Không tìm thấy thông tin nhà yến', data: null });
         }
 
-        const harvestData = await this.todoHarvestAppService.arrangeHarvestRows(harvestPhaseDetail.seq, homeInfo.userHomeFloor);
+        const { isIntegateTempHum, isIntegateCurrent, isTriggered, uniqueId, ...cleanHomeData } = homeData
+
+        const harvestData = await this.todoHarvestAppService.arrangeHarvestRows(harvestPhaseDetail.seq, homeData.userHomeFloor);
 
         return {
           shareType: shareMaster.shareType,
           shareData: {
             seq: harvestPhaseDetail.seq,
+            harvestPhase: harvestPhaseDetail.harvestPhase,
+            harvestYear: harvestPhaseDetail.harvestYear,
             userHomeCode: harvestPhaseDetail.userHomeCode,
+            homeData: cleanHomeData,
             harvestData,
           }
         };
       }
-      
+
       default:
         throw new BadRequestException({ message: 'Loại chia sẻ không được hỗ trợ', data: null });
     }

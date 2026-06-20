@@ -15,11 +15,10 @@ export class CommonGuideStrategy implements IScreenStrategy {
   }
 
   async execute(userCode: string, screen: any): Promise<GetContentScreenResDto | null> {
-    if (!screen.screenContent) return null;
+    if (!screen.contentStart) return null;
 
-    let contentStart = screen.screenContent.contentStart;
     return {
-      contentStart: contentStart,
+      contentStart: screen.contentStart,
       contentCenter: {},
       contentEnd: "",
     } as ScreenSignupServiceResDto;

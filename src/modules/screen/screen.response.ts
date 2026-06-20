@@ -10,9 +10,13 @@ export class ScreenResDto {
     @ApiProperty({ example: '' })
     screenName: string;
     @ApiProperty({ example: '' })
-    screenContent: any;
-    @ApiProperty({ example: '' })
     screenDescription: string;
+    @ApiProperty({ example: '' })
+    contentStart: string;
+    @ApiProperty({ example: {} })
+    contentCenter: any;
+    @ApiProperty({ example: '' })
+    contentEnd: string;
     @ApiProperty({ example: YnEnum.N })
     isActive: YnEnum;
     @ApiProperty({ example: new Date() })

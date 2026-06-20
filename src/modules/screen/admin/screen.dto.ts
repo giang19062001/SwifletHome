@@ -1,23 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-
-export class ScreenContentDto {
-  @ApiProperty({ example: 'Nội dung đầu' })
-  @IsString()
-  @IsOptional()
-  contentStart: string;
-
-  @ApiProperty({ example: 'Nội dung giữa' })
-  @IsObject()
-  @IsOptional()
-  contentCenter: any;
-
-  @ApiProperty({ example: 'Nội dung cuối' })
-  @IsString()
-  @IsOptional()
-  contentEnd: string;
-}
 
 export class UpdateScreenDto {
   @ApiProperty({
@@ -34,15 +16,18 @@ export class UpdateScreenDto {
   @IsNotEmpty()
   screenDescription: string;
 
-  @ApiProperty({
-    example: {
-      contentStart: 'a',
-      contentCenter: {},
-      contentEnd: 'b',
-    },
-    type: ScreenContentDto,
-  })
+  @ApiPropertyOptional({ example: '' })
+  @IsString()
+  @IsOptional()
+  contentStart?: string;
+
+  @ApiPropertyOptional({ example: {} })
   @IsObject()
-  @Type(() => ScreenContentDto)
-  screenContent: ScreenContentDto;
+  @IsOptional()
+  contentCenter?: any;
+
+  @ApiPropertyOptional({ example: '' })
+  @IsString()
+  @IsOptional()
+  contentEnd?: string;
 }

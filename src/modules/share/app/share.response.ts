@@ -1,6 +1,14 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { ShareTypeEnum } from './share.interface';
 import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
+import { UserHomeResDto } from 'src/modules/userHome/app/userHome.dto';
+
+export class SharedHomeDataResDto extends OmitType(UserHomeResDto, [
+  'isIntegateTempHum',
+  'isIntegateCurrent',
+  'isTriggered',
+  'uniqueId',
+] as const) {}
 
 export class GetShareLinkResDto {
   @ApiProperty()
@@ -13,6 +21,15 @@ class ShareDataHarvestDto {
 
   @ApiProperty({ example: '' })
   userHomeCode: string;
+
+  @ApiProperty({ example: 0 })
+  harvestPhase: number;
+
+  @ApiProperty({ example: 0 })
+  harvestYear: number;
+
+  @ApiProperty({ type: () => SharedHomeDataResDto })
+  homeData: SharedHomeDataResDto;
 
   @ApiPropertyOptional({ type: () => [HarvestDataInputDto] })
   harvestData?: HarvestDataInputDto[];

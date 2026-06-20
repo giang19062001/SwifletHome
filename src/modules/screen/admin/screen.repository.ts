@@ -15,8 +15,8 @@ export class ScreenAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<ScreenResDto[]> {
-    let query = `  SELECT seq, screenKeyword, screenName, screenContent, screenDescription, isActive, createdAt, updatedAt, createdId, updatedId 
-        FROM ${this.table} ORDER BY createdAt DESC`;
+    let query = `  SELECT seq, screenKeyword, screenName, screenDescription, contentStart, contentCenter, contentEnd, isActive, createdAt, updatedAt, createdId, updatedId 
+        FROM ${this.table} WHERE isActive = 'Y' ORDER BY createdAt DESC`;
 
     const params: any[] = [];
     if (dto.limit > 0 && dto.page > 0) {
@@ -29,7 +29,7 @@ export class ScreenAdminRepository {
   }
   async getDetail(screenKeyword: string): Promise<ScreenResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `  SELECT A.seq, A.screenKeyword, A.screenName, A.screenContent, A.screenDescription, A.isActive,
+      `  SELECT A.seq, A.screenKeyword, A.screenName, A.screenDescription, A.contentStart, A.contentCenter, A.contentEnd, A.isActive,
         A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A
         WHERE A.screenKeyword = ? 
@@ -41,10 +41,11 @@ export class ScreenAdminRepository {
 
   async update(dto: UpdateScreenDto, updatedId: string, screenKeyword: string): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET screenName = ?, screenDescription = ?, screenContent = ?, updatedId = ?, updatedAt = ?
+      UPDATE ${this.table} SET screenName = ?, screenDescription = ?, contentStart = ?, contentCenter = ?, contentEnd = ?, updatedId = ?, updatedAt = ?
       WHERE screenKeyword = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.screenName, dto.screenDescription, dto.screenContent, updatedId, new Date(), screenKeyword]);
+    const contentCenter = dto.contentCenter ? JSON.stringify(dto.contentCenter) : null;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.screenName, dto.screenDescription, dto.contentStart ?? null, contentCenter, dto.contentEnd ?? null, updatedId, new Date(), screenKeyword]);
 
     return result.affectedRows;
   }
