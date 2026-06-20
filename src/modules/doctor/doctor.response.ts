@@ -62,3 +62,28 @@ export class DoctorFileResDto {
     @ApiProperty({ example: YnEnum.N })
     isActive: YnEnum;
 }
+
+export class DoctorVideoResDto {
+    @ApiProperty({ example: 0 })
+    seq: number;
+    @ApiProperty({ example: '' })
+    name: string;
+    @ApiProperty({ example: '' })
+    address: string;
+    @ApiProperty({ example: '' })
+    videoTitle: string;
+    @ApiProperty({ example: '' })
+    videoUrl: string;
+    @ApiProperty({ example: 0 })
+    sortOrder: number;
+    @ApiProperty({ example: YnEnum.N })
+    isActive: YnEnum;
+    @ApiProperty({ example: new Date() })
+    createdAt: Date;
+    @ApiProperty({ example: new Date() })
+    updatedAt: Date;
+    @ApiProperty({ example: '' })
+    createdId: string;
+    @ApiProperty({ example: '' })
+    updatedId: string;
+}

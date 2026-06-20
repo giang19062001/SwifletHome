@@ -15,7 +15,7 @@ export class ScreenAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<ScreenResDto[]> {
-    let query = `  SELECT seq, screenKeyword, screenName, screenDescription, contentStart, contentCenter, contentEnd, isActive, createdAt, updatedAt, createdId, updatedId 
+    let query = `  SELECT seq, screenKeyword, screenName, screenDescription, contentStart, contentCenter, contentEnd, screenTeamplateKeyword, screenSupportContent, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} WHERE isActive = 'Y' ORDER BY createdAt DESC`;
 
     const params: any[] = [];
@@ -29,7 +29,7 @@ export class ScreenAdminRepository {
   }
   async getDetail(screenKeyword: string): Promise<ScreenResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `  SELECT A.seq, A.screenKeyword, A.screenName, A.screenDescription, A.contentStart, A.contentCenter, A.contentEnd, A.isActive,
+      `  SELECT A.seq, A.screenKeyword, A.screenName, A.screenDescription, A.contentStart, A.contentCenter, A.contentEnd, A.screenTeamplateKeyword, A.screenSupportContent, A.isActive,
         A.createdAt, A.updatedAt, A.createdId, A.updatedId 
         FROM ${this.table} A
         WHERE A.screenKeyword = ? 
@@ -37,6 +37,28 @@ export class ScreenAdminRepository {
       [screenKeyword],
     );
     return rows ? (rows[0] as ScreenResDto) : null;
+  }
+
+  async updateBanner(screenKeyword: string, bannerUrl: string, adminId: string): Promise<number> {
+    const screen = await this.getDetail(screenKeyword);
+    if (!screen) return 0;
+    
+    let contentCenter = screen.contentCenter;
+    if (typeof contentCenter === 'string') {
+      try {
+        contentCenter = JSON.parse(contentCenter);
+      } catch (e) {
+        contentCenter = {};
+      }
+    } else if (!contentCenter) {
+      contentCenter = {};
+    }
+    
+    (contentCenter as any).banner = bannerUrl;
+
+    const sql = `UPDATE ${this.table} SET contentCenter = ?, updatedId = ?, updatedAt = NOW() WHERE screenKeyword = ?`;
+    const [result] = await this.db.query<ResultSetHeader>(sql, [JSON.stringify(contentCenter), adminId, screenKeyword]);
+    return result.affectedRows;
   }
 
   async update(dto: UpdateScreenDto, updatedId: string, screenKeyword: string): Promise<number> {
@@ -48,5 +70,41 @@ export class ScreenAdminRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.screenName, dto.screenDescription, dto.contentStart ?? null, contentCenter, dto.contentEnd ?? null, updatedId, new Date(), screenKeyword]);
 
     return result.affectedRows;
+  }
+
+  // --- Dynamic Video Queries ---
+  async getAllVideos(tableVideo: string): Promise<any[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT seq, name, address, videoTitle, videoUrl, sortOrder, isActive, createdAt FROM ${tableVideo} WHERE isActive = 'Y' ORDER BY sortOrder ASC, createdAt DESC`
+    );
+    return rows;
+  }
+
+  async createVideo(tableVideo: string, dto: any, createdId: string): Promise<number> {
+    const sql = `INSERT INTO ${tableVideo} (name, address, videoTitle, videoUrl, createdId) VALUES (?, ?, ?, ?, ?)`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.name, dto.address, dto.videoTitle, dto.videoUrl, createdId]);
+    return result.insertId;
+  }
+
+  async updateVideo(tableVideo: string, seq: number, dto: any, updatedId: string): Promise<number> {
+    const sql = `UPDATE ${tableVideo} SET name = ?, address = ?, videoTitle = ?, videoUrl = ?, sortOrder = ?, updatedId = ?, updatedAt = ? WHERE seq = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.name, dto.address, dto.videoTitle, dto.videoUrl, dto.sortOrder ?? 0, updatedId, new Date(), seq]);
+    return result.affectedRows;
+  }
+
+  async deleteVideo(tableVideo: string, seq: number, updatedId: string): Promise<number> {
+    const sql = `UPDATE ${tableVideo} SET isActive = 'N', updatedId = ?, updatedAt = ? WHERE seq = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [updatedId, new Date(), seq]);
+    return result.affectedRows;
+  }
+
+  async updateVideoSortOrder(tableVideo: string, items: {seq: number; sortOrder: number}[], updatedId: string): Promise<number> {
+    let affectedRows = 0;
+    for (const item of items) {
+      const sql = `UPDATE ${tableVideo} SET sortOrder = ?, updatedId = ?, updatedAt = ? WHERE seq = ?`;
+      const [result] = await this.db.execute<ResultSetHeader>(sql, [item.sortOrder, updatedId, new Date(), item.seq]);
+      affectedRows += result.affectedRows;
+    }
+    return affectedRows;
   }
 }

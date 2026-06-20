@@ -17,6 +17,10 @@ export class ScreenResDto {
     contentCenter: any;
     @ApiProperty({ example: '' })
     contentEnd: string;
+    @ApiProperty({ example: '' })
+    screenTeamplateKeyword: string;
+    @ApiProperty({ example: {} })
+    screenSupportContent: any;
     @ApiProperty({ example: YnEnum.N })
     isActive: YnEnum;
     @ApiProperty({ example: new Date() })
@@ -29,7 +33,47 @@ export class ScreenResDto {
     updatedId!: string;
 }
 
+export class RequestDoctorVideoYoutubeDto {
+    @ApiProperty({ example: '' })
+    videoTitle: string;
+    @ApiProperty({ example: '' })
+    videoUrl: string;
+}
+
+export class RequestDoctorVideoGroupDto {
+    @ApiProperty({ example: '' })
+    name: string;
+    @ApiProperty({ example: '' })
+    address: string;
+    @ApiProperty({ type: [RequestDoctorVideoYoutubeDto] })
+    listVideoYoutobe: RequestDoctorVideoYoutubeDto[];
+}
+
+export class RequestDoctorContentCenterDto {
+    @ApiProperty({ example: '' })
+    title: string;
+    @ApiProperty({ example: '' })
+    banner: string;
+    @ApiProperty({ example: '' })
+    instruction: string;
+    @ApiProperty({ example: '' })
+    process: string;
+    @ApiProperty({ example: '' })
+    price: string;
+    @ApiProperty({ type: [RequestDoctorVideoGroupDto] })
+    listVideo: RequestDoctorVideoGroupDto[];
+}
+
 export class ScreenRequestDoctorResDto {
+    @ApiProperty({ example: '' })
+    contentEnd: string;
+    @ApiProperty({ example: '' })
+    contentStart: string;
+    @ApiProperty({ type: RequestDoctorContentCenterDto })
+    contentCenter: RequestDoctorContentCenterDto;
+}
+
+export class ScreenCommonGuideResDto {
     @ApiProperty({ example: '' })
     contentEnd: string;
     @ApiProperty({ example: '' })
@@ -37,6 +81,7 @@ export class ScreenRequestDoctorResDto {
     @ApiProperty({ example: '' })
     contentCenter: { symptom : string };
 }
+
 
 export class ScreenSignupServiceResDto {
     @ApiProperty({ example: '' })

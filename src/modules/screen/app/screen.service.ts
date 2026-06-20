@@ -21,7 +21,6 @@ export class ScreenAppService {
 
     // tìm xem keyword này thuộc chiến lược nào
     const strategy = this.strategies.find((s) => s.canHandle(keyword));
-    console.log("strategy", strategy);
     if (strategy) {
       // thực thi chiến lượng
       return strategy.execute(userCode, screen);
