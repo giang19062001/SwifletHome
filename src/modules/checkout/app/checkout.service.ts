@@ -17,7 +17,6 @@ export class CheckoutAppService {
     private readonly logger: LoggingService,
   ) {}
 
-
   async checkoutPay(dto: CheckoutPayDto): Promise<any> {
     const logbase = `${this.SERVICE_NAME}/checkoutPay`;
 
@@ -56,7 +55,7 @@ export class CheckoutAppService {
     // 3. Tính toán thời gian
     const now = moment();
     const updatedAt = new Date();
-    const updatedId = UPDATOR
+    const updatedId = UPDATOR;
 
     // Sử dụng thời gian mua và hết hạn trực tiếp từ webhook của RevenueCat
     const startDateMoment = moment(dto.event.purchased_at_ms);

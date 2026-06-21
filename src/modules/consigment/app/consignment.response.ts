@@ -76,8 +76,6 @@ export class GetAllConsignmentResDto {
   updatedAt: string;
 }
 
-
-
 export class GetDetailConsignmentResDto {
   @ApiProperty({ example: 0 })
   seq: number;

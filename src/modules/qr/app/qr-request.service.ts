@@ -91,7 +91,7 @@ export class QrRequestAppService {
     const taskMedicineList = await this.todoMedicineAppService.getTaskMedicineCompleteAndNotUseList(userHomeCode);
 
     // BƯỚC QUAN TRỌNG: LUÔN LẤY TẤT CẢ CÁC ĐỢT THU HOẠCH (harvestPhase = 0) ĐỂ TÍNH TOÁN TIMELINE CHÍNH XÁC
-    let allTaskHarvestCompleteList = await this.todoHarvestAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, 0);
+    const allTaskHarvestCompleteList = await this.todoHarvestAppService.getTaskHarvestCompleteAndNotUseList(userHomeCode, 0);
 
     // Sắp xếp các đợt thu hoạch theo thứ tự thời gian tăng dần (ASC)
     allTaskHarvestCompleteList.sort((a, b) => moment(a.timestamp).valueOf() - moment(b.timestamp).valueOf());
@@ -105,11 +105,9 @@ export class QrRequestAppService {
 
     // THỰC THI THUẬT TOÁN GÁN DUY NHẤT THEO TIMELINE
     const assignedMedicineCodes = new Set<string>();
-    let allTaskHarvestList: TaskHarvestQrResDto[] = allTaskHarvestCompleteList.map((ele) => {
+    const allTaskHarvestList: TaskHarvestQrResDto[] = allTaskHarvestCompleteList.map((ele) => {
       // Lọc các lăn thuốc hoàn thành trước đợt thu hoạch này và chưa được gán cho đợt nào trước đó
-      const currentMedicines = taskMedicineList.filter((med) => 
-        moment(med.timestamp).isSameOrBefore(moment(ele.timestamp)) && !assignedMedicineCodes.has(med.medicineTaskAlarmCode)
-      );
+      const currentMedicines = taskMedicineList.filter((med) => moment(med.timestamp).isSameOrBefore(moment(ele.timestamp)) && !assignedMedicineCodes.has(med.medicineTaskAlarmCode));
 
       // Đánh dấu các lăn thuốc này đã được gán
       currentMedicines.forEach((med) => assignedMedicineCodes.add(med.medicineTaskAlarmCode));
@@ -156,7 +154,7 @@ export class QrRequestAppService {
 
     const result = await this.qrRequestAppRepository.validateHarvestBeforeRequestQr(userCode);
     const list = result.map((item) => {
-      const harvestAvaliableList = typeof item.harvestAvaliableList === 'string' ? JSON.parse(item.harvestAvaliableList) : (item.harvestAvaliableList || []);
+      const harvestAvaliableList = typeof item.harvestAvaliableList === 'string' ? JSON.parse(item.harvestAvaliableList) : item.harvestAvaliableList || [];
       return {
         userHomeCode: item.userHomeCode,
         userHomeName: item.userHomeName,
@@ -187,7 +185,7 @@ export class QrRequestAppService {
       // lấy thông tin lăn thuốc, thu hoạch,.. từ DB để insert
       const dataInsertDto = await this.getInfoToRequestQrcode(dto.userHomeCode, user, dto.harvestPhase);
 
-      console.log({ dataInsertDto }); 
+      console.log({ dataInsertDto });
       if (!dataInsertDto || !dataInsertDto.seqHarvestPhase) {
         this.logger.error(logbase, `Không thê lấy thông tin yêu cầu mã Qr từ cơ sở dữ liệu của người dùng (${user.userCode}) và nhà yến (${dto.userHomeCode})`);
         result = 0;
@@ -284,14 +282,14 @@ export class QrRequestAppService {
       }
     }
 
-    const result = await this.qrRequestAppRepository.cancelRequest(requestInfo.seq!!, requestCode, userCode);
+    const result = await this.qrRequestAppRepository.cancelRequest(requestInfo.seq!, requestCode, userCode);
     return result;
   }
   // TODO: FILE
   async uploadRequestFile(userCode: string, dto: UploadRequestVideoDto, requestQrcodeFiles: Express.Multer.File[]): Promise<QrRequestFileStrResDto[]> {
     const logbase = `${this.SERVICE_NAME}/uploadRequestFile:`;
     try {
-      let res: QrRequestFileStrResDto[] = [];
+      const res: QrRequestFileStrResDto[] = [];
       if (requestQrcodeFiles.length > 0) {
         for (const file of requestQrcodeFiles) {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);

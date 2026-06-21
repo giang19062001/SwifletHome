@@ -10,7 +10,6 @@ import { CommonGuideStrategy } from './strategies/common-guide.strategy';
 import { RequestDoctorStrategy } from './strategies/request-doctor.strategy';
 import { SignupServiceStrategy } from './strategies/signup-service.strategy';
 
-
 @Module({
   imports: [AuthAppModule, PackageAppModule, InfoAppModule, UserAppModule],
   controllers: [ScreenAppController],
@@ -26,6 +25,6 @@ import { SignupServiceStrategy } from './strategies/signup-service.strategy';
       inject: [SignupServiceStrategy, RequestDoctorStrategy, CommonGuideStrategy], // gom các chiến lược thành 1 nhà máy chung có cùng interface
     },
   ],
-  exports: []
+  exports: [],
 })
 export class ScreenAppModule {}

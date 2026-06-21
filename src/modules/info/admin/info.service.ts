@@ -4,7 +4,7 @@ import { getFileLocation, validateImgExt } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IMG_TYPES } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
-import { InfoResDto } from "../info.response";
+import { InfoResDto } from '../info.response';
 import { UpdateInfoDto } from './info.dto';
 import { InfoAdminRepository } from './info.repository';
 

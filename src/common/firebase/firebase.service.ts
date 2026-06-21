@@ -10,7 +10,7 @@ import { NotificationAppService } from 'src/modules/notification/app/notificatio
 import { NotificationMessageIdEnum, NotificationMethodEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { v4 as uuidv4 } from 'uuid';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
-import { UserNotificationTopicResDto } from "../../modules/notification/notification.response";
+import { UserNotificationTopicResDto } from '../../modules/notification/notification.response';
 import { LoggingService } from '../logger/logger.service';
 import { PushDataPayload } from './firebase.interface';
 
@@ -99,7 +99,7 @@ export class FirebaseService implements OnModuleInit {
         targetScreen: GetAppScreen(notificationType),
         image_logo: this.IMAGE.LOGO,
         image_detail: this.IMAGE.DETAIL,
-        data: JSON.stringify(data) ?? "",
+        data: JSON.stringify(data) ?? '',
         count: String(count),
         notificationMethod: 'SINGLE',
       };
@@ -116,7 +116,7 @@ export class FirebaseService implements OnModuleInit {
       try {
         const response = await this.messaging.send(message);
         if (response) {
-          messageId = response.split('/messages/')[1] || response; 
+          messageId = response.split('/messages/')[1] || response;
           this.logger.log(logbase, `Gửi thông báo đẩy cho ${deviceToken} thành công : ${JSON.stringify(response)}`);
         }
       } catch (error) {
@@ -166,7 +166,7 @@ export class FirebaseService implements OnModuleInit {
       targetScreen: GetAppScreen(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
-      data: JSON.stringify(data) ?? "",
+      data: JSON.stringify(data) ?? '',
       count: '0',
       notificationMethod: 'TOPIC',
     };
@@ -221,23 +221,27 @@ export class FirebaseService implements OnModuleInit {
     intendedUserCodes: string[] = [],
   ): Promise<MulticastResult> {
     const logbase = `${this.SERVICE_NAME}/sendNotificationToMulticast`;
-    
+
     // Nếu số lượng userDeviceTokens < 50, dùng hàng đợi để xử lý đơn lẻ cho từng user
     if (userDeviceTokens.length > 0 && userDeviceTokens.length < QUERY_HELPER.MAXIMUM_TO_SEND_SINGLE_NOTIFICATION) {
       this.logger.log(logbase, `Số lượng userDeviceTokens (${userDeviceTokens.length}) < ${QUERY_HELPER.MAXIMUM_TO_SEND_SINGLE_NOTIFICATION}. Sử dụng hàng đợi BullMQ để xử lý gửi lẻ từng user...`);
-      
-      const queuePromises = userDeviceTokens.map((ele) => 
-        this.notificationQueue.add('sendSingleNotification', {
-          userCode: ele.userCode,
-          deviceToken: ele.deviceToken,
-          title,
-          body,
-          data,
-          notificationType,
-        }, {
-          removeOnComplete: true, // xóa job sau khi hoàn thành khỏi redis
-          removeOnFail: true, // xóa job kể cả khi thất bại khỏi redis
-        })
+
+      const queuePromises = userDeviceTokens.map((ele) =>
+        this.notificationQueue.add(
+          'sendSingleNotification',
+          {
+            userCode: ele.userCode,
+            deviceToken: ele.deviceToken,
+            title,
+            body,
+            data,
+            notificationType,
+          },
+          {
+            removeOnComplete: true, // xóa job sau khi hoàn thành khỏi redis
+            removeOnFail: true, // xóa job kể cả khi thất bại khỏi redis
+          },
+        ),
       );
       await Promise.all(queuePromises);
 
@@ -251,20 +255,20 @@ export class FirebaseService implements OnModuleInit {
     }
 
     const userCodes = userDeviceTokens.map((ele) => ele.userCode);
-    const tokens = [...new Set(userDeviceTokens.map((ele) => ele.deviceToken).filter(token => !!token))]; // BỎ TRÙNG LẶP VÀ TOKEN TRỐNG
+    const tokens = [...new Set(userDeviceTokens.map((ele) => ele.deviceToken).filter((token) => !!token))]; // BỎ TRÙNG LẶP VÀ TOKEN TRỐNG
     const notificationId = uuidv4();
     let messageId: string = NotificationMessageIdEnum.MULTICAST;
-    
+
     // Tìm các user không có token
-    const usersWithTokens = new Set(userDeviceTokens.map(u => u.userCode));
-    const usersMissingTokens = intendedUserCodes.filter(code => !usersWithTokens.has(code));
-    
+    const usersWithTokens = new Set(userDeviceTokens.map((u) => u.userCode));
+    const usersMissingTokens = intendedUserCodes.filter((code) => !usersWithTokens.has(code));
+
     let totalSuccessCount = 0;
     let totalFailureCount = usersMissingTokens.length;
     const successItems: string[] = [];
-    const failureItems: { userCode: string; error: string }[] = usersMissingTokens.map(userCode => ({
+    const failureItems: { userCode: string; error: string }[] = usersMissingTokens.map((userCode) => ({
       userCode,
-      error: MsgAdmin.deviceTokenNotBelongToThisUser
+      error: MsgAdmin.deviceTokenNotBelongToThisUser,
     }));
 
     if (tokens.length === 0) {
@@ -278,13 +282,13 @@ export class FirebaseService implements OnModuleInit {
         targetScreen: GetAppScreen(notificationType),
         image_logo: this.IMAGE.LOGO,
         image_detail: this.IMAGE.DETAIL,
-        data: JSON.stringify(data) ?? "",
+        data: JSON.stringify(data) ?? '',
         count: '0',
         notificationMethod: 'MULTICAST',
       };
 
       // FCM giới hạn gửi tối đa 500 token mỗi lần
-      const BATCH_SIZE = QUERY_HELPER.BATCH_SIZE_FIREBASE_MULTICAST; 
+      const BATCH_SIZE = QUERY_HELPER.BATCH_SIZE_FIREBASE_MULTICAST;
 
       // Chia mảng token lớn thành từng khối (chunk) nhỏ
       for (let i = 0; i < tokens.length; i += BATCH_SIZE) {
@@ -304,9 +308,9 @@ export class FirebaseService implements OnModuleInit {
 
           if (batchResponse.failureCount > 0) {
             const cleanupPromises = batchResponse.responses.map(async (resp, index) => {
-              const currentTokenInfo = userDeviceTokens.find(ut => ut.deviceToken === tokenBatch[index]);
+              const currentTokenInfo = userDeviceTokens.find((ut) => ut.deviceToken === tokenBatch[index]);
               const userCode = currentTokenInfo?.userCode || 'Unknown';
-              
+
               if (!resp.success && resp.error) {
                 const failedToken = tokenBatch[index];
                 const errorCode = resp.error.code || 'unknown';
@@ -328,8 +332,8 @@ export class FirebaseService implements OnModuleInit {
             await Promise.all(cleanupPromises);
           } else {
             // Tất cả đều thành công trong batch này
-            tokenBatch.forEach(token => {
-              const userCode = userDeviceTokens.find(ut => ut.deviceToken === token)?.userCode || 'Unknown';
+            tokenBatch.forEach((token) => {
+              const userCode = userDeviceTokens.find((ut) => ut.deviceToken === token)?.userCode || 'Unknown';
               successItems.push(userCode);
             });
           }
@@ -359,16 +363,15 @@ export class FirebaseService implements OnModuleInit {
       };
       await this.notificationAppService.createNotification(notificationDto);
     }
-    
+
     return {
       totalCount: intendedUserCodes.length || tokens.length,
       successCount: totalSuccessCount,
       failureCount: totalFailureCount,
       successItems: [...new Set(successItems)],
-      failureItems
+      failureItems,
     };
   }
-
 
   // Subscribe user mới vào toàn bộ topic
   async subscribeToTopic(userCode: string, deviceToken: string) {
@@ -387,26 +390,28 @@ export class FirebaseService implements OnModuleInit {
     // Subscribe toàn bộ topic cho user hiện tại
     // Nếu Firebase báo token không hợp lệ → xóa ngay khỏi DB để tránh gửi thông báo thất bại sau này
     let isTokenInvalid = false;
-    await Promise.all(allTopics.map(async (topic) => {
-      try {
-        const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
-        if (response.failureCount > 0) {
-          const invalidCodes = ['messaging/registration-token-not-registered', 'messaging/invalid-registration-token'];
-          const hasInvalidToken = response.errors?.some(e => invalidCodes.includes(e.error?.code));
-          if (hasInvalidToken) {
-            isTokenInvalid = true;
-            this.logger.error(logbase, `Token không hợp lệ khi subscribe topic(${topic.topicName}) cho user(${userCode}) → sẽ xóa khỏi DB`);
-          } else {
-            this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+    await Promise.all(
+      allTopics.map(async (topic) => {
+        try {
+          const response = await admin.messaging().subscribeToTopic(deviceToken, topic.topicCode);
+          if (response.failureCount > 0) {
+            const invalidCodes = ['messaging/registration-token-not-registered', 'messaging/invalid-registration-token'];
+            const hasInvalidToken = response.errors?.some((e) => invalidCodes.includes(e.error?.code));
+            if (hasInvalidToken) {
+              isTokenInvalid = true;
+              this.logger.error(logbase, `Token không hợp lệ khi subscribe topic(${topic.topicName}) cho user(${userCode}) → sẽ xóa khỏi DB`);
+            } else {
+              this.logger.error(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thất bại --> (${JSON.stringify(response)})`);
+            }
           }
+          if (response.successCount > 0) {
+            this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
+          }
+        } catch (error) {
+          this.logger.error(logbase, `Lỗi khi đăng ký topic ${topic.topicCode}: ${error.message}`);
         }
-        if (response.successCount > 0) {
-          this.logger.log(logbase, `Đăng ký TOPIC PUSH(${topic.topicName}) cho người dùng (${userCode}) thành công`);
-        }
-      } catch (error) {
-        this.logger.error(logbase, `Lỗi khi đăng ký topic ${topic.topicCode}: ${error.message}`);
-      }
-    }));
+      }),
+    );
 
     // Nếu phát hiện token invalid → xóa khỏi DB để admin gửi notify không bị lỗi
     if (isTokenInvalid) {
@@ -435,19 +440,20 @@ export class FirebaseService implements OnModuleInit {
       return;
     }
 
-    await Promise.all(existingSubs.map(async (topic) => {
-      try {
-        const response = await admin.messaging().unsubscribeFromTopic(deviceToken, topic.topicCode);
-        if (response.failureCount > 0) {
-          this.logger.error(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thất bại --> ${JSON.stringify(response.errors[0].error)}`);
+    await Promise.all(
+      existingSubs.map(async (topic) => {
+        try {
+          const response = await admin.messaging().unsubscribeFromTopic(deviceToken, topic.topicCode);
+          if (response.failureCount > 0) {
+            this.logger.error(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thất bại --> ${JSON.stringify(response.errors[0].error)}`);
+          }
+          if (response.successCount > 0) {
+            this.logger.log(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thành công`);
+          }
+        } catch (error) {
+          this.logger.error(logbase, `Lỗi khi hủy đăng ký topic ${topic.topicCode}: ${error.message}`);
         }
-        if (response.successCount > 0) {
-          this.logger.log(logbase, `Hủy đăng ký TOPIC PUSH(${topic.topicName}) tự động cho người dùng (${userCode}) thành công`);
-        }
-      } catch (error) {
-        this.logger.error(logbase, `Lỗi khi hủy đăng ký topic ${topic.topicCode}: ${error.message}`);
-      }
-    }));
+      }),
+    );
   }
-
 }

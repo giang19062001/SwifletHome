@@ -260,7 +260,6 @@ export class GetInfoTaskHarvestForAdjustDto {
   @Min(1)
   harvestPhase: number;
 
-  
   @ApiProperty({
     example: 2025,
   })

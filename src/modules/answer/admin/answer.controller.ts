@@ -2,8 +2,8 @@ import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatu
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
-import { AnswerResDto } from "../answer.response";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { AnswerResDto } from '../answer.response';
 import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
 import { AnswerAdminService } from './answer.service';
 
@@ -50,7 +50,7 @@ export class AnswerAdminController {
   @ApiParam({ name: 'answerCode', type: String })
   @Put('update/:answerCode')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateAnswerDto, @Param('answerCode') answerCode: string,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
+  async update(@Body() dto: UpdateAnswerDto, @Param('answerCode') answerCode: string, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.answerAdminService.update(dto, admin.userId, answerCode);
     if (result === 0) {
       throw new BadRequestException();

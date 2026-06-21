@@ -70,6 +70,6 @@ export class ConsignmentAppService {
   async getDetailConsignment(consignmentCode: string, userCode: string): Promise<GetDetailConsignmentResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetailConsignment:`;
     const result = await this.consignmentAppRepository.getDetail(consignmentCode, userCode);
-    return result
+    return result;
   }
 }

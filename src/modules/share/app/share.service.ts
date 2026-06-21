@@ -14,8 +14,8 @@ export class ShareAppService {
     private readonly shareRepository: ShareAppRepository,
     private readonly configService: ConfigService,
     private readonly todoHarvestAppService: TodoHarvestAppService,
-    private readonly userHomeAppService: UserHomeAppService
-  ) { }
+    private readonly userHomeAppService: UserHomeAppService,
+  ) {}
 
   async getShareLink(dto: GetShareLinkDto): Promise<string | null> {
     const { seq, userHomeCode, harvestPhase, harvestYear } = dto;
@@ -55,7 +55,7 @@ export class ShareAppService {
           throw new BadRequestException({ message: 'Không tìm thấy thông tin nhà yến', data: null });
         }
 
-        const { isIntegateTempHum, isIntegateCurrent, isTriggered, uniqueId, ...cleanHomeData } = homeData
+        const { isIntegateTempHum, isIntegateCurrent, isTriggered, uniqueId, ...cleanHomeData } = homeData;
 
         const harvestData = await this.todoHarvestAppService.arrangeHarvestRows(harvestPhaseDetail.seq, homeData.userHomeFloor);
 
@@ -68,7 +68,7 @@ export class ShareAppService {
             userHomeCode: harvestPhaseDetail.userHomeCode,
             homeData: cleanHomeData,
             harvestData,
-          }
+          },
         };
       }
 

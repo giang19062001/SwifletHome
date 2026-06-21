@@ -5,11 +5,10 @@ import ReportAppController from './report.controller';
 import { ReportAppRepository } from './report.repository';
 import { ReportAppService } from './report.service';
 
-
 @Module({
   imports: [AuthAppModule, UserHomeAppModule],
   controllers: [ReportAppController],
   providers: [ReportAppService, ReportAppRepository],
-  exports: []
+  exports: [],
 })
 export class ReportAppModule {}

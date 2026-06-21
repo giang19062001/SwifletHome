@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { NotificationStatusEnum, NotificationTypeEnum, NotificationMethodEnum } from '../notification.interface';
 
-
 export enum DeleteNotificationByStatusEnum {
   SENT = 'SENT',
   READ = 'READ',
@@ -10,7 +9,7 @@ export enum DeleteNotificationByStatusEnum {
 }
 
 export class DeleteNotificationByStatusDto {
-   @ApiProperty({
+  @ApiProperty({
     example: 'SENT',
     enum: DeleteNotificationByStatusEnum,
   })
@@ -105,8 +104,6 @@ export class CreateNotificationDto {
   @IsEnum(NotificationMethodEnum)
   notificationMethod: NotificationMethodEnum;
 }
-
-
 
 export class CreateNotificationOfUserDto {
   @ApiProperty({

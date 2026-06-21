@@ -31,7 +31,6 @@ export class UpdateQuestionDto {
   @IsString()
   @IsNotEmpty()
   questionCategory: string;
-
 }
 
 export class CreateQuestionDto extends UpdateQuestionDto {}

@@ -6,15 +6,7 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { TodoHarvestAppRepository } from './todo-harvest.repository';
-import {
-  AdjustHarvestTaskDto,
-  FloorDataInputDto,
-  GetInfoTaskHarvestForAdjustDto,
-  GetListTaskHarvestForAdjustDto,
-  HarvestDataInputDto,
-  HarvestDataRowInputDto,
-  SetHarvestTaskDto,
-} from './todo.dto';
+import { AdjustHarvestTaskDto, FloorDataInputDto, GetInfoTaskHarvestForAdjustDto, GetListTaskHarvestForAdjustDto, HarvestDataInputDto, HarvestDataRowInputDto, SetHarvestTaskDto } from './todo.dto';
 import { GetInfoTaskHarvestForAdjustResDto, GetListTaskHarvestResDto, GetTaskHarvestResDto } from './todo.response';
 
 @Injectable()
@@ -25,8 +17,7 @@ export class TodoHarvestAppService {
     private readonly todoHarvestAppRepository: TodoHarvestAppRepository,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly logger: LoggingService,
-  ) { }
-
+  ) {}
 
   async insUpDelHarvestRows(userCode: string, userHomeCode: string, seqHarvestPhase: number, harvestData: HarvestDataInputDto[]) {
     // Lấy danh sách các dòng dữ liệu thu hoạch hiện tại trong DB cho đợt này
@@ -82,7 +73,7 @@ export class TodoHarvestAppService {
     } else {
       // Trường hợp DB chưa có dữ liệu nào cho đợt này -> Thêm mới toàn bộ
       if (harvestData.length) {
-        let harvestDataRows: HarvestDataRowInputDto[] = [];
+        const harvestDataRows: HarvestDataRowInputDto[] = [];
         for (const flo of harvestData) {
           for (const cel of flo.floorData) {
             harvestDataRows.push({
@@ -140,10 +131,10 @@ export class TodoHarvestAppService {
    */
   async arrangeMultipleHarvestRows(seqHarvestPhases: number[], userHomeFloor: number): Promise<{ seq: number; harvestData: HarvestDataInputDto[] }[]> {
     if (!seqHarvestPhases || !seqHarvestPhases.length) return [];
-    
+
     // Lấy toàn bộ dữ liệu của tất cả các đợt trong một lần truy vấn DB duy nhất
     const allRows = await this.todoHarvestAppRepository.getMultipleTaskHarvestRows(seqHarvestPhases, true);
-    
+
     // Phân loại các dòng dữ liệu theo ID của đợt thu hoạch (seqHarvestPhase)
     const rowsByPhase = new Map<number, typeof allRows>();
     for (const row of allRows) {
@@ -155,12 +146,12 @@ export class TodoHarvestAppService {
     }
 
     const result: { seq: number; harvestData: HarvestDataInputDto[] }[] = [];
-    
+
     // Với mỗi đợt, thực hiện tổ chức lại dữ liệu theo tầng/ô tương tự arrangeHarvestRows
     for (const seq of seqHarvestPhases) {
       const harvestRows = rowsByPhase.get(seq) || [];
       const existingDataMap = new Map<number, FloorDataInputDto[]>();
-      
+
       for (const row of harvestRows) {
         if (!existingDataMap.has(row.floor)) {
           existingDataMap.set(row.floor, []);
@@ -180,10 +171,10 @@ export class TodoHarvestAppService {
           harvestData.push({ floor: i, floorData: [{ cell: 1, cellCollected: 0, cellRemain: 0 }] });
         }
       }
-      
+
       result.push({ seq, harvestData });
     }
-    
+
     return result;
   }
 
@@ -207,9 +198,7 @@ export class TodoHarvestAppService {
         const taskDate = moment(dto.harvestNextDate).toDate();
 
         // Chèn bản ghi đợt thu hoạch mới vào DB
-        const seqHarvestPhase = await this.todoHarvestAppRepository.insertTaskHarvestPhase(
-          userCode, mainHomeOfUser.userHomeCode, dto.harvestPhase, isUse, taskDate, taskStatus,
-        );
+        const seqHarvestPhase = await this.todoHarvestAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, dto.harvestPhase, isUse, taskDate, taskStatus);
         this.logger.log(logbase, `Tạo đợt thu hoạch mới seqHarvestPhase(${seqHarvestPhase})`);
 
         // Xử lý lưu các dòng dữ liệu tầng/ô chi tiết
@@ -231,9 +220,7 @@ export class TodoHarvestAppService {
         }
 
         // Cập nhật ngày thu hoạch dự kiến
-        await this.todoHarvestAppRepository.updateTaskHarvestDate(
-          userCode, phaseDetail.seq, moment(dto.harvestNextDate).format('YYYY-MM-DD'),
-        );
+        await this.todoHarvestAppRepository.updateTaskHarvestDate(userCode, phaseDetail.seq, moment(dto.harvestNextDate).format('YYYY-MM-DD'));
         this.logger.log(logbase, `Cập nhật taskDate seqHarvestPhase(${phaseDetail.seq})`);
 
         // Cập nhật/Thêm/Xóa các dòng tầng/ô tương ứng
@@ -291,7 +278,7 @@ export class TodoHarvestAppService {
 
     // Lấy và tổ chức dữ liệu các tầng/ô (nếu tạo mới thì phaseDetail?.seq là 0, sẽ trả về data mặc định)
     const harvestData: HarvestDataInputDto[] = await this.arrangeHarvestRows(phaseDetail?.seq ?? 0, homeArea.userHomeFloor);
-    
+
     // Lấy phase cao nhất hiện tại của nhà yến để gợi ý phase tiếp theo
     const harvestPhase = await this.todoHarvestAppRepository.getMaxHarvestPhase(mainHomeOfUser.userHomeCode);
 
@@ -312,7 +299,7 @@ export class TodoHarvestAppService {
    */
   async getInfoTaskHarvestForAdjust(userCode: string, dto: GetInfoTaskHarvestForAdjustDto): Promise<GetInfoTaskHarvestForAdjustResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getInfoTaskHarvestForAdjust:`;
-    
+
     // Kiểm tra thông tin nhà yến
     const homeInfo = await this.userHomeAppService.getDetail(dto.userHomeCode);
     if (!homeInfo) {
@@ -326,8 +313,8 @@ export class TodoHarvestAppService {
     }
 
     // Tìm kiếm đợt thu hoạch đã hoàn thành (taskStatus = 'COMPLETE') và chưa liên kết với mã QR nào
-    let taskHarvestComplete = await this.todoHarvestAppRepository.getTaskHarvestCompleteAndNotUseOne(dto.userHomeCode, dto.harvestPhase, dto.harvestYear);
-    
+    const taskHarvestComplete = await this.todoHarvestAppRepository.getTaskHarvestCompleteAndNotUseOne(dto.userHomeCode, dto.harvestPhase, dto.harvestYear);
+
     // Nếu tìm thấy, lấy chi tiết tầng/ô, nếu không trả về mảng trống
     const harvestData = taskHarvestComplete ? await this.arrangeHarvestRows(taskHarvestComplete.seq, homeInfo.userHomeFloor) : [];
 
@@ -346,7 +333,7 @@ export class TodoHarvestAppService {
     const logbase = `${this.SERVICE_NAME}/adjustTaskHarvest:`;
     try {
       let result = 1;
-      
+
       // Kiểm tra xem đợt này đã được sử dụng (gắn vào QR code) hay chưa
       const isNotUsed = await this.todoHarvestAppRepository.checkTaskHarvestCompleteAndNotUse(dto.seq);
       if (!isNotUsed) {
@@ -354,7 +341,7 @@ export class TodoHarvestAppService {
         result = -1;
         // Chỗ này không return ngay vì logic dưới vẫn gọi insUpDelHarvestRows (có thể là bug hoặc cố ý ghi đè dù đã dùng)
       }
-      
+
       // Cập nhật lại các dòng dữ liệu tầng/ô
       await this.insUpDelHarvestRows(userCode, dto.userHomeCode, dto.seq, dto.harvestData);
       return result;
@@ -384,5 +371,4 @@ export class TodoHarvestAppService {
   async unuseTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
     return await this.todoHarvestAppRepository.unuseTaskHarvestForQr(userCode, userHomeCode, seqHarvestPhase);
   }
-
 }

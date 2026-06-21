@@ -7,7 +7,7 @@ export class HomeSaleSightseeingAppRepository {
   private readonly tableSightSeeing = 'tbl_home_sale_sightseeing';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  // TODO: SIGHTSEEING 
+  // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string, status: string): Promise<number> {
     const sql = `
         INSERT INTO ${this.tableSightSeeing}  (homeCode, userCode, userName, userPhone, numberAttendCode, note, status, createdId) 

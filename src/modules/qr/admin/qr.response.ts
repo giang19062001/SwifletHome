@@ -29,4 +29,3 @@ export class GetInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeResDt
   @IsEnum(YnEnum)
   isSold: YnEnum;
 }
-

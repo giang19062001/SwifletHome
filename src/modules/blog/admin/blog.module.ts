@@ -7,6 +7,6 @@ import { BlogAdminService } from './blog.service';
   imports: [AuthAdminModule],
   controllers: [BlogAdminController],
   providers: [BlogAdminService, BlogAdminRepository],
-  exports:[BlogAdminService]
+  exports: [BlogAdminService],
 })
 export class BlogAdminModule {}

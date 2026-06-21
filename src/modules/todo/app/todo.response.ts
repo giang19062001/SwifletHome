@@ -247,7 +247,6 @@ export class GetListTaskHarvestResDto {
   totalCellRemain: number;
 }
 
-
 export class GetInfoTaskHarvestForAdjustResDto {
   @ApiProperty({ example: '' })
   seq: number;

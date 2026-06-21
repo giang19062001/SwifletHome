@@ -14,7 +14,7 @@ export class HomeSaleIndexAppService {
     private readonly homeSaleIndexAppRepository: HomeSaleIndexAppRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: HomeSaleResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
 

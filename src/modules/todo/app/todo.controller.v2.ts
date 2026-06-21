@@ -4,7 +4,7 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { TodoAlarmAppService } from './todo-alarm.service';
 import { SetTaskAlarmDto } from './todo.dto';
@@ -65,5 +65,4 @@ export default class TodoAppControllerV2 {
       data: result,
     };
   }
-  
 }

@@ -48,5 +48,3 @@ export enum NotificationMessageIdEnum {
   PUSH_FAILED = 'push_failed',
   MULTICAST = 'multicast',
 }
-
-

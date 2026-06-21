@@ -56,7 +56,7 @@ export function getTeamTemplate(data: any) {
           <p style="margin: 15px 20px;"><strong>Họ và tên:</strong> ${data.teamUserName}</p>
           <p style="margin: 15px 20px;"><strong>Số điện thoại:</strong> ${data.teamPhone}</p>
           <p style="margin: 15px 20px;"><strong>Địa chỉ:</strong> ${data.teamAddress}</p>
-          <p style="margin: 15px 20px;"><strong>Loại đội/xưởng đăng ký:</strong> ${data.userTypeKeyWord  == USER_CONST.USER_TYPE.FACTORY.value ? USER_CONST.USER_TYPE.FACTORY.text : USER_CONST.USER_TYPE.TECHNICAL.text}</p>
+          <p style="margin: 15px 20px;"><strong>Loại đội/xưởng đăng ký:</strong> ${data.userTypeKeyWord == USER_CONST.USER_TYPE.FACTORY.value ? USER_CONST.USER_TYPE.FACTORY.text : USER_CONST.USER_TYPE.TECHNICAL.text}</p>
         </div>
         <p style="text-align: center; margin-top: -20px; margin-bottom: 50px;">
  <a href="tel:${data.teamPhone}" style="display: inline-block; width: 280px; box-sizing: border-box; background-color: #1a73e8; color: #ffffff; padding: 12px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">GỌI NHANH CHO KHÁCH HÀNG</a>          </p>

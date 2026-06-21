@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { BlogResDto } from "../blog.response";
+import { BlogResDto } from '../blog.response';
 
 @Injectable()
 export class BlogAdppRepository {
@@ -18,5 +18,4 @@ export class BlogAdppRepository {
     );
     return rows ? (rows[0] as BlogResDto) : null;
   }
-  
 }

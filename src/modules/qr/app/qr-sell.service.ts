@@ -120,9 +120,7 @@ export class QrSellAppService {
 
       // Lấy VAT từ InfoAppService
       const vatInfo = await this.infoAppService.getDetail('VAT');
-      const vat = (vatInfo && vatInfo.infoContent && typeof vatInfo.infoContent === 'object' && 'vat' in vatInfo.infoContent)
-        ? Number(vatInfo.infoContent.vat)
-        : 0;
+      const vat = vatInfo && vatInfo.infoContent && typeof vatInfo.infoContent === 'object' && 'vat' in vatInfo.infoContent ? Number(vatInfo.infoContent.vat) : 0;
 
       const priceVatHistory: PriceVatHistoryDto = {};
 

@@ -3,12 +3,7 @@ import { ShareTypeEnum } from './share.interface';
 import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
 import { UserHomeResDto } from 'src/modules/userHome/app/userHome.dto';
 
-export class SharedHomeDataResDto extends OmitType(UserHomeResDto, [
-  'isIntegateTempHum',
-  'isIntegateCurrent',
-  'isTriggered',
-  'uniqueId',
-] as const) {}
+export class SharedHomeDataResDto extends OmitType(UserHomeResDto, ['isIntegateTempHum', 'isIntegateCurrent', 'isTriggered', 'uniqueId'] as const) {}
 
 export class GetShareLinkResDto {
   @ApiProperty()

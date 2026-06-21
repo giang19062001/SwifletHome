@@ -6,7 +6,7 @@ export class ShareAppRepository {
   private readonly table = 'tbl_share';
   private readonly tableHarvestPhare = 'tbl_todo_task_harvest_phase';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) { }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getShareByDetails(seqShare: number, shareType: string): Promise<any> {
     const query = `
@@ -30,7 +30,6 @@ export class ShareAppRepository {
     return rows.length ? rows[0] : null;
   }
 
-
   async insertShare(shareToken: string, seqShare: number, shareType: string): Promise<number> {
     const sql = `
       INSERT INTO ${this.table} (shareToken, seqShare, shareType)
@@ -50,7 +49,7 @@ export class ShareAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [seqHarvestPhase]);
     return rows.length ? rows[0] : null;
   }
-    async checkHarvestPhaseExist(seqHarvestPhase: number, userHomeCode: string, harvestPhase: number, harvestYear: number): Promise<boolean> {
+  async checkHarvestPhaseExist(seqHarvestPhase: number, userHomeCode: string, harvestPhase: number, harvestYear: number): Promise<boolean> {
     const query = `
       SELECT seq FROM ${this.tableHarvestPhare}
       WHERE seq = ? AND userHomeCode = ? AND harvestPhase = ? AND harvestYear = ? AND isActive = 'Y'

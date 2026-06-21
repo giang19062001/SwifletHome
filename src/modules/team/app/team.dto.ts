@@ -104,10 +104,10 @@ export class ReviewTeamDto {
 }
 
 export class TeamReviewFileStrResDto {
-    @ApiProperty({ example: 0 })
-    seq: number;
-    @ApiProperty({ example: '' })
-    filename: string;
+  @ApiProperty({ example: 0 })
+  seq: number;
+  @ApiProperty({ example: '' })
+  filename: string;
 }
 
 // ─── Team Registration DTOs (App) ───────────────────────────────────────────
@@ -152,11 +152,14 @@ export class CreateTeamAppDto {
     example: [{ serviceTypeCode: 'BUILD_RAW', serviceTextInput: 'nội dung', uniqueId: 'uuid của service này' }],
     description: 'Mảng dịch vụ đăng ký',
   })
-  @Type(() => Array<{
-    serviceTypeCode: string;
-    serviceTextInput: string;
-    uniqueId: string;
-  }>)
+  @Type(
+    () =>
+      Array<{
+        serviceTypeCode: string;
+        serviceTextInput: string;
+        uniqueId: string;
+      }>,
+  )
   @IsOptional()
   servicesData: any;
 
@@ -221,24 +224,24 @@ export class DeleteFileAppDto {
 }
 
 export class TeamReviewFileResDto {
-    @ApiProperty({ example: 0 })
-    seq: number;
-    @ApiProperty({ example: 0 })
-    reviewSeq: number;
-    @ApiProperty({ example: '' })
-    teamCode: string;
-    @ApiProperty({ example: '' })
-    homeName: string;
-    @ApiProperty({ example: '' })
-    filename: string;
-    @ApiProperty({ example: '' })
-    originalname: string;
-    @ApiProperty({ example: 0 })
-    size: number;
-    @ApiProperty({ example: '' })
-    mimetype: string;
-    @ApiProperty({ example: '' })
-    uniqueId: string;
-    @ApiProperty({ example: YnEnum.N })
-    isActive: YnEnum;
+  @ApiProperty({ example: 0 })
+  seq: number;
+  @ApiProperty({ example: 0 })
+  reviewSeq: number;
+  @ApiProperty({ example: '' })
+  teamCode: string;
+  @ApiProperty({ example: '' })
+  homeName: string;
+  @ApiProperty({ example: '' })
+  filename: string;
+  @ApiProperty({ example: '' })
+  originalname: string;
+  @ApiProperty({ example: 0 })
+  size: number;
+  @ApiProperty({ example: '' })
+  mimetype: string;
+  @ApiProperty({ example: '' })
+  uniqueId: string;
+  @ApiProperty({ example: YnEnum.N })
+  isActive: YnEnum;
 }

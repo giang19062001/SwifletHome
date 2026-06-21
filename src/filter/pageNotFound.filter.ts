@@ -1,9 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  NotFoundException,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, NotFoundException } from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch(NotFoundException)
@@ -17,7 +12,7 @@ export class PageNotFoundExceptionFilter implements ExceptionFilter {
     response.status(404).render('pages/404', {
       title: '404',
       isLayout: false,
-      user: request.session?.user, 
+      user: request.session?.user,
     });
   }
 }

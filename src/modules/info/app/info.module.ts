@@ -8,6 +8,6 @@ import { InfoAppService } from './info.service';
   imports: [AuthAppModule],
   controllers: [InfoAppController],
   providers: [InfoAppService, InfoAppRepository],
-  exports: [InfoAppService]
+  exports: [InfoAppService],
 })
 export class InfoAppModule {}

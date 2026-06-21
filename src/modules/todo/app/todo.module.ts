@@ -11,11 +11,10 @@ import TodoAppController from './todo.controller';
 import TodoAppControllerV2 from './todo.controller.v2';
 import TodoAppValidate from './todo.validate';
 
-
 @Module({
   imports: [AuthAppModule, UserHomeAppModule],
   controllers: [TodoAppController, TodoAppControllerV2],
   providers: [TodoAlarmAppService, TodoAlarmAppRepository, TodoHarvestAppService, TodoMedicineAppService, TodoHarvestAppRepository, TodoMedicineAppRepository, TodoAppValidate],
-  exports: [TodoAlarmAppService, TodoHarvestAppService, TodoMedicineAppService]
+  exports: [TodoAlarmAppService, TodoHarvestAppService, TodoMedicineAppService],
 })
 export class TodoAppModule {}

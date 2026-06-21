@@ -9,10 +9,12 @@ export class GuestRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async create(dto: CreateGuestConsulationDto): Promise<number> {
-    const [result] = await this.db.query<ResultSetHeader>(
-      `INSERT INTO ${this.table} (name, phone, issueInterest, issueDescription, createdAt) VALUES (?, ?, ?, ?, NOW())`,
-      [dto.name, dto.phone, dto.issueInterest, dto.issueDescription],
-    );
+    const [result] = await this.db.query<ResultSetHeader>(`INSERT INTO ${this.table} (name, phone, issueInterest, issueDescription, createdAt) VALUES (?, ?, ?, ?, NOW())`, [
+      dto.name,
+      dto.phone,
+      dto.issueInterest,
+      dto.issueDescription,
+    ]);
     return result.insertId;
   }
 }

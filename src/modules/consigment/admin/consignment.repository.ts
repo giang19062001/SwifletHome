@@ -37,7 +37,7 @@ export class ConsignmentAdminRepository {
     return rows as GetAllConsignmentResDto[];
   }
   async getDetail(consignmentCode: string): Promise<GetAllConsignmentResDto | null> {
-    let query = ` SELECT A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestQuantity, A.deliveryAddress, A.receiverName,
+    const query = ` SELECT A.seq, A.consignmentCode, A.userCode, A.senderName, A.senderPhone, A.nestQuantity, A.deliveryAddress, A.receiverName,
      A.receiverPhone, A.consignmentStatus, A.isActive, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') as createdAt, C.valueOption AS nestTypeLabel,
          CASE 
           WHEN COUNT(B.seq) = 0 THEN JSON_ARRAY()

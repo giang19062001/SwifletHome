@@ -80,7 +80,7 @@ export class QrRequestAppRepository {
     return rows as GetRequestQrCodeListResDto[];
   }
   async getRequestQrCocde(requestCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
-    let query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.seqHarvestPhase, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
+    const query = ` SELECT A.seq, A.requestCode, A.userHomeCode, E.userHomeName, A.seqHarvestPhase, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
       CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
         WHEN A.requestStatus = '${QR_CODE_CONST.REQUEST_STATUS.APPROVED.value}'
@@ -115,7 +115,7 @@ export class QrRequestAppRepository {
     return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
   async getApprovedRequestQrCocde(requestCode: string, userCode: string): Promise<GetApprovedRequestQrCodeResDto | null> {
-    let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
+    const query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
       A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
          CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
@@ -163,7 +163,7 @@ export class QrRequestAppRepository {
     return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
   async getRequestQrCodeDetail(requestCode: string, userCode: string): Promise<GetRequestQrCodeDetailResDto | null> {
-    let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
+    const query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
       A.userHomeAddress, A.temperature, COALESCE(D.humidity, A.humidity) AS humidity, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
          CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
@@ -231,7 +231,7 @@ export class QrRequestAppRepository {
   }
   async checkUsedThisHarvest(userHomeCode: string, userCode: string, harvestPhase: number): Promise<boolean> {
     const currentYear = new Date().getFullYear(); // năm nay
-    let query = ` SELECT A.seq
+    const query = ` SELECT A.seq
       FROM ${this.table} A
       LEFT JOIN ${this.tableHarvestPhase} F
       ON A.seqHarvestPhase = F.seq

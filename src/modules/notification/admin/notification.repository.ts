@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { NotificationTopicResDto } from "../notification.response";
+import { NotificationTopicResDto } from '../notification.response';
 
 @Injectable()
 export class NotificationAdminRepository {

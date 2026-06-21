@@ -6,8 +6,7 @@ import { GetOptionDto, OpitionResDto } from './option.dto';
 export class OptionRepository {
   private readonly table = 'tbl_option_common';
 
-  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {
-  }
+  constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAll(dto: GetOptionDto): Promise<OpitionResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.code, A.mainOption, A.subOption, A.keyOption, A.valueOption, A.sortOrder
@@ -15,7 +14,7 @@ export class OptionRepository {
         WHERE A.mainOption = ? AND A.subOption = ? ${'keyOption' in dto && dto.keyOption ? 'AND A.keyOption = ?' : ''}
         AND A.isActive = 'Y' 
         ORDER BY A.sortOrder ASC`,
-        'keyOption' in dto && dto.keyOption ? [dto.mainOption, dto.subOption, dto.keyOption] : [dto.mainOption, dto.subOption],
+      'keyOption' in dto && dto.keyOption ? [dto.mainOption, dto.subOption, dto.keyOption] : [dto.mainOption, dto.subOption],
     );
     return rows as OpitionResDto[];
   }

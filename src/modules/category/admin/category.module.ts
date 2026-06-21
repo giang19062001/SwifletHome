@@ -8,6 +8,6 @@ import { CategoryAdminService } from './category.service';
   imports: [AuthAdminModule],
   controllers: [CategoryAdminController],
   providers: [CategoryAdminService, CategoryAdminRepository],
-  exports:[CategoryAdminService]
+  exports: [CategoryAdminService],
 })
 export class CategoryAdminModule {}

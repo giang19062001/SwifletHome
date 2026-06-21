@@ -11,7 +11,6 @@ export interface ISensorStatus {
   timestamp?: number;
 }
 
-
 export interface ISensorHome {
   userHomeCode: string;
   temperature: number;

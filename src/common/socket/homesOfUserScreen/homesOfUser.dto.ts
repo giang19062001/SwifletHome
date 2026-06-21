@@ -4,7 +4,6 @@ export class LeaveRoomDto {
   @IsString()
   @IsNotEmpty()
   userCode: string;
-
 }
 export class JoinRoomDto {
   @IsString()

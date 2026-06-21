@@ -7,7 +7,7 @@ import { NumberOkResponseDto } from 'src/dto/common.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { getImgVideoMulterConfig } from './../../../config/multer.config';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';

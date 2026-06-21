@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ScreenResDto } from "../screen.response";
+import { ScreenResDto } from '../screen.response';
 import { UpdateScreenDto } from './screen.dto';
 import { ScreenAdminRepository } from './screen.repository';
 import * as fs from 'fs';
@@ -8,7 +8,7 @@ import * as path from 'path';
 
 @Injectable()
 export class ScreenAdminService {
-  constructor(private readonly screenAdminRepository: ScreenAdminRepository) { }
+  constructor(private readonly screenAdminRepository: ScreenAdminRepository) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: ScreenResDto[] }> {
     const total = await this.screenAdminRepository.getTotal();
     const list = await this.screenAdminRepository.getAll(dto);
@@ -20,8 +20,7 @@ export class ScreenAdminService {
   }
 
   async update(dto: UpdateScreenDto, updatedId: string, screenKeyword: string): Promise<number> {
-    const result = await this.screenAdminRepository.update
-    (dto, updatedId, screenKeyword);
+    const result = await this.screenAdminRepository.update(dto, updatedId, screenKeyword);
     return result;
   }
 
@@ -31,14 +30,16 @@ export class ScreenAdminService {
     if (detail && detail.contentCenter) {
       let center = detail.contentCenter;
       if (typeof center === 'string') {
-        try { center = JSON.parse(center); } catch (e) {}
+        try {
+          center = JSON.parse(center);
+        } catch (e) {}
       }
       if (center?.banner) {
         const oldPath = path.join(process.cwd(), 'public', center.banner);
         if (fs.existsSync(oldPath)) {
           try {
             fs.unlinkSync(oldPath);
-          } catch(e) {}
+          } catch (e) {}
         }
       }
     }
@@ -52,12 +53,16 @@ export class ScreenAdminService {
     if (!detail || !detail.screenSupportContent) {
       throw new Error('Screen does not support dynamic videos');
     }
-    
+
     let supportContent = detail.screenSupportContent;
     if (typeof supportContent === 'string') {
-      try { supportContent = JSON.parse(supportContent); } catch(e) { supportContent = {}; }
+      try {
+        supportContent = JSON.parse(supportContent);
+      } catch (e) {
+        supportContent = {};
+      }
     }
-    
+
     const tableVideo = supportContent?.tables?.video;
     if (!tableVideo) {
       throw new Error('No tableVideo configured for this screen');

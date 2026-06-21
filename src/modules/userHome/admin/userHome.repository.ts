@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
-import { UserHomeProvinceForPushResDto, UserHomeForPushResDto } from "../../notification/notification.response";
-import { UserHomeResDto } from "../app/userHome.dto";
+import { UserHomeProvinceForPushResDto, UserHomeForPushResDto } from '../../notification/notification.response';
+import { UserHomeResDto } from '../app/userHome.dto';
 
 @Injectable()
 export class UserHomeAdminRepository {
@@ -48,7 +48,7 @@ export class UserHomeAdminRepository {
       ON A.userCode = B.userCode
     LEFT JOIN tbl_provinces C
       ON A.userHomeProvince = C.provinceCode
-    WHERE A.isActive = 'Y' `;  
+    WHERE A.isActive = 'Y' `;
 
     const params: any[] = [];
 
@@ -76,9 +76,9 @@ export class UserHomeAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as UserHomeResDto[];
   }
-async getUserHomesByUser(userCode?: string | string[]): Promise<UserHomeForPushResDto[]> {
-  try {
-    let query = `
+  async getUserHomesByUser(userCode?: string | string[]): Promise<UserHomeForPushResDto[]> {
+    try {
+      let query = `
       SELECT B.userCode, B.deviceToken, A.userHomeCode
       FROM ${this.table} A
       INNER JOIN ${this.tableUser} B ON A.userCode = B.userCode
@@ -87,35 +87,33 @@ async getUserHomesByUser(userCode?: string | string[]): Promise<UserHomeForPushR
         AND B.deviceToken IS NOT NULL
     `;
 
-    const params: any[] = [];
+      const params: any[] = [];
 
-    if (typeof userCode === 'string') {
-      query += ` AND A.userCode = ?`;
-      params.push(userCode);
+      if (typeof userCode === 'string') {
+        query += ` AND A.userCode = ?`;
+        params.push(userCode);
+      }
+
+      if (Array.isArray(userCode) && userCode.length > 0) {
+        query += ` AND A.userCode IN (${userCode.map(() => '?').join(',')})`;
+        params.push(...userCode);
+      }
+
+      const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+      return rows as UserHomeForPushResDto[];
+    } catch (error) {
+      console.log(error);
+      return [];
     }
-
-    if (Array.isArray(userCode) && userCode.length > 0) {
-      query += ` AND A.userCode IN (${userCode.map(() => '?').join(',')})`;
-      params.push(...userCode);
-    }
-
-    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as UserHomeForPushResDto[];
-
-  } catch (error) {
-    console.log(error);
-    return [];
   }
-}
 
+  async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvinceForPushResDto[]> {
+    try {
+      if (!provinceCodes.length) return [];
 
-async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvinceForPushResDto[]> {
-  try {
-    if (!provinceCodes.length) return [];
+      const placeholders = provinceCodes.map(() => '?').join(', ');
 
-    const placeholders = provinceCodes.map(() => '?').join(', ');
-
-    const query = `
+      const query = `
       SELECT B.userCode, B.deviceToken, A.userHomeCode, C.provinceName AS userHomeProvince
       FROM ${this.table} A
       INNER JOIN ${this.tableUser} B ON A.userCode = B.userCode
@@ -124,13 +122,13 @@ async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvince
         AND A.userHomeProvince IN (${placeholders})
     `;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, provinceCodes);
-    return rows as UserHomeProvinceForPushResDto[];
-  } catch (error) {
-    console.log(error);
-    return [];
+      const [rows] = await this.db.query<RowDataPacket[]>(query, provinceCodes);
+      return rows as UserHomeProvinceForPushResDto[];
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
   }
-}
 
   async getDetail(userHomeCode: string): Promise<UserHomeResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(

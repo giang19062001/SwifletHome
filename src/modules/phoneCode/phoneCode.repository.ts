@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { PhoneCodeResDto } from "./phoneCode.response";
+import { PhoneCodeResDto } from './phoneCode.response';
 
 @Injectable()
 export class PhoneCodeRepository {
@@ -8,16 +8,16 @@ export class PhoneCodeRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAll(): Promise<PhoneCodeResDto[]> {
-    let query = `  SELECT seq, countryName, countryCode, isoCode, languageCode FROM ${this.table} `;
+    const query = `  SELECT seq, countryName, countryCode, isoCode, languageCode FROM ${this.table} `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
     return rows as PhoneCodeResDto[];
   }
 
   async getDetail(countryCode: string): Promise<PhoneCodeResDto | null> {
-    let query = `  SELECT seq, countryName, countryCode, isoCode, languageCode FROM ${this.table} WHERE countryCode = ? `;
+    const query = `  SELECT seq, countryName, countryCode, isoCode, languageCode FROM ${this.table} WHERE countryCode = ? `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [countryCode]);
-    return rows.length ? rows[0] as PhoneCodeResDto : null;
+    return rows.length ? (rows[0] as PhoneCodeResDto) : null;
   }
 }

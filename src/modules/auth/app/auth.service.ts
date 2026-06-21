@@ -90,18 +90,16 @@ export class AuthAppService extends AbAuthService {
 
     Promise.all([
       // Unsubscribe topic cho token CŨ (chỉ khi token cũ KHÁC token mới, tức user đổi thiết bị)
-      user.deviceToken && String(user.deviceToken) !== String(dto.deviceToken)
-        ? this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken)
-        : Promise.resolve(),
+      user.deviceToken && String(user.deviceToken) !== String(dto.deviceToken) ? this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken) : Promise.resolve(),
 
-      // Luôn Subscribe token hiện tại vào topics 
+      // Luôn Subscribe token hiện tại vào topics
       this.firebaseService.subscribeToTopic(user.userCode, dto.deviceToken),
     ]).catch((err) => {
       this.logger.error(`${logbase}/firebase-bg`, err.message);
     });
 
     // Luôn cập nhật device token mỗi lần đăng nhập (kể cả token không thay đổi)
-    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);  
+    await this.userAppService.updateDeviceToken(dto.deviceToken, dto.userPhone);
 
     // ẩn password
     const { userPassword, ...userWithoutPassword } = user;
@@ -126,9 +124,7 @@ export class AuthAppService extends AbAuthService {
       this.logger.log(logbase, `Người dùng ${user.userCode} đăng xuất. Xóa deviceToken và unsubscribe topics.`);
 
       //  unsubscribe topic và xóa deviceToken trong DB để trả về kết quả ngay lập tức
-      Promise.all([
-        this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken),
-        this.userAppService.clearDeviceToken(user.deviceToken)]).catch((error) => {
+      Promise.all([this.firebaseService.unsubscribeFromTopic(user.userCode, user.deviceToken), this.userAppService.clearDeviceToken(user.deviceToken)]).catch((error) => {
         this.logger.error(`${logbase}/background-tasks`, error.message);
       });
 
@@ -346,16 +342,15 @@ export class AuthAppService extends AbAuthService {
         userTypeCode: dto.userTypeCode,
         userTypeKeyWord: isUserTypeValid.userTypeKeyWord,
         isSetted: rsCheckType?.isSetted,
-      };      
+      };
       // cập nhật loại user đang hoạt động - chỉ cập nhập khi type cũ và type mới khác nhau
-      if(payload.userTypeKeyWord !== isUserTypeValid.userTypeKeyWord){
-        const msgForward =  `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của USER(${payload.userCode})`
+      if (payload.userTypeKeyWord !== isUserTypeValid.userTypeKeyWord) {
+        const msgForward = `Thay đổi ${payload.userTypeKeyWord} sang ${isUserTypeValid.userTypeKeyWord} của USER(${payload.userCode})`;
         this.userAppService.upsertUserTypeLive(payload.userCode, dto.userTypeCode, msgForward);
       }
       // ky lại token mới
       const accessToken = this.signToken(newPayload, YnEnum.Y);
       return { ...newPayload, accessToken: accessToken };
-
     } catch (err) {
       this.logger.error(logbase, err.message);
       throw new UnauthorizedException(Msg.TokenInvalid);
@@ -406,5 +401,4 @@ export class AuthAppService extends AbAuthService {
     const hashed = await bcrypt.hash(password, saltRounds);
     return hashed;
   }
-
 }

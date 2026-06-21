@@ -24,7 +24,7 @@ export class UserAppResDto {
   deviceToken: string;
 
   @ApiProperty({ example: '' })
-  countryCode: string
+  countryCode: string;
 }
 
 export class AllowUserTypeResDto {
@@ -38,11 +38,10 @@ export class AllowUserTypeResDto {
   userTypeName: string;
 
   @ApiProperty({ example: null })
-  teamCode: string | null
+  teamCode: string | null;
 
   @ApiProperty({ example: 'N' })
-  isSetted: YnEnum
-
+  isSetted: YnEnum;
 }
 
 export class UserTypeResDto {
@@ -54,7 +53,6 @@ export class UserTypeResDto {
 
   @ApiProperty({ example: '' })
   userTypeName: string;
-
 }
 
 class UserPackageAppResDto {
@@ -86,7 +84,6 @@ export class LoginResDto extends UserAppResDto {
   @ApiProperty({ example: '' })
   accessToken: string;
 }
-
 
 export class ChangeTypeTokenAppResDto extends LoginResDto {
   @ApiProperty({ example: 'Y' })

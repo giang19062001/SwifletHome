@@ -40,7 +40,7 @@ export class GetHarvertReportDetailResDto {
 
   @ApiProperty({
     type: () => CellCollectedByfloorDto,
-    isArray: true
+    isArray: true,
   })
   cellCollectedByfloor: CellCollectedByfloorDto[];
 

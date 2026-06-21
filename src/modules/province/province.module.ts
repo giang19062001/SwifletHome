@@ -7,6 +7,6 @@ import { ProvinceService } from './province.service';
   imports: [],
   controllers: [ProvinceController],
   providers: [ProvinceService, ProvinceRepository],
-  exports: [ProvinceService]
+  exports: [ProvinceService],
 })
 export class ProvinceModule {}

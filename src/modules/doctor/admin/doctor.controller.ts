@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
-import { DoctorResDto } from "../doctor.response";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { DoctorResDto } from '../doctor.response';
 import { UpdateDoctorDto } from './doctor.dto';
 import { DoctorAdminService } from './doctor.service';
 
@@ -40,7 +40,7 @@ export class DoctorAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Put('update/:seq')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateDoctorDto, @Param('seq') seq: number,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
+  async update(@Body() dto: UpdateDoctorDto, @Param('seq') seq: number, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.doctorAdminService.update(dto, admin.userId, seq);
     if (result === 0) {
       throw new BadRequestException();

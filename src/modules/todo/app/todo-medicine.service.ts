@@ -20,16 +20,10 @@ export class TodoMedicineAppService {
     private readonly userHomeAppService: UserHomeAppService,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
 
   // TODO: MEDICINE
-  async handleTaskMedicine(
-    userCode: string,
-    userHomeCode: string,
-    currentMedicineCode: string | null,
-    currentTaskDate: Date | null,
-    dto: SetTaskMedicineDto,
-  ): Promise<number> {
+  async handleTaskMedicine(userCode: string, userHomeCode: string, currentMedicineCode: string | null, currentTaskDate: Date | null, dto: SetTaskMedicineDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskMedicine::handleTaskMedicine:`;
     let result = 0;
     try {
@@ -41,9 +35,7 @@ export class TodoMedicineAppService {
         const isToday = today.isSame(selectedDate, 'day');
         const status = isToday ? TaskStatusEnum.COMPLETE : TaskStatusEnum.WAITING;
 
-        const { medicineCode } = await this.todoMedicineAppRepository.insertTaskMedicine(
-          userCode, userHomeCode, selectedDate.toDate(), status, dto,
-        );
+        const { medicineCode } = await this.todoMedicineAppRepository.insertTaskMedicine(userCode, userHomeCode, selectedDate.toDate(), status, dto);
         this.logger.log(logbase, `Tạo lịch nhắc lăn thuốc medicineCode(${medicineCode}) - Trạng thái: ${status}`);
         result = 1;
       } else {
@@ -66,9 +58,7 @@ export class TodoMedicineAppService {
           if (isPostponed) {
             // Dời lịch xa hơn -> Đánh dấu task cũ là COMPLETE và tạo bản ghi mới WAITING
             await this.todoMedicineAppRepository.changeMedicineStatus(userCode, userHomeCode, currentMedicineCode, TaskStatusEnum.COMPLETE);
-            const { medicineCode: newCode } = await this.todoMedicineAppRepository.insertTaskMedicine(
-              userCode, userHomeCode, selectedDate.toDate(), TaskStatusEnum.WAITING, dto,
-            );
+            const { medicineCode: newCode } = await this.todoMedicineAppRepository.insertTaskMedicine(userCode, userHomeCode, selectedDate.toDate(), TaskStatusEnum.WAITING, dto);
             this.logger.log(logbase, `Postponed: Hoàn thành task cũ(${currentMedicineCode}) và tạo task mới(${newCode}) cho ngày ${selectedDate.format('YYYY-MM-DD')}`);
           } else {
             // Dời lịch sớm hơn hoặc giữ nguyên -> Chỉ cập nhật ngày cho bản ghi hiện tại
@@ -130,12 +120,7 @@ export class TodoMedicineAppService {
         return -2;
       }
 
-      result = await this.handleTaskMedicine(
-        userCode, mainHomeOfUser.userHomeCode,
-        dto.taskAlarmCode,
-        medicineDetail.taskDate ? new Date(medicineDetail.taskDate as any) : null,
-        dto,
-      );
+      result = await this.handleTaskMedicine(userCode, mainHomeOfUser.userHomeCode, dto.taskAlarmCode, medicineDetail.taskDate ? new Date(medicineDetail.taskDate as any) : null, dto);
     }
 
     return result;

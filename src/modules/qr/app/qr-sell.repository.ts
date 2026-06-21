@@ -32,7 +32,7 @@ export class QrSellAppRepository {
 
   // kiểm tra QR đã được duyệt và được user đăng bán chưa
   async checkIsApprovedAndIsSold(requestCode: string): Promise<{ seq: number; isSold: YnEnum } | null> {
-    let query = ` SELECT A.seq,
+    const query = ` SELECT A.seq,
          CASE
             WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
             ELSE 'N'
@@ -64,7 +64,7 @@ export class QrSellAppRepository {
   async GetSellingDetail(requestCode: string, fetchBy: FetchSellingByEnum): Promise<GetSellingDetailResDto | null> {
     const whereSql = this.getPriceOptionWhereSql(fetchBy, 'F');
 
-    let query = `
+    const query = `
         SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, H.harvestPhase, H.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
             CASE
@@ -143,7 +143,7 @@ export class QrSellAppRepository {
       whereSql += ` AND E.isSave = 'Y' `;
     }
 
-    let query = ` SELECT COUNT(A.seq) AS TOTAL 
+    const query = ` SELECT COUNT(A.seq) AS TOTAL 
         FROM ${this.tableSelling}  A
             LEFT JOIN ${this.table} B
         ON A.requestCode = B.requestCode  
@@ -213,7 +213,7 @@ export class QrSellAppRepository {
     const params: any[] = [];
     whereSql += this.getPriceOptionWhereSql(fetchBy, 'D');
 
-    let query = ` SELECT COUNT(A.seq) AS TOTAL 
+    const query = ` SELECT COUNT(A.seq) AS TOTAL 
         FROM ${this.tableSelling}  A
             LEFT JOIN ${this.table} B
         ON A.requestCode = B.requestCode  

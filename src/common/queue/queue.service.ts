@@ -23,14 +23,7 @@ export class QueueService extends WorkerHost {
 
     this.logger.log(logbase, `Đang xử lý thông báo trong hàng đợi cho user(${userCode}), token: ${deviceToken ? deviceToken.substring(0, 20) : 'empty'}...`);
     try {
-      const result = await this.firebaseService.sendNotification(
-        userCode,
-        deviceToken,
-        title,
-        body,
-        data,
-        notificationType,
-      );
+      const result = await this.firebaseService.sendNotification(userCode, deviceToken, title, body, data, notificationType);
       this.logger.log(logbase, `Đã gửi thông báo trong hàng đợi thành công cho user(${userCode}), messageId code: ${result}`);
       return result;
     } catch (error) {

@@ -19,20 +19,19 @@ export class RequestConsigmentDto {
   @IsNotEmpty({ message: MsgDto.CannotNull('senderPhone') })
   senderPhone: string;
 
-
   @ApiProperty({
     example: '',
   })
   @IsString()
   @IsNotEmpty({ message: MsgDto.CannotNull('nestType') })
   nestType: string;
-  
+
   @ApiProperty({
     example: 1,
   })
   @IsInt()
   @IsNotEmpty({ message: MsgDto.CannotNull('nestQuantity') })
-  @Min(1, { message: MsgDto.MustBeGreaterZero('nestQuantity')  })
+  @Min(1, { message: MsgDto.MustBeGreaterZero('nestQuantity') })
   nestQuantity: number;
 
   @ApiProperty({
@@ -58,7 +57,6 @@ export class RequestConsigmentDto {
 }
 
 export class GetAllConsignmentDto extends PagingDto {
-
   @ApiProperty({
     example: 'ALL',
     enum: [...Object.values(ConsignmentStatusEnum), 'ALL'],
@@ -66,5 +64,4 @@ export class GetAllConsignmentDto extends PagingDto {
   @IsNotEmpty()
   @IsIn([...Object.values(ConsignmentStatusEnum), 'ALL'])
   consignmentStatus: ConsignmentStatusEnum | 'ALL';
-
 }

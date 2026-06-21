@@ -4,7 +4,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { sortByDate } from 'src/helpers/func.helper';
 import { Msg } from 'src/helpers/message.helper';
-import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from "../upload.response";
+import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
 import { UploadAdminRepository } from './upload.repository';
 

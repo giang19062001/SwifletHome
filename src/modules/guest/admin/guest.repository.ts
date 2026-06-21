@@ -18,10 +18,7 @@ export class GuestAdminRepository {
       params.push(`%${dto.keyword}%`, `%${dto.keyword}%`);
     }
 
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`,
-      params,
-    );
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
 

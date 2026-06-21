@@ -7,7 +7,7 @@ import { PageAuthAdminGuard } from './modules/auth/admin/auth.page.guard';
 @ApiExcludeController() // hide from swagger
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) { }
+  constructor(private readonly appService: AppService) {}
 
   @Get('/')
   @UseGuards(PageAuthAdminGuard)
@@ -29,7 +29,6 @@ export class AppController {
   renderSupportCenter() {
     return { title: 'Trung tâm hỗ trợ', isLayout: false };
   }
-
 
   @Get('/terms-of-use')
   @UseGuards(PageAuthAdminGuard)

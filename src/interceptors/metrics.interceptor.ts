@@ -1,9 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Counter, Histogram } from 'prom-client';
@@ -15,7 +10,7 @@ export class HttpMetricsInterceptor implements NestInterceptor {
   constructor(
     // + số lần request cho API hiện tại
     @Inject(getToken('http_requests_total')) private readonly countMetric: Counter<string>,
-  ) { }
+  ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();

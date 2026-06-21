@@ -6,7 +6,7 @@ import { ROUTER } from 'src/helpers/const.helper';
 
 @Injectable()
 export class RequestLoggerInterceptor implements NestInterceptor {
-  constructor(private readonly logger: LoggingService) { }
+  constructor(private readonly logger: LoggingService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
@@ -48,10 +48,9 @@ export class RequestLoggerInterceptor implements NestInterceptor {
         this.logger.log(`[RESPONSE] ${method} ${url}`, {
           url: url,
           method: method,
-          response: data?.data || data?.message || "-",
+          response: data?.data || data?.message || '-',
         });
       }),
     );
   }
 }
-

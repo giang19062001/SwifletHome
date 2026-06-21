@@ -11,7 +11,7 @@ export class ScreenAppService {
     private readonly screenAppRepository: ScreenAppRepository,
     private readonly logger: LoggingService,
     @Inject('SCREEN_STRATEGIES') private readonly strategies: IScreenStrategy[],
-  ) { }
+  ) {}
 
   async getContent(userCode: string, keyword: string): Promise<any> {
     const logbase = `${this.SERVICE_NAME}/getContent:`;

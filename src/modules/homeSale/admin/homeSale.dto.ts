@@ -50,8 +50,6 @@ export class CreateHomeDto {
   @IsNotEmpty()
   longitude: number;
 
-
-
   @ApiProperty({
     type: 'string',
     format: 'binary',
@@ -68,7 +66,7 @@ export class CreateHomeDto {
   homeImages: any[];
 }
 
-export class UpdateHomeDto extends CreateHomeDto{}
+export class UpdateHomeDto extends CreateHomeDto {}
 
 export class UpdateStatusDto {
   @ApiProperty({
@@ -77,5 +75,4 @@ export class UpdateStatusDto {
   @IsString()
   @IsNotEmpty()
   status: string;
-
 }

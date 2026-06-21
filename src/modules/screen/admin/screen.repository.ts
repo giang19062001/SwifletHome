@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ScreenResDto } from "../screen.response";
+import { ScreenResDto } from '../screen.response';
 import { UpdateScreenDto } from './screen.dto';
 
 @Injectable()
@@ -42,7 +42,7 @@ export class ScreenAdminRepository {
   async updateBanner(screenKeyword: string, bannerUrl: string, adminId: string): Promise<number> {
     const screen = await this.getDetail(screenKeyword);
     if (!screen) return 0;
-    
+
     let contentCenter = screen.contentCenter;
     if (typeof contentCenter === 'string') {
       try {
@@ -53,8 +53,8 @@ export class ScreenAdminRepository {
     } else if (!contentCenter) {
       contentCenter = {};
     }
-    
-    (contentCenter as any).banner = bannerUrl;
+
+    contentCenter.banner = bannerUrl;
 
     const sql = `UPDATE ${this.table} SET contentCenter = ?, updatedId = ?, updatedAt = NOW() WHERE screenKeyword = ?`;
     const [result] = await this.db.query<ResultSetHeader>(sql, [JSON.stringify(contentCenter), adminId, screenKeyword]);
@@ -67,7 +67,16 @@ export class ScreenAdminRepository {
       WHERE screenKeyword = ?
     `;
     const contentCenter = dto.contentCenter ? JSON.stringify(dto.contentCenter) : null;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.screenName, dto.screenDescription, dto.contentStart ?? null, contentCenter, dto.contentEnd ?? null, updatedId, new Date(), screenKeyword]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      dto.screenName,
+      dto.screenDescription,
+      dto.contentStart ?? null,
+      contentCenter,
+      dto.contentEnd ?? null,
+      updatedId,
+      new Date(),
+      screenKeyword,
+    ]);
 
     return result.affectedRows;
   }
@@ -75,7 +84,7 @@ export class ScreenAdminRepository {
   // --- Dynamic Video Queries ---
   async getAllVideos(tableVideo: string): Promise<any[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT seq, name, address, videoTitle, videoUrl, sortOrder, isActive, createdAt FROM ${tableVideo} WHERE isActive = 'Y' ORDER BY sortOrder ASC, createdAt DESC`
+      `SELECT seq, name, address, videoTitle, videoUrl, sortOrder, isActive, createdAt FROM ${tableVideo} WHERE isActive = 'Y' ORDER BY sortOrder ASC, createdAt DESC`,
     );
     return rows;
   }
@@ -98,7 +107,7 @@ export class ScreenAdminRepository {
     return result.affectedRows;
   }
 
-  async updateVideoSortOrder(tableVideo: string, items: {seq: number; sortOrder: number}[], updatedId: string): Promise<number> {
+  async updateVideoSortOrder(tableVideo: string, items: { seq: number; sortOrder: number }[], updatedId: string): Promise<number> {
     let affectedRows = 0;
     for (const item of items) {
       const sql = `UPDATE ${tableVideo} SET sortOrder = ?, updatedId = ?, updatedAt = ? WHERE seq = ?`;

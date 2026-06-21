@@ -17,7 +17,7 @@ export class UpdateConsignmentDto {
   @ApiProperty({ example: 'DELIVERING', enum: ConsignmentStatusEnum })
   @IsEnum(ConsignmentStatusEnum)
   consignmentStatus: ConsignmentStatusEnum;
-  
+
   @ApiProperty({ example: 'Đang giao hàng tới trạm trung chuyển' })
   @IsString()
   @IsNotEmpty()

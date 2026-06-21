@@ -43,7 +43,7 @@ export class GuestService {
       // Kiểm tra reCAPTCHA v3 trước khi thực hiện action
       const isCaptchaValid = await this.verifyRecaptcha(dto.recapchav3);
       if (!isCaptchaValid) {
-        throw new BadRequestException({message: Msg.CapchaInvalid, data: 0});
+        throw new BadRequestException({ message: Msg.CapchaInvalid, data: 0 });
       }
 
       const result = await this.guestRepository.create(dto);

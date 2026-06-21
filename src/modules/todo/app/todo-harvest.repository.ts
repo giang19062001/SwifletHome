@@ -29,14 +29,7 @@ export class TodoHarvestAppRepository {
     return rows.length ? Number(rows[0].PHASE + 1) : 1;
   }
 
-  async insertTaskHarvestPhase(
-    userCode: string,
-    userHomeCode: string,
-    harvestPhase: number,
-    isUse: YnEnum,
-    taskDate: Date,
-    taskStatus: TaskStatusEnum,
-  ): Promise<number> {
+  async insertTaskHarvestPhase(userCode: string, userHomeCode: string, harvestPhase: number, isUse: YnEnum, taskDate: Date, taskStatus: TaskStatusEnum): Promise<number> {
     const currentYear = moment().year();
 
     // 1. Kiểm tra xem đã có record tương tự chưa
@@ -72,9 +65,7 @@ export class TodoHarvestAppRepository {
         INSERT INTO ${this.tableTaskHarvestPhase} (userCode, userHomeCode, harvestPhase, isUse, harvestYear, taskDate, taskStatus, createdId)
         VALUES(?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      const [result] = await this.db.execute<ResultSetHeader>(sqlInsert, [
-        userCode, userHomeCode, harvestPhase, isUse, currentYear, taskDate, taskStatus, userCode,
-      ]);
+      const [result] = await this.db.execute<ResultSetHeader>(sqlInsert, [userCode, userHomeCode, harvestPhase, isUse, currentYear, taskDate, taskStatus, userCode]);
       return result.insertId;
     }
   }
@@ -182,9 +173,7 @@ export class TodoHarvestAppRepository {
       INSERT INTO ${this.tableTaskHarvest} (seqHarvestPhase, userCode, userHomeCode, floor, cell, cellCollected, cellRemain, createdId)
       VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode]);
     return result.insertId;
   }
 
@@ -194,9 +183,7 @@ export class TodoHarvestAppRepository {
       INSERT INTO ${this.tableTaskHarvest} (seqHarvestPhase, userCode, userHomeCode, floor, cell, cellCollected, cellRemain, createdId)
       VALUES ${dtos.map(() => '(?, ?, ?, ?, ?, ?, ?, ?)').join(', ')}
     `;
-    const params = dtos.flatMap(dto => [
-      dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode,
-    ]);
+    const params = dtos.flatMap((dto) => [dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell, dto.cellCollected, dto.cellRemain, dto.userCode]);
     const [result] = await this.db.execute<ResultSetHeader>(sql, params);
     return result.affectedRows;
   }
@@ -206,10 +193,7 @@ export class TodoHarvestAppRepository {
       UPDATE ${this.tableTaskHarvest}
       SET cellCollected = ?, cellRemain = ?, updatedId = ?, updatedAt = NOW(), isActive = 'Y'
       WHERE seqHarvestPhase = ? AND userCode = ? AND userHomeCode = ? AND floor = ? AND cell = ?`;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.cellCollected, dto.cellRemain, dto.userCode,
-      dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.cellCollected, dto.cellRemain, dto.userCode, dto.seqHarvestPhase, dto.userCode, dto.userHomeCode, dto.floor, dto.cell]);
     return result.affectedRows;
   }
 
@@ -224,7 +208,7 @@ export class TodoHarvestAppRepository {
 
   async deleteMultipleTaskHarvestRows(dtos: HarvestDataRowInputDto[]): Promise<number> {
     if (!dtos || !dtos.length) return 0;
-    const placeholders = dtos.map(() => '(seqHarvestPhase = ? AND userCode = ? AND userHomeCode = ? AND floor = ? AND cell = ? AND isActive = \'Y\')').join(' OR ');
+    const placeholders = dtos.map(() => "(seqHarvestPhase = ? AND userCode = ? AND userHomeCode = ? AND floor = ? AND cell = ? AND isActive = 'Y')").join(' OR ');
     const sql = `
       UPDATE ${this.tableTaskHarvest}
       SET isActive = 'N', updatedId = ?, updatedAt = NOW()
@@ -251,7 +235,7 @@ export class TodoHarvestAppRepository {
   }
 
   async getListTaskHarvestForAdjust(dto: GetListTaskHarvestForAdjustDto, userCode: string): Promise<GetListTaskHarvestResDto[]> {
-    let params: (string | number)[] = [dto.userHomeCode, userCode];
+    const params: (string | number)[] = [dto.userHomeCode, userCode];
     let offsetQuery = '';
     if (dto.limit != 0 && dto.page != 0) {
       offsetQuery = `LIMIT ? OFFSET ?`;
@@ -306,5 +290,4 @@ export class TodoHarvestAppRepository {
     );
     return rows.length ? (rows[0] as TaskHarvestQrResDto & { seq: number }) : null;
   }
-
 }

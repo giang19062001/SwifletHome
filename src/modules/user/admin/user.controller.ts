@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Param, Pos
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
 import { GetAllUserDto, GetDetailDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto } from './user.dto';
 import { UserAdminService } from './user.service';
 
@@ -23,7 +23,6 @@ export class UserAdminController {
     return result;
   }
 
-  
   @ApiBody({
     type: GetUsersForTeamByTypeDto,
   })
@@ -45,20 +44,19 @@ export class UserAdminController {
     return result;
   }
 
-    @ApiBody({ type: UpdateUserPackageAdminDto })
-    @ApiParam({ name: 'userCode', type: String })
-    @Put('updatePackage/:userCode')
-    @HttpCode(HttpStatus.OK)
-    async update(@Body() dto: UpdateUserPackageAdminDto,  @Param('userCode') userCode: string,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
-      // cập nhâp gói miễn phí -> bỏ qua
-      if(dto.packageCode == ''){
-      return 1
-     }
-      const result = await this.userAdminService.updatePackage(dto, admin.userId, userCode);
-      if (result === 0) {
-        throw new BadRequestException();
-      }
-      return result;
+  @ApiBody({ type: UpdateUserPackageAdminDto })
+  @ApiParam({ name: 'userCode', type: String })
+  @Put('updatePackage/:userCode')
+  @HttpCode(HttpStatus.OK)
+  async update(@Body() dto: UpdateUserPackageAdminDto, @Param('userCode') userCode: string, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
+    // cập nhâp gói miễn phí -> bỏ qua
+    if (dto.packageCode == '') {
+      return 1;
     }
-  
+    const result = await this.userAdminService.updatePackage(dto, admin.userId, userCode);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+    return result;
+  }
 }

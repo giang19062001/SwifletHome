@@ -10,10 +10,10 @@ export class TeamReviewAppRepository {
   private readonly tableReview = 'tbl_team_review';
   private readonly tableReviewImg = 'tbl_team_review_img';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  
+
   // TODO: REVIEW
   async getReviewTotalOfTeam(dto: GetReviewListOfTeamDto): Promise<number> {
-    let query = ` 
+    const query = ` 
     SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableReview} A  
     WHERE A.isActive = 'Y' AND A.isDisplay = 'Y' AND A.teamCode = ?`;
 
@@ -54,8 +54,8 @@ export class TeamReviewAppRepository {
     return rows as GetReviewListOfTeamResDto[];
   }
 
-  async checkDuplicateReview(teamCode: string, userCode: string): Promise<Boolean> {
-    let query = ` 
+  async checkDuplicateReview(teamCode: string, userCode: string): Promise<boolean> {
+    const query = ` 
         SELECT A.seq FROM ${this.tableReview} A  WHERE A.teamCode = ? AND A.reviewBy = ? `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode, userCode]);
     return rows.length ? true : false;

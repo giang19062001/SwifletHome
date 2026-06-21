@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { QuestionResDto } from "../question.response";
+import { QuestionResDto } from '../question.response';
 import { QuestionAppRepository } from './question.repository';
 
 @Injectable()

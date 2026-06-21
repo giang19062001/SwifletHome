@@ -8,7 +8,7 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { Msg } from 'src/helpers/message.helper';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { ListResponseDto } from "src/dto/common.dto";
+import { ListResponseDto } from 'src/dto/common.dto';
 
 @Injectable()
 export class UserHomeAppService {
@@ -19,7 +19,7 @@ export class UserHomeAppService {
     private readonly userAppService: UserAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   async getAll(dto: PagingDto, userCode: string): Promise<{ total: number; list: UserHomeResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     const total = await this.userHomeAppRepository.getTotalHomes(userCode);
@@ -75,7 +75,7 @@ export class UserHomeAppService {
     const logbase = `${this.SERVICE_NAME}/updateHome:`;
 
     try {
-      let result = 1;
+      const result = 1;
       const home = await this.userHomeAppRepository.getDetailHome(userHomeCode);
       // nếu uuid khác nhau -> có sự upload ảnh home mới
       if (home) {
@@ -167,7 +167,7 @@ export class UserHomeAppService {
   async uploadHomeImage(userCode: string, dto: UploadUserHomeImageDto, userHomeImageFile: Express.Multer.File): Promise<UserHomeImageStrResDto> {
     const logbase = `${this.SERVICE_NAME}/uploadHomeImage:`;
     try {
-      let res: UserHomeImageStrResDto = { seq: 0, filename: '' };
+      const res: UserHomeImageStrResDto = { seq: 0, filename: '' };
       if (userHomeImageFile) {
         const filenamePath = `${getFileLocation(userHomeImageFile.mimetype, userHomeImageFile.fieldname)}/${userHomeImageFile.filename}`;
         const insertId = await this.userHomeAppRepository.uploadHomeImage(0, dto.uniqueId, userCode, filenamePath, userHomeImageFile);

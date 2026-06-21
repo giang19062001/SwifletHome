@@ -3,7 +3,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { DoctorStatusEnum } from '../doctor.interface';
-import { DoctorFileStrResDto } from "../doctor.response";
+import { DoctorFileStrResDto } from '../doctor.response';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
 
@@ -15,18 +15,18 @@ export class DoctorAppService {
     private readonly doctorAppRepository: DoctorAppRepository,
     private readonly logger: LoggingService,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
 
   async requestDoctor(userCode: string, dto: CreateDoctorDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/requestDoctor:`;
 
     try {
-      let result = 1;
+      const result = 1;
       // tìm tất cả file đã upload cùng uniqueId
       // const filesUploaded: { seq: number }[] = await this.doctorAppRepository.findFilesByUniqueId(dto.uniqueId);
 
       // if (filesUploaded.length) {
-       if (true) {
+      if (true) {
         // mặc định là chờ
         // const seq = await this.doctorAppRepository.create(userCode, dto, DoctorStatusEnum.WAITING);
         await this.doctorAppRepository.create(userCode, dto, DoctorStatusEnum.WAITING);
@@ -52,7 +52,7 @@ export class DoctorAppService {
   async uploadRequestFile(userCode: string, dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<DoctorFileStrResDto[]> {
     const logbase = `${this.SERVICE_NAME}/uploadFile:`;
     try {
-      let res: DoctorFileStrResDto[] = [];
+      const res: DoctorFileStrResDto[] = [];
       if (doctorFiles.length > 0) {
         for (const file of doctorFiles) {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);

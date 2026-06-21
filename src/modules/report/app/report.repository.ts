@@ -10,8 +10,8 @@ export class ReportAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getHarvertReportSummary(dto: GetHarvertReportDto, userCode: string): Promise<GetHarvertReportSummaryResDto | GetHarvertReportDetailResDto[]> {
-    let params: (string | number)[] = [dto.userHomeCode, userCode, dto.harvestYear];
-    let query = ` 
+    const params: (string | number)[] = [dto.userHomeCode, userCode, dto.harvestYear];
+    const query = ` 
         SELECT C.harvestPhase, C.harvestYear,
             CAST(IFNULL(SUM(D.cellCollected), 0) AS SIGNED) AS totalCellCollected
         FROM ${this.tableTaskHarvestPhase} C
@@ -27,8 +27,8 @@ export class ReportAppRepository {
   }
 
   async getHarvertReportDetail(dto: GetHarvertReportDto, userCode: string): Promise<GetHarvertReportSummaryResDto | GetHarvertReportDetailResDto[]> {
-    let params: (string | number)[] = [dto.userHomeCode, userCode, dto.harvestYear];
-    let query = ` 
+    const params: (string | number)[] = [dto.userHomeCode, userCode, dto.harvestYear];
+    const query = ` 
         SELECT C.harvestPhase, C.harvestYear,
             CAST(IFNULL(SUM(D.cellCollected), 0) AS SIGNED) AS totalCellCollected,
             CASE 

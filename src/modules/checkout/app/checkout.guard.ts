@@ -9,11 +9,11 @@ export class ApiKeyGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers['authorization'];
-    console.log("Authorization Header Received: ", authHeader);
-    
+    console.log('Authorization Header Received: ', authHeader);
+
     // Bóc tách key sau tiền tố "x-api-key "
     const apiKey = authHeader?.replace(/x-api-key\s+/i, '').trim();
-    console.log("Extracted API Key: ", apiKey);
+    console.log('Extracted API Key: ', apiKey);
 
     if (!apiKey) {
       throw new UnauthorizedException({ message: Msg.ApiKeyMissing, data: 0 });

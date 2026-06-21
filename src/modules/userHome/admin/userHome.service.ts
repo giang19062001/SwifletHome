@@ -3,7 +3,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { UserHomeAdminRepository } from './userHome.repository';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
-import { UserHomeResDto } from "../app/userHome.dto";
+import { UserHomeResDto } from '../app/userHome.dto';
 
 @Injectable()
 export class UserHomeAdminService {
@@ -37,7 +37,7 @@ export class UserHomeAdminService {
     }
     return res;
   }
-   async resetTriggeringHome(dto: TriggerUserHomeSensorDto, updatedId: string, userHomeCode: string): Promise<number> {
+  async resetTriggeringHome(dto: TriggerUserHomeSensorDto, updatedId: string, userHomeCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/resetTriggeringHome`;
     const result = await this.userHomeAdminRepository.updateSensorForHome(dto, userHomeCode, updatedId);
     this.logger.log(logbase, `Cập nhập cảm biến với Mac ${dto.macId} cho nhà yến ${userHomeCode} của khách hàng ${dto.userCode}`);

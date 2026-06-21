@@ -13,10 +13,13 @@ export class UserHomeAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotalHomes(userCode: string): Promise<number> {
-    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A  
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A  
     INNER JOIN  ${this.tableUserApp} AU
     ON A.userCode = AU.userCode
-    WHERE A.userCode = ?`, [userCode]);
+    WHERE A.userCode = ?`,
+      [userCode],
+    );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAllHomes(dto: PagingDto, userCode: string): Promise<UserHomeResDto[]> {
@@ -41,7 +44,7 @@ export class UserHomeAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as UserHomeResDto[];
   }
-   async getAreaHome(userHomeCode: string): Promise<UserHomeAreaResDto | null> {
+  async getAreaHome(userHomeCode: string): Promise<UserHomeAreaResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userHomeCode,  A.userHomeLength, A.userHomeWidth, A.userHomeFloor
           FROM ${this.table} A 
@@ -191,7 +194,7 @@ export class UserHomeAppRepository {
 
     return rows ? (rows[0] as { seq: number; filename: string; mimetype: string }) : null;
   }
-  async updateSeqFiles(userHomeSeq: number, seq: number, uniqueId: string , updatedId: string): Promise<number> {
+  async updateSeqFiles(userHomeSeq: number, seq: number, uniqueId: string, updatedId: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableImg} SET userHomeSeq = ? , updatedId = ? , updatedAt = NOW()
       WHERE seq = ? AND uniqueId = ?

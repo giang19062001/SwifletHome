@@ -30,7 +30,7 @@ export class CheckoutAppRepository {
         ?, ?, ?, ?, ?, ?
       )
     `;
-    
+
     const entitlementIdsStr = event.entitlement_ids ? JSON.stringify(event.entitlement_ids) : null;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       event.id ?? null,

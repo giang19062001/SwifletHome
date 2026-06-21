@@ -1,13 +1,5 @@
 import { OnEvent } from '@nestjs/event-emitter';
-import {
-  ConnectedSocket,
-  MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { LoggingService } from '../../logger/logger.service';
 import { ISensor } from '../socket.interface';
@@ -24,7 +16,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
   server: Server;
 
   private readonly SERVICE_NAME = 'SocketGateway/homeOfUser';
-  
+
   // Theo dõi home mà user đang xem
   private watchingHome = new Map<string, string>(); // key: userCode, value: userHomeCode
   // Theo dõi client rớt mạng để tránh memory leak
@@ -45,7 +37,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
 
   handleDisconnect(client: Socket) {
     console.log(this.SERVICE_NAME, `Đóng kết nối: ${client.id}`);
-    
+
     // Tìm userCode và xóa khỏi Map để tránh memory leak
     const userCode = this.clientUserMap.get(client.id);
     if (userCode) {
@@ -125,7 +117,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
     this.sendSensorData(room, sensorHome);
   }
 
-  //  Xử lý khi thiết bị offline 
+  //  Xử lý khi thiết bị offline
   @OnEvent('sensor.status.changed')
   handleSensorStatusChanged(payload: { key: string; status: 'online' | 'offline' }) {
     const { key, status } = payload;

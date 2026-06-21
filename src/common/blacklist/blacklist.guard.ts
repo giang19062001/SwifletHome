@@ -14,12 +14,10 @@ export class BlacklistGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    
+
     // Attempt to get IP from x-forwarded-for, req.ip, or remoteAddress
     const forwardedIps = request.headers['x-forwarded-for'];
-    const clientIp = typeof forwardedIps === 'string' 
-      ? forwardedIps.split(',')[0].trim() 
-      : request.ip || request.socket.remoteAddress || 'unknown';
+    const clientIp = typeof forwardedIps === 'string' ? forwardedIps.split(',')[0].trim() : request.ip || request.socket.remoteAddress || 'unknown';
 
     if (this.blacklistService.isBlacklisted(clientIp)) {
       this.logger.log(`Blocked request from blacklisted IP: ${clientIp} to ${request.url}`);

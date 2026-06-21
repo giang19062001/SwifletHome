@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { FileMediaResDto, FileUploadResDto } from "../upload.response";
+import { FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { GetAllMediaDto, MediaTypeEnum } from './upload.dto';
 
 @Injectable()
@@ -28,7 +28,7 @@ export class UploadAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT COUNT(A.seq) AS TOTAL FROM ${mediaType === 'AUDIO' ? this.tableMediaAudio : this.tableMediaVideo} A
       WHERE A.isActive = 'Y'`,
-       [],
+      [],
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
@@ -39,7 +39,7 @@ export class UploadAppRepository {
         WHERE A.isActive = 'Y'
    `;
 
-    let params: any[] = [];
+    const params: any[] = [];
 
     // paging
     if (dto.limit > 0 && dto.page > 0) {
@@ -58,7 +58,7 @@ export class UploadAppRepository {
         ORDER BY A.createdAt DESC
          `;
 
-    let params: any[] = [];
+    const params: any[] = [];
 
     // paging
     if (dto.limit > 0 && dto.page > 0) {

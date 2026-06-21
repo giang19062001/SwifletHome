@@ -9,7 +9,7 @@ import { NotificationAdminService } from 'src/modules/notification/admin/notific
 import { NOTIFICATION_CONST } from 'src/modules/notification/notification.interface';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { UserHomeAdminService } from 'src/modules/userHome/admin/userHome.service';
-import { TodoBoxTaskResDto, TodoTaskResDto } from "../todo.response";
+import { TodoBoxTaskResDto, TodoTaskResDto } from '../todo.response';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
 import { TodoAdminRepository } from './todo.repository';
 
@@ -24,7 +24,7 @@ export class TodoAdminService {
     private readonly notificationAdminService: NotificationAdminService,
     private readonly userAdminService: UserAdminService,
     private readonly userHomeAdminService: UserHomeAdminService,
-  ) { }
+  ) {}
   async getAllTasks(dto: PagingDto): Promise<{ total: number; list: TodoTaskResDto[] }> {
     const total = await this.todoAdminRepository.getTotalTasks();
     const list = await this.todoAdminRepository.getAllTasks(dto);
@@ -102,7 +102,7 @@ export class TodoAdminService {
             }
           }
           // gửi thông báo cho 1 vài user cụ thể
-          const intendedUserCodes = Array.from(new Set(userHomes.map(item => item.userCode)));
+          const intendedUserCodes = Array.from(new Set(userHomes.map((item) => item.userCode)));
           const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body, null, undefined, intendedUserCodes);
           return { success: result.successCount > 0, message: result.successCount > 0 ? MsgAdmin.pushAlarmOk : MsgAdmin.pushAlarmErr, data: result };
         } else {

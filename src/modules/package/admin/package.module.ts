@@ -8,6 +8,6 @@ import { PackageAdminService } from './package.service';
   imports: [forwardRef(() => AuthAdminModule)], // ← phá phụ thuộc vòng tròn
   controllers: [PackageAdminController],
   providers: [PackageAdminService, PackageAdminRepository],
-  exports: [PackageAdminService]
+  exports: [PackageAdminService],
 })
 export class PackageAdminModule {}

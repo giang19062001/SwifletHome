@@ -18,7 +18,7 @@ export class HomeSaleSightseeingAppService {
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
   // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/registerSightSeeing:`;

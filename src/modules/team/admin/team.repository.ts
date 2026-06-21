@@ -71,7 +71,7 @@ export class TeamAdminRepository {
           LIMIT 1 `,
       [teamCode],
     );
-    let result = rows ? (rows[0] as TeamResDto) : null;
+    const result = rows ? (rows[0] as TeamResDto) : null;
     if (result) {
       result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
       result.teamDescriptionSpecial = typeof result.teamDescriptionSpecial === 'string' ? JSON.parse(result.teamDescriptionSpecial) : result.teamDescriptionSpecial;
@@ -94,10 +94,10 @@ export class TeamAdminRepository {
       dto.userCode,
       dto.userTypeCode,
       dto.teamName,
-      dto.teamUserName || "",
-      dto.teamPhone || "",
+      dto.teamUserName || '',
+      dto.teamPhone || '',
       dto.teamAddress,
-      teamImagePath || "",
+      teamImagePath || '',
       dto.teamDescription,
       dto.teamDescriptionSpecial ? JSON.stringify(dto.teamDescriptionSpecial) : null,
       typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes),
@@ -291,7 +291,6 @@ export class TeamAdminRepository {
     return result.affectedRows;
   }
 
-
   async deleteTeamImageOne(seq: number): Promise<number> {
     const sql = `
       DELETE FROM  ${this.tableImg}
@@ -304,7 +303,7 @@ export class TeamAdminRepository {
 
   // TODO: REVIEW
   async getTotalReview(): Promise<number> {
-    let query = ` 
+    const query = ` 
       SELECT COUNT(A.seq) AS TOTAL FROM ${this.tableReview} A `;
 
     const params: any[] = [];
@@ -349,7 +348,7 @@ export class TeamAdminRepository {
     return rows as TeamReviewResDto[];
   }
   async getDetailReview(seq: number): Promise<TeamReviewResDto | null> {
-    let query = ` SELECT A.seq, A.isDisplay, A.teamCode, A.review, A.star, A.reviewBy, B.userName AS reviewByName, C.teamName, D.userName as ownerName, A.createdAt, A.updatedAt,
+    const query = ` SELECT A.seq, A.isDisplay, A.teamCode, A.review, A.star, A.reviewBy, B.userName AS reviewByName, C.teamName, D.userName as ownerName, A.createdAt, A.updatedAt,
           COALESCE(
             (
               SELECT JSON_ARRAYAGG(

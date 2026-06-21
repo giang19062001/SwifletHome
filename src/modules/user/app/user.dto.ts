@@ -39,7 +39,7 @@ export class UserPackageAppResDto {
 
   @ApiProperty({ example: '' })
   packageCode: string | null;
-  
+
   @ApiProperty({ example: '' })
   packageName: string;
 
@@ -106,7 +106,7 @@ export class UserAppResDto {
 
   @ApiProperty({ example: '' })
   endDate!: string | null;
-  
+
   @ApiProperty({ example: '' })
   paymentMethod!: string;
 }

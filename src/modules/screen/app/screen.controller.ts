@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetContentScreenResDto } from './screen.response';
 import { ScreenAppService } from './screen.service';

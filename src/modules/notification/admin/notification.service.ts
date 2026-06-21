@@ -46,7 +46,7 @@ export class NotificationAdminService {
         // gửi thông báo
         if (userDeviceTokens.length) {
           // gửi thông báo cho 1 vài user cụ thể
-          const intendedUserCodes = Array.from(new Set(userHomes.map(item => item.userCode)));
+          const intendedUserCodes = Array.from(new Set(userHomes.map((item) => item.userCode)));
           const result = await this.firebaseService.sendNotificationToMulticast(userDeviceTokens, dto.title, dto.body, null, undefined, intendedUserCodes);
           return {
             success: result.successCount > 0,

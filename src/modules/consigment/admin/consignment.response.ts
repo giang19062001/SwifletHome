@@ -19,7 +19,7 @@ export class GetAllConsignmentResDto {
 
   @ApiProperty({ example: '' })
   nestTypeLabel: string;
-  
+
   @ApiProperty({ example: 0 })
   nestQuantity: number;
 

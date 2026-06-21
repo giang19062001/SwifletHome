@@ -13,7 +13,7 @@ export class QrAdminRepository {
   private readonly tableBlockChain = 'tbl_qr_request_blockchain';
   private readonly tableSelling = 'tbl_qr_request_selling';
   private readonly tableUserHome = 'tbl_user_home';
-  private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase'
+  private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -50,7 +50,7 @@ export class QrAdminRepository {
     return rows as GetInfoRequestQrCodeAdminResDto[];
   }
   async getDetail(requestCode: string): Promise<GetInfoRequestQrCodeAdminResDto | null> {
-    let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
+    const query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
          CASE
         WHEN E.seq IS NOT NULL AND E.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'
@@ -115,8 +115,8 @@ export class QrAdminRepository {
   }
 
   // TODO: BLOCKCHAIN
- async writeQrBlockchain(dto: WriteQrBlockchainDto): Promise<number> {
-  const sql = `
+  async writeQrBlockchain(dto: WriteQrBlockchainDto): Promise<number> {
+    const sql = `
     INSERT INTO ${this.tableBlockChain}
       (requestCode, userCode, userHomeCode, qrCodeUrl, transactionHash, blockNumber, transactionFee, createdId)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -130,18 +130,17 @@ export class QrAdminRepository {
       updatedId = ?
   `;
 
-  const [result] = await this.db.execute<ResultSetHeader>(sql, [
-    dto.requestCode,
-    dto.userCode,
-    dto.userHomeCode,
-    dto.qrCodeUrl,
-    dto.transactionHash,
-    dto.blockNumber,
-    dto.transactionFee,
-    UPDATOR,
-    UPDATOR  
-  ]);
-  return result.insertId;
-}
-
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      dto.requestCode,
+      dto.userCode,
+      dto.userHomeCode,
+      dto.qrCodeUrl,
+      dto.transactionHash,
+      dto.blockNumber,
+      dto.transactionFee,
+      UPDATOR,
+      UPDATOR,
+    ]);
+    return result.insertId;
+  }
 }

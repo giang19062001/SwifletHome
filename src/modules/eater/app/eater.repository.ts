@@ -34,7 +34,7 @@ export class EaterAppRepository {
 
   async insertEater(deviceToken: string): Promise<{ eaterCode: string; userTypeKeyWord: string } | null> {
     try {
-      const userTypeKeyWord = USER_CONST.USER_TYPE.EATER.value
+      const userTypeKeyWord = USER_CONST.USER_TYPE.EATER.value;
       const sqlLast = `SELECT eaterCode FROM ${this.table} ORDER BY eaterCode DESC LIMIT 1`;
       const [[last]] = await this.db.execute<any[]>(sqlLast);
 

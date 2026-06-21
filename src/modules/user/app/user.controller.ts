@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swa
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { AllowUserTypeResDto, UserTypeResDto } from 'src/modules/user/app/user.response';
 import { UserAppService } from 'src/modules/user/app/user.service';
@@ -30,13 +30,13 @@ export class UserAppController {
   @UseGuards(ApiAuthAppGuard)
   @ApiOperation({
     summary: 'Lấy danh sách LOẠI USER được cấp phép chuyển đổi - ngoại trừ LOẠI USER đang đăng nhập hiện tại',
-    description:`
+    description: `
 **isSetted** có giá trị bằng 'Y' là user này đã đăng ký thông tin loại người dùng này rồi, 'N' là chưa có đăng ký - **OWNER** hoặc **PURCHASER** hoặc **EATER** sẽ luôn là 'Y' \n
-**teamCode**: (string | null) **teamCode* sẽ khác null khi **userTypeKeyWord** là **'FACTORY'** hoặc **'TECHNICAL'** và **isSetted** = 'Y' `
-   })
+**teamCode**: (string | null) **teamCode* sẽ khác null khi **userTypeKeyWord** là **'FACTORY'** hoặc **'TECHNICAL'** và **isSetted** = 'Y' `,
+  })
   @Get('getAllowTypesOfUser')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([AllowUserTypeResDto]), })
+  @ApiOkResponse({ type: ApiAppResponseDto([AllowUserTypeResDto]) })
   async getAllowTypesOfUser(@GetUserApp() user: TokenUserAppResDto): Promise<AllowUserTypeResDto[]> {
     const result = await this.userAppService.getAllowTypesOfUser(user.userCode, user.userTypeKeyWord);
     return result;

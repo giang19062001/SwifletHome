@@ -22,7 +22,7 @@ export class QrAdminService {
     private readonly firebaseService: FirebaseService,
     private readonly userAdminService: UserAdminService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: GetInfoRequestQrCodeAdminResDto[] }> {
     const total = await this.qrAdminRepository.getTotal();
     const list = await this.qrAdminRepository.getAll(dto);
@@ -46,10 +46,10 @@ export class QrAdminService {
         if (!detail) return 0;
 
         // ghi blockchain
-        const blockchainData = await this.contractService.recordJson({ userCode: detail.userCode!!, userHomeCode: detail.userHomeCode, qrTargetUrl: qrCode.qrTargetUrl });
+        const blockchainData = await this.contractService.recordJson({ userCode: detail.userCode, userHomeCode: detail.userHomeCode, qrTargetUrl: qrCode.qrTargetUrl });
         // const blockchainData = { transactionHash: "0x1", blockNumber: "123", transactionFee: "0.1" };
         const dto: WriteQrBlockchainDto = {
-          userCode: detail.userCode!!,
+          userCode: detail.userCode,
           userHomeCode: detail.userHomeCode,
           qrCodeUrl: qrCode.qrCodeUrl,
           requestCode: requestCode,
@@ -63,7 +63,7 @@ export class QrAdminService {
         await this.qrAdminRepository.updateRequsetStatus(requestCode, RequestStatusEnum.APPROVED, updatedId);
 
         // send thông báo
-        const user = await this.userAdminService.getDetailUserApp(detail.userCode!!);
+        const user = await this.userAdminService.getDetailUserApp(detail.userCode);
         if (!user) return 0;
 
         const notify = NOTIFICATIONS.QR_CODE_APPROVED(requestCode);
@@ -75,5 +75,4 @@ export class QrAdminService {
       return 0;
     }
   }
-
 }

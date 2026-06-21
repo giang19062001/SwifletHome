@@ -22,7 +22,7 @@ export class TeamUserAppService {
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
   // TODO: TEAM
   async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<CheckAvailableTeamResDto | null> {
     const result = await this.teamUserAppRepository.checkAvailableTeam(userCode, userTypeCode);
@@ -41,7 +41,7 @@ export class TeamUserAppService {
     const provinces = await this.provinceService.getAll();
 
     const serviceOptions = await this.teamUserAppRepository.getTeamServiceTypes(userTypeCode);
-    const services = serviceOptions.map(opt => ({
+    const services = serviceOptions.map((opt) => ({
       serviceTypeCode: opt.serviceTypeCode,
       serviceDescription: opt.serviceTypeName,
       uniqueId: uuidv4(),
@@ -51,7 +51,7 @@ export class TeamUserAppService {
       uniqueId: formUuid,
       teamFileTypes,
       services,
-      provinces: provinces.map(p => ({
+      provinces: provinces.map((p) => ({
         provinceCode: String(p.provinceCode),
         provinceName: p.provinceName,
       })),
@@ -60,7 +60,7 @@ export class TeamUserAppService {
 
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetailTeam:`;
-    let result: any = await this.teamUserAppRepository.getDetailTeam(teamCode);
+    const result: any = await this.teamUserAppRepository.getDetailTeam(teamCode);
 
     if (!result) {
       return null;

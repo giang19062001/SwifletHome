@@ -37,6 +37,7 @@ pipeline {
                     fi
                     '''
                     
+                    sh 'yarn lint'
                     sh 'yarn build'
 
                     withCredentials([string(credentialsId: 'SSH_SERVER_REMOTE', variable: 'SERVER')]) {

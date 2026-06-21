@@ -43,7 +43,7 @@ export default class TodoAppValidate {
   async handleAlarmData(dto: SetTaskAlarmDto): Promise<any> {
     const logbase = `${this.SERVICE_NAME}/handleAlarmData:`;
 
-    let alramDto: any = {
+    const alramDto: any = {
       userHomeCode: dto.userHomeCode,
       taskCode: null,
       taskName: '',

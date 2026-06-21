@@ -77,7 +77,7 @@ import { ShareAppModule } from './modules/share/app/share.module';
       useFactory: async (configService: ConfigService) => ({
         connection: {
           host: configService.get<string>('REDIS_HOST'),
-          port: configService.get<number>(('REDIS_PORT')),
+          port: configService.get<number>('REDIS_PORT'),
         },
       }),
       inject: [ConfigService],
@@ -92,7 +92,7 @@ import { ShareAppModule } from './modules/share/app/share.module';
         name: 'sensitive',
         ttl: 60000, // 1 phút
         limit: 30, // tối đa 30 request / 1 phút cho các API nhạy cảm
-      }
+      },
     ]),
     PrometheusModule.register({
       path: '/metrics',
@@ -198,8 +198,6 @@ import { ShareAppModule } from './modules/share/app/share.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(IpMiddleware)
-      .forRoutes(`${ROUTER.APP}/*`, `${ROUTER.FRONT}/*`, `${ROUTER.EATER_APP}/*`); // bắt ip cho các route api cụ thể
+    consumer.apply(IpMiddleware).forRoutes(`${ROUTER.APP}/*`, `${ROUTER.FRONT}/*`, `${ROUTER.EATER_APP}/*`); // bắt ip cho các route api cụ thể
   }
 }

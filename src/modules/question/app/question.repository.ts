@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { QuestionResDto } from "../question.response";
+import { QuestionResDto } from '../question.response';
 
 @Injectable()
 export class QuestionAppRepository {

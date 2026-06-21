@@ -14,7 +14,7 @@ export class TeamReviewAppService {
     private readonly teamReviewAppRepository: TeamReviewAppRepository,
     private readonly teamUserAppRepository: TeamUserAppRepository,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   // TODO: REVIEW
   async getReviewListOfTeam(dto: GetReviewListOfTeamDto): Promise<{ total: number; list: GetReviewListOfTeamResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
@@ -79,7 +79,7 @@ export class TeamReviewAppService {
         });
       }
       // upload
-      let res: TeamReviewFileStrResDto[] = [];
+      const res: TeamReviewFileStrResDto[] = [];
       if (reviewImgs.length > 0) {
         for (const file of reviewImgs) {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);

@@ -25,7 +25,7 @@ export class SignupServiceStrategy implements IScreenStrategy {
 
     // gói
     const packageActive = await this.packageAppService.getOne();
-    let packages: string[] = [];
+    const packages: string[] = [];
     if (packageActive) {
       let packageTxt = '';
       if (packageActive.packageOptionType == PackageOptionTypeEnum.ITEM) {

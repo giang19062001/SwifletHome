@@ -4,7 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { TaskStatusEnum } from '../todo.interface';
-import { TodoBoxTaskResDto, TodoTaskResDto } from "../todo.response";
+import { TodoBoxTaskResDto, TodoTaskResDto } from '../todo.response';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskDto } from './todo.dto';
 
 @Injectable()
@@ -36,7 +36,7 @@ export class TodoAdminRepository {
   }
   // TODO: BOX-TASK
   async getBoxTasks(): Promise<TodoBoxTaskResDto[]> {
-    let query = `  SELECT seq, taskCode, sortOrder, isActive
+    const query = `  SELECT seq, taskCode, sortOrder, isActive
         FROM ${this.tableBoxTask} 
         WHERE isActive = 'Y' AND seq IN(1,2,3)
         ORDER BY sortOrder ASC
@@ -67,7 +67,7 @@ export class TodoAdminRepository {
         INSERT INTO ${this.tableTaskAlarm}  (userCode, userHomeCode, taskAlarmCode, taskName, taskDate, taskStatus, taskNote, createdId) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?)
       `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, userHomeCode, taskAlarmCode, finalTaskName, dto.taskDate, TaskStatusEnum.WAITING, "", createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, userHomeCode, taskAlarmCode, finalTaskName, dto.taskDate, TaskStatusEnum.WAITING, '', createdId]);
 
     return result.insertId;
   }

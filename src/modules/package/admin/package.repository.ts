@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { formatDecimal } from 'src/helpers/func.helper';
-import { PackageResDto } from "../package.response";
+import { PackageResDto } from '../package.response';
 import { UpdatePackageDto } from './package.dto';
 
 @Injectable()

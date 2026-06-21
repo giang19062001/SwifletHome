@@ -3,7 +3,6 @@ import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
-
 export class UpdateAnswerDto {
   @ApiProperty({ example: '<p>Hello word</p>' })
   @IsNotEmpty()
@@ -31,12 +30,9 @@ export class UpdateAnswerDto {
   @IsEnum(YnEnum)
   @IsNotEmpty()
   isFree: YnEnum;
-
 }
 
 export class CreateAnswerDto extends UpdateAnswerDto {}
-
-
 
 export class GetAllAnswerDto extends PagingDto {
   @ApiProperty({

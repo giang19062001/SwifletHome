@@ -11,7 +11,7 @@ export class UpdatePackageDto {
   packageName: string;
 
   @ApiProperty({
-    example: "0",
+    example: '0',
   })
   @IsString()
   @IsOptional()

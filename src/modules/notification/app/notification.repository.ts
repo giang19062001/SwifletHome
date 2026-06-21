@@ -4,7 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
 import { handleTimezoneQuery } from 'src/helpers/func.helper';
 import { NOTIFICATION_CONST, NotificationStatusEnum } from '../notification.interface';
-import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from "../notification.response";
+import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from '../notification.response';
 import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusEnum } from './notification.dto';
 
 @Injectable()
@@ -118,9 +118,7 @@ export class NotificationAppRepository {
       UPDATE ${this.tableUser} SET isActive = 'N' , updatedId = ?, updatedAt = NOW()
       WHERE userCode = ? AND isActive = 'Y' ${notificationStatus !== DeleteNotificationByStatusEnum.ALL ? ' AND notificationStatus = ? ' : ''}
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, notificationStatus !== DeleteNotificationByStatusEnum.ALL 
-      ? [userCode, userCode, notificationStatus] 
-      : [userCode, userCode]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, notificationStatus !== DeleteNotificationByStatusEnum.ALL ? [userCode, userCode, notificationStatus] : [userCode, userCode]);
 
     return result.affectedRows;
   }
@@ -189,7 +187,7 @@ export class NotificationAppRepository {
   }
   // TODO: USER_TOPIC
   async getUserSubscribedTopics(userCode: string): Promise<UserNotificationTopicResDto[]> {
-    let query = ` SELECT A.seq, A.topicCode, A.userCode, B.topicName
+    const query = ` SELECT A.seq, A.topicCode, A.userCode, B.topicName
         FROM ${this.tableUserTopic} A 
         LEFT JOIN ${this.tableTopic} B
         ON A.topicCode = B.topicCode

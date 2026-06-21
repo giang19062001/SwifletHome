@@ -9,6 +9,6 @@ import { HomeSaleAdminService } from './homeSale.service';
   imports: [AuthAdminModule, FileLocalModule],
   controllers: [HomeSaleAdminController],
   providers: [HomeSaleAdminService, HomeSaleAdminRepository],
-  exports:[HomeSaleAdminService]
+  exports: [HomeSaleAdminService],
 })
 export class HomeSaleAdminModule {}

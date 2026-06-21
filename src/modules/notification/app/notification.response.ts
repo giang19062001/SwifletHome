@@ -24,7 +24,7 @@ export class GetNotificationResDto {
 
   @ApiProperty({ example: APP_SCREENS.REMINDER_SCREEN })
   targetScreen: string;
-  
+
   // @ApiProperty({ example: '' })
   // userCode: string;
 

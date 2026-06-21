@@ -5,8 +5,8 @@ import { ChatService } from './chat.service';
 import { LlmModule } from '../llm/llm.module';
 
 @Module({
-  imports:[UploadAppModule, UserAppModule, LlmModule],
+  imports: [UploadAppModule, UserAppModule, LlmModule],
   providers: [ChatService],
-  exports:[ChatService]
+  exports: [ChatService],
 })
 export class ChatModule {}

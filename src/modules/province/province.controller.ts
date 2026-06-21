@@ -11,7 +11,6 @@ import { ProvinceService } from './province.service';
 export default class ProvinceController {
   constructor(private readonly provinceService: ProvinceService) {}
 
-
   @ApiOperation({
     summary: 'Không cần đăng nhập',
   })

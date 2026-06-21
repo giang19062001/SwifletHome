@@ -25,7 +25,15 @@ import {
   UploadTeamFilesAppDto,
   UploadTeamMainImageAppDto,
 } from './team.dto';
-import { CheckAvailableTeamResDto, GetAllTeamResDto, GetDetailTeamResDto, GetReviewListOfTeamResDto, InitFormCreateTeamAppResDto, UploadReviewFilesResDto, UploadTeamFileResDto } from './team.response';
+import {
+  CheckAvailableTeamResDto,
+  GetAllTeamResDto,
+  GetDetailTeamResDto,
+  GetReviewListOfTeamResDto,
+  InitFormCreateTeamAppResDto,
+  UploadReviewFilesResDto,
+  UploadTeamFileResDto,
+} from './team.response';
 
 @ApiTags('app/team')
 @Controller('/api/app/team')

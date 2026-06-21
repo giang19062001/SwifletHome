@@ -11,9 +11,9 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 export class VideoConverterInterceptor implements NestInterceptor {
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
-    
+
     await this.processFiles(request);
-    
+
     return next.handle();
   }
 
@@ -54,7 +54,7 @@ export class VideoConverterInterceptor implements NestInterceptor {
     if (ext === '.mov' || ext === '.webm' || file.mimetype === 'video/quicktime' || file.mimetype === 'video/webm') {
       const originalPath = file.path;
       const originalFilename = file.filename;
-      
+
       const newFilename = originalFilename.replace(extname(originalFilename), '.mp4');
       const newPath = originalPath.replace(extname(originalPath), '.mp4');
 
@@ -78,7 +78,7 @@ export class VideoConverterInterceptor implements NestInterceptor {
             file.filename = newFilename;
             file.path = newPath;
             file.mimetype = 'video/mp4';
-            
+
             try {
               const stats = fs.statSync(newPath);
               file.size = stats.size;

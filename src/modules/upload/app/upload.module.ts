@@ -6,7 +6,7 @@ import { UploadAppService } from './upload.service';
 
 @Module({
   imports: [AuthAppModule],
-  controllers:[UploadAppController],
+  controllers: [UploadAppController],
   providers: [UploadAppService, UploadAppRepository],
   exports: [UploadAppService],
 })

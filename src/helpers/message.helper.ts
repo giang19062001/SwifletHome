@@ -63,8 +63,7 @@ export const Msg = {
   HomeAlreadyRegistered: 'Dữ liệu này đã được tạo trước đó',
 
   // Hỗ trợ
-  CannotReply:
-    'Những vấn đề kỹ thuật chuyên sâu cần độ chính xác cao. Vui lòng liên hệ qua Zalo hoặc Số điện thoại : 0966222612',
+  CannotReply: 'Những vấn đề kỹ thuật chuyên sâu cần độ chính xác cao. Vui lòng liên hệ qua Zalo hoặc Số điện thoại : 0966222612',
 
   // File
   // UuidNotFound: 'Chưa từng có file nào được upload cùng với uuid này',
@@ -72,8 +71,7 @@ export const Msg = {
   FileEmpty: 'Không có file nào được upload',
   FileAudioRequire: 'Bắt buộc nhập 2 file audio',
   FileOvertake: 'Số file upload đã vượt quá số lượng tối đa',
-  FileWrongType: (ext: string, allowedExts: string[]) =>
-    `File không hỗ trợ: ${ext}. Cho phép: ${allowedExts.join(', ')}`,
+  FileWrongType: (ext: string, allowedExts: string[]) => `File không hỗ trợ: ${ext}. Cho phép: ${allowedExts.join(', ')}`,
   FileDeleteFail: 'Lỗi khi xóa file',
   FileUploadFail: err('Tải file lên'),
 
@@ -94,8 +92,7 @@ export const Msg = {
   OnlyMedicineTaskCanDo: onlyCan(`lịch nhắc 'Lăn thuốc'`, 'thực hiện tác vụ này'),
   OnlyHarvestTaskCanDo: onlyCan(`lịch nhắc 'Thu hoạch'`, 'thực hiện tác vụ này'),
   HomeOfAlarmNotExist: notFound('Nhà yến của lịch nhắc này'),
-  FloorOfHomeIsZero:
-    'Số tầng của nhà yến hiện tại là 0 - không thể khởi tạo dữ liệu thu hoạch',
+  FloorOfHomeIsZero: 'Số tầng của nhà yến hiện tại là 0 - không thể khởi tạo dữ liệu thu hoạch',
 
   // Lăn thuốc
   MedicineTaskAlreadyAdded: `Lịch nhắc 'Lăn thuốc' này đã được ghi chú rồi`,
@@ -103,15 +100,12 @@ export const Msg = {
 
   // Thu hoạch
   HarvestTaskAlreadyAdded: `Lịch nhắc 'Thu hoạch' này đã được ghi chú rồi`,
-  ThisHarvestRequestQrcodeAlreadyCannotAdjust: cannotDo(
-    'đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi',
-  ),
+  ThisHarvestRequestQrcodeAlreadyCannotAdjust: cannotDo('đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi'),
   ThisHarvestRequestQrcodeAlready: alreadyDone('Đợt thu hoạch của nhà yến này đã yêu cầu QrCode'),
   ThisQrNotApproved: 'Qr không tồn tại hoặc chưa được duyệt',
   RequestQrcodeNotFound: notFound('Thông tin Qrcode của yêu cầu bán hiện tại'),
   RequestInfoAlreadySold: alreadyDone('Thông tin của Qr code này đã được rao bán'),
-  RequestNotAllowHarvestEmpty:
-    'Nhà yến chưa có dữ liệu của đợt thu hoạch này, không thể yêu cầu mã Qrcode',
+  RequestNotAllowHarvestEmpty: 'Nhà yến chưa có dữ liệu của đợt thu hoạch này, không thể yêu cầu mã Qrcode',
   RequestCannotCancelNotWaiting: cannotDo('chỉ có thể hủy các yêu cầu đang ở chế độ chờ'),
 
   // QR
@@ -133,7 +127,7 @@ export const Msg = {
 
   // Captcha
   CapchaInvalid: err('Xác thực reCAPTCHA'),
-  
+
   // Checkout
   CheckoutTransactionExist: alreadyDone('Giao dịch thanh toán này'),
   CheckoutPackageNotFound: notFound('Gói cước mặc định'),
@@ -162,13 +156,13 @@ const convertFiledName = (filedName: string): string => {
     nestType: 'Loại yến',
     receiverName: 'Tên người nhận',
     receiverPhone: 'SĐT người nhận',
-    review:'Nội dung đánh giá',
+    review: 'Nội dung đánh giá',
     app_user_id: 'ID người dùng',
     harvestNextDate: 'Ngày thu hoạch tiếp theo',
     medicineNextDate: 'Ngày lăn thuốc tiếp theo',
     priceForEater: 'Giá bán cho người ăn yến',
     priceForPurchaser: 'Giá bán cho nhà thu mua',
-    priceForPurchaser_priceForEater: 'Giá bán cho người ăn yến và nhà thu mua'
+    priceForPurchaser_priceForEater: 'Giá bán cho người ăn yến và nhà thu mua',
   };
   return map[filedName] ?? filedName;
 };
@@ -179,10 +173,8 @@ export const MsgDto = {
   CannotNull: (filedName: string) => `${convertFiledName(filedName)} không thể trống`,
   MustBeGreaterZero: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn 0`,
   InvalidValue: (filedName: string) => `Giá trị của ${convertFiledName(filedName)} không hợp lệ`,
-  InvalidRange: (filedName: string, range: string) =>
-    `${convertFiledName(filedName)} phải nằm trong giá trị cho phép (${range})`,
-  MustBeGreaterThanAndEqualNow: (filedName: string) =>
-    `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
+  InvalidRange: (filedName: string, range: string) => `${convertFiledName(filedName)} phải nằm trong giá trị cho phép (${range})`,
+  MustBeGreaterThanAndEqualNow: (filedName: string) => `${convertFiledName(filedName)} phải lớn hơn ngày hiện tại`,
   IsRequired: (filedName: string) => `${convertFiledName(filedName)} là bắt buộc`,
   MustBeDate: (filedName: string) => `${convertFiledName(filedName)} phải là định dạng ngày hợp lệ`,
   MustBeTodayOrLater: (filedName: string) => `${convertFiledName(filedName)} phải từ ngày hiện tại trở đi`,
@@ -200,4 +192,3 @@ export const MsgAdmin = {
   deviceTokenNotBelongToThisUser: 'Người dùng đã đăng xuất khỏi thiết bị hoặc Token thiết bị của tài khoản người dùng này đã được dùng cho tài khoản người dùng khác',
   userAlreadyCreateThisTeam: 'Người dùng hiện tại đã đăng ký đội công xưởng này rồi',
 };
-

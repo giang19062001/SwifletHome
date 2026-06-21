@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { ChatService } from 'src/common/chat/chat.service';
 import { QuestionAppService } from 'src/modules/question/app/question.service';
-import { QuestionResDto } from "../../question/question.response";
-import { AnswerResDto } from "../answer.response";
+import { QuestionResDto } from '../../question/question.response';
+import { AnswerResDto } from '../answer.response';
 import { AnswerAppRepository } from './answer.repository';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class AnswerAppService {
     private readonly questionAppService: QuestionAppService,
     private readonly chatService: ChatService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
 
   async reply(question: string, userCode: string): Promise<string> {
     const questions: QuestionResDto[] = await this.questionAppService.getQuestionReplied();

@@ -141,6 +141,6 @@ export class ConsignmentAppRepository {
         `,
       params,
     );
-    return rows.length ? rows[0] as GetDetailConsignmentResDto : null;
+    return rows.length ? (rows[0] as GetDetailConsignmentResDto) : null;
   }
 }

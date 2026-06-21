@@ -43,11 +43,10 @@ export class GetUsersForTeamByTypeDto {
   @IsNotEmpty()
   userTypeCode: string;
 
-
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  pageType: "create" | "update"
+  pageType: 'create' | 'update';
 }
 
 export class UpdateUserPackageAdminDto {
@@ -61,7 +60,6 @@ export class UpdateUserPackageAdminDto {
   packageCode: string | null;
 }
 
-
 export class GetDetailDto {
   @ApiProperty({ example: 'APP', enum: UserTypeEnum })
   @IsEnum(UserTypeEnum)
@@ -70,19 +68,19 @@ export class GetDetailDto {
 }
 
 export class UserTypeResDto {
-    @ApiProperty({ example: '' })
-    userTypeCode: string;
-    @ApiProperty({ example: '' })
-    userTypeKeyWord: string;
-    @ApiProperty({ example: '' })
-    userTypeName: string;
+  @ApiProperty({ example: '' })
+  userTypeCode: string;
+  @ApiProperty({ example: '' })
+  userTypeKeyWord: string;
+  @ApiProperty({ example: '' })
+  userTypeName: string;
 }
 
 export class UserForTeamByTypeResDto {
-    @ApiProperty({ example: '' })
-    userCode: string;
-    @ApiProperty({ example: '' })
-    userName: string;
-    @ApiProperty({ example: '' })
-    userPhone: string;
+  @ApiProperty({ example: '' })
+  userCode: string;
+  @ApiProperty({ example: '' })
+  userName: string;
+  @ApiProperty({ example: '' })
+  userPhone: string;
 }

@@ -11,7 +11,7 @@ import QrAppController from './qr.controller';
 import QrAppV2Controller from './qr.controller.v2';
 
 @Module({
-  imports: [AuthAppModule, TodoAppModule ,UserHomeAppModule, InfoAppModule],
+  imports: [AuthAppModule, TodoAppModule, UserHomeAppModule, InfoAppModule],
   controllers: [QrAppController, QrAppV2Controller],
   providers: [QrRequestAppService, QrSellAppService, QrRequestAppRepository, QrSellAppRepository],
   exports: [QrRequestAppService],

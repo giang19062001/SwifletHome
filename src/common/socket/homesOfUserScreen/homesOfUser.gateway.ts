@@ -1,14 +1,5 @@
 import { OnEvent } from '@nestjs/event-emitter';
-import {
-  ConnectedSocket,
-  MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  OnGatewayInit,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { LoggingService } from '../../logger/logger.service';
 import { ISensor, ISensorHome } from '../socket.interface';
@@ -19,9 +10,7 @@ import { JoinRoomDto, LeaveRoomDto } from './homesOfUser.dto';
   transports: ['websocket'],
   cors: { origin: '*' },
 })
-export class HomesOfUserGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
-{
+export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
   @WebSocketServer()
   server: Server;
 
@@ -30,10 +19,10 @@ export class HomesOfUserGateway
   // Theo dõi homes mà user đang xem
   private watchingHomes = new Map<string, Set<string>>(); // userCode -> Set<homeCode>
 
-  // Cache dữ liệu mới nhất 
+  // Cache dữ liệu mới nhất
   private latestSensorDataOfHomes = new Map<string, ISensorHome>(); // key: MAC-userCode-homeCode
 
-  // Trạng thái online/offline 
+  // Trạng thái online/offline
   private sensorOnline = new Map<string, boolean>(); // key: MAC-userCode-homeCode -> true/false
 
   // Theo dõi client rớt mạng để tránh memory leak
@@ -51,7 +40,7 @@ export class HomesOfUserGateway
 
   handleDisconnect(client: Socket) {
     console.log(this.SERVICE_NAME, `Client disconnected: ${client.id}`);
-    
+
     // Tìm userCode và dọn dẹp biến để tránh memory leak
     const userCode = this.clientUserMap.get(client.id);
     if (userCode) {
@@ -134,7 +123,7 @@ export class HomesOfUserGateway
       const isOnline = this.sensorOnline.get(key) ?? false;
 
       if (isOnline) {
-        // Có dữ liệu thật -> dùng cache 
+        // Có dữ liệu thật -> dùng cache
         return this.latestSensorDataOfHomes.get(key)!;
       } else {
         // Offline hoặc chưa có dữ liệu -> trả về 0
@@ -156,7 +145,7 @@ export class HomesOfUserGateway
     console.log(
       this.SERVICE_NAME,
       `toàn bộ dữ liệu sensor của homes cho user ${userCode}: ${snapshot.length} homes`,
-      snapshot.map(s => `${s.userHomeCode}: ${s.temperature}°C, ${s.humidity}%, ${s.current}mA`).join(' | '),
+      snapshot.map((s) => `${s.userHomeCode}: ${s.temperature}°C, ${s.humidity}%, ${s.current}mA`).join(' | '),
     );
 
     this.server.to(room).emit('streamSensorData', snapshot);
@@ -178,7 +167,7 @@ export class HomesOfUserGateway
 
     const cacheKey = `MAC-${userCode}-${homeCode}`;
 
-    // Cập nhật cache dữ liệu 
+    // Cập nhật cache dữ liệu
     const homeData: ISensorHome = {
       userHomeCode: homeCode,
       temperature: data.temperature,

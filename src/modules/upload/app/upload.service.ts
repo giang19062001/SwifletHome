@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { AuthAppService } from 'src/modules/auth/app/auth.service';
-import { FileMediaResDto, FileUploadResDto } from "../upload.response";
+import { FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { GetAllMediaDto } from './upload.dto';
 import { UploadAppRepository } from './upload.repository';
 
@@ -21,7 +21,7 @@ export class UploadAppService {
     const userPackageInfo = await this.authAppService.getInfo(userCode);
 
     const isUpgrade = userPackageInfo?.packageCode && userPackageInfo.packageRemainDay > 0 ? 'UPGRADE' : 'NOT_UPGRADE';
-    console.log("isUpgrade --->", isUpgrade);
+    console.log('isUpgrade --->', isUpgrade);
     if (dto.mediaType == 'AUDIO') {
       const audioList = await this.uploadAppRepository.getAllMediaAudio(dto);
       for (const file of audioList) {
@@ -29,7 +29,7 @@ export class UploadAppService {
         if (isUpgrade === 'UPGRADE') {
           // -> hiện file full
           if (file.isFree === 'Y') {
-            list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "Y"}) as any); // BỎ  isCoupleFree
+            list.push((({ isCoupleFree, isFree, ...rest }) => rest)({ ...file, isCanBeDownload: 'Y' }) as any); // BỎ  isCoupleFree
           }
         }
         // user chưa  cập nhập gói
@@ -38,14 +38,14 @@ export class UploadAppService {
           if (file.isCoupleFree == 'Y') {
             if (file.isFree == 'N') {
               // -> hiện file full
-              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "Y"}) as any);  // BỎ  isCoupleFree
+              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({ ...file, isCanBeDownload: 'Y' }) as any); // BỎ  isCoupleFree
             }
           }
           //  files là tính phí
           else if (file.isCoupleFree == 'N') {
             if (file.isFree == 'Y') {
               // -> hiện file demo
-              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({...file, isCanBeDownload: "N"}) as any);  // BỎ  isCoupleFree
+              list.push((({ isCoupleFree, isFree, ...rest }) => rest)({ ...file, isCanBeDownload: 'N' }) as any); // BỎ  isCoupleFree
             }
           }
         }

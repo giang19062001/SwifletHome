@@ -5,8 +5,8 @@ import { multerAudioConfig, multerImgConfig } from 'src/config/multer.config';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
-import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from "../upload.response";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { UploadAudioFilesDto, UploadImgFileDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
 import { UploadAdminService } from './upload.service';
 
@@ -164,7 +164,7 @@ export class UploadAdminController {
     return result;
   }
 
-   @Delete('deleteMediaVideoLink/:seq')
+  @Delete('deleteMediaVideoLink/:seq')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'seq', type: Number })
   async deleteMediaVideoLink(@Param('seq') seq: number): Promise<number> {
@@ -174,7 +174,6 @@ export class UploadAdminController {
     }
     return result;
   }
-
 
   @Delete('deleteAudio/:seq')
   @HttpCode(HttpStatus.OK)

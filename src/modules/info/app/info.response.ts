@@ -10,7 +10,7 @@ export class GetInfoResDto {
 
   @ApiProperty()
   infoName: string;
-  
+
   @ApiProperty()
   infoContent: Record<string, any>;
 

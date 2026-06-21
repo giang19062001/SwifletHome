@@ -10,6 +10,6 @@ import { TeamAdminService } from './team.service';
   imports: [AuthAdminModule, FileLocalModule, FirebaseModule],
   controllers: [TeamAdminController],
   providers: [TeamAdminService, TeamAdminRepository],
-  exports:[TeamAdminService]
+  exports: [TeamAdminService],
 })
 export class TeamAdminModule {}

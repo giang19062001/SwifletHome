@@ -6,7 +6,7 @@ import { ROUTER } from 'src/helpers/const.helper';
 // Ném và xử lý các lỗi
 @Catch()
 export class ServerExceptionsFilter implements ExceptionFilter {
-  constructor(private readonly logger: LoggingService) { }
+  constructor(private readonly logger: LoggingService) {}
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -20,9 +20,9 @@ export class ServerExceptionsFilter implements ExceptionFilter {
     let detailData = null;
 
     if (typeof errorResponse === 'object' && errorResponse !== null) {
-      const msg = (errorResponse as any).message || (errorResponse as any).error;
+      const msg = errorResponse.message || errorResponse.error;
       message = Array.isArray(msg) ? msg.join(', ') : msg || exception.message || message;
-      detailData = (errorResponse as any).data ?? (errorResponse as any).response?.data ?? null;
+      detailData = errorResponse.data ?? errorResponse.response?.data ?? null;
     } else {
       message = exception.message || message;
     }
@@ -31,15 +31,12 @@ export class ServerExceptionsFilter implements ExceptionFilter {
     const shouldLogError = requestPath.startsWith(ROUTER.APP);
 
     if (shouldLogError) {
-      this.logger.error(
-        `[EXCEPTION] ${request.method} ${request.url} - Status: ${status} - Message: ${message}`,
-        {
-          status,
-          path: request.url,
-          method: request.method,
-          error: errorResponse,
-        },
-      );
+      this.logger.error(`[EXCEPTION] ${request.method} ${request.url} - Status: ${status} - Message: ${message}`, {
+        status,
+        path: request.url,
+        method: request.method,
+        error: errorResponse,
+      });
     }
 
     // CHỈ HANDLE CASE FAIL
@@ -51,4 +48,3 @@ export class ServerExceptionsFilter implements ExceptionFilter {
     });
   }
 }
-

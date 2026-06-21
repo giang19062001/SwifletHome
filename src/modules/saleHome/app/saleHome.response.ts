@@ -61,10 +61,10 @@ export class GetInitFormMutationResDto {
 export class UploadSaleHomeFileResDto {
   @ApiProperty({ example: 0 })
   seq: number;
-  
+
   @ApiProperty({ example: '' })
   url: string;
-  
+
   @ApiProperty({ example: '' })
   mimetype: string;
 }

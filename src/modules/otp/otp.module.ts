@@ -3,7 +3,7 @@ import { OtpRepository } from './otp.repository';
 import { OtpService } from './otp.service';
 
 @Module({
-  imports:[],
+  imports: [],
   providers: [OtpService, OtpRepository],
   exports: [OtpService],
 })

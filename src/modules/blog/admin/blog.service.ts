@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BlogResDto } from "../blog.response";
+import { BlogResDto } from '../blog.response';
 import { ChangToMainBlogDto, CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { BlogAdminRepository } from './blog.repository';
 

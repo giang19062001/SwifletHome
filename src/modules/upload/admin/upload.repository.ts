@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from "../upload.response";
+import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
 
 @Injectable()

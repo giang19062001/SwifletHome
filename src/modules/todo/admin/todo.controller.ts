@@ -4,8 +4,8 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
-import { TodoBoxTaskResDto, TodoTaskResDto } from "../todo.response";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { TodoBoxTaskResDto, TodoTaskResDto } from '../todo.response';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
 import { TodoAdminService } from './todo.service';
 
@@ -33,14 +33,13 @@ export class TodoAdminController {
     return result;
   }
 
- 
-   @ApiBody({ type: SetTaskAlarmByAdminDto })
-   @Post('setTaskAlarmByAdmin')
-   @HttpCode(HttpStatus.OK)
-   async setTaskAlarmByAdmin(@Body() dto: SetTaskAlarmByAdminDto, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<ApiMutationResponse> {
-     const result = await this.todoAdminService.setTaskAlarmByAdmin(dto, admin.userId);
-     return result;
-   }
+  @ApiBody({ type: SetTaskAlarmByAdminDto })
+  @Post('setTaskAlarmByAdmin')
+  @HttpCode(HttpStatus.OK)
+  async setTaskAlarmByAdmin(@Body() dto: SetTaskAlarmByAdminDto, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<ApiMutationResponse> {
+    const result = await this.todoAdminService.setTaskAlarmByAdmin(dto, admin.userId);
+    return result;
+  }
 
   @ApiBody({ type: UpdateBoxTaskArrayDto })
   @Put('updateBoxTask')

@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
-import { PackageResDto } from "../package.response";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { PackageResDto } from '../package.response';
 import { UpdatePackageDto } from './package.dto';
 import { PackageAdminService } from './package.service';
 
@@ -36,16 +36,15 @@ export class PackageAdminController {
     return result;
   }
 
-    @ApiBody({ type: UpdatePackageDto })
-    @ApiParam({ name: 'packageCode', type: String })
-    @Put('update/:packageCode')
-    @HttpCode(HttpStatus.OK)
-    async update(@Body() dto: UpdatePackageDto, @Param('packageCode') packageCode: string,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
-      const result = await this.packageAdminService.update(dto, admin.userId, packageCode);
-      if (result === 0) {
-        throw new BadRequestException();
-      }
-      return result;
+  @ApiBody({ type: UpdatePackageDto })
+  @ApiParam({ name: 'packageCode', type: String })
+  @Put('update/:packageCode')
+  @HttpCode(HttpStatus.OK)
+  async update(@Body() dto: UpdatePackageDto, @Param('packageCode') packageCode: string, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
+    const result = await this.packageAdminService.update(dto, admin.userId, packageCode);
+    if (result === 0) {
+      throw new BadRequestException();
     }
-  
+    return result;
+  }
 }

@@ -23,7 +23,7 @@ export class SaleHomeAppRepository {
       ` SELECT code, subOption, keyOption, valueOption, sortOrder
         FROM ${this.tableOption}
         WHERE mainOption = '${mainOption}' AND isActive = 'Y' 
-        ORDER BY subOption, sortOrder ASC`
+        ORDER BY subOption, sortOrder ASC`,
     );
     return rows as SaleHomeOptionData[];
   }
@@ -35,7 +35,7 @@ export class SaleHomeAppRepository {
     if (rows.length > 0) {
       homeCode = generateCode(rows[0].homeCode, CODES.saleHomeCode.PRE, CODES.saleHomeCode.LEN);
     }
-    
+
     const sql = `
       INSERT INTO ${this.table} (
         homeCode, userCode, hostName, hostPhone, socialContact, hostRole,
@@ -54,12 +54,36 @@ export class SaleHomeAppRepository {
       )
     `;
     const params = [
-      homeCode, userCode, dto.hostInfo.hostName, dto.hostInfo.hostPhone, dto.hostInfo.socialContact || null, dto.hostInfo.hostRole,
-      dto.homeInfo.homeName, dto.homeInfo.homelocation, dto.homeInfo.homeAddress, latitude, longitude, dto.homeInfo.homeAge, dto.homeInfo.homeModel,
-      dto.nestInfo.currentNests, dto.nestInfo.averageYieldKg, dto.nestInfo.numberOfFloors, dto.nestInfo.numberOfRooms,
-      dto.tourInfo.shortDescription, JSON.stringify(dto.tourInfo.topicsShare), JSON.stringify(dto.tourInfo.sightseeingAreas), JSON.stringify(dto.tourInfo.includedServices), dto.tourInfo.serviceNotes || null, dto.tourInfo.tourFee, dto.tourInfo.durationPerTourMinutes,
-      JSON.stringify(dto.policyInfo.availableDays), dto.policyInfo.timeframes, dto.policyInfo.timeNoticeRequired, JSON.stringify(dto.policyInfo.commitments),
-      dto.uniqueId, createdId
+      homeCode,
+      userCode,
+      dto.hostInfo.hostName,
+      dto.hostInfo.hostPhone,
+      dto.hostInfo.socialContact || null,
+      dto.hostInfo.hostRole,
+      dto.homeInfo.homeName,
+      dto.homeInfo.homelocation,
+      dto.homeInfo.homeAddress,
+      latitude,
+      longitude,
+      dto.homeInfo.homeAge,
+      dto.homeInfo.homeModel,
+      dto.nestInfo.currentNests,
+      dto.nestInfo.averageYieldKg,
+      dto.nestInfo.numberOfFloors,
+      dto.nestInfo.numberOfRooms,
+      dto.tourInfo.shortDescription,
+      JSON.stringify(dto.tourInfo.topicsShare),
+      JSON.stringify(dto.tourInfo.sightseeingAreas),
+      JSON.stringify(dto.tourInfo.includedServices),
+      dto.tourInfo.serviceNotes || null,
+      dto.tourInfo.tourFee,
+      dto.tourInfo.durationPerTourMinutes,
+      JSON.stringify(dto.policyInfo.availableDays),
+      dto.policyInfo.timeframes,
+      dto.policyInfo.timeNoticeRequired,
+      JSON.stringify(dto.policyInfo.commitments),
+      dto.uniqueId,
+      createdId,
     ];
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, params);
@@ -71,7 +95,7 @@ export class SaleHomeAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT fileTypeCode, fileTypeText
         FROM ${this.tableFileType}
-        ORDER BY seq ASC`
+        ORDER BY seq ASC`,
     );
     return rows as SaleHomeFileTypeData[];
   }
@@ -176,12 +200,12 @@ export class SaleHomeAppRepository {
     const options = await this.getHomeSaleOptions();
     const getOpt = (code: string) => {
       if (!code) return null;
-      const opt = options.find(o => o.code === code);
+      const opt = options.find((o) => o.code === code);
       return opt ? { code, valueOption: opt.valueOption } : { code, valueOption: code };
     };
     const getOpts = (codes: any[]) => {
       if (!Array.isArray(codes)) return [];
-      return codes.map(c => getOpt(c)).filter(c => c !== null);
+      return codes.map((c) => getOpt(c)).filter((c) => c !== null);
     };
 
     return {

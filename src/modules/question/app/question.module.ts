@@ -5,6 +5,6 @@ import { QuestionAppService } from './question.service';
 @Module({
   imports: [],
   providers: [QuestionAppService, QuestionAppRepository],
-  exports:[QuestionAppService]
+  exports: [QuestionAppService],
 })
 export class QuestionAppModule {}

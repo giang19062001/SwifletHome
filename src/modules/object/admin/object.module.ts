@@ -8,6 +8,6 @@ import { ObjectAdminService } from './object.service';
   imports: [AuthAdminModule],
   controllers: [ObjectAdminController],
   providers: [ObjectAdminService, ObjectAdminRepository],
-  exports: [ObjectAdminService]
+  exports: [ObjectAdminService],
 })
 export class ObjectAdminModule {}

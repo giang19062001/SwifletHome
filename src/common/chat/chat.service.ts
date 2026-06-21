@@ -70,7 +70,7 @@ export class ChatService {
       return `[[audio-data=${audioSrc}]]`;
     });
   }
-  
+
   async replyBaseOnUserPackage(contentHtml: string, isFree: string, userCode: string): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/replyBaseOnUserPackage`;
     // lấy thông tin gói của user
@@ -101,8 +101,6 @@ export class ChatService {
 
           // bỏ nội dung phía sau nút thanh toán
           content = parts[0] + `[[payment]]`;
-        } else {
-          content = content;
         }
       }
       // TODO: [AUDIO]

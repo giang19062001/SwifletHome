@@ -5,31 +5,31 @@ import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
 import { RequestStatusEnum } from '../qr.interface';
 
 export class QrRequestFileResDto {
-    @ApiProperty({ example: 0 })
-    seq: number;
-    @ApiProperty({ example: 0 })
-    qrRequestSeq: number;
-    @ApiProperty({ example: '' })
-    userCode: string;
-    @ApiProperty({ example: '' })
-    uniqueId: string;
-    @ApiProperty({ example: '' })
-    filename: string;
-    @ApiProperty({ example: '' })
-    originalname: string;
-    @ApiProperty({ example: 0 })
-    size: number;
-    @ApiProperty({ example: '' })
-    mimetype: string;
-    @ApiProperty({ example: YnEnum.N })
-    isActive: YnEnum;
+  @ApiProperty({ example: 0 })
+  seq: number;
+  @ApiProperty({ example: 0 })
+  qrRequestSeq: number;
+  @ApiProperty({ example: '' })
+  userCode: string;
+  @ApiProperty({ example: '' })
+  uniqueId: string;
+  @ApiProperty({ example: '' })
+  filename: string;
+  @ApiProperty({ example: '' })
+  originalname: string;
+  @ApiProperty({ example: 0 })
+  size: number;
+  @ApiProperty({ example: '' })
+  mimetype: string;
+  @ApiProperty({ example: YnEnum.N })
+  isActive: YnEnum;
 }
 
 export class QrRequestFileStrResDto {
-    @ApiProperty({ example: 0 })
-    seq: number;
-    @ApiProperty({ example: '' })
-    filename: string;
+  @ApiProperty({ example: 0 })
+  seq: number;
+  @ApiProperty({ example: '' })
+  filename: string;
 }
 
 export class PriceVatHistoryDetailDto {
@@ -414,7 +414,6 @@ export class GetSellingListResDto {
   @IsEnum(YnEnum)
   isSave: YnEnum;
 }
-
 
 class HarvestAvaliableItemResDto {
   @ApiProperty({ example: 0 })

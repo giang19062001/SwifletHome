@@ -22,7 +22,6 @@ export class CreateGuestConsulationDto {
   @IsNotEmpty()
   issueDescription: string;
 
-
   @ApiProperty({ example: 'recapchav3' })
   @IsString()
   @IsNotEmpty()

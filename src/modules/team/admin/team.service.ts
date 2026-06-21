@@ -7,7 +7,18 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { TeamStatusEnum } from 'src/interfaces/admin.interface';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
-import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
+import {
+  ChangDisplayReviewDto,
+  CreateTeamDto,
+  DeleteFileDto,
+  TeamImgResDto,
+  TeamResDto,
+  TeamReviewResDto,
+  UpdateTeamDto,
+  UploadServiceFilesDto,
+  UploadTeamFilesDto,
+  UploadTeamMainImageDto,
+} from './team.dto';
 import { TeamAdminRepository } from './team.repository';
 
 @Injectable()
@@ -33,11 +44,11 @@ export class TeamAdminService {
   }
 
   async getDetail(teamCode: string): Promise<any | null> {
-    let result: any = await this.teamAdminRepository.getDetail(teamCode);
+    const result: any = await this.teamAdminRepository.getDetail(teamCode);
     if (result) {
-      let teamFiles = await this.teamAdminRepository.getImages(result ? result?.seq : 0);
+      const teamFiles = await this.teamAdminRepository.getImages(result ? result?.seq : 0);
       // tách biệt ảnh chính và danh sách ảnh phụ
-      let teamFilesExceptMain: any[] = [];
+      const teamFilesExceptMain: any[] = [];
       for (const img of teamFiles) {
         if (img.filename == result.teamImage) {
           result.teamImage = img;
@@ -48,21 +59,21 @@ export class TeamAdminService {
       // góm nhóm các ảnh phụ theo loại ảnh của chúng
       const allFileTypes = await this.getTeamFileTypes();
       const structuredTeamFiles: any[] = [];
-      
+
       for (const img of teamFilesExceptMain) {
-        let typeGroup = structuredTeamFiles.find(g => g.fileTypeCode === img.fileTypeCode);
+        let typeGroup = structuredTeamFiles.find((g) => g.fileTypeCode === img.fileTypeCode);
         if (!typeGroup) {
-          const typeInfo = allFileTypes.find(t => t.fileTypeCode === img.fileTypeCode) || {};
+          const typeInfo = allFileTypes.find((t) => t.fileTypeCode === img.fileTypeCode) || {};
           typeGroup = {
             fileTypeCode: img.fileTypeCode,
             fileTypeText: typeInfo.fileTypeText || '',
-            images: []
+            images: [],
           };
           structuredTeamFiles.push(typeGroup);
         }
         typeGroup.images.push(img);
       }
-      
+
       result.teamFiles = structuredTeamFiles;
 
       // get services
@@ -198,7 +209,7 @@ export class TeamAdminService {
       if (home.teamImage) {
         const oldFilename = typeof home.teamImage === 'string' ? home.teamImage : (home.teamImage as TeamImgResDto).filename;
         const oldSeq = typeof home.teamImage === 'string' ? 0 : (home.teamImage as TeamImgResDto).seq;
-        
+
         if (oldFilename && oldFilename !== existingMainImg.filename) {
           await this.fileLocalService.deleteLocalFile(oldFilename);
           if (oldSeq > 0) {
@@ -301,14 +312,7 @@ export class TeamAdminService {
         }
 
         if (notification) {
-          await this.firebaseService.sendNotification(
-            team.userCode,
-            deviceToken,
-            notification.TITLE,
-            notification.BODY,
-            { teamCode },
-            NotificationTypeEnum.ADMIN,
-          );
+          await this.firebaseService.sendNotification(team.userCode, deviceToken, notification.TITLE, notification.BODY, { teamCode }, NotificationTypeEnum.ADMIN);
         }
       }
     }

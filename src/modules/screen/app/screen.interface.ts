@@ -1,4 +1,4 @@
-import { GetContentScreenResDto } from "./screen.response";
+import { GetContentScreenResDto } from './screen.response';
 
 export interface IScreenStrategy {
   canHandle(keyword: string): boolean;

@@ -159,7 +159,7 @@ export class TeamResDto {
 
   @ApiProperty({ example: '' })
   teamCode: string;
-  
+
   @ApiProperty({ example: '' })
   teamName: string;
 
@@ -213,7 +213,7 @@ export class TeamResDto {
 
   @ApiProperty({ example: '' })
   userTypeKeyWord: string;
-  
+
   @ApiProperty({ example: '' })
   userTypeName: string;
 }

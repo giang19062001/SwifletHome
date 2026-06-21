@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { QuestionResDto } from "../question.response";
+import { QuestionResDto } from '../question.response';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 
 @Injectable()

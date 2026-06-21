@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { PagingDto } from 'src/dto/admin.dto';
-import { DoctorResDto } from "../doctor.response";
+import { DoctorResDto } from '../doctor.response';
 import { UpdateDoctorDto } from './doctor.dto';
 import { DoctorAdminRepository } from './doctor.repository';
 

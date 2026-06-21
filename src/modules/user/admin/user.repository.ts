@@ -166,7 +166,7 @@ export class UserAdminRepository {
 
     return result.insertId;
   }
-  async isFristTimesUpdatePackage(userCode: string): Promise<Boolean> {
+  async isFristTimesUpdatePackage(userCode: string): Promise<boolean> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` 
       SELECT seq FROM ${this.tableUserPackage} 
@@ -201,8 +201,12 @@ export class UserAdminRepository {
     const sql = ` SELECT A.userCode, A.userName, A.userPhone
          FROM ${this.tableApp} A
          WHERE A.isActive = 'Y' 
-         ${dto.pageType === 'create' ? ` 
-        AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = ? )` : ''}
+         ${
+           dto.pageType === 'create'
+             ? ` 
+        AND A.userCode NOT IN ( SELECT B.userCode FROM ${this.tableTeam} B WHERE B.userTypeCode = ? )`
+             : ''
+         }
       `;
     const params: any[] = [];
     if (dto.pageType === 'create') {

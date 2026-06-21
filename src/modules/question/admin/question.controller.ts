@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
-import { QuestionResDto } from "../question.response";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { QuestionResDto } from '../question.response';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { QuestionAdminService } from './question.service';
 
@@ -51,7 +51,7 @@ export class QuestionAdminController {
   @ApiParam({ name: 'questionCode', type: String })
   @Put('update/:questionCode')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateQuestionDto, @Param('questionCode') questionCode: string,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
+  async update(@Body() dto: UpdateQuestionDto, @Param('questionCode') questionCode: string, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.questionAdminService.update(dto, admin.userId, questionCode);
     if (result === 0) {
       throw new BadRequestException();

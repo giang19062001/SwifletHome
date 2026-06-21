@@ -3,14 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { LoggingService } from '../logger/logger.service';
 import { EMAIL } from 'src/helpers/text.helper';
-import {
-  getGuestTemplate,
-  getTeamTemplate,
-  getDoctorTemplate,
-  getSightSeeingTemplate,
-  getRequestQrTemplate,
-  getConsignmentTemplate,
-} from './mail.teamplate';
+import { getGuestTemplate, getTeamTemplate, getDoctorTemplate, getSightSeeingTemplate, getRequestQrTemplate, getConsignmentTemplate } from './mail.teamplate';
 
 @Injectable()
 export class MailService {

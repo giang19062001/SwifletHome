@@ -18,8 +18,8 @@ export class TeamUserAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   // TODO: TEAM
-  async findTeamByCode(teamCode: string): Promise<Boolean> {
-    let query = ` 
+  async findTeamByCode(teamCode: string): Promise<boolean> {
+    const query = ` 
         SELECT A.seq FROM ${this.table} A  WHERE A.teamCode = ? `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode]);
     return rows.length ? true : false;
@@ -85,7 +85,7 @@ export class TeamUserAppRepository {
   }
 
   async getDetailTeam(teamCode: string): Promise<GetDetailTeamResDto | null> {
-    let query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
+    const query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
             A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress,A.provinceCodes,
             IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial, A.status, A.isSeleted,
              A.teamImage,
@@ -121,25 +121,31 @@ export class TeamUserAppRepository {
           LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode]);
-    let result = rows ? (rows[0] as GetDetailTeamResDto) : null;
+    const result = rows ? (rows[0] as GetDetailTeamResDto) : null;
     if (result) {
       result.teamFiles = typeof result.teamFiles === 'string' ? JSON.parse(result.teamFiles) : result.teamFiles;
       result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
       result.teamDescriptionSpecial = typeof result.teamDescriptionSpecial === 'string' ? JSON.parse(result.teamDescriptionSpecial) : result.teamDescriptionSpecial;
 
       // Lấy danh sách dịch vụ và ảnh dịch vụ
-      const [services] = await this.db.query<RowDataPacket[]>(`
+      const [services] = await this.db.query<RowDataPacket[]>(
+        `
         SELECT S.seq, S.userTypeCode, S.serviceTypeCode, S.serviceTextInput, O.serviceTypeName as serviceTypeText
         FROM ${this.tableService} S
         LEFT JOIN ${this.tableServiceType} O ON S.serviceTypeCode = O.serviceTypeCode
         WHERE S.seqTeam = ?
-      `, [result.seq]);
+      `,
+        [result.seq],
+      );
 
       for (const svc of services) {
-        const [svcImages] = await this.db.query<RowDataPacket[]>(`
+        const [svcImages] = await this.db.query<RowDataPacket[]>(
+          `
           SELECT seq, filename, mimetype
           FROM ${this.tableServiceFile} WHERE seqService = ?
-        `, [svc.seq]);
+        `,
+          [svc.seq],
+        );
         svc.images = svcImages;
       }
       result.services = services as any;
@@ -149,18 +155,15 @@ export class TeamUserAppRepository {
 
   // TODO: TEAM REGISTRATION
   async checkDuplicateTeam(userCode: string, userTypeCode: string): Promise<boolean> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT seq FROM ${this.table} WHERE userCode = ? AND userTypeCode = ?`,
-      [userCode, userTypeCode],
-    );
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq FROM ${this.table} WHERE userCode = ? AND userTypeCode = ?`, [userCode, userTypeCode]);
     return rows.length > 0;
   }
 
-  async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<{ teamCode: string, status: TeamStatusEnum } | null> {
+  async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<{ teamCode: string; status: TeamStatusEnum } | null> {
     const query = ` SELECT teamCode, status FROM ${this.table} 
     WHERE userCode = ? AND userTypeCode = ? AND isActive = 'Y' LIMIT 1 `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeCode]);
-    return rows.length ? (rows[0] as { teamCode: string, status: TeamStatusEnum }) : null;
+    return rows.length ? (rows[0] as { teamCode: string; status: TeamStatusEnum }) : null;
   }
 
   async create(dto: any, userCode: string, teamImagePath: string, createdId: string): Promise<number> {
@@ -282,18 +285,14 @@ export class TeamUserAppRepository {
   }
 
   async getTeamFileTypes(userTypeCode: string): Promise<any[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT fileTypeCode, fileTypeText FROM tbl_team_file_type WHERE userTypeCode = ?`,
-      [userTypeCode],
-    );
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT fileTypeCode, fileTypeText FROM tbl_team_file_type WHERE userTypeCode = ?`, [userTypeCode]);
     return rows;
   }
 
   async getTeamServiceTypes(userTypeCode: string): Promise<any[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT serviceTypeCode, serviceTypeName FROM ${this.tableServiceType} WHERE userTypeCode = ? AND isActive = 'Y' ORDER BY sortOrder ASC`,
-      [userTypeCode],
-    );
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT serviceTypeCode, serviceTypeName FROM ${this.tableServiceType} WHERE userTypeCode = ? AND isActive = 'Y' ORDER BY sortOrder ASC`, [
+      userTypeCode,
+    ]);
     return rows;
   }
 

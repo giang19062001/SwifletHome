@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { BlogResDto } from "../blog.response";
+import { BlogResDto } from '../blog.response';
 import { CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 
 @Injectable()
@@ -126,7 +126,6 @@ export class BlogAdminRepository {
     return result.affectedRows;
   }
 
-  
   async changeToNotMain(updatedId: string, blogCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET isMain = 'N', 

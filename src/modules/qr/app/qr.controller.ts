@@ -40,7 +40,7 @@ export default class QrAppController {
   ) {}
 
   // TODO: QR FETCH
-  // Lấy danh sách yêu cầu cung cấp mã QR 
+  // Lấy danh sách yêu cầu cung cấp mã QR
   @ApiOperation({
     summary: 'Lấy danh sách yêu cầu cung cấp mã QR',
     description: ``,

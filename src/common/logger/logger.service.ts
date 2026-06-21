@@ -11,15 +11,12 @@ export class LoggingService implements LoggerService {
     this.logger = createLogger(getWinstonConfig());
   }
 
-
   private getLogMetadata(context?: any, caller?: string) {
     const requestContext = requestContextStorage.getStore();
     const redactedContext = this.redact(context);
 
     // Tự động stringify TOÀN BỘ context nếu nó là object để Loki dễ bắt
-    let logContext = (redactedContext && typeof redactedContext === 'object')
-      ? JSON.stringify(redactedContext)
-      : redactedContext;
+    let logContext = redactedContext && typeof redactedContext === 'object' ? JSON.stringify(redactedContext) : redactedContext;
 
     if (caller && logContext !== undefined && logContext !== null) {
       const contextStr = String(logContext);
@@ -50,11 +47,14 @@ export class LoggingService implements LoggerService {
 
     // Xử lý Error object (vì for..in không quét được message/stack)
     if (obj instanceof Error) {
-      return this.redact({
-        message: obj.message,
-        stack: obj.stack,
-        ...(obj as any),
-      }, seen);
+      return this.redact(
+        {
+          message: obj.message,
+          stack: obj.stack,
+          ...(obj as any),
+        },
+        seen,
+      );
     }
 
     if (typeof obj !== 'object') return obj;
@@ -81,7 +81,6 @@ export class LoggingService implements LoggerService {
     }
     return redacted;
   }
-
 
   log(message: string, context?: any) {
     this.logger.info(message, this.getLogMetadata(context, message));

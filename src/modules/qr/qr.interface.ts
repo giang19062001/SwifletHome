@@ -1,4 +1,3 @@
-
 export const QR_CODE_CONST = {
   PRICE_OPTION: {
     SELL_FOR_PURCHASER: {
@@ -67,7 +66,6 @@ export enum RequestSellStatusEnum {
   APPROVED = 'APPROVED',
   REFUSE = 'REFUSE',
 }
-
 
 export enum FetchSellingByEnum {
   PURCHASER = 'PURCHASER',

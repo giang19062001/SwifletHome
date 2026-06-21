@@ -22,7 +22,6 @@ export class DoctorFileDto {
   doctorFiles: any[];
 }
 
-
 export class CreateDoctorDto {
   @ApiProperty({
     example: '',

@@ -1,7 +1,6 @@
 import { Type } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 
-
 export function ListResponseDto<TModel extends Type<any>>(model: TModel) {
   class ListDtoClass {
     @ApiProperty({ example: 10 })
@@ -45,7 +44,6 @@ export class NumberErrResponseDto {
   statusCode: number;
 }
 
-
 export class EmptyArrayResponseDto {
   @ApiProperty({ example: false })
   success: boolean;
@@ -59,7 +57,6 @@ export class EmptyArrayResponseDto {
   @ApiProperty({ example: 400 })
   statusCode: number;
 }
-
 
 export class NullResponseDto {
   @ApiProperty({ example: false })

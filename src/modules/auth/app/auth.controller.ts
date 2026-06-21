@@ -7,7 +7,7 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
 import { RequestOtpResDto } from 'src/modules/otp/otp.response';
 import { ChangeTypeTokenAppResDto, GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
@@ -20,7 +20,7 @@ import { AuthAppService } from './auth.service';
 @Controller('/api/app/auth')
 @UseInterceptors(ResponseAppInterceptor)
 export class AuthAppController {
-  constructor(private readonly authAppService: AuthAppService) { }
+  constructor(private readonly authAppService: AuthAppService) {}
 
   @ApiBody({
     type: ChangeTypeTokenDto,
@@ -28,8 +28,8 @@ export class AuthAppController {
   @UseGuards(ApiAuthAppGuard)
   @ApiOperation({
     summary: `Đổi accessToken theo vai trò: Chủ nhà yến, nhà thu mua, xưởng gia công, đội kỹ thuật, người ăn yến `,
-    description:`
-  **isSetted** luôn là 'Y' nếu userTypeKeyWord là 'OWNER/PURCHASER/EATER' hoặc user đã đăng ký 'FACTORY'/'TECHNICAL'`
+    description: `
+  **isSetted** luôn là 'Y' nếu userTypeKeyWord là 'OWNER/PURCHASER/EATER' hoặc user đã đăng ký 'FACTORY'/'TECHNICAL'`,
   })
   @Post('changeTypeToken')
   @HttpCode(HttpStatus.OK)

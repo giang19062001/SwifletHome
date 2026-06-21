@@ -13,7 +13,7 @@ import { AuthAdminService } from './auth.service';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_KEY'),
-        signOptions: { expiresIn: AUTH_CONFIG.EXPIRED_ADMIN},
+        signOptions: { expiresIn: AUTH_CONFIG.EXPIRED_ADMIN },
       }),
     }),
     forwardRef(() => UserAdminModule), // ← phá phụ thuộc vòng tròn

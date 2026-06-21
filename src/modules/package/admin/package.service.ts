@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
 import { formatPrice } from 'src/helpers/func.helper';
-import { PackageResDto } from "../package.response";
+import { PackageResDto } from '../package.response';
 import { UpdatePackageDto } from './package.dto';
 import { PackageAdminRepository } from './package.repository';
 

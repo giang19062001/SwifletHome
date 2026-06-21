@@ -58,9 +58,14 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     }
 
     // team
-    if (fieldname === 'teamImage' || fieldname.includes('teamImage') 
-    ||  fieldname === 'teamFiles' || fieldname.includes('teamFiles')
-    || fieldname === 'teamServiceFiles' ||fieldname.includes('teamServiceFiles')) {
+    if (
+      fieldname === 'teamImage' ||
+      fieldname.includes('teamImage') ||
+      fieldname === 'teamFiles' ||
+      fieldname.includes('teamFiles') ||
+      fieldname === 'teamServiceFiles' ||
+      fieldname.includes('teamServiceFiles')
+    ) {
       result = 'images/teams';
     }
 
@@ -85,12 +90,10 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     if (fieldname === 'requestQrcodeFiles' || fieldname.includes('requestQrcodeFiles')) {
       result = 'videos/requestQrcodes';
     }
-      // team
-    if ( fieldname === 'teamFiles' || fieldname.includes('teamFiles')
-    || fieldname === 'teamServiceFiles' ||fieldname.includes('teamServiceFiles')) {
+    // team
+    if (fieldname === 'teamFiles' || fieldname.includes('teamFiles') || fieldname === 'teamServiceFiles' || fieldname.includes('teamServiceFiles')) {
       result = 'videos/teams';
     }
-
   }
   if (mimetype.startsWith('audio/')) {
     //audio

@@ -14,7 +14,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { GetHomeUserResDto, UserHomeImageResDto, GetHomesUserResDto } from './userHome.response';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 
 @ApiTags('app/userHome')
 @Controller('/api/app/userHome')
@@ -22,8 +22,9 @@ import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class UserHomeAppController {
-  constructor(private readonly userHomeAppService: UserHomeAppService,
-    private readonly userAppService: UserAppService
+  constructor(
+    private readonly userHomeAppService: UserHomeAppService,
+    private readonly userAppService: UserAppService,
   ) {}
 
   // TODO: USER-HOME
@@ -173,5 +174,4 @@ Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uui
       data: result,
     };
   }
-
 }

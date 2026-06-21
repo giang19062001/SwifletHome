@@ -7,6 +7,6 @@ import { PhoneCodeService } from './phoneCode.service';
   imports: [],
   controllers: [PhoneCodeController],
   providers: [PhoneCodeService, PhoneCodeRepository],
-  exports: [PhoneCodeService]
+  exports: [PhoneCodeService],
 })
 export class PhoneCodeModule {}

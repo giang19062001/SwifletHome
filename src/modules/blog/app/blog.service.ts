@@ -11,7 +11,7 @@ export class BlogAppService {
     private readonly blogAppRepository: BlogAdppRepository,
     private readonly chatService: ChatService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   async getContent(userCode: string): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/getContent`;
     const blog = await this.blogAppRepository.getOneContent();

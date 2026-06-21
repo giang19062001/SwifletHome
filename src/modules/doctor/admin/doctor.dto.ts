@@ -15,7 +15,6 @@ export class UpdateDoctorDto {
   @IsString()
   @IsNotEmpty()
   noteAnswered: string;
-
 }
 
 export class DoctorVideoDto {

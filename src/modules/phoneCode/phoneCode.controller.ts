@@ -11,7 +11,6 @@ import { PhoneCodeService } from './phoneCode.service';
 export default class PhoneCodeController {
   constructor(private readonly phoneCodeService: PhoneCodeService) {}
 
-
   @ApiOperation({
     summary: 'Không cần đăng nhập',
   })

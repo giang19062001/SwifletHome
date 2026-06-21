@@ -23,16 +23,20 @@ export class SaleHomeAppService {
 
     const result = new GetInitFormMutationResDto();
     result.uniqueId = uuidv4();
-    
-    result.hostRole = options.filter(o => o.subOption === OPTION_CONST.SALE_HOME.HOST_ROLE.subOption).map(o => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
-    result.homeModel = options.filter(o => o.subOption === OPTION_CONST.SALE_HOME.HOME_MODEL.subOption).map(o => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
-    result.topicsShare = options.filter(o => o.subOption === OPTION_CONST.SALE_HOME.TOPICS_SHARE.subOption).map(o => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
-    result.sightseeingAreas = options.filter(o => o.subOption === OPTION_CONST.SALE_HOME.SIGHTSEEING_AREAS.subOption).map(o => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
-    result.includedServices = options.filter(o => o.subOption === OPTION_CONST.SALE_HOME.INCLUDED_SERVICES.subOption).map(o => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
-    result.availableDays = options.filter(o => o.subOption === OPTION_CONST.SALE_HOME.AVAILABLE_DAYS.subOption).map(o => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
-    result.commitments = options.filter(o => o.subOption === OPTION_CONST.SALE_HOME.COMMITMENTS.subOption).map(o => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
-    
-    result.fileTypes = fileTypes.map(f => ({ fileTypeCode: f.fileTypeCode, fileTypeText: f.fileTypeText }));
+
+    result.hostRole = options.filter((o) => o.subOption === OPTION_CONST.SALE_HOME.HOST_ROLE.subOption).map((o) => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
+    result.homeModel = options.filter((o) => o.subOption === OPTION_CONST.SALE_HOME.HOME_MODEL.subOption).map((o) => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
+    result.topicsShare = options.filter((o) => o.subOption === OPTION_CONST.SALE_HOME.TOPICS_SHARE.subOption).map((o) => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
+    result.sightseeingAreas = options
+      .filter((o) => o.subOption === OPTION_CONST.SALE_HOME.SIGHTSEEING_AREAS.subOption)
+      .map((o) => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
+    result.includedServices = options
+      .filter((o) => o.subOption === OPTION_CONST.SALE_HOME.INCLUDED_SERVICES.subOption)
+      .map((o) => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
+    result.availableDays = options.filter((o) => o.subOption === OPTION_CONST.SALE_HOME.AVAILABLE_DAYS.subOption).map((o) => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
+    result.commitments = options.filter((o) => o.subOption === OPTION_CONST.SALE_HOME.COMMITMENTS.subOption).map((o) => ({ code: o.code, keyOption: o.keyOption, valueOption: o.valueOption }));
+
+    result.fileTypes = fileTypes.map((f) => ({ fileTypeCode: f.fileTypeCode, fileTypeText: f.fileTypeText }));
 
     return result;
   }

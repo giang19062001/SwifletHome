@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
@@ -26,11 +17,7 @@ export class AuthAdminController {
   })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() dto: LoginAdminDto,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async login(@Body() dto: LoginAdminDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = await this.authAdminService.login(dto);
 
     // save token into cookie

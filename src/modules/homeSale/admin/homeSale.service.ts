@@ -4,7 +4,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { diffByTwoArr } from 'src/helpers/func.helper';
-import { HomeSaleImgResDto, HomeSaleResDto, HomeSaleSightSeeingResDto } from "../homeSale.response";
+import { HomeSaleImgResDto, HomeSaleResDto, HomeSaleSightSeeingResDto } from '../homeSale.response';
 import { CreateHomeDto, UpdateHomeDto, UpdateStatusDto } from './homeSale.dto';
 import { HomeSaleAdminRepository } from './homeSale.repository';
 
@@ -15,18 +15,18 @@ export class HomeSaleAdminService {
     private readonly homSaleAdminRepository: HomeSaleAdminRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: HomeSaleResDto[] }> {
     const total = await this.homSaleAdminRepository.getTotal();
     const list = await this.homSaleAdminRepository.getAll(dto);
     return { total, list };
   }
   async getDetail(homeCode: string): Promise<HomeSaleResDto | null> {
-    let result = await this.homSaleAdminRepository.getDetail(homeCode);
+    const result = await this.homSaleAdminRepository.getDetail(homeCode);
     if (result) {
-      let homeImages = await this.homSaleAdminRepository.getImages(result ? result?.seq : 0);
+      const homeImages = await this.homSaleAdminRepository.getImages(result ? result?.seq : 0);
       // tách biệt ảnh chính và danh sách ảnh phụ
-      let homeImagesExceptMain: HomeSaleImgResDto[] = [];
+      const homeImagesExceptMain: HomeSaleImgResDto[] = [];
       for (const img of homeImages) {
         if (img.filename == result.homeImage) {
           result.homeImage = img;
@@ -63,7 +63,7 @@ export class HomeSaleAdminService {
     const logbase = `${this.SERVICE_NAME}/update`;
 
     const home = await this.getDetail(homeCode);
-    let homeImagePath = (home?.homeImage as HomeSaleImgResDto).filename
+    let homeImagePath = (home?.homeImage as HomeSaleImgResDto).filename;
     if (home) {
       // homeImage bị thay đổi -> xóa ảnh hiện tại của nó
       if (dto.homeImage.filename !== (home.homeImage as HomeSaleImgResDto).filename) {

@@ -3,7 +3,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { NotificationStatusEnum } from '../notification.interface';
-import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from "../notification.response";
+import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from '../notification.response';
 import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusDto } from './notification.dto';
 import { NotificationAppRepository } from './notification.repository';
 
@@ -15,7 +15,7 @@ export class NotificationAppService {
     private readonly notificationAppRepository: NotificationAppRepository,
     private readonly userAppService: UserAppService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
   async getAllTopic(dto: PagingDto = { limit: 0, page: 0 }): Promise<{ total: number; list: NotificationTopicResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAllTopic`;
 
@@ -142,6 +142,6 @@ export class NotificationAppService {
     const logbase = `${this.SERVICE_NAME}/clearInvalidDeviceToken`;
     this.logger.log(logbase, `Xóa token không hợp lệ khỏi DB: ${deviceToken}`);
     await this.userAppService.clearDeviceToken(deviceToken);
-    return 1
+    return 1;
   }
 }

@@ -22,8 +22,6 @@ export class UploadFilesAppDto {
   saleHomeFiles: any[];
 }
 
-
-
 export class HostInfoDto {
   @ApiProperty({ example: 'Nguyễn Văn A' })
   @IsString()
@@ -101,17 +99,17 @@ export class TourInfoDto {
   @IsNotEmpty()
   shortDescription: string;
 
-  @ApiProperty({ example: ["COD000044", "COD000045", "COD000046"] })
+  @ApiProperty({ example: ['COD000044', 'COD000045', 'COD000046'] })
   @IsArray()
   @IsNotEmpty()
   topicsShare: string[];
 
-  @ApiProperty({ example: ["COD000051", "COD000052"] })
+  @ApiProperty({ example: ['COD000051', 'COD000052'] })
   @IsArray()
   @IsNotEmpty()
   sightseeingAreas: string[];
 
-  @ApiProperty({ example: ["COD000058", "COD000059"] })
+  @ApiProperty({ example: ['COD000058', 'COD000059'] })
   @IsArray()
   @IsNotEmpty()
   includedServices: string[];
@@ -133,7 +131,7 @@ export class TourInfoDto {
 }
 
 export class PolicyInfoDto {
-  @ApiProperty({ example: ["COD000064", "COD000065", "COD000066"] })
+  @ApiProperty({ example: ['COD000064', 'COD000065', 'COD000066'] })
   @IsArray()
   @IsNotEmpty()
   availableDays: string[];
@@ -149,7 +147,7 @@ export class PolicyInfoDto {
   @IsNotEmpty()
   timeNoticeRequired: string;
 
-  @ApiProperty({ example: ["COD000072","COD000073","COD000074","COD000075"] })
+  @ApiProperty({ example: ['COD000072', 'COD000073', 'COD000074', 'COD000075'] })
   @IsArray()
   @IsNotEmpty()
   commitments: string[];

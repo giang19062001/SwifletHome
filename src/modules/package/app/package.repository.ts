@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { PackageResDto } from "../package.response";
+import { PackageResDto } from '../package.response';
 
 @Injectable()
 export class PackageAppRepository {
@@ -8,7 +8,7 @@ export class PackageAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getOne(): Promise<PackageResDto> {
-    let query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageItemSamePrice,
+    const query = ` SELECT A.seq, A.packageCode, A.packageName, A.packagePrice, A.packageItemSamePrice,
               A.packageOptionType, A.packageExpireDay, A.packageDescription
                FROM ${this.table} A
                WHERE A.isActive = 'Y' 

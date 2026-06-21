@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { QuestionAdminService } from 'src/modules/question/admin/question.service';
-import { AnswerResDto } from "../answer.response";
+import { AnswerResDto } from '../answer.response';
 import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
 import { AnswerAdminRepository } from './answer.repository';
 

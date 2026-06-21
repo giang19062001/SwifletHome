@@ -47,11 +47,11 @@ export const initSwagger = (app) => {
 
     return a.name.localeCompare(b.name);
   });
-SwaggerModule.setup('api-docs', app, document, {
-  swaggerOptions: {
-    operationsSorter: 'alpha',
-  },
-  customCss: `
+  SwaggerModule.setup('api-docs', app, document, {
+    swaggerOptions: {
+      operationsSorter: 'alpha',
+    },
+    customCss: `
     .opblock-tag[data-tag^="app/"],
     .opblock-tag[data-tag^="front/"],
     .opblock-tag[data-tag^="eater-app/"] {
@@ -73,5 +73,5 @@ SwaggerModule.setup('api-docs', app, document, {
     .opblock-tag[data-tag^="front/"]::before { content: "🌐"; }
     .opblock-tag[data-tag^="eater-app/"]::before { content: "🛒"; }
   `,
-});
+  });
 };

@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swa
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from "src/modules/auth/app/auth.dto";
+import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetContentBlogResDto } from './blog.response';
 import { BlogAppService } from './blog.service';
@@ -14,9 +14,7 @@ import { BlogAppService } from './blog.service';
 @Controller('/api/app/blog')
 @UseInterceptors(ResponseAppInterceptor)
 export class BlogAppController {
-  constructor(
-    private readonly blogAppService: BlogAppService,
-  ) {}
+  constructor(private readonly blogAppService: BlogAppService) {}
 
   @ApiOperation({
     summary: 'Ngày có chim đêm tab,..',
@@ -26,6 +24,6 @@ export class BlogAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(GetContentBlogResDto) })
   async getContent(@GetUserApp() user: TokenUserAppResDto): Promise<string> {
     const result = await this.blogAppService.getContent(user.userCode);
-    return result
+    return result;
   }
 }

@@ -9,6 +9,6 @@ import { NotificationAppService } from './notification.service';
   imports: [AuthAppModule, UserAppModule],
   controllers: [NotificationAppController],
   providers: [NotificationAppService, NotificationAppRepository],
-  exports: [NotificationAppService]
+  exports: [NotificationAppService],
 })
-export class NotificationAppModule {} 
+export class NotificationAppModule {}

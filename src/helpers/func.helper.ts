@@ -7,7 +7,7 @@ export const generateCode = (code: string, keyword: string, lengthNum: number) =
   const lastCode = code;
 
   const numberPart = lastCode.substring(3);
-  let nextNumber = parseInt(numberPart, 10) + 1;
+  const nextNumber = parseInt(numberPart, 10) + 1;
 
   const nextNumberString = nextNumber.toString().padStart(lengthNum, '0');
 
@@ -51,20 +51,25 @@ export function replaceNbspToSpace(str: string) {
   return str.replace(/&nbsp;/g, ' ');
 }
 
-
 export function safeParseArray(val: any): any[] {
-    if (!val) return [];
-    if (Array.isArray(val)) return val;
-    if (typeof val === 'string') {
-      try {
-        if (val.trim().startsWith('[')) {
-          const parsed = JSON.parse(val);
-          return Array.isArray(parsed) ? parsed : [parsed];
-        }
-        return val.split(',').map(s => s.trim()).filter(s => s !== '');
-      } catch (e) {
-        return val.split(',').map(s => s.trim()).filter(s => s !== '');
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    try {
+      if (val.trim().startsWith('[')) {
+        const parsed = JSON.parse(val);
+        return Array.isArray(parsed) ? parsed : [parsed];
       }
+      return val
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s !== '');
+    } catch (e) {
+      return val
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s !== '');
     }
-    return [val];
   }
+  return [val];
+}

@@ -23,7 +23,7 @@ export class TodoAlarmAppService {
     private readonly todoAppValidate: TodoAppValidate,
     private readonly userHomeAppService: UserHomeAppService,
     private readonly logger: LoggingService,
-  ) { }
+  ) {}
 
   // TODO: BOX-TASK
   async getScheduledTasks(userCode: string): Promise<{ [key: string]: string }[]> {
@@ -69,7 +69,7 @@ export class TodoAlarmAppService {
             };
           }
         } else if (ele.taskKeyword === TODO_CONST.TASK_BOX.LURING.value) {
-          const alarmData = await this.todoAlarmAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, TODO_CONST.TASK_BOX.LURING.value, today)
+          const alarmData = await this.todoAlarmAppRepository.getOneTaskAlarmsNearly(userCode, home.userHomeCode, TODO_CONST.TASK_BOX.LURING.value, today);
           if (alarmData) {
             data = {
               taskDate: alarmData.taskDate as any,
@@ -148,7 +148,7 @@ export class TodoAlarmAppService {
     const logbase = `${this.SERVICE_NAME}/setTaskAlarm:`;
 
     // kiểm tra duplicate lịch nhắc
-    let alramDto = await this.todoAppValidate.handleAlarmData(dto);
+    const alramDto = await this.todoAppValidate.handleAlarmData(dto);
 
     // taskDate khác null mới kiểm tra
     if (alramDto.taskDate != null) {
@@ -173,7 +173,7 @@ export class TodoAlarmAppService {
   async getListTaskAlarmsToday(todayStr: string) {
     return await this.todoAlarmAppRepository.getListTaskAlarmsToday(todayStr);
   }
-   async getListTaskMedicinesToday(todayStr: string) {
+  async getListTaskMedicinesToday(todayStr: string) {
     return await this.todoMedicineAppRepository.getListTaskMedicinesToday(todayStr);
   }
 }

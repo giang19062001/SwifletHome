@@ -1,6 +1,6 @@
 import { format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
-import LokiTransport from "winston-loki";
+import LokiTransport from 'winston-loki';
 
 // log ghi trong file
 const customFormat = format.printf(({ timestamp, level, message, context, stack, ip }) => {
@@ -8,7 +8,7 @@ const customFormat = format.printf(({ timestamp, level, message, context, stack,
     level,
     timestamp,
     caller: message,
-    context
+    context,
   };
 
   if (ip) {
@@ -63,9 +63,9 @@ export const getWinstonConfig = () => {
   ];
 
   // chỉ ghi log cho LOKI khi ở Production
-  if(process.env.NODE_ENV != "local"){
+  if (process.env.NODE_ENV != 'local') {
     const lokiHost = process.env.LOKI_HOST;
-    if (lokiHost && lokiHost.startsWith("http")) {
+    if (lokiHost && lokiHost.startsWith('http')) {
       transportsList.push(
         new LokiTransport({
           host: lokiHost,
@@ -81,15 +81,8 @@ export const getWinstonConfig = () => {
 
   return {
     level: 'info',
-    format: format.combine(
-      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-      format.errors({ stack: true }),
-      format.splat(),
-      customFormat,
-    ),
+    format: format.combine(format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), format.errors({ stack: true }), format.splat(), customFormat),
     transports: transportsList,
     exitOnError: false, // tránh crash app khi có lỗi ghi log
   };
 };
-
-

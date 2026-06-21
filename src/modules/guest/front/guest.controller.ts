@@ -11,7 +11,7 @@ import { Msg } from 'src/helpers/message.helper';
 @Controller('/api/front/guest')
 @UseInterceptors(ResponseAppInterceptor)
 export class GuestController {
-  constructor(private readonly guestService: GuestService) { }
+  constructor(private readonly guestService: GuestService) {}
 
   @ApiOperation({
     summary: 'Yêu cầu tư vấn',

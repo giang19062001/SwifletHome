@@ -8,9 +8,7 @@ import { ScreenAppRepository } from '../screen.repository';
 
 @Injectable()
 export class RequestDoctorStrategy implements IScreenStrategy {
-  constructor(
-    private readonly screenAppRepository: ScreenAppRepository,
-  ) {}
+  constructor(private readonly screenAppRepository: ScreenAppRepository) {}
 
   canHandle(keyword: string): boolean {
     return keyword === APP_SCREENS.REQUEST_DOCTOR;
@@ -20,7 +18,9 @@ export class RequestDoctorStrategy implements IScreenStrategy {
     let tableVideo = null;
     let supportContent = screen.screenSupportContent;
     if (typeof supportContent === 'string') {
-      try { supportContent = JSON.parse(supportContent); } catch(e) {}
+      try {
+        supportContent = JSON.parse(supportContent);
+      } catch (e) {}
     }
     if (supportContent?.tables?.video) {
       tableVideo = supportContent.tables.video;
@@ -36,19 +36,21 @@ export class RequestDoctorStrategy implements IScreenStrategy {
         acc[key] = {
           name: curr.name,
           address: curr.address,
-          listVideoYoutobe: []
+          listVideoYoutobe: [],
         };
       }
       acc[key].listVideoYoutobe.push({
         videoTitle: curr.videoTitle,
-        videoUrl: curr.videoUrl
+        videoUrl: curr.videoUrl,
       });
       return acc;
     }, {});
-    
+
     let center = screen.contentCenter;
     if (typeof center === 'string') {
-        try { center = JSON.parse(center); } catch(e) {}
+      try {
+        center = JSON.parse(center);
+      } catch (e) {}
     }
 
     return {
@@ -56,7 +58,7 @@ export class RequestDoctorStrategy implements IScreenStrategy {
       contentCenter: {
         title: screen.screenName,
         ...center,
-        listVideo: Object.values(groupedVideos)
+        listVideo: Object.values(groupedVideos),
       },
       contentEnd: replaceNbspToSpace(screen.contentEnd ?? ''),
     } as ScreenRequestDoctorResDto;

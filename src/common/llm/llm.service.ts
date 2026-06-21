@@ -69,7 +69,7 @@ export class LlmService {
         response_format: { type: 'json_object' },
       });
 
-      let text = completion.choices[0]?.message?.content?.trim() || '';
+      const text = completion.choices[0]?.message?.content?.trim() || '';
       this.logger.log('replyWithLLM: text LLM ------------> ', text);
 
       // Tìm và bóc tách JSON một cách mạnh mẽ hơn

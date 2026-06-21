@@ -20,7 +20,7 @@ export class TodoAlarmAppRepository {
 
   // TODO: BOX - TASK
   async getBoxTasks(): Promise<TodoTaskResDto[]> {
-    let query = `  SELECT A.seq, A.taskCode, B.taskKeyword, B.taskName, A.sortOrder 
+    const query = `  SELECT A.seq, A.taskCode, B.taskKeyword, B.taskName, A.sortOrder 
     FROM ${this.tableBoxTask} A
     LEFT JOIN ${this.tableTask} B
     ON A.taskCode = B.taskCode
@@ -32,14 +32,14 @@ export class TodoAlarmAppRepository {
 
   // TODO: TASK
   async getTasks(): Promise<TodoTaskResDto[]> {
-    let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' `;
+    const query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
     return rows as TodoTaskResDto[];
   }
 
   async getDetailTask(taskCode: string): Promise<TodoTaskResDto | null> {
-    let query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' AND taskCode  = ? LIMIT 1 `;
+    const query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' AND taskCode  = ? LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskCode]);
     return rows.length ? (rows[0] as TodoTaskResDto) : null;
@@ -59,7 +59,7 @@ export class TodoAlarmAppRepository {
   }
 
   async getOneTaskAlarm(taskAlarmCode: string): Promise<GetTaskAlarmResDto | null> {
-    let query = ` SELECT A.seq, A.taskAlarmCode, NULL AS taskCode, '' AS taskKeyword, 
+    const query = ` SELECT A.seq, A.taskAlarmCode, NULL AS taskCode, '' AS taskKeyword, 
       CASE 
           WHEN A.taskName = '${TODO_CONST.TASK_BOX.LURING.value}' THEN '${TODO_CONST.TASK_BOX.LURING.text}'
           ELSE A.taskName 
@@ -74,7 +74,7 @@ export class TodoAlarmAppRepository {
   }
 
   async getOneTaskAlarmsNearly(userCode: string, userHomeCode: string, taskName: string, today: string): Promise<GetTaskAlarmResDto | null> {
-    let query = `
+    const query = `
         SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode, 
               CASE 
                   WHEN A.taskName = '${TODO_CONST.TASK_BOX.LURING.value}' THEN '${TODO_CONST.TASK_BOX.LURING.text}'
@@ -92,13 +92,7 @@ export class TodoAlarmAppRepository {
         ORDER BY A.taskDate ASC
         LIMIT 1`;
 
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [
-      userCode,
-      userHomeCode,
-      taskName,
-      today,
-      today,
-    ]);
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userHomeCode, taskName, today, today]);
 
     return rows.length ? (rows[0] as GetTaskAlarmResDto) : null;
   }
@@ -118,14 +112,14 @@ export class TodoAlarmAppRepository {
   }
 
   async getListTaskAlarms(userCode: string, userHomeCode: string, dto: PagingDto): Promise<GetTaskAlarmResDto[]> {
-    let params: (string | number)[] = [userCode, userHomeCode];
+    const params: (string | number)[] = [userCode, userHomeCode];
     let offsetQuery = ` `;
     if (dto.limit != 0 && dto.page != 0) {
       offsetQuery += `LIMIT ? OFFSET ?`;
       params.push(dto.limit);
       params.push((dto.page - 1) * dto.limit);
     }
-    let query = `
+    const query = `
             SELECT A.seq, A.userCode, A.userHomeCode, A.taskAlarmCode, NULL AS taskCode, 
             CASE 
                 WHEN A.taskName = '${TODO_CONST.TASK_BOX.LURING.value}' THEN '${TODO_CONST.TASK_BOX.LURING.text}'
@@ -184,13 +178,7 @@ export class TodoAlarmAppRepository {
         UPDATE ${this.tableTaskAlarm}
         SET taskStatus = ?,  updatedId = ?, updatedAt = ?
         WHERE taskAlarmCode = ? AND userCode = ? `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      taskStatus,
-      userCode,
-      new Date(),
-      taskAlarmCode,
-      userCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [taskStatus, userCode, new Date(), taskAlarmCode, userCode]);
 
     return result.affectedRows;
   }

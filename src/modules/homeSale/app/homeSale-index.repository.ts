@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { HomeSaleResDto } from "../homeSale.response";
+import { HomeSaleResDto } from '../homeSale.response';
 
 @Injectable()
 export class HomeSaleIndexAppRepository {
@@ -58,7 +58,7 @@ export class HomeSaleIndexAppRepository {
       [homeCode],
     );
 
-    let result = rows ? (rows[0] as HomeSaleResDto) : null;
+    const result = rows ? (rows[0] as HomeSaleResDto) : null;
     if (result) {
       result.homeImages = typeof result.homeImages === 'string' ? JSON.parse(result.homeImages) : result.homeImages;
     }

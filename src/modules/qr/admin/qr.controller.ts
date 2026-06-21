@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
 import { QrAdminService } from './qr.service';
 
@@ -34,5 +34,4 @@ export class QrAdminController {
     }
     return result;
   }
-
 }

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ContractService } from "./contract.service";
+import { ContractService } from './contract.service';
 
 @Module({
   providers: [ContractService],
-  exports:[ContractService]
+  exports: [ContractService],
 })
 export class ContractModule {}

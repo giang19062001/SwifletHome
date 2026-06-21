@@ -8,6 +8,6 @@ import { AnswerAdminService } from './answer.service';
   imports: [AuthAdminModule, QuestionAdminModule],
   controllers: [AnswerAdminController],
   providers: [AnswerAdminService, AnswerAdminRepository],
-  exports:[AnswerAdminService]
+  exports: [AnswerAdminService],
 })
 export class AnswerAdminModule {}

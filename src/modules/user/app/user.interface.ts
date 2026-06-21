@@ -1,5 +1,3 @@
-
-
 export const USER_CONST = {
   USER_TYPE: {
     OWNER: {
@@ -18,12 +16,12 @@ export const USER_CONST = {
       value: 'TECHNICAL',
       text: 'Đội kỹ thuật',
     },
-    EATER:{
+    EATER: {
       value: 'EATER',
       text: 'Người ăn yến',
-    }
+    },
   },
-}
+};
 
 export enum IUserTeamTypeEnum {
   FACTORY = 'FACTORY',

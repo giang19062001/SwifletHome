@@ -32,13 +32,7 @@ export class TodoMedicineAppRepository {
     return rows.length ? (rows[0] as GetTasksMedicineRowResDto) : null;
   }
 
-  async insertTaskMedicine(
-    userCode: string,
-    userHomeCode: string,
-    taskDate: Date,
-    taskStatus: TaskStatusEnum,
-    dto: SetTaskMedicineDto,
-  ): Promise<{ insertId: number; medicineCode: string }> {
+  async insertTaskMedicine(userCode: string, userHomeCode: string, taskDate: Date, taskStatus: TaskStatusEnum, dto: SetTaskMedicineDto): Promise<{ insertId: number; medicineCode: string }> {
     // generate medicineCode
     const [last] = await this.db.execute<any[]>(`SELECT medicineCode FROM ${this.tableTaskMedicine} ORDER BY medicineCode DESC LIMIT 1`);
     let medicineCode = CODES.medicineCode.FRIST_CODE;
@@ -51,11 +45,7 @@ export class TodoMedicineAppRepository {
         (medicineCode, userCode, userHomeCode, medicineOptionCode, medicineOther, medicineUsage, taskDate, taskStatus, isUse, createdId)
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, 'N', ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      medicineCode, userCode, userHomeCode,
-      dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage,
-      taskDate, taskStatus, userCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [medicineCode, userCode, userHomeCode, dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, taskDate, taskStatus, userCode]);
     return { insertId: result.insertId, medicineCode };
   }
 
@@ -64,10 +54,7 @@ export class TodoMedicineAppRepository {
       UPDATE ${this.tableTaskMedicine}
       SET medicineOptionCode = ?, medicineOther = ?, medicineUsage = ?, updatedId = ?, updatedAt = NOW()
       WHERE medicineCode = ? AND userCode = ? AND userHomeCode = ?`;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [
-      dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, userCode,
-      medicineCode, userCode, userHomeCode,
-    ]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.medicineOptionCode, dto.medicineOther, dto.medicineUsage, userCode, medicineCode, userCode, userHomeCode]);
     return result.affectedRows;
   }
 
@@ -161,9 +148,8 @@ export class TodoMedicineAppRepository {
             AND A.taskStatus = '${TaskStatusEnum.WAITING}'
         ORDER BY A.taskDate DESC
       `;
-      
+
     const [rows] = await this.db.query<RowDataPacket[]>(query, [dateStr, dateStr]);
     return rows as (GetTaskAlarmResDto & { deviceToken: string })[];
   }
-
 }

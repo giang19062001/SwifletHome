@@ -6,7 +6,7 @@ import { UserAdminRepository } from './user.repository';
 import { UserAdminService } from './user.service';
 
 @Module({
-  imports:[PackageAdminModule, forwardRef(() => AuthAdminModule)], // ← phá phụ thuộc vòng tròn
+  imports: [PackageAdminModule, forwardRef(() => AuthAdminModule)], // ← phá phụ thuộc vòng tròn
   controllers: [UserAdminController],
   providers: [UserAdminService, UserAdminRepository],
   exports: [UserAdminService],

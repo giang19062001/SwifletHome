@@ -108,7 +108,7 @@ export class CornService implements OnModuleInit {
 
           this.logger.log(logbase, `sẽ gửi thông báo: ${JSON.stringify(notify)} của taskDate(${task.taskDate}) với hôm nay(${todayStr}) của task(${task.seq}) cho user(${task.userCode})`);
 
-          return this.firebaseService.sendNotification(task.userCode!!, task.deviceToken, notify.TITLE, notify.BODY, null, NotificationTypeEnum.TODO);
+          return this.firebaseService.sendNotification(task.userCode!, task.deviceToken, notify.TITLE, notify.BODY, null, NotificationTypeEnum.TODO);
         });
 
         // Đợi tất cả promises trong chunk xử lý xong, dù có success hay fail

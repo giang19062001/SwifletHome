@@ -24,7 +24,6 @@ export class UserAppRepository {
   private readonly tablePhoneCode = 'tbl_phone_code';
   private readonly tableUserTypeLive = 'tbl_user_type_live';
 
-
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getAllUserCode(): Promise<TokenUserAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT seq, userCode FROM ${this.table} WHERE isActive = 'Y' `, []);
@@ -185,7 +184,6 @@ export class UserAppRepository {
     return result.affectedRows;
   }
   async updateDeviceToken(deviceToken: string, userPhone: string): Promise<number> {
-
     const sql = `
         UPDATE ${this.table} SET deviceToken = ?, updatedAt = NOW(), updatedId = ?
         WHERE userPhone = ?
@@ -308,8 +306,8 @@ export class UserAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode, userCode]);
     return rows as AllowUserTypeResDto[];
   }
-  
-  async checkAllowTypeOfUser(userCode: string, userTypeKeyWord: string): Promise<{isSetted: YnEnum} | null> {
+
+  async checkAllowTypeOfUser(userCode: string, userTypeKeyWord: string): Promise<{ isSetted: YnEnum } | null> {
     const sql = `  SELECT IF(COUNT(teamCode) > 0, 'Y', 'N') as isSetted
           FROM ${this.tableTeam} A
           LEFT JOIN ${this.tableType} B
@@ -317,7 +315,7 @@ export class UserAppRepository {
           WHERE B.userTypeKeyWord = ?
             AND A.userCode = ? `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userTypeKeyWord, userCode]);
-    return rows.length ? (rows[0] as {isSetted: YnEnum}) : null;
+    return rows.length ? (rows[0] as { isSetted: YnEnum }) : null;
   }
 
   async upsertUserTypeLive(userCode: string, userTypeCode: string): Promise<number> {

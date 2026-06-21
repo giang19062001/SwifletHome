@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { YnEnum } from "src/interfaces/admin.interface";
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class GetOptionDto {
   @ApiProperty({
@@ -26,20 +26,20 @@ export class GetOptionDto {
 }
 
 export class OpitionResDto {
-    @ApiProperty({ example: 0 })
-    seq: number;
-    @ApiProperty({ example: '' })
-    code: string;
-    @ApiProperty({ example: '' })
-    mainOption: string;
-    @ApiProperty({ example: '' })
-    subOption: string;
-    @ApiProperty({ example: '' })
-    keyOption: string;
-    @ApiProperty({ example: '' })
-    valueOption: string;
-    @ApiProperty({ example: 0 })
-    sortOrder: number;
-    @ApiProperty({ example: YnEnum.N })
-    isActive: YnEnum;
+  @ApiProperty({ example: 0 })
+  seq: number;
+  @ApiProperty({ example: '' })
+  code: string;
+  @ApiProperty({ example: '' })
+  mainOption: string;
+  @ApiProperty({ example: '' })
+  subOption: string;
+  @ApiProperty({ example: '' })
+  keyOption: string;
+  @ApiProperty({ example: '' })
+  valueOption: string;
+  @ApiProperty({ example: 0 })
+  sortOrder: number;
+  @ApiProperty({ example: YnEnum.N })
+  isActive: YnEnum;
 }

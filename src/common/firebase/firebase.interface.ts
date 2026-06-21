@@ -1,4 +1,3 @@
-
 export interface PushDataPayload {
   title: string;
   body: string;
@@ -9,5 +8,5 @@ export interface PushDataPayload {
   notificationId: string; // custom
   data: string; // custom (stringfy)
   notificationMethod: 'SINGLE' | 'MULTICAST' | 'TOPIC';
-  [key: string]: string; 
+  [key: string]: string;
 }

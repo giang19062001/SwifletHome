@@ -97,8 +97,8 @@ export class FileLocalService {
     try {
       const metadata = await sharp(thePath).metadata();
       return {
-        width: metadata.width!,
-        height: metadata.height!,
+        width: metadata.width,
+        height: metadata.height,
       };
     } catch (error) {
       console.log('error', error);

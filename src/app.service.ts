@@ -167,7 +167,7 @@ export class AppService {
     const userTypes = await this.userAdminService.getTypesForTeam();
     const teamFileTypes = await this.teamAdminService.getTeamFileTypes();
     const teamServiceTypes = await this.teamAdminService.getTeamServiceTypes();
-    
+
     return {
       provinces: provinces,
       userTypes: userTypes,
@@ -181,7 +181,7 @@ export class AppService {
     const userTypes = await this.userAdminService.getTypesForTeam();
     const teamFileTypes = await this.teamAdminService.getTeamFileTypes();
     const teamServiceTypes = await this.teamAdminService.getTeamServiceTypes();
-    
+
     return {
       teamData: teamData,
       provinces: provinces,

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { formatPrice } from 'src/helpers/func.helper';
-import { PackageResDto } from "../package.response";
+import { PackageResDto } from '../package.response';
 import { PackageAppRepository } from './package.repository';
 
 @Injectable()

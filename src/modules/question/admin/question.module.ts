@@ -7,6 +7,6 @@ import { QuestionAdminService } from './question.service';
   imports: [AuthAdminModule],
   controllers: [QuestionAdminController],
   providers: [QuestionAdminService, QuestionAdminRepository],
-  exports:[QuestionAdminService]
+  exports: [QuestionAdminService],
 })
 export class QuestionAdminModule {}

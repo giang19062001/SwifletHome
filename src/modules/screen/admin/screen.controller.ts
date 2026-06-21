@@ -4,12 +4,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "src/modules/auth/admin/auth.dto";
+import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
 import { getFileLocation, multerImgConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
 import { UploadImgFileDto } from 'src/modules/upload/admin/upload.dto';
 import { UploadAdminService } from 'src/modules/upload/admin/upload.service';
-import { ScreenResDto } from "../screen.response";
+import { ScreenResDto } from '../screen.response';
 import { UpdateScreenDto } from './screen.dto';
 import { ScreenAdminService } from './screen.service';
 
@@ -29,14 +29,14 @@ export class ScreenAdminController {
   @UseInterceptors(FileInterceptor('screenImage', multerImgConfig))
   async uploadScreenImage(
     @Param('screenKeyword') screenKeyword: string,
-    @Body() dto: UploadImgFileDto, 
-    @UploadedFile() file: Express.Multer.File, 
-    @GetUserAdmin() admin: TokenUserAdminResDto
+    @Body() dto: UploadImgFileDto,
+    @UploadedFile() file: Express.Multer.File,
+    @GetUserAdmin() admin: TokenUserAdminResDto,
   ): Promise<{ url: string }> {
     if (!file) {
       throw new BadRequestException(Msg.FileEmpty);
     }
-    
+
     const url = `${getFileLocation(file.mimetype, file.filename)}/${file.filename}`;
     await this.screenAdminService.updateBanner(screenKeyword, url, admin.userId);
     return { url };
@@ -56,7 +56,7 @@ export class ScreenAdminController {
   @ApiParam({ name: 'keyword', type: String })
   @Put('update/:keyword')
   @HttpCode(HttpStatus.OK)
-  async update(@Body() dto: UpdateScreenDto, @Param('keyword') screenKeyword: string,  @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
+  async update(@Body() dto: UpdateScreenDto, @Param('keyword') screenKeyword: string, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<number> {
     const result = await this.screenAdminService.update(dto, admin.userId, screenKeyword);
     if (result === 0) {
       throw new BadRequestException();

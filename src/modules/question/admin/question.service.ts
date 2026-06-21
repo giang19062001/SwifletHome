@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { QuestionResDto } from "../question.response";
+import { QuestionResDto } from '../question.response';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { QuestionAdminRepository } from './question.repository';
 
 @Injectable()
 export class QuestionAdminService {
-  constructor(private readonly questionAdminRepository: QuestionAdminRepository) {
-  }
+  constructor(private readonly questionAdminRepository: QuestionAdminRepository) {}
   async getAll(dto: PagingDto): Promise<{ total: number; list: QuestionResDto[] }> {
     const total = await this.questionAdminRepository.getTotal();
     const list = await this.questionAdminRepository.getAll(dto);

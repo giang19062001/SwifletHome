@@ -7,11 +7,7 @@ import { GetContentScreenResDto } from '../screen.response';
 @Injectable()
 export class CommonGuideStrategy implements IScreenStrategy {
   canHandle(keyword: string): boolean {
-    return (
-      keyword === APP_SCREENS.REQUEST_QR_GUIDE ||
-      keyword === APP_SCREENS.CONSIGNMENT_GUIDE ||
-      keyword === APP_SCREENS.USER_TYPE_NOT_REGISTER
-    );
+    return keyword === APP_SCREENS.REQUEST_QR_GUIDE || keyword === APP_SCREENS.CONSIGNMENT_GUIDE || keyword === APP_SCREENS.USER_TYPE_NOT_REGISTER;
   }
 
   async execute(userCode: string, screen: any): Promise<GetContentScreenResDto | null> {
@@ -20,7 +16,7 @@ export class CommonGuideStrategy implements IScreenStrategy {
     return {
       contentStart: screen.contentStart,
       contentCenter: {},
-      contentEnd: "",
+      contentEnd: '',
     } as ScreenCommonGuideResDto;
   }
 }
