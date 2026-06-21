@@ -1,0 +1,2 @@
+ALTER TABLE tbl_blacklist_ip
+MODIFY COLUMN ipAddress VARCHAR(255) NOT NULL;
