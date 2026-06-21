@@ -47,10 +47,18 @@ pipeline {
                         string(credentialsId: 'FLYWAY_DB_PASS', variable: 'DB_PASS')
                     ]) {
                         sh '''
-                            docker run --rm \
-                                --add-host=host.docker.internal:host-gateway \
-                                -v ${DEPLOY_DIR}/db/migrations:/flyway/sql \
-                                flyway/flyway:latest \
+                            FLYWAY_DIR="/var/jenkins_home/flyway/flyway-10.15.0"
+                            
+                            if [ ! -d "$FLYWAY_DIR" ]; then
+                                echo "Downloading Flyway CLI..."
+                                mkdir -p /var/jenkins_home/flyway
+                                wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.0/flyway-commandline-10.15.0-linux-x64.tar.gz | tar xvz -C /var/jenkins_home/flyway
+                            else
+                                echo "Flyway CLI already in $FLYWAY_DIR, skip downloading"
+                            fi
+                            
+                            $FLYWAY_DIR/flyway \
+                                -locations=filesystem:${DEPLOY_DIR}/db/migrations \
                                 -url=${DB_URL} \
                                 -user=${DB_USER} \
                                 -password=${DB_PASS} \
