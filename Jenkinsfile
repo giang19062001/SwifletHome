@@ -52,7 +52,7 @@ pipeline {
                             if [ ! -d "$FLYWAY_DIR" ]; then
                                 echo "Downloading Flyway CLI..."
                                 mkdir -p /var/jenkins_home/flyway
-                                wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.0/flyway-commandline-10.15.0-linux-x64.tar.gz | tar xvz -C /var/jenkins_home/flyway
+                                curl -sL https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.0/flyway-commandline-10.15.0-linux-x64.tar.gz | tar xvz -C /var/jenkins_home/flyway
                             else
                                 echo "Flyway CLI already in $FLYWAY_DIR, skip downloading"
                             fi
