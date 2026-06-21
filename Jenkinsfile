@@ -39,6 +39,26 @@ pipeline {
                     
                     sh 'yarn lint'
                     sh 'yarn build'
+                    
+                    // run Migration DB by Flyway via Docker 
+                    withCredentials([
+                        string(credentialsId: 'FLYWAY_DB_URL', variable: 'DB_URL'),
+                        string(credentialsId: 'FLYWAY_DB_USER', variable: 'DB_USER'),
+                        string(credentialsId: 'FLYWAY_DB_PASS', variable: 'DB_PASS')
+                    ]) {
+                        sh '''
+                            docker run --rm \
+                                --add-host=host.docker.internal:host-gateway \
+                                -v ${DEPLOY_DIR}/db/migrations:/flyway/sql \
+                                flyway/flyway:latest \
+                                -url=${DB_URL} \
+                                -user=${DB_USER} \
+                                -password=${DB_PASS} \
+                                -baselineOnMigrate=true \
+                                -baselineVersion=1 \
+                                migrate
+                        '''
+                    }
 
                     withCredentials([string(credentialsId: 'SSH_SERVER_REMOTE', variable: 'SERVER')]) {
                         sh 'ssh -o StrictHostKeyChecking=no $SERVER "cd $DEPLOY_DIR && pm2 reload SWIFLETHOME --update-env"'
