@@ -1,263 +1,365 @@
-const pageType = window.location.pathname.includes('/update') ? 'update' : 'create';
-const homeMutationConstraints = {
-  homeName: {
-    presence: { allowEmpty: false, message: '^Vui lòng nhập tên nhà yến.' },
-  },
-  homeAddress: {
-    presence: { allowEmpty: false, message: '^Vui lòng nhập vị trí nhà yến.' },
-    length: { minimum: 5, message: '^Vị trí nhà yến phải có ít nhất 5 ký tự.' },
-  },
-  latitude: {
-    presence: { message: '^Vui lòng nhập vĩ độ.' },
-    numericality: { message: '^Vĩ độ phải là số hợp lệ.' },
-  },
-  longitude: {
-    presence: { message: '^Vui lòng nhập kinh độ.' },
-    numericality: { message: '^Kinh độ phải là số hợp lệ.' },
-  },
-  homeDescription: {
-    quillPresence: { message: '^Vui lòng nhập mô tả.' },
-  },
-  homeImage: {
-    filePresence: { message: '^Vui lòng chọn ảnh chính.' },
-  },
-  homeImages: {
-    filePresence: { message: '^Vui lòng chọn ít nhất một ảnh phụ.' },
-  },
-};
-let homeImagesFiles = [];
+const isDetailMode = typeof IS_DETAIL !== 'undefined' && IS_DETAIL;
+const pageType = isDetailMode ? 'detail' : (window.location.pathname.includes('/update') ? 'update' : 'create');
 
-// TODO: INIT
+const saleHomeMutationConstraints = {
+  hostName: { presence: { allowEmpty: false, message: '^Vui lòng nhập họ tên chủ nhà.' } },
+  hostPhone: { presence: { allowEmpty: false, message: '^Vui lòng nhập SĐT chủ nhà.' } },
+  hostRole: { presence: { allowEmpty: false, message: '^Vui lòng chọn vai trò.' } },
+  homeName: { presence: { allowEmpty: false, message: '^Vui lòng nhập tên nhà yến.' } },
+  homelocation: { presence: { allowEmpty: false, message: '^Vui lòng nhập khu vực.' } },
+  homeAddress: { presence: { allowEmpty: false, message: '^Vui lòng nhập địa chỉ chi tiết.' } },
+  homeAge: { presence: { allowEmpty: false, message: '^Vui lòng nhập số năm vận hành.' }, numericality: { greaterThan: 0, message: '^Năm vận hành phải lớn hơn 0' } },
+  homeModel: { presence: { allowEmpty: false, message: '^Vui lòng chọn mô hình nhà yến.' } },
+  currentNests: { presence: { allowEmpty: false, message: '^Vui lòng nhập số tổ.' }, numericality: { greaterThan: 0, message: '^Số tổ phải lớn hơn 0' } },
+  averageYieldKg: { presence: { allowEmpty: false, message: '^Vui lòng nhập sản lượng.' }, numericality: { greaterThan: 0, message: '^Sản lượng phải lớn hơn 0' } },
+  numberOfFloors: { presence: { allowEmpty: false, message: '^Vui lòng nhập số tầng.' }, numericality: { greaterThan: 0, message: '^Số tầng phải lớn hơn 0' } },
+  numberOfRooms: { presence: { allowEmpty: false, message: '^Vui lòng nhập số phòng.' }, numericality: { greaterThan: 0, message: '^Số phòng phải lớn hơn 0' } },
+  userCode: { presence: { allowEmpty: false, message: '^Vui lòng chọn người sở hữu.' } },
+  shortDescription: { presence: { allowEmpty: false, message: '^Vui lòng nhập mô tả ngắn.' } },
+  topicsShare: { presence: { allowEmpty: false, message: '^Vui lòng chọn ít nhất 1 chủ đề chia sẻ.' } },
+  sightseeingAreas: { presence: { allowEmpty: false, message: '^Vui lòng chọn khu vực tham quan.' } },
+  includedServices: { presence: { allowEmpty: false, message: '^Vui lòng chọn dịch vụ đi kèm.' } },
+  serviceNotes: { presence: { allowEmpty: false, message: '^Vui lòng nhập ghi chú.' } },
+  tourFee: { presence: { allowEmpty: false, message: '^Vui lòng nhập phí tham quan.' } },
+  durationPerTourMinutes: { presence: { allowEmpty: false, message: '^Vui lòng nhập thời gian/lượt.' }, numericality: { greaterThan: 0, message: '^Thời gian phải lớn hơn 0' } },
+  availableDays: { presence: { allowEmpty: false, message: '^Vui lòng chọn ngày mở cửa.' } },
+  timeframes: { 
+    presence: { allowEmpty: false, message: '^Vui lòng nhập khung giờ đón khách.' },
+    format: { pattern: /^(\d{2}:\d{2}\s*-\s*\d{2}:\d{2})(,\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})*$/, message: '^Khung thời gian phải ở định dạng HH:mm - HH:mm, HH:mm - HH:mm' }
+  },
+  timeNoticeRequired: { presence: { allowEmpty: false, message: '^Vui lòng nhập thời gian báo trước.' } },
+  commitments: { presence: { allowEmpty: false, message: '^Vui lòng chọn cam kết.' } }
+};
+
+let dynamicImagesFiles = {}; // { [typeCode]: File[] }
+
 document.addEventListener('DOMContentLoaded', () => {
-  if (pageType === 'update') {
-    // cho trạng thái chỉnh sửa
+  if (pageType === 'update' || pageType === 'detail') {
     initializeForm();
     assignForm(homeData);
   } else if (pageType === 'create') {
-    // cho trạng thái thêm
     initializeForm();
+    document.getElementById('userCode').disabled = false;
   }
 });
 
+/**
+ * API Upload các tệp tin (ảnh/video) cho nhà yến sale
+ */
+async function uploadSaleHomeFilesApi(files, uniqueId, fileTypeCode) {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('saleHomeFiles', file);
+  }
+  formData.append('uniqueId', uniqueId);
+  if (fileTypeCode) formData.append('fileTypeCode', fileTypeCode);
+
+  try {
+    const res = await axios.post('/api/admin/saleHome/uploadFiles', formData, axiosAuth());
+    return res.data; // Array of results
+  } catch (e) {
+    console.error(e);
+    toastErr('Upload lỗi');
+    return null;
+  }
+}
+
+/**
+ * API Xóa tệp tin đã upload trên server
+ */
+async function deleteFileApi(seq) {
+  if (!seq) return;
+  try {
+    await axios.delete('/api/admin/saleHome/deleteFile/' + seq, axiosAuth());
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 function initializeForm() {
-  const form = document.getElementById(pageType === 'create' ? 'home-create-form' : 'home-update-form');
-  const homeImagePreview = form.querySelector('#homeImagePreview');
-  const homeImagesPreview = form.querySelector('#homeImagesPreview');
-  const homeImageInput = form.querySelector('#homeImage');
-  const homeImagesInput = form.querySelector('#homeImages');
+  const formId = pageType === 'create' ? 'home-sale-create-form' : (pageType === 'update' ? 'home-sale-update-form' : 'home-sale-detail-form');
+  const form = document.getElementById(formId);
 
-  // gắn submit event cho form
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
+  if (form) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-    const formData = {
-      homeName: form.querySelector('#homeName').value,
-      homeAddress: form.querySelector('#homeAddress').value,
-      latitude: form.querySelector('#latitude').value,
-      longitude: form.querySelector('#longitude').value,
-      homeDescription: quillGlobal.root.innerHTML,
-      homeImage: form.querySelector('#homeImage').files,
-      homeImages: form.querySelector('#homeImages').files,
-      homeCode: pageType === 'update' ? homeData.homeCode : undefined,
-    };
+      const getRadioValue = (name) => {
+        const checked = form.querySelector(`input[name="${name}"]:checked`);
+        return checked ? checked.value : '';
+      };
+      const getCheckboxValues = (name) => {
+        return Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+      };
 
-    // kiểm tra errors
-    const isOk = checkingErrors(formData, homeMutationConstraints);
-    if (!isOk) return;
+      const formData = {
+        hostInfo: {
+          hostName: form.querySelector('#hostName').value,
+          hostPhone: form.querySelector('#hostPhone').value,
+          socialContact: form.querySelector('#socialContact').value,
+          hostRole: getRadioValue('hostRole'),
+        },
+        homeInfo: {
+          homeName: form.querySelector('#homeName').value,
+          homelocation: form.querySelector('#homelocation').value,
+          homeAddress: form.querySelector('#homeAddress').value,
+          homeAge: Number(form.querySelector('#homeAge').value),
+          homeModel: form.querySelector('#homeModel').value,
+        },
+        nestInfo: {
+          currentNests: Number(form.querySelector('#currentNests').value),
+          averageYieldKg: Number(form.querySelector('#averageYieldKg').value),
+          numberOfFloors: Number(form.querySelector('#numberOfFloors').value),
+          numberOfRooms: Number(form.querySelector('#numberOfRooms').value),
+        },
+        tourInfo: {
+          shortDescription: form.querySelector('#shortDescription').value,
+          topicsShare: getCheckboxValues('topicsShare'),
+          sightseeingAreas: getCheckboxValues('sightseeingAreas'),
+          includedServices: getCheckboxValues('includedServices'),
+          serviceNotes: form.querySelector('#serviceNotes').value,
+          tourFee: form.querySelector('#tourFee').value,
+          durationPerTourMinutes: Number(form.querySelector('#durationPerTourMinutes').value),
+        },
+        policyInfo: {
+          availableDays: getCheckboxValues('availableDays'),
+          timeframes: form.querySelector('#timeframes').value,
+          timeNoticeRequired: form.querySelector('#timeNoticeRequired').value,
+          commitments: getCheckboxValues('commitments'),
+        },
+        userCode: form.querySelector('#userCode').value,
+        uniqueId: uniqueId,
+        homeCode: pageType === 'update' ? homeData.homeCode : undefined,
+      };
 
-    // submit
-    if (pageType === 'update') {
-      await updateHome(formData);
-    } else if (pageType === 'create') {
-      await createHome(formData);
-    }
-  });
+      const flatData = {
+        ...formData.hostInfo,
+        ...formData.homeInfo,
+        ...formData.nestInfo,
+        ...formData.tourInfo,
+        ...formData.policyInfo,
+        userCode: formData.userCode
+      };
 
-  //  gắn validate event cho các input
-  attachValidateForm(form, homeMutationConstraints);
+      const isOk = checkingErrors(flatData, saleHomeMutationConstraints);
+      if (!isOk) return;
 
-  // gắn validate  cho các editor nếu có
-  attachValidateEditor(form, 'homeDescription', homeMutationConstraints.homeDescription.quillPresence.message);
+      if (!dynamicImagesFiles['FILE_OUTSIDE'] || dynamicImagesFiles['FILE_OUTSIDE'].length === 0) {
+        toastErr('Vui lòng upload Ảnh/Video đại diện (Ảnh bên ngoài nhà yến)');
+        return;
+      }
 
-  homeImagesInput.addEventListener('change', () => {
-    // thêm các file mới vào biến global 'homeImagesFiles'
-    const addedFiles = Array.from(homeImagesInput.files);
-    homeImagesFiles = homeImagesFiles.concat(addedFiles);
+      if (pageType === 'update') {
+        await submitSaleHome(formData, `/api/admin/saleHome/update/${formData.homeCode}`, 'put', 'Chỉnh sửa thành công');
+      } else if (pageType === 'create') {
+        await submitSaleHome(formData, '/api/admin/saleHome/create', 'post', 'Thêm thành công');
+      }
+    });
+  }
 
-    // cập nhập lại FileList
-    const dataTransfer = new DataTransfer();
-    homeImagesFiles.forEach((file) => dataTransfer.items.add(file));
-    homeImagesInput.files = dataTransfer.files;
+  if (form) {
+    attachValidateForm(form, saleHomeMutationConstraints);
+  }
 
-    // re-render ảnh preview
-    homeImagesPreview.innerHTML = '';
-    homeImagesFiles.forEach((file, index) => renderImagePreview(file, index, homeImagesInput, homeImagesPreview, 'homeImages'));
+  document.querySelectorAll('.dynamic-sale-home-files').forEach((input) => {
+    const typeCode = input.dataset.typecode;
+    dynamicImagesFiles[typeCode] = [];
+    input.addEventListener('change', async () => {
+      const addedFiles = Array.from(input.files);
+      if (addedFiles.length === 0) return;
 
-    // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
-    validateField(homeMutationConstraints, homeImagesInput);
-  });
+      const preview = document.getElementById(`saleHomeFilesPreview_${typeCode}`);
 
-  homeImageInput.addEventListener('change', () => {
-    // re-render ảnh preview
-    homeImagePreview.innerHTML = '';
-    if (homeImageInput.files.length > 0) {
-      renderImagePreview(homeImageInput.files[0], 0, homeImageInput, homeImagePreview, 'homeImage');
-    }
-    // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
-    validateField(homeMutationConstraints, homeImageInput);
+      showPageLoader();
+      const results = await uploadSaleHomeFilesApi(addedFiles, uniqueId, typeCode);
+      if (results && Array.isArray(results)) {
+        for (const res of results) {
+          const item = { seq: res.seq, url: res.url };
+          dynamicImagesFiles[typeCode].push(item);
+          const currentIndex = dynamicImagesFiles[typeCode].length - 1;
+          setTimeout(() => {
+            renderImagePreview(item, currentIndex, input, preview, `saleHomeFiles_${typeCode}`);
+          }, 300);
+        }
+      }
+      hidePageLoader();
+      input.value = ''; // reset input
+    });
   });
 }
 
-// TODO: FUNC
-async function assignForm(homeData) {
-  const form = document.getElementById('home-update-form');
-  const homeImagePreview = form.querySelector('#homeImagePreview');
-  const homeImagesPreview = form.querySelector('#homeImagesPreview');
-  const homeImageInput = form.querySelector('#homeImage');
-  const homeImagesInput = form.querySelector('#homeImages');
+async function assignForm(data) {
+  const formId = pageType === 'create' ? 'home-sale-create-form' : (pageType === 'update' ? 'home-sale-update-form' : 'home-sale-detail-form');
+  const form = document.getElementById(formId);
 
-  // reset các biến
   clearErrors();
-  homeImagesFiles = [];
-  homeImageInput.value = '';
-  homeImagesInput.value = '';
 
-  // điền giá trị các input bằng dữ liệu từ API
-  form.querySelector('#homeName').value = homeData.homeName || '';
-  form.querySelector('#homeAddress').value = homeData.homeAddress || '';
-  form.querySelector('#latitude').value = homeData.latitude || '';
-  form.querySelector('#longitude').value = homeData.longitude || '';
-  quillGlobal.root.innerHTML = quillGlobal && homeData.homeDescription ? homeData.homeDescription : '';
-
-  // homeImage
-  if (pageType === 'update' && homeData.homeImage) {
-    const file = await ChangeUrlToFile(homeData.homeImage.filename);
-    if (file) {
-      // cập nhập FileList cho homeImage
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      homeImageInput.files = dataTransfer.files;
-
-      // re-render ảnh preview
-      renderImagePreview(file, 0, homeImageInput, homeImagePreview, 'homeImage');
-
-      // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
-      validateField(homeMutationConstraints, homeImageInput);
+  if(data.hostInfo) {
+    form.querySelector('#hostName').value = data.hostInfo.hostName || '';
+    form.querySelector('#hostPhone').value = data.hostInfo.hostPhone || '';
+    form.querySelector('#socialContact').value = data.hostInfo.socialContact || '';
+    if(data.hostInfo.hostRole?.code) {
+      const radio = form.querySelector(`input[name="hostRole"][value="${data.hostInfo.hostRole.code}"]`);
+      if(radio) radio.checked = true;
     }
   }
 
-  // homeImages
-  if (pageType === 'update' && homeData.homeImages && Array.isArray(homeData.homeImages)) {
-    const files = await Promise.all(homeData.homeImages.map((img) => ChangeUrlToFile(img.filename)));
-    homeImagesFiles = files.filter((file) => file !== null);
+  if(data.homeInfo) {
+    form.querySelector('#homeName').value = data.homeInfo.homeName || '';
+    form.querySelector('#homelocation').value = data.homeInfo.homelocation || '';
+    form.querySelector('#homeAddress').value = data.homeInfo.homeAddress || '';
+    form.querySelector('#homeAge').value = data.homeInfo.homeAge || '';
+    form.querySelector('#homeModel').value = data.homeInfo.homeModel?.code || '';
+  }
 
-    if (homeImagesFiles.length > 0) {
-      // cập nhập FileList cho homeImages
-      const dataTransfer = new DataTransfer();
-      homeImagesFiles.forEach((file) => dataTransfer.items.add(file));
-      homeImagesInput.files = dataTransfer.files;
-      homeImagesPreview.innerHTML = '';
+  if(data.nestInfo) {
+    form.querySelector('#currentNests').value = data.nestInfo.currentNests || '';
+    form.querySelector('#averageYieldKg').value = data.nestInfo.averageYieldKg || '';
+    form.querySelector('#numberOfFloors').value = data.nestInfo.numberOfFloors || '';
+    form.querySelector('#numberOfRooms').value = data.nestInfo.numberOfRooms || '';
+  }
 
-      // re-render ảnh preview
-      homeImagesFiles.forEach((file, index) => renderImagePreview(file, index, homeImagesInput, homeImagesPreview, 'homeImages'));
+  if(data.tourInfo) {
+    form.querySelector('#shortDescription').value = data.tourInfo.shortDescription || '';
+    if (data.tourInfo.topicsShare) data.tourInfo.topicsShare.forEach(o => {
+      const cb = form.querySelector(`input[name="topicsShare"][value="${o.code}"]`);
+      if(cb) cb.checked = true;
+    });
+    if (data.tourInfo.sightseeingAreas) data.tourInfo.sightseeingAreas.forEach(o => {
+      const cb = form.querySelector(`input[name="sightseeingAreas"][value="${o.code}"]`);
+      if(cb) cb.checked = true;
+    });
+    if (data.tourInfo.includedServices) data.tourInfo.includedServices.forEach(o => {
+      const cb = form.querySelector(`input[name="includedServices"][value="${o.code}"]`);
+      if(cb) cb.checked = true;
+    });
+    form.querySelector('#serviceNotes').value = data.tourInfo.serviceNotes || '';
+    form.querySelector('#tourFee').value = data.tourInfo.tourFee || '';
+    form.querySelector('#durationPerTourMinutes').value = data.tourInfo.durationPerTourMinutes || '';
+  }
 
-      // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
-      validateField(homeMutationConstraints, homeImagesInput);
+  if(data.policyInfo) {
+    if (data.policyInfo.availableDays) data.policyInfo.availableDays.forEach(o => {
+      const cb = form.querySelector(`input[name="availableDays"][value="${o.code}"]`);
+      if(cb) cb.checked = true;
+    });
+    form.querySelector('#timeframes').value = data.policyInfo.timeframes || '';
+    form.querySelector('#timeNoticeRequired').value = data.policyInfo.timeNoticeRequired || '';
+    if (data.policyInfo.commitments) data.policyInfo.commitments.forEach(o => {
+      const cb = form.querySelector(`input[name="commitments"][value="${o.code}"]`);
+      if(cb) cb.checked = true;
+    });
+  }
+
+  if(data.userCode) {
+    form.querySelector('#userCode').value = data.userCode;
+  }
+
+  if (data.files && Array.isArray(data.files)) {
+    for (const img of data.files) {
+      if (!img.fileTypeCode) continue;
+      const typeCode = img.fileTypeCode;
+      const file = await ChangeUrlToFile(img.filename);
+      if (file) {
+        if (!dynamicImagesFiles[typeCode]) dynamicImagesFiles[typeCode] = [];
+        dynamicImagesFiles[typeCode].push({ seq: img.seq, url: img.filename, file: file });
+      }
     }
+
+    Object.keys(dynamicImagesFiles).forEach((typeCode) => {
+      const input = document.getElementById(`saleHomeFiles_${typeCode}`);
+      const preview = document.getElementById(`saleHomeFilesPreview_${typeCode}`);
+      if (dynamicImagesFiles[typeCode].length > 0) {
+        if (preview) preview.innerHTML = '';
+        dynamicImagesFiles[typeCode].forEach((file, index) => renderImagePreview(file, index, input, preview, `saleHomeFiles_${typeCode}`));
+      }
+    });
   }
 }
 
-// TODO: RENDER
-function renderImagePreview(file, index, input, preview, field) {
-  // tạo preview hộp
+function renderImagePreview(item, index, input, preview, field) {
+  const isVideo = (item.url && /\.(mp4|mov|avi)$/i.test(item.url)) || (item.mimetype && item.mimetype.startsWith('video/'));
+
+  const mediaTag = isVideo ? `<video src="" controls class="no-premium-style"></video>` : `<img src="" alt="Preview ${index + 1}" class="no-premium-style">`;
+
   const previewHtml = `
     <div class="image-preview" data-index="${index}">
-      <img src="" alt="Preview ${index + 1}">
-      <button class="delete-btn" type="button" data-index="${index}">x</button>
+      ${mediaTag}
+      ${isDetailMode ? '' : `<button class="delete-btn" type="button" data-index="${index}">x</button>`}
     </div>
   `;
   preview.insertAdjacentHTML('beforeend', previewHtml);
 
-  // gán src cho ảnh preview
   const previewElement = preview.querySelector(`[data-index="${index}"]`);
-  const imgElement = previewElement.querySelector('img');
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    imgElement.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  const mediaElement = previewElement.querySelector(isVideo ? 'video' : 'img');
 
-  // tạo nút delete ảnh preview
-  const deleteBtn = previewElement.querySelector('.delete-btn');
-  deleteBtn.addEventListener('click', () => {
-    const idx = parseInt(previewElement.dataset.index);
-
-    if (field === 'homeImages') {
-      // xóa file ra khỏi homeImagesFiles
-      // cập nhập lại FileList cho 'homeImages'
-      // gán dữ liệu  FileList mới vào 'homeImagesInput'
-
-      homeImagesFiles.splice(idx, 1);
-      const dataTransfer = new DataTransfer();
-      homeImagesFiles.forEach((file) => dataTransfer.items.add(file));
-      input.files = dataTransfer.files;
-    } else if (field === 'homeImage') {
-      input.value = '';
+  let displayUrl = item.url || '';
+  if (displayUrl) {
+    if (!displayUrl.startsWith('blob:') && !displayUrl.startsWith('http') && !displayUrl.startsWith('uploads/')) {
+      displayUrl = 'uploads/' + displayUrl;
     }
-
-    // re-render ảnh preview
-    preview.innerHTML = '';
-    if (field === 'homeImages') {
-      homeImagesFiles.forEach((file, i) => renderImagePreview(file, i, input, preview, field));
-    } else if (field === 'homeImage' && input.files.length > 0) {
-      renderImagePreview(input.files[0], 0, input, preview, field);
-    }
-
-    // re-check lại validation -> nếu có file - xóa lỗi, ko có file - hiện lỗi
-    validateField(homeMutationConstraints, input);
-  });
-}
-
-// TODO: API
-async function createHome(formData) {
-  await submitHome(formData, '/api/admin/homeSale/create', 'post', 'Thêm thành công');
-}
-
-async function updateHome(formData) {
-  await submitHome(formData, `/api/admin/homeSale/update/${formData.homeCode}`, 'put', 'Chỉnh sửa thành công');
-}
-
-async function submitHome(formData, url, method, successMessage) {
-  // add dự liệu input vào formData
-  const postData = new FormData();
-  const fields = ['homeName', 'homeAddress', 'homeDescription', 'latitude', 'longitude'];
-  fields.forEach((field) => postData.append(field, formData[field]));
-
-  // đẩy homeImage, homeImages vào formData nếu có thay đổi
-  if (formData.homeImage?.length) {
-    postData.append('homeImage', formData.homeImage[0]);
+    mediaElement.src = displayUrl.startsWith('blob:') || displayUrl.startsWith('http') ? displayUrl : CURRENT_URL + '/' + displayUrl;
   }
-  if (formData.homeImages?.length) {
-    Array.from(formData.homeImages).forEach((file) => {
-      postData.append('homeImages', file);
+
+  const deleteBtn = previewElement.querySelector('.delete-btn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
+      const idx = parseInt(previewElement.dataset.index);
+
+      if (field.startsWith('saleHomeFiles_')) {
+        const typeCode = field.replace('saleHomeFiles_', '');
+        const delItem = dynamicImagesFiles[typeCode][idx];
+        if (delItem && delItem.seq) await deleteFileApi(delItem.seq);
+        dynamicImagesFiles[typeCode].splice(idx, 1);
+        
+        preview.innerHTML = '';
+        dynamicImagesFiles[typeCode].forEach((f, i) => renderImagePreview(f, i, input, preview, field));
+      }
     });
   }
+}
 
-  // disable button
+async function submitSaleHome(formData, url, method, successMessage) {
   const submitBtn = document.querySelector('.btn-submit-lg');
   submitBtn.disabled = true;
 
   try {
-    const response = await axios[method](url, postData, axiosAuth());
+    const response = await axios[method](url, formData, axiosAuth());
     if (response.data) {
       toastOk(successMessage);
       reloadPage('/dashboard/home/sale');
     }
   } catch (error) {
     console.error(`error:`, error);
-    if (error.response.data) {
-      toastErr(error.response.data.message);
+    if (error.response?.data) {
+      let msg = error.response.data.message;
+      if (Array.isArray(msg)) msg = msg[0];
+      if (typeof msg === 'string') {
+        msg = msg.replace(/^[a-zA-Z]+\./, ''); // remove object prefix like policyInfo.
+      }
+      toastErr(msg);
     }
     submitBtn.disabled = false;
+  }
+}
+
+async function updateSaleHomeStatus(homeCode, status) {
+  const statusText = status === 'APPROVED' ? 'Duyệt' : 'Từ chối';
+  const confirmed = window.confirm(`Bạn có chắc chắn muốn ${statusText} nhà yến này không?`);
+  if (!confirmed) return;
+
+  const buttons = document.querySelectorAll('.btn-add, .btn-danger');
+  buttons.forEach(b => b.disabled = true);
+
+  try {
+    const response = await axios.put(`/api/admin/saleHome/updateStatus/${homeCode}`, { status }, axiosAuth());
+    if (response.data) {
+      toastOk('Cập nhật trạng thái thành công');
+      reloadPage('/dashboard/home/sale');
+    }
+  } catch (error) {
+    console.error(error);
+    toastErr('Cập nhật trạng thái thất bại');
+    buttons.forEach(b => b.disabled = false);
   }
 }

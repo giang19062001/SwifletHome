@@ -55,4 +55,9 @@ const VARIABLE_ENUM = {
     REFUSE: { TEXT: 'Từ chối duyệt', VALUE: 'REFUSE' },
     WAITING: { TEXT: 'Đang chờ duyệt', VALUE: 'WAITING' },
   },
+  SALE_HOME_STATUS: {
+    APPROVED: { TEXT: 'Đã duyệt', VALUE: 'APPROVED' },
+    REFUSE: { TEXT: 'Từ chối duyệt', VALUE: 'REFUSE' },
+    WAITING: { TEXT: 'Đang chờ duyệt', VALUE: 'WAITING' },
+  },
 };

@@ -153,7 +153,7 @@ export class SaleHomeAppRepository {
   }
 
   async getTotalSaleHomes(dto: PagingDto, userCode: string): Promise<number> {
-    const sql = `SELECT COUNT(seq) as total FROM ${this.table} WHERE userCode = ?`;
+    const sql = `SELECT COUNT(seq) as total FROM ${this.table} WHERE userCode = ? AND status = 'APPROVED'`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode]);
     return rows[0].total;
   }
@@ -169,7 +169,7 @@ export class SaleHomeAppRepository {
               WHERE uniqueId = h.uniqueId AND fileTypeCode = 'FILE_OUTSIDE' 
               ORDER BY seq ASC LIMIT 1) as homeImage
       FROM ${this.table} h
-      WHERE h.userCode = ?
+      WHERE h.userCode = ? AND h.status = 'APPROVED'
       ORDER BY h.seq DESC
       LIMIT ? OFFSET ?
     `;
@@ -187,7 +187,7 @@ export class SaleHomeAppRepository {
              shortDescription, topicsShare, sightseeingAreas, includedServices, serviceNotes, tourFee, durationPerTourMinutes,
              availableDays, timeframes, timeNoticeRequired, commitments
       FROM ${this.table}
-      WHERE homeCode = ? LIMIT 1
+      WHERE homeCode = ? AND status = 'APPROVED' LIMIT 1
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [homeCode]);
     if (rows.length === 0) return null;

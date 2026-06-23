@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
 import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
 import { HomeSaleAdminService } from './modules/homeSale/admin/homeSale.service';
+import { SaleHomeAdminService } from './modules/saleHome/admin/saleHome.service';
 import { ObjectAdminService } from './modules/object/admin/object.service';
 import { OPTION_CONST } from './modules/options/option.interface';
 import { OptionService } from './modules/options/option.service';
@@ -19,6 +21,7 @@ export class AppService {
     private readonly answerAdminService: AnswerAdminService,
     private readonly catetegoryAdminService: CategoryAdminService,
     private readonly homeAdminService: HomeSaleAdminService,
+    private readonly saleHomeAdminService: SaleHomeAdminService,
     private readonly teamAdminService: TeamAdminService,
     private readonly blogAdminService: BlogAdminService,
     private readonly objectAdminService: ObjectAdminService,
@@ -105,10 +108,41 @@ export class AppService {
     };
   }
   // home
-  async renderHomeUpdate(homeCode: string): Promise<any> {
-    const homeData = await this.homeAdminService.getDetail(homeCode);
+  async renderHomeCreate(): Promise<any> {
+    const options = await this.saleHomeAdminService.getInitFormOptions();
+    const provinces = await this.provinceService.getAll();
+    const usersResult = await this.userAdminService.getAllUser({ type: 'APP' as any, limit: 1000, page: 1, userName: '', userPhone: '' });
     return {
-      homeData: homeData,
+      uniqueId: uuidv4(),
+      ...options,
+      provinces,
+      users: usersResult.list,
+    };
+  }
+
+  async renderHomeUpdate(homeCode: string): Promise<any> {
+    const homeData = await this.saleHomeAdminService.getDetailSaleHome(homeCode);
+    const options = await this.saleHomeAdminService.getInitFormOptions();
+    const provinces = await this.provinceService.getAll();
+    const usersResult = await this.userAdminService.getAllUser({ type: 'APP' as any, limit: 1000, page: 1, userName: '', userPhone: '' });
+    return {
+      homeData,
+      ...options,
+      provinces,
+      users: usersResult.list,
+    };
+  }
+
+  async renderHomeSaleDetail(homeCode: string): Promise<any> {
+    const homeData = await this.saleHomeAdminService.getDetailSaleHome(homeCode);
+    const options = await this.saleHomeAdminService.getInitFormOptions();
+    const provinces = await this.provinceService.getAll();
+    const usersResult = await this.userAdminService.getAllUser({ type: 'APP' as any, limit: 1000, page: 1, userName: '', userPhone: '' });
+    return {
+      homeData,
+      ...options,
+      provinces,
+      users: usersResult.list,
     };
   }
 

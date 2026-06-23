@@ -316,7 +316,7 @@ export class AppController {
   @Render('pages/home-sale')
   renderHome(@Req() req: Request) {
     return {
-      title: 'Danh sách nhà yến',
+      title: 'Danh sách nhà yến siêu cạnh tranh',
       isLayout: true,
       user: req.session.user,
     };
@@ -325,8 +325,9 @@ export class AppController {
   @Get('/dashboard/home/sale/create')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/home-sale-create')
-  renderHomeCreate(@Req() req: Request) {
-    return { title: 'Thêm nhà yến', isLayout: true, user: req.session.user };
+  async renderHomeCreate(@Req() req: Request) {
+    const values = await this.appService.renderHomeCreate();
+    return { title: 'Thêm nhà yến', isLayout: true, user: req.session.user, values };
   }
 
   @Get('/dashboard/home/sale/update/:id')
@@ -336,6 +337,19 @@ export class AppController {
     const values = await this.appService.renderHomeUpdate(req.params.id);
     return {
       title: 'Chỉnh sửa nhà yến',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
+  @Get('/dashboard/home/sale/detail/:id')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/home-sale-detail')
+  async renderHomeSaleDetail(@Req() req: Request) {
+    const values = await this.appService.renderHomeSaleDetail(req.params.id);
+    return {
+      title: 'Chi tiết nhà yến',
       isLayout: true,
       user: req.session.user,
       values: values,

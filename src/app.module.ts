@@ -40,6 +40,7 @@ import { GuestAdminModule } from './modules/guest/admin/guest.module';
 import { GuestModule } from './modules/guest/front/guest.module';
 import { HomeSaleAdminModule } from './modules/homeSale/admin/homeSale.module';
 import { HomeSaleAppModule } from './modules/homeSale/app/homeSale.module';
+import { SaleHomeAdminModule } from './modules/saleHome/admin/saleHome.module';
 import { SaleHomeAppModule } from './modules/saleHome/app/saleHome.module';
 import { InfoAdminModule } from './modules/info/admin/info.module';
 import { NotificationAdminModule } from './modules/notification/admin/notification.module';
@@ -142,6 +143,7 @@ import { ShareAppModule } from './modules/share/app/share.module';
     AnswerAdminModule,
     UploadAdminModule,
     HomeSaleAdminModule,
+    SaleHomeAdminModule,
     BlogAdminModule,
     DoctorAdminModule,
     ScreenAdminModule,

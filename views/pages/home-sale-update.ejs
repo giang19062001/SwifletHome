@@ -6,7 +6,9 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
-                                 <p class="title-page"><%= title %></p>
+                                <p class="title-page">
+                                    <%= title %>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -14,40 +16,129 @@
             </div>
             <div class="row g-4">
                 <div class="col-12">
-                    <form id="home-update-form" novalidate>
+                    <form id="home-sale-update-form" novalidate>
                         <div class="row g-4">
-                            <!-- Section: Thông tin cơ bản -->
+                            <!-- Section: Thông tin chủ nhà -->
                             <div class="col-lg-4">
                                 <div class="card border-0 shadow-sm h-100">
                                     <div class="card-header bg-white py-3">
-                                        <h6 class="mb-0 fw-bold card-title-custom">Thông tin cơ bản</h6>
+                                        <h6 class="mb-0 fw-bold card-title-custom">Thông tin chủ nhà & Nhà yến</h6>
                                     </div>
                                     <div class="card-body">
+                                        <h6 class="fw-bold text-primary mb-3">Thông tin chủ nhà</h6>
                                         <div class="form-group mb-3">
-                                            <label for="homeName" class="form-label small text-muted">Tên nhà yến</label>
-                                            <input type="text" class="form-control" id="homeName" name="homeName" placeholder="Nhập tên nhà yến..." />
-                                            <div class="error-message" data-error="homeName"></div>
+                                            <label for="hostName" class="form-label small text-muted">Họ và tên</label>
+                                            <input type="text" class="form-control" id="hostName" name="hostName" placeholder="Nhập họ và tên..." />
+                                            <div class="error-message" data-error="hostName"></div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="hostPhone" class="form-label small text-muted">Số điện thoại</label>
+                                            <input type="text" class="form-control" id="hostPhone" name="hostPhone" placeholder="Nhập số điện thoại..." />
+                                            <div class="error-message" data-error="hostPhone"></div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="socialContact" class="form-label small text-muted">Liên hệ MXH (Zalo/FB)</label>
+                                            <input type="text" class="form-control" id="socialContact" name="socialContact" placeholder="Nhập link liên hệ..." />
+                                            <div class="error-message" data-error="socialContact"></div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label small text-muted">Vai trò</label>
+                                            <div class="row">
+                                                <% if (values?.hostRole && values.hostRole.length > 0) { %>
+                                                    <% values.hostRole.forEach(function(opt) { %>
+                                                        <div class="col-12 col-md-6 mb-2">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="hostRole" id="hostRole_<%= opt.code %>" value="<%= opt.code %>">
+                                                                <label class="form-check-label" for="hostRole_<%= opt.code %>"><%= opt.valueOption %></label>
+                                                            </div>
+                                                        </div>
+                                                    <% }) %>
+                                                <% } %>
+                                            </div>
+                                            <div class="error-message" data-error="hostRole"></div>
                                         </div>
 
+                                        <hr class="my-4">
+                                        <h6 class="fw-bold text-primary mb-3">Thông tin nhà yến</h6>
                                         <div class="form-group mb-3">
-                                            <label for="homeAddress" class="form-label small text-muted">Vị trí / Địa chỉ</label>
+                                            <label for="homeName" class="form-label small text-muted">Tên nhà yến</label>
+                                            <input type="text" class="form-control" id="homeName" name="homeName" placeholder="Tên nhà yến..." />
+                                            <div class="error-message" data-error="homeName"></div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="homelocation" class="form-label small text-muted">Khu vực</label>
+                                            <input type="text" class="form-control" id="homelocation" name="homelocation" placeholder="Ví dụ: AEON Tạ Quang Bửu" />
+                                            <div class="error-message" data-error="homelocation"></div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="homeAddress" class="form-label small text-muted">Địa chỉ chi tiết</label>
                                             <input type="text" class="form-control" id="homeAddress" name="homeAddress" placeholder="Địa chỉ chi tiết..." />
                                             <div class="error-message" data-error="homeAddress"></div>
                                         </div>
-
+                                        <div class="form-group mb-3">
+                                            <label for="homeAge" class="form-label small text-muted">Số năm vận hành</label>
+                                            <input type="number" class="form-control" id="homeAge" name="homeAge" placeholder="Nhập số năm..." />
+                                            <div class="error-message" data-error="homeAge"></div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="homeModel" class="form-label small text-muted">Mô hình nhà yến</label>
+                                            <select class="form-select" id="homeModel" name="homeModel">
+                                                <option value="">-- Chọn mô hình --</option>
+                                                <% if (values?.homeModel && values.homeModel.length > 0) { %>
+                                                    <% values.homeModel.forEach(function(opt) { %>
+                                                        <option value="<%= opt.code %>"><%= opt.valueOption %></option>
+                                                    <% }) %>
+                                                <% } %>
+                                            </select>
+                                            <div class="error-message" data-error="homeModel"></div>
+                                        </div>
+                                        
+                                        <hr class="my-4">
+                                        <h6 class="fw-bold text-primary mb-3">Số liệu thực tế</h6>
                                         <div class="row g-2">
-                                            <div class="col-6 form-group mb-3">
-                                                <label for="latitude" class="form-label small text-muted">Vĩ độ</label>
-                                                <input type="text" class="form-control" id="latitude" name="latitude" placeholder="0.0000" />
-                                                <div class="error-message" data-error="latitude"></div>
+                                            <div class="col-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="currentNests" class="form-label small text-muted">Số lượng tổ hiện tại</label>
+                                                    <input type="number" class="form-control" id="currentNests" name="currentNests" />
+                                                    <div class="error-message" data-error="currentNests"></div>
+                                                </div>
                                             </div>
-
-                                            <div class="col-6 form-group mb-3">
-                                                <label for="longitude" class="form-label small text-muted">Kinh độ</label>
-                                                <input type="text" class="form-control" id="longitude" name="longitude" placeholder="0.0000" />
-                                                <div class="error-message" data-error="longitude"></div>
+                                            <div class="col-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="averageYieldKg" class="form-label small text-muted">Sản lượng trung bình (kg/năm)</label>
+                                                    <input type="number" step="0.1" class="form-control" id="averageYieldKg" name="averageYieldKg" />
+                                                    <div class="error-message" data-error="averageYieldKg"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="numberOfFloors" class="form-label small text-muted">Số tầng</label>
+                                                    <input type="number" class="form-control" id="numberOfFloors" name="numberOfFloors" />
+                                                    <div class="error-message" data-error="numberOfFloors"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="numberOfRooms" class="form-label small text-muted">Số phòng</label>
+                                                    <input type="number" class="form-control" id="numberOfRooms" name="numberOfRooms" />
+                                                    <div class="error-message" data-error="numberOfRooms"></div>
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="userCode" class="form-label small text-muted">Người sở hữu (Tài khoản App)</label>
+                                            <select class="form-select" id="userCode" name="userCode" disabled>
+                                                <option value="">-- Chọn người sở hữu --</option>
+                                                <% if (values?.users && values.users.length > 0) { %>
+                                                    <% values.users.forEach(function(u) { %>
+                                                        <option value="<%= u.userCode %>" <%= (values.homeData.userCode === u.userCode) ? 'selected' : '' %>><%= u.userName %> (<%= u.userPhone %>)</option>
+                                                    <% }) %>
+                                                <% } %>
+                                            </select>
+                                            <div class="error-message" data-error="userCode"></div>
+                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -56,55 +147,182 @@
                             <div class="col-lg-8">
                                 <div class="card border-0 shadow-sm h-100">
                                     <div class="card-header bg-white py-3">
-                                        <h6 class="mb-0 fw-bold card-title-custom">Hình ảnh & Video</h6>
+                                        <h6 class="mb-0 fw-bold card-title-custom">Hình ảnh/ Video xác minh</h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row g-4">
-                                            <div class="col-md-5">
-                                                <div class="upload-zone p-4 border-dashed rounded-4 text-center bg-light mb-3">
-                                                    <label for="homeImage" class="form-label d-block fw-bold mb-3">Ảnh đại diện chính</label>
-                                                    <label for="homeImage" class="btn btn-outline-primary btn-sm px-4 rounded-pill">
-                                                        <i class="fa fa-cloud-upload-alt me-2"></i>Thay đổi ảnh chính
-                                                    </label>
-                                                    <input type="file" id="homeImage" name="homeImage" accept=".png, .jpg, .jpeg" style="display: none;" />
-                                                    <div class="error-message mt-2" data-error="homeImage"></div>
-                                                    <div class="image-preview-container mt-3" id="homeImagePreview"></div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-7">
-                                                <div class="upload-zone p-4 border-dashed rounded-4 bg-light h-100">
-                                                    <label for="homeImages" class="form-label d-block fw-bold mb-3">Bộ sưu tập ảnh phụ</label>
-                                                    <label for="homeImages" class="btn btn-outline-secondary btn-sm px-4 rounded-pill">
-                                                        <i class="fa fa-plus-circle me-2"></i>Thêm ảnh phụ mới
-                                                    </label>
-                                                    <input type="file" id="homeImages" name="homeImages" multiple accept=".png, .jpg, .jpeg" style="display: none;" />
-                                                    <div class="error-message mt-2" data-error="homeImages"></div>
-                                                    <div class="image-preview-container mt-3" id="homeImagesPreview"></div>
+                                        <div class="row g-4 mb-4">
+                                            <div class="col-12" id="dynamicFileTypesContainer">
+                                                <div class="bg-light p-4 rounded-4">
+                                                    <label class="form-label d-block fw-bold mb-3 text-muted">Upload Ảnh/Video</label>
+                                                    <div id="fileTypesList" class="row">
+                                                        <% if (values?.fileTypes && values.fileTypes.length > 0) { %>
+                                                            <% values.fileTypes.forEach(function(fileType) { %>
+                                                                <div class="col-12 col-md-6 mb-4 img-type-block">
+                                                                    <div class="p-3 bg-white rounded-3 shadow-sm h-100">
+                                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                            <label class="form-label fw-bold mb-0 text-dark"><%= fileType.fileTypeText %></label>
+                                                                            <label for="saleHomeFiles_<%= fileType.fileTypeCode %>" class="btn btn-sm btn-link text-decoration-none p-0">
+                                                                                <i class="fa fa-plus-circle me-1"></i>Chọn
+                                                                            </label>
+                                                                        </div>
+                                                                        <input type="file" class="form-control d-none dynamic-sale-home-files" id="saleHomeFiles_<%= fileType.fileTypeCode %>"
+                                                                            name="saleHomeFiles_<%= fileType.fileTypeCode %>" multiple accept=".png, .jpg, .jpeg, .mp4, .mov, .webm"
+                                                                            data-typecode="<%= fileType.fileTypeCode %>" />
+                                                                        <div class="error-message mt-1" data-error="saleHomeFiles_<%= fileType.fileTypeCode %>"></div>
+                                                                        <div class="image-preview-container mt-2" id="saleHomeFilesPreview_<%= fileType.fileTypeCode %>"></div>
+                                                                    </div>
+                                                                </div>
+                                                            <% }) %>
+                                                        <% } %>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Section: Mô tả chi tiết -->
-                            <div class="col-12">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-white py-3">
-                                        <h6 class="mb-0 fw-bold card-title-custom">Mô tả chi tiết</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <%- include('./component-editor', { content: "" }) %>
-                                        <div class="error-message mt-2" data-error="homeDescription"></div>
+                                        <div class="row g-4">
+                                            <div class="col-12">
+                                                <h6 class="fw-bold text-primary mb-3">Nội dung tham quan</h6>
+                                                
+                                                <div class="form-group mb-3">
+                                                    <label for="shortDescription" class="form-label small text-muted">Mô tả ngắn hiển thị trên app</label>
+                                                    <textarea class="form-control" id="shortDescription" name="shortDescription" rows="3" placeholder="Nhập mô tả ngắn..."></textarea>
+                                                    <div class="error-message" data-error="shortDescription"></div>
+                                                </div>
+                                                
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label small text-muted">Chủ nhà muốn chia sẽ điều gì</label>
+                                                    <div class="row">
+                                                        <% if (values?.topicsShare && values.topicsShare.length > 0) { %>
+                                                            <% values.topicsShare.forEach(function(opt) { %>
+                                                                <div class="col-12 col-md-6 mb-2">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="topicsShare" id="topic_<%= opt.code %>" value="<%= opt.code %>">
+                                                                        <label class="form-check-label" for="topic_<%= opt.code %>"><%= opt.valueOption %></label>
+                                                                    </div>
+                                                                </div>
+                                                            <% }) %>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="error-message" data-error="topicsShare"></div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label small text-muted">Khách được tham quan khu vực nào</label>
+                                                    <div class="row">
+                                                        <% if (values?.sightseeingAreas && values.sightseeingAreas.length > 0) { %>
+                                                            <% values.sightseeingAreas.forEach(function(opt) { %>
+                                                                <div class="col-12 col-md-6 mb-2">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="sightseeingAreas" id="sightseeing_<%= opt.code %>" value="<%= opt.code %>">
+                                                                        <label class="form-check-label" for="sightseeing_<%= opt.code %>"><%= opt.valueOption %></label>
+                                                                    </div>
+                                                                </div>
+                                                            <% }) %>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="error-message" data-error="sightseeingAreas"></div>
+                                                </div>
+                                                
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label small text-muted">Dịch vụ đi kèm</label>
+                                                    <div class="row">
+                                                        <% if (values?.includedServices && values.includedServices.length > 0) { %>
+                                                            <% values.includedServices.forEach(function(opt) { %>
+                                                                <div class="col-12 col-md-6 mb-2">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="includedServices" id="inc_srv_<%= opt.code %>" value="<%= opt.code %>">
+                                                                        <label class="form-check-label" for="inc_srv_<%= opt.code %>"><%= opt.valueOption %></label>
+                                                                    </div>
+                                                                </div>
+                                                            <% }) %>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="error-message" data-error="includedServices"></div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label for="serviceNotes" class="form-label small text-muted">Ghi chú dịch vụ</label>
+                                                    <textarea class="form-control" id="serviceNotes" name="serviceNotes" rows="2" placeholder="Ghi chú..."></textarea>
+                                                    <div class="error-message" data-error="serviceNotes"></div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6 form-group mb-3">
+                                                        <label for="tourFee" class="form-label small text-muted">Phí tham quan</label>
+                                                        <input type="text" class="form-control" id="tourFee" name="tourFee" placeholder="Ví dụ: Thỏa thuận với app" />
+                                                        <div class="error-message" data-error="tourFee"></div>
+                                                    </div>
+                                                    <div class="col-md-6 form-group mb-3">
+                                                        <label for="durationPerTourMinutes" class="form-label small text-muted">Thời lượng mỗi lượt tham quan</label>
+                                                        <input type="number" class="form-control" id="durationPerTourMinutes" name="durationPerTourMinutes" placeholder="60" />
+                                                        <div class="error-message" data-error="durationPerTourMinutes"></div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <!-- Section: Chính sách -->
+                                        <div class="row g-4 mt-1">
+                                            <div class="col-12">
+                                                <h6 class="fw-bold text-primary mb-3">Lịch tham quan & cam kết</h6>
+                                                
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label small text-muted">Ngày có thể nhận khách</label>
+                                                    <div class="row">
+                                                        <% if (values?.availableDays && values.availableDays.length > 0) { %>
+                                                            <% values.availableDays.forEach(function(opt) { %>
+                                                                <div class="col-12 col-md-4 mb-2">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="availableDays" id="avail_day_<%= opt.code %>" value="<%= opt.code %>">
+                                                                        <label class="form-check-label" for="avail_day_<%= opt.code %>"><%= opt.valueOption %></label>
+                                                                    </div>
+                                                                </div>
+                                                            <% }) %>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="error-message" data-error="availableDays"></div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label for="timeframes" class="form-label small text-muted">Khung giờ tham quan phù hợp (Ví dụ: 09:00 - 11:00, 14:00 - 16:00)</label>
+                                                    <input type="text" class="form-control" id="timeframes" name="timeframes" placeholder="09:00 - 11:00, 14:00 - 16:00" />
+                                                    <div class="error-message" data-error="timeframes"></div>
+                                                </div>
+                                                
+                                                <div class="form-group mb-3">
+                                                    <label for="timeNoticeRequired" class="form-label small text-muted">Thời gian cần báo trước</label>
+                                                    <input type="text" class="form-control" id="timeNoticeRequired" name="timeNoticeRequired" placeholder="1 ngày trước" />
+                                                    <div class="error-message" data-error="timeNoticeRequired"></div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label small text-muted">Cam kết của chủ nhà yến</label>
+                                                    <div class="row">
+                                                        <% if (values?.commitments && values.commitments.length > 0) { %>
+                                                            <% values.commitments.forEach(function(opt) { %>
+                                                                <div class="col-12 col-md-6 mb-2">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="commitments" id="commit_<%= opt.code %>" value="<%= opt.code %>">
+                                                                        <label class="form-check-label" for="commit_<%= opt.code %>"><%= opt.valueOption %></label>
+                                                                    </div>
+                                                                </div>
+                                                            <% }) %>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="error-message" data-error="commitments"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Action Button -->
-                            <div class="col-12 text-center mt-2">
-                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-bold btn-submit-lg">
-                                    Lưu thay đổi thông tin
+                            <div class="col-12 text-center mt-4 mb-4">
+                                <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold btn-submit-lg">
+                                    Lưu thông tin
                                 </button>
                             </div>
                         </div>
@@ -112,13 +330,12 @@
                 </div>
             </div>
         </div>
-            </div>
-        </div>
     </div>
 </div>
+
 <script>
-  const homeData = <%- JSON.stringify(values.homeData) %>
-  console.log('homeData', homeData);
+  const uniqueId = "<%= values.homeData?.uniqueId || values.uniqueId %>";
+  const homeData = <%- JSON.stringify(values.homeData || {}) %>;
 </script>
 
 <script src="/js/common-validate.js"></script>
