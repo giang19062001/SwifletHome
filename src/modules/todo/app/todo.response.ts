@@ -1,8 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsArray, IsEnum } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { UserHomeResDto } from 'src/modules/userHome/app/userHome.dto';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
 import { HarvestDataInputDto } from './todo.dto';
+
+export class TodoHomeDataResDto extends OmitType(UserHomeResDto, ['isIntegateTempHum', 'isIntegateCurrent', 'isTriggered', 'uniqueId'] as const) {}
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })
@@ -177,7 +180,7 @@ export class GetTaskHarvestResDto {
   @ApiProperty({ example: 1 })
   harvestPhase: number;
 
-  @ApiProperty({ example: 'N' })
+  @ApiProperty({ example: 'Y' })
   isComplete: string;
 
   @ApiProperty({ type: () => HarvestDataInputDto, isArray: true })
@@ -253,6 +256,15 @@ export class GetInfoTaskHarvestForAdjustResDto {
 
   @ApiProperty({ example: '' })
   userHomeCode: string;
+
+  @ApiProperty({ example: 0 })
+  harvestPhase: number;
+
+  @ApiProperty({ example: 0 })
+  harvestYear: number;
+
+  @ApiProperty({ type: () => TodoHomeDataResDto })
+  homeData: TodoHomeDataResDto;
 
   @ApiProperty({ type: () => [HarvestDataInputDto] })
   @IsArray()

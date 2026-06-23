@@ -20,7 +20,7 @@ export class SignupServiceStrategy implements IScreenStrategy {
     return keyword === APP_SCREENS.SIGNUP_SERVICE;
   }
 
-  async execute(userCode: string, screen: any): Promise<GetContentScreenResDto | null> {
+  async execute(screen: any): Promise<GetContentScreenResDto | null> {
     if (!screen.contentStart) return null;
 
     // gói

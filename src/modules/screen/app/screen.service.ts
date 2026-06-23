@@ -13,7 +13,7 @@ export class ScreenAppService {
     @Inject('SCREEN_STRATEGIES') private readonly strategies: IScreenStrategy[],
   ) {}
 
-  async getContent(userCode: string, keyword: string): Promise<any> {
+  async getContent(keyword: string): Promise<any> {
     const logbase = `${this.SERVICE_NAME}/getContent:`;
 
     const screen = await this.screenAppRepository.getDetail(keyword);
@@ -23,7 +23,7 @@ export class ScreenAppService {
     const strategy = this.strategies.find((s) => s.canHandle(keyword));
     if (strategy) {
       // thực thi chiến lượng
-      return strategy.execute(userCode, screen);
+      return strategy.execute(screen);
     }
 
     return null;

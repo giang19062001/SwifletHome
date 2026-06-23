@@ -3,8 +3,8 @@ import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
 import { ScreenRequestDoctorResDto } from '../../screen.response';
 import { IScreenStrategy } from '../screen.interface';
-import { GetContentScreenResDto } from '../screen.response';
 import { ScreenAppRepository } from '../screen.repository';
+import { GetContentScreenResDto } from '../screen.response';
 
 @Injectable()
 export class RequestDoctorStrategy implements IScreenStrategy {
@@ -14,7 +14,7 @@ export class RequestDoctorStrategy implements IScreenStrategy {
     return keyword === APP_SCREENS.REQUEST_DOCTOR;
   }
 
-  async execute(userCode: string, screen: any): Promise<GetContentScreenResDto | null> {
+  async execute(screen: any): Promise<GetContentScreenResDto | null> {
     let tableVideo = null;
     let supportContent = screen.screenSupportContent;
     if (typeof supportContent === 'string') {

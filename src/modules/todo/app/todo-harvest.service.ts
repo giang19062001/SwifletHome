@@ -4,7 +4,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { TaskStatusEnum } from '../todo.interface';
 import { TodoHarvestAppRepository } from './todo-harvest.repository';
 import { AdjustHarvestTaskDto, FloorDataInputDto, GetInfoTaskHarvestForAdjustDto, GetListTaskHarvestForAdjustDto, HarvestDataInputDto, HarvestDataRowInputDto, SetHarvestTaskDto } from './todo.dto';
 import { GetInfoTaskHarvestForAdjustResDto, GetListTaskHarvestResDto, GetTaskHarvestResDto } from './todo.response';
@@ -94,9 +94,21 @@ export class TodoHarvestAppService {
     }
   }
 
-  async arrangeHarvestRows(seqHarvestPhase: number, userHomeFloor: number): Promise<HarvestDataInputDto[]> {
+  async arrangeHarvestRows(seqHarvestPhase: number, userHomeFloor: number, userHomeCode?: string): Promise<HarvestDataInputDto[]> {
     // Lấy toàn bộ dòng dữ liệu thu hoạch của đợt này từ DB
-    const harvestRows = await this.todoHarvestAppRepository.getTaskHarvestRows(seqHarvestPhase, true);
+    let harvestRows = await this.todoHarvestAppRepository.getTaskHarvestRows(seqHarvestPhase, true);
+
+    // Nếu chưa có dữ liệu và có truyền mã nhà, tìm đợt thu hoạch hoàn thành gần nhất để lấy số lượng còn lại
+    if (harvestRows.length === 0 && userHomeCode) {
+      const latestCompleteSeq = await this.todoHarvestAppRepository.getLatestCompleteTaskHarvestPhase(userHomeCode);
+      if (latestCompleteSeq) {
+        const prevRows = await this.todoHarvestAppRepository.getTaskHarvestRows(latestCompleteSeq, true);
+        harvestRows = prevRows.map((row) => ({
+          ...row,
+          cellCollected: 0,
+        }));
+      }
+    }
 
     // Gom nhóm dữ liệu theo từng tầng
     const existingDataMap = new Map<number, FloorDataInputDto[]>();
@@ -177,7 +189,7 @@ export class TodoHarvestAppService {
 
     return result;
   }
-
+  /*
   async setTaskHarvest(userCode: string, dto: SetHarvestTaskDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskHarvest:`;
     try {
@@ -239,6 +251,100 @@ export class TodoHarvestAppService {
       return 0;
     }
   }
+  */
+  async setTaskHarvestV2(userCode: string, dto: SetHarvestTaskDto): Promise<number> {
+    const logbase = `${this.SERVICE_NAME}/setTaskHarvestV2:`;
+    try {
+      const result = 1;
+
+      const mainHomeOfUser = await this.userHomeAppService.getMainHomeByUser(userCode);
+      if (!mainHomeOfUser) {
+        this.logger.error(logbase, `Main home của user này không có`);
+        throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
+      }
+      const userHomeCode = mainHomeOfUser.userHomeCode;
+
+      let currentPhaseSeq = 0;
+      let currentHarvestPhase = dto.harvestPhase;
+      let currentHarvestYear = moment().year();
+
+      if (!dto.taskAlarmCode || String(dto.taskAlarmCode).trim() === '') {
+        const taskDate = moment().toDate();
+        currentPhaseSeq = await this.todoHarvestAppRepository.insertTaskHarvestPhase(userCode, userHomeCode, dto.harvestPhase, YnEnum.N, taskDate, TaskStatusEnum.COMPLETE, currentHarvestYear);
+        this.logger.log(logbase, `Tạo và hoàn thành đợt thu hoạch mới seqHarvestPhase(${currentPhaseSeq})`);
+        await this.insUpDelHarvestRows(userCode, userHomeCode, currentPhaseSeq, dto.harvestData);
+      } else {
+        const phaseDetail = await this.todoHarvestAppRepository.getOneTaskHarvestPhase(Number(dto.taskAlarmCode));
+        if (!phaseDetail) {
+          this.logger.error(logbase, `seqHarvestPhase(${dto.taskAlarmCode}) không có dữ liệu`);
+          return -1;
+        }
+
+        if (phaseDetail.taskStatus === TaskStatusEnum.COMPLETE) {
+          const isNotUsed = await this.todoHarvestAppRepository.checkTaskHarvestCompleteAndNotUse(phaseDetail.seq);
+          if (!isNotUsed) {
+            this.logger.error(logbase, `Đợt này đã dùng QR, ko cho update`);
+            return -2;
+          }
+        } else {
+          await this.todoHarvestAppRepository.completeTaskHarvestPhase(userCode, phaseDetail.userHomeCode ?? userHomeCode, phaseDetail.seq, dto.harvestPhase);
+        }
+
+        await this.insUpDelHarvestRows(userCode, phaseDetail.userHomeCode ?? userHomeCode, phaseDetail.seq, dto.harvestData);
+
+        currentPhaseSeq = phaseDetail.seq;
+        currentHarvestPhase = phaseDetail.harvestPhase;
+        currentHarvestYear = phaseDetail.harvestYear;
+      }
+
+      const nextDateMoment = moment(dto.harvestNextDate);
+      const todayMoment = moment().startOf('day');
+
+      if (nextDateMoment.isAfter(todayMoment)) {
+        let nextHarvestYear = currentHarvestYear;
+        let nextHarvestPhase = currentHarvestPhase + 1;
+
+        if (nextDateMoment.year() > currentHarvestYear) {
+          nextHarvestYear = nextDateMoment.year();
+          nextHarvestPhase = 1;
+        }
+
+        const existingWaitingPhase = await this.todoHarvestAppRepository.getWaitingTaskHarvestPhase(userHomeCode);
+
+        const nextHarvestData = dto.harvestData.map((floor) => ({
+          floor: floor.floor,
+          floorData: floor.floorData.map((cell) => ({
+            cell: cell.cell,
+            cellCollected: 0,
+            cellRemain: cell.cellRemain,
+          })),
+        }));
+
+        if (existingWaitingPhase) {
+          await this.todoHarvestAppRepository.updateWaitingTaskHarvestPhase(existingWaitingPhase.seq, nextHarvestPhase, nextHarvestYear, nextDateMoment.format('YYYY-MM-DD'));
+          await this.insUpDelHarvestRows(userCode, userHomeCode, existingWaitingPhase.seq, nextHarvestData);
+          this.logger.log(logbase, `Cập nhật đợt thu hoạch WAITING có sẵn seqHarvestPhase(${existingWaitingPhase.seq})`);
+        } else {
+          const nextPhaseSeq = await this.todoHarvestAppRepository.insertTaskHarvestPhase(
+            userCode,
+            userHomeCode,
+            nextHarvestPhase,
+            YnEnum.N,
+            nextDateMoment.toDate(),
+            TaskStatusEnum.WAITING,
+            nextHarvestYear,
+          );
+          await this.insUpDelHarvestRows(userCode, userHomeCode, nextPhaseSeq, nextHarvestData);
+          this.logger.log(logbase, `Tạo đợt thu hoạch WAITING mới seqHarvestPhase(${nextPhaseSeq})`);
+        }
+      }
+
+      return result;
+    } catch (error) {
+      this.logger.error(logbase, error);
+      return 0;
+    }
+  }
 
   async getTaskHarvest(userCode: string, seqHarvestPhaseStr: string): Promise<GetTaskHarvestResDto | number> {
     const logbase = `${this.SERVICE_NAME}/getTaskHarvest:`;
@@ -276,8 +382,8 @@ export class TodoHarvestAppService {
       }
     }
 
-    // Lấy và tổ chức dữ liệu các tầng/ô (nếu tạo mới thì phaseDetail?.seq là 0, sẽ trả về data mặc định)
-    const harvestData: HarvestDataInputDto[] = await this.arrangeHarvestRows(phaseDetail?.seq ?? 0, homeArea.userHomeFloor);
+    // Lấy và tổ chức dữ liệu các tầng/ô (nếu tạo mới thì phaseDetail?.seq là 0, sẽ trả về data mặc định hoặc từ đợt gần nhất)
+    const harvestData: HarvestDataInputDto[] = await this.arrangeHarvestRows(phaseDetail?.seq ?? 0, homeArea.userHomeFloor, mainHomeOfUser.userHomeCode);
 
     // Lấy phase cao nhất hiện tại của nhà yến để gợi ý phase tiếp theo
     const harvestPhase = await this.todoHarvestAppRepository.getMaxHarvestPhase(mainHomeOfUser.userHomeCode);
@@ -288,7 +394,7 @@ export class TodoHarvestAppService {
       taskAlarmCode: phaseDetail ? String(phaseDetail.seq) : '',
       harvestNextDate: phaseDetail?.taskDate ?? moment().format('YYYY-MM-DD'),
       harvestPhase,
-      isComplete: 'N',
+      isComplete: 'Y',
       harvestData,
     };
     return result;
@@ -318,9 +424,14 @@ export class TodoHarvestAppService {
     // Nếu tìm thấy, lấy chi tiết tầng/ô, nếu không trả về mảng trống
     const harvestData = taskHarvestComplete ? await this.arrangeHarvestRows(taskHarvestComplete.seq, homeInfo.userHomeFloor) : [];
 
+    const { isIntegateTempHum, isIntegateCurrent, isTriggered, uniqueId, ...cleanHomeData } = homeInfo;
+
     return {
       seq: dto.seq,
       userHomeCode: dto.userHomeCode,
+      harvestPhase: taskHarvestComplete?.harvestPhase ?? dto.harvestPhase,
+      harvestYear: taskHarvestComplete?.harvestYear ?? dto.harvestYear,
+      homeData: cleanHomeData,
       harvestData,
     } as GetInfoTaskHarvestForAdjustResDto;
   }

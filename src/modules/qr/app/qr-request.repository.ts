@@ -163,7 +163,7 @@ export class QrRequestAppRepository {
     return rows.length ? (rows[0] as GetApprovedRequestQrCodeResDto) : null;
   }
   async getRequestQrCodeDetail(requestCode: string, userCode: string): Promise<GetRequestQrCodeDetailResDto | null> {
-    const query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
+    const query = ` SELECT A.seq, A.requestCode, A.userCode, D.userName, A.userHomeCode,  E.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
       A.userHomeAddress, A.temperature, COALESCE(D.humidity, A.humidity) AS humidity, F.harvestPhase, F.harvestYear, A.taskMedicineList, A.taskHarvestList, A.requestStatus,
          CASE
         WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN '${QR_CODE_CONST.REQUEST_STATUS.SOLD.text}'

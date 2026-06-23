@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { PagingDto } from 'src/dto/admin.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { InfoAppService } from 'src/modules/info/app/info.service';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { OptionService } from 'src/modules/options/option.service';
-import { InfoAppService } from 'src/modules/info/app/info.service';
 import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { FetchSellingByEnum, MarkTypeEnum, RequestSellPriceOptionEnum } from '../qr.interface';
 import { QrSellAppRepository } from './qr-sell.repository';
 import { GetSellingForPurchaserListDto, InsertRequestSellDto } from './qr.dto';
 import { GetSellingDetailResDto, GetSellingListResDto, PriceVatHistoryDto } from './qr.response';
-import { PagingDto } from 'src/dto/admin.dto';
 
 @Injectable()
 export class QrSellAppService {
@@ -119,30 +119,31 @@ export class QrSellAppService {
       }
 
       // Lấy VAT từ InfoAppService
-      const vatInfo = await this.infoAppService.getDetail('VAT');
-      const vat = vatInfo && vatInfo.infoContent && typeof vatInfo.infoContent === 'object' && 'vat' in vatInfo.infoContent ? Number(vatInfo.infoContent.vat) : 0;
+      // const vatInfo = await this.infoAppService.getDetail('VAT');
+      // const vat = vatInfo && vatInfo.infoContent && typeof vatInfo.infoContent === 'object' && 'vat' in vatInfo.infoContent ? Number(vatInfo.infoContent.vat) : 0;
 
       const priceVatHistory: PriceVatHistoryDto = {};
 
-      if (dto.priceForPurchaser !== null && dto.priceForPurchaser !== undefined) {
-        const finalPrice = dto.priceForPurchaser * (1 + vat / 100);
-        priceVatHistory.priceForPurchaser = {
-          priceForPurchaser: dto.priceForPurchaser,
-          vat: vat,
-          finalPrice: finalPrice,
-        };
-        dto.priceForPurchaser = finalPrice;
-      }
+      // KO TÍNH VAT NỮA
+      // if (dto.priceForPurchaser !== null && dto.priceForPurchaser !== undefined) {
+      //   const finalPrice = dto.priceForPurchaser * (1 + vat / 100);
+      //   priceVatHistory.priceForPurchaser = {
+      //     priceForPurchaser: dto.priceForPurchaser,
+      //     vat: vat,
+      //     finalPrice: finalPrice,
+      //   };
+      //   dto.priceForPurchaser = finalPrice;
+      // }
 
-      if (dto.priceForEater !== null && dto.priceForEater !== undefined) {
-        const finalPrice = dto.priceForEater * (1 + vat / 100);
-        priceVatHistory.priceForEater = {
-          priceForEater: dto.priceForEater,
-          vat: vat,
-          finalPrice: finalPrice,
-        };
-        dto.priceForEater = finalPrice;
-      }
+      // if (dto.priceForEater !== null && dto.priceForEater !== undefined) {
+      //   const finalPrice = dto.priceForEater * (1 + vat / 100);
+      //   priceVatHistory.priceForEater = {
+      //     priceForEater: dto.priceForEater,
+      //     vat: vat,
+      //     finalPrice: finalPrice,
+      //   };
+      //   dto.priceForEater = finalPrice;
+      // }
 
       const result = await this.qrSellAppRepository.insertRequestSell(user.userCode, dto, priceVatHistory);
       return result;

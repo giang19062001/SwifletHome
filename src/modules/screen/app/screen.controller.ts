@@ -1,23 +1,20 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { GetUserApp } from 'src/decorator/auth.decorator';
+import { Controller, Get, HttpCode, HttpStatus, Param, UseInterceptors } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
-import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { GetContentScreenResDto } from './screen.response';
 import { ScreenAppService } from './screen.service';
 
 @ApiTags('app/screen')
 @Controller('/api/app/screen')
-@ApiBearerAuth('app-auth')
-@UseGuards(ApiAuthAppGuard)
+// @ApiBearerAuth('app-auth')
+// @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class ScreenAppController {
   constructor(private readonly screenAppService: ScreenAppService) {}
 
   @ApiOperation({
-    summary: 'Nội dung màn hình đăng kí dịch vụ, màn hình khám bệnh nhà yến..',
+    summary: 'Nội dung màn hình đăng kí dịch vụ, màn hình khám bệnh nhà yến.. (không cần đăng nhập)',
   })
   @ApiParam({
     description: `
@@ -32,8 +29,8 @@ export class ScreenAppController {
   @Get('getContent/:keyword')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetContentScreenResDto) })
-  async getContent(@GetUserApp() user: TokenUserAppResDto, @Param('keyword') keyword: string) {
-    const result = await this.screenAppService.getContent(user.userCode, keyword);
+  async getContent(@Param('keyword') keyword: string) {
+    const result = await this.screenAppService.getContent(keyword);
     return result;
   }
 }

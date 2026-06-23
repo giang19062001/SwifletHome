@@ -29,8 +29,8 @@ export class TodoHarvestAppRepository {
     return rows.length ? Number(rows[0].PHASE + 1) : 1;
   }
 
-  async insertTaskHarvestPhase(userCode: string, userHomeCode: string, harvestPhase: number, isUse: YnEnum, taskDate: Date, taskStatus: TaskStatusEnum): Promise<number> {
-    const currentYear = moment().year();
+  async insertTaskHarvestPhase(userCode: string, userHomeCode: string, harvestPhase: number, isUse: YnEnum, taskDate: Date, taskStatus: TaskStatusEnum, harvestYear?: number): Promise<number> {
+    const currentYear = harvestYear || moment().year();
 
     // 1. Kiểm tra xem đã có record tương tự chưa
     const [existing] = await this.db.query<RowDataPacket[]>(
@@ -116,6 +116,26 @@ export class TodoHarvestAppRepository {
     return result.affectedRows;
   }
 
+  async updateWaitingTaskHarvestPhase(seq: number, harvestPhase: number, harvestYear: number, taskDate: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableTaskHarvestPhase}
+      SET harvestPhase = ?, harvestYear = ?, taskDate = ?, updatedAt = NOW()
+      WHERE seq = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [harvestPhase, harvestYear, taskDate, seq]);
+    return result.affectedRows;
+  }
+
+  async getWaitingTaskHarvestPhase(userHomeCode: string): Promise<{ seq: number; harvestPhase: number; harvestYear: number } | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT seq, harvestPhase, harvestYear
+       FROM ${this.tableTaskHarvestPhase}
+       WHERE userHomeCode = ? AND taskStatus = '${TaskStatusEnum.WAITING}'
+       LIMIT 1`,
+      [userHomeCode],
+    );
+    return rows.length ? (rows[0] as { seq: number; harvestPhase: number; harvestYear: number }) : null;
+  }
+
   /** Lấy lịch thu hoạch WAITING gần nhất để hiển thị 4 Box */
   async getNextHarvestSchedule(userCode: string, userHomeCode: string, today: string): Promise<{ seq: number; taskDate: string; taskStatus: string } | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
@@ -140,6 +160,18 @@ export class TodoHarvestAppRepository {
       [seqHarvestPhase],
     );
     return rows.length ? (rows[0] as GetHarvestTaskPhaseResDto) : null;
+  }
+
+  async getLatestCompleteTaskHarvestPhase(userHomeCode: string): Promise<number | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT seq
+       FROM ${this.tableTaskHarvestPhase}
+       WHERE userHomeCode = ? AND taskStatus = '${TaskStatusEnum.COMPLETE}'
+       ORDER BY harvestYear DESC, harvestPhase DESC
+       LIMIT 1`,
+      [userHomeCode],
+    );
+    return rows.length ? rows[0].seq : null;
   }
 
   // ─── HARVEST ROWS ─────────────────────────────────────────────────────────

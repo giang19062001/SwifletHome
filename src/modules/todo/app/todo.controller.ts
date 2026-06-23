@@ -21,15 +21,7 @@ import {
   SetHarvestTaskDto,
   SetTaskMedicineDto,
 } from './todo.dto';
-import {
-  GetInfoTaskHarvestForAdjustResDto,
-  GetListTaskAlarmsResDto,
-  GetListTaskHarvestResDto,
-  GetScheduledTasksResDto,
-  GetTaskHarvestResDto,
-  GetTaskResDto,
-  GetTasksMedicineResDto,
-} from './todo.response';
+import { GetInfoTaskHarvestForAdjustResDto, GetListTaskAlarmsResDto, GetListTaskHarvestResDto, GetScheduledTasksResDto, GetTaskHarvestResDto, GetTasksMedicineResDto } from './todo.response';
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -224,7 +216,45 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
   @ApiOkResponse({ type: NumberOkResponseDto })
   @ApiBadRequestResponse({ type: NumberErrResponseDto })
   async setTaskHarvest(@GetUserApp() user: TokenUserAppResDto, @Body() dto: SetHarvestTaskDto) {
-    const result = await this.todoHarvestAppService.setTaskHarvest(user.userCode, dto);
+    const result = await this.todoHarvestAppService.setTaskHarvestV2(user.userCode, dto);
+    if (result == -1) {
+      throw new BadRequestException({
+        message: Msg.OnlyHarvestTaskCanDo,
+        data: 0,
+      });
+    }
+    if (result == -2) {
+      throw new BadRequestException({
+        message: Msg.AlreadyCompleteCannotDo,
+        data: 0,
+      });
+    }
+
+    if (result == 0) {
+      throw new BadRequestException({
+        message: Msg.UpdateErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.UpdateOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Nhập dữ liệu thu hoạch V2 (Luôn hoàn thành đợt hiện tại, tự động sinh đợt mới nếu harvestNextDate > hôm nay)',
+  })
+  @Post('setTaskHarvestV2')
+  @ApiBody({
+    type: SetHarvestTaskDto,
+    description: `Giống setTaskHarvest nhưng isComplete luôn được ngầm định là Y (Luôn hoàn thành đợt hiện tại). Nếu harvestNextDate lớn hơn ngày hiện tại, hệ thống tự sinh đợt mới.`,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: NumberOkResponseDto })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async setTaskHarvestV2(@GetUserApp() user: TokenUserAppResDto, @Body() dto: SetHarvestTaskDto) {
+    const result = await this.todoHarvestAppService.setTaskHarvestV2(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
         message: Msg.OnlyHarvestTaskCanDo,

@@ -10,7 +10,7 @@ export class CommonGuideStrategy implements IScreenStrategy {
     return keyword === APP_SCREENS.REQUEST_QR_GUIDE || keyword === APP_SCREENS.CONSIGNMENT_GUIDE || keyword === APP_SCREENS.USER_TYPE_NOT_REGISTER;
   }
 
-  async execute(userCode: string, screen: any): Promise<GetContentScreenResDto | null> {
+  async execute(screen: any): Promise<GetContentScreenResDto | null> {
     if (!screen.contentStart) return null;
 
     return {
