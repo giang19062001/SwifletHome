@@ -4,8 +4,10 @@
 /build
 /public/uploads/*
 /localfile/**
+
 # firebase
 firebase-adminsdk.json
+
 # Logs
 logs
 *.log
@@ -64,3 +66,10 @@ pids
 
 # image/video/audio
 uploads/*
+
+# AI
+.claude
+.gitnexus
+.agents
+AGENTS.md
+CLAUDE.md
