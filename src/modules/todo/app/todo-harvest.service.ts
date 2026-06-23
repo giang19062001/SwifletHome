@@ -177,69 +177,7 @@ export class TodoHarvestAppService {
 
     return result;
   }
-  /*
-  async setTaskHarvest(userCode: string, dto: SetHarvestTaskDto): Promise<number> {
-    const logbase = `${this.SERVICE_NAME}/setTaskHarvest:`;
-    try {
-      let result = 1;
 
-      // Tìm nhà chính (Main Home) của người dùng để liên kết dữ liệu
-      const mainHomeOfUser = await this.userHomeAppService.getMainHomeByUser(userCode);
-      if (!mainHomeOfUser) {
-        this.logger.error(logbase, `Main home của user này không có`);
-        throw new BadRequestException({ message: Msg.UpdateErr, data: 0 });
-      }
-
-      // ─── KHỞI TẠO MỚI (Trường hợp taskAlarmCode trống) ─────────────────────────────────────────────────
-      if (!dto.taskAlarmCode || String(dto.taskAlarmCode).trim() === '') {
-        // Xác định trạng thái dựa trên flag isComplete
-        const isUse = YnEnum.N;
-        const taskStatus = dto.isComplete === YnEnum.Y ? TaskStatusEnum.COMPLETE : TaskStatusEnum.WAITING;
-        const taskDate = moment(dto.harvestNextDate).toDate();
-
-        // Chèn bản ghi đợt thu hoạch mới vào DB
-        const seqHarvestPhase = await this.todoHarvestAppRepository.insertTaskHarvestPhase(userCode, mainHomeOfUser.userHomeCode, dto.harvestPhase, isUse, taskDate, taskStatus);
-        this.logger.log(logbase, `Tạo đợt thu hoạch mới seqHarvestPhase(${seqHarvestPhase})`);
-
-        // Xử lý lưu các dòng dữ liệu tầng/ô chi tiết
-        await this.insUpDelHarvestRows(userCode, mainHomeOfUser.userHomeCode, seqHarvestPhase, dto.harvestData);
-      } else {
-        // ─── CẬP NHẬT (Trường hợp đã có taskAlarmCode) ─────────────────────────────────────────────────────
-        const phaseDetail = await this.todoHarvestAppRepository.getOneTaskHarvestPhase(Number(dto.taskAlarmCode));
-        if (!phaseDetail) {
-          this.logger.error(logbase, `seqHarvestPhase(${dto.taskAlarmCode}) không có dữ liệu`);
-          result = -1;
-          return result;
-        }
-
-        // Nếu đợt thu hoạch này đã hoàn thành thì không cho phép chỉnh sửa nữa
-        if (phaseDetail.taskStatus == TaskStatusEnum.COMPLETE) {
-          this.logger.error(logbase, `seqHarvestPhase(${dto.taskAlarmCode}) ${Msg.AlreadyCompleteCannotDo}`);
-          result = -2;
-          return result;
-        }
-
-        // Cập nhật ngày thu hoạch dự kiến
-        await this.todoHarvestAppRepository.updateTaskHarvestDate(userCode, phaseDetail.seq, moment(dto.harvestNextDate).format('YYYY-MM-DD'));
-        this.logger.log(logbase, `Cập nhật taskDate seqHarvestPhase(${phaseDetail.seq})`);
-
-        // Cập nhật/Thêm/Xóa các dòng tầng/ô tương ứng
-        await this.insUpDelHarvestRows(userCode, phaseDetail.userHomeCode ?? mainHomeOfUser.userHomeCode, phaseDetail.seq, dto.harvestData);
-
-        // Nếu người dùng đánh dấu là Hoàn thành (Complete) toàn bộ đợt
-        if (dto.isComplete === YnEnum.Y) {
-          await this.todoHarvestAppRepository.completeTaskHarvestPhase(userCode, phaseDetail.userHomeCode ?? mainHomeOfUser.userHomeCode, phaseDetail.seq, dto.harvestPhase);
-          this.logger.log(logbase, `Hoàn thành đợt thu hoạch seqHarvestPhase(${phaseDetail.seq})`);
-        }
-      }
-
-      return result;
-    } catch (error) {
-      this.logger.error(logbase, error);
-      return 0;
-    }
-  }
-  */
   async setTaskHarvestV2(userCode: string, dto: SetHarvestTaskDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/setTaskHarvestV2:`;
     try {
@@ -258,11 +196,13 @@ export class TodoHarvestAppService {
 
       if (!dto.taskAlarmCode || String(dto.taskAlarmCode).trim() === '') {
         const taskDate = moment().toDate();
-        currentPhaseSeq = await this.todoHarvestAppRepository.insertTaskHarvestPhase(userCode, userHomeCode, dto.harvestPhase, YnEnum.N, taskDate, TaskStatusEnum.COMPLETE, currentHarvestYear);
+        const { seq } = await this.todoHarvestAppRepository.insertTaskHarvestPhase(userCode, userHomeCode, dto.harvestPhase, YnEnum.N, taskDate, TaskStatusEnum.COMPLETE, currentHarvestYear);
+        currentPhaseSeq = seq;
+
         this.logger.log(logbase, `Tạo và hoàn thành đợt thu hoạch mới seqHarvestPhase(${currentPhaseSeq})`);
         await this.insUpDelHarvestRows(userCode, userHomeCode, currentPhaseSeq, dto.harvestData);
       } else {
-        const phaseDetail = await this.todoHarvestAppRepository.getOneTaskHarvestPhase(Number(dto.taskAlarmCode));
+        const phaseDetail = await this.todoHarvestAppRepository.getOneTaskHarvestPhase(dto.taskAlarmCode);
         if (!phaseDetail) {
           this.logger.error(logbase, `seqHarvestPhase(${dto.taskAlarmCode}) không có dữ liệu`);
           return -1;
@@ -313,7 +253,7 @@ export class TodoHarvestAppService {
           await this.insUpDelHarvestRows(userCode, userHomeCode, existingWaitingPhase.seq, nextHarvestData);
           this.logger.log(logbase, `Cập nhật đợt thu hoạch WAITING có sẵn seqHarvestPhase(${existingWaitingPhase.seq})`);
         } else {
-          const nextPhaseSeq = await this.todoHarvestAppRepository.insertTaskHarvestPhase(
+          const { seq: nextPhaseSeq } = await this.todoHarvestAppRepository.insertTaskHarvestPhase(
             userCode,
             userHomeCode,
             nextHarvestPhase,
@@ -334,7 +274,7 @@ export class TodoHarvestAppService {
     }
   }
 
-  async getTaskHarvest(userCode: string, seqHarvestPhaseStr: string): Promise<GetTaskHarvestResDto | number> {
+  async getTaskHarvest(userCode: string, harvestCode: string): Promise<GetTaskHarvestResDto | number> {
     const logbase = `${this.SERVICE_NAME}/getTaskHarvest:`;
 
     // Lấy thông tin nhà chính của user
@@ -357,15 +297,15 @@ export class TodoHarvestAppService {
 
     let phaseDetail: any = null;
     // Nếu có truyền ID đợt thu hoạch, thực hiện tìm kiếm thông tin trong DB
-    if (seqHarvestPhaseStr && String(seqHarvestPhaseStr).trim() !== '') {
-      phaseDetail = await this.todoHarvestAppRepository.getOneTaskHarvestPhase(Number(seqHarvestPhaseStr));
+    if (harvestCode && String(harvestCode).trim() !== '') {
+      phaseDetail = await this.todoHarvestAppRepository.getOneTaskHarvestPhase(harvestCode);
       if (!phaseDetail) {
-        this.logger.error(logbase, `seqHarvestPhase(${seqHarvestPhaseStr}) không có dữ liệu`);
+        this.logger.error(logbase, `harvestCode(${harvestCode}) không có dữ liệu`);
         return 0;
       }
       // Kiểm tra trạng thái: nếu đã hoàn thành thì không cho xử lý tiếp ở màn hình này
       if (phaseDetail.taskStatus == TaskStatusEnum.COMPLETE) {
-        this.logger.error(logbase, `seqHarvestPhase(${seqHarvestPhaseStr}) ${Msg.AlreadyCompleteCannotDo}`);
+        this.logger.error(logbase, `harvestCode(${harvestCode}) ${Msg.AlreadyCompleteCannotDo}`);
         return -4;
       }
     }
@@ -379,7 +319,7 @@ export class TodoHarvestAppService {
     // Xây dựng DTO phản hồi cho client
     const result: GetTaskHarvestResDto = {
       userHomeName: mainHomeOfUser.userHomeName,
-      taskAlarmCode: phaseDetail ? String(phaseDetail.seq) : '',
+      taskAlarmCode: phaseDetail ? phaseDetail.harvestCode : '',
       harvestNextDate: phaseDetail?.taskDate ?? moment().format('YYYY-MM-DD'),
       harvestPhase,
       isComplete: 'Y',

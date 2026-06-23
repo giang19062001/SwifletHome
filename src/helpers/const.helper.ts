@@ -112,6 +112,11 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'MED000001',
   },
+  harvestCode: {
+    PRE: 'HAR',
+    LEN: 6,
+    FRIST_CODE: 'HAR000001',
+  },
   saleHomeCode: {
     PRE: 'SLH',
     LEN: 6,

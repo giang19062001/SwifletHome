@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import moment from 'moment';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { CODES } from 'src/helpers/const.helper';
+import { generateCode } from 'src/helpers/func.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
 import { TaskStatusEnum } from '../todo.interface';
@@ -29,7 +31,15 @@ export class TodoHarvestAppRepository {
     return rows.length ? Number(rows[0].PHASE + 1) : 1;
   }
 
-  async insertTaskHarvestPhase(userCode: string, userHomeCode: string, harvestPhase: number, isUse: YnEnum, taskDate: Date, taskStatus: TaskStatusEnum, harvestYear?: number): Promise<number> {
+  async insertTaskHarvestPhase(
+    userCode: string,
+    userHomeCode: string,
+    harvestPhase: number,
+    isUse: YnEnum,
+    taskDate: Date,
+    taskStatus: TaskStatusEnum,
+    harvestYear?: number,
+  ): Promise<{ seq: number; harvestCode: string }> {
     const currentYear = harvestYear || moment().year();
 
     // 1. Kiểm tra xem đã có record tương tự chưa
@@ -58,15 +68,22 @@ export class TodoHarvestAppRepository {
       `;
       await this.db.execute(sqlUpdate, [isUse, taskDate, taskStatus, userCode, seq]);
 
-      return seq;
+      const [row] = await this.db.query<RowDataPacket[]>(`SELECT harvestCode FROM ${this.tableTaskHarvestPhase} WHERE seq = ?`, [seq]);
+      return { seq, harvestCode: row[0].harvestCode as string };
     } else {
       // 4. Nếu không có, thêm mới như bình thường
+      const [last] = await this.db.execute<any[]>(`SELECT harvestCode FROM ${this.tableTaskHarvestPhase} ORDER BY harvestCode DESC LIMIT 1`);
+      let harvestCode = CODES.harvestCode.FRIST_CODE;
+      if (last.length > 0) {
+        harvestCode = generateCode(last[0].harvestCode, CODES.harvestCode.PRE, CODES.harvestCode.LEN);
+      }
+
       const sqlInsert = `
-        INSERT INTO ${this.tableTaskHarvestPhase} (userCode, userHomeCode, harvestPhase, isUse, harvestYear, taskDate, taskStatus, createdId)
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO ${this.tableTaskHarvestPhase} (harvestCode, userCode, userHomeCode, harvestPhase, isUse, harvestYear, taskDate, taskStatus, createdId)
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      const [result] = await this.db.execute<ResultSetHeader>(sqlInsert, [userCode, userHomeCode, harvestPhase, isUse, currentYear, taskDate, taskStatus, userCode]);
-      return result.insertId;
+      const [result] = await this.db.execute<ResultSetHeader>(sqlInsert, [harvestCode, userCode, userHomeCode, harvestPhase, isUse, currentYear, taskDate, taskStatus, userCode]);
+      return { seq: result.insertId, harvestCode };
     }
   }
 
@@ -137,9 +154,9 @@ export class TodoHarvestAppRepository {
   }
 
   /** Lấy lịch thu hoạch WAITING gần nhất để hiển thị 4 Box */
-  async getNextHarvestSchedule(userCode: string, userHomeCode: string, today: string): Promise<{ seq: number; taskDate: string; taskStatus: string } | null> {
+  async getNextHarvestSchedule(userCode: string, userHomeCode: string, today: string): Promise<{ harvestCode: string; taskDate: string; taskStatus: string } | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT seq, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, taskStatus
+      `SELECT harvestCode, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate, taskStatus
        FROM ${this.tableTaskHarvestPhase}
        WHERE userCode = ? AND userHomeCode = ?
          AND taskStatus = '${TaskStatusEnum.WAITING}'
@@ -148,16 +165,16 @@ export class TodoHarvestAppRepository {
        LIMIT 1`,
       [userCode, userHomeCode, today],
     );
-    return rows.length ? (rows[0] as { seq: number; taskDate: string; taskStatus: string }) : null;
+    return rows.length ? (rows[0] as { harvestCode: string; taskDate: string; taskStatus: string }) : null;
   }
 
-  async getOneTaskHarvestPhase(seqHarvestPhase: number): Promise<GetHarvestTaskPhaseResDto | null> {
+  async getOneTaskHarvestPhase(harvestCode: string): Promise<GetHarvestTaskPhaseResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT seq, userCode, userHomeCode, harvestPhase, harvestYear, isUse,
+      `SELECT seq, harvestCode, userCode, userHomeCode, harvestPhase, harvestYear, isUse,
               DATE_FORMAT(taskDate,'%Y-%m-%d') AS taskDate, taskStatus
        FROM ${this.tableTaskHarvestPhase}
-       WHERE seq = ? LIMIT 1`,
-      [seqHarvestPhase],
+       WHERE harvestCode = ? LIMIT 1`,
+      [harvestCode],
     );
     return rows.length ? (rows[0] as GetHarvestTaskPhaseResDto) : null;
   }
@@ -263,7 +280,7 @@ export class TodoHarvestAppRepository {
     }
     const query = `
       SELECT
-        A.seq, A.userHomeCode, A.harvestPhase, A.harvestYear,
+        A.seq, A.harvestCode AS taskAlarmCode, A.userHomeCode, A.harvestPhase, A.harvestYear,
         E.userHomeFloor AS totalFloor,
         CAST(IFNULL(SUM(D.cellCollected), 0) AS SIGNED) AS totalCellCollected,
         CAST(IFNULL(SUM(D.cellRemain), 0) AS SIGNED) AS totalCellRemain
@@ -280,7 +297,7 @@ export class TodoHarvestAppRepository {
   async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number; timestamp: Date })[]> {
     const currentYear = moment().year();
     const query = `
-      SELECT A.seq AS seq, A.seq AS seqHarvestPhase, A.harvestPhase, A.harvestYear, COALESCE(A.updatedAt, A.createdAt) AS timestamp
+      SELECT A.harvestCode AS harvestTaskAlarmCode, A.seq AS seq, A.harvestPhase, A.harvestYear, COALESCE(A.updatedAt, A.createdAt) AS timestamp
       FROM ${this.tableTaskHarvestPhase} A
       WHERE A.userHomeCode = ? AND A.taskStatus = '${TaskStatusEnum.COMPLETE}' AND A.isUse = 'N'
         AND A.harvestYear = ?
@@ -301,7 +318,7 @@ export class TodoHarvestAppRepository {
 
   async getTaskHarvestCompleteAndNotUseOne(userHomeCode: string, harvestPhase: number, harvestYear: number): Promise<(TaskHarvestQrResDto & { seq: number }) | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT seq AS seq, seq AS seqHarvestPhase, harvestPhase, harvestYear
+      `SELECT seq, harvestCode AS harvestTaskAlarmCode, harvestPhase, harvestYear
        FROM ${this.tableTaskHarvestPhase}
        WHERE userHomeCode = ? AND taskStatus = '${TaskStatusEnum.COMPLETE}' AND isUse = 'N'
          AND harvestYear = ? AND harvestPhase = ?

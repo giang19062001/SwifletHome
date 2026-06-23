@@ -55,7 +55,7 @@ export class TodoAlarmAppService {
           if (harvestData) {
             data = {
               taskDate: harvestData.taskDate,
-              taskAlarmCode: harvestData.seq.toString(),
+              taskAlarmCode: harvestData.harvestCode,
               taskStatus: harvestData.taskStatus,
             };
           }

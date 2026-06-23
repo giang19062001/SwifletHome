@@ -23,6 +23,9 @@ export class GetHarvestTaskPhaseResDto {
   seq: number;
 
   @ApiProperty({ example: '' })
+  harvestCode: string;
+
+  @ApiProperty({ example: '' })
   userCode: string;
 
   @ApiProperty({ example: '' })
