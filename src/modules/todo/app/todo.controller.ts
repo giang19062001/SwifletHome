@@ -243,44 +243,6 @@ nếu bấm vào Box lăn thuốc sẽ thì truyền **taskAlarmCode** từ màn
   }
 
   @ApiOperation({
-    summary: 'Nhập dữ liệu thu hoạch V2 (Luôn hoàn thành đợt hiện tại, tự động sinh đợt mới nếu harvestNextDate > hôm nay)',
-  })
-  @Post('setTaskHarvestV2')
-  @ApiBody({
-    type: SetHarvestTaskDto,
-    description: `Giống setTaskHarvest nhưng isComplete luôn được ngầm định là Y (Luôn hoàn thành đợt hiện tại). Nếu harvestNextDate lớn hơn ngày hiện tại, hệ thống tự sinh đợt mới.`,
-  })
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: NumberOkResponseDto })
-  @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async setTaskHarvestV2(@GetUserApp() user: TokenUserAppResDto, @Body() dto: SetHarvestTaskDto) {
-    const result = await this.todoHarvestAppService.setTaskHarvestV2(user.userCode, dto);
-    if (result == -1) {
-      throw new BadRequestException({
-        message: Msg.OnlyHarvestTaskCanDo,
-        data: 0,
-      });
-    }
-    if (result == -2) {
-      throw new BadRequestException({
-        message: Msg.AlreadyCompleteCannotDo,
-        data: 0,
-      });
-    }
-
-    if (result == 0) {
-      throw new BadRequestException({
-        message: Msg.UpdateErr,
-        data: 0,
-      });
-    }
-    return {
-      message: Msg.UpdateOk,
-      data: result,
-    };
-  }
-
-  @ApiOperation({
     summary: 'Lấy thông tin dữ liệu thu hoạch có sẵn cho Form nhập dữ liệu thu hoạch',
     description: `Luôn gọi API này khi vào màn hình 'Form nhập dữ liệu thu hoạch' để nhận dữ liệu khởi tạo ban đầu Hoặc dữ liệu đã sẵn để gắn vào 'Form nhập dữ liệu thu hoạch'`,
   })

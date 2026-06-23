@@ -94,21 +94,9 @@ export class TodoHarvestAppService {
     }
   }
 
-  async arrangeHarvestRows(seqHarvestPhase: number, userHomeFloor: number, userHomeCode?: string): Promise<HarvestDataInputDto[]> {
+  async arrangeHarvestRows(seqHarvestPhase: number, userHomeFloor: number): Promise<HarvestDataInputDto[]> {
     // Lấy toàn bộ dòng dữ liệu thu hoạch của đợt này từ DB
-    let harvestRows = await this.todoHarvestAppRepository.getTaskHarvestRows(seqHarvestPhase, true);
-
-    // Nếu chưa có dữ liệu và có truyền mã nhà, tìm đợt thu hoạch hoàn thành gần nhất để lấy số lượng còn lại
-    if (harvestRows.length === 0 && userHomeCode) {
-      const latestCompleteSeq = await this.todoHarvestAppRepository.getLatestCompleteTaskHarvestPhase(userHomeCode);
-      if (latestCompleteSeq) {
-        const prevRows = await this.todoHarvestAppRepository.getTaskHarvestRows(latestCompleteSeq, true);
-        harvestRows = prevRows.map((row) => ({
-          ...row,
-          cellCollected: 0,
-        }));
-      }
-    }
+    const harvestRows = await this.todoHarvestAppRepository.getTaskHarvestRows(seqHarvestPhase, true);
 
     // Gom nhóm dữ liệu theo từng tầng
     const existingDataMap = new Map<number, FloorDataInputDto[]>();
@@ -316,7 +304,7 @@ export class TodoHarvestAppService {
           floorData: floor.floorData.map((cell) => ({
             cell: cell.cell,
             cellCollected: 0,
-            cellRemain: cell.cellRemain,
+            cellRemain: 0,
           })),
         }));
 
@@ -382,8 +370,8 @@ export class TodoHarvestAppService {
       }
     }
 
-    // Lấy và tổ chức dữ liệu các tầng/ô (nếu tạo mới thì phaseDetail?.seq là 0, sẽ trả về data mặc định hoặc từ đợt gần nhất)
-    const harvestData: HarvestDataInputDto[] = await this.arrangeHarvestRows(phaseDetail?.seq ?? 0, homeArea.userHomeFloor, mainHomeOfUser.userHomeCode);
+    // Lấy và tổ chức dữ liệu các tầng/ô (nếu tạo mới thì phaseDetail?.seq là 0, sẽ trả về data mặc định)
+    const harvestData: HarvestDataInputDto[] = await this.arrangeHarvestRows(phaseDetail?.seq ?? 0, homeArea.userHomeFloor);
 
     // Lấy phase cao nhất hiện tại của nhà yến để gợi ý phase tiếp theo
     const harvestPhase = await this.todoHarvestAppRepository.getMaxHarvestPhase(mainHomeOfUser.userHomeCode);

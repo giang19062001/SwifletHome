@@ -162,18 +162,6 @@ export class TodoHarvestAppRepository {
     return rows.length ? (rows[0] as GetHarvestTaskPhaseResDto) : null;
   }
 
-  async getLatestCompleteTaskHarvestPhase(userHomeCode: string): Promise<number | null> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      `SELECT seq
-       FROM ${this.tableTaskHarvestPhase}
-       WHERE userHomeCode = ? AND taskStatus = '${TaskStatusEnum.COMPLETE}'
-       ORDER BY harvestYear DESC, harvestPhase DESC
-       LIMIT 1`,
-      [userHomeCode],
-    );
-    return rows.length ? rows[0].seq : null;
-  }
-
   // ─── HARVEST ROWS ─────────────────────────────────────────────────────────
 
   async getTaskHarvestRows(seqHarvestPhase: number, isOnlyActive: boolean): Promise<HarvestDataRowInputDto[]> {
