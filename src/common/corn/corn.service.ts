@@ -6,11 +6,11 @@ import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { DoctorAppService } from 'src/modules/doctor/app/doctor.service';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { QrRequestAppService } from 'src/modules/qr/app/qr-request.service';
+import { SaleHomeAppService } from 'src/modules/saleHome/app/saleHome.service';
 import { TeamReviewAppService } from 'src/modules/team/app/team-review.service';
 import { TeamUserAppService } from 'src/modules/team/app/team-user.service';
 import { TodoAlarmAppService } from 'src/modules/todo/app/todo-alarm.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { SaleHomeAppService } from 'src/modules/saleHome/app/saleHome.service';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
@@ -89,8 +89,9 @@ export class CornService implements OnModuleInit {
 
     const taskAlarmList = await this.todoAlarmAppService.getListTaskAlarmsToday(todayStr);
     const taskMedicinesList = await this.todoAlarmAppService.getListTaskMedicinesToday(todayStr);
+    const taskHarvestList = await this.todoAlarmAppService.getListTaskHarvertToday(todayStr);
 
-    const taskList = [...taskAlarmList, ...taskMedicinesList];
+    const taskList = [...taskAlarmList, ...taskMedicinesList, ...taskHarvestList];
 
     this.logger.log(logbase, `Số lượng các lịch nhắc được thiết lập cho ngày hôm nay là: ${taskList.length}`);
 

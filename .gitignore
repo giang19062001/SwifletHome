@@ -3,7 +3,7 @@
 /node_modules
 /build
 /public/uploads/*
-/localfile/**
+/local/**
 
 # firebase
 firebase-adminsdk.json

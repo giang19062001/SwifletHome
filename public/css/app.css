@@ -11891,6 +11891,9 @@ textarea.form-control-lg {
 }
 :root {
   --header-height: 85px;
+  --main-color: #71ab33;
+  --main-color-light: rgba(113, 171, 51, 0.7);
+  --main-color-lighter: rgba(113, 171, 51, 0.4);
 }
 
 @media (max-width: 768px) {
@@ -11909,7 +11912,7 @@ textarea.form-control-lg {
   }
 }
 .topbar-title {
-  color: #0175ff;
+  color: #71ab33;
   font-weight: 700;
   font-size: 28px;
   font-family: "PretendardBold" !important;
@@ -12221,14 +12224,14 @@ textarea.form-control-lg {
   stroke: #7f8387;
 }
 .vertical-menu #sidebar-menu ul li a.active, .vertical-menu #sidebar-menu ul li a.child-active {
-  color: #0175ff;
+  color: #71ab33;
   font-weight: 600;
 }
 .vertical-menu #sidebar-menu ul li a.active svg.my-icon,
 .vertical-menu #sidebar-menu ul li a.active i, .vertical-menu #sidebar-menu ul li a.child-active svg.my-icon,
 .vertical-menu #sidebar-menu ul li a.child-active i {
-  color: #0175ff;
-  stroke: #0175ff;
+  color: #71ab33;
+  stroke: #71ab33;
 }
 .vertical-menu #sidebar-menu ul li .sub-menu {
   overflow: hidden;
@@ -18991,8 +18994,8 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   margin: 1px;
 }
 .page-item.active .page-link {
-  background-color: #0175ff !important;
-  border-color: #0175ff !important;
+  background-color: #71ab33 !important;
+  border-color: #71ab33 !important;
   color: #ffffff;
 }
 .page-item .page-link {
@@ -19086,7 +19089,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 .page-login .box-login .txt-title {
-  color: #0175ff;
+  color: #71ab33;
   font-size: 32px;
   font-family: "PretendardMedium";
   font-weight: 700;
@@ -19139,7 +19142,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
 }
 .page-login .box-login #btn-login {
   padding: 13px 0px;
-  background-color: #0175ff;
+  background-color: #71ab33;
   color: #ffffff;
   border-radius: 100px;
   font-size: 16px;
@@ -19182,7 +19185,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   letter-spacing: 0px;
 }
 #alert-login-modal .modal-content .modal-body button {
-  background-color: #0175ff;
+  background-color: #71ab33;
   font-size: 16px;
   font-family: "PretendardMedium";
   color: #ffffff;
@@ -19394,7 +19397,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   height: auto;
 }
 #page-answer-mutation .preview .user .bubble {
-  background-color: #0175ff;
+  background-color: #71ab33;
   color: #fff;
   border-bottom-right-radius: 4px;
 }
@@ -19583,16 +19586,16 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   color: #fff;
 }
 .page-main .sparkboxes .box1 {
-  background: linear-gradient(135deg, #0396ff 10%, #abdcff 100%);
+  background: linear-gradient(135deg, #71ab33 10%, rgb(176.1959459459, 218.1283783784, 131.3716216216) 100%);
 }
 .page-main .sparkboxes .box2 {
-  background: linear-gradient(135deg, #4c83ff 10%, #2afadf 100%);
+  background: linear-gradient(135deg, rgb(151.1554054054, 206.4121621622, 92.0878378378) 10%, rgb(213.7567567568, 235.7027027027, 190.2972972973) 100%);
 }
 .page-main .sparkboxes .box3 {
-  background: linear-gradient(135deg, #5961f9 10%, #ee9ae5 100%);
+  background: linear-gradient(135deg, rgb(100.0202702703, 151.3581081081, 45.1418918919) 10%, rgb(151.1554054054, 206.4121621622, 92.0878378378) 100%);
 }
 .page-main .sparkboxes .box4 {
-  background: linear-gradient(135deg, #da6ccf 10%, #f1a3a7 100%);
+  background: linear-gradient(135deg, rgb(74.0608108108, 112.0743243243, 33.4256756757) 10%, rgb(125.9797297297, 190.6418918919, 56.8581081081) 100%);
 }
 .page-main .pretty-shadow {
   box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
@@ -19743,7 +19746,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   stroke-width: 1.5;
 }
 #page-screen-mutation .contents .file-card .file-icon svg.active {
-  fill: #0175ff !important;
+  fill: #71ab33 !important;
 }
 #page-screen-mutation .contents .file-card .file-info {
   display: flex;
@@ -19763,7 +19766,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   width: 200px;
 }
 #page-screen-mutation .contents .file-card .file-info .file-name.active {
-  color: #0175ff;
+  color: #71ab33;
 }
 #page-screen-mutation .contents .file-card .file-info .file-date {
   font-size: 12px;

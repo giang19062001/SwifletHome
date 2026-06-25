@@ -176,4 +176,7 @@ export class TodoAlarmAppService {
   async getListTaskMedicinesToday(todayStr: string) {
     return await this.todoMedicineAppRepository.getListTaskMedicinesToday(todayStr);
   }
+  async getListTaskHarvertToday(todayStr: string) {
+    return await this.todoHarvestAppRepository.getListTaskHarvertToday(todayStr);
+  }
 }

@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS `tbl_ads_banner` (
+    `seq` INT NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(255) DEFAULT NULL,
+    `bannerUrl` VARCHAR(500) NOT NULL,
+    `position` VARCHAR(50) DEFAULT NULL,
+    `displayOrder` INT DEFAULT 0,
+    `startTime` DATETIME NOT NULL,
+    `endTime` DATETIME NOT NULL,
+    `targetScreen` VARCHAR(255) NOT NULL,
+    `actionType` ENUM('LINK','FUNCTION') DEFAULT 'LINK',
+    `actionValue` VARCHAR(500) NOT NULL,
+    `isActive` CHAR(1) NOT NULL DEFAULT 'Y',
+    `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    `createdId` VARCHAR(45) DEFAULT 'SYSTEM',
+    `updatedId` VARCHAR(45) DEFAULT NULL,
+    PRIMARY KEY (`seq`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

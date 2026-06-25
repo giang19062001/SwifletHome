@@ -48,19 +48,19 @@
     }
 
     .box1 {
-      background: linear-gradient(135deg, #0396ff 10%, #abdcff 100%);
+      background: linear-gradient(135deg, $main-color 10%, lighten($main-color, 25%) 100%);
     }
 
     .box2 {
-      background: linear-gradient(135deg, #4c83ff 10%, #2afadf 100%);
+      background: linear-gradient(135deg, lighten($main-color, 15%) 10%, lighten($main-color, 40%) 100%);
     }
 
     .box3 {
-      background: linear-gradient(135deg, #5961f9 10%, #ee9ae5 100%);
+      background: linear-gradient(135deg, darken($main-color, 5%) 10%, lighten($main-color, 15%) 100%);
     }
 
     .box4 {
-      background: linear-gradient(135deg, #da6ccf 10%, #f1a3a7 100%);
+      background: linear-gradient(135deg, darken($main-color, 15%) 10%, lighten($main-color, 5%) 100%);
     }
   }
 

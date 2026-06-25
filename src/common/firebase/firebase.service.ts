@@ -3,7 +3,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bullmq';
 import admin from 'firebase-admin';
-import { GetAppScreen, QUERY_HELPER } from 'src/helpers/const.helper';
+import { GetAppScreenForPush, QUERY_HELPER } from 'src/helpers/const.helper';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { NotificationAppService } from 'src/modules/notification/app/notification.service';
@@ -96,7 +96,7 @@ export class FirebaseService implements OnModuleInit {
         notificationId: notificationId,
         title,
         body,
-        targetScreen: GetAppScreen(notificationType),
+        targetScreen: GetAppScreenForPush(notificationType),
         image_logo: this.IMAGE.LOGO,
         image_detail: this.IMAGE.DETAIL,
         data: JSON.stringify(data) ?? '',
@@ -140,7 +140,7 @@ export class FirebaseService implements OnModuleInit {
       messageId: messageId,
       title: title,
       body: body,
-      targetScreen: GetAppScreen(notificationType),
+      targetScreen: GetAppScreenForPush(notificationType),
       data: data ?? null,
       userCode: userCode,
       userCodesMuticast: [],
@@ -163,7 +163,7 @@ export class FirebaseService implements OnModuleInit {
       notificationId,
       title,
       body,
-      targetScreen: GetAppScreen(notificationType),
+      targetScreen: GetAppScreenForPush(notificationType),
       image_logo: this.IMAGE.LOGO,
       image_detail: this.IMAGE.DETAIL,
       data: JSON.stringify(data) ?? '',
@@ -198,7 +198,7 @@ export class FirebaseService implements OnModuleInit {
       messageId,
       title,
       body,
-      targetScreen: GetAppScreen(notificationType),
+      targetScreen: GetAppScreenForPush(notificationType),
       data: data ?? null,
       userCode: null, // null vì gửi theo topic
       userCodesMuticast: [],
@@ -279,7 +279,7 @@ export class FirebaseService implements OnModuleInit {
         notificationId,
         title,
         body,
-        targetScreen: GetAppScreen(notificationType),
+        targetScreen: GetAppScreenForPush(notificationType),
         image_logo: this.IMAGE.LOGO,
         image_detail: this.IMAGE.DETAIL,
         data: JSON.stringify(data) ?? '',
@@ -353,7 +353,7 @@ export class FirebaseService implements OnModuleInit {
         messageId,
         title,
         body,
-        targetScreen: GetAppScreen(notificationType),
+        targetScreen: GetAppScreenForPush(notificationType),
         data: data ?? null,
         userCode: null, // null vì gửi theo multicast
         userCodesMuticast: [...new Set(userCodes)], // Tránh lưu danh sách user bị trùng lặp

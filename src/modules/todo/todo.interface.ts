@@ -26,7 +26,7 @@ export const TODO_CONST = {
   TASK_BOX: {
     HARVEST: {
       value: 'HARVEST',
-      text: 'Nhập dữ liệu',
+      text: 'Thu hoạch',
     },
     MEDICINE: {
       value: 'MEDICINE',

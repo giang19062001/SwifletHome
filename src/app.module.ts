@@ -56,6 +56,7 @@ import { ReportAdminModule } from './modules/report/admin/report.module';
 import { ReportAppModule } from './modules/report/app/report.module';
 import { ScreenAdminModule } from './modules/screen/admin/screen.module';
 import { ScreenAppModule } from './modules/screen/app/screen.module';
+import { AdsAppModule } from './modules/ads/app/ads.module';
 import { TeamAdminModule } from './modules/team/admin/team.module';
 import { TeamAppModule } from './modules/team/app/team.module';
 import { TodoAdminModule } from './modules/todo/admin/todo.module';
@@ -130,6 +131,7 @@ import { ShareAppModule } from './modules/share/app/share.module';
     ReportAppModule,
     CheckoutAppModule,
     ShareAppModule,
+    AdsAppModule,
     // front
     GuestModule,
     // eater - app

@@ -49,11 +49,11 @@
 .btn-submit {
   @extend #btn;
   min-width: 125px;
-  background-color: $main-color;
-  border-color: $main-color;
+  background-color: $btn-main-color;
+  border-color: $btn-main-color;
   color: #ffffff;
   &:hover {
-    background-color: $main-color-hover;
+    background-color: $btn-main-color-hover;
   }
 }
 .btn-submit-lg {
@@ -61,11 +61,11 @@
   font-size: medium;
   min-width: 175px;
   min-height: 40px;
-  background-color: $main-color;
-  border-color: $main-color;
+  background-color: $btn-main-color;
+  border-color: $btn-main-color;
   color: #ffffff;
   &:hover {
-    background-color: $main-color-hover;
+    background-color: $btn-main-color-hover;
   }
 }
 
@@ -80,11 +80,11 @@
 }
 .btn-info {
   @extend #btn;
-  background-color: $main-color;
-  border-color: $main-color;
+  background-color: $btn-main-color;
+  border-color: $btn-main-color;
   color: #ffffff;
   &:hover {
-    background-color: $main-color-hover;
+    background-color: $btn-main-color-hover;
   }
 }
 
@@ -121,9 +121,9 @@
   @extend #btn;
   background-color: #ffffff;
   border-color: #ffffff;
-  color: $main-color;
+  color: $btn-main-color;
   &:hover {
-    background-color: $main-color;
+    background-color: $btn-main-color;
     color: #ffffff;
   }
 }
@@ -285,7 +285,7 @@ img, video {
 
 // dùng cho  link điều hướng
 .link-premium {
-  color: $main-color;
+  color: $btn-main-color;
   text-decoration: none;
   transition: all 0.3s ease;
   position: relative;
@@ -300,7 +300,7 @@ img, video {
   }
 
   &:hover {
-    color: $main-color-hover;
+    color: $btn-main-color-hover;
     
     i {
       transform: scale(1.15) translateX(2px);

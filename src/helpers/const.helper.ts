@@ -12,19 +12,20 @@ export const AUDIO_TYPES = ['.mp3'];
 export const VIDEO_TYPES = ['.mp4', '.mov', '.webm'];
 
 export const APP_SCREENS = {
+  ACCOUNT_SCREEN: 'ACCOUNT_SCREEN',
   QR_SCREEN: 'QR_SCREEN',
   REMINDER_SCREEN: 'REMINDER_SCREEN',
   NOTIFICATION_SCREEN: 'NOTIFICATION_SCREEN',
   CONSIGNMENT_SCREEN: 'CONSIGNMENT_SCREEN',
-
   SIGNUP_SERVICE: 'SIGNUP_SERVICE',
   REQUEST_DOCTOR: 'REQUEST_DOCTOR',
+  USER_TYPE_NOT_REGISTER: 'USER_TYPE_NOT_REGISTER',
+  // MODAL
   REQUEST_QR_GUIDE: 'REQUEST_QR_GUIDE',
   CONSIGNMENT_GUIDE: 'CONSIGNMENT_GUIDE',
-  USER_TYPE_NOT_REGISTER: 'USER_TYPE_NOT_REGISTER',
 };
 
-export const GetAppScreen = (notificationType: NotificationTypeEnum): string => {
+export const GetAppScreenForPush = (notificationType: NotificationTypeEnum): string => {
   if (notificationType === 'TODO') {
     return APP_SCREENS.REMINDER_SCREEN;
   } else if (notificationType === 'ADMIN') {

@@ -12,6 +12,12 @@ window.Apex = {
   }
 };
 
+const rootStyles = getComputedStyle(document.documentElement);
+const dynamicColor1 = rootStyles.getPropertyValue('--main-color').trim() || '#3F51B5';
+const dynamicColor2 = rootStyles.getPropertyValue('--main-color-light').trim() || '#2196F3';
+const dynamicColor3 = rootStyles.getPropertyValue('--main-color-lighter').trim() || '#5961f9';
+const chartColors = [dynamicColor1, dynamicColor2, dynamicColor3];
+
 // === SPARKLINE CHARTS (4 cái nhỏ) ===
 const sparkConfig = {
   chart: {
@@ -56,7 +62,7 @@ var optionsLine = {
     dropShadow: { enabled: true, top: 3, left: 2, blur: 4, opacity: 0.2 }
   },
   stroke: { curve: 'smooth', width: 2 },
-  colors: ['#3F51B5', '#2196F3', '#5961f9'],
+  colors: chartColors,
   series: [
     { name: "Music", data: [1, 15, 26, 20, 33, 27] },
     { name: "Photos", data: [3, 33, 21, 42, 19, 32] },
@@ -112,7 +118,7 @@ var optionsCircle4 = {
     },
   },
   stroke: { lineCap: 'round' },
-  colors: ['#3F51B5', '#2196F3', '#5961f9'],
+  colors: chartColors,
   series: [71, 63, 77],
   labels: ['June', 'May', 'April'],
   legend: {
@@ -145,7 +151,7 @@ var optionsBar = {
   plotOptions: {
     bar: { columnWidth: '30%', horizontal: false },
   },
-  colors: ['#3F51B5', '#2196F3', '#5961f9'],
+  colors: chartColors,
   series: [
     { name: 'PRODUCT A', data: [14, 25, 21, 17, 12, 13, 11, 19] },
     { name: 'PRODUCT B', data: [13, 23, 20, 8, 13, 27, 33, 12] },
@@ -173,7 +179,7 @@ var optionsArea = {
     stacked: false,
   },
   stroke: { curve: 'straight', width: 2 },
-  colors: ['#3F51B5', '#2196F3', '#5961f9'],
+  colors: chartColors,
   series: [
     { name: "Music", data: [11, 15, 26, 20, 33, 27] },
     { name: "Photos", data: [32, 33, 21, 42, 19, 32] },

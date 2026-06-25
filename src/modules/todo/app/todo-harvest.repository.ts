@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import moment from 'moment';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { CODES } from 'src/helpers/const.helper';
+import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
-import { TaskStatusEnum } from '../todo.interface';
+import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
 import { GetListTaskHarvestForAdjustDto, HarvestDataRowInputDto } from './todo.dto';
-import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto } from './todo.response';
+import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto, GetTaskAlarmResDto } from './todo.response';
 
 @Injectable()
 export class TodoHarvestAppRepository {
@@ -177,6 +177,28 @@ export class TodoHarvestAppRepository {
       [harvestCode],
     );
     return rows.length ? (rows[0] as GetHarvestTaskPhaseResDto) : null;
+  }
+
+  async getListTaskHarvertToday(dateStr: string): Promise<(GetTaskAlarmResDto & { deviceToken: string })[]> {
+    const query = `
+        SELECT 
+            A.seq, A.userCode, A.userHomeCode,  C.userHomeName, NULL AS taskAlarmCode, NULL AS taskCode,
+            '${TODO_CONST.TASK_BOX.HARVEST.text}' AS taskName, DATE_FORMAT(taskDate, '%Y-%m-%d') AS taskDate,  A.taskStatus,  '' AS taskNote, 
+            'Y' AS isActive, B.deviceToken
+        FROM ${this.tableTaskHarvestPhase} A
+        INNER JOIN ${this.tableUserApp} B
+          ON A.userCode = B.userCode
+        INNER JOIN ${this.tableUserHome} C
+          ON A.userHomeCode = C.userHomeCode
+        WHERE A.taskDate >= ?
+            AND A.taskDate <= DATE_ADD(?, INTERVAL ${QUERY_HELPER.MAX_DAY_SEND_NOTIFY} DAY)
+            AND A.taskStatus = '${TaskStatusEnum.WAITING}'
+        ORDER BY A.taskDate DESC
+      `;
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [dateStr, dateStr]);
+
+    return rows as (GetTaskAlarmResDto & { deviceToken: string })[];
   }
 
   // ─── HARVEST ROWS ─────────────────────────────────────────────────────────

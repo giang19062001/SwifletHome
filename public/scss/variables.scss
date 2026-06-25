@@ -1,7 +1,9 @@
 // Variables
 // Color system
-$main-color: #0175ff;
-$main-color-hover: #0760ce;
+$main-color: #71ab33;
+$btn-main-color: #0175ff;
+$btn-main-color-hover: #0760ce;
+
 $err-color: #DC3545;
 $err-color-hover: #b92d3b;
 // scss-docs-start gray-color-variables
@@ -86,7 +88,7 @@ $sidebar-menu-item-color: #505050;
 $sidebar-menu-sub-item-color: #545a6d;
 $sidebar-menu-item-icon-color: #7f8387;
 $sidebar-menu-item-hover-color: #383c40;
-$sidebar-menu-item-active-color: #0175ff;
+$sidebar-menu-item-active-color: #71ab33;
 // $sidebar-width:                                       250px;
 $sidebar-width: 280px;
 $sidebar-collapsed-width: 70px;
@@ -108,6 +110,9 @@ $header-item-color: #555b6d;
 // mobile, tablet => height -30px
 :root {
   --header-height: #{$header-height};
+  --main-color: #{$main-color};
+  --main-color-light: #{rgba($main-color, 0.7)};
+  --main-color-lighter: #{rgba($main-color, 0.4)};
 }
 
 @media (max-width: $tablet) {
