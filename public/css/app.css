@@ -18405,7 +18405,7 @@ select {
   color: #565c66;
 }
 
-#btn, .btn-error-out, .btn-error-lg, .btn-error, .btn-edit-out, .btn-edit, .btn-add-out, .btn-add, .btn-info-out, .btn-info-video, .btn-info-audio, .btn-info-image, .btn-info, .btn-sub, .btn-submit-lg, .btn-submit, .btn-closed {
+#btn, #page-blockchain .btn-deposit, .btn-error-out, .btn-error-lg, .btn-error, .btn-edit-out, .btn-edit, .btn-add-out, .btn-add, .btn-info-out, .btn-info-video, .btn-info-audio, .btn-info-image, .btn-info, .btn-sub, .btn-submit-lg, .btn-submit, .btn-main, .btn-closed {
   padding: 7px 15px;
   border-radius: 15px;
   font-family: Pretendard;
@@ -18416,7 +18416,7 @@ select {
   outline: auto;
   cursor: pointer;
 }
-#btn:disabled, .btn-error-out:disabled, .btn-error-lg:disabled, .btn-error:disabled, .btn-edit-out:disabled, .btn-edit:disabled, .btn-add-out:disabled, .btn-add:disabled, .btn-info-out:disabled, .btn-info-video:disabled, .btn-info-audio:disabled, .btn-info-image:disabled, .btn-info:disabled, .btn-sub:disabled, .btn-submit-lg:disabled, .btn-submit:disabled, .btn-closed:disabled {
+#btn:disabled, #page-blockchain .btn-deposit:disabled, .btn-error-out:disabled, .btn-error-lg:disabled, .btn-error:disabled, .btn-edit-out:disabled, .btn-edit:disabled, .btn-add-out:disabled, .btn-add:disabled, .btn-info-out:disabled, .btn-info-video:disabled, .btn-info-audio:disabled, .btn-info-image:disabled, .btn-info:disabled, .btn-sub:disabled, .btn-submit-lg:disabled, .btn-submit:disabled, .btn-main:disabled, .btn-closed:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background-color: #f0f0f0;
@@ -18431,6 +18431,16 @@ select {
 }
 .btn-closed:hover {
   background-color: gray;
+}
+
+.btn-main {
+  min-width: 125px;
+  background-color: #71ab33;
+  border-color: #71ab33;
+  color: #ffffff;
+}
+.btn-main:hover {
+  background-color: #5a8d2a;
 }
 
 .btn-submit {
@@ -18801,6 +18811,10 @@ select {
   border: 1px solid #e2e8f0;
 }
 
+.txt-main {
+  color: #71ab33;
+}
+
 img:not(.no-premium-style):not([id^=icon-]), video:not(.no-premium-style):not([id^=icon-]) {
   object-fit: cover;
   border-radius: 8px;
@@ -18848,6 +18862,11 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
 
 .last-border-0:last-child {
   border-bottom: none !important;
+}
+
+.form-check-input:checked {
+  background-color: #71ab33 !important;
+  border-color: #71ab33 !important;
 }
 
 .common-table-container .table {
@@ -19338,7 +19357,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: -10px;
+  margin-top: -5px;
 }
 #page-answer-mutation .bottom-swtich {
   padding: 10px;
@@ -19427,7 +19446,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: -10px;
+  margin-top: -5px;
 }
 #page-blog-mutation .bottom-swtich {
   padding: 10px;
@@ -19626,7 +19645,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: -10px;
+  margin-top: -5px;
 }
 #page-screen-mutation .preview {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
@@ -20271,8 +20290,8 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   font-size: 0.9rem;
 }
 .page-user-teams-mutation .form-control:focus, .page-user-teams-mutation .form-select:focus {
-  border-color: rgba(13, 110, 253, 0.5);
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+  border-color: rgba(113, 171, 51, 0.5);
+  box-shadow: 0 0 0 0.25rem rgba(113, 171, 51, 0.1);
 }
 .page-user-teams-mutation .form-control::placeholder, .page-user-teams-mutation .form-select::placeholder {
   color: #adb5bd;
@@ -20285,11 +20304,11 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   cursor: pointer;
 }
 .page-user-teams-mutation .upload-zone:hover {
-  border-color: #0d6efd;
-  background-color: rgba(13, 110, 253, 0.03) !important;
+  border-color: #71ab33;
+  background-color: rgba(113, 171, 51, 0.03) !important;
 }
 .page-user-teams-mutation .upload-zone:hover .btn-outline-primary {
-  background-color: #0d6efd;
+  background-color: #71ab33;
   color: #fff;
 }
 .page-user-teams-mutation .image-preview-container {
@@ -20684,6 +20703,52 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   transform: scale(1.02);
 }
 
+#page-blockchain .btn-deposit {
+  min-width: 125px;
+  background-color: #8247e5;
+  border-color: #8247e5;
+  color: #ffffff;
+}
+#page-blockchain .btn-deposit:hover {
+  background-color: #6b35c5;
+}
+#page-blockchain .wallet-card {
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+#page-blockchain .wallet-card .wallet-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+#page-blockchain .wallet-card .wallet-info {
+  padding: 10px 0;
+}
+#page-blockchain .wallet-card .wallet-info .info-group {
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+#page-blockchain .wallet-card .wallet-info .info-group label {
+  font-weight: 600;
+  margin-right: 10px;
+  color: #555;
+  min-width: 200px;
+  display: inline-block;
+}
+#page-blockchain .wallet-card .wallet-info .info-group span {
+  font-family: monospace;
+  font-size: 16px;
+  color: #333;
+  word-break: break-all;
+}
+#page-blockchain .wallet-card .wallet-info .info-group .text-muted {
+  color: #999;
+  font-style: italic;
+  font-family: inherit;
+}
+
 .component-upload {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
   border-radius: 15px;
@@ -20872,7 +20937,7 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   content: "3x";
 }
 .component-editor #editor {
-  height: 85%;
+  height: 83%;
   margin-bottom: 10px;
 }
 .component-editor .html-editor {

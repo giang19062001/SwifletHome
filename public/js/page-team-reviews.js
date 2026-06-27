@@ -97,7 +97,7 @@ function renderAllTeamReview(data, objElement) {
               </div>
             </td>
             <td>
-               <button class="btn-info"  onclick="getDetailTeamReview('${ele.seq}')">Ảnh đính kèm</button> 
+               <button class="btn-main"  onclick="getDetailTeamReview('${ele.seq}')">Ảnh đính kèm</button> 
             </td>
          </tr>`;
       HTML += rowHtml;

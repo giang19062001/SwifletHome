@@ -100,7 +100,8 @@ async function openModal(type, packageData) {
   modal.show();
 
   //  enable lại nút submit
-  submitBtn.disabled = false;
+  // submitBtn.disabled = false;
+  submitBtn.disabled = true;
   submitBtn.innerHTML = type === 'create' ? 'Thêm' : 'Lưu thông tin';
 
   // thêm validate

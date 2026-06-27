@@ -123,7 +123,7 @@ async function createAnswer() {
   }
 
   // disable button
-  const submitBtn = document.querySelector('.btn-submit');
+  const submitBtn = document.querySelector('#createAnswerBtn');
   submitBtn.disabled = true;
 
   try {
@@ -168,7 +168,7 @@ async function updateAnswer() {
   }
 
   // disable button
-  const submitBtn = document.querySelector('.btn-submit');
+  const submitBtn = document.querySelector('#updateAnswerBtn');
   submitBtn.disabled = true;
 
   try {

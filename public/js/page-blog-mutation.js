@@ -147,7 +147,7 @@ async function createBlog() {
     return;
   }
   // disable button
-  const submitBtn = document.querySelector('.btn-submit');
+  const submitBtn = document.querySelector('#createBlogBtn');
   submitBtn.disabled = true;
 
   try {
@@ -195,7 +195,7 @@ async function updateBlog() {
     return;
   }
   // disable button
-  const submitBtn = document.querySelector('.btn-submit');
+  const submitBtn = document.querySelector('#updateBlogBtn');
   submitBtn.disabled = true;
 
   try {

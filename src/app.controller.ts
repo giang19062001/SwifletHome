@@ -89,6 +89,18 @@ export class AppController {
       user: req.session.user,
     };
   }
+
+  // config/blockchain
+  @Get('/dashboard/config/blockchain')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/blockchain')
+  renderBlockchain(@Req() req: Request) {
+    return {
+      title: 'Thông tin Blockchain',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
   // q-and-a/question
   @Get('/dashboard/q-and-a/question')
   @UseGuards(PageAuthAdminGuard)

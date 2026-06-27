@@ -150,9 +150,9 @@ function initializeForm() {
       }
 
       if (pageType === 'update') {
-        await submitSaleHome(formData, `/api/admin/saleHome/update/${formData.homeCode}`, 'put', 'Chỉnh sửa thành công');
+        await submitSaleHome(formData, `/api/admin/saleHome/update/${formData.homeCode}`, 'put', '#updateSaleHomeBtn', 'Chỉnh sửa thành công');
       } else if (pageType === 'create') {
-        await submitSaleHome(formData, '/api/admin/saleHome/create', 'post', 'Thêm thành công');
+        await submitSaleHome(formData, '/api/admin/saleHome/create', 'post', '#createSaleHomeBtn', 'Thêm thành công');
       }
     });
   }
@@ -319,8 +319,8 @@ function renderImagePreview(item, index, input, preview, field) {
   }
 }
 
-async function submitSaleHome(formData, url, method, successMessage) {
-  const submitBtn = document.querySelector('.btn-submit-lg');
+async function submitSaleHome(formData, url, method, idSubmitBtn, successMessage) {
+  const submitBtn = document.querySelector(idSubmitBtn);
   submitBtn.disabled = true;
 
   try {

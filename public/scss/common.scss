@@ -45,6 +45,16 @@
     background-color: gray
   }
 }
+.btn-main {
+  @extend #btn;
+  min-width: 125px;
+  background-color: $main-color;
+  border-color: $main-color;
+  color: #ffffff;
+  &:hover {
+    background-color: $main-color-hover;
+  }
+}
 
 .btn-submit {
   @extend #btn;
@@ -56,6 +66,7 @@
     background-color: $btn-main-color-hover;
   }
 }
+
 .btn-submit-lg {
   @extend #btn;
   font-size: medium;
@@ -241,6 +252,9 @@
   }
 }
 
+.txt-main {
+  color: $main-color;
+}
 .txt-status-waiting,
 .txt-status-delivering {
   @extend .badge;
@@ -326,3 +340,9 @@ img, video {
   border-bottom: none !important;
 }
 
+
+// checkbox
+.form-check-input:checked {
+    background-color:$main-color !important;
+    border-color: $main-color !important;
+}

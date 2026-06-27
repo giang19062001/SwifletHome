@@ -1,0 +1,40 @@
+<div class="row" id="page-blockchain">
+    <div class="col-xl-12">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="title-page m-0"><%= typeof title !== 'undefined' ? title : 'Blockchain Wallet' %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card wallet-card">
+                    <div class="card-body">
+                        <h3 class="mb-4 wallet-title">Thông tin Ví</h3>
+                        <div class="wallet-info">
+                            <div class="info-group">
+                                <label>Ví ID:</label>
+                                <span id="wallet-id" class="text-muted">Chưa kết nối ví</span>
+                            </div>
+                            <div class="info-group">
+                                <label>Số Coin Polygon:</label>
+                                <span id="coin-balance" class="text-muted">0</span>
+                            </div>
+                            <div class="d-flex gap-2 mt-3">
+                                <button id="btn-connect-wallet" class="btn-main">Kết nối Ví</button>
+                                <a class="btn btn-primary btn-deposit" href="https://faucet.polygon.technology/" target="_blank">Nạp Coin</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/lib/web3.min.js"></script>
+<script src="/js/page-blockchain.js"></script>

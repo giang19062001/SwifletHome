@@ -15,7 +15,11 @@ export class AdsAppController {
   constructor(private readonly adsAppService: AdsAppService) {}
 
   @Post('getBanner')
-  @ApiOperation({ summary: 'Lấy danh sách banner quảng cáo theo màn hình' })
+  @ApiOperation({ summary: 'Lấy danh sách banner quảng cáo theo màn hình', description: `
+  **REMINDER_SCREEN**: màn hình 'lịch nhắc việc'\n
+  **NOTIFICATION_SCREEN**: màn hình 'thông báo'\n
+  **ACCOUNT_SCREEN**: màn hình 'thông tin tài khoản'\n
+  `})
   @ApiOkResponse({ type: [AdsBannerResDto] })
   @HttpCode(HttpStatus.OK)
   async getBanners(@Body() dto: GetAdsBannerDto) {

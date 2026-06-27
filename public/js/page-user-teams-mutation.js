@@ -713,17 +713,17 @@ function renderImagePreview(item, index, input, preview, field) {
 }
 
 async function createTeam(formData) {
-  await submitTeam(formData, '/api/admin/team/create', 'post', 'Thêm thành công');
+  await submitTeam(formData, '/api/admin/team/create', 'post', '#createTeamBtn', 'Thêm thành công');
 }
 
 async function updateTeam(formData) {
-  await submitTeam(formData, `/api/admin/team/update/${formData.teamCode}`, 'put', 'Chỉnh sửa thành công');
+  await submitTeam(formData, `/api/admin/team/update/${formData.teamCode}`, 'put', '#updateTeamBtn', 'Chỉnh sửa thành công');
 }
 
 /**
  * Xử lý gửi dữ liệu Form lên server (Create/Update)
  */
-async function submitTeam(formData, url, method, successMessage) {
+async function submitTeam(formData, url, method, idSubmitBtn, successMessage) {
   const postData = new FormData();
   const fields = ['teamName', 'teamUserName', 'teamAddress', 'teamPhone', 'provinceCodes', 'userTypeCode', 'userCode', 'teamDescription', 'teamDescriptionSpecial', 'isSeleted'];
   postData.append('uniqueId', teamUniqueId);
@@ -776,7 +776,7 @@ async function submitTeam(formData, url, method, successMessage) {
 
   postData.append('servicesData', JSON.stringify(servicesData));
 
-  const submitBtn = document.querySelector('.btn-submit-lg');
+  const submitBtn = document.querySelector(idSubmitBtn);
   submitBtn.disabled = true;
 
   try {

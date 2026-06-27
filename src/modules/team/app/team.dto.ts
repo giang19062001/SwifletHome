@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
+import { MsgDto } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { IUserTeamTypeEnum } from '../../user/app/user.interface';
-import { MsgDto } from 'src/helpers/message.helper';
 
 export class GetAllTeamDto extends PagingDto {
   @ApiProperty({
@@ -41,7 +41,7 @@ export class GetReviewListOfTeamDto extends PagingDto {
 
 export class UploadReviewFilesDto {
   @ApiProperty({
-    example: 'uuid chính lấy từ getInitFormCreateTeam',
+    example: '',
     format: 'uuid',
     description: 'Luôn được generate phía app (uuid)',
   })
@@ -95,7 +95,7 @@ export class ReviewTeamDto {
   teamCode: string;
 
   @ApiProperty({
-    example: 'uuid chính lấy từ getInitFormCreateTeam',
+    example: '',
     format: 'uuid',
   })
   @IsUUID()
@@ -163,14 +163,14 @@ export class CreateTeamAppDto {
   @IsOptional()
   servicesData: any;
 
-  @ApiProperty({ example: 'uuid chính lấy từ getInitFormCreateTeam', format: 'uuid' })
+  @ApiProperty({ example: '', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
 }
 
 export class UploadTeamMainImageAppDto {
-  @ApiProperty({ example: 'uuid chính lấy từ getInitFormCreateTeam', format: 'uuid' })
+  @ApiProperty({ example: '', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
@@ -180,7 +180,7 @@ export class UploadTeamMainImageAppDto {
 }
 
 export class UploadTeamFilesAppDto {
-  @ApiProperty({ example: 'uuid chính lấy từ getInitFormCreateTeam', format: 'uuid' })
+  @ApiProperty({ example: '', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
