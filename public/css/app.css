@@ -18815,18 +18815,18 @@ select {
   color: #71ab33;
 }
 
-img:not(.no-premium-style):not([id^=icon-]), video:not(.no-premium-style):not([id^=icon-]) {
+img:not(.normal):not([id^=icon-]), video:not(.normal):not([id^=icon-]) {
   object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 2px solid #fff;
   transition: transform 0.2s;
 }
-img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):not([id^=icon-]):hover {
+img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hover {
   transform: translateY(-2px);
 }
 
-.link-premium {
+.link-redirect {
   color: #0175ff;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -18835,15 +18835,15 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   font-size: 15px;
   font-weight: 500;
 }
-.link-premium i {
+.link-redirect i {
   font-size: 13px;
   margin-right: 4px;
   transition: transform 0.3s ease;
 }
-.link-premium:hover {
+.link-redirect:hover {
   color: #0760ce;
 }
-.link-premium:hover i {
+.link-redirect:hover i {
   transform: scale(1.15) translateX(2px);
 }
 
@@ -20747,6 +20747,21 @@ img:not(.no-premium-style):not([id^=icon-]):hover, video:not(.no-premium-style):
   color: #999;
   font-style: italic;
   font-family: inherit;
+}
+
+#page-ads .banner-list-img {
+  height: 100px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.ads-modal .banner-preview {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  object-fit: contain;
+  margin-top: 10px;
 }
 
 .component-upload {

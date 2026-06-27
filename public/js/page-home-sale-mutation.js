@@ -280,7 +280,7 @@ async function assignForm(data) {
 function renderImagePreview(item, index, input, preview, field) {
   const isVideo = (item.url && /\.(mp4|mov|avi)$/i.test(item.url)) || (item.mimetype && item.mimetype.startsWith('video/'));
 
-  const mediaTag = isVideo ? `<video src="" controls class="no-premium-style"></video>` : `<img src="" alt="Preview ${index + 1}" class="no-premium-style">`;
+  const mediaTag = isVideo ? `<video src="" controls class="normal"></video>` : `<img src="" alt="Preview ${index + 1}" class="normal">`;
 
   const previewHtml = `
     <div class="image-preview" data-index="${index}">

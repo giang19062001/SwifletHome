@@ -66,6 +66,7 @@ import { UserAdminModule } from './modules/user/admin/user.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { ShareAppModule } from './modules/share/app/share.module';
+import { AdsAdminModule } from './modules/ads/admin/ads.module';
 
 @Module({
   imports: [
@@ -159,6 +160,7 @@ import { ShareAppModule } from './modules/share/app/share.module';
     ConsignmentAdminModule,
     GuestAdminModule,
     ReportAdminModule,
+    AdsAdminModule,
   ],
   controllers: [AppController],
   providers: [

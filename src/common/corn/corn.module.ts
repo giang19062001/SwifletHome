@@ -7,11 +7,12 @@ import { TodoAppModule } from 'src/modules/todo/app/todo.module';
 import { UserAppModule } from 'src/modules/user/app/user.module';
 import { UserHomeAppModule } from 'src/modules/userHome/app/userHome.module';
 import { SaleHomeAppModule } from 'src/modules/saleHome/app/saleHome.module';
+import { AdsAdminModule } from 'src/modules/ads/admin/ads.module';
 import { FileLocalModule } from '../fileLocal/fileLocal.module';
 import { CornService } from './corn.service';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), UserAppModule, FileLocalModule, DoctorAppModule, TodoAppModule, UserHomeAppModule, QrAppModule, TeamAppModule, SaleHomeAppModule],
+  imports: [ScheduleModule.forRoot(), UserAppModule, FileLocalModule, DoctorAppModule, TodoAppModule, UserHomeAppModule, QrAppModule, TeamAppModule, SaleHomeAppModule, AdsAdminModule],
   controllers: [],
   providers: [CornService],
   exports: [],

@@ -1,0 +1,148 @@
+<div class="common-table-container row" id="page-ads">
+    <div class="col-xl-12">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <p class="title-page"><%= title %></p>
+                            <button class="btn-add">Thêm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="container-table">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr class="text-center">
+                                    <th>STT</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Màn hình</th>
+                                    <th class="d-none">Vị trí</th>
+                                    <th class="d-none">Thứ tự</th>
+                                    <th>Thời gian</th>
+                                    <th>Hành động</th>
+                                    <th>Ngày tạo</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table"></tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination" id="privacy-main-pager"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal common-modal ads-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-header-title">Quản lý quảng cáo</p>
+                <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                        <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow-y:hidden">
+                <form>
+                    <input type="hidden" id="seq" value="">
+                    <input type="hidden" id="uuid" value="">
+                    
+                    <div class="form-group mb-3">
+                        <label class="form-label d-block">Hình ảnh Banner <span class="text-danger">*</span></label>
+                        <div class="d-flex flex-column align-items-start gap-3 mt-2">
+                            <img id="bannerPreview" class="banner-preview" src="" alt="" style="display: none;">
+                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('bannerUrlInput').click()">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="me-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                </svg>
+                                Tải ảnh lên
+                            </button>
+                            <input type="file" id="bannerUrlInput" accept=".png,.jpg,.jpeg" style="display: none;">
+                            <input type="hidden" id="bannerUrl">
+                        </div>
+                        <div class="err-bannerUrl text-danger mt-1" style="display: none;">Vui lòng chọn hình ảnh banner.</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" placeholder="Tiêu đề quảng cáo">
+                            <div class="err-title text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Màn hình đích <span class="text-danger">*</span></label>
+                            <select class="form-select" id="targetScreen">
+                                <option value="">Chọn màn hình đích</option>
+                                <option value="REMINDER_SCREEN">Lịch nhắc việc</option>
+                                <option value="NOTIFICATION_SCREEN">Thông báo</option>
+                                <option value="ACCOUNT_SCREEN">Thông tin tài khoản</option>
+                                <option value="QR_SCREEN">Danh sách mã QR code</option>
+                                <option value="CONSIGNMENT_SCREEN">Gửi yến đi nước ngoài</option>
+                                <option value="REQUEST_DOCTOR">Tăng đàn nhà yến</option>
+                            </select>
+                            <div class="err-targetScreen text-danger mt-1" style="display: none;">Vui lòng chọn màn hình đích.</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 d-none">
+                        <div class="col-md-6">
+                            <label class="form-label">Thứ tự hiển thị</label>
+                            <input type="number" class="form-control" id="displayOrder" value="0" min="0">
+                            <div class="err-displayOrder text-danger mt-1" style="display: none;">Thứ tự hiển thị không được âm.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Vị trí</label>
+                            <input type="text" class="form-control" id="position" placeholder="Vị trí hiển thị">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Thời gian bắt đầu <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="startTime">
+                            <div class="err-startTime text-danger mt-1" style="display: none;">Vui lòng chọn thời gian bắt đầu.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Thời gian kết thúc <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="endTime">
+                            <div class="err-endTime text-danger mt-1" style="display: none;">Vui lòng chọn thời gian kết thúc.</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Loại hành động</label>
+                            <select class="form-select" id="actionType">
+                                <option value="LINK">Chuyển hướng</option>
+                                <option value="FUNCTION">Chức năng</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Giá trị hành động <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="actionValue" placeholder="URL hoặc tên Function">
+                            <div class="err-actionValue text-danger mt-1" style="display: none;">Vui lòng nhập giá trị hành động.</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-main"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/page-ads.js"></script>

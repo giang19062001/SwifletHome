@@ -3,6 +3,7 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import moment from 'moment';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
+import { AdsAdminService } from 'src/modules/ads/admin/ads.service';
 import { DoctorAppService } from 'src/modules/doctor/app/doctor.service';
 import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { QrRequestAppService } from 'src/modules/qr/app/qr-request.service';
@@ -27,6 +28,7 @@ export class CornService implements OnModuleInit {
     private readonly saleHomeAppService: SaleHomeAppService,
     private readonly todoAlarmAppService: TodoAlarmAppService,
     private readonly qrRequestAppService: QrRequestAppService,
+    private readonly adsAdminService: AdsAdminService,
     private readonly fileLocalService: FileLocalService,
     private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
@@ -42,6 +44,7 @@ export class CornService implements OnModuleInit {
       await this.deleteReviewFilesNotUse();
       await this.deleteTeamFilesNotUse();
       await this.deleteSaleHomeFilesNotUse();
+      await this.deleteAdsFilesNotUse();
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();
@@ -68,6 +71,7 @@ export class CornService implements OnModuleInit {
     this.schedulerRegistry.addCronJob('dailyMorningTask', jobDailyAt8AM);
     jobDailyAt8AM.start();
     // ! test
+    // await this.deleteAdsFilesNotUse();
     // await this.deleteQrRequestFilesNotUse()
     //  await this.deleteDoctorFilesNotUse();
     // await this.deleteUserHomeFilesNotUse();
@@ -244,4 +248,24 @@ export class CornService implements OnModuleInit {
       this.logger.error(logbase, `Có lỗi khi xóa các file đội gia công - đội kỹ thuật không dùng theo lịch trình : ${JSON.stringify(error)}`);
     }
   }
+
+  async deleteAdsFilesNotUse() {
+    const logbase = `${this.SERVICE_NAME}/deleteAdsFilesNotUse`;
+    this.logger.log(logbase, `Chuẩn bị xóa các file ads banner không dùng theo lịch trình....`);
+    try {
+      const filesNotUse = await this.adsAdminService.getFilesNotUse();
+      if (filesNotUse.length) {
+        for (const file of filesNotUse) {
+          await this.adsAdminService.deleteFile(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file ads banner không dùng đã được xóa theo lịch trình thành công`);
+      } else {
+        this.logger.log(logbase, `Không có file ads banner nào cần được xóa`);
+      }
+    } catch (error) {
+      this.logger.error(logbase, `Có lỗi khi xóa file ads banner không dùng theo lịch trình: ${JSON.stringify(error)}`);
+    }
+  }
 }
+

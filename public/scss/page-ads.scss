@@ -1,0 +1,18 @@
+#page-ads {
+  .banner-list-img {
+    height: 100px;
+    border-radius: 6px;
+    object-fit: contain;
+  }
+}
+
+.ads-modal {
+  .banner-preview {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    object-fit: contain;
+    margin-top: 10px;
+  }
+}

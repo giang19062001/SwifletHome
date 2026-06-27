@@ -284,7 +284,7 @@
 
 // Style chung cho ảnh và video
 img, video {
-  &:not(.no-premium-style):not([id^="icon-"]) {
+  &:not(.normal):not([id^="icon-"]) {
       object-fit: cover;
       border-radius: 8px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -298,7 +298,7 @@ img, video {
 }
 
 // dùng cho  link điều hướng
-.link-premium {
+.link-redirect {
   color: $btn-main-color;
   text-decoration: none;
   transition: all 0.3s ease;

@@ -60,4 +60,16 @@ const VARIABLE_ENUM = {
     REFUSE: { TEXT: 'Từ chối duyệt', VALUE: 'REFUSE' },
     WAITING: { TEXT: 'Đang chờ duyệt', VALUE: 'WAITING' },
   },
+  ADS_TARGET_SCREEN: {
+    REMINDER_SCREEN: 'Lịch nhắc việc',
+    NOTIFICATION_SCREEN: 'Thông báo',
+    ACCOUNT_SCREEN: 'Thông tin tài khoản',
+    QR_SCREEN: 'Danh sách mã QR code',
+    CONSIGNMENT_SCREEN: 'Gửi yến đi nước ngoài',
+    REQUEST_DOCTOR: 'Tăng đàn nhà yến',
+  },
+  ADS_ACTION_TYPE: {
+    LINK: 'Chuyển hướng',
+    FUNCTION: 'Chức năng',
+  }
 };

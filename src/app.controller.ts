@@ -499,6 +499,18 @@ export class AppController {
       values: values,
     };
   }
+  // ads
+  @Get('/dashboard/ads')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/ads')
+  renderAds(@Req() req: Request) {
+    return {
+      title: 'Danh sách Quảng cáo',
+      isLayout: true,
+      user: req.session.user,
+    };
+  }
+
   // 404
   @Get('/404')
   @Render('pages/404')
