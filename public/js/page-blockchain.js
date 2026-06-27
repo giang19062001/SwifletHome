@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const walletIdEl = document.getElementById("wallet-id");
     const coinBalanceEl = document.getElementById("coin-balance");
 
-    // Check if Web3 is injected (e.g., MetaMask)
+    // Check if Web3 is injected (MetaMask)
     if (typeof window.ethereum !== 'undefined') {
         const web3 = new Web3(window.ethereum);
 
