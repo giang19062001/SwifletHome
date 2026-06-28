@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { IScreenStrategy } from './screen.interface';
 import { ScreenAppRepository } from './screen.repository';
+import { GetContentScreenResDto } from './screen.response';
 
 @Injectable()
 export class ScreenAppService {
@@ -13,7 +14,7 @@ export class ScreenAppService {
     @Inject('SCREEN_STRATEGIES') private readonly strategies: IScreenStrategy[],
   ) {}
 
-  async getContent(keyword: string): Promise<any> {
+  async getContent(keyword: string): Promise<GetContentScreenResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getContent:`;
 
     const screen = await this.screenAppRepository.getDetail(keyword);

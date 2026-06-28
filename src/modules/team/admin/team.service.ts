@@ -20,6 +20,8 @@ import {
   UploadTeamMainImageDto,
 } from './team.dto';
 import { TeamAdminRepository } from './team.repository';
+import { TeamFileTypeResDto, TeamServiceTypeResDto } from '../team.response';
+import { GetDetailTeamResDto } from '../app/team.response';
 
 @Injectable()
 export class TeamAdminService {
@@ -35,15 +37,15 @@ export class TeamAdminService {
     const list = await this.teamAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getTeamFileTypes(): Promise<any[]> {
+  async getTeamFileTypes(): Promise<TeamFileTypeResDto[]> {
     return await this.teamAdminRepository.getTeamFileTypes();
   }
 
-  async getTeamServiceTypes(userTypeCode?: string): Promise<any[]> {
+  async getTeamServiceTypes(userTypeCode?: string): Promise<TeamServiceTypeResDto[]> {
     return await this.teamAdminRepository.getTeamServiceTypes(userTypeCode);
   }
 
-  async getDetail(teamCode: string): Promise<any | null> {
+  async getDetail(teamCode: string): Promise<GetDetailTeamResDto | null> {
     const result: any = await this.teamAdminRepository.getDetail(teamCode);
     if (result) {
       const teamFiles = await this.teamAdminRepository.getImages(result ? result?.seq : 0);
@@ -63,10 +65,10 @@ export class TeamAdminService {
       for (const img of teamFilesExceptMain) {
         let typeGroup = structuredTeamFiles.find((g) => g.fileTypeCode === img.fileTypeCode);
         if (!typeGroup) {
-          const typeInfo = allFileTypes.find((t) => t.fileTypeCode === img.fileTypeCode) || {};
+          const typeInfo = allFileTypes.find((t) => t.fileTypeCode === img.fileTypeCode);
           typeGroup = {
             fileTypeCode: img.fileTypeCode,
-            fileTypeText: typeInfo.fileTypeText || '',
+            fileTypeText: typeInfo?.fileTypeText || '',
             images: [],
           };
           structuredTeamFiles.push(typeGroup);
@@ -78,11 +80,15 @@ export class TeamAdminService {
 
       // get services
       const services = await this.teamAdminRepository.getTeamServices(result.seq);
+      const servicesWithImages: any[] = [];
       for (const svc of services) {
         const svcImages = await this.teamAdminRepository.getTeamServiceFiles(svc.seq);
-        svc.images = svcImages;
+        servicesWithImages.push({
+          ...svc,
+          images: svcImages,
+        });
       }
-      result.services = services;
+      result.services = servicesWithImages;
 
       return result;
     } else {

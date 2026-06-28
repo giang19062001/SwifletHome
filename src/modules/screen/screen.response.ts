@@ -90,3 +90,14 @@ export class ScreenSignupServiceResDto {
   @ApiProperty({ example: '' })
   contentCenter: { packages: string[]; bankInfo: InfoBankResDto | null };
 }
+
+export class ScreenVideoResDto {
+  seq: number;
+  name: string;
+  address: string;
+  videoTitle: string;
+  videoUrl: string;
+  sortOrder: number;
+  isActive: string;
+  createdAt: Date;
+}

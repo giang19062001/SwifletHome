@@ -47,7 +47,18 @@ export class AdsAdminRepository {
       INSERT INTO ${this.table} (title, position, displayOrder, startTime, endTime, targetScreen, actionType, actionValue, createdId, uniqueId) 
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.title, dto.position, dto.displayOrder || 0, new Date(dto.startTime), new Date(dto.endTime), dto.targetScreen, dto.actionType || 'LINK', dto.actionValue, createdId, dto.uuid]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      dto.title,
+      dto.position,
+      dto.displayOrder || 0,
+      new Date(dto.startTime),
+      new Date(dto.endTime),
+      dto.targetScreen,
+      dto.actionType || 'LINK',
+      dto.actionValue,
+      createdId,
+      dto.uuid,
+    ]);
 
     return result.insertId;
   }
@@ -56,7 +67,19 @@ export class AdsAdminRepository {
       UPDATE ${this.table} SET title = ?, position = ?, displayOrder = ?, startTime = ?, endTime = ?, targetScreen = ?, actionType = ?, actionValue = ?, uniqueId = ?, updatedId = ?, updatedAt = NOW()
       WHERE seq = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [dto.title, dto.position, dto.displayOrder || 0, new Date(dto.startTime), new Date(dto.endTime), dto.targetScreen, dto.actionType || 'LINK', dto.actionValue, dto.uuid, updatedId, seq]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      dto.title,
+      dto.position,
+      dto.displayOrder || 0,
+      new Date(dto.startTime),
+      new Date(dto.endTime),
+      dto.targetScreen,
+      dto.actionType || 'LINK',
+      dto.actionValue,
+      dto.uuid,
+      updatedId,
+      seq,
+    ]);
 
     return result.affectedRows;
   }
@@ -105,7 +128,7 @@ export class AdsAdminRepository {
   async getFilesNotUse(): Promise<AdsFileNotUseResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.adsSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A
-        WHERE A.adsSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL) OR A.isActive = 'N' `
+        WHERE A.adsSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL) OR A.isActive = 'N' `,
     );
     return rows as AdsFileNotUseResDto[];
   }

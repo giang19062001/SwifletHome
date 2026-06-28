@@ -4,7 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { QR_CODE_CONST, RequestStatusEnum } from '../qr.interface';
-import { GetApprovedRequestQrCodeResDto, GetRequestQrCodeDetailResDto, GetRequestQrCodeListResDto, QrRequestFileResDto, RequestQrCodeResDto } from './qr.response';
+import { GetApprovedRequestQrCodeResDto, GetRequestQrCodeDetailResDto, GetRequestQrCodeListResDto, QrRequestFileResDto, RequestQrCodeResDto, ValidateHarvestItemResDto } from './qr.response';
 
 @Injectable()
 export class QrRequestAppRepository {
@@ -341,7 +341,7 @@ export class QrRequestAppRepository {
     return result.affectedRows;
   }
 
-  async validateHarvestBeforeRequestQr(userCode: string): Promise<any[]> {
+  async validateHarvestBeforeRequestQr(userCode: string): Promise<ValidateHarvestItemResDto[]> {
     const query = `
       SELECT 
         H.userHomeCode, 
@@ -367,6 +367,6 @@ export class QrRequestAppRepository {
     `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
-    return rows;
+    return rows as unknown as ValidateHarvestItemResDto[];
   }
 }

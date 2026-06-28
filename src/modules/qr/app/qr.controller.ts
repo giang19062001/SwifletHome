@@ -120,7 +120,7 @@ export default class QrAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(ValidateHarvestItemResDto)) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async validateHarvestBeforeRequestQr(@GetUserApp() user: TokenUserAppResDto) {
+  async validateHarvestBeforeRequestQr(@GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: ValidateHarvestItemResDto[] }> {
     const result = await this.qrRequestAppService.validateHarvestBeforeRequestQr(user.userCode);
     return result;
   }

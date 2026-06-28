@@ -3,6 +3,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { MsgDto } from 'src/helpers/message.helper';
 import { TaskStatusEnum } from '../todo.interface';
 import { SetTaskAlarmDto } from './todo.dto';
+import { HandleAlarmDataResDto } from '../todo.response';
 
 @Injectable()
 export default class TodoAppValidate {
@@ -40,10 +41,10 @@ export default class TodoAppValidate {
     return error;
   }
 
-  async handleAlarmData(dto: SetTaskAlarmDto): Promise<any> {
+  async handleAlarmData(dto: SetTaskAlarmDto): Promise<HandleAlarmDataResDto> {
     const logbase = `${this.SERVICE_NAME}/handleAlarmData:`;
 
-    const alramDto: any = {
+    const alramDto: HandleAlarmDataResDto = {
       userHomeCode: dto.userHomeCode,
       taskCode: null,
       taskName: '',

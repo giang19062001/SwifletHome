@@ -84,10 +84,10 @@ export class TeamUserAppService {
 
       let typeGroup = structuredTeamFiles.find((g) => g.fileTypeCode === img.fileTypeCode);
       if (!typeGroup) {
-        const typeInfo = allFileTypes.find((t) => t.fileTypeCode === img.fileTypeCode) || {};
+        const typeInfo = allFileTypes.find((t) => t.fileTypeCode === img.fileTypeCode);
         typeGroup = {
           fileTypeCode: img.fileTypeCode,
-          fileTypeText: typeInfo.fileTypeText || '',
+          fileTypeText: typeInfo?.fileTypeText || '',
           images: [],
         };
         structuredTeamFiles.push(typeGroup);

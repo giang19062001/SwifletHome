@@ -3,6 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
+import { TeamFileTypeResDto, TeamImgBaseResDto, TeamServiceBaseResDto, TeamServiceFileBaseResDto, TeamServiceTypeResDto } from '../team.response';
 import { TeamStatusEnum, YnEnum } from './../../../interfaces/admin.interface';
 import { CreateTeamDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto } from './team.dto';
 
@@ -142,12 +143,12 @@ export class TeamAdminRepository {
 
     return result.affectedRows;
   }
-  async getTeamFileTypes(): Promise<any[]> {
+  async getTeamFileTypes(): Promise<TeamFileTypeResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT * FROM ${this.tableFileType}`);
-    return rows;
+    return rows as unknown as TeamFileTypeResDto[];
   }
 
-  async getTeamServiceTypes(userTypeCode?: string): Promise<any[]> {
+  async getTeamServiceTypes(userTypeCode?: string): Promise<TeamServiceTypeResDto[]> {
     let query = `SELECT seq, userTypeCode, serviceTypeCode, serviceTypeName FROM ${this.tableServiceType} WHERE isActive = 'Y'`;
     const params: any[] = [];
     if (userTypeCode) {
@@ -156,17 +157,17 @@ export class TeamAdminRepository {
     }
     query += ` ORDER BY sortOrder ASC`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows;
+    return rows as unknown as TeamServiceTypeResDto[];
   }
 
-  async getImages(seq: number): Promise<any[]> {
+  async getImages(seq: number): Promise<TeamImgBaseResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.teamSeq, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.fileTypeCode
           FROM ${this.tableImg} A 
           WHERE A.teamSeq = ? `,
       [seq],
     );
-    return rows;
+    return rows as unknown as TeamImgBaseResDto[];
   }
   async createImages(seq: number, createdId: string, filenamePath: string, file: Express.Multer.File | TeamImgResDto, fileTypeCode?: string): Promise<number> {
     const sql = `
@@ -194,9 +195,9 @@ export class TeamAdminRepository {
     return result.affectedRows;
   }
 
-  async getFileTeamBySeq(seq: number): Promise<any | null> {
-    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableImg} WHERE seq = ?`, [seq]);
-    return rows.length > 0 ? rows[0] : null;
+  async getFileTeamBySeq(seq: number): Promise<TeamImgBaseResDto | null> {
+    const [rows] = await this.db.execute<RowDataPacket[]>(`SELECT * FROM ${this.tableImg} WHERE seq = ?`, [seq]);
+    return rows.length > 0 ? (rows[0] as TeamImgBaseResDto) : null;
   }
 
   async updateSeqFilesTeam(teamSeq: number, uniqueId: string, updatedId: string): Promise<number> {
@@ -208,9 +209,9 @@ export class TeamAdminRepository {
     return result.affectedRows;
   }
 
-  async findMainImageByUniqueId(uniqueId: string): Promise<any | null> {
-    const [rows] = await this.db.execute<any[]>(` SELECT * FROM ${this.tableImg} WHERE uniqueId = ? AND fileTypeCode IS NULL AND teamSeq = 0 LIMIT 1 `, [uniqueId]);
-    return rows.length > 0 ? rows[0] : null;
+  async findMainImageByUniqueId(uniqueId: string): Promise<TeamImgBaseResDto | null> {
+    const [rows] = await this.db.execute<RowDataPacket[]>(` SELECT * FROM ${this.tableImg} WHERE uniqueId = ? AND fileTypeCode IS NULL AND teamSeq = 0 LIMIT 1 `, [uniqueId]);
+    return rows.length > 0 ? (rows[0] as TeamImgBaseResDto) : null;
   }
 
   // TODO: SERVICE
@@ -247,9 +248,9 @@ export class TeamAdminRepository {
     return result.affectedRows;
   }
 
-  async getFileServiceBySeq(seq: number): Promise<any | null> {
-    const [rows] = await this.db.execute<any[]>(`SELECT * FROM ${this.tableServiceFile} WHERE seq = ?`, [seq]);
-    return rows.length > 0 ? rows[0] : null;
+  async getFileServiceBySeq(seq: number): Promise<TeamServiceFileBaseResDto | null> {
+    const [rows] = await this.db.execute<RowDataPacket[]>(`SELECT * FROM ${this.tableServiceFile} WHERE seq = ?`, [seq]);
+    return rows.length > 0 ? (rows[0] as TeamServiceFileBaseResDto) : null;
   }
 
   async updateSeqFilesService(seqService: number, uniqueId: string, updatedId: string): Promise<number> {
@@ -261,7 +262,7 @@ export class TeamAdminRepository {
     return result.affectedRows;
   }
 
-  async getTeamServices(seqTeam: number): Promise<any[]> {
+  async getTeamServices(seqTeam: number): Promise<TeamServiceBaseResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `
       SELECT seq, seqTeam, uniqueId, userTypeCode, serviceTypeCode, serviceTextInput
@@ -269,10 +270,10 @@ export class TeamAdminRepository {
     `,
       [seqTeam],
     );
-    return rows;
+    return rows as unknown as TeamServiceBaseResDto[];
   }
 
-  async getTeamServiceFiles(seqService: number): Promise<any[]> {
+  async getTeamServiceFiles(seqService: number): Promise<TeamServiceFileBaseResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `
       SELECT seq, seqService, filename, originalname, size, mimetype, isActive
@@ -280,7 +281,7 @@ export class TeamAdminRepository {
     `,
       [seqService],
     );
-    return rows;
+    return rows as unknown as TeamServiceFileBaseResDto[];
   }
 
   async deleteTeamServicesByTeam(seqTeam: number): Promise<number> {

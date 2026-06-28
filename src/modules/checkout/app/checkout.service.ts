@@ -17,7 +17,7 @@ export class CheckoutAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async checkoutPay(dto: CheckoutPayDto): Promise<any> {
+  async checkoutPay(dto: CheckoutPayDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/checkoutPay`;
 
     // 1. Lưu lại payload gửi lên (Upsert - Nếu trùng ID thì update, không báo lỗi)

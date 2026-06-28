@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { ScreenResDto } from '../screen.response';
+import { ScreenResDto, ScreenVideoResDto } from '../screen.response';
 
 @Injectable()
 export class ScreenAppRepository {
@@ -18,8 +18,8 @@ export class ScreenAppRepository {
     return rows ? (rows[0] as ScreenResDto) : null;
   }
 
-  async getAllVideosByTable(tableVideo: string): Promise<any[]> {
+  async getAllVideosByTable(tableVideo: string): Promise<ScreenVideoResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT name, address, videoTitle, videoUrl FROM ${tableVideo} WHERE isActive = 'Y' ORDER BY sortOrder ASC, createdAt DESC`);
-    return rows;
+    return rows as unknown as ScreenVideoResDto[];
   }
 }

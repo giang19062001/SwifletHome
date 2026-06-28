@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ScreenResDto } from '../screen.response';
+import { ScreenResDto, ScreenVideoResDto } from '../screen.response';
 import { UpdateScreenDto } from './screen.dto';
 
 @Injectable()
@@ -82,11 +82,11 @@ export class ScreenAdminRepository {
   }
 
   // --- Dynamic Video Queries ---
-  async getAllVideos(tableVideo: string): Promise<any[]> {
+  async getAllVideos(tableVideo: string): Promise<ScreenVideoResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT seq, name, address, videoTitle, videoUrl, sortOrder, isActive, createdAt FROM ${tableVideo} WHERE isActive = 'Y' ORDER BY sortOrder ASC, createdAt DESC`,
     );
-    return rows;
+    return rows as unknown as ScreenVideoResDto[];
   }
 
   async createVideo(tableVideo: string, dto: any, createdId: string): Promise<number> {

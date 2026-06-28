@@ -9,7 +9,7 @@ import { getFileLocation, multerImgConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
 import { UploadImgFileDto } from 'src/modules/upload/admin/upload.dto';
 import { UploadAdminService } from 'src/modules/upload/admin/upload.service';
-import { ScreenResDto } from '../screen.response';
+import { ScreenResDto, ScreenVideoResDto } from '../screen.response';
 import { UpdateScreenDto } from './screen.dto';
 import { ScreenAdminService } from './screen.service';
 
@@ -67,7 +67,7 @@ export class ScreenAdminController {
   // xử lí video cho screen dùng kiểu BANNER_VIDEOS_TEXT
   @Get(':screenKeyword/video/getAll')
   @HttpCode(HttpStatus.OK)
-  async getAllVideos(@Param('screenKeyword') screenKeyword: string): Promise<any[]> {
+  async getAllVideos(@Param('screenKeyword') screenKeyword: string): Promise<ScreenVideoResDto[]> {
     return this.screenAdminService.getAllVideos(screenKeyword);
   }
 

@@ -56,3 +56,12 @@ export class TodoTaskAlramResDto {
   @ApiProperty({ example: '' })
   taskNote: string;
 }
+
+export class HandleAlarmDataResDto {
+  userHomeCode: string;
+  taskCode: string | null;
+  taskName: string;
+  taskNote: string;
+  taskDate: Date;
+  taskStatus: TaskStatusEnum;
+}

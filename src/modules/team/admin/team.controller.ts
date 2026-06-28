@@ -7,6 +7,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { GetDetailTeamResDto } from '../app/team.response';
 import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, TeamResDto, TeamReviewResDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
 import { TeamAdminService } from './team.service';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
@@ -33,7 +34,7 @@ export class TeamAdminController {
   @ApiParam({ name: 'teamCode', type: String })
   @Get('getDetail/:teamCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('teamCode') teamCode: string): Promise<TeamResDto | null> {
+  async getDetail(@Param('teamCode') teamCode: string): Promise<GetDetailTeamResDto | null> {
     const result = await this.teamAdminService.getDetail(teamCode);
     if (!result) {
       throw new BadRequestException();

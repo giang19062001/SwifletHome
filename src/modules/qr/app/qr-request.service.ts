@@ -12,7 +12,15 @@ import { TokenUserAppResDto } from '../../auth/app/auth.dto';
 import { RequestStatusEnum } from '../qr.interface';
 import { QrRequestAppRepository } from './qr-request.repository';
 import { RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
-import { GetApprovedRequestQrCodeResDto, GetInfoToRequestQrcodeResDto, GetRequestQrCodeDetailResDto, GetRequestQrCodeListResDto, QrRequestFileStrResDto, TaskHarvestQrResDto } from './qr.response';
+import {
+  GetApprovedRequestQrCodeResDto,
+  GetInfoToRequestQrcodeResDto,
+  GetRequestQrCodeDetailResDto,
+  GetRequestQrCodeListResDto,
+  QrRequestFileStrResDto,
+  TaskHarvestQrResDto,
+  ValidateHarvestItemResDto,
+} from './qr.response';
 
 @Injectable()
 export class QrRequestAppService {
@@ -149,7 +157,7 @@ export class QrRequestAppService {
     } as GetInfoToRequestQrcodeResDto & { seqHarvestPhase?: number };
   }
 
-  async validateHarvestBeforeRequestQr(userCode: string) {
+  async validateHarvestBeforeRequestQr(userCode: string): Promise<{ total: number; list: ValidateHarvestItemResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/validateHarvestBeforeRequestQr:`;
 
     const result = await this.qrRequestAppRepository.validateHarvestBeforeRequestQr(userCode);

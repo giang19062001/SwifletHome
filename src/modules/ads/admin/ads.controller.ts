@@ -23,11 +23,7 @@ export class AdsAdminController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: AdsFileDto })
   @UseInterceptors(FileInterceptor('adsBanner', multerImgConfig))
-  async uploadAdsBanner(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() dto: AdsFileDto,
-    @GetUserAdmin() admin: TokenUserAdminResDto,
-  ): Promise<{ url: string }> {
+  async uploadAdsBanner(@UploadedFile() file: Express.Multer.File, @Body() dto: AdsFileDto, @GetUserAdmin() admin: TokenUserAdminResDto): Promise<{ url: string }> {
     if (!file) throw new BadRequestException(Msg.FileEmpty);
     if (!dto.uuid) throw new BadRequestException('Vui lòng cung cấp uuid');
     const result = await this.adsAdminService.uploadAdsFile(dto.uuid, file, admin.userId);
