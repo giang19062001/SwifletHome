@@ -47,11 +47,9 @@ function renderAllSaleHome(data, objElement) {
             <td class="p-3"><img class="home-img" src="${CURRENT_URL}/${ele.homeImage || ''}"></img></td>
             <td><p>${ele.homeName || ''}</p></td>
             <td><b>${ele.hostName || ''}</b></td>
-            <td><p>${ele.hostRoleName || ''}</p></td>
             <td><p>${ele.homeLocation || ''}</p></td>
             <td><p>${statusBadge}</p></td>
             <td><p>${ele.hostPhone || ''}</p></td>
-            <td><p>${ele.currentNests || ''}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
                ${actionBtn}

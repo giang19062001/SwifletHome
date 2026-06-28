@@ -18,3 +18,11 @@ export class AdsBannerResDto {
   createdId: string;
   updatedId: string;
 }
+
+export class AdsFileNotUseResDto {
+  seq: number;
+  adsSeq: number;
+  uniqueId: string;
+  filename: string;
+  mimetype: string;
+}

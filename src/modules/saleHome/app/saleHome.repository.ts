@@ -6,6 +6,7 @@ import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { SaleHomeFileTypeData, SaleHomeOptionData } from '../saleHome.interface';
 import { CreateSaleHomeAppDto } from './saleHome.dto';
 import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto } from './saleHome.response';
+import { SaleHomeFileItemResDto } from '../saleHome.response';
 import { PagingDto } from 'src/dto/admin.dto';
 
 @Injectable()
@@ -124,10 +125,10 @@ export class SaleHomeAppRepository {
     return result.affectedRows;
   }
 
-  async getFileSaleHomeBySeq(seq: number): Promise<any> {
+  async getFileSaleHomeBySeq(seq: number): Promise<{ filename: string; createdId: string } | null> {
     const sql = `SELECT filename, createdId FROM ${this.tableFile} WHERE seq = ?`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [seq]);
-    return rows[0] || null;
+    return (rows[0] as { filename: string; createdId: string }) || null;
   }
 
   async deleteFileSaleHome(seq: number, createdId: string): Promise<number> {
@@ -136,14 +137,14 @@ export class SaleHomeAppRepository {
     return result.affectedRows;
   }
 
-  async getFilesNotUse(): Promise<any[]> {
+  async getFilesNotUse(): Promise<{ seq: number; filename: string }[]> {
     const sql = `
       SELECT seq, filename 
       FROM ${this.tableFile} 
       WHERE homeSeq = 0 OR uniqueId NOT IN (SELECT uniqueId FROM ${this.table})
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql);
-    return rows;
+    return rows as { seq: number; filename: string }[];
   }
 
   async deleteFileCron(seq: number): Promise<number> {
@@ -203,7 +204,7 @@ export class SaleHomeAppRepository {
       const opt = options.find((o) => o.code === code);
       return opt ? { code, valueOption: opt.valueOption } : { code, valueOption: code };
     };
-    const getOpts = (codes: any[]) => {
+    const getOpts = (codes: string[]) => {
       if (!Array.isArray(codes)) return [];
       return codes.map((c) => getOpt(c)).filter((c) => c !== null);
     };
@@ -248,7 +249,7 @@ export class SaleHomeAppRepository {
         timeNoticeRequired: h.timeNoticeRequired,
         commitments: getOpts(safeParseArray(h.commitments)),
       },
-      files: fileRows,
+      files: fileRows as unknown as SaleHomeFileItemResDto[],
     };
   }
 }

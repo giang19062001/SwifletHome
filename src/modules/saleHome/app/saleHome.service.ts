@@ -76,7 +76,7 @@ export class SaleHomeAppService {
     return await this.saleHomeAppRepository.deleteFileSaleHome(seq, userCode);
   }
 
-  async getFilesNotUse(): Promise<any[]> {
+  async getFilesNotUse(): Promise<{ seq: number; filename: string }[]> {
     return await this.saleHomeAppRepository.getFilesNotUse();
   }
 

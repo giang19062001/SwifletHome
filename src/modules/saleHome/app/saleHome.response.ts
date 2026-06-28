@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { OmitType } from '@nestjs/swagger';
-import { CreateSaleHomeAppDto, HostInfoDto, HomeInfoDto, NestInfoDto, TourInfoDto, PolicyInfoDto } from './saleHome.dto';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { SaleHomeFileItemResDto } from '../saleHome.response';
+import { HomeInfoDto, HostInfoDto, NestInfoDto, PolicyInfoDto, TourInfoDto } from './saleHome.dto';
 
 export class OptionSimpleDto {
   @ApiProperty()
@@ -143,6 +143,6 @@ export class GetDetailSaleHomeResDto {
   @ApiProperty({ type: PolicyInfoDetailDto })
   policyInfo: PolicyInfoDetailDto;
 
-  @ApiProperty({ example: [] })
-  files: any[];
+  @ApiProperty({ type: [SaleHomeFileItemResDto] })
+  files: SaleHomeFileItemResDto[];
 }

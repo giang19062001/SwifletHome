@@ -113,8 +113,8 @@ export class AppService {
     const provinces = await this.provinceService.getAll();
     const usersResult = await this.userAdminService.getAllUser({ type: 'APP' as any, limit: 1000, page: 1, userName: '', userPhone: '' });
     return {
-      uniqueId: uuidv4(),
       ...options,
+      uniqueId: uuidv4(),
       provinces,
       users: usersResult.list,
     };

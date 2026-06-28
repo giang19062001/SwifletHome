@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { AdsBannerResDto } from '../ads.response';
+import { AdsBannerResDto, AdsFileNotUseResDto } from '../ads.response';
 import { CreateAdsBannerDto, UpdateAdsBannerDto } from './ads.dto';
 import { AdsAdminRepository } from './ads.repository';
 import { getFileLocation } from 'src/config/multer.config';
@@ -45,7 +45,7 @@ export class AdsAdminService {
     return { url };
   }
 
-  async getFilesNotUse(): Promise<any[]> {
+  async getFilesNotUse(): Promise<AdsFileNotUseResDto[]> {
     return await this.adsAdminRepository.getFilesNotUse();
   }
 

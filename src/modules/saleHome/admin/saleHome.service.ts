@@ -7,6 +7,8 @@ import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto, UploadFilesAdminDto, UpdateStatusSaleHomeDto } from './saleHome.dto';
 import { SaleHomeAdminRepository } from './saleHome.repository';
+import { GetInitFormMutationResDto } from '../app/saleHome.response';
+import { GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto } from '../saleHome.response';
 
 @Injectable()
 export class SaleHomeAdminService {
@@ -16,7 +18,7 @@ export class SaleHomeAdminService {
     private readonly fileLocalService: FileLocalService,
   ) {}
 
-  async getInitFormOptions(): Promise<any> {
+  async getInitFormOptions(): Promise<Omit<GetInitFormMutationResDto, 'uniqueId'>> {
     const options = await this.saleHomeAdminRepository.getHomeSaleOptions();
     const fileTypes = await this.saleHomeAdminRepository.getHomeSaleFileTypes();
     return {
@@ -51,13 +53,13 @@ export class SaleHomeAdminService {
     return await this.saleHomeAdminRepository.deleteFileSaleHome(seq);
   }
 
-  async getAllSaleHomes(dto: PagingDto): Promise<{ total: number; list: any[] }> {
+  async getAllSaleHomes(dto: PagingDto): Promise<{ total: number; list: GetAllSaleHomeAdminResDto[] }> {
     const total = await this.saleHomeAdminRepository.getTotalSaleHomes(dto);
     const list = await this.saleHomeAdminRepository.getAllSaleHomes(dto);
     return { total, list };
   }
 
-  async getDetailSaleHome(homeCode: string): Promise<any | null> {
+  async getDetailSaleHome(homeCode: string): Promise<GetDetailSaleHomeAdminResDto | null> {
     return await this.saleHomeAdminRepository.getDetailSaleHome(homeCode);
   }
 

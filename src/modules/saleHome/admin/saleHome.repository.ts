@@ -1,11 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode, safeParseArray } from 'src/helpers/func.helper';
-import { PagingDto } from 'src/dto/admin.dto';
-import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto } from './saleHome.dto';
-import { GetDetailSaleHomeResDto } from '../app/saleHome.response';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
+import { SaleHomeOptionData, SaleHomeFileTypeData } from '../saleHome.interface';
+import { GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto, SaleHomeFileItemResDto } from '../saleHome.response';
+import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto } from './saleHome.dto';
 
 @Injectable()
 export class SaleHomeAdminRepository {
@@ -16,7 +17,7 @@ export class SaleHomeAdminRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getHomeSaleOptions(): Promise<any[]> {
+  async getHomeSaleOptions(): Promise<SaleHomeOptionData[]> {
     const mainOption = Object.values(OPTION_CONST.SALE_HOME)[0]?.mainOption;
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT code, subOption, keyOption, valueOption, sortOrder
@@ -24,43 +25,44 @@ export class SaleHomeAdminRepository {
         WHERE mainOption = '${mainOption}' AND isActive = 'Y' 
         ORDER BY subOption, sortOrder ASC`,
     );
-    return rows as any[];
+    return rows as unknown as SaleHomeOptionData[];
   }
 
-  async getHomeSaleFileTypes(): Promise<any[]> {
+  async getHomeSaleFileTypes(): Promise<SaleHomeFileTypeData[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT fileTypeCode, fileTypeText
         FROM ${this.tableFileType}
         ORDER BY seq ASC`,
     );
-    return rows as any[];
+    return rows as unknown as SaleHomeFileTypeData[];
   }
 
   async getTotalSaleHomes(dto: PagingDto): Promise<number> {
-    const sql = `SELECT COUNT(seq) as total FROM ${this.table}`;
+    const sql = ` SELECT COUNT(seq) as total FROM ${this.table} WHERE isActive = 'Y' `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql);
     return rows[0].total;
   }
 
-  async getAllSaleHomes(dto: PagingDto): Promise<any[]> {
+  async getAllSaleHomes(dto: PagingDto): Promise<GetAllSaleHomeAdminResDto[]> {
     const page = dto.page || 1;
     const limit = dto.limit || 10;
     const offset = (page - 1) * limit;
 
     const sql = `
-      SELECT h.homeCode, h.homeName, h.homelocation as homeLocation, h.status, h.userCode, h.hostName, h.hostPhone,
+      SELECT h.homeCode, h.homeName, h.homelocation as homeLocation, h.status, h.userCode, h.hostName, h.hostPhone, h.createdAt,
              (SELECT filename FROM ${this.tableFile} 
               WHERE uniqueId = h.uniqueId AND fileTypeCode = 'FILE_OUTSIDE' 
               ORDER BY seq ASC LIMIT 1) as homeImage
       FROM ${this.table} h
+      WHERE h.isActive = 'Y'
       ORDER BY h.seq DESC
       LIMIT ? OFFSET ?
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [limit, offset]);
-    return rows;
+    return rows as unknown as GetAllSaleHomeAdminResDto[];
   }
 
-  async getDetailSaleHome(homeCode: string): Promise<any> {
+  async getDetailSaleHome(homeCode: string): Promise<GetDetailSaleHomeAdminResDto | null> {
     const sql = `
       SELECT homeCode, status, uniqueId, hostName, hostPhone, socialContact, hostRole,
              homeName, homelocation, homeAddress, homeAge, homeModel,
@@ -85,7 +87,7 @@ export class SaleHomeAdminRepository {
       const opt = options.find((o) => o.code === code);
       return opt ? { code, valueOption: opt.valueOption } : { code, valueOption: code };
     };
-    const getOpts = (codes: any[]) => {
+    const getOpts = (codes: string[]) => {
       if (!Array.isArray(codes)) return [];
       return codes.map((c) => getOpt(c)).filter((c) => c !== null);
     };
@@ -131,7 +133,7 @@ export class SaleHomeAdminRepository {
         timeNoticeRequired: h.timeNoticeRequired,
         commitments: getOpts(safeParseArray(h.commitments)),
       },
-      files: fileRows,
+      files: fileRows as unknown as SaleHomeFileItemResDto[],
     };
   }
 
@@ -281,10 +283,10 @@ export class SaleHomeAdminRepository {
     return result.affectedRows;
   }
 
-  async getFileSaleHomeBySeq(seq: number): Promise<any> {
+  async getFileSaleHomeBySeq(seq: number): Promise<{ filename: string; createdId: string } | null> {
     const sql = `SELECT filename, createdId FROM ${this.tableFile} WHERE seq = ?`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [seq]);
-    return rows[0] || null;
+    return (rows[0] as { filename: string; createdId: string }) || null;
   }
 
   async deleteFileSaleHome(seq: number): Promise<number> {

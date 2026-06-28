@@ -216,8 +216,8 @@ function renderAllAds(data, objElement) {
             <td><p>${screenName}</p></td>
             <td class="d-none"><p>${ele.position || ''}</p></td>
             <td class="d-none"><p>${ele.displayOrder || 0}</p></td>
-            <td><p style="font-size: 13px;">${timeStr}</p></td>
-            <td><p style="font-size: 13px;">${actionStr}</p></td>
+            <td><p>${timeStr}</p></td>
+            <td class="d-none"><p style="font-size: 13px;">${actionStr}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm') : ''}</p></td>
             <td>
                 <button class="btn-edit" onclick="handleDetailAds(${ele.seq})">Chỉnh sửa</button>

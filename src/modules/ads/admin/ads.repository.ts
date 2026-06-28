@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { AdsBannerResDto } from '../ads.response';
+import { AdsBannerResDto, AdsFileNotUseResDto } from '../ads.response';
 import { CreateAdsBannerDto, UpdateAdsBannerDto } from './ads.dto';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class AdsAdminRepository {
         WHERE A.isActive = 'Y'
         ORDER BY A.displayOrder ASC, A.createdAt DESC  `;
 
-    const params: any[] = [];
+    const params: (string | number)[] = [];
     if (dto.limit > 0 && dto.page > 0) {
       query += ` LIMIT ? OFFSET ?`;
       params.push(dto.limit, (dto.page - 1) * dto.limit);
@@ -102,12 +102,12 @@ export class AdsAdminRepository {
     return result.affectedRows;
   }
 
-  async getFilesNotUse(): Promise<any[]> {
+  async getFilesNotUse(): Promise<AdsFileNotUseResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.adsSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A
         WHERE A.adsSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL) OR A.isActive = 'N' `
     );
-    return rows;
+    return rows as AdsFileNotUseResDto[];
   }
 
   async deleteFile(seq: number): Promise<number> {
