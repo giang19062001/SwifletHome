@@ -1,10 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 export class AdsBannerResDto {
   seq: number;
   uniqueId: string;
   title: string;
   bannerUrl: string;
+  bannerType: string;
   position: string;
   displayOrder: number;
   startTime: Date;

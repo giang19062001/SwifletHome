@@ -16,7 +16,7 @@ export class AdsAdminRepository {
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
   async getAll(dto: PagingDto): Promise<AdsBannerResDto[]> {
-    let query = ` SELECT A.seq, A.title, B.filename as bannerUrl, A.uniqueId, A.position, A.displayOrder, A.startTime, A.endTime, A.targetScreen, A.actionType, A.actionValue, A.isActive, A.createdAt, A.createdId
+    let query = ` SELECT A.seq, A.title, B.filename as bannerUrl, A.uniqueId, A.bannerType, A.position, A.displayOrder, A.startTime, A.endTime, A.targetScreen, A.actionType, A.actionValue, A.isActive, A.createdAt, A.createdId
         FROM ${this.table} A
         LEFT JOIN ${this.tableFile} B ON A.seq = B.adsSeq AND B.isActive = 'Y'
         WHERE A.isActive = 'Y'
@@ -33,7 +33,7 @@ export class AdsAdminRepository {
   }
   async getDetail(seq: number): Promise<AdsBannerResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.title, B.filename as bannerUrl, A.uniqueId, A.position, A.displayOrder, A.startTime, A.endTime, A.targetScreen, A.actionType, A.actionValue, A.isActive, A.createdAt, A.createdId
+      ` SELECT A.seq, A.title, B.filename as bannerUrl, A.uniqueId, A.bannerType, A.position, A.displayOrder, A.startTime, A.endTime, A.targetScreen, A.actionType, A.actionValue, A.isActive, A.createdAt, A.createdId
         FROM ${this.table} A
         LEFT JOIN ${this.tableFile} B ON A.seq = B.adsSeq AND B.isActive = 'Y'
         WHERE A.seq = ? AND A.isActive = 'Y'
@@ -44,11 +44,12 @@ export class AdsAdminRepository {
   }
   async create(dto: CreateAdsBannerDto, createdId: string): Promise<number> {
     const sql = `
-      INSERT INTO ${this.table} (title, position, displayOrder, startTime, endTime, targetScreen, actionType, actionValue, createdId, uniqueId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ${this.table} (title, bannerType, position, displayOrder, startTime, endTime, targetScreen, actionType, actionValue, createdId, uniqueId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       dto.title,
+      dto.bannerType || 'LARGE',
       dto.position,
       dto.displayOrder || 0,
       new Date(dto.startTime),
@@ -64,11 +65,12 @@ export class AdsAdminRepository {
   }
   async update(dto: UpdateAdsBannerDto, updatedId: string, seq: number): Promise<number> {
     const sql = `
-      UPDATE ${this.table} SET title = ?, position = ?, displayOrder = ?, startTime = ?, endTime = ?, targetScreen = ?, actionType = ?, actionValue = ?, uniqueId = ?, updatedId = ?, updatedAt = NOW()
+      UPDATE ${this.table} SET title = ?, bannerType = ?, position = ?, displayOrder = ?, startTime = ?, endTime = ?, targetScreen = ?, actionType = ?, actionValue = ?, uniqueId = ?, updatedId = ?, updatedAt = NOW()
       WHERE seq = ?
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       dto.title,
+      dto.bannerType || 'LARGE',
       dto.position,
       dto.displayOrder || 0,
       new Date(dto.startTime),

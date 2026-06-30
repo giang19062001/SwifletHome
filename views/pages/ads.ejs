@@ -21,10 +21,11 @@
                                 <tr class="text-center">
                                     <th>STT</th>
                                     <th>Hình ảnh</th>
+                                    <th>Loại ảnh</th>
                                     <th>Tiêu đề</th>
                                     <th>Màn hình</th>
-                                    <th class="d-none">Vị trí</th>
-                                    <th class="d-none">Thứ tự</th>
+                                    <th>Vị trí</th>
+                                    <th>Thứ tự</th>
                                     <th>Thời gian</th>
                                     <th class="d-none">Hành động</th>
                                     <th>Ngày tạo</th>
@@ -44,7 +45,7 @@
 </div>
 <!-- Modal -->
 <div class="modal common-modal ads-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <p class="modal-header-title">Quản lý quảng cáo</p>
@@ -55,7 +56,7 @@
                     </svg>
                 </button>
             </div>
-            <div class="modal-body" style="overflow-y:hidden">
+            <div class="modal-body">
                 <form>
                     <input type="hidden" id="seq" value="">
                     <input type="hidden" id="uuid" value="">
@@ -77,6 +78,15 @@
                     </div>
 
                     <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Loại ảnh <span class="text-danger">*</span></label>
+                            <select class="form-select" id="bannerType">
+                            </select>
+                            <div class="err-bannerType text-danger mt-1" style="display: none;">Vui lòng chọn loại ảnh.</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Tiêu đề <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="title" placeholder="Tiêu đề quảng cáo">
@@ -85,7 +95,6 @@
                         <div class="col-md-6">
                             <label class="form-label">Màn hình đích <span class="text-danger">*</span></label>
                             <select class="form-select" id="targetScreen">
-                                <option value="">Chọn màn hình đích</option>
                                 <option value="REMINDER_SCREEN">Lịch nhắc việc</option>
                                 <option value="NOTIFICATION_SCREEN">Thông báo</option>
                                 <option value="ACCOUNT_SCREEN">Thông tin tài khoản</option>
@@ -97,7 +106,7 @@
                         </div>
                     </div>
 
-                    <div class="row mb-3 d-none">
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Thứ tự hiển thị</label>
                             <input type="number" class="form-control" id="displayOrder" value="0" min="0">
@@ -105,7 +114,8 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Vị trí</label>
-                            <input type="text" class="form-control" id="position" placeholder="Vị trí hiển thị">
+                            <select class="form-select" id="position">
+                            </select>
                         </div>
                     </div>
 

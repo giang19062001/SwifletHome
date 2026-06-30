@@ -108,6 +108,7 @@ async function handleSaveAds(type, btn) {
   const bannerUrl = modalBody.querySelector('#bannerUrl').value.trim();
   const targetScreen = modalBody.querySelector('#targetScreen').value.trim();
   const position = modalBody.querySelector('#position').value.trim();
+  const bannerType = modalBody.querySelector('#bannerType').value.trim();
   const displayOrder = parseInt(modalBody.querySelector('#displayOrder').value) || 0;
   const startTime = modalBody.querySelector('#startTime').value;
   const endTime = modalBody.querySelector('#endTime').value;
@@ -135,6 +136,13 @@ async function handleSaveAds(type, btn) {
     isValid = false;
   } else {
     modalBody.querySelector('.err-targetScreen').style.display = 'none';
+  }
+
+  if (!bannerType) {
+    modalBody.querySelector('.err-bannerType').style.display = 'block';
+    isValid = false;
+  } else {
+    modalBody.querySelector('.err-bannerType').style.display = 'none';
   }
 
   if (displayOrder < 0) {
@@ -175,6 +183,7 @@ async function handleSaveAds(type, btn) {
   const payload = {
     uuid,
     title,
+    bannerType,
     targetScreen,
     position,
     displayOrder,
@@ -207,15 +216,18 @@ function renderAllAds(data, objElement) {
       const actionStr = `${actionTypeName}: ${ele.actionValue}`;
 
       const screenName = VARIABLE_ENUM.ADS_TARGET_SCREEN[ele.targetScreen] || ele.targetScreen;
+      const positionName = VARIABLE_ENUM.ADS_POSITIONS && VARIABLE_ENUM.ADS_POSITIONS[ele.position] ? VARIABLE_ENUM.ADS_POSITIONS[ele.position] : (ele.position || '');
+      const bannerTypeName = VARIABLE_ENUM.ADS_BANNER_TYPE && VARIABLE_ENUM.ADS_BANNER_TYPE[ele.bannerType] ? VARIABLE_ENUM.ADS_BANNER_TYPE[ele.bannerType] : (ele.bannerType || '');
 
       const rowHtml = `
          <tr class="text-center align-middle">
             <td><p>${(page - 1) * limit + i++}</p></td>
             <td>${bannerImg}</td>
+            <td><p>${bannerTypeName}</p></td>
             <td><p>${ele.title || ''}</p></td>
             <td><p>${screenName}</p></td>
-            <td class="d-none"><p>${ele.position || ''}</p></td>
-            <td class="d-none"><p>${ele.displayOrder || 0}</p></td>
+            <td><p>${positionName}</p></td>
+            <td><p>${ele.displayOrder || 0}</p></td>
             <td><p>${timeStr}</p></td>
             <td class="d-none"><p style="font-size: 13px;">${actionStr}</p></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm') : ''}</p></td>
@@ -245,9 +257,25 @@ function openModal(type, data) {
 
   // render dropdowns from VARIABLE_ENUM
   const targetScreenSelect = modalBody.querySelector('#targetScreen');
-  targetScreenSelect.innerHTML = '<option value="">Chọn màn hình đích</option>';
+  targetScreenSelect.innerHTML = '';
   for (const [key, value] of Object.entries(VARIABLE_ENUM.ADS_TARGET_SCREEN)) {
     targetScreenSelect.innerHTML += `<option value="${key}">${value}</option>`;
+  }
+
+  const positionSelect = modalBody.querySelector('#position');
+  positionSelect.innerHTML = '';
+  if (VARIABLE_ENUM.ADS_POSITIONS) {
+    for (const [key, value] of Object.entries(VARIABLE_ENUM.ADS_POSITIONS)) {
+      positionSelect.innerHTML += `<option value="${key}">${value}</option>`;
+    }
+  }
+
+  const bannerTypeSelect = modalBody.querySelector('#bannerType');
+  bannerTypeSelect.innerHTML = '';
+  if (VARIABLE_ENUM.ADS_BANNER_TYPE) {
+    for (const [key, value] of Object.entries(VARIABLE_ENUM.ADS_BANNER_TYPE)) {
+      bannerTypeSelect.innerHTML += `<option value="${key}">${value}</option>`;
+    }
   }
 
   const actionTypeSelect = modalBody.querySelector('#actionType');
@@ -260,10 +288,11 @@ function openModal(type, data) {
   modalBody.querySelector('#uuid').value = data.uniqueId || generateUUID();
   modalBody.querySelector('#title').value = data.title || '';
   modalBody.querySelector('#bannerUrl').value = data.bannerUrl || '';
-  modalBody.querySelector('#targetScreen').value = data.targetScreen || '';
-  modalBody.querySelector('#position').value = data.position || '';
+  modalBody.querySelector('#targetScreen').value = data.targetScreen || Object.keys(VARIABLE_ENUM.ADS_TARGET_SCREEN)[0];
+  modalBody.querySelector('#position').value = data.position || Object.keys(VARIABLE_ENUM.ADS_POSITIONS)[0];
+  modalBody.querySelector('#bannerType').value = data.bannerType || Object.keys(VARIABLE_ENUM.ADS_BANNER_TYPE)[0];
   modalBody.querySelector('#displayOrder').value = data.displayOrder || 0;
-  modalBody.querySelector('#actionType').value = data.actionType || 'LINK';
+  modalBody.querySelector('#actionType').value = data.actionType || Object.keys(VARIABLE_ENUM.ADS_ACTION_TYPE)[0];
   modalBody.querySelector('#actionValue').value = data.actionValue || '';
 
   if (data.startTime) {
@@ -303,6 +332,9 @@ function openModal(type, data) {
   });
   modalBody.querySelector('#targetScreen')?.addEventListener('change', (e) => {
     modalBody.querySelector('.err-targetScreen').style.display = String(e.target.value).trim() === '' ? 'block' : 'none';
+  });
+  modalBody.querySelector('#bannerType')?.addEventListener('change', (e) => {
+    modalBody.querySelector('.err-bannerType').style.display = String(e.target.value).trim() === '' ? 'block' : 'none';
   });
   modalBody.querySelector('#displayOrder')?.addEventListener('input', (e) => {
     modalBody.querySelector('.err-displayOrder').style.display = parseInt(e.target.value) < 0 ? 'block' : 'none';

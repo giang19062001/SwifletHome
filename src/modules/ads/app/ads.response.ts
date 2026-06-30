@@ -10,6 +10,9 @@ export class AdsBannerResDto {
   @ApiProperty({ example: 'https://example.com/banner.jpg' })
   bannerUrl: string;
 
+  @ApiProperty({ example: 'LARGE' })
+  bannerType: string;
+
   @ApiProperty({ example: 'BOTTOM' })
   position: string;
 

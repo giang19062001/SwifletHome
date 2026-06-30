@@ -12,6 +12,11 @@ export class CreateAdsBannerDto {
   title: string;
 
   @ApiProperty()
+  @IsEnum(['LARGE', 'SMALL'])
+  @IsNotEmpty()
+  bannerType: string;
+
+  @ApiProperty()
   @IsString()
   @IsOptional()
   position?: string;

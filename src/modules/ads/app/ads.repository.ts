@@ -12,7 +12,7 @@ export class AdsAppRepository {
 
   async getBanners(dto: GetAdsBannerDto): Promise<AdsBannerResDto[]> {
     const query = `
-      SELECT A.seq, A.title, B.filename as bannerUrl, A.position, A.displayOrder, A.startTime, A.endTime,
+      SELECT A.seq, A.title, B.filename as bannerUrl, A.bannerType, A.position, A.displayOrder, A.startTime, A.endTime,
        A.targetScreen, A.actionType, A.actionValue
       FROM ${this.tableAdsBanner} A
       LEFT JOIN ${this.tableFile} B ON A.seq = B.adsSeq AND B.isActive = 'Y'

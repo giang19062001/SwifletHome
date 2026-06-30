@@ -1,0 +1,1 @@
+ALTER TABLE tbl_ads_banner ADD COLUMN bannerType ENUM('LARGE', 'SMALL') DEFAULT 'LARGE';

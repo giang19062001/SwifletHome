@@ -71,5 +71,14 @@ const VARIABLE_ENUM = {
   ADS_ACTION_TYPE: {
     LINK: 'Chuyển hướng',
     FUNCTION: 'Chức năng',
+  },
+  ADS_POSITIONS: {
+    TOP: 'Đầu màn hình',
+    MIDDLE: 'Giữa màn hình',
+    BOTTOM: 'Đáy màn hình'
+  },
+   ADS_BANNER_TYPE: {
+    LARGE: 'Loại ảnh lớn',
+    SMALL: 'Loại ảnh nhỏ',
   }
 };
