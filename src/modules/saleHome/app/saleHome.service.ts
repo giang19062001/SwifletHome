@@ -1,13 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { GeoService } from 'src/common/geo/geo.service';
 import { getFileLocation } from 'src/config/multer.config';
+import { PagingDto } from 'src/dto/admin.dto';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { GeoService } from 'src/common/geo/geo.service';
-import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
-import { CreateSaleHomeAppDto, UploadFilesAppDto } from './saleHome.dto';
+import { CreateSaleHomeAppDto, UpdateSaleHomeAppDto, UploadFilesAppDto } from './saleHome.dto';
 import { SaleHomeAppRepository } from './saleHome.repository';
-import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto, GetInitFormMutationResDto } from './saleHome.response';
-import { PagingDto } from 'src/dto/admin.dto';
+import { GetAllSaleHomeWrapperResDto, GetDetailSaleHomeResDto, GetInitFormMutationResDto } from './saleHome.response';
 
 @Injectable()
 export class SaleHomeAppService {
@@ -57,13 +57,42 @@ export class SaleHomeAppService {
       return -1;
     }
 
-    const coords = await this.geoService.getCoordinates(dto.homeInfo.homelocation);
+    let { latitude, longitude } = dto.homeInfo;
+    if (!latitude || !longitude) {
+      // const coords = await this.geoService.getCoordinates(dto.homeInfo.homelocation);
+      // latitude = coords.latitude;
+      // longitude = coords.longitude;
+      latitude = 0;
+      longitude = 0;
+    }
 
-    const seq = await this.saleHomeAppRepository.createSaleHome(dto, userCode, userCode, coords.latitude, coords.longitude);
+    const seq = await this.saleHomeAppRepository.createSaleHome(dto, userCode, userCode, latitude, longitude);
     if (seq) {
       await this.saleHomeAppRepository.updateSeqFilesSaleHome(seq, dto.uniqueId, userCode);
     }
     return seq;
+  }
+
+  async updateSaleHome(homeCode: string, dto: UpdateSaleHomeAppDto, userCode: string): Promise<number> {
+    let { latitude, longitude } = dto.homeInfo;
+    if (!latitude || !longitude) {
+      // const coords = await this.geoService.getCoordinates(dto.homeInfo.homelocation);
+      // latitude = coords.latitude;
+      // longitude = coords.longitude;
+      latitude = 0;
+      longitude = 0;
+    }
+    const affected = await this.saleHomeAppRepository.updateSaleHome(homeCode, dto, userCode, latitude, longitude);
+    if (affected) {
+      const detail = await this.saleHomeAppRepository.getDetailSaleHome(homeCode);
+      if (detail && detail.uniqueId) {
+        const seq = await this.saleHomeAppRepository.getSeqByHomeCode(homeCode);
+        if (seq) {
+          await this.saleHomeAppRepository.updateSeqFilesSaleHome(seq, detail.uniqueId, userCode);
+        }
+      }
+    }
+    return affected;
   }
 
   async deleteFile(seq: number, userCode: string): Promise<number> {
@@ -84,10 +113,17 @@ export class SaleHomeAppService {
     return await this.saleHomeAppRepository.deleteFileCron(seq);
   }
 
-  async getAllSaleHomes(dto: PagingDto, userCode: string): Promise<{ total: number; list: GetAllSaleHomeResDto[] }> {
-    const total = await this.saleHomeAppRepository.getTotalSaleHomes(dto, userCode);
-    const list = await this.saleHomeAppRepository.getAllSaleHomes(dto, userCode);
-    return { total, list };
+  async getAllSaleHomes(dto: PagingDto, userCode: string): Promise<GetAllSaleHomeWrapperResDto> {
+    const myTotal = await this.saleHomeAppRepository.getTotalSaleHomes(true, userCode);
+    const myList = await this.saleHomeAppRepository.getAllSaleHomes(null, true, userCode);
+
+    const otherTotal = await this.saleHomeAppRepository.getTotalSaleHomes(false, userCode);
+    const otherList = await this.saleHomeAppRepository.getAllSaleHomes(dto, false, userCode);
+
+    return {
+      myHomes: { total: myTotal, list: myList },
+      otherHomes: { total: otherTotal, list: otherList },
+    };
   }
 
   async getDetailSaleHome(homeCode: string): Promise<GetDetailSaleHomeResDto | null> {

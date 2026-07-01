@@ -81,6 +81,25 @@ export class GetAllSaleHomeResDto {
 
   @ApiProperty({ example: 'AEON Tạ Quang Bửu' })
   homeLocation: string;
+
+  @ApiProperty({ example: 'US000001' })
+  userCode: string;
+}
+
+export class SaleHomeListResDto {
+  @ApiProperty({ example: 10 })
+  total: number;
+
+  @ApiProperty({ type: [GetAllSaleHomeResDto] })
+  list: GetAllSaleHomeResDto[];
+}
+
+export class GetAllSaleHomeWrapperResDto {
+  @ApiProperty({ type: SaleHomeListResDto })
+  myHomes: SaleHomeListResDto;
+
+  @ApiProperty({ type: SaleHomeListResDto })
+  otherHomes: SaleHomeListResDto;
 }
 
 export class HostInfoDetailDto extends OmitType(HostInfoDto, ['hostRole'] as const) {

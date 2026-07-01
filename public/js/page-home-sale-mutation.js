@@ -10,6 +10,8 @@ const saleHomeMutationConstraints = {
   homeAddress: { presence: { allowEmpty: false, message: '^Vui lòng nhập địa chỉ chi tiết.' } },
   homeAge: { presence: { allowEmpty: false, message: '^Vui lòng nhập số năm vận hành.' }, numericality: { greaterThan: 0, message: '^Năm vận hành phải lớn hơn 0' } },
   homeModel: { presence: { allowEmpty: false, message: '^Vui lòng chọn mô hình nhà yến.' } },
+  latitude: { presence: { allowEmpty: false, message: '^Vui lòng nhập vĩ độ.' }, numericality: { message: '^Vĩ độ phải là số' } },
+  longitude: { presence: { allowEmpty: false, message: '^Vui lòng nhập kinh độ.' }, numericality: { message: '^Kinh độ phải là số' } },
   currentNests: { presence: { allowEmpty: false, message: '^Vui lòng nhập số tổ.' }, numericality: { greaterThan: 0, message: '^Số tổ phải lớn hơn 0' } },
   averageYieldKg: { presence: { allowEmpty: false, message: '^Vui lòng nhập sản lượng.' }, numericality: { greaterThan: 0, message: '^Sản lượng phải lớn hơn 0' } },
   numberOfFloors: { presence: { allowEmpty: false, message: '^Vui lòng nhập số tầng.' }, numericality: { greaterThan: 0, message: '^Số tầng phải lớn hơn 0' } },
@@ -105,6 +107,8 @@ function initializeForm() {
           homeAddress: form.querySelector('#homeAddress').value,
           homeAge: Number(form.querySelector('#homeAge').value),
           homeModel: form.querySelector('#homeModel').value,
+          latitude: form.querySelector('#latitude').value ? Number(form.querySelector('#latitude').value) : '',
+          longitude: form.querySelector('#longitude').value ? Number(form.querySelector('#longitude').value) : '',
         },
         nestInfo: {
           currentNests: Number(form.querySelector('#currentNests').value),
@@ -209,11 +213,13 @@ async function assignForm(data) {
     form.querySelector('#homelocation').value = data.homeInfo.homelocation || '';
     form.querySelector('#homeAddress').value = data.homeInfo.homeAddress || '';
     form.querySelector('#homeAge').value = data.homeInfo.homeAge || '';
-    form.querySelector('#homeModel').value = data.homeInfo.homeModel?.code || '';
+    if (form.querySelector('#homeModel')) form.querySelector('#homeModel').value = data.homeInfo.homeModel?.code || '';
+    if (form.querySelector('#latitude')) form.querySelector('#latitude').value = data.homeInfo.latitude || '';
+    if (form.querySelector('#longitude')) form.querySelector('#longitude').value = data.homeInfo.longitude || '';
   }
 
   if(data.nestInfo) {
-    form.querySelector('#currentNests').value = data.nestInfo.currentNests || '';
+    if (form.querySelector('#currentNests')) form.querySelector('#currentNests').value = data.nestInfo.currentNests || '';
     form.querySelector('#averageYieldKg').value = data.nestInfo.averageYieldKg || '';
     form.querySelector('#numberOfFloors').value = data.nestInfo.numberOfFloors || '';
     form.querySelector('#numberOfRooms').value = data.nestInfo.numberOfRooms || '';

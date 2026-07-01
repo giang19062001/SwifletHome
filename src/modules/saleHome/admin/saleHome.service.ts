@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { getFileLocation } from 'src/config/multer.config';
-import { v4 as uuidv4 } from 'uuid';
-import { GeoService } from 'src/common/geo/geo.service';
-import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { GeoService } from 'src/common/geo/geo.service';
+import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
-import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto, UploadFilesAdminDto, UpdateStatusSaleHomeDto } from './saleHome.dto';
-import { SaleHomeAdminRepository } from './saleHome.repository';
+import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { GetInitFormMutationResDto } from '../app/saleHome.response';
 import { GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto } from '../saleHome.response';
+import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto, UpdateStatusSaleHomeDto, UploadFilesAdminDto } from './saleHome.dto';
+import { SaleHomeAdminRepository } from './saleHome.repository';
 
 @Injectable()
 export class SaleHomeAdminService {
@@ -69,8 +68,15 @@ export class SaleHomeAdminService {
       return -1;
     }
 
-    const coords = await this.geoService.getCoordinates(dto.homeInfo.homelocation);
-    const seq = await this.saleHomeAdminRepository.createSaleHome(dto, createdId, coords.latitude, coords.longitude);
+    let { latitude, longitude } = dto.homeInfo;
+    if (!latitude || !longitude) {
+      // const coords = await this.geoService.getCoordinates(dto.homeInfo.homelocation);
+      // latitude = coords.latitude;
+      // longitude = coords.longitude;
+      latitude = 0;
+      longitude = 0;
+    }
+    const seq = await this.saleHomeAdminRepository.createSaleHome(dto, createdId, latitude, longitude);
     if (seq) {
       await this.saleHomeAdminRepository.updateSeqFilesSaleHome(seq, dto.uniqueId, createdId);
     }
@@ -78,12 +84,20 @@ export class SaleHomeAdminService {
   }
 
   async updateSaleHome(homeCode: string, dto: UpdateSaleHomeAdminDto, updatedId: string): Promise<number> {
-    const coords = await this.geoService.getCoordinates(dto.homeInfo.homelocation);
-    const affected = await this.saleHomeAdminRepository.updateSaleHome(homeCode, dto, updatedId, coords.latitude, coords.longitude);
+    let { latitude, longitude } = dto.homeInfo;
+    if (!latitude || !longitude) {
+      const coords = await this.geoService.getCoordinates(dto.homeInfo.homelocation);
+      latitude = coords.latitude;
+      longitude = coords.longitude;
+    }
+    const affected = await this.saleHomeAdminRepository.updateSaleHome(homeCode, dto, updatedId, latitude, longitude);
     if (affected) {
-      const seq = await this.saleHomeAdminRepository.getSeqByHomeCode(homeCode);
-      if (seq) {
-        await this.saleHomeAdminRepository.updateSeqFilesSaleHome(seq, dto.uniqueId, updatedId);
+      const detail = await this.saleHomeAdminRepository.getDetailSaleHome(homeCode);
+      if (detail && detail.uniqueId) {
+        const seq = await this.saleHomeAdminRepository.getSeqByHomeCode(homeCode);
+        if (seq) {
+          await this.saleHomeAdminRepository.updateSeqFilesSaleHome(seq, detail.uniqueId, updatedId);
+        }
       }
     }
     return affected;

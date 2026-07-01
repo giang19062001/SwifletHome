@@ -1,20 +1,19 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UploadedFiles, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { getImgVideoMulterConfig } from 'src/config/multer.config';
 import { GetUserApp } from 'src/decorator/auth.decorator';
+import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
-import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
+import { NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
+import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { CreateSaleHomeAppDto, UploadFilesAppDto } from './saleHome.dto';
-import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto, GetInitFormMutationResDto, UploadSaleHomeFileResDto } from './saleHome.response';
+import { CreateSaleHomeAppDto, UpdateSaleHomeAppDto, UploadFilesAppDto } from './saleHome.dto';
+import { GetAllSaleHomeWrapperResDto, GetDetailSaleHomeResDto, GetInitFormMutationResDto, UploadSaleHomeFileResDto } from './saleHome.response';
 import { SaleHomeAppService } from './saleHome.service';
-import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
-import { PagingDto } from 'src/dto/admin.dto';
 
 @ApiTags('app/saleHome')
 @Controller('/api/app/saleHome')
@@ -81,6 +80,28 @@ export class SaleHomeAppController {
   }
 
   @ApiOperation({
+    summary: 'Cập nhật nhà yến sale',
+  })
+  @Put('update/:homeCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: UpdateSaleHomeAppDto })
+  @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async updateSaleHome(@Param('homeCode') homeCode: string, @Body() dto: UpdateSaleHomeAppDto, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.saleHomeAppService.updateSaleHome(homeCode, dto, user.userCode);
+    if (!result) {
+      throw new BadRequestException({
+        message: Msg.UpdateErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.UpdateOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
     summary: 'Xóa file ảnh/video đã upload',
     description: `Truyền seq của file muốn xóa trên url`,
   })
@@ -96,11 +117,11 @@ export class SaleHomeAppController {
     };
   }
 
-  @ApiOperation({ summary: 'Lấy danh sách nhà yến' })
+  @ApiOperation({ summary: 'Lấy danh sách nhà yến', description: `Phân trang chỉ có ảnh hưởng với **otherHomes**`})
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: PagingDto })
-  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetAllSaleHomeResDto)) })
+  @ApiOkResponse({ type: ApiAppResponseDto(GetAllSaleHomeWrapperResDto) })
   async getAllSaleHomes(@Body() dto: PagingDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.saleHomeAppService.getAllSaleHomes(dto, user.userCode);
     return {

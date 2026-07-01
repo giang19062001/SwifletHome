@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode, safeParseArray } from 'src/helpers/func.helper';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { SaleHomeFileTypeData, SaleHomeOptionData } from '../saleHome.interface';
-import { CreateSaleHomeAppDto } from './saleHome.dto';
-import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto } from './saleHome.response';
 import { SaleHomeFileItemResDto } from '../saleHome.response';
-import { PagingDto } from 'src/dto/admin.dto';
+import { CreateSaleHomeAppDto, UpdateSaleHomeAppDto } from './saleHome.dto';
+import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto } from './saleHome.response';
 
 @Injectable()
 export class SaleHomeAppRepository {
@@ -153,28 +153,38 @@ export class SaleHomeAppRepository {
     return result.affectedRows;
   }
 
-  async getTotalSaleHomes(dto: PagingDto, userCode: string): Promise<number> {
-    const sql = `SELECT COUNT(seq) as total FROM ${this.table} WHERE userCode = ? AND status = 'APPROVED'`;
+  async getTotalSaleHomes(isMyHome: boolean, userCode: string): Promise<number> {
+    const userCondition = isMyHome ? `AND userCode = ?` : `AND (userCode != ? OR userCode IS NULL)`;
+    const sql = `SELECT COUNT(seq) as total FROM ${this.table} WHERE status = 'APPROVED' ${userCondition}`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode]);
     return rows[0].total;
   }
 
-  async getAllSaleHomes(dto: PagingDto, userCode: string): Promise<GetAllSaleHomeResDto[]> {
-    const page = dto.page || 1;
-    const limit = dto.limit || 10;
-    const offset = (page - 1) * limit;
+  async getAllSaleHomes(dto: PagingDto | null, isMyHome: boolean, userCode: string): Promise<GetAllSaleHomeResDto[]> {
+    const userCondition = isMyHome ? `AND h.userCode = ?` : `AND (h.userCode != ? OR h.userCode IS NULL)`;
+
+    let limitClause = '';
+    const params: any[] = [userCode];
+
+    if (dto) {
+      const page = dto.page || 1;
+      const limit = dto.limit || 10;
+      const offset = (page - 1) * limit;
+      limitClause = `LIMIT ? OFFSET ?`;
+      params.push(limit, offset);
+    }
 
     const sql = `
-      SELECT h.homeCode, h.homeName, h.homelocation as homeLocation,
+      SELECT h.homeCode, h.homeName, h.homelocation as homeLocation, h.userCode,
              (SELECT filename FROM ${this.tableFile} 
               WHERE uniqueId = h.uniqueId AND fileTypeCode = 'FILE_OUTSIDE' 
               ORDER BY seq ASC LIMIT 1) as homeImage
       FROM ${this.table} h
-      WHERE h.userCode = ? AND h.status = 'APPROVED'
+      WHERE h.status = 'APPROVED' ${userCondition}
       ORDER BY h.seq DESC
-      LIMIT ? OFFSET ?
+      ${limitClause}
     `;
-    const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode, limit, offset]);
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
 
     return rows as GetAllSaleHomeResDto[];
   }
@@ -251,5 +261,58 @@ export class SaleHomeAppRepository {
       },
       files: fileRows as unknown as SaleHomeFileItemResDto[],
     };
+  }
+
+  async getSeqByHomeCode(homeCode: string): Promise<number> {
+    const sql = `SELECT seq FROM ${this.table} WHERE homeCode = ? LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [homeCode]);
+    return rows.length > 0 ? rows[0].seq : 0;
+  }
+
+  async updateSaleHome(homeCode: string, dto: UpdateSaleHomeAppDto, userCode: string, latitude: number, longitude: number): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET
+        hostName = ?, hostPhone = ?, socialContact = ?, hostRole = ?,
+        homeName = ?, homelocation = ?, homeAddress = ?, latitude = ?, longitude = ?, homeAge = ?, homeModel = ?,
+        currentNests = ?, averageYieldKg = ?, numberOfFloors = ?, numberOfRooms = ?,
+        shortDescription = ?, topicsShare = ?, sightseeingAreas = ?, includedServices = ?, serviceNotes = ?, tourFee = ?, durationPerTourMinutes = ?,
+        availableDays = ?, timeframes = ?, timeNoticeRequired = ?, commitments = ?,
+        updatedId = ?, updatedAt = NOW()
+      WHERE homeCode = ? AND userCode = ?
+    `;
+    const params = [
+      dto.hostInfo?.hostName,
+      dto.hostInfo?.hostPhone,
+      dto.hostInfo?.socialContact || null,
+      dto.hostInfo?.hostRole,
+      dto.homeInfo?.homeName,
+      dto.homeInfo?.homelocation,
+      dto.homeInfo?.homeAddress,
+      latitude,
+      longitude,
+      dto.homeInfo?.homeAge,
+      dto.homeInfo?.homeModel,
+      dto.nestInfo?.currentNests,
+      dto.nestInfo?.averageYieldKg,
+      dto.nestInfo?.numberOfFloors,
+      dto.nestInfo?.numberOfRooms,
+      dto.tourInfo?.shortDescription,
+      JSON.stringify(dto.tourInfo?.topicsShare),
+      JSON.stringify(dto.tourInfo?.sightseeingAreas),
+      JSON.stringify(dto.tourInfo?.includedServices),
+      dto.tourInfo?.serviceNotes || null,
+      dto.tourInfo?.tourFee,
+      dto.tourInfo?.durationPerTourMinutes,
+      JSON.stringify(dto.policyInfo?.availableDays),
+      dto.policyInfo?.timeframes,
+      dto.policyInfo?.timeNoticeRequired,
+      JSON.stringify(dto.policyInfo?.commitments),
+      userCode,
+      homeCode,
+      userCode
+    ];
+
+    const [result] = await this.db.execute<ResultSetHeader>(sql, params);
+    return result.affectedRows;
   }
 }

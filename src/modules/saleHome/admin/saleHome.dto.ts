@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsObject, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { HomeInfoDto, HostInfoDto, NestInfoDto, PolicyInfoDto, TourInfoDto } from '../app/saleHome.dto';
@@ -64,7 +64,7 @@ export class CreateSaleHomeAdminDto {
   uniqueId: string;
 }
 
-export class UpdateSaleHomeAdminDto extends CreateSaleHomeAdminDto {}
+export class UpdateSaleHomeAdminDto extends OmitType(CreateSaleHomeAdminDto, ['uniqueId'] as const) {}
 
 export class UpdateStatusSaleHomeDto {
   @ApiProperty({ example: 'APPROVED' })

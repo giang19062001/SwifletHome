@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, IsUUID, Matches, ValidateNested } from 'class-validator';
 import { MsgDto } from 'src/helpers/message.helper';
@@ -69,6 +69,16 @@ export class HomeInfoDto {
   @IsString()
   @IsNotEmpty()
   homeModel: string;
+
+  @ApiProperty({ example: 10.762622, required: false })
+  @IsNumber()
+  @IsOptional()
+  latitude?: number;
+
+  @ApiProperty({ example: 106.660172, required: false })
+  @IsNumber()
+  @IsOptional()
+  longitude?: number;
 }
 
 export class NestInfoDto {
@@ -184,8 +194,10 @@ export class CreateSaleHomeAppDto {
   @IsObject()
   policyInfo: PolicyInfoDto;
 
-  @ApiProperty({ example: 'uuid chính lấy từ getInitFormMutation', format: 'uuid' })
+  @ApiProperty({ example: 'uuid chính lấy từ /saleHome/getDetail', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
 }
+
+export class UpdateSaleHomeAppDto extends OmitType(CreateSaleHomeAppDto, ['uniqueId'] as const) {}
