@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import { LoggingService } from '../logger/logger.service';
 import { EMAIL } from 'src/helpers/text.helper';
-import { getGuestTemplate, getTeamTemplate, getDoctorTemplate, getSightSeeingTemplate, getRequestQrTemplate, getConsignmentTemplate } from './mail.teamplate';
+import { LoggingService } from '../logger/logger.service';
+import { getConsignmentTemplate, getDoctorTemplate, getGuestTemplate, getRequestQrTemplate, getSaleHomeTeamplate, getSightSeeingTemplate, getTeamTemplate } from './mail.teamplate';
 
 @Injectable()
 export class MailService {
@@ -52,6 +52,11 @@ export class MailService {
   async sendConsignmentEmail(data: any) {
     const html = getConsignmentTemplate(data);
     await this.sendMail(EMAIL.SUBJECT_SEND_CONSIGNMENT, html, `Consignment:${data.senderName}`);
+  }
+
+  async sendSaleHomeEmail(data: any) {
+    const html = getSaleHomeTeamplate(data);
+    await this.sendMail(EMAIL.SUBJECT_SEND_SALE_HOME, html, `SaleHome:${data.userName}`);
   }
 
   private async sendMail(subject: string, html: string, logContext = '') {

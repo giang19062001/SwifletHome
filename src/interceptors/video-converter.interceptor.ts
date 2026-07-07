@@ -67,48 +67,40 @@ export class VideoConverterInterceptor implements NestInterceptor {
       const originalPathExt = extname(originalPath);
       const newPath = originalPathExt ? originalPath.slice(0, -originalPathExt.length) + '.mp4' : originalPath + '.mp4';
 
-      return new Promise<void>((resolve, reject) => {
-        ffmpeg(originalPath)
-          .inputOptions(FFMPEG_OPTIONS.inputOptions)
-          .output(newPath)
-          .videoCodec(FFMPEG_OPTIONS.videoCodec)
-          .audioCodec(FFMPEG_OPTIONS.audioCodec)
-          .videoFilter(FFMPEG_OPTIONS.videoFilter)
-          .outputOptions(FFMPEG_OPTIONS.outputOptions)
-          .on('end', () => {
-            // xóa file gốc sau khi convert xong
-            try {
-              if (fs.existsSync(originalPath)) {
-                fs.unlinkSync(originalPath);
-              }
-            } catch (e) {
-              console.error('Error unlinking original file:', e);
+      // Đổi ngay lập tức object file sang mp4 để trả về Controller lưu DB liền, không bắt user đợi
+      const origExt = extname(file.originalname);
+      file.originalname = origExt ? file.originalname.slice(0, -origExt.length) + '.mp4' : file.originalname + '.mp4';
+      file.filename = newFilename;
+      file.path = newPath;
+      file.mimetype = 'video/mp4';
+      // file.size giữ nguyên (kích thước file gốc) vì chạy ngầm chưa có kích thước mới
+
+      // Chạy ffmpeg ngầm (background)
+      ffmpeg(originalPath)
+        .inputOptions(FFMPEG_OPTIONS.inputOptions)
+        .output(newPath)
+        .videoCodec(FFMPEG_OPTIONS.videoCodec)
+        .audioCodec(FFMPEG_OPTIONS.audioCodec)
+        .videoFilter(FFMPEG_OPTIONS.videoFilter)
+        .outputOptions(FFMPEG_OPTIONS.outputOptions)
+        .on('end', () => {
+          // xóa file gốc sau khi convert xong
+          try {
+            if (fs.existsSync(originalPath)) {
+              fs.unlinkSync(originalPath);
             }
+          } catch (e) {
+            console.error('Error unlinking original file:', e);
+          }
+        })
+        .on('error', (err, stdout, stderr) => {
+          console.error('FFmpeg background conversion error:', err);
+          console.error('FFmpeg stderr:', stderr);
+        })
+        .run();
 
-            // cập nhật lại thông tin file
-            const origExt = extname(file.originalname);
-            file.originalname = origExt ? file.originalname.slice(0, -origExt.length) + '.mp4' : file.originalname + '.mp4';
-            file.filename = newFilename;
-            file.path = newPath;
-            file.mimetype = 'video/mp4';
-
-            try {
-              const stats = fs.statSync(newPath);
-              file.size = stats.size;
-            } catch (e) {
-              console.error('Error getting stats for new file:', e);
-            }
-
-            resolve();
-          })
-          .on('error', (err, stdout, stderr) => {
-            console.error('FFmpeg conversion error:', err);
-            console.error('FFmpeg stderr:', stderr);
-            // reject để báo lỗi, không lưu file sai định dạng
-            reject(new BadRequestException('Lỗi chuyển đổi video. Vui lòng thử lại.'));
-          })
-          .run();
-      });
+      // Return liền mà không dùng Promise chờ FFMPEG chạy
+      return Promise.resolve();
     }
   }
 }

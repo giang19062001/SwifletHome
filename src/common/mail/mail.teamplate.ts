@@ -98,3 +98,19 @@ export function getConsignmentTemplate(data: any) {
       </div>
   `;
 }
+
+export function getSaleHomeTeamplate(data: any) {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <div style="padding: 0px; color: #333;">
+        <div style="background: #fff; padding: 15px; margin: 20px 0; border-radius: 4px;">
+          <p style="margin: 15px 20px;"><strong>Tên nhà yến:</strong> ${data.homeName}</p>
+          <p style="margin: 15px 20px;"><strong>Họ và tên chủ nhà:</strong> ${data.userName}</p>
+          <p style="margin: 15px 20px;"><strong>Số điện thoại:</strong> ${data.userPhone}</p>
+          <p style="margin: 15px 20px;"><strong>Địa chỉ:</strong> ${data.homeAddress}</p>
+        </div>
+        <p style="text-align: center; margin-top: -20px; margin-bottom: 50px;">
+ <a href="tel:${data.userPhone}" style="display: inline-block; width: 280px; box-sizing: border-box; background-color: #1a73e8; color: #ffffff; padding: 12px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">GỌI NHANH CHO KHÁCH HÀNG</a>          </p>
+      </div>
+  `;
+}

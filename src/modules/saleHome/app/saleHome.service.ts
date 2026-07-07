@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { GeoService } from 'src/common/geo/geo.service';
+import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
@@ -15,6 +16,7 @@ export class SaleHomeAppService {
     private readonly saleHomeAppRepository: SaleHomeAppRepository,
     private readonly geoService: GeoService,
     private readonly fileLocalService: FileLocalService,
+    private readonly mailService: MailService,
   ) {}
 
   async getInitFormMutation(): Promise<GetInitFormMutationResDto> {
@@ -42,12 +44,13 @@ export class SaleHomeAppService {
   }
 
   async uploadFiles(dto: UploadFilesAppDto, files: Express.Multer.File[], createdId: string): Promise<{ seq: number; url: string; mimetype: string }[]> {
-    const result: { seq: number; url: string; mimetype: string }[] = [];
-    for (const file of files) {
-      const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
-      const seq = await this.saleHomeAppRepository.uploadFileSaleHome(dto.uniqueId, createdId, filenamePath, file, dto.fileTypeCode);
-      result.push({ seq, url: filenamePath, mimetype: file.mimetype });
-    }
+    const result = await Promise.all(
+      files.map(async (file) => {
+        const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+        const seq = await this.saleHomeAppRepository.uploadFileSaleHome(dto.uniqueId, createdId, filenamePath, file, dto.fileTypeCode);
+        return { seq, url: filenamePath, mimetype: file.mimetype };
+      }),
+    );
     return result;
   }
 
@@ -69,6 +72,13 @@ export class SaleHomeAppService {
     const seq = await this.saleHomeAppRepository.createSaleHome(dto, userCode, userCode, latitude, longitude);
     if (seq) {
       await this.saleHomeAppRepository.updateSeqFilesSaleHome(seq, dto.uniqueId, userCode);
+      // gửi email thông báo có đơn đăng ký nhà yến sale
+      this.mailService.sendSaleHomeEmail({
+        homeName: dto.homeInfo.homeName,
+        userName: dto.hostInfo.hostName,
+        userPhone: dto.hostInfo.hostPhone,
+        homeAddress: dto.homeInfo.homelocation
+      })
     }
     return seq;
   }

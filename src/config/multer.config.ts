@@ -114,6 +114,17 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
   return 'uploads/' + result;
 };
 
+// Cache thư mục đã tạo — tránh gọi existsSync/mkdirSync lặp lại mỗi request
+const createdDirs = new Set<string>();
+
+function ensureDir(folderPath: string) {
+  if (createdDirs.has(folderPath)) return;
+  if (!existsSync(folderPath)) {
+    mkdirSync(folderPath, { recursive: true });
+  }
+  createdDirs.add(folderPath);
+}
+
 export const createMulterConfig = (allowedExts: string[], customLimits?: MulterLimits) => {
   const defaultLimits: MulterLimits = {
     fileSize: 50 * 1024 * 1024, // 50MB mặc định
@@ -127,9 +138,7 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
       destination: (req, file, cb) => {
         const location = getFileLocation(file.mimetype, file.fieldname);
         const folderPath = join(process.cwd(), 'public', location);
-        if (!existsSync(folderPath)) {
-          mkdirSync(folderPath, { recursive: true });
-        }
+        ensureDir(folderPath);
         cb(null, folderPath);
       },
       filename: (req, file, cb) => {

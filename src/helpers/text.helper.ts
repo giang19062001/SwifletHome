@@ -50,4 +50,5 @@ export const EMAIL = {
   SUBJECT_SEND_CONSIGNMENT: 'Yêu cầu ký gửi từ 3fam.vn',
   SUBJECT_SEND_SIGHTSEEING: 'Yêu cầu duyệt đơn đăng ký tham quan nhà yến từ 3fam.vn',
   SUBJECT_SEND_REQUEST_QR: 'Yêu cầu duyệt cấp mã QR Code từ 3fam.vn',
+  SUBJECT_SEND_SALE_HOME: 'Yêu cầu tạo nhà yến siêu cạnh tranh từ 3fam.vn',
 };
