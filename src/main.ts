@@ -1,14 +1,14 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import expressLayouts from 'express-ejs-layouts';
 import session from 'express-session';
+import helmet from 'helmet';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import { initSwagger } from './config/swagger.config';
 import { LoggingService } from './common/logger/logger.service';
+import { initSwagger } from './config/swagger.config';
 import { ServerExceptionsFilter } from './filter/serverException.filter';
 
 async function bootstrap() {

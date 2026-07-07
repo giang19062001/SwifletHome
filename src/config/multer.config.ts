@@ -2,10 +2,12 @@ import { BadRequestException } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import { LoggingService } from 'src/common/logger/logger.service';
 import { AUDIO_TYPES, IMG_TYPES, VIDEO_TYPES } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
 import { v4 as uuidv4 } from 'uuid';
 
+const logger = new LoggingService();
 interface MulterLimits {
   fileSize?: number;
   files?: number;
@@ -139,6 +141,7 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
         const location = getFileLocation(file.mimetype, file.fieldname);
         const folderPath = join(process.cwd(), 'public', location);
         ensureDir(folderPath);
+        logger.log(`[CALLER] MULTER_UPLOAD: ${file.originalname}`);
         cb(null, folderPath);
       },
       filename: (req, file, cb) => {
