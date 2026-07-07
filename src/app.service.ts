@@ -3,13 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { AnswerAdminService } from './modules/answer/admin/answer.service';
 import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
-import { HomeSaleAdminService } from './modules/homeSale/admin/homeSale.service';
-import { SaleHomeAdminService } from './modules/saleHome/admin/saleHome.service';
 import { ObjectAdminService } from './modules/object/admin/object.service';
-import { OPTION_CONST } from './modules/options/option.interface';
 import { OptionService } from './modules/options/option.service';
 import { ProvinceService } from './modules/province/province.service';
 import { QrAdminService } from './modules/qr/admin/qr.service';
+import { SaleHomeAdminService } from './modules/saleHome/admin/saleHome.service';
 import { ScreenAdminService } from './modules/screen/admin/screen.service';
 import { TeamAdminService } from './modules/team/admin/team.service';
 import { TodoAdminService } from './modules/todo/admin/todo.service';
@@ -20,7 +18,6 @@ export class AppService {
   constructor(
     private readonly answerAdminService: AnswerAdminService,
     private readonly catetegoryAdminService: CategoryAdminService,
-    private readonly homeAdminService: HomeSaleAdminService,
     private readonly saleHomeAdminService: SaleHomeAdminService,
     private readonly teamAdminService: TeamAdminService,
     private readonly blogAdminService: BlogAdminService,

@@ -95,6 +95,11 @@ export class SaleHomeAppService {
     return affected;
   }
 
+  async deleteSaleHome(homeCode: string, userCode: string): Promise<number> {
+    return await this.saleHomeAppRepository.deleteSaleHome(homeCode, userCode);
+  }
+
+  // TODO: FILE
   async deleteFile(seq: number, userCode: string): Promise<number> {
     const fileInfo = await this.saleHomeAppRepository.getFileSaleHomeBySeq(seq);
     if (!fileInfo || fileInfo.createdId !== userCode) return 0;
@@ -113,6 +118,7 @@ export class SaleHomeAppService {
     return await this.saleHomeAppRepository.deleteFileCron(seq);
   }
 
+  // TODO: GET
   async getAllSaleHomes(dto: PagingDto, userCode: string): Promise<GetAllSaleHomeWrapperResDto> {
     const myTotal = await this.saleHomeAppRepository.getTotalSaleHomes(true, userCode);
     const myList = await this.saleHomeAppRepository.getAllSaleHomes(null, true, userCode);

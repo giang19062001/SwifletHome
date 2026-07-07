@@ -10,19 +10,21 @@ import { BlacklistGuard } from './common/blacklist/blacklist.guard';
 import { BlacklistModule } from './common/blacklist/blacklist.module';
 import { CornModule } from './common/corn/corn.module';
 import { FirebaseModule } from './common/firebase/firebase.module';
-import { RedisModule } from './common/redis/redis.module';
+import { GeoModule } from './common/geo/geo.module';
 import { CustomThrottlerGuard } from './common/guards/throttler.guard';
 import { LoggerModule } from './common/logger/logger.module';
 import { MailModule } from './common/mail/mail.module';
 import { MqttModule } from './common/mqtt/mqtt.module';
+import { RedisModule } from './common/redis/redis.module';
 import { SocketModule } from './common/socket/socket.module';
-import { GeoModule } from './common/geo/geo.module';
 import { DatabaseModule } from './database/database.module';
 import { PageNotFoundExceptionFilter } from './filter/pageNotFound.filter';
 import { ROUTER } from './helpers/const.helper';
 import { HttpMetricsInterceptor } from './interceptors/metrics.interceptor';
 import { RequestLoggerInterceptor } from './interceptors/request.interceptor';
 import { IpMiddleware } from './middleware/ip.middleware';
+import { AdsAdminModule } from './modules/ads/admin/ads.module';
+import { AdsAppModule } from './modules/ads/app/ads.module';
 import { AnswerAdminModule } from './modules/answer/admin/answer.module';
 import { AnswerAppModule } from './modules/answer/app/answer.module';
 import { AuthAdminModule } from './modules/auth/admin/auth.module';
@@ -38,10 +40,6 @@ import { DoctorAppModule } from './modules/doctor/app/doctor.module';
 import { EaterAppModule } from './modules/eater/app/eater.module';
 import { GuestAdminModule } from './modules/guest/admin/guest.module';
 import { GuestModule } from './modules/guest/front/guest.module';
-import { HomeSaleAdminModule } from './modules/homeSale/admin/homeSale.module';
-import { HomeSaleAppModule } from './modules/homeSale/app/homeSale.module';
-import { SaleHomeAdminModule } from './modules/saleHome/admin/saleHome.module';
-import { SaleHomeAppModule } from './modules/saleHome/app/saleHome.module';
 import { InfoAdminModule } from './modules/info/admin/info.module';
 import { NotificationAdminModule } from './modules/notification/admin/notification.module';
 import { ObjectAdminModule } from './modules/object/admin/object.module';
@@ -54,9 +52,11 @@ import { QrAppModule } from './modules/qr/app/qr.module';
 import { QuestionAdminModule } from './modules/question/admin/question.module';
 import { ReportAdminModule } from './modules/report/admin/report.module';
 import { ReportAppModule } from './modules/report/app/report.module';
+import { SaleHomeAdminModule } from './modules/saleHome/admin/saleHome.module';
+import { SaleHomeAppModule } from './modules/saleHome/app/saleHome.module';
 import { ScreenAdminModule } from './modules/screen/admin/screen.module';
 import { ScreenAppModule } from './modules/screen/app/screen.module';
-import { AdsAppModule } from './modules/ads/app/ads.module';
+import { ShareAppModule } from './modules/share/app/share.module';
 import { TeamAdminModule } from './modules/team/admin/team.module';
 import { TeamAppModule } from './modules/team/app/team.module';
 import { TodoAdminModule } from './modules/todo/admin/todo.module';
@@ -65,8 +65,6 @@ import { UploadAdminModule } from './modules/upload/admin/upload.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
-import { ShareAppModule } from './modules/share/app/share.module';
-import { AdsAdminModule } from './modules/ads/admin/ads.module';
 
 @Module({
   imports: [
@@ -120,7 +118,6 @@ import { AdsAdminModule } from './modules/ads/admin/ads.module';
     AuthAppModule,
     AnswerAppModule,
     DoctorAppModule,
-    HomeSaleAppModule,
     SaleHomeAppModule,
     ScreenAppModule,
     UserHomeAppModule,
@@ -145,7 +142,6 @@ import { AdsAdminModule } from './modules/ads/admin/ads.module';
     QuestionAdminModule,
     AnswerAdminModule,
     UploadAdminModule,
-    HomeSaleAdminModule,
     SaleHomeAdminModule,
     BlogAdminModule,
     DoctorAdminModule,

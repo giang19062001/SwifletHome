@@ -201,3 +201,39 @@ export class CreateSaleHomeAppDto {
 }
 
 export class UpdateSaleHomeAppDto extends OmitType(CreateSaleHomeAppDto, ['uniqueId'] as const) {}
+
+export class CreateHomeSightSeeingDto {
+  @ApiProperty({
+    example: 'HOM000001',
+  })
+  @IsString()
+  @IsNotEmpty()
+  homeCode: string;
+
+  @ApiProperty({
+    example: 'Giang',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userName: string;
+
+  @ApiProperty({
+    example: '0334644324',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userPhone: string;
+
+  @ApiProperty({
+    example: 'COD000003',
+  })
+  @IsString()
+  @IsNotEmpty()
+  numberAttendCode: string;
+
+  @ApiProperty({
+    example: '',
+  })
+  @IsString()
+  note: string;
+}

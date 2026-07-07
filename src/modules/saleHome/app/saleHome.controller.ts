@@ -81,6 +81,7 @@ export class SaleHomeAppController {
 
   @ApiOperation({
     summary: 'Cập nhật nhà yến sale',
+    description: 'Tái sử dụng **uniqueId** từ API getDetail để dùng upload lại ảnh/video hiện tại',
   })
   @Put('update/:homeCode')
   @HttpCode(HttpStatus.OK)
@@ -102,6 +103,27 @@ export class SaleHomeAppController {
   }
 
   @ApiOperation({
+    summary: 'Xóa nhà yến sale',
+  })
+  @Delete('delete/:homeCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
+  @ApiBadRequestResponse({ type: NumberErrResponseDto })
+  async deleteSaleHome(@Param('homeCode') homeCode: string, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.saleHomeAppService.deleteSaleHome(homeCode, user.userCode);
+    if (!result) {
+      throw new BadRequestException({
+        message: Msg.DeleteErr,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.DeleteOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
     summary: 'Xóa file ảnh/video đã upload',
     description: `Truyền seq của file muốn xóa trên url`,
   })
@@ -117,7 +139,7 @@ export class SaleHomeAppController {
     };
   }
 
-  @ApiOperation({ summary: 'Lấy danh sách nhà yến', description: `Phân trang chỉ có ảnh hưởng với **otherHomes**`})
+  @ApiOperation({ summary: 'Lấy danh sách nhà yến', description: `Phân trang chỉ có ảnh hưởng với **otherHomes**` })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: PagingDto })

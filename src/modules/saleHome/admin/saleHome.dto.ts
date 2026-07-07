@@ -72,3 +72,13 @@ export class UpdateStatusSaleHomeDto {
   @IsNotEmpty()
   status: string;
 }
+
+export class UpdateStatusSightseeingDto {
+  @ApiProperty({
+    example: 'APPROVED',
+  })
+  @IsString()
+  @IsNotEmpty()
+  status: string;
+}
+

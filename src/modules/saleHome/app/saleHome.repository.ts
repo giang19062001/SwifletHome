@@ -154,14 +154,14 @@ export class SaleHomeAppRepository {
   }
 
   async getTotalSaleHomes(isMyHome: boolean, userCode: string): Promise<number> {
-    const userCondition = isMyHome ? `AND userCode = ?` : `AND (userCode != ? OR userCode IS NULL)`;
-    const sql = `SELECT COUNT(seq) as total FROM ${this.table} WHERE status = 'APPROVED' ${userCondition}`;
+    const userCondition = isMyHome ? `AND userCode = ?` : ` AND status = 'APPROVED' AND (userCode != ? OR userCode IS NULL)`;
+    const sql = ` SELECT COUNT(seq) as total FROM ${this.table} WHERE isActive = 'Y' ${userCondition}`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode]);
     return rows[0].total;
   }
 
   async getAllSaleHomes(dto: PagingDto | null, isMyHome: boolean, userCode: string): Promise<GetAllSaleHomeResDto[]> {
-    const userCondition = isMyHome ? `AND h.userCode = ?` : `AND (h.userCode != ? OR h.userCode IS NULL)`;
+    const userCondition = isMyHome ? `AND h.userCode = ?` : `AND h.status = 'APPROVED' AND (h.userCode != ? OR h.userCode IS NULL)`;
 
     let limitClause = '';
     const params: any[] = [userCode];
@@ -180,7 +180,7 @@ export class SaleHomeAppRepository {
               WHERE uniqueId = h.uniqueId AND fileTypeCode = 'FILE_OUTSIDE' 
               ORDER BY seq ASC LIMIT 1) as homeImage
       FROM ${this.table} h
-      WHERE h.status = 'APPROVED' ${userCondition}
+      WHERE h.isActive = 'Y' ${userCondition}
       ORDER BY h.seq DESC
       ${limitClause}
     `;
@@ -198,7 +198,7 @@ export class SaleHomeAppRepository {
              shortDescription, topicsShare, sightseeingAreas, includedServices, serviceNotes, tourFee, durationPerTourMinutes,
              availableDays, timeframes, timeNoticeRequired, commitments
       FROM ${this.table}
-      WHERE homeCode = ? AND status = 'APPROVED' LIMIT 1
+      WHERE homeCode = ? AND status = 'APPROVED' AND isActive = 'Y' LIMIT 1
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [homeCode]);
     if (rows.length === 0) return null;
@@ -269,6 +269,11 @@ export class SaleHomeAppRepository {
     return rows.length > 0 ? rows[0].seq : 0;
   }
 
+  async checkHomeExists(homeCode: string): Promise<{ seq: number; homeName: string } | null> {
+    const sql = ` SELECT seq, homeName FROM ${this.table} WHERE homeCode = ? LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [homeCode]);
+    return rows.length > 0 ? { seq: rows[0].seq, homeName: rows[0].homeName } : null;
+  }
   async updateSaleHome(homeCode: string, dto: UpdateSaleHomeAppDto, userCode: string, latitude: number, longitude: number): Promise<number> {
     const sql = `
       UPDATE ${this.table} SET
@@ -313,6 +318,15 @@ export class SaleHomeAppRepository {
     ];
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, params);
+    return result.affectedRows;
+  }
+
+  async deleteSaleHome(homeCode: string, userCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.table} SET isActive = 'N', updatedId = ?, updatedAt = NOW()
+      WHERE homeCode = ? AND userCode = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, homeCode, userCode]);
     return result.affectedRows;
   }
 }

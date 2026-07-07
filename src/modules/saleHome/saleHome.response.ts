@@ -44,3 +44,18 @@ export class GetDetailSaleHomeAdminResDto {
   policyInfo: PolicyInfoDetailDto;
   files: SaleHomeFileItemResDto[];
 }
+
+export class SaleHomeSightSeeingResDto {
+  seq: number;
+  homeCode: string;
+  userCode: string;
+  userName: string;
+  userPhone: string;
+  numberAttend: string;
+  status: string;
+  note: string;
+  cancelReason: string;
+  createdId: string;
+  updatedId: string;
+}
+

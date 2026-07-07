@@ -1,34 +1,36 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { MailService } from 'src/common/mail/mail.service';
 import { Msg } from 'src/helpers/message.helper';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { OptionService } from 'src/modules/options/option.service';
-import { HomeSaleSightSeeingStatusEnum } from '../homeSale.interface';
-import { HomeSaleIndexAppRepository } from './homeSale-index.repository';
-import { HomeSaleSightseeingAppRepository } from './homeSale-sightseeing.repository';
-import { CreateHomeSightSeeingDto } from './homeSale.dto';
-import { MailService } from 'src/common/mail/mail.service';
+import { HomeSaleSightSeeingStatusEnum } from '../saleHome.interface';
+import { SaleHomeSightseeingAppRepository } from './saleHome-sightseeing.repository';
+import { CreateHomeSightSeeingDto } from './saleHome.dto';
+import { SaleHomeAppRepository } from './saleHome.repository';
 
 @Injectable()
-export class HomeSaleSightseeingAppService {
-  private readonly SERVICE_NAME = 'HomeSaleSightseeingAppService';
+export class SaleHomeSightseeingAppService {
+  private readonly SERVICE_NAME = 'SaleHomeSightseeingAppService';
   constructor(
-    private readonly homeSaleSightseeingAppRepository: HomeSaleSightseeingAppRepository,
-    private readonly homeSaleIndexAppRepository: HomeSaleIndexAppRepository,
+    private readonly saleHomeSightseeingAppRepository: SaleHomeSightseeingAppRepository,
+    private readonly saleHomeAppRepository: SaleHomeAppRepository,
     private readonly optionService: OptionService,
     private readonly logger: LoggingService,
     private readonly mailService: MailService,
   ) {}
+  
   // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/registerSightSeeing:`;
 
     // kiểm tra homeCode
-    const home = await this.homeSaleIndexAppRepository.getDetail(dto.homeCode);
+    const home = await this.saleHomeAppRepository.checkHomeExists(dto.homeCode);
     if (!home) {
       this.logger.error(logbase, `homeCode(${dto.homeCode}) -> ${Msg.HomeNotFound}`);
       throw new BadRequestException({ message: Msg.HomeNotFound, data: 0 });
     }
+    
     // kiểm tra attendCode
     const attendCodes = await this.optionService.getAll({
       mainOption: OPTION_CONST.SIGHTSEEING.mainOption,
@@ -38,8 +40,9 @@ export class HomeSaleSightseeingAppService {
     if (!attendCodes.map((c) => c.code).includes(dto.numberAttendCode)) {
       throw new BadRequestException({ message: Msg.CodeInvalid, data: 0 });
     }
+      
     // mặc định status ban đầu là  'Đang chờ duyệt'
-    const result = await this.homeSaleSightseeingAppRepository.registerSightSeeing(dto, userCode, HomeSaleSightSeeingStatusEnum.WAITING);
+    const result = await this.saleHomeSightseeingAppRepository.registerSightSeeing(dto, userCode, HomeSaleSightSeeingStatusEnum.WAITING);
     this.logger.log(logbase, `Đăng ký tham quan homeCode(${dto.homeCode}) -> ${result ? Msg.RegisterOk : Msg.RegisterErr}`);
 
     // sendEmail

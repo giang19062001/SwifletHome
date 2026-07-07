@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
-import { CreateHomeSightSeeingDto } from './homeSale.dto';
+import { CreateHomeSightSeeingDto } from './saleHome.dto';
 
 @Injectable()
-export class HomeSaleSightseeingAppRepository {
-  private readonly tableSightSeeing = 'tbl_home_sale_sightseeing';
+export class SaleHomeSightseeingAppRepository {
+  private readonly tableSightSeeing = 'tbl_sale_home_sightseeing';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
+  
   // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string, status: string): Promise<number> {
     const sql = `
