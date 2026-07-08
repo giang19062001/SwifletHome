@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import Fuse, { IFuseOptions } from 'fuse.js';
 import { Msg } from 'src/helpers/message.helper';
-import { QuestionResDto } from 'src/modules/question/question.response';
+import { QuestionAppResDto } from '../../modules/question/app/question.response';
 import { UploadAppService } from 'src/modules/upload/app/upload.service';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { FileUploadResDto } from '../../modules/upload/upload.response';
+import { FileUploadAppResDto } from '../../modules/upload/app/upload.response';
 import { LlmService } from '../llm/llm.service';
 import { LoggingService } from '../logger/logger.service';
 import { IChatItem } from './chat.interface';
@@ -42,7 +42,7 @@ export class ChatService {
       .trim();
   }
 
-  handleAudio(content: string, remainDay: number, isFree: string, fileList: FileUploadResDto[]) {
+  handleAudio(content: string, remainDay: number, isFree: string, fileList: FileUploadAppResDto[]) {
     // TODO: [AUDIO]
     return content.replace(/\[\[audio-data=([^\]]+)\]\]/g, (match, url) => {
       const baseUrl = url.split('/').slice(0, 3).join('/');
@@ -109,7 +109,7 @@ export class ChatService {
     return content;
   }
 
-  async reply(question: string, userCode: string, data: IChatItem[], allQuestions: QuestionResDto[] = []): Promise<string> {
+  async reply(question: string, userCode: string, data: IChatItem[], allQuestions: QuestionAppResDto[] = []): Promise<string> {
     const logbase = `${this.SERVICE_NAME}/reply`;
 
     if (!data?.length) {

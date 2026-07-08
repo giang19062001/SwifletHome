@@ -5,8 +5,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
-import { TodoTaskResDto } from '../todo.response';
-import { GetTaskAlarmResDto } from './todo.response';
+import { GetTaskAlarmResDto, TodoTaskAppResDto } from './todo.response';
 
 @Injectable()
 export class TodoAlarmAppRepository {
@@ -19,7 +18,7 @@ export class TodoAlarmAppRepository {
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   // TODO: BOX - TASK
-  async getBoxTasks(): Promise<TodoTaskResDto[]> {
+  async getBoxTasks(): Promise<TodoTaskAppResDto[]> {
     const query = `  SELECT A.seq, A.taskCode, B.taskKeyword, B.taskName, A.sortOrder 
     FROM ${this.tableBoxTask} A
     LEFT JOIN ${this.tableTask} B
@@ -27,22 +26,22 @@ export class TodoAlarmAppRepository {
     WHERE A.isActive = 'Y' `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
-    return rows as TodoTaskResDto[];
+    return rows as TodoTaskAppResDto[];
   }
 
   // TODO: TASK
-  async getTasks(): Promise<TodoTaskResDto[]> {
+  async getTasks(): Promise<TodoTaskAppResDto[]> {
     const query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
-    return rows as TodoTaskResDto[];
+    return rows as TodoTaskAppResDto[];
   }
 
-  async getDetailTask(taskCode: string): Promise<TodoTaskResDto | null> {
+  async getDetailTask(taskCode: string): Promise<TodoTaskAppResDto | null> {
     const query = `  SELECT seq, taskCode, taskName FROM ${this.tableTask} WHERE isActive = 'Y' AND taskCode  = ? LIMIT 1 `;
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, [taskCode]);
-    return rows.length ? (rows[0] as TodoTaskResDto) : null;
+    return rows.length ? (rows[0] as TodoTaskAppResDto) : null;
   }
 
   // TODO: ALARM

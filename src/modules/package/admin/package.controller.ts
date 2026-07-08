@@ -4,7 +4,7 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { PackageResDto } from '../package.response';
+import { PackageAdminResDto } from './package.response';
 import { UpdatePackageDto } from './package.dto';
 import { PackageAdminService } from './package.service';
 
@@ -20,7 +20,7 @@ export class PackageAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: PackageResDto[] }> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: PackageAdminResDto[] }> {
     const result = await this.packageAdminService.getAll(dto);
     return result;
   }
@@ -28,7 +28,7 @@ export class PackageAdminController {
   @ApiParam({ name: 'packageCode', type: String })
   @Get('getDetail/:packageCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('packageCode') packageCode: string): Promise<PackageResDto | null> {
+  async getDetail(@Param('packageCode') packageCode: string): Promise<PackageAdminResDto | null> {
     const result = await this.packageAdminService.getDetail(packageCode);
     if (!result) {
       throw new BadRequestException();

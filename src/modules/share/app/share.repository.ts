@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { ShareItemResDto, HarvestPhaseItemResDto } from '../share.response';
+import { ShareItemAppResDto, HarvestPhaseItemAppResDto } from './share.response';
 
 @Injectable()
 export class ShareAppRepository {
@@ -9,7 +9,7 @@ export class ShareAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getShareByDetails(seqShare: number, shareType: string): Promise<ShareItemResDto | null> {
+  async getShareByDetails(seqShare: number, shareType: string): Promise<ShareItemAppResDto | null> {
     const query = `
       SELECT seq, shareToken, seqShare, shareType, isActive 
       FROM ${this.table}
@@ -17,10 +17,10 @@ export class ShareAppRepository {
       LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [seqShare, shareType]);
-    return rows.length ? (rows[0] as ShareItemResDto) : null;
+    return rows.length ? (rows[0] as ShareItemAppResDto) : null;
   }
 
-  async getShareByToken(shareToken: string): Promise<ShareItemResDto | null> {
+  async getShareByToken(shareToken: string): Promise<ShareItemAppResDto | null> {
     const query = `
       SELECT seq, shareToken, seqShare, shareType, isActive 
       FROM ${this.table}
@@ -28,7 +28,7 @@ export class ShareAppRepository {
       LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [shareToken]);
-    return rows.length ? (rows[0] as ShareItemResDto) : null;
+    return rows.length ? (rows[0] as ShareItemAppResDto) : null;
   }
 
   async insertShare(shareToken: string, seqShare: number, shareType: string): Promise<number> {
@@ -40,7 +40,7 @@ export class ShareAppRepository {
     return result.insertId;
   }
 
-  async getHarvestPhaseBySeq(seqHarvestPhase: number): Promise<HarvestPhaseItemResDto | null> {
+  async getHarvestPhaseBySeq(seqHarvestPhase: number): Promise<HarvestPhaseItemAppResDto | null> {
     const query = `
       SELECT seq, userHomeCode, harvestPhase, harvestYear
       FROM ${this.tableHarvestPhare}
@@ -48,7 +48,7 @@ export class ShareAppRepository {
       LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [seqHarvestPhase]);
-    return rows.length ? (rows[0] as HarvestPhaseItemResDto) : null;
+    return rows.length ? (rows[0] as HarvestPhaseItemAppResDto) : null;
   }
   async checkHarvestPhaseExist(seqHarvestPhase: number, userHomeCode: string, harvestPhase: number, harvestYear: number): Promise<boolean> {
     const query = `

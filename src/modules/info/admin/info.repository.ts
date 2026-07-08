@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { InfoResDto } from '../info.response';
+import { InfoAdminResDto } from './info.response';
 import { UpdateInfoDto } from './info.dto';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class InfoAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<InfoResDto[]> {
+  async getAll(dto: PagingDto): Promise<InfoAdminResDto[]> {
     let query = `  SELECT seq, infoKeyword, infoName, infoContent, infoDescription, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} `;
 
@@ -25,9 +25,9 @@ export class InfoAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as InfoResDto[];
+    return rows as InfoAdminResDto[];
   }
-  async getDetail(infoKeyword: string): Promise<InfoResDto | null> {
+  async getDetail(infoKeyword: string): Promise<InfoAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `  SELECT A.seq, A.infoKeyword, A.infoName, A.infoContent, A.infoDescription, A.isActive,
         A.createdAt, A.updatedAt, A.createdId, A.updatedId 
@@ -36,7 +36,7 @@ export class InfoAdminRepository {
         LIMIT 1`,
       [infoKeyword],
     );
-    return rows ? (rows[0] as InfoResDto) : null;
+    return rows ? (rows[0] as InfoAdminResDto) : null;
   }
 
   async update(dto: UpdateInfoDto, updatedId: string, infoKeyword: string): Promise<number> {

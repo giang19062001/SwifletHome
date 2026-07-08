@@ -8,7 +8,6 @@ import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { TodoTaskAlramResDto } from '../todo.response';
 import { TodoAlarmAppService } from './todo-alarm.service';
 import { TodoHarvestAppService } from './todo-harvest.service';
 import { TodoMedicineAppService } from './todo-medicine.service';
@@ -21,7 +20,15 @@ import {
   SetHarvestTaskDto,
   SetTaskMedicineDto,
 } from './todo.dto';
-import { GetInfoTaskHarvestForAdjustResDto, GetListTaskAlarmsResDto, GetListTaskHarvestResDto, GetScheduledTasksResDto, GetTaskHarvestResDto, GetTasksMedicineResDto } from './todo.response';
+import {
+  GetInfoTaskHarvestForAdjustResDto,
+  GetListTaskAlarmsResDto,
+  GetListTaskHarvestResDto,
+  GetScheduledTasksResDto,
+  GetTaskHarvestResDto,
+  GetTasksMedicineResDto,
+  TodoTaskAlramAppResDto,
+} from './todo.response';
 
 @ApiTags('app/todo')
 @Controller('/api/app/todo')
@@ -60,7 +67,7 @@ export default class TodoAppController {
 **rightEventLabel**: enum('Hoàn thành')  --- Hiển thị text nút bên phải của lịch nhắc trên APP \n
 `,
   })
-  async getAll(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetListTaskAlarmsDTO): Promise<{ total: number; list: TodoTaskAlramResDto[] }> {
+  async getAll(@GetUserApp() user: TokenUserAppResDto, @Body() dto: GetListTaskAlarmsDTO): Promise<{ total: number; list: TodoTaskAlramAppResDto[] }> {
     const result = await this.todoAlarmAppService.getListTaskAlarms(user.userCode, dto.userHomeCode, dto);
     return result;
   }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { formatPrice } from 'src/helpers/func.helper';
-import { PackageResDto } from '../package.response';
+import { PackageAppResDto } from './package.response';
 import { PackageAppRepository } from './package.repository';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class PackageAppService {
     private readonly logger: LoggingService,
   ) {}
 
-  async getOne(): Promise<PackageResDto> {
+  async getOne(): Promise<PackageAppResDto> {
     const result = await this.packageAppRepository.getOne();
 
     return {

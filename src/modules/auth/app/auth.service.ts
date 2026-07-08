@@ -1,21 +1,21 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException, Inject, forwardRef } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { FirebaseService } from 'src/common/firebase/firebase.service';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { BadRequestExceptionNumData } from 'src/filter/badRequestNumber.exception';
 import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
-import { OtpService } from 'src/modules/otp/otp.service';
-import { PhoneCodeService } from 'src/modules/phoneCode/phoneCode.service';
+import { EaterAppService } from 'src/modules/eater/app/eater.service';
+import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/app/otp.dto';
+import { OtpService } from 'src/modules/otp/app/otp.service';
+import { PhoneCodeService } from 'src/modules/phoneCode/app/phoneCode.service';
+import { GetInfoUserAppResDto } from 'src/modules/user/app/user.response';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { USER_CONST } from '../../user/app/user.interface';
 import { AbAuthService } from '../auth.abstract';
 import { AUTH_CONFIG } from '../auth.config';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, TokenEaterAppResDto, TokenUserAppResDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
-import { BadRequestExceptionNumData } from 'src/filter/badRequestNumber.exception';
-import { GetInfoUserAppResDto } from 'src/modules/user/app/user.response';
-import { EaterAppService } from 'src/modules/eater/app/eater.service';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {

@@ -3,8 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { GetAllTeamDto } from './team.dto';
-import { GetAllTeamResDto, GetDetailTeamResDto } from './team.response';
-import { TeamFileTypeResDto, TeamServiceTypeResDto, TeamImgBaseResDto, TeamServiceFileBaseResDto, TeamFileNotUseResDto } from '../team.response';
+import { GetAllTeamResDto, GetDetailTeamResDto, TeamFileTypeAppResDto, TeamServiceTypeAppResDto, TeamImgBaseAppResDto, TeamServiceFileBaseAppResDto, TeamFileNotUseAppResDto } from './team.response';
 import { TeamStatusEnum, YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
@@ -207,9 +206,9 @@ export class TeamUserAppRepository {
     return result.insertId;
   }
 
-  async findMainImageByUniqueId(uniqueId: string): Promise<TeamImgBaseResDto | null> {
+  async findMainImageByUniqueId(uniqueId: string): Promise<TeamImgBaseAppResDto | null> {
     const [rows] = await this.db.execute<RowDataPacket[]>(`SELECT * FROM ${this.tableTeamImg} WHERE uniqueId = ? AND fileTypeCode IS NULL AND teamSeq = 0 LIMIT 1`, [uniqueId]);
-    return rows.length > 0 ? (rows[0] as TeamImgBaseResDto) : null;
+    return rows.length > 0 ? (rows[0] as TeamImgBaseAppResDto) : null;
   }
 
   async uploadFileTeam(uniqueId: string, createdId: string, filenamePath: string, file: Express.Multer.File, fileTypeCode?: string): Promise<number> {
@@ -257,9 +256,9 @@ export class TeamUserAppRepository {
     return result.affectedRows;
   }
 
-  async getFileTeamBySeq(seq: number): Promise<TeamImgBaseResDto | null> {
+  async getFileTeamBySeq(seq: number): Promise<TeamImgBaseAppResDto | null> {
     const [rows] = await this.db.execute<RowDataPacket[]>(`SELECT * FROM ${this.tableTeamImg} WHERE seq = ?`, [seq]);
-    return rows.length > 0 ? (rows[0] as TeamImgBaseResDto) : null;
+    return rows.length > 0 ? (rows[0] as TeamImgBaseAppResDto) : null;
   }
 
   async deleteFileTeam(seq: number): Promise<number> {
@@ -268,9 +267,9 @@ export class TeamUserAppRepository {
     return result.affectedRows;
   }
 
-  async getFileServiceBySeq(seq: number): Promise<TeamServiceFileBaseResDto | null> {
+  async getFileServiceBySeq(seq: number): Promise<TeamServiceFileBaseAppResDto | null> {
     const [rows] = await this.db.execute<RowDataPacket[]>(`SELECT * FROM ${this.tableServiceFile} WHERE seq = ?`, [seq]);
-    return rows.length > 0 ? (rows[0] as TeamServiceFileBaseResDto) : null;
+    return rows.length > 0 ? (rows[0] as TeamServiceFileBaseAppResDto) : null;
   }
 
   async deleteFileService(seq: number): Promise<number> {
@@ -285,25 +284,25 @@ export class TeamUserAppRepository {
     return result.affectedRows;
   }
 
-  async getTeamFileTypes(userTypeCode: string): Promise<TeamFileTypeResDto[]> {
+  async getTeamFileTypes(userTypeCode: string): Promise<TeamFileTypeAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT fileTypeCode, fileTypeText FROM tbl_team_file_type WHERE userTypeCode = ?`, [userTypeCode]);
-    return rows as unknown as TeamFileTypeResDto[];
+    return rows as unknown as TeamFileTypeAppResDto[];
   }
 
-  async getTeamServiceTypes(userTypeCode: string): Promise<TeamServiceTypeResDto[]> {
+  async getTeamServiceTypes(userTypeCode: string): Promise<TeamServiceTypeAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT serviceTypeCode, serviceTypeName FROM ${this.tableServiceType} WHERE userTypeCode = ? AND isActive = 'Y' ORDER BY sortOrder ASC`, [
       userTypeCode,
     ]);
-    return rows as unknown as TeamServiceTypeResDto[];
+    return rows as unknown as TeamServiceTypeAppResDto[];
   }
 
-  async getFilesNotUseTeam(): Promise<TeamFileNotUseResDto[]> {
+  async getFilesNotUseTeam(): Promise<TeamFileNotUseAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq, filename FROM ${this.tableTeamImg} WHERE teamSeq = 0`);
-    return rows as unknown as TeamFileNotUseResDto[];
+    return rows as unknown as TeamFileNotUseAppResDto[];
   }
 
-  async getFilesNotUseService(): Promise<TeamFileNotUseResDto[]> {
+  async getFilesNotUseService(): Promise<TeamFileNotUseAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq, filename FROM ${this.tableServiceFile} WHERE seqService = 0`);
-    return rows as unknown as TeamFileNotUseResDto[];
+    return rows as unknown as TeamFileNotUseAppResDto[];
   }
 }

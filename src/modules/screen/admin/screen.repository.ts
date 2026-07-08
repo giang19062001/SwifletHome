@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ScreenResDto, ScreenVideoResDto } from '../screen.response';
 import { UpdateScreenDto } from './screen.dto';
+import { ScreenAdminResDto, ScreenVideoAdminResDto } from './screen.response';
 
 @Injectable()
 export class ScreenAdminRepository {
@@ -14,7 +14,7 @@ export class ScreenAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<ScreenResDto[]> {
+  async getAll(dto: PagingDto): Promise<ScreenAdminResDto[]> {
     let query = `  SELECT seq, screenKeyword, screenName, screenDescription, contentStart, contentCenter, contentEnd, screenTeamplateKeyword, screenSupportContent, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} WHERE isActive = 'Y' ORDER BY createdAt DESC`;
 
@@ -25,9 +25,9 @@ export class ScreenAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as ScreenResDto[];
+    return rows as ScreenAdminResDto[];
   }
-  async getDetail(screenKeyword: string): Promise<ScreenResDto | null> {
+  async getDetail(screenKeyword: string): Promise<ScreenAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `  SELECT A.seq, A.screenKeyword, A.screenName, A.screenDescription, A.contentStart, A.contentCenter, A.contentEnd, A.screenTeamplateKeyword, A.screenSupportContent, A.isActive,
         A.createdAt, A.updatedAt, A.createdId, A.updatedId 
@@ -36,7 +36,7 @@ export class ScreenAdminRepository {
         LIMIT 1`,
       [screenKeyword],
     );
-    return rows ? (rows[0] as ScreenResDto) : null;
+    return rows ? (rows[0] as ScreenAdminResDto) : null;
   }
 
   async updateBanner(screenKeyword: string, bannerUrl: string, adminId: string): Promise<number> {
@@ -82,11 +82,11 @@ export class ScreenAdminRepository {
   }
 
   // --- Dynamic Video Queries ---
-  async getAllVideos(tableVideo: string): Promise<ScreenVideoResDto[]> {
+  async getAllVideos(tableVideo: string): Promise<ScreenVideoAdminResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT seq, name, address, videoTitle, videoUrl, sortOrder, isActive, createdAt FROM ${tableVideo} WHERE isActive = 'Y' ORDER BY sortOrder ASC, createdAt DESC`,
     );
-    return rows as unknown as ScreenVideoResDto[];
+    return rows as unknown as ScreenVideoAdminResDto[];
   }
 
   async createVideo(tableVideo: string, dto: any, createdId: string): Promise<number> {

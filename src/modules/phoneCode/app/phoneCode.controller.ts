@@ -2,7 +2,7 @@ import { Controller, Get, HttpCode, HttpStatus, UseInterceptors } from '@nestjs/
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { GetPhoneCodeResDto, PhoneCodeResDto } from './phoneCode.response';
+import { GetPhoneCodeAppResDto, PhoneCodeAppResDto } from './phoneCode.response';
 import { PhoneCodeService } from './phoneCode.service';
 
 @ApiTags('app/phoneCode')
@@ -16,8 +16,8 @@ export default class PhoneCodeController {
   })
   @Get('getAll')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([GetPhoneCodeResDto]) })
-  async getAll(): Promise<PhoneCodeResDto[]> {
+  @ApiOkResponse({ type: ApiAppResponseDto([GetPhoneCodeAppResDto]) })
+  async getAll(): Promise<PhoneCodeAppResDto[]> {
     const result = await this.phoneCodeService.getAll();
     return result;
   }

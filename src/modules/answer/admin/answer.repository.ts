@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { AnswerResDto } from '../answer.response';
+import { AnswerAdminResDto } from './answer.response';
 import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class AnswerAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause} AND isActive = 'Y'`, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: GetAllAnswerDto): Promise<AnswerResDto[]> {
+  async getAll(dto: GetAllAnswerDto): Promise<AnswerAdminResDto[]> {
     const params: any[] = [];
 
     let whereClause = 'WHERE 1 = 1';
@@ -62,9 +62,9 @@ export class AnswerAdminRepository {
       ${limitClause}`,
       params,
     );
-    return rows as AnswerResDto[];
+    return rows as AnswerAdminResDto[];
   }
-  async getDetail(answerCode: string): Promise<AnswerResDto | null> {
+  async getDetail(answerCode: string): Promise<AnswerAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.answerCode, A.answerContent, A.answerObject, A.answerCategory, A.isActive, A.isFree, A.createdAt, A.createdId,
         B.categoryName, C.objectName
@@ -77,7 +77,7 @@ export class AnswerAdminRepository {
         LIMIT 1 `,
       [answerCode],
     );
-    return rows ? (rows[0] as AnswerResDto) : null;
+    return rows ? (rows[0] as AnswerAdminResDto) : null;
   }
   async create(dto: CreateAnswerDto, createdId: string): Promise<number> {
     const sqlLast = ` SELECT answerCode FROM ${this.table} ORDER BY answerCode DESC LIMIT 1`;

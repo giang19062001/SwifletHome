@@ -15,9 +15,7 @@ import { CreateHomeSightSeeingDto } from './saleHome.dto';
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
 export class SaleHomeSightseeingAppController {
-  constructor(
-    private readonly saleHomeSightseeingAppService: SaleHomeSightseeingAppService,
-  ) {}
+  constructor(private readonly saleHomeSightseeingAppService: SaleHomeSightseeingAppService) {}
 
   // TODO: SIGHTSEEING
   @ApiOperation({

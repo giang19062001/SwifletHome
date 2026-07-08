@@ -1,53 +1,35 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { PackageOptionTypeEnum } from '../package.interface';
-
-export class PackageResDto {
-  @ApiProperty()
-  seq: number;
-
-  @ApiProperty()
-  packageCode: string;
-
-  @ApiProperty()
-  packageName: string;
-
-  @ApiProperty()
-  packagePrice: string;
-
-  @ApiProperty()
-  packageExpireDay: number;
-
-  @ApiProperty()
-  packageDescription: string;
-}
-export class PackageAppResDto {
+export class BlogAdminResDto {
   @ApiProperty({ example: 0 })
   seq: number;
 
   @ApiProperty({ example: '' })
-  packageCode: string;
+  blogCode: string;
 
   @ApiProperty({ example: '' })
-  packageName: string;
+  blogName: string;
 
   @ApiProperty({ example: '' })
-  packageDescription: string;
+  blogObject: string;
 
   @ApiProperty({ example: '' })
-  packagePrice: string;
+  blogContent: string;
 
   @ApiProperty({ example: '' })
-  packageItemSamePrice: string;
-
-  @ApiProperty({ example: 0 })
-  packageExpireDay: number;
+  blogCategory: string;
 
   @ApiProperty({ example: '' })
-  packageOptionType: PackageOptionTypeEnum;
+  blogScreenCode: string;
 
   @ApiProperty({ example: YnEnum.N })
   isActive: YnEnum;
+
+  @ApiProperty({ example: YnEnum.N })
+  isFree: YnEnum;
+
+  @ApiProperty({ example: YnEnum.N })
+  isMain: YnEnum;
 
   @ApiProperty({ example: new Date() })
   createdAt: Date;

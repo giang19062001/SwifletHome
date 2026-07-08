@@ -37,3 +37,16 @@ export class GetShareDataResDto {
   @ApiPropertyOptional({ type: () => ShareDataHarvestDto })
   shareData?: ShareDataHarvestDto;
 }
+export class ShareItemAppResDto {
+  seq: number;
+  shareToken: string;
+  seqShare: number;
+  shareType: string;
+  isActive: string;
+}
+export class HarvestPhaseItemAppResDto {
+  seq: number;
+  userHomeCode: string;
+  harvestPhase: number;
+  harvestYear: number;
+}

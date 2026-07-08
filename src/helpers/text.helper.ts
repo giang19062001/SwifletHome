@@ -1,17 +1,17 @@
-import { PackageResDto } from '../modules/package/package.response';
+import { PackageAppResDto } from '../modules/package/app/package.response';
 
 export const NOTIFICATIONS = {
   UPDATE_STATUS_CONSIGNMENT: (consignmentCode: string, noticeContent: string) => ({
     TITLE: 'Thông báo gửi yến đi nước ngoài',
     BODY: `Đơn hàng #${consignmentCode} - ${noticeContent}`,
   }),
-  UPDATE_PACKAGE_FRIST_TIME: (packageData?: PackageResDto | null, startDate?: string, endDate?: string) => ({
+  UPDATE_PACKAGE_FRIST_TIME: (packageData?: PackageAppResDto | null, startDate?: string, endDate?: string) => ({
     TITLE: 'Thông báo kích hoạt gói',
     BODY: !packageData
       ? 'Gói Miễn phí được kích hoạt thành công'
       : `Cảm ơn bạn đã sử dụng dịch vụ 3FAM của chúng tôi. Tài khoản của bạn (${packageData.packageName} đã được kích hoạt thành công, có hiệu lực từ ${startDate} đến ${endDate})`,
   }),
-  UPDATE_PACKAGE_TIMES: (packageData?: PackageResDto | null, startDate?: string, endDate?: string) => ({
+  UPDATE_PACKAGE_TIMES: (packageData?: PackageAppResDto | null, startDate?: string, endDate?: string) => ({
     TITLE: 'Thông báo gia hạn gói',
     BODY: !packageData
       ? 'Gói Miễn phí được gia hạn thành công'

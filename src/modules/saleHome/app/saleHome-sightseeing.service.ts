@@ -19,7 +19,7 @@ export class SaleHomeSightseeingAppService {
     private readonly logger: LoggingService,
     private readonly mailService: MailService,
   ) {}
-  
+
   // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/registerSightSeeing:`;
@@ -30,7 +30,7 @@ export class SaleHomeSightseeingAppService {
       this.logger.error(logbase, `homeCode(${dto.homeCode}) -> ${Msg.HomeNotFound}`);
       throw new BadRequestException({ message: Msg.HomeNotFound, data: 0 });
     }
-    
+
     // kiểm tra attendCode
     const attendCodes = await this.optionService.getAll({
       mainOption: OPTION_CONST.SIGHTSEEING.mainOption,
@@ -40,7 +40,7 @@ export class SaleHomeSightseeingAppService {
     if (!attendCodes.map((c) => c.code).includes(dto.numberAttendCode)) {
       throw new BadRequestException({ message: Msg.CodeInvalid, data: 0 });
     }
-      
+
     // mặc định status ban đầu là  'Đang chờ duyệt'
     const result = await this.saleHomeSightseeingAppRepository.registerSightSeeing(dto, userCode, HomeSaleSightSeeingStatusEnum.WAITING);
     this.logger.log(logbase, `Đăng ký tham quan homeCode(${dto.homeCode}) -> ${result ? Msg.RegisterOk : Msg.RegisterErr}`);

@@ -4,7 +4,7 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { QuestionResDto } from '../question.response';
+import { QuestionAdminResDto } from './question.response';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 import { QuestionAdminService } from './question.service';
 
@@ -20,7 +20,7 @@ export class QuestionAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: QuestionResDto[] }> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: QuestionAdminResDto[] }> {
     const result = await this.questionAdminService.getAll(dto);
     return result;
   }
@@ -28,7 +28,7 @@ export class QuestionAdminController {
   @ApiParam({ name: 'questionCode', type: String })
   @Get('getDetail/:questionCode')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('questionCode') questionCode: string): Promise<QuestionResDto | null> {
+  async getDetail(@Param('questionCode') questionCode: string): Promise<QuestionAdminResDto | null> {
     const result = await this.questionAdminService.getDetail(questionCode);
     if (!result) {
       throw new BadRequestException();

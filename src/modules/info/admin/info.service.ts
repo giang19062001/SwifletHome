@@ -4,7 +4,7 @@ import { getFileLocation, validateImgExt } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { IMG_TYPES } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
-import { InfoResDto } from '../info.response';
+import { InfoAdminResDto } from './info.response';
 import { UpdateInfoDto } from './info.dto';
 import { InfoAdminRepository } from './info.repository';
 
@@ -37,12 +37,12 @@ export class InfoAdminService {
       throw new BadRequestException(Msg.FileWrongType(file.originalname, IMG_TYPES));
     }
   }
-  async getAll(dto: PagingDto): Promise<{ total: number; list: InfoResDto[] }> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: InfoAdminResDto[] }> {
     const total = await this.infoAdminRepository.getTotal();
     const list = await this.infoAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(infoKeyword: string): Promise<InfoResDto | null> {
+  async getDetail(infoKeyword: string): Promise<InfoAdminResDto | null> {
     const result = await this.infoAdminRepository.getDetail(infoKeyword);
     if (result && result.infoContent && typeof result.infoContent === 'object' && 'vat' in result.infoContent) {
       result.infoContent.vat = Number(result.infoContent.vat);

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ObjectResDto } from '../object.response';
+import { ObjectAdminResDto } from './object.response';
 
 @Injectable()
 export class ObjectAdminRepository {
@@ -13,7 +13,7 @@ export class ObjectAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y' `);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<ObjectResDto[]> {
+  async getAll(dto: PagingDto): Promise<ObjectAdminResDto[]> {
     let query = `  SELECT seq, objectKeyword, objectName, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table} 
          WHERE isActive = 'Y'
@@ -26,6 +26,6 @@ export class ObjectAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as ObjectResDto[];
+    return rows as ObjectAdminResDto[];
   }
 }

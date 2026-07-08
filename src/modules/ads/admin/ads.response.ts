@@ -1,4 +1,4 @@
-export class AdsBannerResDto {
+export class AdsBannerAdminResDto {
   seq: number;
   uniqueId: string;
   title: string;
@@ -17,8 +17,7 @@ export class AdsBannerResDto {
   createdId: string;
   updatedId: string;
 }
-
-export class AdsFileNotUseResDto {
+export class AdsFileNotUseAdminResDto {
   seq: number;
   adsSeq: number;
   uniqueId: string;

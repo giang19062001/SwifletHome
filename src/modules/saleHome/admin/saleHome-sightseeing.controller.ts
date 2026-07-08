@@ -4,7 +4,7 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { SaleHomeSightSeeingResDto } from '../saleHome.response';
+import { SaleHomeSightSeeingAdminResDto } from './saleHome.response';
 import { UpdateStatusSightseeingDto } from './saleHome.dto';
 import { SaleHomeSightseeingAdminService } from './saleHome-sightseeing.service';
 
@@ -21,7 +21,7 @@ export class SaleHomeSightseeingAdminController {
   })
   @Post('getAllSightseeing')
   @HttpCode(HttpStatus.OK)
-  async getAllSightseeing(@Body() dto: PagingDto): Promise<{ total: number; list: SaleHomeSightSeeingResDto[] }> {
+  async getAllSightseeing(@Body() dto: PagingDto): Promise<{ total: number; list: SaleHomeSightSeeingAdminResDto[] }> {
     const result = await this.saleHomeSightseeingAdminService.getAllSightseeing(dto);
     return result;
   }
@@ -41,7 +41,7 @@ export class SaleHomeSightseeingAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Get('getDetailSightseeing/:seq')
   @HttpCode(HttpStatus.OK)
-  async getDetailSightseeing(@Param('seq') seq: number): Promise<SaleHomeSightSeeingResDto | null> {
+  async getDetailSightseeing(@Param('seq') seq: number): Promise<SaleHomeSightSeeingAdminResDto | null> {
     const result = await this.saleHomeSightseeingAdminService.getDetailSightseeing(seq);
     if (!result) {
       throw new BadRequestException();

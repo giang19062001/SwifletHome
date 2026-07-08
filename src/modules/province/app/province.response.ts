@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-
-export class GetProvinceResDto {
+export class GetProvinceAppResDto {
   @ApiProperty({ example: 0 })
   seq: number;
 
@@ -10,8 +9,7 @@ export class GetProvinceResDto {
   @ApiProperty({ example: '' })
   provinceName: string;
 }
-
-export class ProvinceResDto {
+export class ProvinceAppResDto {
   @ApiProperty({ example: 0 })
   seq: number;
   @ApiProperty({ example: 0 })

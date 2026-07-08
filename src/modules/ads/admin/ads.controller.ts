@@ -8,7 +8,7 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { AdsBannerResDto } from '../ads.response';
+import { AdsBannerAdminResDto } from './ads.response';
 import { CreateAdsBannerDto, UpdateAdsBannerDto, AdsFileDto } from './ads.dto';
 import { AdsAdminService } from './ads.service';
 
@@ -33,14 +33,14 @@ export class AdsAdminController {
   @ApiBody({ type: PagingDto })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: AdsBannerResDto[] }> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: AdsBannerAdminResDto[] }> {
     return await this.adsAdminService.getAll(dto);
   }
 
   @ApiParam({ name: 'seq', type: Number })
   @Get('getDetail/:seq')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('seq') seq: number): Promise<AdsBannerResDto | null> {
+  async getDetail(@Param('seq') seq: number): Promise<AdsBannerAdminResDto | null> {
     const result = await this.adsAdminService.getDetail(seq);
     if (!result) throw new BadRequestException();
     return result;

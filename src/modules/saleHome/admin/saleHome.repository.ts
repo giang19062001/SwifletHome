@@ -5,8 +5,8 @@ import { CODES } from 'src/helpers/const.helper';
 import { generateCode, safeParseArray } from 'src/helpers/func.helper';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { SaleHomeOptionData, SaleHomeFileTypeData } from '../saleHome.interface';
-import { GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto, SaleHomeFileItemResDto } from '../saleHome.response';
 import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto } from './saleHome.dto';
+import { SaleHomeFileItemAdminResDto, GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto } from './saleHome.response';
 
 @Injectable()
 export class SaleHomeAdminRepository {
@@ -133,7 +133,7 @@ export class SaleHomeAdminRepository {
         timeNoticeRequired: h.timeNoticeRequired,
         commitments: getOpts(safeParseArray(h.commitments)),
       },
-      files: fileRows as unknown as SaleHomeFileItemResDto[],
+      files: fileRows as unknown as SaleHomeFileItemAdminResDto[],
     };
   }
 

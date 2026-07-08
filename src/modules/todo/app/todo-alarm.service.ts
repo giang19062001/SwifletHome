@@ -5,7 +5,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
-import { TodoTaskResDto } from '../todo.response';
+import { TodoTaskAppResDto } from './todo.response';
 import { TodoAlarmAppRepository } from './todo-alram.repository';
 import { TodoHarvestAppRepository } from './todo-harvest.repository';
 import { TodoMedicineAppRepository } from './todo-medicine.repository';
@@ -121,7 +121,7 @@ export class TodoAlarmAppService {
   }
 
   // TODO: TASK
-  async getTasks(): Promise<TodoTaskResDto[]> {
+  async getTasks(): Promise<TodoTaskAppResDto[]> {
     const logbase = `${this.SERVICE_NAME}/getTasks:`;
     const list = await this.todoAlarmAppRepository.getTasks();
     return list;

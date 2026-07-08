@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { AuthAppService } from 'src/modules/auth/app/auth.service';
-import { FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { GetAllMediaDto } from './upload.dto';
 import { UploadAppRepository } from './upload.repository';
+import { FileUploadAppResDto, FileMediaAppResDto } from './upload.response';
 
 @Injectable()
 export class UploadAppService {
@@ -16,8 +16,8 @@ export class UploadAppService {
   ) {}
 
   //*media
-  async getAllMedia(dto: GetAllMediaDto, userCode: string): Promise<{ total: number; list: FileMediaResDto[] }> {
-    let list: FileMediaResDto[] = [];
+  async getAllMedia(dto: GetAllMediaDto, userCode: string): Promise<{ total: number; list: FileMediaAppResDto[] }> {
+    let list: FileMediaAppResDto[] = [];
     const userPackageInfo = await this.authAppService.getInfo(userCode);
 
     const isUpgrade = userPackageInfo?.packageCode && userPackageInfo.packageRemainDay > 0 ? 'UPGRADE' : 'NOT_UPGRADE';
@@ -65,7 +65,7 @@ export class UploadAppService {
     };
   }
   //*upload-editor
-  async getAllAudioFile(): Promise<FileUploadResDto[]> {
+  async getAllAudioFile(): Promise<FileUploadAppResDto[]> {
     const audios = await this.uploadAppRepository.getAllAudioFile();
     return audios;
   }

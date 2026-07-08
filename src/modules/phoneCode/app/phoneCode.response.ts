@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-
-export class GetPhoneCodeResDto {
+export class GetPhoneCodeAppResDto {
   @ApiProperty({ example: 0 })
   seq: number;
 
@@ -13,8 +12,7 @@ export class GetPhoneCodeResDto {
   @ApiProperty({ example: '' })
   isoCode: string;
 }
-
-export class PhoneCodeResDto {
+export class PhoneCodeAppResDto {
   @ApiProperty({ example: 0 })
   seq: number;
   @ApiProperty({ example: 0 })

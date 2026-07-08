@@ -2,12 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
 import { InfoAppService } from 'src/modules/info/app/info.service';
-import { InfoBankResDto } from 'src/modules/info/info.response';
+import { InfoBankAppResDto } from '../../../info/app/info.response';
 import { PackageAppService } from 'src/modules/package/app/package.service';
 import { PackageOptionTypeEnum } from 'src/modules/package/package.interface';
-import { ScreenSignupServiceResDto } from '../../screen.response';
 import { IScreenStrategy } from '../screen.interface';
-import { GetContentScreenResDto } from '../screen.response';
+import { GetContentScreenResDto, ScreenSignupServiceAppResDto } from '../screen.response';
 
 @Injectable()
 export class SignupServiceStrategy implements IScreenStrategy {
@@ -58,7 +57,7 @@ export class SignupServiceStrategy implements IScreenStrategy {
     } else {
       // thông tin chuyển khoản
       const bankInfo = await this.infoAppService.getDetail('BANK');
-      const infoContent: InfoBankResDto = bankInfo ? bankInfo.infoContent : null;
+      const infoContent: InfoBankAppResDto = bankInfo ? bankInfo.infoContent : null;
       result = {
         contentStart: replaceNbspToSpace(screen.contentStart),
         contentCenter: {
@@ -66,7 +65,7 @@ export class SignupServiceStrategy implements IScreenStrategy {
           bankInfo: infoContent ? { ...infoContent, accountName: `${infoContent.accountNumber} - ${infoContent.accountName}` } : null,
         },
         contentEnd: replaceNbspToSpace(screen.contentEnd ?? ''),
-      } as ScreenSignupServiceResDto;
+      } as ScreenSignupServiceAppResDto;
     }
 
     return result;

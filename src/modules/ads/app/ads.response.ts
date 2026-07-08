@@ -34,3 +34,31 @@ export class AdsBannerResDto {
   @ApiProperty({ example: 'https://example.com' })
   actionValue: string;
 }
+
+export class AdsBannerAppResDto {
+  seq: number;
+  uniqueId: string;
+  title: string;
+  bannerUrl: string;
+  bannerType: string;
+  position: string;
+  displayOrder: number;
+  startTime: Date;
+  endTime: Date;
+  targetScreen: string;
+  actionType: string;
+  actionValue: string;
+  isActive: string;
+  createdAt: Date;
+  updatedAt: Date;
+  createdId: string;
+  updatedId: string;
+}
+
+export class AdsFileNotUseAppResDto {
+  seq: number;
+  adsSeq: number;
+  uniqueId: string;
+  filename: string;
+  mimetype: string;
+}

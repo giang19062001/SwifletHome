@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
-import { UserHomeProvinceForPushResDto, UserHomeForPushResDto } from '../../notification/notification.response';
 import { UserHomeResDto } from '../app/userHome.dto';
+import { UserHomeProvinceForPushAdminResDto, UserHomeForPushAdminResDto } from '../../notification/admin/notification.response';
 
 @Injectable()
 export class UserHomeAdminRepository {
@@ -76,7 +76,7 @@ export class UserHomeAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
     return rows as UserHomeResDto[];
   }
-  async getUserHomesByUser(userCode?: string | string[]): Promise<UserHomeForPushResDto[]> {
+  async getUserHomesByUser(userCode?: string | string[]): Promise<UserHomeForPushAdminResDto[]> {
     try {
       let query = `
       SELECT B.userCode, B.deviceToken, A.userHomeCode
@@ -100,14 +100,14 @@ export class UserHomeAdminRepository {
       }
 
       const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-      return rows as UserHomeForPushResDto[];
+      return rows as UserHomeForPushAdminResDto[];
     } catch (error) {
       console.log(error);
       return [];
     }
   }
 
-  async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvinceForPushResDto[]> {
+  async getUserHomesByProvinces(provinceCodes: string[]): Promise<UserHomeProvinceForPushAdminResDto[]> {
     try {
       if (!provinceCodes.length) return [];
 
@@ -123,7 +123,7 @@ export class UserHomeAdminRepository {
     `;
 
       const [rows] = await this.db.query<RowDataPacket[]>(query, provinceCodes);
-      return rows as UserHomeProvinceForPushResDto[];
+      return rows as UserHomeProvinceForPushAdminResDto[];
     } catch (error) {
       console.log(error);
       return [];

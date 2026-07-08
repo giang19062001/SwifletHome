@@ -3,7 +3,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { DoctorStatusEnum } from '../doctor.interface';
-import { DoctorFileStrResDto } from '../doctor.response';
+import { DoctorFileStrAppResDto } from './doctor.response';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
 
@@ -49,10 +49,10 @@ export class DoctorAppService {
       return 0;
     }
   }
-  async uploadRequestFile(userCode: string, dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<DoctorFileStrResDto[]> {
+  async uploadRequestFile(userCode: string, dto: DoctorFileDto, doctorFiles: Express.Multer.File[]): Promise<DoctorFileStrAppResDto[]> {
     const logbase = `${this.SERVICE_NAME}/uploadFile:`;
     try {
-      const res: DoctorFileStrResDto[] = [];
+      const res: DoctorFileStrAppResDto[] = [];
       if (doctorFiles.length > 0) {
         for (const file of doctorFiles) {
           this.logger.log(logbase, `Đang Upload file.. ${JSON.stringify(file)}`);

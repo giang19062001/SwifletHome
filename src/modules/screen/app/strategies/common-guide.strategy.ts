@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { APP_SCREENS } from 'src/helpers/const.helper';
-import { ScreenCommonGuideResDto } from '../../screen.response';
 import { IScreenStrategy } from '../screen.interface';
-import { GetContentScreenResDto } from '../screen.response';
+import { GetContentScreenResDto, ScreenCommonGuideAppResDto } from '../screen.response';
 
 @Injectable()
 export class CommonGuideStrategy implements IScreenStrategy {
@@ -17,6 +16,6 @@ export class CommonGuideStrategy implements IScreenStrategy {
       contentStart: screen.contentStart,
       contentCenter: {},
       contentEnd: '',
-    } as ScreenCommonGuideResDto;
+    } as ScreenCommonGuideAppResDto;
   }
 }

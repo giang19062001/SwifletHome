@@ -1,18 +1,16 @@
-export class TeamFileTypeResDto {
+export class TeamFileTypeAdminResDto {
   seq?: number;
   fileTypeCode: string;
   fileTypeText: string;
   isActive?: string;
 }
-
-export class TeamServiceTypeResDto {
+export class TeamServiceTypeAdminResDto {
   seq: number;
   userTypeCode: string;
   serviceTypeCode: string;
   serviceTypeName: string;
 }
-
-export class TeamImgBaseResDto {
+export class TeamImgBaseAdminResDto {
   seq: number;
   teamSeq?: number;
   filename: string;
@@ -23,8 +21,7 @@ export class TeamImgBaseResDto {
   fileTypeCode?: string;
   uniqueId?: string;
 }
-
-export class TeamServiceBaseResDto {
+export class TeamServiceBaseAdminResDto {
   seq: number;
   seqTeam: number;
   uniqueId: string;
@@ -32,8 +29,7 @@ export class TeamServiceBaseResDto {
   serviceTypeCode: string;
   serviceTextInput: string;
 }
-
-export class TeamServiceFileBaseResDto {
+export class TeamServiceFileBaseAdminResDto {
   seq: number;
   seqService: number;
   filename: string;
@@ -43,8 +39,7 @@ export class TeamServiceFileBaseResDto {
   isActive: string;
   uniqueId?: string;
 }
-
-export class TeamFileNotUseResDto {
+export class TeamFileNotUseAdminResDto {
   seq: number;
   filename: string;
 }

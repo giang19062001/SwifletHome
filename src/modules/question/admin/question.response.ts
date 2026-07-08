@@ -1,46 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
-
-export class GetContentBlogResDto {
-  @ApiProperty()
-  blogCode: string;
-
-  @ApiProperty()
-  blogName: string;
-
-  @ApiProperty()
-  blogContent: string;
-}
-export class BlogAppResDto {
+export class QuestionAdminResDto {
   @ApiProperty({ example: 0 })
   seq: number;
 
   @ApiProperty({ example: '' })
-  blogCode: string;
+  questionCode: string;
 
   @ApiProperty({ example: '' })
-  blogName: string;
+  questionContent: string;
 
   @ApiProperty({ example: '' })
-  blogObject: string;
+  questionObject: string;
 
   @ApiProperty({ example: '' })
-  blogContent: string;
-
-  @ApiProperty({ example: '' })
-  blogCategory: string;
-
-  @ApiProperty({ example: '' })
-  blogScreenCode: string;
+  questionCategory: string;
 
   @ApiProperty({ example: YnEnum.N })
   isActive: YnEnum;
-
-  @ApiProperty({ example: YnEnum.N })
-  isFree: YnEnum;
-
-  @ApiProperty({ example: YnEnum.N })
-  isMain: YnEnum;
 
   @ApiProperty({ example: new Date() })
   createdAt: Date;
@@ -53,4 +30,13 @@ export class BlogAppResDto {
 
   @ApiProperty({ example: '' })
   updatedId: string;
+
+  @ApiProperty({ example: '' })
+  answerCode: string;
+
+  @ApiProperty({ example: '' })
+  categoryQuesName!: string;
+
+  @ApiProperty({ example: '' })
+  answerContent!: string;
 }

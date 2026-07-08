@@ -5,9 +5,9 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { TodoBoxTaskResDto, TodoTaskResDto } from '../todo.response';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
 import { TodoAdminService } from './todo.service';
+import { TodoBoxTaskAdminResDto, TodoTaskAdminResDto } from './todo.response';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/todo')
@@ -21,14 +21,14 @@ export class TodoAdminController {
   })
   @Post('getAllTasks')
   @HttpCode(HttpStatus.OK)
-  async getAllTasks(@Body() dto: PagingDto): Promise<{ total: number; list: TodoTaskResDto[] }> {
+  async getAllTasks(@Body() dto: PagingDto): Promise<{ total: number; list: TodoTaskAdminResDto[] }> {
     const result = await this.todoAdminService.getAllTasks(dto);
     return result;
   }
 
   @Get('getBoxTasks')
   @HttpCode(HttpStatus.OK)
-  async getBoxTasks(): Promise<TodoBoxTaskResDto[]> {
+  async getBoxTasks(): Promise<TodoBoxTaskAdminResDto[]> {
     const result = await this.todoAdminService.getBoxTasks();
     return result;
   }

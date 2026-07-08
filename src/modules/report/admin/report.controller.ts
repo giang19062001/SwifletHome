@@ -1,8 +1,8 @@
 import { Controller, Get, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { ReportOverviewResDto } from './report.response';
 import { ReportAdminService } from './report.service';
-import { ReportOverviewResDto } from './report.dto';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/report')

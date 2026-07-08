@@ -3,9 +3,9 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { NotificationStatusEnum } from '../notification.interface';
-import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from '../notification.response';
 import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusDto } from './notification.dto';
 import { NotificationAppRepository } from './notification.repository';
+import { NotificationAppResDto, NotificationTopicAppResDto, UserNotificationTopicAppResDto } from './notification.response';
 
 @Injectable()
 export class NotificationAppService {
@@ -16,7 +16,7 @@ export class NotificationAppService {
     private readonly userAppService: UserAppService,
     private readonly logger: LoggingService,
   ) {}
-  async getAllTopic(dto: PagingDto = { limit: 0, page: 0 }): Promise<{ total: number; list: NotificationTopicResDto[] }> {
+  async getAllTopic(dto: PagingDto = { limit: 0, page: 0 }): Promise<{ total: number; list: NotificationTopicAppResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAllTopic`;
 
     const total = await this.notificationAppRepository.getTotalTopic();
@@ -24,7 +24,7 @@ export class NotificationAppService {
     return { total, list };
   }
   //* lấy các thông báo có userCode là user hiện tại OR có userCodesMulticast chứa userCode của user hiện tại OR thông báo là thông báo chung cho toàn user
-  async getAll(dto: PagingDto, userCode: string): Promise<{ total: number; list: NotificationResDto[] }> {
+  async getAll(dto: PagingDto, userCode: string): Promise<{ total: number; list: NotificationAppResDto[] }> {
     const logbase = `${this.SERVICE_NAME}/getAll:`;
     // kiem tra user có bị xóa ko
     const checkUserHas = await this.userAppService.findByCode(userCode);
@@ -47,7 +47,7 @@ export class NotificationAppService {
       return 0;
     }
   }
-  async getDetail(notificationId: string, userCode: string): Promise<NotificationResDto | null> {
+  async getDetail(notificationId: string, userCode: string): Promise<NotificationAppResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getDetail`;
     const result = await this.notificationAppRepository.getDetail(notificationId, userCode);
     return result;
@@ -130,7 +130,7 @@ export class NotificationAppService {
     return result;
   }
 
-  async getUserSubscribedTopics(userCode: string): Promise<UserNotificationTopicResDto[]> {
+  async getUserSubscribedTopics(userCode: string): Promise<UserNotificationTopicAppResDto[]> {
     return await this.notificationAppRepository.getUserSubscribedTopics(userCode);
   }
 

@@ -1,7 +1,7 @@
-import { HomeInfoDetailDto, HostInfoDetailDto, PolicyInfoDetailDto, TourInfoDetailDto } from './app/saleHome.response';
-import { NestInfoDto } from './app/saleHome.dto';
+import { HomeInfoDetailDto, HostInfoDetailDto, PolicyInfoDetailDto, TourInfoDetailDto } from '../app/saleHome.response';
+import { NestInfoDto } from '../app/saleHome.dto';
 
-export class SaleHomeFileItemResDto {
+export class SaleHomeFileItemAdminResDto {
   seq: number;
   homeCode: string;
   uniqueId: string;
@@ -13,13 +13,11 @@ export class SaleHomeFileItemResDto {
   isActive: string;
   createdAt: Date;
 }
-
-export class SaleHomeOptionResDto {
+export class SaleHomeOptionAdminResDto {
   seq: number;
   homeCode: string;
   optionCode: string;
 }
-
 export class GetAllSaleHomeAdminResDto {
   homeCode: string;
   homeName: string;
@@ -31,7 +29,6 @@ export class GetAllSaleHomeAdminResDto {
   createdAt: Date;
   homeImage: string;
 }
-
 export class GetDetailSaleHomeAdminResDto {
   homeCode: string;
   status: string;
@@ -42,10 +39,9 @@ export class GetDetailSaleHomeAdminResDto {
   nestInfo: NestInfoDto;
   tourInfo: TourInfoDetailDto;
   policyInfo: PolicyInfoDetailDto;
-  files: SaleHomeFileItemResDto[];
+  files: SaleHomeFileItemAdminResDto[];
 }
-
-export class SaleHomeSightSeeingResDto {
+export class SaleHomeSightSeeingAdminResDto {
   seq: number;
   homeCode: string;
   userCode: string;
@@ -58,4 +54,3 @@ export class SaleHomeSightSeeingResDto {
   createdId: string;
   updatedId: string;
 }
-

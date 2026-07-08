@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { formatDecimal } from 'src/helpers/func.helper';
-import { PackageResDto } from '../package.response';
+import { PackageAdminResDto } from './package.response';
 import { UpdatePackageDto } from './package.dto';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class PackageAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}  WHERE isActive = 'Y' `);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<PackageResDto[]> {
+  async getAll(dto: PagingDto): Promise<PackageAdminResDto[]> {
     let query = `  SELECT seq, packageCode, packageName, packagePrice, packageItemSamePrice, packageExpireDay, packageDescription,
         packageOptionType, isActive, createdAt, updatedAt, createdId, updatedId 
         FROM ${this.table}
@@ -29,9 +29,9 @@ export class PackageAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as PackageResDto[];
+    return rows as PackageAdminResDto[];
   }
-  async getDetail(packageCode: string): Promise<PackageResDto | null> {
+  async getDetail(packageCode: string): Promise<PackageAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, packageCode, packageName, packagePrice, packageItemSamePrice, packageExpireDay, packageDescription,
         packageOptionType, isActive, createdAt, updatedAt, createdId, updatedId 
@@ -39,7 +39,7 @@ export class PackageAdminRepository {
         WHERE packageCode = ? AND isActive = 'Y'`,
       [packageCode],
     );
-    return rows ? (rows[0] as PackageResDto) : null;
+    return rows ? (rows[0] as PackageAdminResDto) : null;
   }
   async update(dto: UpdatePackageDto, updatedId: string, packageCode: string): Promise<number> {
     const sql = `

@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ScreenResDto, ScreenVideoResDto } from '../screen.response';
 import { UpdateScreenDto } from './screen.dto';
 import { ScreenAdminRepository } from './screen.repository';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ScreenAdminResDto, ScreenVideoAdminResDto } from './screen.response';
 
 @Injectable()
 export class ScreenAdminService {
   constructor(private readonly screenAdminRepository: ScreenAdminRepository) {}
-  async getAll(dto: PagingDto): Promise<{ total: number; list: ScreenResDto[] }> {
+  async getAll(dto: PagingDto): Promise<{ total: number; list: ScreenAdminResDto[] }> {
     const total = await this.screenAdminRepository.getTotal();
     const list = await this.screenAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(screenKeyword: string): Promise<ScreenResDto | null> {
+  async getDetail(screenKeyword: string): Promise<ScreenAdminResDto | null> {
     const result = await this.screenAdminRepository.getDetail(screenKeyword);
     return result ?? null;
   }
@@ -71,7 +71,7 @@ export class ScreenAdminService {
     return tableVideo;
   }
 
-  async getAllVideos(screenKeyword: string): Promise<ScreenVideoResDto[]> {
+  async getAllVideos(screenKeyword: string): Promise<ScreenVideoAdminResDto[]> {
     const tableVideo = await this.getTableVideo(screenKeyword);
     return this.screenAdminRepository.getAllVideos(tableVideo);
   }

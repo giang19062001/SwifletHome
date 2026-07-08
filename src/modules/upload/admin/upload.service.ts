@@ -4,9 +4,9 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { sortByDate } from 'src/helpers/func.helper';
 import { Msg } from 'src/helpers/message.helper';
-import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
 import { UploadAdminRepository } from './upload.repository';
+import { FileUploadAdminResDto, AudioFreePayAdminResDto, FileMediaAdminResDto } from './upload.response';
 
 @Injectable()
 export class UploadAdminService {
@@ -92,26 +92,26 @@ export class UploadAdminService {
     return result;
   }
   //* get
-  async getAllAudioFile(): Promise<FileUploadResDto[]> {
+  async getAllAudioFile(): Promise<FileUploadAdminResDto[]> {
     const audios = await this.uploadAdminRepository.getAllAudioFile();
     return audios;
   }
-  async getAllFile(): Promise<FileUploadResDto[]> {
+  async getAllFile(): Promise<FileUploadAdminResDto[]> {
     const files = await this.uploadAdminRepository.getAllImgFile();
     const audios = await this.uploadAdminRepository.getAllAudioFile();
     const videos = await this.uploadAdminRepository.getAllVideoLink();
     return sortByDate('createdAt', [...files, ...audios, ...videos]);
   }
-  async getAllMediaAudioFile(): Promise<FileMediaResDto[]> {
+  async getAllMediaAudioFile(): Promise<FileMediaAdminResDto[]> {
     const audios = await this.uploadAdminRepository.getAllMediaAudioFile();
     return sortByDate('createdAt', [...audios]);
   }
 
-  async getAllMediaVideoLink(): Promise<FileMediaResDto[]> {
+  async getAllMediaVideoLink(): Promise<FileMediaAdminResDto[]> {
     const videos = await this.uploadAdminRepository.getAllMediaVideoLink();
     return sortByDate('createdAt', [...videos]);
   }
-  async getFileAudio(seq: number): Promise<AudioFreePayResDto | null> {
+  async getFileAudio(seq: number): Promise<AudioFreePayAdminResDto | null> {
     const files = await this.uploadAdminRepository.getFileAudio(seq);
     return files;
   }

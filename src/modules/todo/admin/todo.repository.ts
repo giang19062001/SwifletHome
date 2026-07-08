@@ -4,8 +4,8 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { TaskStatusEnum } from '../todo.interface';
-import { TodoBoxTaskResDto, TodoTaskResDto } from '../todo.response';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskDto } from './todo.dto';
+import { TodoBoxTaskAdminResDto, TodoTaskAdminResDto } from './todo.response';
 
 @Injectable()
 export class TodoAdminRepository {
@@ -19,7 +19,7 @@ export class TodoAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableTask} WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllTasks(dto: PagingDto): Promise<TodoTaskResDto[]> {
+  async getAllTasks(dto: PagingDto): Promise<TodoTaskAdminResDto[]> {
     let query = `  SELECT seq, taskCode, taskName, createdId, createdAt
         FROM ${this.tableTask} 
         WHERE isActive = 'Y'
@@ -32,17 +32,17 @@ export class TodoAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as TodoTaskResDto[];
+    return rows as TodoTaskAdminResDto[];
   }
   // TODO: BOX-TASK
-  async getBoxTasks(): Promise<TodoBoxTaskResDto[]> {
+  async getBoxTasks(): Promise<TodoBoxTaskAdminResDto[]> {
     const query = `  SELECT seq, taskCode, sortOrder, isActive
         FROM ${this.tableBoxTask} 
         WHERE isActive = 'Y' AND seq IN(1,2,3)
         ORDER BY sortOrder ASC
         LIMIT 3 `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, []);
-    return rows as TodoBoxTaskResDto[];
+    return rows as TodoBoxTaskAdminResDto[];
   }
   async updateBoxTask(dto: UpdateBoxTaskDto, updatedId: string): Promise<number> {
     const sql = `

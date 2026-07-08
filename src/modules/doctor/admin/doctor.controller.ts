@@ -4,7 +4,7 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { DoctorResDto } from '../doctor.response';
+import { DoctorAdminResDto } from './doctor.response';
 import { UpdateDoctorDto } from './doctor.dto';
 import { DoctorAdminService } from './doctor.service';
 
@@ -20,7 +20,7 @@ export class DoctorAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: DoctorResDto[] }> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: DoctorAdminResDto[] }> {
     const result = await this.doctorAdminService.getAll(dto);
     return result;
   }
@@ -28,7 +28,7 @@ export class DoctorAdminController {
   @ApiParam({ name: 'seq', type: Number })
   @Get('getDetail/:seq')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('seq') seq: number): Promise<DoctorResDto | null> {
+  async getDetail(@Param('seq') seq: number): Promise<DoctorAdminResDto | null> {
     const result = await this.doctorAdminService.getDetail(seq);
     if (!result) {
       throw new BadRequestException();

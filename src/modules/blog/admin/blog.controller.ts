@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { BlogResDto } from '../blog.response';
+import { BlogAdminResDto } from './blog.response';
 import { ChangToMainBlogDto, CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 import { BlogAdminService } from './blog.service';
 
@@ -19,7 +19,7 @@ export class BlogAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: GetAllBlogDto): Promise<{ total: number; list: BlogResDto[] }> {
+  async getAll(@Body() dto: GetAllBlogDto): Promise<{ total: number; list: BlogAdminResDto[] }> {
     const result = await this.blogAdminService.getAll(dto);
     return result;
   }
@@ -27,7 +27,7 @@ export class BlogAdminController {
   @Get('getDetail/:blogCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'blogCode', type: String })
-  async getDetail(@Param('blogCode') blogCode: string): Promise<BlogResDto | null> {
+  async getDetail(@Param('blogCode') blogCode: string): Promise<BlogAdminResDto | null> {
     const result = await this.blogAdminService.getDetail(blogCode);
     if (!result) {
       throw new BadRequestException();

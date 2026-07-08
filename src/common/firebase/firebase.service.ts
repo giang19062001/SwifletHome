@@ -10,7 +10,7 @@ import { NotificationAppService } from 'src/modules/notification/app/notificatio
 import { NotificationMessageIdEnum, NotificationMethodEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
 import { v4 as uuidv4 } from 'uuid';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
-import { UserNotificationTopicResDto } from '../../modules/notification/notification.response';
+import { UserNotificationTopicAppResDto } from '../../modules/notification/app/notification.response';
 import { LoggingService } from '../logger/logger.service';
 import { PushDataPayload } from './firebase.interface';
 
@@ -421,7 +421,7 @@ export class FirebaseService implements OnModuleInit {
     }
 
     // Sync DB - chỉ insert những topic còn thiếu
-    const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: UserNotificationTopicResDto) => sub.topicCode === topic.topicCode));
+    const missingTopics = allTopics.filter((topic) => !existingSubs.some((sub: UserNotificationTopicAppResDto) => sub.topicCode === topic.topicCode));
     for (const topic of missingTopics) {
       await this.notificationAppService.subscribeToTopic(userCode, topic.topicCode);
     }

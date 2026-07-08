@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { CategoryResDto } from '../category.response';
+import { CategoryAdminResDto } from './category.response';
 import { CategoryAdminService } from './category.service';
 
 @ApiBearerAuth('admin-auth')
@@ -17,7 +17,7 @@ export class CategoryAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: CategoryResDto[] }> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: CategoryAdminResDto[] }> {
     const result = await this.categoryAdminService.getAll(dto);
     return result;
   }

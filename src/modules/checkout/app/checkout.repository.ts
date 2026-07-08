@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { CheckoutPayDto } from './checkout.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
-import { CheckoutCurrentPackageResDto, CheckoutPackageByExpireDayResDto } from '../checkout.response';
+import { CheckoutCurrentPackageAppResDto, CheckoutPackageByExpireDayAppResDto } from './checkout.response';
 
 @Injectable()
 export class CheckoutAppRepository {
@@ -86,16 +86,16 @@ export class CheckoutAppRepository {
     return result.affectedRows;
   }
 
-  async getCurrentPackage(userCode: string): Promise<CheckoutCurrentPackageResDto | null> {
+  async getCurrentPackage(userCode: string): Promise<CheckoutCurrentPackageAppResDto | null> {
     const sql = `SELECT packageCode, startDate, endDate FROM ${this.tablePackage} WHERE userCode = ? LIMIT 1`;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [userCode]);
-    return rows.length ? (rows[0] as CheckoutCurrentPackageResDto) : null;
+    return rows.length ? (rows[0] as CheckoutCurrentPackageAppResDto) : null;
   }
 
-  async getPackageByExpireDay(expireDay: number): Promise<CheckoutPackageByExpireDayResDto | null> {
+  async getPackageByExpireDay(expireDay: number): Promise<CheckoutPackageByExpireDayAppResDto | null> {
     const sql = `SELECT packageCode, packageExpireDay FROM tbl_package WHERE isActive = 'Y' AND packageExpireDay = ? LIMIT 1`;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, [expireDay]);
-    return rows.length ? (rows[0] as CheckoutPackageByExpireDayResDto) : null;
+    return rows.length ? (rows[0] as CheckoutPackageByExpireDayAppResDto) : null;
   }
 
   async existsById(id: string): Promise<number | null> {

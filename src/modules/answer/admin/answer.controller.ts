@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { AnswerResDto } from '../answer.response';
+import { AnswerAdminResDto } from './answer.response';
 import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
 import { AnswerAdminService } from './answer.service';
 
@@ -19,7 +19,7 @@ export class AnswerAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: GetAllAnswerDto): Promise<{ total: number; list: AnswerResDto[] }> {
+  async getAll(@Body() dto: GetAllAnswerDto): Promise<{ total: number; list: AnswerAdminResDto[] }> {
     const result = await this.answerAdminService.getAll(dto);
     return result;
   }
@@ -27,7 +27,7 @@ export class AnswerAdminController {
   @Get('getDetail/:answerCode')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'answerCode', type: String })
-  async getDetail(@Param('answerCode') answerCode: string): Promise<AnswerResDto | null> {
+  async getDetail(@Param('answerCode') answerCode: string): Promise<AnswerAdminResDto | null> {
     const result = await this.answerAdminService.getDetail(answerCode);
     if (!result) {
       throw new BadRequestException();

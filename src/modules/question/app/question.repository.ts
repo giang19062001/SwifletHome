@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { QuestionResDto } from '../question.response';
+import { QuestionAppResDto } from './question.response';
 
 @Injectable()
 export class QuestionAppRepository {
@@ -8,12 +8,12 @@ export class QuestionAppRepository {
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getQuestionReplied(): Promise<QuestionResDto[]> {
+  async getQuestionReplied(): Promise<QuestionAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT  A.questionContent, A.answerCode
         FROM ${this.table} A 
        WHERE A.answerCode IS NOT NULL AND A.isActive = 'Y' `,
     );
-    return rows as QuestionResDto[];
+    return rows as QuestionAppResDto[];
   }
 }

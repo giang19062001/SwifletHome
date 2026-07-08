@@ -5,7 +5,7 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { InfoResDto } from '../info.response';
+import { InfoAdminResDto } from './info.response';
 import { UpdateInfoDto } from './info.dto';
 import { InfoAdminService } from './info.service';
 
@@ -21,7 +21,7 @@ export class InfoAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: InfoResDto[] }> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: InfoAdminResDto[] }> {
     const result = await this.infoAdminService.getAll(dto);
     return result;
   }
@@ -29,7 +29,7 @@ export class InfoAdminController {
   @ApiParam({ name: 'infoKeyword', type: String })
   @Get('getDetail/:infoKeyword')
   @HttpCode(HttpStatus.OK)
-  async getDetail(@Param('infoKeyword') infoKeyword: string): Promise<InfoResDto | null> {
+  async getDetail(@Param('infoKeyword') infoKeyword: string): Promise<InfoAdminResDto | null> {
     const result = await this.infoAdminService.getDetail(infoKeyword);
     if (!result) {
       throw new BadRequestException();

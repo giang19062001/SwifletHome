@@ -5,9 +5,9 @@ import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { GetInitFormMutationResDto } from '../app/saleHome.response';
-import { GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto } from '../saleHome.response';
 import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto, UpdateStatusSaleHomeDto, UploadFilesAdminDto } from './saleHome.dto';
 import { SaleHomeAdminRepository } from './saleHome.repository';
+import { GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto } from './saleHome.response';
 
 @Injectable()
 export class SaleHomeAdminService {

@@ -5,7 +5,7 @@ import { BlogAdminService } from './modules/blog/admin/blog.service';
 import { CategoryAdminService } from './modules/category/admin/category.service';
 import { ObjectAdminService } from './modules/object/admin/object.service';
 import { OptionService } from './modules/options/option.service';
-import { ProvinceService } from './modules/province/province.service';
+import { ProvinceService } from './modules/province/app/province.service';
 import { QrAdminService } from './modules/qr/admin/qr.service';
 import { SaleHomeAdminService } from './modules/saleHome/admin/saleHome.service';
 import { ScreenAdminService } from './modules/screen/admin/screen.service';

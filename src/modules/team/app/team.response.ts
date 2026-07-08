@@ -220,3 +220,48 @@ export class CheckAvailableTeamResDto {
   @ApiProperty({ example: TeamStatusEnum.APPROVE, enum: TeamStatusEnum })
   status: TeamStatusEnum;
 }
+export class TeamFileTypeAppResDto {
+  seq?: number;
+  fileTypeCode: string;
+  fileTypeText: string;
+  isActive?: string;
+}
+export class TeamServiceTypeAppResDto {
+  seq: number;
+  userTypeCode: string;
+  serviceTypeCode: string;
+  serviceTypeName: string;
+}
+export class TeamImgBaseAppResDto {
+  seq: number;
+  teamSeq?: number;
+  filename: string;
+  originalname: string;
+  size: number;
+  mimetype: string;
+  isActive: string;
+  fileTypeCode?: string;
+  uniqueId?: string;
+}
+export class TeamServiceBaseAppResDto {
+  seq: number;
+  seqTeam: number;
+  uniqueId: string;
+  userTypeCode: string;
+  serviceTypeCode: string;
+  serviceTextInput: string;
+}
+export class TeamServiceFileBaseAppResDto {
+  seq: number;
+  seqService: number;
+  filename: string;
+  originalname: string;
+  size: number;
+  mimetype: string;
+  isActive: string;
+  uniqueId?: string;
+}
+export class TeamFileNotUseAppResDto {
+  seq: number;
+  filename: string;
+}

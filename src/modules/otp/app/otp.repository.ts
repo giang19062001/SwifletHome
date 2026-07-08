@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { OtpResDto } from './otp.dto';
+import { OtpResDto } from '../app/otp.dto';
 
 @Injectable()
 export class OtpRepository {

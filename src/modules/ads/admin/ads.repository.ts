@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { AdsBannerResDto, AdsFileNotUseResDto } from '../ads.response';
 import { CreateAdsBannerDto, UpdateAdsBannerDto } from './ads.dto';
+import { AdsBannerAdminResDto, AdsFileNotUseAdminResDto } from './ads.response';
 
 @Injectable()
 export class AdsAdminRepository {
@@ -15,7 +15,7 @@ export class AdsAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<AdsBannerResDto[]> {
+  async getAll(dto: PagingDto): Promise<AdsBannerAdminResDto[]> {
     let query = ` SELECT A.seq, A.title, B.filename as bannerUrl, A.uniqueId, A.bannerType, A.position, A.displayOrder, A.startTime, A.endTime, A.targetScreen, A.actionType, A.actionValue, A.isActive, A.createdAt, A.createdId
         FROM ${this.table} A
         LEFT JOIN ${this.tableFile} B ON A.seq = B.adsSeq AND B.isActive = 'Y'
@@ -29,9 +29,9 @@ export class AdsAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as AdsBannerResDto[];
+    return rows as AdsBannerAdminResDto[];
   }
-  async getDetail(seq: number): Promise<AdsBannerResDto | null> {
+  async getDetail(seq: number): Promise<AdsBannerAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.title, B.filename as bannerUrl, A.uniqueId, A.bannerType, A.position, A.displayOrder, A.startTime, A.endTime, A.targetScreen, A.actionType, A.actionValue, A.isActive, A.createdAt, A.createdId
         FROM ${this.table} A
@@ -40,7 +40,7 @@ export class AdsAdminRepository {
         LIMIT 1`,
       [seq],
     );
-    return rows ? (rows[0] as AdsBannerResDto) : null;
+    return rows ? (rows[0] as AdsBannerAdminResDto) : null;
   }
   async create(dto: CreateAdsBannerDto, createdId: string): Promise<number> {
     const sql = `
@@ -127,12 +127,12 @@ export class AdsAdminRepository {
     return result.affectedRows;
   }
 
-  async getFilesNotUse(): Promise<AdsFileNotUseResDto[]> {
+  async getFilesNotUse(): Promise<AdsFileNotUseAdminResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.adsSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A
         WHERE A.adsSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL) OR A.isActive = 'N' `,
     );
-    return rows as AdsFileNotUseResDto[];
+    return rows as AdsFileNotUseAdminResDto[];
   }
 
   async deleteFile(seq: number): Promise<number> {

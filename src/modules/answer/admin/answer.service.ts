@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { QuestionAdminService } from 'src/modules/question/admin/question.service';
-import { AnswerResDto } from '../answer.response';
+import { AnswerAdminResDto } from './answer.response';
 import { CreateAnswerDto, GetAllAnswerDto, UpdateAnswerDto } from './answer.dto';
 import { AnswerAdminRepository } from './answer.repository';
 
@@ -10,12 +10,12 @@ export class AnswerAdminService {
     private readonly answerAdminRepository: AnswerAdminRepository,
     private readonly questionAdminService: QuestionAdminService,
   ) {}
-  async getAll(dto: GetAllAnswerDto): Promise<{ total: number; list: AnswerResDto[] }> {
+  async getAll(dto: GetAllAnswerDto): Promise<{ total: number; list: AnswerAdminResDto[] }> {
     const total = await this.answerAdminRepository.getTotal(dto);
     const list = await this.answerAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getDetail(answerCode: string): Promise<AnswerResDto | null> {
+  async getDetail(answerCode: string): Promise<AnswerAdminResDto | null> {
     const result = await this.answerAdminRepository.getDetail(answerCode);
     return result;
   }

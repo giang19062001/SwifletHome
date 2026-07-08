@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { OptionService } from 'src/modules/options/option.service';
-import { ProvinceService } from 'src/modules/province/province.service';
+import { ProvinceService } from 'src/modules/province/app/province.service';
+import { v4 as uuidv4 } from 'uuid';
 import { TeamUserAppRepository } from './team-user.repository';
-import { CreateTeamAppDto, DeleteFileAppDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto } from './team.dto';
-import { GetAllTeamDto } from './team.dto';
+import { CreateTeamAppDto, DeleteFileAppDto, GetAllTeamDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto } from './team.dto';
 import { CheckAvailableTeamResDto, GetAllTeamResDto, GetDetailTeamResDto, InitFormCreateTeamAppResDto } from './team.response';
-import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class TeamUserAppService {

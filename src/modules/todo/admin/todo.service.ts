@@ -9,9 +9,9 @@ import { NotificationAdminService } from 'src/modules/notification/admin/notific
 import { NOTIFICATION_CONST } from 'src/modules/notification/notification.interface';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { UserHomeAdminService } from 'src/modules/userHome/admin/userHome.service';
-import { TodoBoxTaskResDto, TodoTaskResDto } from '../todo.response';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';
 import { TodoAdminRepository } from './todo.repository';
+import { TodoBoxTaskAdminResDto, TodoTaskAdminResDto } from './todo.response';
 
 @Injectable()
 export class TodoAdminService {
@@ -25,12 +25,12 @@ export class TodoAdminService {
     private readonly userAdminService: UserAdminService,
     private readonly userHomeAdminService: UserHomeAdminService,
   ) {}
-  async getAllTasks(dto: PagingDto): Promise<{ total: number; list: TodoTaskResDto[] }> {
+  async getAllTasks(dto: PagingDto): Promise<{ total: number; list: TodoTaskAdminResDto[] }> {
     const total = await this.todoAdminRepository.getTotalTasks();
     const list = await this.todoAdminRepository.getAllTasks(dto);
     return { total, list };
   }
-  async getBoxTasks(): Promise<TodoBoxTaskResDto[]> {
+  async getBoxTasks(): Promise<TodoBoxTaskAdminResDto[]> {
     const result = await this.todoAdminRepository.getBoxTasks();
     return result;
   }

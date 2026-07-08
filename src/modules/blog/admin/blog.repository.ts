@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { BlogResDto } from '../blog.response';
+import { BlogAdminResDto } from './blog.response';
 import { CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class BlogAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} ${whereClause}`, params);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: GetAllBlogDto): Promise<BlogResDto[]> {
+  async getAll(dto: GetAllBlogDto): Promise<BlogAdminResDto[]> {
     const params: any[] = [];
 
     let whereClause = ` WHERE  A.isActive = 'Y' `;
@@ -62,9 +62,9 @@ export class BlogAdminRepository {
       ${limitClause}`,
       params,
     );
-    return rows as BlogResDto[];
+    return rows as BlogAdminResDto[];
   }
-  async getMainBlog(): Promise<BlogResDto | null> {
+  async getMainBlog(): Promise<BlogAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain
             FROM ${this.table} A 
@@ -72,9 +72,9 @@ export class BlogAdminRepository {
             LIMIT 1 `,
       [],
     );
-    return rows ? (rows[0] as BlogResDto) : null;
+    return rows ? (rows[0] as BlogAdminResDto) : null;
   }
-  async getDetail(blogCode: string): Promise<BlogResDto | null> {
+  async getDetail(blogCode: string): Promise<BlogAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.blogCode, A.blogName, A.blogContent, A.blogObject, A.blogCategory, A.isActive, A.isFree, A.createdAt, A.createdId, A.isMain,
         B.categoryName, C.objectName
@@ -87,7 +87,7 @@ export class BlogAdminRepository {
         LIMIT 1 `,
       [blogCode],
     );
-    return rows ? (rows[0] as BlogResDto) : null;
+    return rows ? (rows[0] as BlogAdminResDto) : null;
   }
   async create(dto: CreateBlogDto, isMain: string, createdId: string): Promise<number> {
     const sqlLast = ` SELECT blogCode FROM ${this.table} ORDER BY blogCode DESC LIMIT 1`;

@@ -1,6 +1,6 @@
+import { NestInfoDto } from './saleHome.dto';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { SaleHomeFileItemResDto } from '../saleHome.response';
-import { HomeInfoDto, HostInfoDto, NestInfoDto, PolicyInfoDto, TourInfoDto } from './saleHome.dto';
+import { HomeInfoDto, HostInfoDto, PolicyInfoDto, TourInfoDto } from './saleHome.dto';
 
 export class OptionSimpleDto {
   @ApiProperty()
@@ -137,6 +137,18 @@ export class PolicyInfoDetailDto extends OmitType(PolicyInfoDto, ['availableDays
   commitments: OptionSimpleDto[];
 }
 
+export class SaleHomeFileItemAppResDto {
+  seq: number;
+  homeCode: string;
+  uniqueId: string;
+  fileTypeCode: string;
+  fileUrl: string;
+  originalname: string;
+  mimetype: string;
+  size: number;
+  isActive: string;
+  createdAt: Date;
+}
 export class GetDetailSaleHomeResDto {
   @ApiProperty({ example: 'HOM000001' })
   homeCode: string;
@@ -162,6 +174,48 @@ export class GetDetailSaleHomeResDto {
   @ApiProperty({ type: PolicyInfoDetailDto })
   policyInfo: PolicyInfoDetailDto;
 
-  @ApiProperty({ type: [SaleHomeFileItemResDto] })
-  files: SaleHomeFileItemResDto[];
+  @ApiProperty({ type: [SaleHomeFileItemAppResDto] })
+  files: SaleHomeFileItemAppResDto[];
+}
+
+export class SaleHomeOptionAppResDto {
+  seq: number;
+  homeCode: string;
+  optionCode: string;
+}
+export class GetAllSaleHomeAppResDto {
+  homeCode: string;
+  homeName: string;
+  homeLocation: string;
+  status: string;
+  userCode: string;
+  hostName: string;
+  hostPhone: string;
+  createdAt: Date;
+  homeImage: string;
+}
+export class GetDetailSaleHomeAppResDto {
+  homeCode: string;
+  status: string;
+  uniqueId: string;
+  userCode: string;
+  hostInfo: HostInfoDetailDto;
+  homeInfo: HomeInfoDetailDto;
+  nestInfo: NestInfoDto;
+  tourInfo: TourInfoDetailDto;
+  policyInfo: PolicyInfoDetailDto;
+  files: SaleHomeFileItemAppResDto[];
+}
+export class SaleHomeSightSeeingAppResDto {
+  seq: number;
+  homeCode: string;
+  userCode: string;
+  userName: string;
+  userPhone: string;
+  numberAttend: string;
+  status: string;
+  note: string;
+  cancelReason: string;
+  createdId: string;
+  updatedId: string;
 }

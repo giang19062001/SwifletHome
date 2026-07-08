@@ -1,5 +1,4 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, UseGuards, UseInterceptors } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { GetUserApp } from 'src/decorator/auth.decorator';
@@ -8,9 +7,9 @@ import { NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
-import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/otp.dto';
-import { RequestOtpResDto } from 'src/modules/otp/otp.response';
+import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/app/otp.dto';
 import { ChangeTypeTokenAppResDto, GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
+import { RequestOtpAppResDto } from '../../otp/app/otp.response';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { ApiAuthAppGuard } from './auth.guard';
 import { AuthAppService } from './auth.service';
@@ -184,7 +183,7 @@ export class AuthAppController {
   })
   @Post('requestOtp')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(RequestOtpResDto) })
+  @ApiOkResponse({ type: ApiAppResponseDto(RequestOtpAppResDto) })
   async requestOtp(@Body() dto: RequestOtpDto) {
     const otpCode = await this.authAppService.requestOtp(dto);
     return {

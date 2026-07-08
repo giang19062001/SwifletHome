@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { ChatService } from 'src/common/chat/chat.service';
 import { QuestionAppService } from 'src/modules/question/app/question.service';
-import { QuestionResDto } from '../../question/question.response';
-import { AnswerResDto } from '../answer.response';
+import { QuestionAppResDto } from '../../question/app/question.response';
+import { AnswerAppResDto } from './answer.response';
 import { AnswerAppRepository } from './answer.repository';
 
 @Injectable()
@@ -18,8 +18,8 @@ export class AnswerAppService {
   ) {}
 
   async reply(question: string, userCode: string): Promise<string> {
-    const questions: QuestionResDto[] = await this.questionAppService.getQuestionReplied();
-    let answers: AnswerResDto[] = [];
+    const questions: QuestionAppResDto[] = await this.questionAppService.getQuestionReplied();
+    let answers: AnswerAppResDto[] = [];
 
     if (questions.length) {
       const answerCodes = [...new Set(questions.map((q) => q.answerCode).filter(Boolean))];

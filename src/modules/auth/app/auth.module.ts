@@ -1,10 +1,10 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { OtpAppModule } from 'src/modules/otp/otp.module';
-import { PhoneCodeModule } from 'src/modules/phoneCode/phoneCode.module';
-import { UserAppModule } from 'src/modules/user/app/user.module';
 import { EaterAppModule } from 'src/modules/eater/app/eater.module';
+import { OtpAppModule } from 'src/modules/otp/app/otp.module';
+import { PhoneCodeModule } from 'src/modules/phoneCode/app/phoneCode.module';
+import { UserAppModule } from 'src/modules/user/app/user.module';
 import { AuthAppController } from './auth.controller';
 import { AuthAppService } from './auth.service';
 

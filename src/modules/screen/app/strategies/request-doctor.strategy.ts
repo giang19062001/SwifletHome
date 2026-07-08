@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
-import { ScreenRequestDoctorResDto } from '../../screen.response';
 import { IScreenStrategy } from '../screen.interface';
 import { ScreenAppRepository } from '../screen.repository';
-import { GetContentScreenResDto } from '../screen.response';
+import { GetContentScreenResDto, ScreenRequestDoctorAppResDto } from '../screen.response';
 
 @Injectable()
 export class RequestDoctorStrategy implements IScreenStrategy {
@@ -61,6 +60,6 @@ export class RequestDoctorStrategy implements IScreenStrategy {
         listVideo: Object.values(groupedVideos),
       },
       contentEnd: replaceNbspToSpace(screen.contentEnd ?? ''),
-    } as ScreenRequestDoctorResDto;
+    } as ScreenRequestDoctorAppResDto;
   }
 }

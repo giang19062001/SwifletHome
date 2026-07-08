@@ -6,9 +6,9 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { AudioFreePayResDto, FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { UploadAudioFilesDto, UploadImgFileDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
 import { UploadAdminService } from './upload.service';
+import { FileUploadAdminResDto, AudioFreePayAdminResDto, FileMediaAdminResDto } from './upload.response';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/upload')
@@ -126,21 +126,21 @@ export class UploadAdminController {
 
   @Get('getAllFile')
   @HttpCode(HttpStatus.OK)
-  async getAll(): Promise<FileUploadResDto[]> {
+  async getAll(): Promise<FileUploadAdminResDto[]> {
     const result = await this.uploadAdminService.getAllFile();
     return result;
   }
 
   @Get('getAllMediaAudioFile')
   @HttpCode(HttpStatus.OK)
-  async getAllMediaAudioFile(): Promise<FileMediaResDto[]> {
+  async getAllMediaAudioFile(): Promise<FileMediaAdminResDto[]> {
     const result = await this.uploadAdminService.getAllMediaAudioFile();
     return result;
   }
 
   @Get('getAllMediaVideoLink')
   @HttpCode(HttpStatus.OK)
-  async getAllMediaVideoLink(): Promise<FileMediaResDto[]> {
+  async getAllMediaVideoLink(): Promise<FileMediaAdminResDto[]> {
     const result = await this.uploadAdminService.getAllMediaVideoLink();
     return result;
   }
@@ -148,7 +148,7 @@ export class UploadAdminController {
   @Get('getFileAudio/:seq')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'seq', type: Number })
-  async getFileAudio(@Param('seq') seq: number): Promise<AudioFreePayResDto | null> {
+  async getFileAudio(@Param('seq') seq: number): Promise<AudioFreePayAdminResDto | null> {
     const result = await this.uploadAdminService.getFileAudio(seq);
     return result;
   }

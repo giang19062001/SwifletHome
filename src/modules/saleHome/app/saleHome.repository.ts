@@ -5,9 +5,8 @@ import { CODES } from 'src/helpers/const.helper';
 import { generateCode, safeParseArray } from 'src/helpers/func.helper';
 import { OPTION_CONST } from 'src/modules/options/option.interface';
 import { SaleHomeFileTypeData, SaleHomeOptionData } from '../saleHome.interface';
-import { SaleHomeFileItemResDto } from '../saleHome.response';
 import { CreateSaleHomeAppDto, UpdateSaleHomeAppDto } from './saleHome.dto';
-import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto } from './saleHome.response';
+import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto, SaleHomeFileItemAppResDto } from './saleHome.response';
 
 @Injectable()
 export class SaleHomeAppRepository {
@@ -259,7 +258,7 @@ export class SaleHomeAppRepository {
         timeNoticeRequired: h.timeNoticeRequired,
         commitments: getOpts(safeParseArray(h.commitments)),
       },
-      files: fileRows as unknown as SaleHomeFileItemResDto[],
+      files: fileRows as unknown as SaleHomeFileItemAppResDto[],
     };
   }
 
@@ -314,7 +313,7 @@ export class SaleHomeAppRepository {
       JSON.stringify(dto.policyInfo?.commitments),
       userCode,
       homeCode,
-      userCode
+      userCode,
     ];
 
     const [result] = await this.db.execute<ResultSetHeader>(sql, params);

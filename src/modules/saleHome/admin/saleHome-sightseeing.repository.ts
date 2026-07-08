@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { SaleHomeSightSeeingResDto } from '../saleHome.response';
+import { SaleHomeSightSeeingAdminResDto } from './saleHome.response';
 import { UpdateStatusSightseeingDto } from './saleHome.dto';
 
 @Injectable()
@@ -9,16 +9,16 @@ export class SaleHomeSightseeingAdminRepository {
   private readonly tableSaleHome = 'tbl_sale_home';
   private readonly tableSightseeing = 'tbl_sale_home_sightseeing';
   private readonly tableOptionCommon = 'tbl_option_common';
-  
+
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  
+
   // TODO: SIGHTSEEING
   async getTotalSightseeing(): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableSightseeing} WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  
-  async getAllSightseeing(dto: PagingDto): Promise<SaleHomeSightSeeingResDto[]> {
+
+  async getAllSightseeing(dto: PagingDto): Promise<SaleHomeSightSeeingAdminResDto[]> {
     let query = `  SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.status, A.note, A.cancelReason, A.createdAt,
           B.homeName, C.valueOption AS numberAttend
           FROM ${this.tableSightseeing} A 
@@ -36,10 +36,10 @@ export class SaleHomeSightseeingAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as SaleHomeSightSeeingResDto[];
+    return rows as SaleHomeSightSeeingAdminResDto[];
   }
 
-  async getDetailSightseeing(seq: number): Promise<SaleHomeSightSeeingResDto | null> {
+  async getDetailSightseeing(seq: number): Promise<SaleHomeSightSeeingAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.homeCode, A.userCode, A.userName, A.userPhone, A.numberAttendCode, A.status, A.note, A.cancelReason, A.createdAt,
           B.homeName, C.valueOption AS numberAttend
@@ -52,7 +52,7 @@ export class SaleHomeSightseeingAdminRepository {
           LIMIT 1 `,
       [seq],
     );
-    return rows.length ? (rows[0] as SaleHomeSightSeeingResDto) : null;
+    return rows.length ? (rows[0] as SaleHomeSightSeeingAdminResDto) : null;
   }
 
   async updateSightseeing(dto: UpdateStatusSightseeingDto, updatedId: string, seq: number): Promise<number> {

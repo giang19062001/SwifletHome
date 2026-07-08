@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { FileMediaResDto, FileUploadResDto } from '../upload.response';
 import { GetAllMediaDto, MediaTypeEnum } from './upload.dto';
+import { FileUploadAppResDto, FileMediaAppResDto } from './upload.response';
 
 @Injectable()
 export class UploadAppRepository {
@@ -12,7 +12,7 @@ export class UploadAppRepository {
   private readonly tableMediaVideo = 'tbl_media_video';
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
-  async getAllAudioFile(): Promise<FileUploadResDto[]> {
+  async getAllAudioFile(): Promise<FileUploadAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, B.filename AS filenamePay, A.filename, A.originalname, A.size, A.mimetype, A.isActive, A.createdAt, '' as urlLink
         FROM ${this.tableAudio} A 
@@ -21,7 +21,7 @@ export class UploadAppRepository {
         WHERE A.isActive = 'Y' AND A.isFree = 'Y'
          `,
     );
-    return rows as FileUploadResDto[];
+    return rows as FileUploadAppResDto[];
   }
   //* media
   async getTotalMedia(mediaType: MediaTypeEnum): Promise<number> {
@@ -32,7 +32,7 @@ export class UploadAppRepository {
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllMediaAudio(dto: GetAllMediaDto): Promise<FileMediaResDto[]> {
+  async getAllMediaAudio(dto: GetAllMediaDto): Promise<FileMediaAppResDto[]> {
     let query = ` SELECT A.seq,  A.filename, A.originalname, A.size, A.mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, '' as urlLink, A.isFree,
     A.isCoupleFree, A.badge
         FROM ${this.tableMediaAudio} A
@@ -48,10 +48,10 @@ export class UploadAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as FileMediaResDto[];
+    return rows as FileMediaAppResDto[];
   }
 
-  async getAllMediaVideo(dto: GetAllMediaDto): Promise<FileMediaResDto[]> {
+  async getAllMediaVideo(dto: GetAllMediaDto): Promise<FileMediaAppResDto[]> {
     let query = ` SELECT A.seq, '' as filename,  A.originalname, 0 as size, 'video/youtube' as mimetype, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt, A.urlLink, A.badge
         FROM ${this.tableMediaVideo} A
         WHERE A.isActive = 'Y'
@@ -67,6 +67,6 @@ export class UploadAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as FileMediaResDto[];
+    return rows as FileMediaAppResDto[];
   }
 }

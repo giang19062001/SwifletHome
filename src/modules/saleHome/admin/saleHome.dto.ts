@@ -81,4 +81,3 @@ export class UpdateStatusSightseeingDto {
   @IsNotEmpty()
   status: string;
 }
-

@@ -1,32 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { PackageOptionTypeEnum } from './package.interface';
-
-export class PackageResDto {
+export class AnswerAdminResDto {
   @ApiProperty({ example: 0 })
   seq: number;
+
   @ApiProperty({ example: '' })
-  packageCode: string;
+  answerCode: string;
+
   @ApiProperty({ example: '' })
-  packageName: string;
+  answerObject: string;
+
   @ApiProperty({ example: '' })
-  packageDescription: string;
+  answerContent: string;
+
   @ApiProperty({ example: '' })
-  packagePrice: string;
-  @ApiProperty({ example: '' })
-  packageItemSamePrice: string;
-  @ApiProperty({ example: 0 })
-  packageExpireDay: number;
-  @ApiProperty({ example: '' })
-  packageOptionType: PackageOptionTypeEnum;
+  answerCategory: string;
+
   @ApiProperty({ example: YnEnum.N })
   isActive: YnEnum;
+
+  @ApiProperty({ example: '' })
+  isFree: string;
+
   @ApiProperty({ example: new Date() })
   createdAt: Date;
+
   @ApiProperty({ example: new Date() })
   updatedAt: Date;
+
   @ApiProperty({ example: '' })
   createdId: string;
+
   @ApiProperty({ example: '' })
   updatedId: string;
 }

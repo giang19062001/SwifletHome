@@ -4,8 +4,8 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
 import { handleTimezoneQuery } from 'src/helpers/func.helper';
 import { NOTIFICATION_CONST, NotificationStatusEnum } from '../notification.interface';
-import { NotificationResDto, NotificationTopicResDto, UserNotificationTopicResDto } from '../notification.response';
 import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusEnum } from './notification.dto';
+import { NotificationAppResDto, NotificationTopicAppResDto, UserNotificationTopicAppResDto } from './notification.response';
 
 @Injectable()
 export class NotificationAppRepository {
@@ -26,7 +26,7 @@ export class NotificationAppRepository {
     );
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto, userCode: string): Promise<NotificationResDto[]> {
+  async getAll(dto: PagingDto, userCode: string): Promise<NotificationAppResDto[]> {
     let query = `
     SELECT B.seq, B.notificationId, B.messageId, B.title, B.body, B.targetScreen, B.data, 
     B.notificationType, B.notificationMethod,
@@ -55,10 +55,10 @@ export class NotificationAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as NotificationResDto[];
+    return rows as NotificationAppResDto[];
   }
 
-  async getDetail(notificationId: string, userCode: string): Promise<NotificationResDto | null> {
+  async getDetail(notificationId: string, userCode: string): Promise<NotificationAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `   SELECT B.seq, B.notificationId, B.messageId, B.title, B.body, B.targetScreen, B.data, 
            B.notificationType, B.notificationMethod,
@@ -78,7 +78,7 @@ export class NotificationAppRepository {
         LIMIT 1`,
       [notificationId, userCode],
     );
-    return rows ? (rows[0] as NotificationResDto) : null;
+    return rows ? (rows[0] as NotificationAppResDto) : null;
   }
 
   async getCntNotifyNotReadByUser(userCode: string): Promise<number> {
@@ -162,7 +162,7 @@ export class NotificationAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableTopic}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAllTopic(dto: PagingDto): Promise<NotificationTopicResDto[]> {
+  async getAllTopic(dto: PagingDto): Promise<NotificationTopicAppResDto[]> {
     let query = ` SELECT A.seq, A.topicCode, A.topicName, A.topicDescription, A.isActive, A.createdAt, A.createdId
         FROM ${this.tableTopic} A `;
 
@@ -173,9 +173,9 @@ export class NotificationAppRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as NotificationTopicResDto[];
+    return rows as NotificationTopicAppResDto[];
   }
-  async getDetailTopic(topicKeyword: string): Promise<NotificationTopicResDto | null> {
+  async getDetailTopic(topicKeyword: string): Promise<NotificationTopicAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.topicCode, A.topicKeyword, A.topicName, A.topicDescription
         FROM ${this.tableTopic} A
@@ -183,17 +183,17 @@ export class NotificationAppRepository {
         LIMIT 1`,
       [topicKeyword],
     );
-    return rows ? (rows[0] as NotificationTopicResDto) : null;
+    return rows ? (rows[0] as NotificationTopicAppResDto) : null;
   }
   // TODO: USER_TOPIC
-  async getUserSubscribedTopics(userCode: string): Promise<UserNotificationTopicResDto[]> {
+  async getUserSubscribedTopics(userCode: string): Promise<UserNotificationTopicAppResDto[]> {
     const query = ` SELECT A.seq, A.topicCode, A.userCode, B.topicName
         FROM ${this.tableUserTopic} A 
         LEFT JOIN ${this.tableTopic} B
         ON A.topicCode = B.topicCode
         WHERE A.userCode = ? AND A.isActive = 'Y' `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode]);
-    return rows as UserNotificationTopicResDto[];
+    return rows as UserNotificationTopicAppResDto[];
   }
 
   async subscribeToTopic(userCode: string, topicCode: string): Promise<number> {

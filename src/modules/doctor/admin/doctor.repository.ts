@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { DoctorFileResDto, DoctorResDto } from '../doctor.response';
 import { UpdateDoctorDto } from './doctor.dto';
+import { DoctorAdminResDto, DoctorFileAdminResDto } from './doctor.response';
 
 @Injectable()
 export class DoctorAdminRepository {
@@ -15,7 +15,7 @@ export class DoctorAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table}`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<DoctorResDto[]> {
+  async getAll(dto: PagingDto): Promise<DoctorAdminResDto[]> {
     let query = `  SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
         FROM ${this.table} A  
         ORDER BY A.createdAt DESC `;
@@ -27,10 +27,10 @@ export class DoctorAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as DoctorResDto[];
+    return rows as DoctorAdminResDto[];
   }
 
-  async getDetail(seq: number): Promise<DoctorResDto | null> {
+  async getDetail(seq: number): Promise<DoctorAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.createdAt
         FROM ${this.table} A 
@@ -38,7 +38,7 @@ export class DoctorAdminRepository {
         LIMIT 1 `,
       [seq],
     );
-    return rows ? (rows[0] as DoctorResDto) : null;
+    return rows ? (rows[0] as DoctorAdminResDto) : null;
   }
   async update(dto: UpdateDoctorDto, updatedId: string, seq: number): Promise<number> {
     const sql = `
@@ -50,7 +50,7 @@ export class DoctorAdminRepository {
     return result.affectedRows;
   }
 
-  async getFilesBySeq(seq: number): Promise<DoctorFileResDto[]> {
+  async getFilesBySeq(seq: number): Promise<DoctorFileAdminResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT B.seq, B.filename,  B.mimetype
         FROM ${this.table} A 
@@ -60,6 +60,6 @@ export class DoctorAdminRepository {
       `,
       [seq],
     );
-    return rows as DoctorFileResDto[];
+    return rows as DoctorFileAdminResDto[];
   }
 }

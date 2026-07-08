@@ -9,9 +9,9 @@ import { getFileLocation, multerImgConfig } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
 import { UploadImgFileDto } from 'src/modules/upload/admin/upload.dto';
 import { UploadAdminService } from 'src/modules/upload/admin/upload.service';
-import { ScreenResDto, ScreenVideoResDto } from '../screen.response';
 import { UpdateScreenDto } from './screen.dto';
 import { ScreenAdminService } from './screen.service';
+import { ScreenAdminResDto, ScreenVideoAdminResDto } from './screen.response';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/screen')
@@ -47,7 +47,7 @@ export class ScreenAdminController {
   })
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
-  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: ScreenResDto[] }> {
+  async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: ScreenAdminResDto[] }> {
     const result = await this.screenAdminService.getAll(dto);
     return result;
   }
@@ -67,7 +67,7 @@ export class ScreenAdminController {
   // xử lí video cho screen dùng kiểu BANNER_VIDEOS_TEXT
   @Get(':screenKeyword/video/getAll')
   @HttpCode(HttpStatus.OK)
-  async getAllVideos(@Param('screenKeyword') screenKeyword: string): Promise<ScreenVideoResDto[]> {
+  async getAllVideos(@Param('screenKeyword') screenKeyword: string): Promise<ScreenVideoAdminResDto[]> {
     return this.screenAdminService.getAllVideos(screenKeyword);
   }
 

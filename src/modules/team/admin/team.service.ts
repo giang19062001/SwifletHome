@@ -20,8 +20,8 @@ import {
   UploadTeamMainImageDto,
 } from './team.dto';
 import { TeamAdminRepository } from './team.repository';
-import { TeamFileTypeResDto, TeamServiceTypeResDto } from '../team.response';
 import { GetDetailTeamResDto } from '../app/team.response';
+import { TeamFileTypeAdminResDto, TeamServiceTypeAdminResDto } from './team.response';
 
 @Injectable()
 export class TeamAdminService {
@@ -37,11 +37,11 @@ export class TeamAdminService {
     const list = await this.teamAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getTeamFileTypes(): Promise<TeamFileTypeResDto[]> {
+  async getTeamFileTypes(): Promise<TeamFileTypeAdminResDto[]> {
     return await this.teamAdminRepository.getTeamFileTypes();
   }
 
-  async getTeamServiceTypes(userTypeCode?: string): Promise<TeamServiceTypeResDto[]> {
+  async getTeamServiceTypes(userTypeCode?: string): Promise<TeamServiceTypeAdminResDto[]> {
     return await this.teamAdminRepository.getTeamServiceTypes(userTypeCode);
   }
 

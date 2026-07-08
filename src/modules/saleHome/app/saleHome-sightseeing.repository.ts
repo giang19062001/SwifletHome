@@ -7,7 +7,7 @@ export class SaleHomeSightseeingAppRepository {
   private readonly tableSightSeeing = 'tbl_sale_home_sightseeing';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  
+
   // TODO: SIGHTSEEING
   async registerSightSeeing(dto: CreateHomeSightSeeingDto, userCode: string, status: string): Promise<number> {
     const sql = `

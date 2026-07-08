@@ -5,7 +5,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { PackageAdminService } from 'src/modules/package/admin/package.service';
 import { TokenUserAdminResDto } from '../../auth/admin/auth.dto';
-import { PackageResDto } from '../../package/package.response';
+import { PackageAdminResDto } from '../../package/admin/package.response';
 import { UserAppResDto } from '../app/user.dto';
 import { GetAllUserDto, GetUsersForTeamByTypeDto, UpdateUserPackageAdminDto, UserForTeamByTypeResDto, UserTypeResDto } from './user.dto';
 import { UserAdminRepository } from './user.repository';
@@ -54,7 +54,7 @@ export class UserAdminService {
     const updatedAt = new Date();
     let startDate: string | null = null;
     let endDate: string | null = null;
-    let packageData: PackageResDto | null = null;
+    let packageData: PackageAdminResDto | null = null;
     // chọn gói miễn phí
     if (!dto.packageCode) {
       startDate = null;

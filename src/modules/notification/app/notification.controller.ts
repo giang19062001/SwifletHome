@@ -9,9 +9,8 @@ import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { NotificationResDto } from '../notification.response';
 import { DeleteNotificationByStatusDto } from './notification.dto';
-import { GetNotificationResDto } from './notification.response';
+import { GetNotificationResDto, NotificationAppResDto } from './notification.response';
 import { NotificationAppService } from './notification.service';
 
 @ApiTags('app/notification')
@@ -37,7 +36,7 @@ export class NotificationAppController {
 **notificationStatus**: enum('SENT','READ')\n
 **targetScreen**: 'REMINDER_SCREEN' | 'NOTIFICATION_SCREEN' | 'QR_SCREEN'`,
   })
-  async getAll(@Body() dto: PagingDto, @GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: NotificationResDto[] }> {
+  async getAll(@Body() dto: PagingDto, @GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: NotificationAppResDto[] }> {
     const result = await this.notificationAppService.getAll(dto, user.userCode);
     return result;
   }
@@ -59,7 +58,7 @@ export class NotificationAppController {
   @ApiParam({ name: 'notificationId', type: String })
   @ApiOkResponse({ type: ApiAppResponseDto(GetNotificationResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getDetail(@GetUserApp() user: TokenUserAppResDto, @Param('notificationId') notificationId: string): Promise<NotificationResDto | null> {
+  async getDetail(@GetUserApp() user: TokenUserAppResDto, @Param('notificationId') notificationId: string): Promise<NotificationAppResDto | null> {
     const result = await this.notificationAppService.getDetail(notificationId, user.userCode);
     if (!result) {
       throw new BadRequestException();

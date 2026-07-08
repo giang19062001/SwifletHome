@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { DoctorFileResDto, DoctorResDto } from '../doctor.response';
 import { CreateDoctorDto } from './doctor.dto';
+import { DoctorAppResDto, DoctorFileAppResDto } from './doctor.response';
 
 @Injectable()
 export class DoctorAppRepository {
@@ -9,7 +9,7 @@ export class DoctorAppRepository {
   private readonly tableFile = 'tbl_doctor_file';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async uploadFile(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | DoctorFileResDto): Promise<number> {
+  async uploadFile(seq: number, uniqueId: string, userCode: string, filenamePath: string, file: Express.Multer.File | DoctorFileAppResDto): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableFile} (filename, originalname, size, mimetype, uniqueId, doctorSeq, userCode, createdId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -19,7 +19,7 @@ export class DoctorAppRepository {
 
     return result.insertId;
   }
-  async getDetail(seq: number): Promise<DoctorResDto | null> {
+  async getDetail(seq: number): Promise<DoctorAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.note, A.noteAnswered, A.status, A.uniqueId
           FROM ${this.table} A 
@@ -27,7 +27,7 @@ export class DoctorAppRepository {
           LIMIT 1 `,
       [seq],
     );
-    return rows ? (rows[0] as DoctorResDto) : null;
+    return rows ? (rows[0] as DoctorAppResDto) : null;
   }
   async create(userCode: string, dto: CreateDoctorDto, status: string): Promise<number> {
     const sql = `
@@ -65,13 +65,13 @@ export class DoctorAppRepository {
     return result.affectedRows;
   }
 
-  async getFilesNotUse(): Promise<DoctorFileResDto[]> {
+  async getFilesNotUse(): Promise<DoctorFileAppResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.doctorSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A
       WHERE A.doctorSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table}) OR A.isActive = 'N'
       `,
     );
-    return rows as DoctorFileResDto[];
+    return rows as DoctorFileAppResDto[];
   }
   async deleteSeqFile(seq: number, updatedId: string): Promise<number> {
     const sql = `

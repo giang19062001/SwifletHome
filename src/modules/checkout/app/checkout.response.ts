@@ -1,10 +1,9 @@
-export class CheckoutCurrentPackageResDto {
+export class CheckoutCurrentPackageAppResDto {
   packageCode: string;
   startDate: Date;
   endDate: Date;
 }
-
-export class CheckoutPackageByExpireDayResDto {
+export class CheckoutPackageByExpireDayAppResDto {
   packageCode: string;
   packageExpireDay: number;
 }

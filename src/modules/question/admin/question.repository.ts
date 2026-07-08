@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { QuestionResDto } from '../question.response';
+import { QuestionAdminResDto } from './question.response';
 import { CreateQuestionDto, UpdateQuestionDto } from './question.dto';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class QuestionAdminRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.table} WHERE isActive = 'Y'`);
     return rows.length ? (rows[0].TOTAL as number) : 0;
   }
-  async getAll(dto: PagingDto): Promise<QuestionResDto[]> {
+  async getAll(dto: PagingDto): Promise<QuestionAdminResDto[]> {
     let query = ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
         FROM ${this.table} A 
@@ -34,9 +34,9 @@ export class QuestionAdminRepository {
     }
 
     const [rows] = await this.db.query<RowDataPacket[]>(query, params);
-    return rows as QuestionResDto[];
+    return rows as QuestionAdminResDto[];
   }
-  async getDetail(questionCode: string): Promise<QuestionResDto | null> {
+  async getDetail(questionCode: string): Promise<QuestionAdminResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName, D.answerContent
@@ -51,7 +51,7 @@ export class QuestionAdminRepository {
         LIMIT 1`,
       [questionCode],
     );
-    return rows ? (rows[0] as QuestionResDto) : null;
+    return rows ? (rows[0] as QuestionAdminResDto) : null;
   }
   async create(dto: CreateQuestionDto, createdId: string): Promise<number> {
     const sqlLast = ` SELECT questionCode FROM ${this.table} ORDER BY questionCode DESC LIMIT 1`;
@@ -89,7 +89,7 @@ export class QuestionAdminRepository {
     return result.affectedRows;
   }
 
-  async getAllByAnswer(answerCode: string): Promise<QuestionResDto[]> {
+  async getAllByAnswer(answerCode: string): Promise<QuestionAdminResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.questionCode, A.questionContent, A.questionObject, A.questionCategory, A.isActive, A.createdAt, A.createdId, A.answerCode,
         B.categoryName, C.objectName
@@ -101,7 +101,7 @@ export class QuestionAdminRepository {
         WHERE A.answerCode IS NOT NULL AND A.answerCode = ? AND A.isActive = 'Y' `,
       [answerCode],
     );
-    return rows as QuestionResDto[];
+    return rows as QuestionAdminResDto[];
   }
   async updateAnswerQuestionNull(questionCode: string): Promise<number> {
     const sql = `

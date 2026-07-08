@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import Groq from 'groq-sdk';
-import { QuestionResDto } from 'src/modules/question/question.response';
+import { QuestionAppResDto } from '../../modules/question/app/question.response';
 import { LoggingService } from '../logger/logger.service';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class LlmService {
 
   constructor(private readonly logger: LoggingService) {}
 
-  async replyWithLLM(question: string, allQuestions: QuestionResDto[]): Promise<{ answerCode: string | null }> {
+  async replyWithLLM(question: string, allQuestions: QuestionAppResDto[]): Promise<{ answerCode: string | null }> {
     const groqApiKey = process.env.LLM_GROQ_KEY;
     const modelName = process.env.LLM_GROQ_MODEL;
     if (!groqApiKey || !allQuestions?.length) return { answerCode: null };
