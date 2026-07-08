@@ -1,13 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
-import { GetOptionDto, OpitionResDto } from './option.dto';
+import { GetOptionDto } from './option.dto';
+import { GetOptionResDto } from './option.response';
 
 @Injectable()
 export class OptionRepository {
   private readonly table = 'tbl_option_common';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  async getAll(dto: GetOptionDto): Promise<OpitionResDto[]> {
+  async getAll(dto: GetOptionDto): Promise<GetOptionResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.code, A.mainOption, A.subOption, A.keyOption, A.valueOption, A.sortOrder
         FROM ${this.table} A
@@ -16,6 +17,6 @@ export class OptionRepository {
         ORDER BY A.sortOrder ASC`,
       'keyOption' in dto && dto.keyOption ? [dto.mainOption, dto.subOption, dto.keyOption] : [dto.mainOption, dto.subOption],
     );
-    return rows as OpitionResDto[];
+    return rows as GetOptionResDto[];
   }
 }

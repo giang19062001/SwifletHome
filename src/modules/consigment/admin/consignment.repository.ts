@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
-import { ConsignmentStatusEnum } from '../app/consigment.interface';
+import { ConsignmentStatusEnum } from '../common/consigment.enum';
 import { UpdateConsignmentDto } from './consignment.dto';
 import { GetAllConsignmentResDto } from './consignment.response';
 

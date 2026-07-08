@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { PackageOptionTypeEnum } from '../package.interface';
+import { PackageOptionTypeEnum } from '../common/package.enum';
 
 export class UpdatePackageDto {
   @ApiProperty({

@@ -1,15 +1,14 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { getFileLocation, multerImgConfig } from 'src/config/multer.config';
-import { Msg } from 'src/helpers/message.helper';
-import { UploadImgFileDto } from 'src/modules/upload/admin/upload.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
+import { multerImgConfig } from 'src/config/multer.config';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
+import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
+import { AdsFileDto, CreateAdsBannerDto, UpdateAdsBannerDto } from './ads.dto';
 import { AdsBannerAdminResDto } from './ads.response';
-import { CreateAdsBannerDto, UpdateAdsBannerDto, AdsFileDto } from './ads.dto';
 import { AdsAdminService } from './ads.service';
 
 @ApiBearerAuth('admin-auth')

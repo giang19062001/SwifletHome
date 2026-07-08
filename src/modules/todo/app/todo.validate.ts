@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { MsgDto } from 'src/helpers/message.helper';
-import { TaskStatusEnum } from '../todo.interface';
+import { TaskStatusEnum } from '../common/todo.enum';
 import { SetTaskAlarmDto } from './todo.dto';
 import { HandleAlarmDataAppResDto } from './todo.response';
 

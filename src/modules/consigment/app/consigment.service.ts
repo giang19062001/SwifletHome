@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
+import { MailService } from 'src/common/mail/mail.service';
 import { Msg } from 'src/helpers/message.helper';
-import { OPTION_CONST } from 'src/modules/options/option.interface';
+import { OPTION_CONST } from 'src/modules/options/option.const';
 import { OptionService } from 'src/modules/options/option.service';
+import { ConsignmentStatusEnum } from '../common/consigment.enum';
 import { GetAllConsignmentDto, RequestConsigmentDto } from './consigment.dto';
-import { ConsignmentStatusEnum } from './consigment.interface';
 import { ConsignmentAppRepository } from './consigment.repository';
 import { GetAllConsignmentResDto, GetDetailConsignmentResDto } from './consignment.response';
-import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class ConsignmentAppService {

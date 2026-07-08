@@ -3,7 +3,7 @@ import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { GeoService } from 'src/common/geo/geo.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
-import { OPTION_CONST } from 'src/modules/options/option.interface';
+import { OPTION_CONST } from 'src/modules/options/option.const';
 import { GetInitFormMutationResDto } from '../app/saleHome.response';
 import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto, UpdateStatusSaleHomeDto, UploadFilesAdminDto } from './saleHome.dto';
 import { SaleHomeAdminRepository } from './saleHome.repository';

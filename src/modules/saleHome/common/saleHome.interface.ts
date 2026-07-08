@@ -10,9 +10,3 @@ export interface SaleHomeFileTypeData {
   fileTypeCode: string;
   fileTypeText: string;
 }
-
-export enum HomeSaleSightSeeingStatusEnum {
-  WAITING = 'WAITING',
-  APPROVED = 'APPROVED',
-  CANCEL = 'CANCEL',
-}

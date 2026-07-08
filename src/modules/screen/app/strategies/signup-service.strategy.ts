@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { APP_SCREENS } from 'src/helpers/const.helper';
 import { replaceNbspToSpace } from 'src/helpers/func.helper';
 import { InfoAppService } from 'src/modules/info/app/info.service';
-import { InfoBankAppResDto } from '../../../info/app/info.response';
 import { PackageAppService } from 'src/modules/package/app/package.service';
-import { PackageOptionTypeEnum } from 'src/modules/package/package.interface';
+import { PackageOptionTypeEnum } from 'src/modules/package/common/package.enum';
+import { InfoBankAppResDto } from '../../../info/app/info.response';
 import { IScreenStrategy } from '../screen.interface';
 import { GetContentScreenResDto, ScreenSignupServiceAppResDto } from '../screen.response';
 

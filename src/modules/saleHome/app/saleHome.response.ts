@@ -1,6 +1,5 @@
-import { NestInfoDto } from './saleHome.dto';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { HomeInfoDto, HostInfoDto, PolicyInfoDto, TourInfoDto } from './saleHome.dto';
+import { HomeInfoDto, HostInfoDto, NestInfoDto, PolicyInfoDto, TourInfoDto } from './saleHome.dto';
 
 export class OptionSimpleDto {
   @ApiProperty()

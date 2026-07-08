@@ -5,7 +5,7 @@ import moment from 'moment';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { AdsAdminService } from 'src/modules/ads/admin/ads.service';
 import { DoctorAppService } from 'src/modules/doctor/app/doctor.service';
-import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NotificationTypeEnum } from 'src/modules/notification/common/notification.enum';
 import { QrRequestAppService } from 'src/modules/qr/app/qr-request.service';
 import { SaleHomeAppService } from 'src/modules/saleHome/app/saleHome.service';
 import { TeamReviewAppService } from 'src/modules/team/app/team-review.service';

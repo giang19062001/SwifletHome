@@ -1,6 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { IsOptional } from 'class-validator';
-import { TeamStatusEnum } from 'src/interfaces/admin.interface';
+import { TeamStatusEnum, YnEnum } from 'src/interfaces/admin.interface';
 
 export class TeamImgResDto {
   @ApiProperty({ example: 1 })
@@ -264,4 +263,44 @@ export class TeamServiceFileBaseAppResDto {
 export class TeamFileNotUseAppResDto {
   seq: number;
   filename: string;
+}
+
+export class TeamReviewFileStrResDto {
+    @ApiProperty({ example: 0 })
+    seq: number;
+
+    @ApiProperty({ example: '' })
+    filename: string;
+}
+
+export class TeamReviewFileResDto {
+    @ApiProperty({ example: 0 })
+    seq: number;
+
+    @ApiProperty({ example: 0 })
+    reviewSeq: number;
+
+    @ApiProperty({ example: '' })
+    teamCode: string;
+
+    @ApiProperty({ example: '' })
+    homeName: string;
+
+    @ApiProperty({ example: '' })
+    filename: string;
+
+    @ApiProperty({ example: '' })
+    originalname: string;
+
+    @ApiProperty({ example: 0 })
+    size: number;
+
+    @ApiProperty({ example: '' })
+    mimetype: string;
+
+    @ApiProperty({ example: '' })
+    uniqueId: string;
+    
+    @ApiProperty({ example: YnEnum.N })
+    isActive: YnEnum;
 }

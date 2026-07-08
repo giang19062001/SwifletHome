@@ -1,8 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { AUTH_CONFIG } from '../auth.config';
+import { AUTH_CONFIG } from '../common/auth.config';
 import { GeneratePasswordDto, LoginAdminDto } from './auth.dto';
 import { AuthAdminService } from './auth.service';
 

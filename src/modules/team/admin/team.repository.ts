@@ -4,8 +4,8 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { TeamStatusEnum, YnEnum } from './../../../interfaces/admin.interface';
-import { CreateTeamDto, TeamImgResDto, TeamResDto, TeamReviewResDto, UpdateTeamDto } from './team.dto';
-import { TeamFileTypeAdminResDto, TeamServiceTypeAdminResDto, TeamImgBaseAdminResDto, TeamServiceBaseAdminResDto, TeamServiceFileBaseAdminResDto } from './team.response';
+import { CreateTeamDto, UpdateTeamDto } from './team.dto';
+import { TeamFileTypeAdminResDto, TeamImgBaseAdminResDto, TeamImgResDto, TeamResDto, TeamReviewResDto, TeamServiceBaseAdminResDto, TeamServiceFileBaseAdminResDto, TeamServiceTypeAdminResDto } from './team.response';
 
 @Injectable()
 export class TeamAdminRepository {

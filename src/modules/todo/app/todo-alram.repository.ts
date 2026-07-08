@@ -4,7 +4,8 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { TODO_CONST } from '../common/todo.const';
+import { TaskStatusEnum } from '../common/todo.enum';
 import { GetTaskAlarmResDto, TodoTaskAppResDto } from './todo.response';
 
 @Injectable()

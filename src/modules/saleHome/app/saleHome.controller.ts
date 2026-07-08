@@ -9,8 +9,8 @@ import { NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TokenUserAppResDto } from "../../auth/app/auth.response";
 import { CreateSaleHomeAppDto, UpdateSaleHomeAppDto, UploadFilesAppDto } from './saleHome.dto';
 import { GetAllSaleHomeWrapperResDto, GetDetailSaleHomeResDto, GetInitFormMutationResDto, UploadSaleHomeFileResDto } from './saleHome.response';
 import { SaleHomeAppService } from './saleHome.service';

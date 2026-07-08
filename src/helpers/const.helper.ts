@@ -1,4 +1,4 @@
-import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NotificationTypeEnum } from 'src/modules/notification/common/notification.enum';
 
 export const ROUTER = {
   APP: '/api/app',

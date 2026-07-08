@@ -8,18 +8,18 @@ import { Msg } from 'src/helpers/message.helper';
 import { TodoHarvestAppService } from 'src/modules/todo/app/todo-harvest.service';
 import { TodoMedicineAppService } from 'src/modules/todo/app/todo-medicine.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { TokenUserAppResDto } from '../../auth/app/auth.dto';
-import { RequestStatusEnum } from '../qr.interface';
+import { TokenUserAppResDto } from "../../auth/app/auth.response";
+import { RequestStatusEnum } from '../common/qr.enum';
 import { QrRequestAppRepository } from './qr-request.repository';
 import { RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import {
-  GetApprovedRequestQrCodeResDto,
-  GetInfoToRequestQrcodeResDto,
-  GetRequestQrCodeDetailResDto,
-  GetRequestQrCodeListResDto,
-  QrRequestFileStrResDto,
-  TaskHarvestQrResDto,
-  ValidateHarvestItemResDto,
+    GetApprovedRequestQrCodeResDto,
+    GetInfoToRequestQrcodeResDto,
+    GetRequestQrCodeDetailResDto,
+    GetRequestQrCodeListResDto,
+    QrRequestFileStrResDto,
+    TaskHarvestQrResDto,
+    ValidateHarvestItemResDto,
 } from './qr.response';
 
 @Injectable()

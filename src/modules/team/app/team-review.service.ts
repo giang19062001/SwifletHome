@@ -4,8 +4,8 @@ import { getFileLocation } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
 import { TeamReviewAppRepository } from './team-review.repository';
 import { TeamUserAppRepository } from './team-user.repository';
-import { GetReviewListOfTeamDto, ReviewTeamDto, TeamReviewFileStrResDto, UploadReviewFilesDto } from './team.dto';
-import { GetReviewListOfTeamResDto } from './team.response';
+import { GetReviewListOfTeamDto, ReviewTeamDto, UploadReviewFilesDto } from './team.dto';
+import { GetReviewListOfTeamResDto, TeamReviewFileStrResDto } from './team.response';
 
 @Injectable()
 export class TeamReviewAppService {

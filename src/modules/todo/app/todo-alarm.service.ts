@@ -4,12 +4,13 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
-import { TodoTaskAppResDto } from './todo.response';
+import { TODO_CONST } from '../common/todo.const';
+import { TaskStatusEnum } from '../common/todo.enum';
 import { TodoAlarmAppRepository } from './todo-alram.repository';
 import { TodoHarvestAppRepository } from './todo-harvest.repository';
 import { TodoMedicineAppRepository } from './todo-medicine.repository';
 import { SetTaskAlarmDto } from './todo.dto';
+import { TodoTaskAppResDto } from './todo.response';
 import TodoAppValidate from './todo.validate';
 
 @Injectable()

@@ -4,8 +4,8 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TokenUserAppResDto } from "../../auth/app/auth.response";
 import { AnswerReplyDto } from './answer.dto';
 import { AnswerAppService } from './answer.service';
 

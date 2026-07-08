@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
 import { PushNotifycationByAdminDto } from './notification.dto';
 import { NotificationAdminService } from './notification.service';
 

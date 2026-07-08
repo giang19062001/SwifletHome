@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
-import { DoctorStatusEnum } from '../doctor.interface';
-import { DoctorFileStrAppResDto } from './doctor.response';
+import { DoctorStatusEnum } from '../common/doctor.enum';
 import { CreateDoctorDto, DoctorFileDto } from './doctor.dto';
 import { DoctorAppRepository } from './doctor.repository';
+import { DoctorFileStrAppResDto } from './doctor.response';
 
 @Injectable()
 export class DoctorAppService {

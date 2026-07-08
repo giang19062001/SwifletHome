@@ -2,10 +2,10 @@ import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, UseInterceptor
 import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiOkResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
-import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { Msg } from 'src/helpers/message.helper';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
+import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TokenUserAppResDto } from "../../auth/app/auth.response";
 import { GetHarvertReportDto } from './report.dto';
 import { GetHarvertReportDetailResDto, GetHarvertReportSummaryResDto } from './report.response';
 import { ReportAppService } from './report.service';

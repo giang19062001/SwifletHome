@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { MediaBadgeEnum } from '../upload.interface';
+import { MediaBadgeEnum } from '../common/upload.enum';
 
 export class GetAllMediaResDto {
   @ApiProperty({ example: 1 })

@@ -3,8 +3,8 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode, safeParseArray } from 'src/helpers/func.helper';
-import { OPTION_CONST } from 'src/modules/options/option.interface';
-import { SaleHomeFileTypeData, SaleHomeOptionData } from '../saleHome.interface';
+import { OPTION_CONST } from 'src/modules/options/option.const';
+import { SaleHomeFileTypeData, SaleHomeOptionData } from '../common/saleHome.interface';
 import { CreateSaleHomeAppDto, UpdateSaleHomeAppDto } from './saleHome.dto';
 import { GetAllSaleHomeResDto, GetDetailSaleHomeResDto, SaleHomeFileItemAppResDto } from './saleHome.response';
 

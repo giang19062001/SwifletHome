@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ConsignmentStatusEnum } from '../app/consigment.interface';
+import { ConsignmentStatusEnum } from '../common/consigment.enum';
 
 export class DeliveringAddressDto {
   @ApiProperty({ example: 0 })

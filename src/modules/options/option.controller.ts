@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post, UseInterceptors } from '@
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { GetOptionDto, OpitionResDto } from './option.dto';
+import { GetOptionDto } from './option.dto';
 import { GetOptionResDto } from './option.response';
 import { OptionService } from './option.service';
 
@@ -37,7 +37,7 @@ export default class OptionController {
   @Post('getAll')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([GetOptionResDto]) })
-  async getAll(@Body() dto: GetOptionDto): Promise<OpitionResDto[]> {
+  async getAll(@Body() dto: GetOptionDto): Promise<GetOptionResDto[]> {
     const result = await this.optionService.getAll(dto);
     return result;
   }

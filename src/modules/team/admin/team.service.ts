@@ -6,22 +6,19 @@ import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { TeamStatusEnum } from 'src/interfaces/admin.interface';
-import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NotificationTypeEnum } from 'src/modules/notification/common/notification.enum';
+import { GetDetailTeamResDto } from '../app/team.response';
 import {
-  ChangDisplayReviewDto,
-  CreateTeamDto,
-  DeleteFileDto,
-  TeamImgResDto,
-  TeamResDto,
-  TeamReviewResDto,
-  UpdateTeamDto,
-  UploadServiceFilesDto,
-  UploadTeamFilesDto,
-  UploadTeamMainImageDto,
+    ChangDisplayReviewDto,
+    CreateTeamDto,
+    DeleteFileDto,
+    UpdateTeamDto,
+    UploadServiceFilesDto,
+    UploadTeamFilesDto,
+    UploadTeamMainImageDto,
 } from './team.dto';
 import { TeamAdminRepository } from './team.repository';
-import { GetDetailTeamResDto } from '../app/team.response';
-import { TeamFileTypeAdminResDto, TeamServiceTypeAdminResDto } from './team.response';
+import { TeamFileTypeAdminResDto, TeamImgResDto, TeamResDto, TeamReviewResDto, TeamServiceTypeAdminResDto } from './team.response';
 
 @Injectable()
 export class TeamAdminService {

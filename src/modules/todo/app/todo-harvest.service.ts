@@ -4,7 +4,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
-import { TaskStatusEnum } from '../todo.interface';
+import { TaskStatusEnum } from '../common/todo.enum';
 import { TodoHarvestAppRepository } from './todo-harvest.repository';
 import { AdjustHarvestTaskDto, FloorDataInputDto, GetInfoTaskHarvestForAdjustDto, GetListTaskHarvestForAdjustDto, HarvestDataInputDto, HarvestDataRowInputDto, SetHarvestTaskDto } from './todo.dto';
 import { GetInfoTaskHarvestForAdjustResDto, GetListTaskHarvestResDto, GetTaskHarvestResDto } from './todo.response';

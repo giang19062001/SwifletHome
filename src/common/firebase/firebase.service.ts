@@ -7,7 +7,7 @@ import { GetAppScreenForPush, QUERY_HELPER } from 'src/helpers/const.helper';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { CreateNotificationDto } from 'src/modules/notification/app/notification.dto';
 import { NotificationAppService } from 'src/modules/notification/app/notification.service';
-import { NotificationMessageIdEnum, NotificationMethodEnum, NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NotificationMessageIdEnum, NotificationMethodEnum, NotificationTypeEnum } from 'src/modules/notification/common/notification.enum';
 import { v4 as uuidv4 } from 'uuid';
 import serviceAccountJson from '../../../firebase-adminsdk.json'; // JSON từ Firebase
 import { UserNotificationTopicAppResDto } from '../../modules/notification/app/notification.response';

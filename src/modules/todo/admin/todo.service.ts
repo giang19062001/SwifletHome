@@ -6,7 +6,7 @@ import { MsgAdmin } from 'src/helpers/message.helper';
 import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 import { SentTypeEnum } from 'src/modules/notification/admin/notification.dto';
 import { NotificationAdminService } from 'src/modules/notification/admin/notification.service';
-import { NOTIFICATION_CONST } from 'src/modules/notification/notification.interface';
+import { NOTIFICATION_CONST } from 'src/modules/notification/common/notification.const';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { UserHomeAdminService } from 'src/modules/userHome/admin/userHome.service';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskArrayDto } from './todo.dto';

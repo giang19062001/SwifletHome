@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { NotificationStatusEnum, NotificationTypeEnum, NotificationMethodEnum } from '../notification.interface';
+import { NotificationMethodEnum, NotificationStatusEnum, NotificationTypeEnum } from '../common/notification.enum';
 
 export enum DeleteNotificationByStatusEnum {
   SENT = 'SENT',

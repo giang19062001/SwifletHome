@@ -1,8 +1,8 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsArray, IsEnum } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { UserHomeResDto } from 'src/modules/userHome/app/userHome.dto';
-import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../todo.interface';
+import { UserHomeResDto } from "../../userHome/app/userHome.response";
+import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../common/todo.enum';
 import { HarvestDataInputDto } from './todo.dto';
 
 export class TodoHomeDataResDto extends OmitType(UserHomeResDto, ['isIntegateTempHum', 'isIntegateCurrent', 'isTriggered', 'uniqueId'] as const) {}

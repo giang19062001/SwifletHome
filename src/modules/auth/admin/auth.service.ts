@@ -3,8 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Msg } from 'src/helpers/message.helper';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
-import { AbAuthService } from '../auth.abstract';
-import { LoginAdminDto, TokenUserAdminResDto } from './auth.dto';
+import { AbAuthService } from '../common/auth.abstract';
+import { LoginAdminDto } from './auth.dto';
+import { TokenUserAdminResDto } from "./auth.response";
 
 @Injectable()
 export class AuthAdminService extends AbAuthService {

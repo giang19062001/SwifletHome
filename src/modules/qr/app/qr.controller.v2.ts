@@ -4,8 +4,8 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg, MsgDto } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TokenUserAppResDto } from "../../auth/app/auth.response";
 import { QrSellAppService } from './qr-sell.service';
 import { InsertRequestSellDto } from './qr.dto';
 

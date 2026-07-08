@@ -1,3 +1,4 @@
+
 export class AdsBannerAdminResDto {
   seq: number;
   uniqueId: string;

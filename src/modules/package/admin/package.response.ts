@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { PackageOptionTypeEnum } from '../package.interface';
+import { PackageOptionTypeEnum } from '../common/package.enum';
+
 export class PackageAdminResDto {
   @ApiProperty({ example: 0 })
   seq: number;

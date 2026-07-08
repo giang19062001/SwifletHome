@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
+import { ConsignmentStatusEnum } from '../common/consigment.enum';
 import { GetAllConsignmentDto, RequestConsigmentDto } from './consigment.dto';
-import { ConsignmentStatusEnum } from './consigment.interface';
 import { GetAllConsignmentResDto, GetDetailConsignmentResDto } from './consignment.response';
 
 @Injectable()

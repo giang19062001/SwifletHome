@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable, Unauthor
 import { Request } from 'express';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
-import { TokenEaterAppResDto, TokenUserAppResDto } from './auth.dto';
+import { TokenEaterAppResDto, TokenUserAppResDto } from "./auth.response";
 import { AuthAppService } from './auth.service';
 
 @Injectable()

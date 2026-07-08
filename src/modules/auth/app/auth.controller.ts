@@ -6,12 +6,12 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { CheckPhoneDto, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/app/otp.dto';
 import { ChangeTypeTokenAppResDto, GetInfoUserAppResDto, LoginResDto } from 'src/modules/user/app/user.response';
 import { RequestOtpAppResDto } from '../../otp/app/otp.response';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { ApiAuthAppGuard } from './auth.guard';
+import { TokenUserAppResDto } from "./auth.response";
 import { AuthAppService } from './auth.service';
 
 @ApiBearerAuth('app-auth')

@@ -1,17 +1,17 @@
 import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { getImgVideoMulterConfig, multerImgConfig } from 'src/config/multer.config';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { MsgAdmin } from 'src/helpers/message.helper';
-import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { GetDetailTeamResDto } from '../app/team.response';
-import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, TeamResDto, TeamReviewResDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
-import { TeamAdminService } from './team.service';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
+import { GetDetailTeamResDto } from '../app/team.response';
+import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
+import { TeamResDto, TeamReviewResDto } from "./team.response";
+import { TeamAdminService } from './team.service';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/team')

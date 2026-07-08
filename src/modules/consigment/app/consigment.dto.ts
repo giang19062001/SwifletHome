@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsInt, IsNotEmpty, IsNumberString, IsString, Min } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { MsgDto } from 'src/helpers/message.helper';
-import { ConsignmentStatusEnum } from './consigment.interface';
+import { ConsignmentStatusEnum } from '../common/consigment.enum';
 
 export class RequestConsigmentDto {
   @ApiProperty({

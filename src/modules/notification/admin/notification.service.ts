@@ -5,7 +5,7 @@ import { MsgAdmin } from 'src/helpers/message.helper';
 import { ApiMutationResponse } from 'src/interfaces/admin.interface';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { UserHomeAdminService } from 'src/modules/userHome/admin/userHome.service';
-import { NOTIFICATION_CONST } from '../notification.interface';
+import { NOTIFICATION_CONST } from '../common/notification.const';
 import { PushNotifycationByAdminDto, SentTypeEnum } from './notification.dto';
 import { NotificationAdminRepository } from './notification.repository';
 

@@ -5,7 +5,8 @@ import { IsTodayOrAfter } from 'src/decorator/validate.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { MsgDto } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { TODO_CONST } from '../common/todo.const';
+import { TaskStatusEnum } from '../common/todo.enum';
 
 export class GetListTaskAlarmsDTO extends PagingDto {
   @ApiProperty({

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ConsignmentStatusEnum } from './consigment.interface';
+import { ConsignmentStatusEnum } from '../common/consigment.enum';
 
 export class DeliveringAddressResDto {
   @ApiProperty({ example: 0 })

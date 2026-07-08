@@ -5,10 +5,10 @@ import { multerAudioConfig, multerImgConfig } from 'src/config/multer.config';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
 import { UploadAudioFilesDto, UploadImgFileDto, UploadMediaAudioFilesDto, UploadMediaVideoLinkDto, UploadVideoLinkDto } from './upload.dto';
+import { AudioFreePayAdminResDto, FileMediaAdminResDto, FileUploadAdminResDto } from './upload.response';
 import { UploadAdminService } from './upload.service';
-import { FileUploadAdminResDto, AudioFreePayAdminResDto, FileMediaAdminResDto } from './upload.response';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/upload')

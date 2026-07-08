@@ -10,12 +10,13 @@ import { EaterAppService } from 'src/modules/eater/app/eater.service';
 import { PurposeEnum, RequestOtpDto, VerifyOtpDto } from 'src/modules/otp/app/otp.dto';
 import { OtpService } from 'src/modules/otp/app/otp.service';
 import { PhoneCodeService } from 'src/modules/phoneCode/app/phoneCode.service';
+import { USER_CONST } from 'src/modules/user/app/user.const';
 import { GetInfoUserAppResDto } from 'src/modules/user/app/user.response';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { USER_CONST } from '../../user/app/user.interface';
-import { AbAuthService } from '../auth.abstract';
-import { AUTH_CONFIG } from '../auth.config';
-import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, TokenEaterAppResDto, TokenUserAppResDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { AbAuthService } from '../common/auth.abstract';
+import { AUTH_CONFIG } from '../common/auth.config';
+import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
+import { TokenEaterAppResDto, TokenUserAppResDto } from "./auth.response";
 
 @Injectable()
 export class AuthAppService extends AbAuthService {

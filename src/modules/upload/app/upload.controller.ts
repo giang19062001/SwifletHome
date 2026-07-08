@@ -4,10 +4,10 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto } from 'src/dto/common.dto';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TokenUserAppResDto } from "../../auth/app/auth.response";
 import { GetAllMediaDto } from './upload.dto';
-import { GetAllMediaResDto, FileMediaAppResDto } from './upload.response';
+import { FileMediaAppResDto, GetAllMediaResDto } from './upload.response';
 import { UploadAppService } from './upload.service';
 
 @ApiTags('app/upload')

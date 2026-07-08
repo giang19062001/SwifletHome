@@ -4,7 +4,7 @@ import { GeoService } from 'src/common/geo/geo.service';
 import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
-import { OPTION_CONST } from 'src/modules/options/option.interface';
+import { OPTION_CONST } from 'src/modules/options/option.const';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateSaleHomeAppDto, UpdateSaleHomeAppDto, UploadFilesAppDto } from './saleHome.dto';
 import { SaleHomeAppRepository } from './saleHome.repository';

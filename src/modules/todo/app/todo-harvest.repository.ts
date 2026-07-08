@@ -5,7 +5,8 @@ import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
-import { TaskStatusEnum, TODO_CONST } from '../todo.interface';
+import { TODO_CONST } from '../common/todo.const';
+import { TaskStatusEnum } from '../common/todo.enum';
 import { GetListTaskHarvestForAdjustDto, HarvestDataRowInputDto } from './todo.dto';
 import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto, GetTaskAlarmResDto } from './todo.response';
 

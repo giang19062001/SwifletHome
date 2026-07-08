@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { InfoBankAppResDto } from '../../info/app/info.response';
+
 export class ScreenAdminResDto {
   @ApiProperty({ example: 0 })
   seq: number;

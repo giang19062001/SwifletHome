@@ -3,8 +3,7 @@ import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { MsgDto } from 'src/helpers/message.helper';
-import { YnEnum } from 'src/interfaces/admin.interface';
-import { IUserTeamTypeEnum } from '../../user/app/user.interface';
+import { IUserTeamTypeEnum } from 'src/modules/user/common/user.enum';
 
 export class GetAllTeamDto extends PagingDto {
   @ApiProperty({
@@ -101,13 +100,6 @@ export class ReviewTeamDto {
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
-}
-
-export class TeamReviewFileStrResDto {
-  @ApiProperty({ example: 0 })
-  seq: number;
-  @ApiProperty({ example: '' })
-  filename: string;
 }
 
 // ─── Team Registration DTOs (App) ───────────────────────────────────────────
@@ -221,27 +213,4 @@ export class DeleteFileAppDto {
   @IsString()
   @IsNotEmpty()
   uploadType: 'teamFiles' | 'teamServiceFiles' | 'teamImage';
-}
-
-export class TeamReviewFileResDto {
-  @ApiProperty({ example: 0 })
-  seq: number;
-  @ApiProperty({ example: 0 })
-  reviewSeq: number;
-  @ApiProperty({ example: '' })
-  teamCode: string;
-  @ApiProperty({ example: '' })
-  homeName: string;
-  @ApiProperty({ example: '' })
-  filename: string;
-  @ApiProperty({ example: '' })
-  originalname: string;
-  @ApiProperty({ example: 0 })
-  size: number;
-  @ApiProperty({ example: '' })
-  mimetype: string;
-  @ApiProperty({ example: '' })
-  uniqueId: string;
-  @ApiProperty({ example: YnEnum.N })
-  isActive: YnEnum;
 }

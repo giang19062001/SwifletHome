@@ -3,10 +3,10 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode, safeParseArray } from 'src/helpers/func.helper';
-import { OPTION_CONST } from 'src/modules/options/option.interface';
-import { SaleHomeOptionData, SaleHomeFileTypeData } from '../saleHome.interface';
+import { OPTION_CONST } from 'src/modules/options/option.const';
+import { SaleHomeFileTypeData, SaleHomeOptionData } from '../common/saleHome.interface';
 import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto } from './saleHome.dto';
-import { SaleHomeFileItemAdminResDto, GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto } from './saleHome.response';
+import { GetAllSaleHomeAdminResDto, GetDetailSaleHomeAdminResDto, SaleHomeFileItemAdminResDto } from './saleHome.response';
 
 @Injectable()
 export class SaleHomeAdminRepository {

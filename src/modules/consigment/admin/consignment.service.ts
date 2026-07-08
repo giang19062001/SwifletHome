@@ -4,7 +4,7 @@ import { LoggingService } from 'src/common/logger/logger.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { NotificationAdminService } from 'src/modules/notification/admin/notification.service';
-import { NotificationTypeEnum } from 'src/modules/notification/notification.interface';
+import { NotificationTypeEnum } from 'src/modules/notification/common/notification.enum';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { UpdateConsignmentDto } from './consignment.dto';
 import { ConsignmentAdminRepository } from './consignment.repository';

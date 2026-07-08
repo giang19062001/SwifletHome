@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { TaskStatusEnum } from '../todo.interface';
+import { TaskStatusEnum } from '../common/todo.enum';
 import { SetTaskAlarmByAdminDto, UpdateBoxTaskDto } from './todo.dto';
 import { TodoBoxTaskAdminResDto, TodoTaskAdminResDto } from './todo.response';
 

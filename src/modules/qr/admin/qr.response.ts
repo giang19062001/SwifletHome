@@ -1,7 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsEnum, IsString } from 'class-validator';
-import { RequestQrcodeFilesResDto, RequestQrCodeResDto } from '../app/qr.response';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { RequestQrcodeFilesResDto, RequestQrCodeResDto } from '../app/qr.response';
 
 export class GetInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeResDto, ['uniqueId'] as const) {
   @ApiProperty({ example: '' })

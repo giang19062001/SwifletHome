@@ -4,8 +4,8 @@ import { GetUserApp } from 'src/decorator/auth.decorator';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
+import { TokenUserAppResDto } from "../../auth/app/auth.response";
 import { SaleHomeSightseeingAppService } from './saleHome-sightseeing.service';
 import { CreateHomeSightSeeingDto } from './saleHome.dto';
 

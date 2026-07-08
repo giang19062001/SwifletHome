@@ -22,8 +22,3 @@ export const USER_CONST = {
     },
   },
 };
-
-export enum IUserTeamTypeEnum {
-  FACTORY = 'FACTORY',
-  TECHNICAL = 'TECHNICAL',
-}

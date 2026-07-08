@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { DoctorStatusEnum } from '../doctor.interface';
+import { DoctorStatusEnum } from '../common/doctor.enum';
+
 export class DoctorAdminResDto {
   @ApiProperty({ example: 0 })
   seq: number;

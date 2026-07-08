@@ -3,7 +3,8 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { QR_CODE_CONST, RequestStatusEnum } from '../qr.interface';
+import { QR_CODE_CONST } from '../common/qr.const';
+import { RequestStatusEnum } from '../common/qr.enum';
 import { GetApprovedRequestQrCodeResDto, GetRequestQrCodeDetailResDto, GetRequestQrCodeListResDto, QrRequestFileResDto, RequestQrCodeResDto, ValidateHarvestItemResDto } from './qr.response';
 
 @Injectable()

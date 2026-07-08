@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { YnEnum } from 'src/interfaces/admin.interface';
+
 export class AnswerAdminResDto {
   @ApiProperty({ example: 0 })
   seq: number;

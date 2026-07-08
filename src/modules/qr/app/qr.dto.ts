@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
-import { GetSellingTypeEnum, MarkTypeEnum } from '../qr.interface';
+import { GetSellingTypeEnum, MarkTypeEnum } from '../common/qr.enum';
 
 export class GetSellingForPurchaserListDto extends PagingDto {
   @ApiProperty({

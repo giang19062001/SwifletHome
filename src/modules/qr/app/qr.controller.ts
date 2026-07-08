@@ -9,23 +9,23 @@ import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/c
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenEaterAppResDto, TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
+import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { USER_CONST } from 'src/modules/user/app/user.interface';
-import { FetchSellingByEnum } from '../qr.interface';
+import { USER_CONST } from 'src/modules/user/app/user.const';
+import { TokenEaterAppResDto, TokenUserAppResDto } from "../../auth/app/auth.response";
+import { FetchSellingByEnum } from '../common/qr.enum';
 import { QrRequestAppService } from './qr-request.service';
 import { QrSellAppService } from './qr-sell.service';
-import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { GetSellingForPurchaserListDto, MaskRequestSellDto, RequestQrCodeDto, UploadRequestVideoDto } from './qr.dto';
 import {
-  GetApprovedRequestQrCodeResDto,
-  GetInfoToRequestQrcodeResDto,
-  GetRequestQrCodeDetailResDto,
-  GetRequestQrCodeListResDto,
-  GetSellingDetailResDto,
-  GetSellingListResDto,
-  UploadRequestVideoResDto,
-  ValidateHarvestItemResDto,
+    GetApprovedRequestQrCodeResDto,
+    GetInfoToRequestQrcodeResDto,
+    GetRequestQrCodeDetailResDto,
+    GetRequestQrCodeListResDto,
+    GetSellingDetailResDto,
+    GetSellingListResDto,
+    UploadRequestVideoResDto,
+    ValidateHarvestItemResDto,
 } from './qr.response';
 
 @ApiTags('app/qr')

@@ -8,31 +8,31 @@ import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkRespons
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { TokenUserAppResDto } from 'src/modules/auth/app/auth.dto';
+import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { USER_CONST } from 'src/modules/user/app/user.interface';
+import { USER_CONST } from 'src/modules/user/app/user.const';
+import { TokenUserAppResDto } from "../../auth/app/auth.response";
 import { TeamReviewAppService } from './team-review.service';
 import { TeamUserAppService } from './team-user.service';
-import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import {
-  CreateTeamAppDto,
-  DeleteFileAppDto,
-  GetAllTeamDto,
-  GetReviewListOfTeamDto,
-  ReviewTeamDto,
-  UploadReviewFilesDto,
-  UploadServiceFilesAppDto,
-  UploadTeamFilesAppDto,
-  UploadTeamMainImageAppDto,
+    CreateTeamAppDto,
+    DeleteFileAppDto,
+    GetAllTeamDto,
+    GetReviewListOfTeamDto,
+    ReviewTeamDto,
+    UploadReviewFilesDto,
+    UploadServiceFilesAppDto,
+    UploadTeamFilesAppDto,
+    UploadTeamMainImageAppDto,
 } from './team.dto';
 import {
-  CheckAvailableTeamResDto,
-  GetAllTeamResDto,
-  GetDetailTeamResDto,
-  GetReviewListOfTeamResDto,
-  InitFormCreateTeamAppResDto,
-  UploadReviewFilesResDto,
-  UploadTeamFileResDto,
+    CheckAvailableTeamResDto,
+    GetAllTeamResDto,
+    GetDetailTeamResDto,
+    GetReviewListOfTeamResDto,
+    InitFormCreateTeamAppResDto,
+    UploadReviewFilesResDto,
+    UploadTeamFileResDto,
 } from './team.response';
 
 @ApiTags('app/team')

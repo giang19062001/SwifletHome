@@ -1,13 +1,12 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, UseInterceptors, BadRequestException, UseFilters, UploadedFile, Param, Get, Delete, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PagingDto } from 'src/dto/admin.dto';
-import { UserHomeAdminService } from './userHome.service';
-import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
-import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
-import { ListResponseDto } from 'src/dto/common.dto';
-import { UserHomeResDto } from '../app/userHome.dto';
-import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
+import { PagingDto } from 'src/dto/admin.dto';
+import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
+import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
+import { UserHomeResDto } from "../app/userHome.response";
+import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
+import { UserHomeAdminService } from './userHome.service';
 
 @ApiTags('admin/userHome')
 @Controller('/api/admin/userHome')

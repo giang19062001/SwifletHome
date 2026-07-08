@@ -4,6 +4,12 @@ export interface IPaging {
   page: number;
 }
 
+export interface ApiMutationResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
+
 export enum YnEnum {
   Y = 'Y',
   N = 'N',
@@ -13,10 +19,4 @@ export enum TeamStatusEnum {
   APPROVE = 'APPROVE',
   REFUSE = 'REFUSE',
   WAITING = 'WAITING',
-}
-
-export interface ApiMutationResponse {
-  success: boolean;
-  message: string;
-  data?: any;
 }

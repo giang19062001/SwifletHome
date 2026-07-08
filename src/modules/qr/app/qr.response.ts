@@ -2,7 +2,7 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
-import { RequestStatusEnum } from '../qr.interface';
+import { RequestStatusEnum } from '../common/qr.enum';
 
 export class QrRequestFileResDto {
   @ApiProperty({ example: 0 })

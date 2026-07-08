@@ -2,9 +2,9 @@ import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatu
 import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from 'src/modules/auth/admin/auth.dto';
-import { BlogAdminResDto } from './blog.response';
+import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
 import { ChangToMainBlogDto, CreateBlogDto, GetAllBlogDto, UpdateBlogDto } from './blog.dto';
+import { BlogAdminResDto } from './blog.response';
 import { BlogAdminService } from './blog.service';
 
 @ApiBearerAuth('admin-auth')

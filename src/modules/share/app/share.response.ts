@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
-import { ShareTypeEnum } from './share.interface';
 import { HarvestDataInputDto } from 'src/modules/todo/app/todo.dto';
-import { UserHomeResDto } from 'src/modules/userHome/app/userHome.dto';
+import { UserHomeResDto } from "../../userHome/app/userHome.response";
+import { ShareTypeEnum } from './share.enum';
 
 export class SharedHomeDataResDto extends OmitType(UserHomeResDto, ['isIntegateTempHum', 'isIntegateCurrent', 'isTriggered', 'uniqueId'] as const) {}
 

@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AUTH_CONFIG, PUBLIC_ROUTERS } from '../auth.config';
+import { AUTH_CONFIG, PUBLIC_ROUTERS } from '../common/auth.config';
 import { AuthAdminService } from './auth.service';
 
 @Injectable()

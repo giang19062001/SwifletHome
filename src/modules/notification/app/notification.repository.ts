@@ -3,7 +3,8 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
 import { handleTimezoneQuery } from 'src/helpers/func.helper';
-import { NOTIFICATION_CONST, NotificationStatusEnum } from '../notification.interface';
+import { NOTIFICATION_CONST } from '../common/notification.const';
+import { NotificationStatusEnum } from '../common/notification.enum';
 import { CreateNotificationDto, CreateNotificationOfUserDto, DeleteNotificationByStatusEnum } from './notification.dto';
 import { NotificationAppResDto, NotificationTopicAppResDto, UserNotificationTopicAppResDto } from './notification.response';
 
