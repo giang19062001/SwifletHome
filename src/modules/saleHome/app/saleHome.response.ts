@@ -81,6 +81,9 @@ export class GetAllSaleHomeResDto {
   @ApiProperty({ example: 'AEON Tạ Quang Bửu' })
   homeLocation: string;
 
+  @ApiProperty({ example: 'Thôn 1, xã Hàm Tân, tỉnh Lâm Đồng' })
+  homeAddress: string;
+
   @ApiProperty({ example: 'US000001' })
   userCode: string;
 }

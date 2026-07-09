@@ -174,7 +174,7 @@ export class SaleHomeAppRepository {
     }
 
     const sql = `
-      SELECT h.homeCode, h.homeName, h.homelocation as homeLocation, h.userCode,
+      SELECT h.homeCode, h.homeName, h.homelocation as homeLocation, h.homeAddress, h.userCode,
              (SELECT filename FROM ${this.tableFile} 
               WHERE uniqueId = h.uniqueId AND fileTypeCode = 'FILE_OUTSIDE' 
               ORDER BY seq ASC LIMIT 1) as homeImage
