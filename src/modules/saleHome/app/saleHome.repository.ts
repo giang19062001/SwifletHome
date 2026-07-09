@@ -197,7 +197,7 @@ export class SaleHomeAppRepository {
              shortDescription, topicsShare, sightseeingAreas, includedServices, serviceNotes, tourFee, durationPerTourMinutes,
              availableDays, timeframes, timeNoticeRequired, commitments
       FROM ${this.table}
-      WHERE homeCode = ? AND status = 'APPROVED' AND isActive = 'Y' LIMIT 1
+      WHERE homeCode = ? AND isActive = 'Y' LIMIT 1
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [homeCode]);
     if (rows.length === 0) return null;

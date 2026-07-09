@@ -77,7 +77,7 @@ export class SaleHomeAppService {
         homeName: dto.homeInfo.homeName,
         userName: dto.hostInfo.hostName,
         userPhone: dto.hostInfo.hostPhone,
-        homeAddress: dto.homeInfo.homelocation,
+        homeAddress: dto.homeInfo.homeAddress,
       });
     }
     return seq;
