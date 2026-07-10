@@ -52,13 +52,13 @@ export class TeamReviewAppService {
         const seq = await this.teamReviewAppRepository.insertReview(userCode, dto);
         await this.teamReviewAppRepository.updateSeqFilesByUniqueId(seq, dto.uniqueId, dto.teamCode, userCode);
       } else {
-        // không có file ảnh nào được upload của đơn khám bệnh này -> báo lỗi
+        // không có file ảnh nào được upload  -> báo lỗi
         result = -1;
         this.logger.error(logbase, `${Msg.UuidNotFound} --> uniqueId: ${dto.uniqueId}`);
       }
 
       if (result == 1) {
-        this.logger.log(logbase, `Đăng ký khám bệnh thành công: ${JSON.stringify(dto)}`);
+        this.logger.log(logbase, `Review team thành công: ${JSON.stringify(dto)}`);
       }
       return result;
     } catch (error) {

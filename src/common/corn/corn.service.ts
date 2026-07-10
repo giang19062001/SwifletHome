@@ -124,7 +124,7 @@ export class CornService implements OnModuleInit {
 
   async deleteDoctorFilesNotUse() {
     const logbase = `${this.SERVICE_NAME}/deleteDoctorFilesNotUse`;
-    this.logger.log(logbase, `Chuẩn bị xóa các file khám bệnh không dùng theo lịch trình....`);
+    this.logger.log(logbase, `Chuẩn bị xóa các file tăng đàn không dùng theo lịch trình....`);
     try {
       const filesNotUse = await this.doctorAppService.getFilesNotUse();
       if (filesNotUse.length) {
@@ -132,12 +132,12 @@ export class CornService implements OnModuleInit {
           await this.doctorAppService.deleteFile(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
-        this.logger.log(logbase, `Các file khám bệnh không dùng đã được xóa theo lịch trình thành công`);
+        this.logger.log(logbase, `Các file tăng đàn  không dùng đã được xóa theo lịch trình thành công`);
       } else {
-        this.logger.log(logbase, `Không có file khám bệnh nào cần được xóa`);
+        this.logger.log(logbase, `Không có file tăng đàn  nào cần được xóa`);
       }
     } catch (error) {
-      this.logger.error(logbase, `Có lỗi khi xóa các file khám bệnh không dùng theo lịch trình : ${JSON.stringify(error)}`);
+      this.logger.error(logbase, `Có lỗi khi xóa các file tăng đàn  không dùng theo lịch trình : ${JSON.stringify(error)}`);
     }
   }
 

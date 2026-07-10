@@ -14,12 +14,12 @@ export class ScreenAppController {
   constructor(private readonly screenAppService: ScreenAppService) {}
 
   @ApiOperation({
-    summary: 'Nội dung màn hình đăng kí dịch vụ, màn hình khám bệnh nhà yến.. (không cần đăng nhập)',
+    summary: 'Nội dung màn hình đăng kí dịch vụ, màn hình tăng đàn nhà yến.. (không cần đăng nhập)',
   })
   @ApiParam({
     description: `
 **SIGNUP_SERVICE**: Màn hình đăng kí dịch vụ,\n
-**REQUEST_DOCTOR**: Màn hình khám bệnh nhà yến\n
+**REQUEST_DOCTOR**: Màn hình tăng đàn nhà yến\n
 **REQUEST_QR_GUIDE**: Popup hướng dẫn cho màn hình yêu cầu mã QR \n
 **CONSIGNMENT_GUIDE**: Popup hướng dẫn cho màn hình ký gửi\n
 **USER_TYPE_NOT_REGISTER**: Màn hình thông báo loại người dùng này chưa được đăng ký`,

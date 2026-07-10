@@ -2,12 +2,17 @@ import { BadRequestException } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { LoggingService } from 'src/common/logger/logger.service';
 import { AUDIO_TYPES, IMG_TYPES, VIDEO_TYPES } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
 import { v4 as uuidv4 } from 'uuid';
 
-const logger = new LoggingService();
+const FILE_SIZE_LIMITS = {
+  image: 50 * 1024 * 1024, // 50MB
+  audio: 50 * 1024 * 1024, // 50MB
+  video: 100 * 1024 * 1024, // 100MB
+  mix: 100 * 1024 * 1024, // 100MB
+};
+
 interface MulterLimits {
   fileSize?: number;
   files?: number;
@@ -129,7 +134,7 @@ function ensureDir(folderPath: string) {
 
 export const createMulterConfig = (allowedExts: string[], customLimits?: MulterLimits) => {
   const defaultLimits: MulterLimits = {
-    fileSize: 50 * 1024 * 1024, // 50MB mặc định
+    fileSize: FILE_SIZE_LIMITS.mix,
     files: undefined, // không giới hạn nếu không truyền
   };
 
@@ -141,7 +146,6 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
         const location = getFileLocation(file.mimetype, file.fieldname);
         const folderPath = join(process.cwd(), 'public', location);
         ensureDir(folderPath);
-        logger.log(`[CALLER] MULTER_UPLOAD: ${file.originalname}`);
         cb(null, folderPath);
       },
       filename: (req, file, cb) => {
@@ -163,15 +167,15 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
 };
 
 export const multerImgConfig = createMulterConfig(IMG_TYPES, {
-  fileSize: 50 * 1024 * 1024, // 50MB cho ảnh
+  fileSize: FILE_SIZE_LIMITS.image, // 50MB cho ảnh
 });
 
 export const multerAudioConfig = createMulterConfig(AUDIO_TYPES, {
-  fileSize: 50 * 1024 * 1024, // 50MB cho audio
+  fileSize: FILE_SIZE_LIMITS.audio, // 50MB cho audio
 });
 
 export const multerVideoConfig = createMulterConfig(VIDEO_TYPES, {
-  fileSize: 50 * 1024 * 1024, // 50MB cho media
+  fileSize: FILE_SIZE_LIMITS.video, // 100MB cho media
 });
 
-export const getImgVideoMulterConfig = (files: number) => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES], { fileSize: 50 * 1024 * 1024, files: files });
+export const getImgVideoMulterConfig = (files: number) => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES], { fileSize: FILE_SIZE_LIMITS.mix, files: files });

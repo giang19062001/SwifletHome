@@ -33,13 +33,13 @@ export class DoctorAppService {
         // cập nhập doctorSeq của các file đã tìm cùng uniqueId với doctor vừa created bằng 1 query duy nhất
         // await this.doctorAppRepository.updateSeqFilesByUniqueId(seq, dto.uniqueId, userCode);
       } else {
-        // // không có file ảnh nào được upload của đơn khám bệnh này -> báo lỗi
+        // // không có file ảnh nào được upload của đơn tăng đàn  này -> báo lỗi
         // result = -1;
         // this.logger.error(logbase, `${Msg.UuidNotFound} --> uniqueId: ${dto.uniqueId}`);
       }
 
       if (result == 1) {
-        this.logger.log(logbase, `Đăng ký khám bệnh thành công: ${JSON.stringify(dto)}`);
+        this.logger.log(logbase, `Đăng ký tăng đàn thành công: ${JSON.stringify(dto)}`);
         //sendEmail
         this.mailService.sendDoctorEmail(dto);
       }

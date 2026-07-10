@@ -70,12 +70,12 @@ export class HomeInfoDto {
   @IsNotEmpty()
   homeModel: string;
 
-  @ApiProperty({ example: 10.762622, required: false })
+  @ApiProperty({ example: 0, required: false })
   @IsNumber()
   @IsOptional()
   latitude?: number;
 
-  @ApiProperty({ example: 106.660172, required: false })
+  @ApiProperty({ example: 0, required: false })
   @IsNumber()
   @IsOptional()
   longitude?: number;

@@ -46,7 +46,7 @@ export const TEXTS = {
 export const EMAIL = {
   SUBJECT_SEND_CONSULTATION: 'Yêu cầu tư vấn nhà yến từ 3fam.vn',
   SUBJECT_SEND_TEAM: 'Yêu cầu duyệt đơn đăng ký đội kỹ thuật/xưởng gia công từ 3fam.vn',
-  SUBJECT_SEND_DOCTOR: 'Yêu cầu tư vấn khám bệnh nhà yến từ 3fam.vn',
+  SUBJECT_SEND_DOCTOR: 'Yêu cầu tư vấn tăng đàn nhà yến từ 3fam.vn',
   SUBJECT_SEND_CONSIGNMENT: 'Yêu cầu ký gửi từ 3fam.vn',
   SUBJECT_SEND_SIGHTSEEING: 'Yêu cầu duyệt đơn đăng ký tham quan nhà yến từ 3fam.vn',
   SUBJECT_SEND_REQUEST_QR: 'Yêu cầu duyệt cấp mã QR Code từ 3fam.vn',

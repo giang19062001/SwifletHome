@@ -386,7 +386,7 @@ export class AppController {
   @Render('pages/doctor')
   renderDoctor(@Req() req: Request) {
     return {
-      title: 'Danh sách khám bệnh nhà yến',
+      title: 'Danh sách tư vấn tăng đàn nhà yến',
       isLayout: true,
       user: req.session.user,
     };

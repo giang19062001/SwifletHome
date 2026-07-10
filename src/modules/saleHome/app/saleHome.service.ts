@@ -6,6 +6,7 @@ import { getFileLocation } from 'src/config/multer.config';
 import { PagingDto } from 'src/dto/admin.dto';
 import { OPTION_CONST } from 'src/modules/options/option.const';
 import { v4 as uuidv4 } from 'uuid';
+import { SALE_HOME_CONST } from './saleHome.const';
 import { CreateSaleHomeAppDto, UpdateSaleHomeAppDto, UploadFilesAppDto } from './saleHome.dto';
 import { SaleHomeAppRepository } from './saleHome.repository';
 import { GetAllSaleHomeWrapperResDto, GetDetailSaleHomeResDto, GetInitFormMutationResDto } from './saleHome.response';
@@ -65,8 +66,8 @@ export class SaleHomeAppService {
       // const coords = await this.geoService.getCoordinates(dto.homeInfo.homelocation);
       // latitude = coords.latitude;
       // longitude = coords.longitude;
-      latitude = 0;
-      longitude = 0;
+      latitude = SALE_HOME_CONST.LAT;
+      longitude = SALE_HOME_CONST.LON;
     }
 
     const seq = await this.saleHomeAppRepository.createSaleHome(dto, userCode, userCode, latitude, longitude);

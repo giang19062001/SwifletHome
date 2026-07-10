@@ -24,7 +24,7 @@ export class DoctorAppController {
   constructor(private readonly doctorAppService: DoctorAppService) {}
 
   @ApiOperation({
-    summary: 'Yêu cầu khám bệnh nhà yến',
+    summary: 'Yêu cầu tăng đàn nhà yến',
   })
   @Post('requestDoctor')
   @ApiBody({ type: CreateDoctorDto, description: '**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file' })
