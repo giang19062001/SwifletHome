@@ -140,7 +140,7 @@ export class SaleHomeAppRepository {
     const sql = `
       SELECT seq, filename 
       FROM ${this.tableFile} 
-      WHERE homeSeq = 0 OR uniqueId NOT IN (SELECT uniqueId FROM ${this.table})
+      WHERE homeSeq = 0 OR uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL)
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql);
     return rows as { seq: number; filename: string }[];

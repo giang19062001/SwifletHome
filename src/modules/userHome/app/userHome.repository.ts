@@ -208,8 +208,8 @@ export class UserHomeAppRepository {
   async getFilesNotUse(): Promise<UserHomeImageFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userHomeSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableImg} A
-        WHERE A.userHomeSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table})
-        `,
+        WHERE A.userHomeSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL)
+      `,
     );
     return rows as UserHomeImageFileResDto[];
   }

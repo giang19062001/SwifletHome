@@ -130,7 +130,8 @@ export class AdsAdminRepository {
   async getFilesNotUse(): Promise<AdsFileNotUseAdminResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.adsSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableFile} A
-        WHERE A.adsSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL) OR A.isActive = 'N' `,
+        WHERE A.adsSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL)
+      `,
     );
     return rows as AdsFileNotUseAdminResDto[];
   }

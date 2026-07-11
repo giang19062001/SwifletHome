@@ -111,8 +111,8 @@ export class TeamReviewAppRepository {
   async getFilesNotUse(): Promise<TeamReviewFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.reviewSeq, A.uniqueId, A.filename, A.mimetype FROM ${this.tableReviewImg} A
-        WHERE A.reviewSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.tableReview} ) OR A.isActive = 'N'
-        `,
+        WHERE A.reviewSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.tableReview} WHERE uniqueId IS NOT NULL)
+      `,
     );
     return rows as TeamReviewFileResDto[];
   }

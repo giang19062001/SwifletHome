@@ -33,87 +33,46 @@ export const validateImgExt = (originalname) => {
 };
 
 export const getFileLocation = (mimetype: string, fieldname: string) => {
-  // console.log('getFileLocation ---> ', mimetype, fieldname);
   let result = '';
+
   if (mimetype.startsWith('image/')) {
-    // image
-    if (fieldname === 'editorImg' || fieldname.includes('editorImg')) {
-      result = 'images/editors';
-    }
-    if (fieldname === 'homeImage' || fieldname.includes('homeImage') || fieldname === 'homeImages' || fieldname.includes('homeImages')) {
-      result = 'images/homes';
-    }
-
-    if (fieldname === 'userHomeImage' || fieldname.includes('userHomeImage')) {
+    if (fieldname.includes('userHomeImage')) {
       result = 'images/userHomes';
-    }
-    if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
+    } else if (fieldname.includes('editorImg')) {
+      result = 'images/editors';
+    } else if (fieldname.includes('doctorFiles')) {
       result = 'images/doctors';
-    }
-    if (fieldname === 'saleHomeFiles' || fieldname.includes('saleHomeFiles')) {
+    } else if (fieldname.includes('saleHomeFiles')) {
       result = 'images/saleHomes';
-    }
-    if (fieldname === 'configfiles' || fieldname.includes('configfiles')) {
+    } else if (fieldname.includes('configfiles')) {
       result = 'images/configs';
-    }
-    if (fieldname === 'screenImage' || fieldname.includes('screenImage')) {
+    } else if (fieldname.includes('screenImage')) {
       result = 'images/screens';
-    }
-
-    if (fieldname === 'requestQrcodeFiles' || fieldname.includes('requestQrcodeFiles')) {
+    } else if (fieldname.includes('requestQrcodeFiles')) {
       result = 'images/requestQrcodes';
-    }
-
-    if (fieldname === 'adsBanner' || fieldname.includes('adsBanner')) {
+    } else if (fieldname.includes('adsBanner')) {
       result = 'images/ads';
-    }
-
-    // team
-    if (
-      fieldname === 'teamImage' ||
-      fieldname.includes('teamImage') ||
-      fieldname === 'teamFiles' ||
-      fieldname.includes('teamFiles') ||
-      fieldname === 'teamServiceFiles' ||
-      fieldname.includes('teamServiceFiles')
-    ) {
+    } else if (fieldname.includes('teamImage') || fieldname.includes('teamFiles') || fieldname.includes('teamServiceFiles')) {
       result = 'images/teams';
-    }
-
-    // team review
-    if (fieldname === 'reviewImg' || fieldname.includes('reviewImg')) {
+    } else if (fieldname.includes('reviewImg')) {
       result = 'images/reviews';
-    }
-
-    // quan trọng
-    if (fieldname === 'qrcode' || fieldname.includes('qrcode')) {
+    } else if (fieldname.includes('qrcode')) {
       result = 'images/qrcodes';
     }
-  }
-  if (mimetype.startsWith('video/')) {
-    //doctor
-    if (fieldname === 'doctorFiles' || fieldname.includes('doctorFiles')) {
+  } else if (mimetype.startsWith('video/')) {
+    if (fieldname.includes('doctorFiles')) {
       result = 'videos/doctors';
-    }
-    if (fieldname === 'saleHomeFiles' || fieldname.includes('saleHomeFiles')) {
+    } else if (fieldname.includes('saleHomeFiles')) {
       result = 'videos/saleHomes';
-    }
-    if (fieldname === 'requestQrcodeFiles' || fieldname.includes('requestQrcodeFiles')) {
+    } else if (fieldname.includes('requestQrcodeFiles')) {
       result = 'videos/requestQrcodes';
-    }
-    // team
-    if (fieldname === 'teamFiles' || fieldname.includes('teamFiles') || fieldname === 'teamServiceFiles' || fieldname.includes('teamServiceFiles')) {
+    } else if (fieldname.includes('teamFiles') || fieldname.includes('teamServiceFiles')) {
       result = 'videos/teams';
     }
-  }
-  if (mimetype.startsWith('audio/')) {
-    //audio
-    if (fieldname === 'editorAudio' || fieldname.includes('editorAudio')) {
+  } else if (mimetype.startsWith('audio/')) {
+    if (fieldname.includes('editorAudio')) {
       result = 'audios/editors';
-    }
-  }
-  if (mimetype.startsWith('audio/')) {
-    if (fieldname === 'mediaAudio' || fieldname.includes('mediaAudio')) {
+    } else if (fieldname.includes('mediaAudio')) {
       result = 'audios/medias';
     }
   }

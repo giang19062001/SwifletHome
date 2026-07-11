@@ -1,7 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import * as fs from 'fs';
 import moment from 'moment';
+import type { Pool } from 'mysql2/promise';
+import * as path from 'path';
 import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { AdsAdminService } from 'src/modules/ads/admin/ads.service';
 import { DoctorAppService } from 'src/modules/doctor/app/doctor.service';
@@ -21,6 +24,7 @@ export class CornService implements OnModuleInit {
   private readonly SERVICE_NAME = 'CornService';
 
   constructor(
+    @Inject('MYSQL_CONNECTION') private readonly db: Pool,
     private readonly doctorAppService: DoctorAppService,
     private readonly teamUserAppService: TeamUserAppService,
     private readonly teamReviewAppService: TeamReviewAppService,
@@ -45,6 +49,7 @@ export class CornService implements OnModuleInit {
       await this.deleteTeamFilesNotUse();
       await this.deleteSaleHomeFilesNotUse();
       await this.deleteAdsFilesNotUse();
+      await this.deleteOrphanedLocalFiles();
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
     jobDaily.start();
@@ -72,15 +77,14 @@ export class CornService implements OnModuleInit {
     jobDailyAt8AM.start();
     // ! test
     // await this.deleteAdsFilesNotUse();
-    // await this.deleteQrRequestFilesNotUse()
-    //  await this.deleteDoctorFilesNotUse();
+    // await this.deleteQrRequestFilesNotUse();
+    // await this.deleteDoctorFilesNotUse();
     // await this.deleteUserHomeFilesNotUse();
     // await this.pushNotificationsByTaskAlarms();
-    // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.MONTH);
-    // await this.insertTodoTaskAlarmByPeriod(PeriodTypeEnum.WEEK);
     // await this.deleteReviewFilesNotUse();
     // await this.deleteTeamFilesNotUse();
-    // this.deleteSaleHomeFilesNotUse();
+    // await this.deleteSaleHomeFilesNotUse();
+    // await this.deleteOrphanedLocalFiles();
   }
 
   async pushNotificationsByTaskAlarms() {
@@ -265,6 +269,116 @@ export class CornService implements OnModuleInit {
       }
     } catch (error) {
       this.logger.error(logbase, `Có lỗi khi xóa file ads banner không dùng theo lịch trình: ${JSON.stringify(error)}`);
+    }
+  }
+  async deleteOrphanedLocalFiles() {
+    const logbase = `${this.SERVICE_NAME}/deleteOrphanedLocalFiles`;
+    this.logger.log(logbase, `Bắt đầu tiến trình quét file rác...`);
+
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      this.logger.log(logbase, `Thư mục public/uploads không tồn tại, bỏ qua.`);
+      return;
+    }
+
+    const IGNORED_PATHS = ['images/configs', 'images/screens'];
+    const localFilesSet = new Set<string>();
+
+    // Quét đệ quy lấy toàn bộ file trên ổ cứng vào Set
+    const walkDir = async (dir: string) => {
+      const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
+      for (const dirent of dirents) {
+        const absolutePath = path.join(dir, dirent.name);
+        const relativePath = path.relative(path.join(process.cwd(), 'public'), absolutePath).replace(/\\/g, '/');
+
+        // Bỏ qua thư mục/file rác nằm trong danh sách cấm
+        if (dirent.name.startsWith('.') || IGNORED_PATHS.some((ignored) => relativePath.includes(ignored))) {
+          continue;
+        }
+
+        if (dirent.isDirectory()) {
+          await walkDir(absolutePath);
+        } else {
+          // Thêm file vào Set
+          localFilesSet.add(relativePath);
+        }
+      }
+    };
+
+    try {
+      await walkDir(uploadsDir);
+      this.logger.log(logbase, `Đã quét được ${localFilesSet.size} files trên ổ cứng.`);
+
+      if (localFilesSet.size === 0) return;
+
+      // Danh sách tất cả các bảng và cột chứa đường dẫn file
+      const dbMappings = [
+        { table: 'tbl_user_home', column: 'userHomeImage' },
+        { table: 'tbl_user_home_img', column: 'filename' },
+        { table: 'tbl_uploads_image', column: 'filename' },
+        { table: 'tbl_doctor_file', column: 'filename' },
+        { table: 'tbl_sale_home_file', column: 'filename' },
+        { table: 'tbl_qr_request_file', column: 'filename' },
+        { table: 'tbl_ads_file', column: 'filename' },
+        { table: 'tbl_team_img', column: 'filename' },
+        { table: 'tbl_team_service_file', column: 'filename' },
+        { table: 'tbl_team_user', column: 'teamImage' },
+        { table: 'tbl_team_review_img', column: 'filename' },
+        { table: 'tbl_qr_request_blockchain', column: 'qrCodeUrl' },
+        { table: 'tbl_uploads_audio', column: 'filename' },
+        { table: 'tbl_media_audio', column: 'filename' },
+      ];
+
+      // Truy vấn DB lấy toàn bộ path đang được sử dụng và loại bỏ khỏi Set
+      for (const mapping of dbMappings) {
+        const sql = ` SELECT ${mapping.column} AS filepath FROM ${mapping.table} WHERE ${mapping.column} LIKE 'uploads/%'`;
+        try {
+          const [rows]: any = await this.db.execute(sql);
+          if (rows && rows.length > 0) {
+            for (const row of rows) {
+              if (row.filepath) {
+                // Xóa khỏi Set vì file này đang được DB sử dụng (không phải rác)
+                localFilesSet.delete(row.filepath);
+              }
+            }
+          }
+        } catch (err) {
+          this.logger.error(logbase, `Lỗi khi lấy dữ liệu từ bảng ${mapping.table}: ${JSON.stringify(err)}`);
+        }
+      }
+
+      // Các file còn lại trong Set chính là file rác (cần xóa)
+      const orphanedFiles = Array.from(localFilesSet);
+      this.logger.log(logbase, `Phát hiện ${orphanedFiles.length} file rác không có trong DB.`);
+
+      if (orphanedFiles.length === 0) {
+        this.logger.log(logbase, `Không có file rác nào cần dọn dẹp`);
+        return;
+      }
+
+      //  Xóa hàng loạt theo chunk (50 file mỗi lượt)
+      let deletedCount = 0;
+      const CHUNK_SIZE = 50;
+
+      for (let i = 0; i < orphanedFiles.length; i += CHUNK_SIZE) {
+        const chunk = orphanedFiles.slice(i, i + CHUNK_SIZE);
+
+        await Promise.allSettled(
+          chunk.map(async (relativePath) => {
+            const absolutePath = path.join(process.cwd(), 'public', relativePath);
+            try {
+              await fs.promises.unlink(absolutePath);
+              this.logger.log(logbase, `Đã xóa: ${relativePath} dựa vào bảng ${dbMappings.map((m) => m.table).join(', ')}`);
+              deletedCount++;
+            } catch (err) {
+              this.logger.error(logbase, `Không thể xóa file ${relativePath}: ${JSON.stringify(err)}`);
+            }
+          }),
+        );
+      }
+      this.logger.log(logbase, `Hoàn tất dọn rác local. Đã xử lý ${deletedCount} file rác.`);
+    } catch (error) {
+      this.logger.error(logbase, `Lỗi trong quá trình quét đệ quy file rác: ${JSON.stringify(error)}`);
     }
   }
 }

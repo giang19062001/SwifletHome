@@ -281,10 +281,9 @@ export class QrRequestAppRepository {
   async getFilesNotUse(): Promise<QrRequestFileResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.qrRequestSeq, A.uniqueId, A.filename, A.mimetype 
-            FROM ${this.tableFile} A
-          WHERE A.qrRequestSeq = 0 OR A.uniqueId 
-          NOT IN (SELECT uniqueId FROM ${this.table} WHERE isActive = 'Y')
-    `,
+        FROM ${this.tableFile} A
+        WHERE A.qrRequestSeq = 0 OR A.uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL)
+      `,
     );
     return rows as QrRequestFileResDto[];
   }
