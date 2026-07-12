@@ -4,9 +4,7 @@ import { FirebaseService } from './firebase.service';
 
 @Global()
 @Module({
-  imports: [
-    NotificationAppModule,
-  ],
+  imports: [NotificationAppModule],
   providers: [FirebaseService],
   exports: [FirebaseService],
 })

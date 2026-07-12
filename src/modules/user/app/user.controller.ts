@@ -6,7 +6,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { AllowUserTypeResDto, UserTypeResDto } from 'src/modules/user/app/user.response';
 import { UserAppService } from 'src/modules/user/app/user.service';
-import { TokenUserAppResDto } from "../../auth/app/auth.response";
+import { TokenUserAppResDto } from '../../auth/app/auth.response';
 
 @ApiTags('app/user')
 @Controller('/api/app/user')

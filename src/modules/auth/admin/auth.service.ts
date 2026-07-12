@@ -5,7 +5,7 @@ import { Msg } from 'src/helpers/message.helper';
 import { UserAdminService } from 'src/modules/user/admin/user.service';
 import { AbAuthService } from '../common/auth.abstract';
 import { LoginAdminDto } from './auth.dto';
-import { TokenUserAdminResDto } from "./auth.response";
+import { TokenUserAdminResDto } from './auth.response';
 
 @Injectable()
 export class AuthAdminService extends AbAuthService {

@@ -16,7 +16,7 @@ import { UserAppService } from 'src/modules/user/app/user.service';
 import { AbAuthService } from '../common/auth.abstract';
 import { AUTH_CONFIG } from '../common/auth.config';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
-import { TokenEaterAppResDto, TokenUserAppResDto } from "./auth.response";
+import { TokenEaterAppResDto, TokenUserAppResDto } from './auth.response';
 
 @Injectable()
 export class AuthAppService extends AbAuthService {

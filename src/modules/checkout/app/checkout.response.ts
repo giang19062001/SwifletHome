@@ -1,4 +1,3 @@
-
 export class CheckoutCurrentPackageAppResDto {
   packageCode: string;
   startDate: Date;

@@ -7,7 +7,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { ROUTER } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
+import { TokenUserAdminResDto } from '../../auth/admin/auth.response';
 import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto, UpdateStatusSaleHomeDto, UploadFilesAdminDto } from './saleHome.dto';
 import { SaleHomeAdminService } from './saleHome.service';
 

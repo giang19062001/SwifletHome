@@ -4,7 +4,7 @@ import { RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { USER_CONST } from 'src/modules/user/app/user.const';
-import { TokenEaterAppResDto } from "../../auth/app/auth.response";
+import { TokenEaterAppResDto } from '../../auth/app/auth.response';
 import { UserEaterRecord } from './eater.interface';
 
 @Injectable()

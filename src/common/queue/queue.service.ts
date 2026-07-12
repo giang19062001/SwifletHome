@@ -34,8 +34,9 @@ export class NotificationQueueService extends WorkerHost {
       const result = await this.firebaseService.sendNotification(userCode, deviceToken, title, body, data, notificationType);
       this.logger.log(logbase, `Đã gửi thông báo trong hàng đợi thành công cho user(${userCode}), messageId code: ${result}`);
       return result;
-    } catch (error) {
-      this.logger.error(logbase, `Không thể gửi thông báo đã xếp hàng chờ cho user(${userCode}): ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(logbase, `Không thể gửi thông báo đã xếp hàng chờ cho user(${userCode}): ${message}`);
       throw error;
     }
   }
@@ -78,9 +79,12 @@ export class VideoQueueService extends WorkerHost {
             }
             this.logger.log(logbase, `Hoàn tất nén video: ${newPath}`);
             resolve('Convert video success');
-          } catch (e) {
-            this.logger.error(logbase, `Lỗi khi đổi tên file video temp: ${e.message}`);
-            reject(e);
+          } catch (e: unknown) {
+            const error = e instanceof Error ? e : new Error(String(e));
+
+            this.logger.error(logbase, `Lỗi khi đổi tên file video temp: ${error.message}`);
+
+            reject(error);
           }
         })
         .on('error', (err, stdout, stderr) => {

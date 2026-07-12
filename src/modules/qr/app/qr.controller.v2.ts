@@ -5,7 +5,7 @@ import { NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg, MsgDto } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { TokenUserAppResDto } from "../../auth/app/auth.response";
+import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { QrSellAppService } from './qr-sell.service';
 import { InsertRequestSellDto } from './qr.dto';
 

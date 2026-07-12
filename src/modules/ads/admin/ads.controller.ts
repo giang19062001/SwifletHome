@@ -6,7 +6,7 @@ import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
+import { TokenUserAdminResDto } from '../../auth/admin/auth.response';
 import { AdsFileDto, CreateAdsBannerDto, UpdateAdsBannerDto } from './ads.dto';
 import { AdsBannerAdminResDto } from './ads.response';
 import { AdsAdminService } from './ads.service';

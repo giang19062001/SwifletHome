@@ -4,7 +4,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/
 import { GetUserAdmin } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
+import { TokenUserAdminResDto } from '../../auth/admin/auth.response';
 import { UpdateInfoDto } from './info.dto';
 import { InfoAdminResDto } from './info.response';
 import { InfoAdminService } from './info.service';

@@ -8,7 +8,7 @@ import { Msg } from 'src/helpers/message.helper';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { UploadImgFileDto } from 'src/modules/upload/admin/upload.dto';
 import { UploadAdminService } from 'src/modules/upload/admin/upload.service';
-import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
+import { TokenUserAdminResDto } from '../../auth/admin/auth.response';
 import { UpdateScreenDto } from './screen.dto';
 import { ScreenAdminResDto, ScreenVideoAdminResDto } from './screen.response';
 import { ScreenAdminService } from './screen.service';

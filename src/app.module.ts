@@ -111,7 +111,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     MqttModule,
     BlacklistModule,
     GeoModule,
-    QueueModule, 
+    QueueModule,
     // commmon
     OptionModule,
     ProvinceModule,

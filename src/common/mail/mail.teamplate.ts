@@ -1,4 +1,4 @@
-import { USER_CONST } from "src/modules/user/app/user.const";
+import { USER_CONST } from 'src/modules/user/app/user.const';
 
 export function getGuestTemplate(data: { name: string; phone: string; issueInterest: string; issueDescription: string }) {
   return `

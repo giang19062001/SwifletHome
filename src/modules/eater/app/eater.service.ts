@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { AUTH_CONFIG } from 'src/modules/auth/common/auth.config';
-import { TokenEaterAppResDto } from "../../auth/app/auth.response";
+import { TokenEaterAppResDto } from '../../auth/app/auth.response';
 import { EaterEntryDto } from './eater.dto';
 import { EaterAppRepository } from './eater.repository';
 import { EaterAuthResDto } from './eater.response';

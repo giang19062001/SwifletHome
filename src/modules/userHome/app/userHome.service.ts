@@ -8,7 +8,7 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { UserAppService } from 'src/modules/user/app/user.service';
 import { MutationUserHomeDto, UploadUserHomeImageDto } from './userHome.dto';
 import { UserHomeAppRepository } from './userHome.repository';
-import { UserHomeAreaResDto, UserHomeImageStrResDto, UserHomeResDto } from "./userHome.response";
+import { UserHomeAreaResDto, UserHomeImageStrResDto, UserHomeResDto } from './userHome.response';
 
 @Injectable()
 export class UserHomeAppService {

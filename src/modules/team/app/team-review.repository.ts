@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { TeamReviewFileResDto } from "../admin/team.response";
+import { TeamReviewFileResDto } from '../admin/team.response';
 import { GetReviewListOfTeamDto, ReviewTeamDto } from './team.dto';
 import { GetReviewListOfTeamResDto } from './team.response';
 

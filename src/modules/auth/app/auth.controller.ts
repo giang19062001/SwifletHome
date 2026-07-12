@@ -11,7 +11,7 @@ import { ChangeTypeTokenAppResDto, GetInfoUserAppResDto, LoginResDto } from 'src
 import { RequestOtpAppResDto } from '../../otp/app/otp.response';
 import { ChangeTypeTokenDto, LoginAppDto, RegisterUserAppDto, UpdateDeviceTokenDto, UpdatePasswordDto, UpdateUserDto } from './auth.dto';
 import { ApiAuthAppGuard } from './auth.guard';
-import { TokenUserAppResDto } from "./auth.response";
+import { TokenUserAppResDto } from './auth.response';
 import { AuthAppService } from './auth.service';
 
 @ApiBearerAuth('app-auth')

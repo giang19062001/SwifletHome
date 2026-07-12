@@ -6,7 +6,7 @@ import { YnEnum } from 'src/interfaces/admin.interface';
 import { InfoAppService } from 'src/modules/info/app/info.service';
 import { OPTION_CONST } from 'src/modules/options/option.const';
 import { OptionService } from 'src/modules/options/option.service';
-import { TokenUserAppResDto } from "../../auth/app/auth.response";
+import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { FetchSellingByEnum, MarkTypeEnum, RequestSellPriceOptionEnum } from '../common/qr.enum';
 import { QrSellAppRepository } from './qr-sell.repository';
 import { GetSellingForPurchaserListDto, InsertRequestSellDto } from './qr.dto';

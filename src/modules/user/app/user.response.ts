@@ -109,13 +109,12 @@ export class UserAppResDto {
 
   @ApiProperty({ example: '' })
   userTypeCode?: string;
-  
+
   @ApiProperty({ example: '' })
   userTypeKeyWord?: string;
 }
 
-export class GetInfoUserAppResDto extends IntersectionType(UserAppResDto, UserTypeResDto, UserPackageAppResDto) {
-}
+export class GetInfoUserAppResDto extends IntersectionType(UserAppResDto, UserTypeResDto, UserPackageAppResDto) {}
 
 export class LoginResDto extends UserAppResDto {
   @ApiProperty({ example: '' })

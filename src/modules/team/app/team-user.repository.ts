@@ -300,7 +300,7 @@ export class TeamUserAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, filename FROM ${this.tableTeamImg} 
         WHERE teamSeq = 0 OR uniqueId NOT IN (SELECT uniqueId FROM ${this.table} WHERE uniqueId IS NOT NULL)
-      `
+      `,
     );
     return rows as unknown as TeamFileNotUseAppResDto[];
   }
@@ -309,7 +309,7 @@ export class TeamUserAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT seq, filename FROM ${this.tableServiceFile} 
         WHERE seqService = 0 OR uniqueId NOT IN (SELECT uniqueId FROM ${this.tableService} WHERE uniqueId IS NOT NULL)
-      `
+      `,
     );
     return rows as unknown as TeamFileNotUseAppResDto[];
   }

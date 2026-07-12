@@ -51,7 +51,7 @@ export class VideoConverterInterceptor implements NestInterceptor {
 
       const originalFilenameExt = extname(originalFilename);
       const baseFilename = originalFilenameExt ? originalFilename.slice(0, -originalFilenameExt.length) : originalFilename;
-      const newFilename = baseFilename + '.mp4'; 
+      const newFilename = baseFilename + '.mp4';
 
       const originalPathExt = extname(originalPath);
       const basePath = originalPathExt ? originalPath.slice(0, -originalPathExt.length) : originalPath;

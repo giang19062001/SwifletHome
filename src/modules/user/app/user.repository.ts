@@ -6,7 +6,7 @@ import { generateCode } from 'src/helpers/func.helper';
 import { TEXTS } from 'src/helpers/text.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { RegisterUserAppDto } from 'src/modules/auth/app/auth.dto';
-import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from "../../auth/app/auth.response";
+import { TokenUserAppResDto, TokenUserAppWithPasswordResDto } from '../../auth/app/auth.response';
 import { USER_CONST } from './user.const';
 import { CreateUserPackageAppDto } from './user.dto';
 import { AllowUserTypeResDto, GetInfoUserAppResDto, UserPackageAppResDto, UserTypeResDto } from './user.response';

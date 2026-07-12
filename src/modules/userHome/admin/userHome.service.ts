@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
-import { UserHomeResDto } from "../app/userHome.response";
+import { UserHomeResDto } from '../app/userHome.response';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
 import { UserHomeAdminRepository } from './userHome.repository';
 

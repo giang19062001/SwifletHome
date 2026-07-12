@@ -1,7 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsArray, IsEnum } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { UserHomeResDto } from "../../userHome/app/userHome.response";
+import { UserHomeResDto } from '../../userHome/app/userHome.response';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../common/todo.enum';
 import { HarvestDataInputDto } from './todo.dto';
 

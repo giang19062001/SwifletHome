@@ -7,10 +7,10 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { MsgAdmin } from 'src/helpers/message.helper';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
-import { TokenUserAdminResDto } from "../../auth/admin/auth.response";
+import { TokenUserAdminResDto } from '../../auth/admin/auth.response';
 import { GetDetailTeamResDto } from '../app/team.response';
 import { ChangDisplayReviewDto, CreateTeamDto, DeleteFileDto, UpdateTeamDto, UploadServiceFilesDto, UploadTeamFilesDto, UploadTeamMainImageDto } from './team.dto';
-import { TeamResDto, TeamReviewResDto } from "./team.response";
+import { TeamResDto, TeamReviewResDto } from './team.response';
 import { TeamAdminService } from './team.service';
 
 @ApiBearerAuth('admin-auth')

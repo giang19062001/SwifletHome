@@ -5,7 +5,7 @@ import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { MutationUserHomeDto } from './userHome.dto';
-import { UserHomeAreaResDto, UserHomeImageFileResDto, UserHomeResDto } from "./userHome.response";
+import { UserHomeAreaResDto, UserHomeImageFileResDto, UserHomeResDto } from './userHome.response';
 
 @Injectable()
 export class UserHomeAppRepository {

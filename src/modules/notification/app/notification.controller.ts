@@ -8,7 +8,7 @@ import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkRespons
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
-import { TokenUserAppResDto } from "../../auth/app/auth.response";
+import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { DeleteNotificationByStatusDto } from './notification.dto';
 import { GetNotificationResDto, NotificationAppResDto } from './notification.response';
 import { NotificationAppService } from './notification.service';

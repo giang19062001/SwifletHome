@@ -266,41 +266,41 @@ export class TeamFileNotUseAppResDto {
 }
 
 export class TeamReviewFileStrResDto {
-    @ApiProperty({ example: 0 })
-    seq: number;
+  @ApiProperty({ example: 0 })
+  seq: number;
 
-    @ApiProperty({ example: '' })
-    filename: string;
+  @ApiProperty({ example: '' })
+  filename: string;
 }
 
 export class TeamReviewFileResDto {
-    @ApiProperty({ example: 0 })
-    seq: number;
+  @ApiProperty({ example: 0 })
+  seq: number;
 
-    @ApiProperty({ example: 0 })
-    reviewSeq: number;
+  @ApiProperty({ example: 0 })
+  reviewSeq: number;
 
-    @ApiProperty({ example: '' })
-    teamCode: string;
+  @ApiProperty({ example: '' })
+  teamCode: string;
 
-    @ApiProperty({ example: '' })
-    homeName: string;
+  @ApiProperty({ example: '' })
+  homeName: string;
 
-    @ApiProperty({ example: '' })
-    filename: string;
+  @ApiProperty({ example: '' })
+  filename: string;
 
-    @ApiProperty({ example: '' })
-    originalname: string;
+  @ApiProperty({ example: '' })
+  originalname: string;
 
-    @ApiProperty({ example: 0 })
-    size: number;
+  @ApiProperty({ example: 0 })
+  size: number;
 
-    @ApiProperty({ example: '' })
-    mimetype: string;
+  @ApiProperty({ example: '' })
+  mimetype: string;
 
-    @ApiProperty({ example: '' })
-    uniqueId: string;
-    
-    @ApiProperty({ example: YnEnum.N })
-    isActive: YnEnum;
+  @ApiProperty({ example: '' })
+  uniqueId: string;
+
+  @ApiProperty({ example: YnEnum.N })
+  isActive: YnEnum;
 }

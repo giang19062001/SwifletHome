@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { UserHomeForPushAdminResDto, UserHomeProvinceForPushAdminResDto } from '../../notification/admin/notification.response';
-import { UserHomeResDto } from "../app/userHome.response";
+import { UserHomeResDto } from '../app/userHome.response';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
 
 @Injectable()
