@@ -68,11 +68,18 @@ export class VideoConverterInterceptor implements NestInterceptor {
       file.mimetype = 'video/mp4';
 
       // Đẩy job convert vào BullMQ để xử lý FFmpeg ngầm
-      await this.videoQueue.add('convert', {
-        originalPath,
-        tempPath,
-        newPath,
-      });
+      await this.videoQueue.add(
+        'convert',
+        {
+          originalPath,
+          tempPath,
+          newPath,
+        },
+        {
+          removeOnComplete: true, // xóa job sau khi hoàn thành khỏi redis
+          removeOnFail: true, // xóa job kể cả khi thất bại khỏi redis
+        },
+      );
 
       // Return liền không chờ FFMPEG chạy
       return Promise.resolve();

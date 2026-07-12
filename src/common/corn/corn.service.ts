@@ -84,7 +84,7 @@ export class CornService implements OnModuleInit {
     // await this.pushNotificationsByTaskAlarms();
     // await this.deleteReviewFilesNotUse();
     // await this.deleteTeamFilesNotUse();
-    await this.deleteSaleHomeFilesNotUse();
+    // await this.deleteSaleHomeFilesNotUse();
     // await this.deleteOrphanedLocalFiles();
   }
 

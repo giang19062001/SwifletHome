@@ -32,7 +32,7 @@ export class FirebaseService implements OnModuleInit {
     DETAIL: string;
   };
 
-  private fcmConfig(title: string, body: string, badgeCount = 0) {
+  private FcmConfig(title: string, body: string, badgeCount = 0) {
     return {
       android: {
         priority: 'high' as const,
@@ -109,7 +109,7 @@ export class FirebaseService implements OnModuleInit {
         token: deviceToken,
         notification: { title, body },
         data: dataPayload,
-        ...this.fcmConfig(title, body, Number(count) || 0),
+        ...this.FcmConfig(title, body, Number(count) || 0),
       };
 
       this.logMessagePayload(logbase, message);
@@ -175,7 +175,7 @@ export class FirebaseService implements OnModuleInit {
       topic,
       notification: { title, body },
       data: dataPayload,
-      ...this.fcmConfig(title, body, Number(dataPayload.count) || 0),
+      ...this.FcmConfig(title, body, Number(dataPayload.count) || 0),
     };
 
     this.logMessagePayload(logbase, message);
@@ -297,7 +297,7 @@ export class FirebaseService implements OnModuleInit {
           tokens: tokenBatch,
           notification: { title, body },
           data: dataPayload,
-          ...this.fcmConfig(title, body, Number(dataPayload.count) || 0),
+          ...this.FcmConfig(title, body, Number(dataPayload.count) || 0),
         };
 
         this.logMessagePayload(logbase, message);
