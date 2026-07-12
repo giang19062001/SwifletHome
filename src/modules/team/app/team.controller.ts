@@ -7,32 +7,33 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto, NullResponseDto, NumberErrResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
+import { ImageOptimizerInterceptor } from 'src/interceptors/image-optimizer.interceptor';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { USER_CONST } from 'src/modules/user/app/user.const';
-import { TokenUserAppResDto } from "../../auth/app/auth.response";
+import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { TeamReviewAppService } from './team-review.service';
 import { TeamUserAppService } from './team-user.service';
 import {
-    CreateTeamAppDto,
-    DeleteFileAppDto,
-    GetAllTeamDto,
-    GetReviewListOfTeamDto,
-    ReviewTeamDto,
-    UploadReviewFilesDto,
-    UploadServiceFilesAppDto,
-    UploadTeamFilesAppDto,
-    UploadTeamMainImageAppDto,
+  CreateTeamAppDto,
+  DeleteFileAppDto,
+  GetAllTeamDto,
+  GetReviewListOfTeamDto,
+  ReviewTeamDto,
+  UploadReviewFilesDto,
+  UploadServiceFilesAppDto,
+  UploadTeamFilesAppDto,
+  UploadTeamMainImageAppDto,
 } from './team.dto';
 import {
-    CheckAvailableTeamResDto,
-    GetAllTeamResDto,
-    GetDetailTeamResDto,
-    GetReviewListOfTeamResDto,
-    InitFormCreateTeamAppResDto,
-    UploadReviewFilesResDto,
-    UploadTeamFileResDto,
+  CheckAvailableTeamResDto,
+  GetAllTeamResDto,
+  GetDetailTeamResDto,
+  GetReviewListOfTeamResDto,
+  InitFormCreateTeamAppResDto,
+  UploadReviewFilesResDto,
+  UploadTeamFileResDto,
 } from './team.response';
 
 @ApiTags('app/team')
@@ -154,7 +155,7 @@ export class TeamAppController {
   @ApiBody({ type: UploadTeamMainImageAppDto })
   @ApiOkResponse({ type: ApiAppResponseDto(UploadTeamFileResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  @UseInterceptors(FileInterceptor('teamImage', multerImgConfig))
+  @UseInterceptors(FileInterceptor('teamImage', multerImgConfig), ImageOptimizerInterceptor)
   async uploadTeamMainImage(@Body() dto: UploadTeamMainImageAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFile() file: Express.Multer.File) {
     if (!file) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
     const result = await this.teamUserAppService.uploadTeamMainImage(dto, file, user.userCode);
@@ -171,7 +172,7 @@ export class TeamAppController {
   @ApiBody({ type: UploadTeamFilesAppDto })
   @ApiOkResponse({ type: ApiAppResponseDto([UploadTeamFileResDto]) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  @UseInterceptors(FilesInterceptor('teamFiles', 20, getImgVideoMulterConfig(20)), VideoConverterInterceptor)
+  @UseInterceptors(FilesInterceptor('teamFiles', 20, getImgVideoMulterConfig(20)), ImageOptimizerInterceptor, VideoConverterInterceptor)
   async uploadTeamFiles(@Body() dto: UploadTeamFilesAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
     const result = await this.teamUserAppService.uploadTeamFiles(dto, files, user.userCode);
@@ -188,7 +189,7 @@ export class TeamAppController {
   @ApiBody({ type: UploadServiceFilesAppDto })
   @ApiOkResponse({ type: ApiAppResponseDto([UploadTeamFileResDto]) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  @UseInterceptors(FilesInterceptor('teamServiceFiles', 20, getImgVideoMulterConfig(20)), VideoConverterInterceptor)
+  @UseInterceptors(FilesInterceptor('teamServiceFiles', 20, getImgVideoMulterConfig(20)), ImageOptimizerInterceptor, VideoConverterInterceptor)
   async uploadServiceFiles(@Body() dto: UploadServiceFilesAppDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) throw new BadRequestException({ message: Msg.FileEmpty, data: null });
     const result = await this.teamUserAppService.uploadServiceFiles(dto, files, user.userCode);
@@ -284,7 +285,7 @@ export class TeamAppController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadReviewFilesDto })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('reviewImg', 5, multerImgConfig))
+  @UseInterceptors(FilesInterceptor('reviewImg', 5, multerImgConfig), ImageOptimizerInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadReviewFilesResDto]) })
   async uploadReviewFiles(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadReviewFilesDto, @UploadedFiles() reviewImgs: Express.Multer.File[]) {

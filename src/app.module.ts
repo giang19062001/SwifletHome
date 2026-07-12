@@ -15,6 +15,7 @@ import { CustomThrottlerGuard } from './common/guards/throttler.guard';
 import { LoggerModule } from './common/logger/logger.module';
 import { MailModule } from './common/mail/mail.module';
 import { MqttModule } from './common/mqtt/mqtt.module';
+import { QueueModule } from './common/queue/queue.module';
 import { RedisModule } from './common/redis/redis.module';
 import { SocketModule } from './common/socket/socket.module';
 import { DatabaseModule } from './database/database.module';
@@ -110,6 +111,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     MqttModule,
     BlacklistModule,
     GeoModule,
+    QueueModule, 
     // commmon
     OptionModule,
     ProvinceModule,

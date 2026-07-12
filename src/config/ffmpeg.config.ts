@@ -8,16 +8,22 @@ export const FFMPEG_OPTIONS = {
   // Sử dụng bộ giải mã âm thanh AAC chuẩn cho MP4
   audioCodec: 'aac',
 
-  // Bộ lọc chống lỗi 'Invalid argument': Ép kích thước chiều rộng/cao của video làm tròn thành số chẵn
-  videoFilter: 'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+  // Bộ lọc chống lỗi 'Invalid argument' VÀ ép kích thước tối đa 720p để đồng nhất, giảm dung lượng
+  videoFilter: "scale='min(1280,iw)':-2",
 
   outputOptions: [
-    // Đẩy tốc độ mã hoá lên mức tối đa (hy sinh chút dung lượng để lấy thời gian xử lý cực nhanh)
+    // Tốc độ mã hóa 'fast' - cân bằng tốt giữa thời gian convert và dung lượng file
     '-preset',
-    'ultrafast',
-    // Sử dụng tất cả các nhân CPU đang rảnh rỗi để xử lý đa luồng
-    '-threads',
-    '0',
+    'fast',
+    // Giảm bitrate thông minh (CRF 28 - mắt thường khó phân biệt, giảm mạnh dung lượng)
+    '-crf',
+    '28',
+    // Giới hạn tốc độ khung hình (FPS) tối đa 30 để tránh các video 60fps làm nặng file
+    '-r',
+    '30',
+    // Cắt giảm luồng âm thanh về chuẩn 128k (đủ nghe rõ)
+    '-b:a',
+    '128k',
     // Chỉ lấy duy nhất luồng video số 0 (ngăn lỗi FFmpeg cố mã hóa nhầm ảnh bìa / thumbnail thành video)
     '-map',
     '0:v:0',

@@ -1,0 +1,16 @@
+export const TABLE_MAPPING_TO_JOB_CLEAR = [
+  { table: 'tbl_user_home', column: 'userHomeImage' },
+  { table: 'tbl_user_home_img', column: 'filename' },
+  { table: 'tbl_uploads_image', column: 'filename' },
+  { table: 'tbl_doctor_file', column: 'filename' },
+  { table: 'tbl_sale_home_file', column: 'filename' },
+  { table: 'tbl_qr_request_file', column: 'filename' },
+  { table: 'tbl_ads_file', column: 'filename' },
+  { table: 'tbl_team_img', column: 'filename' },
+  { table: 'tbl_team_service_file', column: 'filename' },
+  { table: 'tbl_team_user', column: 'teamImage' },
+  { table: 'tbl_team_review_img', column: 'filename' },
+  { table: 'tbl_qr_request_blockchain', column: 'qrCodeUrl' },
+  { table: 'tbl_uploads_audio', column: 'filename' },
+  { table: 'tbl_media_audio', column: 'filename' },
+];

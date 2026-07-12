@@ -1,16 +1,13 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import ffmpegStatic from 'ffmpeg-static';
-import ffmpeg from 'fluent-ffmpeg';
-import * as fs from 'fs';
+import { Queue } from 'bullmq';
 import { extname } from 'path';
 import { Observable } from 'rxjs';
-import { FFMPEG_OPTIONS } from 'src/config/ffmpeg.config';
 
-if (ffmpegStatic) {
-  ffmpeg.setFfmpegPath(ffmpegStatic);
-}
 @Injectable()
 export class VideoConverterInterceptor implements NestInterceptor {
+  constructor(@InjectQueue('video') private readonly videoQueue: Queue) {}
+
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
 
@@ -46,60 +43,38 @@ export class VideoConverterInterceptor implements NestInterceptor {
   private async convertIfNeeded(file: any): Promise<void> {
     const ext = extname(file.originalname).toLowerCase();
 
-    // Fix Safari bug: uploads .mp4 but sets mimetype to video/quicktime
-    if (ext === '.mp4') {
-      if (file.mimetype !== 'video/mp4') {
-        file.mimetype = 'video/mp4';
-      }
-      return; // Bỏ qua convert vì đã là mp4
-    }
+    const isVideo = file.mimetype.startsWith('video/') || ext === '.mov' || ext === '.webm' || ext === '.mp4';
 
-    // Chỉ đổi sang .mp4 khi chắc chắn file là video (dựa vào mimetype HOẶC đuôi file) VÀ không phải là .mp4
-    const isVideo = file.mimetype.startsWith('video/') || ext === '.mov' || ext === '.webm';
-
-    if (isVideo && ext !== '.mp4') {
+    if (isVideo) {
       const originalPath = file.path;
       const originalFilename = file.filename;
 
       const originalFilenameExt = extname(originalFilename);
-      const newFilename = originalFilenameExt ? originalFilename.slice(0, -originalFilenameExt.length) + '.mp4' : originalFilename + '.mp4';
+      const baseFilename = originalFilenameExt ? originalFilename.slice(0, -originalFilenameExt.length) : originalFilename;
+      const newFilename = baseFilename + '.mp4'; 
 
       const originalPathExt = extname(originalPath);
-      const newPath = originalPathExt ? originalPath.slice(0, -originalPathExt.length) + '.mp4' : originalPath + '.mp4';
+      const basePath = originalPathExt ? originalPath.slice(0, -originalPathExt.length) : originalPath;
+      const newPath = basePath + '.mp4'; // Đường dẫn cuối cùng
+      const tempPath = basePath + '-temp.mp4'; // Đường dẫn tạm để FFmpeg render
 
-      // Đổi ngay lập tức object file sang mp4 để trả về Controller lưu DB liền, không bắt user đợi
+      // Đổi object file sang mp4
       const origExt = extname(file.originalname);
-      file.originalname = origExt ? file.originalname.slice(0, -origExt.length) + '.mp4' : file.originalname + '.mp4';
+      const baseOriginal = origExt ? file.originalname.slice(0, -origExt.length) : file.originalname;
+      file.originalname = baseOriginal + '.mp4';
+
       file.filename = newFilename;
       file.path = newPath;
       file.mimetype = 'video/mp4';
-      // file.size giữ nguyên (kích thước file gốc) vì chạy ngầm chưa có kích thước mới
 
-      // Chạy ffmpeg ngầm (background)
-      ffmpeg(originalPath)
-        .inputOptions(FFMPEG_OPTIONS.inputOptions)
-        .output(newPath)
-        .videoCodec(FFMPEG_OPTIONS.videoCodec)
-        .audioCodec(FFMPEG_OPTIONS.audioCodec)
-        .videoFilter(FFMPEG_OPTIONS.videoFilter)
-        .outputOptions(FFMPEG_OPTIONS.outputOptions)
-        .on('end', () => {
-          // xóa file gốc sau khi convert xong
-          try {
-            if (fs.existsSync(originalPath)) {
-              fs.unlinkSync(originalPath);
-            }
-          } catch (e) {
-            console.error('Error unlinking original file:', e);
-          }
-        })
-        .on('error', (err, stdout, stderr) => {
-          console.error('FFmpeg background conversion error:', err);
-          console.error('FFmpeg stderr:', stderr);
-        })
-        .run();
+      // Đẩy job convert vào BullMQ để xử lý FFmpeg ngầm
+      await this.videoQueue.add('convert', {
+        originalPath,
+        tempPath,
+        newPath,
+      });
 
-      // Return liền mà không dùng Promise chờ FFMPEG chạy
+      // Return liền không chờ FFMPEG chạy
       return Promise.resolve();
     }
   }

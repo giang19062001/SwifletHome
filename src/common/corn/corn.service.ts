@@ -18,6 +18,7 @@ import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
+import { TABLE_MAPPING_TO_JOB_CLEAR } from './corn.const';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -83,7 +84,7 @@ export class CornService implements OnModuleInit {
     // await this.pushNotificationsByTaskAlarms();
     // await this.deleteReviewFilesNotUse();
     // await this.deleteTeamFilesNotUse();
-    // await this.deleteSaleHomeFilesNotUse();
+    await this.deleteSaleHomeFilesNotUse();
     // await this.deleteOrphanedLocalFiles();
   }
 
@@ -312,25 +313,9 @@ export class CornService implements OnModuleInit {
       if (localFilesSet.size === 0) return;
 
       // Danh sách tất cả các bảng và cột chứa đường dẫn file
-      const dbMappings = [
-        { table: 'tbl_user_home', column: 'userHomeImage' },
-        { table: 'tbl_user_home_img', column: 'filename' },
-        { table: 'tbl_uploads_image', column: 'filename' },
-        { table: 'tbl_doctor_file', column: 'filename' },
-        { table: 'tbl_sale_home_file', column: 'filename' },
-        { table: 'tbl_qr_request_file', column: 'filename' },
-        { table: 'tbl_ads_file', column: 'filename' },
-        { table: 'tbl_team_img', column: 'filename' },
-        { table: 'tbl_team_service_file', column: 'filename' },
-        { table: 'tbl_team_user', column: 'teamImage' },
-        { table: 'tbl_team_review_img', column: 'filename' },
-        { table: 'tbl_qr_request_blockchain', column: 'qrCodeUrl' },
-        { table: 'tbl_uploads_audio', column: 'filename' },
-        { table: 'tbl_media_audio', column: 'filename' },
-      ];
 
       // Truy vấn DB lấy toàn bộ path đang được sử dụng và loại bỏ khỏi Set
-      for (const mapping of dbMappings) {
+      for (const mapping of TABLE_MAPPING_TO_JOB_CLEAR) {
         const sql = ` SELECT ${mapping.column} AS filepath FROM ${mapping.table} WHERE ${mapping.column} LIKE 'uploads/%'`;
         try {
           const [rows]: any = await this.db.execute(sql);
@@ -368,7 +353,7 @@ export class CornService implements OnModuleInit {
             const absolutePath = path.join(process.cwd(), 'public', relativePath);
             try {
               await fs.promises.unlink(absolutePath);
-              this.logger.log(logbase, `Đã xóa: ${relativePath} dựa vào bảng ${dbMappings.map((m) => m.table).join(', ')}`);
+              this.logger.log(logbase, `Đã xóa: ${relativePath} dựa vào bảng ${TABLE_MAPPING_TO_JOB_CLEAR.map((m) => m.table).join(', ')}`);
               deletedCount++;
             } catch (err) {
               this.logger.error(logbase, `Không thể xóa file ${relativePath}: ${JSON.stringify(err)}`);

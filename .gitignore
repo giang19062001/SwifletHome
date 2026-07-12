@@ -73,3 +73,4 @@ uploads/*
 .agents
 AGENTS.md
 CLAUDE.md
+.vscode
