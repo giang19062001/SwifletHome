@@ -29,7 +29,7 @@ export class TeamUserAppRepository {
     SELECT COUNT(A.seq) AS TOTAL FROM ${this.table} A  
     LEFT JOIN ${this.tableUserType} B
     ON A.userTypeCode = B.userTypeCode
-    WHERE A.isActive = 'Y' AND A.userCode != ? AND B.userTypeKeyWord = ? `;
+    WHERE A.isActive = 'Y' AND A.userCode != ? AND B.userTypeKeyWord = ?  AND A.status = '${TeamStatusEnum.APPROVE}'`;
 
     const params: any[] = [userCode, dto.userTypeKeyWord];
     if (dto.provinceCode) {

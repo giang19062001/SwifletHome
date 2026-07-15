@@ -190,7 +190,7 @@ export class UserAdminRepository {
   // TODO: TYPE
   async getTypesForTeam(): Promise<UserTypeResDto[]> {
     const sql = ` SELECT userTypeCode, userTypeKeyWord, userTypeName
-         FROM ${this.tableType} WHERE isActive = 'Y' 
+         FROM ${this.tableType} WHERE 1=1 
          AND userTypeKeyWord != '${USER_CONST.USER_TYPE.OWNER.value}'  
          AND userTypeKeyWord != '${USER_CONST.USER_TYPE.PURCHASER.value}' 
          AND userTypeKeyWord != '${USER_CONST.USER_TYPE.EATER.value}'`;

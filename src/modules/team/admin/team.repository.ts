@@ -152,6 +152,45 @@ export class TeamAdminRepository {
 
     return result.affectedRows;
   }
+
+  async deleteForce(seq: number, teamCode: string): Promise<number> {
+    const connection = await this.db.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // delete service files
+      await connection.execute(
+        `
+        DELETE FROM ${this.tableServiceFile} 
+        WHERE seqService IN (SELECT seq FROM ${this.tableService} WHERE seqTeam = ?)
+      `,
+        [seq],
+      );
+
+      // delete services
+      await connection.execute(`DELETE FROM ${this.tableService} WHERE seqTeam = ?`, [seq]);
+
+      // delete team images
+      await connection.execute(`DELETE FROM ${this.tableImg} WHERE teamSeq = ?`, [seq]);
+
+      // delete team review images
+      await connection.execute(`DELETE FROM ${this.tableReviewImg} WHERE teamCode = ?`, [teamCode]);
+
+      // delete team review
+      await connection.execute(`DELETE FROM ${this.tableReview} WHERE teamCode = ?`, [teamCode]);
+
+      // delete main team user record
+      const [result] = await connection.execute<ResultSetHeader>(`DELETE FROM ${this.table} WHERE seq = ?`, [seq]);
+
+      await connection.commit();
+      return result.affectedRows;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
   async getTeamFileTypes(): Promise<TeamFileTypeAdminResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT * FROM ${this.tableFileType}`);
     return rows as unknown as TeamFileTypeAdminResDto[];

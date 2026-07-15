@@ -178,32 +178,26 @@ export class TeamAdminService {
     }
   }
 
-  /**
-   * Cập nhật thông tin Team
-   * @param dto Dữ liệu cập nhật
-   * @param updatedId ID người thực hiện cập nhật
-   * @param teamCode Mã Team cần cập nhật
-   */
   async update(dto: UpdateTeamDto, updatedId: string, teamCode: string): Promise<number> {
-    // 1. Lấy thông tin chi tiết hiện tại của Team
-    const home = await this.getDetail(teamCode);
-    if (!home) return 0;
+    // Lấy thông tin chi tiết hiện tại của Team
+    const team = await this.getDetail(teamCode);
+    if (!team) return 0;
 
-    // 2. Xác định đường dẫn ảnh đại diện hiện tại
+    // Xác định đường dẫn ảnh đại diện hiện tại
     let teamImagePath = '';
-    if (home.teamImage) {
-      teamImagePath = typeof home.teamImage === 'string' ? home.teamImage : (home.teamImage as TeamImgResDto).filename;
+    if (team.teamImage) {
+      teamImagePath = typeof team.teamImage === 'string' ? team.teamImage : (team.teamImage as TeamImgResDto).filename;
     }
 
-    // 3. Xử lý ảnh đại diện (Main Image)
+    // Xử lý ảnh đại diện (Main Image)
     // Ưu tiên tìm ảnh mới đã được upload tức thì thông qua uniqueId
     const existingMainImg = await this.teamAdminRepository.findMainImageByUniqueId(dto.uniqueId);
 
     if (existingMainImg) {
       // Nếu tìm thấy ảnh mới: Thực hiện xóa ảnh cũ (file vật lý và DB) trước khi cập nhật
-      if (home.teamImage) {
-        const oldFilename = typeof home.teamImage === 'string' ? home.teamImage : (home.teamImage as TeamImgResDto).filename;
-        const oldSeq = typeof home.teamImage === 'string' ? 0 : (home.teamImage as TeamImgResDto).seq;
+      if (team.teamImage) {
+        const oldFilename = typeof team.teamImage === 'string' ? team.teamImage : (team.teamImage as TeamImgResDto).filename;
+        const oldSeq = typeof team.teamImage === 'string' ? 0 : (team.teamImage as TeamImgResDto).seq;
 
         if (oldFilename && oldFilename !== existingMainImg.filename) {
           await this.fileLocalService.deleteLocalFile(oldFilename);
@@ -217,12 +211,12 @@ export class TeamAdminService {
     }
     // Nếu không có ảnh mới từ uniqueId, teamImagePath sẽ giữ nguyên giá trị ảnh cũ đã lấy ở Bước 2
 
-    // 4. Liên kết các file (ảnh/video phụ) đã upload tức thì với Team này
-    await this.teamAdminRepository.updateSeqFilesTeam(home.seq, dto.uniqueId, updatedId);
+    // Liên kết các file (ảnh/video phụ) đã upload tức thì với Team này
+    await this.teamAdminRepository.updateSeqFilesTeam(team.seq, dto.uniqueId, updatedId);
 
-    // 5. Xử lý các dịch vụ (Services)
-    // Bước 5.1: Kiểm tra các dịch vụ cũ, nếu không còn trong danh sách mới thì xóa file vật lý của dịch vụ đó
-    const oldServices = await this.teamAdminRepository.getTeamServices(home.seq);
+    // Xử lý các dịch vụ (Services)
+    // Kiểm tra các dịch vụ cũ, nếu không còn trong danh sách mới thì xóa file vật lý của dịch vụ đó
+    const oldServices = await this.teamAdminRepository.getTeamServices(team.seq);
     for (const svc of oldServices) {
       if (dto.servicesData) {
         try {
@@ -238,17 +232,17 @@ export class TeamAdminService {
       }
     }
 
-    // Bước 5.2: Xóa toàn bộ liên kết dịch vụ cũ trong DB (sẽ tạo lại danh sách mới)
-    await this.teamAdminRepository.deleteTeamServicesByTeam(home.seq);
+    // Xóa toàn bộ liên kết dịch vụ cũ trong DB (sẽ tạo lại danh sách mới)
+    await this.teamAdminRepository.deleteTeamServicesByTeam(team.seq);
 
-    // Bước 5.3: Tạo mới các dịch vụ và liên kết file của từng dịch vụ
+    // Tạo mới các dịch vụ và liên kết file của từng dịch vụ
     if (dto.servicesData) {
       try {
         const services = JSON.parse(dto.servicesData);
         for (let i = 0; i < services.length; i++) {
           const svc = services[i];
           // Lưu thông tin dịch vụ
-          const seqService = await this.teamAdminRepository.createTeamService(home.seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
+          const seqService = await this.teamAdminRepository.createTeamService(team.seq, dto.userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
 
           // Nếu dịch vụ có ảnh đi kèm (đã upload qua uniqueId), thực hiện liên kết
           if (svc.uniqueId) {
@@ -258,14 +252,64 @@ export class TeamAdminService {
       } catch (e) {}
     }
 
-    // 6. Cập nhật thông tin chính của Team vào database
+    // Cập nhật thông tin chính của Team vào database
     const result = await this.teamAdminRepository.update(dto, teamImagePath, updatedId, teamCode);
     return result;
   }
   async delete(teamCode: string): Promise<number> {
-    const home = await this.teamAdminRepository.getDetail(teamCode);
-    if (home) {
-      const resultHome = await this.teamAdminRepository.delete(teamCode);
+    const team = await this.getDetail(teamCode);
+    if (team) {
+      const filesToDelete: string[] = [];
+
+      // collect main image
+      if (team.teamImage && typeof team.teamImage === 'string') {
+        filesToDelete.push(team.teamImage);
+      } else if (team.teamImage && typeof team.teamImage === 'object' && (team.teamImage as any).filename) {
+        filesToDelete.push((team.teamImage as any).filename);
+      }
+
+      // collect team files
+      if (team.teamFiles) {
+        for (const group of team.teamFiles) {
+          if (group.images) {
+            for (const img of group.images) {
+              if (img.filename) {
+                filesToDelete.push(img.filename);
+              }
+            }
+          }
+        }
+      }
+
+      // collect service files
+      if (team.services) {
+        for (const svc of team.services) {
+          if (svc.images) {
+            for (const img of svc.images) {
+              if (img.filename) {
+                filesToDelete.push(img.filename);
+              }
+            }
+          }
+        }
+      }
+
+      // perform database deletion transaction first
+      const resultHome = await this.teamAdminRepository.deleteForce(team.seq, teamCode);
+
+      // delete physical files only if database deletion is successful
+      if (resultHome) {
+        for (const file of filesToDelete) {
+          if (file) {
+            try {
+              await this.fileLocalService.deleteLocalFile(file);
+            } catch (e) {
+              this.logger.error(`Error deleting physical file: ${file}`, e);
+            }
+          }
+        }
+      }
+
       return resultHome;
     } else {
       return 0;

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Delete, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { getImgVideoMulterConfig, multerImgConfig } from 'src/config/multer.config';
@@ -123,16 +123,16 @@ export class TeamAdminController {
     return result;
   }
 
-  // @Delete('delete/:teamCode')
-  // @HttpCode(HttpStatus.OK)
-  // @ApiParam({ name: 'teamCode', type: String })
-  // async delete(@Param('teamCode') teamCode: string): Promise<number> {
-  //   const result = await this.teamAdminService.delete(teamCode);
-  //   if (result === 0) {
-  //     throw new BadRequestException();
-  //   }
-  //   return result;
-  // }
+  @Delete('delete/:teamCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({ name: 'teamCode', type: String })
+  async delete(@Param('teamCode') teamCode: string): Promise<number> {
+    const result = await this.teamAdminService.delete(teamCode);
+    if (result === 0) {
+      throw new BadRequestException();
+    }
+    return result;
+  }
 
   // TODO: REVIEW
   @ApiBody({

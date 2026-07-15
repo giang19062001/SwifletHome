@@ -33,6 +33,9 @@ function renderAllTeam(data, objElement) {
       let actionBtn = '';
       if (ele.status === VARIABLE_ENUM.TEAM_STATUS.WAITING.VALUE || ele.status === VARIABLE_ENUM.TEAM_STATUS.REFUSE.VALUE) {
         actionBtn = `<button class="btn btn-info" onclick="gotoTeamDetail('${ele.teamCode}')">Xem chi tiết</button>`;
+        if (ele.status === VARIABLE_ENUM.TEAM_STATUS.WAITING.VALUE) {
+          actionBtn += ` <button class="btn-error" onclick="deleteTeam('${ele.teamCode}')">Xóa</button>`;
+        }
       } else {
         actionBtn = `<button class="btn-edit" onclick="gotoTeamUpdate('${ele.teamCode}')">Chỉnh sửa</button>`;
       }
@@ -71,7 +74,7 @@ function renderAllTeam(data, objElement) {
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     // dữ liệu trống
-    renderEmptyRowTable(objElement, 11);
+    renderEmptyRowTable(objElement, 10);
   }
 
   // xóa skeleton
@@ -82,7 +85,7 @@ function renderAllTeam(data, objElement) {
 async function getAllTeam(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
-  showSkeleton(objElement, limit, 11);
+  showSkeleton(objElement, limit, 10);
 
   await axios
     .post(
