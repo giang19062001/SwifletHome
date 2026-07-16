@@ -102,7 +102,6 @@ export class ReviewTeamDto {
   uniqueId: string;
 }
 
-// ─── Team Registration DTOs (App) ───────────────────────────────────────────
 export class CreateTeamAppDto {
   @ApiProperty({ example: '' })
   @IsString()
@@ -159,6 +158,71 @@ export class CreateTeamAppDto {
   @IsUUID()
   @IsNotEmpty()
   uniqueId: string;
+}
+
+export class SaveDraftAppDto {
+  @ApiProperty({
+    example: IUserTeamTypeEnum.FACTORY,
+    enum: IUserTeamTypeEnum,
+  })
+  @IsEnum(IUserTeamTypeEnum)
+  @IsNotEmpty()
+  userTypeKeyWord: IUserTeamTypeEnum;
+
+  @ApiProperty({ example: 1, required: true })
+  @IsNumber()
+  @IsNotEmpty()
+  currentStep: number;
+
+  @ApiProperty({ example: '', format: 'uuid', required: true })
+  @IsUUID()
+  @IsNotEmpty()
+  uniqueId: string;
+
+  @ApiProperty({ example: '', required: false })
+  @IsString()
+  @IsOptional()
+  teamName?: string;
+
+  @ApiProperty({ example: '', required: false })
+  @IsString()
+  @IsOptional()
+  teamUserName?: string;
+
+  @ApiProperty({ example: '', required: false })
+  @IsString()
+  @IsOptional()
+  teamPhone?: string;
+
+  @ApiProperty({ example: ['79', '82'], required: false })
+  @IsOptional()
+  provinceCodes?: any;
+
+  @ApiProperty({ example: '', required: false })
+  @IsString()
+  @IsOptional()
+  teamAddress?: string;
+
+  @ApiProperty({ example: '', required: false })
+  @IsString()
+  @IsOptional()
+  teamDescription?: string;
+
+  @ApiProperty({
+    example: { monthlyVolumn: 1000, minimunQuantity: 10 },
+    description: 'Thông tin đặc thù của xưởng gia công',
+    required: false,
+  })
+  @IsOptional()
+  teamDescriptionSpecial?: any | null;
+
+  @ApiProperty({
+    example: [{ serviceTypeCode: 'BUILD_RAW', serviceTextInput: 'nội dung', uniqueId: 'uuid của service này' }],
+    description: 'Mảng dịch vụ đăng ký',
+    required: false,
+  })
+  @IsOptional()
+  servicesData?: any;
 }
 
 export class UploadTeamMainImageAppDto {

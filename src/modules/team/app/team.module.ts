@@ -8,11 +8,12 @@ import { TeamReviewAppRepository } from './team-review.repository';
 import { TeamReviewAppService } from './team-review.service';
 import { TeamUserAppRepository } from './team-user.repository';
 import { TeamUserAppService } from './team-user.service';
+import { TeamReviewAppController } from './team-review.controller';
 import { TeamAppController } from './team.controller';
 
 @Module({
   imports: [AuthAppModule, UserAppModule, FileLocalModule, ProvinceModule, OptionModule],
-  controllers: [TeamAppController],
+  controllers: [TeamAppController, TeamReviewAppController],
   providers: [TeamUserAppService, TeamReviewAppService, TeamUserAppRepository, TeamReviewAppRepository],
   exports: [TeamReviewAppService, TeamUserAppService],
 })

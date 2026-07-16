@@ -19,4 +19,5 @@ export enum TeamStatusEnum {
   APPROVE = 'APPROVE',
   REFUSE = 'REFUSE',
   WAITING = 'WAITING',
+  DRAFT = 'DRAFT',
 }

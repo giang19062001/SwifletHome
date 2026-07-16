@@ -96,6 +96,9 @@ export class UserAppService {
   }
 
   // TODO: TYPE
+  async getUserTypeCodeByKeyWord(userTypeKeyWord: string): Promise<string | null> {
+    return await this.userAppRepository.getUserTypeCodeByKeyWord(userTypeKeyWord);
+  }
   async getAllUserType(): Promise<UserTypeResDto[]> {
     return await this.userAppRepository.getAllUserType();
   }

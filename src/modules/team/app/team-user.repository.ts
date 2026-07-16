@@ -11,13 +11,15 @@ export class TeamUserAppRepository {
   private readonly table = 'tbl_team_user';
   private readonly tableUserType = 'tbl_user_type';
   private readonly tableTeamImg = 'tbl_team_img';
+  private readonly tableTeamFile = 'tbl_team_file_type';
   private readonly tableReview = 'tbl_team_review';
   private readonly tableService = 'tbl_team_service';
   private readonly tableServiceFile = 'tbl_team_service_file';
   private readonly tableServiceType = 'tbl_team_service_type';
+  private readonly tableProvinces = 'tbl_provinces';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-  // TODO: TEAM
+  // TODO: FETCH
   async findTeamByCode(teamCode: string): Promise<boolean> {
     const query = ` 
         SELECT A.seq FROM ${this.table} A  WHERE A.teamCode = ? `;
@@ -121,7 +123,7 @@ export class TeamUserAppRepository {
           LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode]);
-    const result = rows ? (rows[0] as GetDetailTeamResDto) : null;
+    const result = rows.length ? (rows[0] as GetDetailTeamResDto) : null;
     if (result) {
       result.teamFiles = typeof result.teamFiles === 'string' ? JSON.parse(result.teamFiles) : result.teamFiles;
       result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
@@ -130,7 +132,7 @@ export class TeamUserAppRepository {
       // Lấy danh sách dịch vụ và ảnh dịch vụ
       const [services] = await this.db.query<RowDataPacket[]>(
         `
-        SELECT S.seq, S.userTypeCode, S.serviceTypeCode, S.serviceTextInput, O.serviceTypeName as serviceTypeText
+        SELECT S.seq, S.userTypeCode, S.serviceTypeCode, S.serviceTextInput, S.uniqueId, O.serviceTypeName as serviceTypeText
         FROM ${this.tableService} S
         LEFT JOIN ${this.tableServiceType} O ON S.serviceTypeCode = O.serviceTypeCode
         WHERE S.seqTeam = ?
@@ -153,19 +155,173 @@ export class TeamUserAppRepository {
     return result;
   }
 
-  // TODO: TEAM REGISTRATION
+  // TODO: VALIDATE
   async checkDuplicateTeam(userCode: string, userTypeCode: string): Promise<boolean> {
     const [rows] = await this.db.query<RowDataPacket[]>(`SELECT seq FROM ${this.table} WHERE userCode = ? AND userTypeCode = ?`, [userCode, userTypeCode]);
     return rows.length > 0;
   }
 
-  async checkAvailableTeam(userCode: string, userTypeCode: string): Promise<{ teamCode: string; status: TeamStatusEnum } | null> {
-    const query = ` SELECT teamCode, status FROM ${this.table} 
-    WHERE userCode = ? AND userTypeCode = ? AND isActive = 'Y' LIMIT 1 `;
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeCode]);
+  async checkAvailableTeam(userCode: string, userTypeKeyWord: string): Promise<{ teamCode: string; status: TeamStatusEnum } | null> {
+    const query = ` SELECT A.teamCode, A.status 
+    FROM ${this.table} A
+    LEFT JOIN ${this.tableUserType} B ON A.userTypeCode = B.userTypeCode
+    WHERE A.userCode = ? AND B.userTypeKeyWord = ? AND A.isActive = 'Y' LIMIT 1 `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeKeyWord]);
     return rows.length ? (rows[0] as { teamCode: string; status: TeamStatusEnum }) : null;
   }
 
+  // TODO: DRAFT
+  async getDraftSimple(userCode: string, userTypeKeyWord: string): Promise<any | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT A.seq, A.teamCode, A.uniqueId, A.currentStep 
+       FROM ${this.table} A 
+       JOIN ${this.tableUserType} B ON A.userTypeCode = B.userTypeCode 
+       WHERE A.userCode = ? AND B.userTypeKeyWord = ? AND A.status = ? LIMIT 1`,
+      [userCode, userTypeKeyWord, TeamStatusEnum.DRAFT],
+    );
+    return rows.length ? rows[0] : null;
+  }
+
+  async getDraft(userCode: string, userTypeKeyWord: string): Promise<GetDetailTeamResDto | null> {
+    const query = `
+      SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCodes, A.uniqueId, A.currentStep,
+      B.userTypeKeyWord, B.userTypeName,
+      GROUP_CONCAT(C.provinceName SEPARATOR ', ') AS provinceName
+      FROM ${this.table} A 
+      JOIN ${this.tableUserType} B ON A.userTypeCode = B.userTypeCode
+      LEFT JOIN ${this.tableProvinces} C ON JSON_CONTAINS(A.provinceCodes, JSON_QUOTE(C.provinceCode))
+      WHERE A.isActive = 'Y' AND A.userCode = ? AND B.userTypeKeyWord = ? AND A.status = ?
+      GROUP BY A.seq
+      LIMIT 1
+    `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeKeyWord, TeamStatusEnum.DRAFT]);
+    const result = rows.length ? (rows[0] as GetDetailTeamResDto) : null;
+    if (result) {
+      result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
+      result.teamDescriptionSpecial = typeof result.teamDescriptionSpecial === 'string' ? JSON.parse(result.teamDescriptionSpecial) : result.teamDescriptionSpecial;
+
+      // Lấy danh sách dịch vụ và ảnh dịch vụ
+      const [services] = await this.db.query<RowDataPacket[]>(
+        `
+        SELECT S.seq, S.userTypeCode, S.serviceTypeCode, S.serviceTextInput, S.uniqueId, O.serviceTypeName as serviceTypeText
+        FROM ${this.tableService} S
+        LEFT JOIN ${this.tableServiceType} O ON S.serviceTypeCode = O.serviceTypeCode
+        WHERE S.seqTeam = ?
+      `,
+        [result.seq],
+      );
+
+      for (const svc of services) {
+        const [svcImages] = await this.db.query<RowDataPacket[]>(
+          `
+          SELECT seq, filename, mimetype
+          FROM ${this.tableServiceFile} WHERE seqService = ?
+        `,
+          [svc.seq],
+        );
+        svc.images = svcImages;
+      }
+      result.services = services as any;
+    }
+    return result;
+  }
+
+  async createDraft(dto: any, userCode: string, teamImagePath: string, createdId: string): Promise<number> {
+    const sqlLast = `SELECT teamCode FROM ${this.table} ORDER BY teamCode DESC LIMIT 1`;
+    const [rows] = await this.db.execute<any[]>(sqlLast);
+    let teamCode = CODES.teamCode.FRIST_CODE;
+    if (rows.length > 0) {
+      teamCode = generateCode(rows[0].teamCode, CODES.teamCode.PRE, CODES.teamCode.LEN);
+    }
+    const sql = `
+      INSERT INTO ${this.table} (teamCode, userCode, userTypeCode, teamName, teamUserName, teamPhone, teamAddress, teamImage, teamDescription, teamDescriptionSpecial, provinceCodes, createdId, uniqueId, status, isSeleted, currentStep) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [
+      teamCode,
+      userCode,
+      dto.userTypeCode,
+      dto.teamName || '',
+      dto.teamUserName || '',
+      dto.teamPhone || null,
+      dto.teamAddress || '',
+      teamImagePath || '',
+      dto.teamDescription || '',
+      dto.teamDescriptionSpecial ? JSON.stringify(dto.teamDescriptionSpecial) : null,
+      dto.provinceCodes ? (typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes)) : '[]',
+      createdId,
+      dto.uniqueId || '',
+      TeamStatusEnum.DRAFT,
+      YnEnum.N,
+      dto.currentStep || 1,
+    ]);
+    return result.insertId;
+  }
+
+  async updateDraft(seq: number, dto: any, teamImagePath: string, updatedId: string): Promise<number> {
+    const updates: string[] = [];
+    const params: any[] = [];
+
+    if (dto.teamName !== undefined) {
+      updates.push('teamName = ?');
+      params.push(dto.teamName);
+    }
+    if (dto.teamUserName !== undefined) {
+      updates.push('teamUserName = ?');
+      params.push(dto.teamUserName);
+    }
+    if (dto.teamPhone !== undefined) {
+      updates.push('teamPhone = ?');
+      params.push(dto.teamPhone);
+    }
+    if (dto.teamAddress !== undefined) {
+      updates.push('teamAddress = ?');
+      params.push(dto.teamAddress);
+    }
+    if (teamImagePath) {
+      updates.push('teamImage = ?');
+      params.push(teamImagePath);
+    }
+    if (dto.teamDescription !== undefined) {
+      updates.push('teamDescription = ?');
+      params.push(dto.teamDescription);
+    }
+    if (dto.teamDescriptionSpecial !== undefined) {
+      updates.push('teamDescriptionSpecial = ?');
+      params.push(JSON.stringify(dto.teamDescriptionSpecial));
+    }
+    if (dto.provinceCodes !== undefined) {
+      updates.push('provinceCodes = ?');
+      params.push(typeof dto.provinceCodes === 'string' ? dto.provinceCodes : JSON.stringify(dto.provinceCodes));
+    }
+    if (dto.currentStep !== undefined) {
+      updates.push('currentStep = ?');
+      params.push(dto.currentStep);
+    }
+    if (dto.uniqueId !== undefined) {
+      updates.push('uniqueId = ?');
+      params.push(dto.uniqueId);
+    }
+
+    if (updates.length > 0) {
+      updates.push('updatedId = ?');
+      params.push(updatedId);
+      updates.push('updatedAt = NOW()');
+
+      const sql = `UPDATE ${this.table} SET ${updates.join(', ')} WHERE seq = ? AND status = ?`;
+      params.push(seq, TeamStatusEnum.DRAFT);
+      await this.db.execute<ResultSetHeader>(sql, params);
+    }
+    return seq;
+  }
+
+  async submitDraft(seq: number, updatedId: string): Promise<number> {
+    const sql = `UPDATE ${this.table} SET status = ?, updatedId = ?, updatedAt = NOW() WHERE seq = ? AND status = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [TeamStatusEnum.WAITING, updatedId, seq, TeamStatusEnum.DRAFT]);
+    return result.affectedRows;
+  }
+
+  // ! WILL DELETE
   async create(dto: any, userCode: string, teamImagePath: string, createdId: string): Promise<number> {
     const sqlLast = `SELECT teamCode FROM ${this.table} ORDER BY teamCode DESC LIMIT 1`;
     const [rows] = await this.db.execute<any[]>(sqlLast);
@@ -197,6 +353,7 @@ export class TeamUserAppRepository {
     return result.insertId;
   }
 
+  // TODO: CRUD FILE
   async createImages(seq: number, createdId: string, filenamePath: string, file: any, fileTypeCode?: string): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableTeamImg} (filename, originalname, size, mimetype, teamSeq, createdId, fileTypeCode)
@@ -204,11 +361,6 @@ export class TeamUserAppRepository {
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [filenamePath, file.originalname, file.size, file.mimetype, seq, createdId, fileTypeCode || null]);
     return result.insertId;
-  }
-
-  async findMainImageByUniqueId(uniqueId: string): Promise<TeamImgBaseAppResDto | null> {
-    const [rows] = await this.db.execute<RowDataPacket[]>(`SELECT * FROM ${this.tableTeamImg} WHERE uniqueId = ? AND fileTypeCode IS NULL AND teamSeq = 0 LIMIT 1`, [uniqueId]);
-    return rows.length > 0 ? (rows[0] as TeamImgBaseAppResDto) : null;
   }
 
   async uploadFileTeam(uniqueId: string, createdId: string, filenamePath: string, file: Express.Multer.File, fileTypeCode?: string): Promise<number> {
@@ -256,26 +408,20 @@ export class TeamUserAppRepository {
     return result.affectedRows;
   }
 
-  async getFileTeamBySeq(seq: number): Promise<TeamImgBaseAppResDto | null> {
-    const [rows] = await this.db.execute<RowDataPacket[]>(`SELECT * FROM ${this.tableTeamImg} WHERE seq = ?`, [seq]);
-    return rows.length > 0 ? (rows[0] as TeamImgBaseAppResDto) : null;
-  }
-
   async deleteFileTeam(seq: number): Promise<number> {
     const sql = `DELETE FROM ${this.tableTeamImg} WHERE seq = ?`;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
     return result.affectedRows;
   }
 
-  async getFileServiceBySeq(seq: number): Promise<TeamServiceFileBaseAppResDto | null> {
-    const [rows] = await this.db.execute<RowDataPacket[]>(`SELECT * FROM ${this.tableServiceFile} WHERE seq = ?`, [seq]);
-    return rows.length > 0 ? (rows[0] as TeamServiceFileBaseAppResDto) : null;
-  }
-
   async deleteFileService(seq: number): Promise<number> {
     const sql = `DELETE FROM ${this.tableServiceFile} WHERE seq = ?`;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [seq]);
     return result.affectedRows;
+  }
+  async deleteServicesByTeamSeq(seqTeam: number): Promise<void> {
+    await this.db.execute(`UPDATE ${this.tableServiceFile} SET seqService = 0 WHERE seqService IN (SELECT seq FROM ${this.tableService} WHERE seqTeam = ?)`, [seqTeam]);
+    await this.db.execute(`DELETE FROM ${this.tableService} WHERE seqTeam = ?`, [seqTeam]);
   }
 
   async clearTeamMainImage(teamSeq: number): Promise<number> {
@@ -284,16 +430,51 @@ export class TeamUserAppRepository {
     return result.affectedRows;
   }
 
-  async getTeamFileTypes(userTypeCode: string): Promise<TeamFileTypeAppResDto[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT fileTypeCode, fileTypeText FROM tbl_team_file_type WHERE userTypeCode = ?`, [userTypeCode]);
+  // TODO: FETCH FILES
+  async findMainImageByUniqueId(uniqueId: string): Promise<TeamImgBaseAppResDto | null> {
+    const [rows] = await this.db.execute<RowDataPacket[]>(
+      `SELECT seq, teamSeq, uniqueId, fileTypeCode, filename, originalname, size, mimetype, isActive, createdAt, updatedAt, createdId, updatedId FROM ${this.tableTeamImg} WHERE uniqueId = ? AND fileTypeCode IS NULL AND teamSeq = 0 LIMIT 1`,
+      [uniqueId],
+    );
+    return rows.length > 0 ? (rows[0] as TeamImgBaseAppResDto) : null;
+  }
+
+  async getFileTeamBySeq(seq: number): Promise<TeamImgBaseAppResDto | null> {
+    const [rows] = await this.db.execute<RowDataPacket[]>(
+      `SELECT seq, teamSeq, uniqueId, fileTypeCode, filename, originalname, size, mimetype, isActive, createdAt, updatedAt, createdId, updatedId FROM ${this.tableTeamImg} WHERE seq = ?`,
+      [seq],
+    );
+    return rows.length > 0 ? (rows[0] as TeamImgBaseAppResDto) : null;
+  }
+  async getFileServiceBySeq(seq: number): Promise<TeamServiceFileBaseAppResDto | null> {
+    const [rows] = await this.db.execute<RowDataPacket[]>(
+      `SELECT seq, seqService, uniqueId, filename, originalname, size, mimetype, isActive, createdAt, updatedAt, createdId, updatedId FROM ${this.tableServiceFile} WHERE seq = ?`,
+      [seq],
+    );
+    return rows.length > 0 ? (rows[0] as TeamServiceFileBaseAppResDto) : null;
+  }
+
+  async getTeamFileTypes(userTypeKeyWord: string): Promise<TeamFileTypeAppResDto[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT F.fileTypeCode, F.fileTypeText 
+       FROM ${this.tableTeamFile} F
+       JOIN ${this.tableUserType} U ON F.userTypeCode = U.userTypeCode 
+       WHERE U.userTypeKeyWord = ?`,
+      [userTypeKeyWord],
+    );
     return rows as unknown as TeamFileTypeAppResDto[];
   }
 
-  async getTeamServiceTypes(userTypeCode: string): Promise<TeamServiceTypeAppResDto[]> {
-    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT serviceTypeCode, serviceTypeName FROM ${this.tableServiceType} WHERE userTypeCode = ? AND isActive = 'Y' ORDER BY sortOrder ASC`, [
-      userTypeCode,
-    ]);
-    return rows as unknown as TeamServiceTypeAppResDto[];
+  async getTeamServiceTypes(userTypeKeyWord: string): Promise<TeamServiceTypeAppResDto[]> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      `SELECT S.seq, S.userTypeCode, S.serviceTypeCode, S.serviceTypeName 
+       FROM ${this.tableServiceType} S
+       JOIN ${this.tableUserType} U ON S.userTypeCode = U.userTypeCode
+       WHERE U.userTypeKeyWord = ? AND S.isActive = 'Y' 
+       ORDER BY S.sortOrder ASC`,
+      [userTypeKeyWord],
+    );
+    return rows as TeamServiceTypeAppResDto[];
   }
 
   async getFilesNotUseTeam(): Promise<TeamFileNotUseAppResDto[]> {

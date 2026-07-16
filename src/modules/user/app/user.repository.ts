@@ -256,6 +256,10 @@ export class UserAppRepository {
   }
 
   // TODO: TYPE
+  async getUserTypeCodeByKeyWord(userTypeKeyWord: string): Promise<string | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(`SELECT userTypeCode FROM ${this.tableType} WHERE userTypeKeyWord = ? LIMIT 1`, [userTypeKeyWord]);
+    return rows.length ? rows[0].userTypeCode : null;
+  }
   async getAllUserType(): Promise<UserTypeResDto[]> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT userTypeCode, userTypeKeyWord, userTypeName

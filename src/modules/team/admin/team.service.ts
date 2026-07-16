@@ -26,12 +26,12 @@ export class TeamAdminService {
     const list = await this.teamAdminRepository.getAll(dto);
     return { total, list };
   }
-  async getTeamFileTypes(): Promise<TeamFileTypeAdminResDto[]> {
-    return await this.teamAdminRepository.getTeamFileTypes();
+  async getTeamFileTypes(userTypeKeyWord?: string): Promise<TeamFileTypeAdminResDto[]> {
+    return await this.teamAdminRepository.getTeamFileTypes(userTypeKeyWord);
   }
 
-  async getTeamServiceTypes(userTypeCode?: string): Promise<TeamServiceTypeAdminResDto[]> {
-    return await this.teamAdminRepository.getTeamServiceTypes(userTypeCode);
+  async getTeamServiceTypes(userTypeKeyWord?: string): Promise<TeamServiceTypeAdminResDto[]> {
+    return await this.teamAdminRepository.getTeamServiceTypes(userTypeKeyWord);
   }
 
   async getDetail(teamCode: string): Promise<GetDetailTeamResDto | null> {

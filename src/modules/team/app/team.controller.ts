@@ -15,26 +15,8 @@ import { USER_CONST } from 'src/modules/user/app/user.const';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { TeamReviewAppService } from './team-review.service';
 import { TeamUserAppService } from './team-user.service';
-import {
-  CreateTeamAppDto,
-  DeleteFileAppDto,
-  GetAllTeamDto,
-  GetReviewListOfTeamDto,
-  ReviewTeamDto,
-  UploadReviewFilesDto,
-  UploadServiceFilesAppDto,
-  UploadTeamFilesAppDto,
-  UploadTeamMainImageAppDto,
-} from './team.dto';
-import {
-  CheckAvailableTeamResDto,
-  GetAllTeamResDto,
-  GetDetailTeamResDto,
-  GetReviewListOfTeamResDto,
-  InitFormCreateTeamAppResDto,
-  UploadReviewFilesResDto,
-  UploadTeamFileResDto,
-} from './team.response';
+import { SaveDraftAppDto, DeleteFileAppDto, GetAllTeamDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto, CreateTeamAppDto } from './team.dto';
+import { CheckAvailableTeamResDto, GetAllTeamResDto, GetDetailTeamResDto, InitFormCreateTeamAppResDto, UploadTeamFileResDto } from './team.response';
 
 @ApiTags('app/team')
 @Controller('/api/app/team')
@@ -48,22 +30,55 @@ export class TeamAppController {
   ) {}
 
   // TODO: TEAM
-  @ApiOperation({ summary: 'Kiểm tra trạng thái đăng ký nhóm ( CHƯA DĂNG KÝ SẼ TRẢ VỀ null )' })
+  @ApiOperation({
+    summary:
+      'Kiểm tra trạng thái đăng ký nhóm ( chưa đăng ký sẽ trả về null ) ⚠️ API này tự động lấy userTypeCode từ token nhưng không còn chuyển đổi token cho xưởng kỹ thuật, đội gia công nữa nên API này sẽ bị xóa ⚠️',
+  })
   @Get('checkAvailable')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(CheckAvailableTeamResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
   async checkAvailable(@GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.teamUserAppService.checkAvailableTeam(user.userCode, user.userTypeCode);
+    const result = await this.teamUserAppService.checkAvailableTeam(user.userCode, user.userTypeKeyWord);
+    return result;
+  }
+  @ApiOperation({ summary: 'Kiểm tra trạng thái đăng ký nhóm ( chưa đăng ký sẽ trả về null )', description: '**userTypeKeyWord**: enum(FACTORY, TECHNICAL)' })
+  @Get('checkAvailable/:userTypeKeyWord')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(CheckAvailableTeamResDto) })
+  @ApiBadRequestResponse({ type: NullResponseDto })
+  async checkAvailableByKeyword(@GetUserApp() user: TokenUserAppResDto, @Param('userTypeKeyWord') userTypeKeyWord: string) {
+    if (userTypeKeyWord !== USER_CONST.USER_TYPE.TECHNICAL.value && userTypeKeyWord !== USER_CONST.USER_TYPE.FACTORY.value) {
+      throw new BadRequestException({
+        message: Msg.InvalidUserType,
+        data: null,
+      });
+    }
+    const result = await this.teamUserAppService.checkAvailableTeam(user.userCode, userTypeKeyWord);
     return result;
   }
 
-  @ApiOperation({ summary: 'Lấy thông tin khởi tạo form đăng ký team' })
+  @ApiOperation({
+    summary: 'Lấy thông tin khởi tạo form đăng ký team ⚠️ API này tự động lấy userTypeCode từ token nhưng không còn chuyển đổi token cho xưởng kỹ thuật, đội gia công nữa nên API này sẽ bị xóa ⚠️',
+  })
   @Get('getInitFormCreateTeam')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(InitFormCreateTeamAppResDto) })
   async getInitFormCreateTeam(@GetUserApp() user: TokenUserAppResDto) {
     const result = await this.teamUserAppService.getInitFormCreateTeam(user.userTypeCode, user.userTypeKeyWord);
+    return result;
+  }
+
+  @ApiOperation({
+    summary: 'Lấy thông tin khởi tạo form đăng ký team, bao gồm cả bản nháp đăng ký trước đó nếu có',
+    description: `**userTypeKeyWord**: enum(FACTORY, TECHNICAL)\n
+  **uuid** sẽ bằng **draft.uuid** nếu **draft** khác null, nếu **draft** là null thì uuid sẽ là uuid mới`,
+  })
+  @Get('getInitFormSubmitTeam/:userTypeKeyWord')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(InitFormCreateTeamAppResDto) })
+  async getInitFormSubmitTeam(@GetUserApp() user: TokenUserAppResDto, @Param('userTypeKeyWord') userTypeKeyWord: string) {
+    const result = await this.teamUserAppService.getInitFormSubmitTeam(user.userCode, user.userTypeCode, userTypeKeyWord);
     return result;
   }
 
@@ -106,7 +121,7 @@ export class TeamAppController {
 
   // TODO: TEAM REGISTRATION
   @ApiOperation({
-    summary: 'Đăng ký đội kỹ thuật / xưởng gia công mới',
+    summary: 'Đăng ký đội kỹ thuật / xưởng gia công mới ⚠️ Sẽ bị xóa vì chuyển sang dùng saveDraft và submitTeam API ⚠️',
     description: `
 **servicesData**: Mảng dịch vụ [{"serviceTypeCode": "BUILD_RAW", "serviceTextInput": "nội dung", "uniqueId": "****"}] \n
 **teamDescriptionSpecial**: 
@@ -139,6 +154,73 @@ export class TeamAppController {
     } else if (result === -3) {
       throw new BadRequestException({
         message: Msg.TeamServiceDuplicate,
+        data: 0,
+      });
+    }
+    return {
+      message: Msg.RegisterOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Lưu tạm bản nháp đăng ký đội kỹ thuật / xưởng gia công mới',
+    description: `
+**userTypeKeyWord**: bắt buộc (FACTORY, TECHNICAL)\n
+**currentStep**: Mặc định khi khởi tạo là 1, giá trị tối đa của đội kỹ thuật là 4 còn xưởng gia công là 5, nó sẽ giúp ích cho việc nên active step nào trên thanh progress bar của màn hình đăng ký (bắt buộc)\n
+**uniqueId**: bắt buộc`,
+  })
+  @Post('saveDraft')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: SaveDraftAppDto })
+  @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
+  async saveDraft(@Body() dto: SaveDraftAppDto, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.teamUserAppService.saveDraft(dto, user.userCode);
+    if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.RegisterErr,
+        data: 0,
+      });
+    }
+    return {
+      message: 'Success',
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Kết thúc quá trình lưu tạm hoàn tất đăng ký đội kỹ thuật / xưởng gia công mới',
+    description: `
+**userTypeKeyWord**: là bắt buộc (FACTORY, TECHNICAL)\n`,
+  })
+  @Post('submitTeam/:userTypeKeyWord')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
+  async submitTeam(@Param('userTypeKeyWord') userTypeKeyWord: string, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.teamUserAppService.submitTeam(userTypeKeyWord, user.userCode);
+    if (result === 0) {
+      throw new BadRequestException({
+        message: Msg.RegisterErr,
+        data: 0,
+      });
+    } else if (result === -1) {
+      throw new BadRequestException({
+        message: Msg.TeamAlreadyRegistered,
+        data: 0,
+      });
+    } else if (result === -2) {
+      throw new BadRequestException({
+        message: Msg.TeamServiceRequired,
+        data: 0,
+      });
+    } else if (result === -3) {
+      throw new BadRequestException({
+        message: Msg.TeamServiceDuplicate,
+        data: 0,
+      });
+    } else if (result === -4) {
+      throw new BadRequestException({
+        message: 'Không tìm thấy bản nháp nào để gửi',
         data: 0,
       });
     }
@@ -200,7 +282,7 @@ export class TeamAppController {
   }
 
   @ApiOperation({
-    summary: 'Xóa file ảnh/video đã upload',
+    summary: 'Xóa file ảnh/video đã upload cho ảnh chính, ảnh/video phụ, ảnh/video dịch vụ',
     description: `**uploadType**: 
   - teamImage: xóa ảnh chính \n 
   - teamFiles: xóa ảnh/video phụ  \n
@@ -215,83 +297,6 @@ export class TeamAppController {
     const result = await this.teamUserAppService.deleteFile(dto, user.userCode);
     return {
       message: result > 0 ? Msg.DeleteOk : Msg.DeleteErr,
-      data: result,
-    };
-  }
-
-  // TODO: REVIEW
-  @ApiOperation({
-    summary: 'Lấy danh sách review của 1 team',
-    description: ``,
-  })
-  @ApiBody({
-    type: GetReviewListOfTeamDto,
-  })
-  @Post('getReviewListOfTeam')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(ListResponseDto(GetReviewListOfTeamResDto)) })
-  async getReviewListOfTeam(@Body() dto: GetReviewListOfTeamDto, @GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: GetReviewListOfTeamResDto[] }> {
-    const result = await this.teamReviewAppService.getReviewListOfTeam(dto);
-    return result;
-  }
-
-  @ApiOperation({
-    summary: 'Viết đánh giá',
-  })
-  @Post('reviewTeam')
-  @ApiBody({
-    type: ReviewTeamDto,
-    description: `
-**uuid** dùng khi post dữ liệu phải trùng với **uuid** khi upload file\n
-**star**: number (1 -> 5 )\n
-**review**: text (nội dung)`,
-  })
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: NumberOkResponseDto })
-  async reviewTeam(@GetUserApp() user: TokenUserAppResDto, @Body() dto: ReviewTeamDto) {
-    const result = await this.teamReviewAppService.reviewTeam(user.userCode, dto);
-    if (result === -1) {
-      throw new BadRequestException({
-        message: Msg.UuidNotFound,
-        data: 0,
-      });
-    }
-    if (result === -2) {
-      throw new BadRequestException({
-        message: Msg.TeamNotFound,
-        data: 0,
-      });
-    }
-    if (result === -3) {
-      throw new BadRequestException({
-        message: Msg.YouAlreadyReview,
-        data: 0,
-      });
-    }
-
-    if (result === 0) {
-      throw new BadRequestException({
-        message: Msg.RegisterErr,
-        data: 0,
-      });
-    }
-    return {
-      message: Msg.RegisterOk,
-      data: result,
-    };
-  }
-
-  @Post('uploadReviewFiles')
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: UploadReviewFilesDto })
-  @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('reviewImg', 5, multerImgConfig), ImageOptimizerInterceptor)
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto([UploadReviewFilesResDto]) })
-  async uploadReviewFiles(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadReviewFilesDto, @UploadedFiles() reviewImgs: Express.Multer.File[]) {
-    const result = await this.teamReviewAppService.uploadReviewFiles(user.userCode, dto, reviewImgs);
-    return {
-      message: result.length ? Msg.UploadOk : Msg.UploadErr,
       data: result,
     };
   }

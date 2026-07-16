@@ -42,6 +42,9 @@ export class TeamServiceResDto {
   @ApiProperty({ example: 'Mô tả dịch vụ' })
   serviceTextInput: string;
 
+  @ApiProperty({ example: 'uuid-string', required: false })
+  uniqueId?: string;
+
   @ApiProperty({ type: [TeamImgResDto] })
   images: TeamImgResDto[];
 }
@@ -58,6 +61,12 @@ export class GetDetailTeamResDto {
 
   @ApiProperty({ example: '' })
   userTypeKeyWord: string;
+
+  @ApiProperty({ example: 'uuid-string', required: false })
+  uniqueId?: string;
+
+  @ApiProperty({ example: 1, required: false })
+  currentStep?: number;
 
   @ApiProperty({ example: '' })
   userTypeName: string;
@@ -210,6 +219,9 @@ export class InitFormCreateTeamAppResDto {
 
   @ApiProperty({ type: [ProvinceResDto] })
   provinces: ProvinceResDto[];
+
+  @ApiProperty({ type: GetDetailTeamResDto, nullable: true })
+  draft?: GetDetailTeamResDto | null;
 }
 
 export class CheckAvailableTeamResDto {
