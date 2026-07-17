@@ -32,6 +32,8 @@ export class QrAdminService {
     const result = await this.qrAdminRepository.getDetail(requestCode);
     return result;
   }
+
+  // TODO: BLOCKCHAIN
   async approved(requestCode: string, updatedId: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/approved:`;
 
@@ -74,5 +76,9 @@ export class QrAdminService {
       this.logger.error(logbase, error);
       return 0;
     }
+  }
+
+  async getBlockchainTransactions(): Promise<any[]> {
+    return this.qrAdminRepository.getBlockchainTransactions();
   }
 }

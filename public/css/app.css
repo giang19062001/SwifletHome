@@ -20712,6 +20712,9 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
 #page-blockchain .btn-deposit:hover {
   background-color: #6b35c5;
 }
+#page-blockchain .transaction-card {
+  margin-bottom: 20px;
+}
 #page-blockchain .wallet-card {
   padding: 10px;
   border-radius: 12px;
@@ -20719,9 +20722,10 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
 }
 #page-blockchain .wallet-card .wallet-title {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 20px;
-  color: #333;
+  color: #565c66;
+  font-family: PretendardBold !important;
 }
 #page-blockchain .wallet-card .wallet-info {
   padding: 10px 0;

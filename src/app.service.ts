@@ -236,4 +236,11 @@ export class AppService {
       teamServiceTypes: teamServiceTypes,
     };
   }
+
+  async renderBlockchain(): Promise<any> {
+    const transactions = await this.qrAdminService.getBlockchainTransactions();
+    return {
+      transactions: transactions,
+    };
+  }
 }

@@ -94,11 +94,14 @@ export class AppController {
   @Get('/dashboard/config/blockchain')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/blockchain')
-  renderBlockchain(@Req() req: Request) {
+  async renderBlockchain(@Req() req: Request) {
+    const values = await this.appService.renderBlockchain();
     return {
       title: 'Thông tin Blockchain',
       isLayout: true,
       user: req.session.user,
+      values: values,
+      blockchainNet: process.env.BLOCKCHAIN_NET,
     };
   }
   // q-and-a/question

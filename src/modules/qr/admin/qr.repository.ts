@@ -144,4 +144,14 @@ export class QrAdminRepository {
     ]);
     return result.insertId;
   }
+
+  async getBlockchainTransactions(): Promise<any[]> {
+    const query = `
+      SELECT seq, requestCode, transactionHash, blockNumber, transactionFee, createdAt 
+      FROM ${this.tableBlockChain} 
+      ORDER BY seq DESC
+    `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query);
+    return rows;
+  }
 }

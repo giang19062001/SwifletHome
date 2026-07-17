@@ -1,4 +1,4 @@
-<div class="row" id="page-blockchain">
+<div class="common-table-container row" id="page-blockchain">
     <div class="col-xl-12">
         <div class="row mb-3">
             <div class="col-12">
@@ -15,7 +15,7 @@
             <div class="col-12">
                 <div class="card wallet-card">
                     <div class="card-body">
-                        <h3 class="mb-4 wallet-title">Thông tin Ví</h3>
+                        <h3 class="mb-4 wallet-title">Thông tin ví</h3>
                         <div class="wallet-info">
                             <div class="info-group">
                                 <label>Ví ID:</label>
@@ -30,6 +30,62 @@
                                 <a class="btn btn-primary btn-deposit" href="https://faucet.polygon.technology/" target="_blank">Nạp Coin</a>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mt-4">
+                <div class="card transaction-card">
+                    <div class="card-body">
+                        <div>
+                            <h3 class="title-page m-0" style="font-size: 1.2rem;">Danh sách Giao dịch Blockchain</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-table">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr class="text-center">
+                                    <th><p>STT</p></th>
+                                    <th><p>Mã yêu cầu QRCODE</p></th>
+                                    <th><p>Transaction Hash</p></th>
+                                    <th><p>Số Block Number</p></th>
+                                    <th><p>Phí giao dịch</p></th>
+                                    <th><p>Thời gian giao dịch</p></th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table">
+                                <% if (typeof values !== 'undefined' && values.transactions && values.transactions.length > 0) { %>
+                                    <% values.transactions.forEach(function(tx, index) { %>
+                                        <tr class="text-center">
+                                            <td><p><%= index + 1 %></p></td>
+                                            <td>
+                                                <p>
+                                                    <a href="/dashboard/qrcode/update/<%= tx.requestCode %>" target="_blank" rel="noopener noreferrer" class="text-decoration-underline text-primary">
+                                                        <%= tx.requestCode %>
+                                                    </a>
+                                                </p>
+                                            </td>
+                                            <td class="text-start" style="word-break: break-all;">
+                                                <p>
+                                                    <a href="<%= typeof blockchainNet !== 'undefined' ? blockchainNet : '' %>/tx/<%= tx.transactionHash %>" target="_blank" rel="noopener noreferrer" class="text-decoration-underline text-primary">
+                                                        <%= tx.transactionHash %>
+                                                    </a>
+                                                </p>
+                                            </td>
+                                            <td><p><%= tx.blockNumber %></p></td>
+                                            <td><p><%= tx.transactionFee %></p></td>
+                                            <td><p><%= new Date(tx.createdAt).toLocaleString() %></p></td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="text-center"><p>Chưa có giao dịch nào</p></td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

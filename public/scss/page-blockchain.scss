@@ -10,6 +10,10 @@
         }
     }
 
+    .transaction-card{
+        margin-bottom: 20px;
+    }
+
     .wallet-card {
         padding:10px;
         border-radius: 12px;
@@ -17,9 +21,10 @@
 
         .wallet-title {
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 20px;
-            color: #333;
+            color: #565c66;
+            font-family: PretendardBold !important;
         }
         .wallet-info {
             padding: 10px 0;
