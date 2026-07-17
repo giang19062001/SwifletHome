@@ -114,6 +114,9 @@ export class GetDetailTeamResDto {
   @ApiProperty({ example: 'uploads/images/***/***.jpg' })
   teamImage: string;
 
+  @ApiProperty({ example: 1, required: false })
+  teamImageSeq?: number;
+
   @ApiProperty({
     type: [StructuredTeamFilesResDto],
   })

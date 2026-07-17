@@ -90,7 +90,8 @@ export class TeamUserAppRepository {
     const query = ` SELECT A.seq, A.userCode, A.userTypeCode, B.userTypeKeyWord, B.userTypeName, 
             A.teamCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress,A.provinceCodes,
             IFNULL(R.star, 0) AS star, A.teamDescription, A.teamDescriptionSpecial, A.status, A.isSeleted,
-             A.teamImage,
+            A.teamImage,
+            TI.seq AS teamImageSeq,
             COALESCE(
               (
                 SELECT JSON_ARRAYAGG(
@@ -102,7 +103,7 @@ export class TeamUserAppRepository {
                   )
                 )
                 FROM ${this.tableTeamImg} D
-                WHERE D.teamSeq = A.seq AND D.filename <> A.teamImage
+                WHERE D.teamSeq = A.seq AND D.filename <> IFNULL(A.teamImage, '')
               ),
               JSON_ARRAY()
             ) AS teamFiles
@@ -110,6 +111,8 @@ export class TeamUserAppRepository {
           FROM ${this.table} A 
           LEFT JOIN ${this.tableUserType} B
             ON A.userTypeCode = B.userTypeCode
+          LEFT JOIN ${this.tableTeamImg} TI 
+            ON TI.teamSeq = A.seq AND TI.filename = A.teamImage
           LEFT JOIN (
               SELECT 
                 teamCode,
@@ -119,7 +122,7 @@ export class TeamUserAppRepository {
               GROUP BY teamCode
           ) R ON A.teamCode = R.teamCode
           WHERE A.isActive = 'Y'
-          AND A.teamCode = ? AND A.status = '${TeamStatusEnum.APPROVE}'
+          AND A.teamCode = ? AND A.status != '${TeamStatusEnum.DRAFT}'
           LIMIT 1
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [teamCode]);
@@ -165,8 +168,8 @@ export class TeamUserAppRepository {
     const query = ` SELECT A.teamCode, A.status 
     FROM ${this.table} A
     LEFT JOIN ${this.tableUserType} B ON A.userTypeCode = B.userTypeCode
-    WHERE A.userCode = ? AND B.userTypeKeyWord = ? AND A.isActive = 'Y' LIMIT 1 `;
-    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeKeyWord]);
+    WHERE A.userCode = ? AND B.userTypeKeyWord = ? AND A.isActive = 'Y' AND A.status != ? LIMIT 1 `;
+    const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeKeyWord, TeamStatusEnum.DRAFT]);
     return rows.length ? (rows[0] as { teamCode: string; status: TeamStatusEnum }) : null;
   }
 
@@ -184,12 +187,29 @@ export class TeamUserAppRepository {
 
   async getDraft(userCode: string, userTypeKeyWord: string): Promise<GetDetailTeamResDto | null> {
     const query = `
-      SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, A.teamImage, A.teamDescription, A.teamDescriptionSpecial, A.provinceCodes, A.uniqueId, A.currentStep,
+      SELECT A.seq, A.teamCode, A.userCode, A.userTypeCode, A.teamName, A.teamUserName, A.teamPhone, A.teamAddress, 
+      A.teamImage, MAX(TI.seq) AS teamImageSeq, A.teamDescription, A.teamDescriptionSpecial, A.provinceCodes, A.uniqueId, A.currentStep,
+      COALESCE(
+        (
+          SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'seq', D.seq,
+              'filename', D.filename,
+              'mimetype', D.mimetype,
+              'fileTypeCode', D.fileTypeCode
+            )
+          )
+          FROM ${this.tableTeamImg} D
+          WHERE D.teamSeq = A.seq AND D.filename <> IFNULL(A.teamImage, '')
+        ),
+        JSON_ARRAY()
+      ) AS teamFiles,
       B.userTypeKeyWord, B.userTypeName,
       GROUP_CONCAT(C.provinceName SEPARATOR ', ') AS provinceName
       FROM ${this.table} A 
       JOIN ${this.tableUserType} B ON A.userTypeCode = B.userTypeCode
       LEFT JOIN ${this.tableProvinces} C ON JSON_CONTAINS(A.provinceCodes, JSON_QUOTE(C.provinceCode))
+      LEFT JOIN ${this.tableTeamImg} TI ON TI.teamSeq = A.seq AND TI.filename = A.teamImage
       WHERE A.isActive = 'Y' AND A.userCode = ? AND B.userTypeKeyWord = ? AND A.status = ?
       GROUP BY A.seq
       LIMIT 1
@@ -197,6 +217,7 @@ export class TeamUserAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userCode, userTypeKeyWord, TeamStatusEnum.DRAFT]);
     const result = rows.length ? (rows[0] as GetDetailTeamResDto) : null;
     if (result) {
+      result.teamFiles = typeof result.teamFiles === 'string' ? JSON.parse(result.teamFiles) : result.teamFiles || [];
       result.provinceCodes = typeof result.provinceCodes === 'string' ? JSON.parse(result.provinceCodes) : result.provinceCodes;
       result.teamDescriptionSpecial = typeof result.teamDescriptionSpecial === 'string' ? JSON.parse(result.teamDescriptionSpecial) : result.teamDescriptionSpecial;
 

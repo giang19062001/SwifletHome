@@ -4,7 +4,6 @@ import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { MailService } from 'src/common/mail/mail.service';
 import { getFileLocation } from 'src/config/multer.config';
-import { OptionService } from 'src/modules/options/option.service';
 import { ProvinceService } from 'src/modules/province/app/province.service';
 import { v4 as uuidv4 } from 'uuid';
 import { TeamUserAppRepository } from './team-user.repository';
@@ -19,7 +18,6 @@ export class TeamUserAppService {
     private readonly teamUserAppRepository: TeamUserAppRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly provinceService: ProvinceService,
-    private readonly optionService: OptionService,
     private readonly logger: LoggingService,
     private readonly mailService: MailService,
     private readonly userAppService: UserAppService,
@@ -71,6 +69,28 @@ export class TeamUserAppService {
       serviceDescription: opt.serviceTypeName,
       uniqueId: uuidv4(),
     }));
+
+    if (draft) {
+      const teamFiles = draft.teamFiles || [];
+
+      const fileTypeMap = new Map(teamFileTypes.map((t) => [t.fileTypeCode, t.fileTypeText]));
+      const structuredTeamFilesMap = new Map<string, any>();
+
+      for (const img of teamFiles as any[]) {
+        let typeGroup = structuredTeamFilesMap.get(img.fileTypeCode);
+        if (!typeGroup) {
+          typeGroup = {
+            fileTypeCode: img.fileTypeCode,
+            fileTypeText: fileTypeMap.get(img.fileTypeCode) || '',
+            images: [],
+          };
+          structuredTeamFilesMap.set(img.fileTypeCode, typeGroup);
+        }
+        typeGroup.images.push(img);
+      }
+      draft.teamFiles = Array.from(structuredTeamFilesMap.values());
+    }
+
     return {
       uniqueId: formUuid,
       teamFileTypes,
@@ -94,31 +114,38 @@ export class TeamUserAppService {
     // Group teamFiles by fileTypeCode
     const teamFiles = result.teamFiles || [];
     const allFileTypes = await this.teamUserAppRepository.getTeamFileTypes(result.userTypeKeyWord);
-    const structuredTeamFiles: any[] = [];
+
+    await Promise.all(
+      teamFiles.map(async (img) => {
+        const dimensions = await this.fileLocalService.getImageDimensions(img.filename);
+        if (dimensions) {
+          img.width = dimensions.width;
+          img.height = dimensions.height;
+        } else {
+          img.width = 0;
+          img.height = 0;
+        }
+      }),
+    );
+
+    // Nhóm file bằng Map để tối ưu
+    const fileTypeMap = new Map(allFileTypes.map((t) => [t.fileTypeCode, t.fileTypeText]));
+    const structuredTeamFilesMap = new Map<string, any>();
 
     for (const img of teamFiles) {
-      // Thêm width, height
-      const dimensions = await this.fileLocalService.getImageDimensions(img.filename);
-      if (dimensions) {
-        img.width = dimensions.width;
-        img.height = dimensions.height;
-      } else {
-        img.width = 0;
-        img.height = 0;
-      }
-
-      let typeGroup = structuredTeamFiles.find((g) => g.fileTypeCode === img.fileTypeCode);
+      let typeGroup = structuredTeamFilesMap.get(img.fileTypeCode);
       if (!typeGroup) {
-        const typeInfo = allFileTypes.find((t) => t.fileTypeCode === img.fileTypeCode);
         typeGroup = {
           fileTypeCode: img.fileTypeCode,
-          fileTypeText: typeInfo?.fileTypeText || '',
+          fileTypeText: fileTypeMap.get(img.fileTypeCode) || '',
           images: [],
         };
-        structuredTeamFiles.push(typeGroup);
+        structuredTeamFilesMap.set(img.fileTypeCode, typeGroup);
       }
       typeGroup.images.push(img);
     }
+
+    const structuredTeamFiles = Array.from(structuredTeamFilesMap.values());
 
     result.teamFiles = structuredTeamFiles;
     return result;
@@ -132,22 +159,26 @@ export class TeamUserAppService {
   }
 
   async uploadTeamFiles(dto: UploadTeamFilesAppDto, files: Express.Multer.File[], createdId: string): Promise<{ seq: number; url: string; mimetype: string }[]> {
-    const result: { seq: number; url: string; mimetype: string }[] = [];
-    for (const file of files) {
-      const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
-      const seq = await this.teamUserAppRepository.uploadFileTeam(dto.uniqueId, createdId, filenamePath, file, dto.fileTypeCode);
-      result.push({ seq, url: filenamePath, mimetype: file.mimetype });
-    }
+    // upload các file song song
+    const result = await Promise.all(
+      files.map(async (file) => {
+        const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+        const seq = await this.teamUserAppRepository.uploadFileTeam(dto.uniqueId, createdId, filenamePath, file, dto.fileTypeCode);
+        return { seq, url: filenamePath, mimetype: file.mimetype };
+      }),
+    );
     return result;
   }
 
   async uploadServiceFiles(dto: UploadServiceFilesAppDto, files: Express.Multer.File[], createdId: string): Promise<{ seq: number; url: string; mimetype: string }[]> {
-    const result: { seq: number; url: string; mimetype: string }[] = [];
-    for (const file of files) {
-      const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
-      const seq = await this.teamUserAppRepository.uploadFileService(dto.uniqueId, createdId, filenamePath, file);
-      result.push({ seq, url: filenamePath, mimetype: file.mimetype });
-    }
+    // upload các file dịch vụ song song
+    const result = await Promise.all(
+      files.map(async (file) => {
+        const filenamePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+        const seq = await this.teamUserAppRepository.uploadFileService(dto.uniqueId, createdId, filenamePath, file);
+        return { seq, url: filenamePath, mimetype: file.mimetype };
+      }),
+    );
     return result;
   }
 
@@ -216,15 +247,15 @@ export class TeamUserAppService {
         // Xóa liên kết (set seqService = 0) và xóa toàn bộ service cũ để cập nhật mới (Clear and Replace)
         await this.teamUserAppRepository.deleteServicesByTeamSeq(seq);
 
-        for (let i = 0; i < services.length; i++) {
-          const svc = services[i];
-          // Tạo mới từng dịch vụ con
-          const seqService = await this.teamUserAppRepository.createTeamService(seq, userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
-          // Liên kết các file ảnh của dịch vụ con này với ID dịch vụ vừa tạo (dựa theo uniqueId của file)
-          if (svc.uniqueId) {
-            await this.teamUserAppRepository.updateSeqFilesService(seqService, svc.uniqueId, userCode);
-          }
-        }
+        // tạo mới các dịch vụ con song song
+        await Promise.all(
+          services.map(async (svc: any) => {
+            const seqService = await this.teamUserAppRepository.createTeamService(seq, userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
+            if (svc.uniqueId) {
+              await this.teamUserAppRepository.updateSeqFilesService(seqService, svc.uniqueId, userCode);
+            }
+          }),
+        );
       }
       return seq;
     } catch (error) {
@@ -249,6 +280,7 @@ export class TeamUserAppService {
 
       await this.teamUserAppRepository.submitDraft(draftFull.seq, userCode);
 
+      // gửi email
       this.mailService.sendTeamEmail({
         teamName: draftFull.teamName,
         teamUserName: draftFull.teamUserName,
@@ -264,12 +296,7 @@ export class TeamUserAppService {
     }
   }
 
-  /**
-   * Validate:
-   * - Không trùng team (user + userTypeCode)
-   * - Số lượng dịch vụ >= 1
-   * - Không có dịch vụ trùng nhau
-   */
+  // ! WILL DELETE
   async createTeam(dto: CreateTeamAppDto, userCode: string, userTypeCode: string, userTypeKeyWord: string): Promise<number> {
     // Check duplicate team
     const isDuplicate = await this.teamUserAppRepository.checkDuplicateTeam(userCode, userTypeCode);
@@ -303,14 +330,15 @@ export class TeamUserAppService {
         // Re-link team files
         await this.teamUserAppRepository.updateSeqFilesTeam(seq, dto.uniqueId, userCode);
 
-        // Tạo services
-        for (let i = 0; i < services.length; i++) {
-          const svc = services[i];
-          const seqService = await this.teamUserAppRepository.createTeamService(seq, userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
-          if (svc.uniqueId) {
-            await this.teamUserAppRepository.updateSeqFilesService(seqService, svc.uniqueId, userCode);
-          }
-        }
+        // Tạo services song song
+        await Promise.all(
+          services.map(async (svc: any) => {
+            const seqService = await this.teamUserAppRepository.createTeamService(seq, userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
+            if (svc.uniqueId) {
+              await this.teamUserAppRepository.updateSeqFilesService(seqService, svc.uniqueId, userCode);
+            }
+          }),
+        );
 
         // sendEmail
         this.mailService.sendTeamEmail({ ...dto, userTypeKeyWord });

@@ -105,7 +105,7 @@ export class TeamAppController {
   }
 
   @ApiOperation({
-    summary: 'Lấy thông tin chi tiết 1 đội kỹ thuật - thi công ( mô tả, danh sách ảnh ) ngoại trừ danh sách Review',
+    summary: 'Lấy thông tin chi tiết 1 đội kỹ thuật - thi công ( mô tả, danh sách ảnh ) không lấy bản nháp và không lấy danh sách Review',
     description: `
 **teamDescription** là Html,
 **teamDescriptionSpecial** { monthlyVolumn: number, minimunQuantity: number,} hoặc 'null'`,
