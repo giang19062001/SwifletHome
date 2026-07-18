@@ -38,7 +38,7 @@
                 <div class="card transaction-card">
                     <div class="card-body">
                         <div>
-                            <h3 class="title-page m-0" style="font-size: 1.2rem;">Danh sách Giao dịch Blockchain</h3>
+                            <h3 class="title-page m-0" style="font-size: 1.2rem;">Danh sách giao dịch Blockchain</h3>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                                     <th><p>STT</p></th>
                                     <th><p>Mã yêu cầu QRCODE</p></th>
                                     <th><p>Transaction Hash</p></th>
-                                    <th><p>Số Block Number</p></th>
+                                    <th><p>Block Number</p></th>
                                     <th><p>Phí giao dịch</p></th>
                                     <th><p>Thời gian giao dịch</p></th>
                                 </tr>
@@ -62,19 +62,19 @@
                                             <td><p><%= index + 1 %></p></td>
                                             <td>
                                                 <p>
-                                                    <a href="/dashboard/qrcode/update/<%= tx.requestCode %>" target="_blank" rel="noopener noreferrer" class="text-decoration-underline text-primary">
-                                                        <%= tx.requestCode %>
-                                                    </a>
+                                                    <a class="link-redirect" target="_blank" href="/dashboard/qrcode/update/<%= tx.requestCode %>"><i class="fa fa-external-link-alt me-1"></i>QRCODE</a>                    
                                                 </p>
                                             </td>
-                                            <td class="text-start" style="word-break: break-all;">
+                                            <td class="text-center" style="word-break: break-all;">
                                                 <p>
-                                                    <a href="<%= typeof blockchainNet !== 'undefined' ? blockchainNet : '' %>/tx/<%= tx.transactionHash %>" target="_blank" rel="noopener noreferrer" class="text-decoration-underline text-primary">
-                                                        <%= tx.transactionHash %>
-                                                    </a>
+                                                     <a class="link-redirect" target="_blank" href="<%= typeof values.blockchainNet !== 'undefined' ? values.blockchainNet : '' %>/tx/<%= tx.transactionHash %>"><i class="fa fa-external-link-alt me-1"></i> Blockchain Link</a>                    
                                                 </p>
                                             </td>
-                                            <td><p><%= tx.blockNumber %></p></td>
+                                            <td>
+                                                <p>
+                                                    <a class="link-redirect" target="_blank" href="<%= typeof values.blockchainNet !== 'undefined' ? values.blockchainNet : '' %>/block/<%= tx.blockNumber %>"><i class="fa fa-external-link-alt me-1"></i> <%= tx.blockNumber %></a>                    
+                                                </p>
+                                            </td>
                                             <td><p><%= tx.transactionFee %></p></td>
                                             <td><p><%= new Date(tx.createdAt).toLocaleString() %></p></td>
                                         </tr>

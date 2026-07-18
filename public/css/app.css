@@ -19605,16 +19605,16 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
   color: #fff;
 }
 .page-main .sparkboxes .box1 {
-  background: linear-gradient(135deg, #71ab33 10%, rgb(176.1959459459, 218.1283783784, 131.3716216216) 100%);
+  background: linear-gradient(135deg, rgb(151.1554054054, 206.4121621622, 92.0878378378) 10%, rgb(151.1554054054, 206.4121621622, 92.0878378378) 100%);
 }
 .page-main .sparkboxes .box2 {
-  background: linear-gradient(135deg, rgb(151.1554054054, 206.4121621622, 92.0878378378) 10%, rgb(213.7567567568, 235.7027027027, 190.2972972973) 100%);
+  background: linear-gradient(135deg, rgb(151.1554054054, 206.4121621622, 92.0878378378) 10%, rgb(151.1554054054, 206.4121621622, 92.0878378378) 100%);
 }
 .page-main .sparkboxes .box3 {
-  background: linear-gradient(135deg, rgb(100.0202702703, 151.3581081081, 45.1418918919) 10%, rgb(151.1554054054, 206.4121621622, 92.0878378378) 100%);
+  background: linear-gradient(135deg, rgb(151.1554054054, 206.4121621622, 92.0878378378) 10%, rgb(151.1554054054, 206.4121621622, 92.0878378378) 100%);
 }
 .page-main .sparkboxes .box4 {
-  background: linear-gradient(135deg, rgb(74.0608108108, 112.0743243243, 33.4256756757) 10%, rgb(125.9797297297, 190.6418918919, 56.8581081081) 100%);
+  background: linear-gradient(135deg, rgb(151.1554054054, 206.4121621622, 92.0878378378) 10%, rgb(151.1554054054, 206.4121621622, 92.0878378378) 100%);
 }
 .page-main .pretty-shadow {
   box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;

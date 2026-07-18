@@ -100,8 +100,7 @@ export class AppController {
       title: 'Thông tin Blockchain',
       isLayout: true,
       user: req.session.user,
-      values: values,
-      blockchainNet: process.env.BLOCKCHAIN_NET,
+      values: { ...values, blockchainNet: process.env.BLOCKCHAIN_NET },
     };
   }
   // q-and-a/question

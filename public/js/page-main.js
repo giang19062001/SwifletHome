@@ -17,8 +17,14 @@ const dynamicColor1 = rootStyles.getPropertyValue('--main-color').trim() || '#3F
 const dynamicColor2 = rootStyles.getPropertyValue('--main-color-light').trim() || '#2196F3';
 const dynamicColor3 = rootStyles.getPropertyValue('--main-color-lighter').trim() || '#5961f9';
 const chartColors = [dynamicColor1, dynamicColor2, dynamicColor3];
-
 // === SPARKLINE CHARTS (4 cái nhỏ) ===
+const sparkCategories = [];
+for (let i = 9; i >= 0; i--) {
+  const d = new Date();
+  d.setMonth(d.getMonth() - i);
+  sparkCategories.push("Tháng " + (d.getMonth() + 1));
+}
+
 const sparkConfig = {
   chart: {
     group: 'sparks',
@@ -37,23 +43,43 @@ const sparkConfig = {
   markers: { size: 0 },
   colors: ['#fff'],  // giữ trắng
   tooltip: {
+    enabled: true,
+    theme: 'dark',
     x: { show: false },
-    y: { title: { formatter: () => '' } }
+    y: {
+      title: {
+        formatter: function (seriesName, opts) {
+          return sparkCategories[opts.dataPointIndex] + ':';
+        }
+      }
+    }
+  },
+  xaxis: {
+    categories: sparkCategories,
+    crosshairs: { width: 1 }
   },
   grid: { padding: { top: 20, bottom: 30, left: 110 } }
 };
 
-var spark1 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark1' }, series: [{ data: [25, 66, 41, 59, 25, 44, 12, 36, 9, 21] }] };
-var spark2 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark2' }, series: [{ data: [12, 14, 2, 47, 32, 44, 14, 55, 41, 69] }] };
-var spark3 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark3' }, series: [{ data: [47, 45, 74, 32, 56, 31, 44, 33, 45, 19] }], xaxis: { crosshairs: { width: 1 } } };
-var spark4 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark4' }, series: [{ data: [15, 75, 47, 65, 14, 32, 19, 54, 44, 61] }], xaxis: { crosshairs: { width: 1 } } };
+var spark1 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark1' }, series: [{ name: '', data: [] }] };
+var spark2 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark2' }, series: [{ name: '', data: [] }] };
+var spark3 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark3' }, series: [{ name: '', data: [] }] };
+var spark4 = { ...sparkConfig, chart: { ...sparkConfig.chart, id: 'spark4' }, series: [{ name: '', data: [] }] };
 
 new ApexCharts(document.querySelector("#spark1"), spark1).render();
 new ApexCharts(document.querySelector("#spark2"), spark2).render();
 new ApexCharts(document.querySelector("#spark3"), spark3).render();
 new ApexCharts(document.querySelector("#spark4"), spark4).render();
 
+
 // === LINE CHART (Media) ===
+const mediaLabels = [];
+for (let i = 5; i >= 0; i--) {
+  const d = new Date();
+  d.setMonth(d.getMonth() - i);
+  mediaLabels.push(String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear());
+}
+
 var optionsLine = {
   chart: {
     height: 328,
@@ -64,26 +90,26 @@ var optionsLine = {
   stroke: { curve: 'smooth', width: 2 },
   colors: chartColors,
   series: [
-    { name: "Music", data: [1, 15, 26, 20, 33, 27] },
-    { name: "Photos", data: [3, 33, 21, 42, 19, 32] },
-    { name: "Files", data: [0, 39, 52, 11, 29, 43] }
+    { name: "Nhà yến của khách hàng", data: [] },
+    { name: "Nhà yến SCT đã duyệt", data: [] },
+    { name: "Nhà yến SCT chờ duyệt", data: [] }
   ],
   title: {
-    text: 'Media',
+    text: 'Thống kê',
     align: 'left',
     offsetY: 25,
     offsetX: 20,
     style: { color: '#565c66', fontSize: '16px', fontWeight: 600 }
   },
   subtitle: {
-    text: 'Statistics',
+    text: 'Nhà Yến',
     offsetY: 55,
     offsetX: 20,
     style: { color: '#565c66', fontSize: '13px' }
   },
   markers: { size: 6, strokeWidth: 0, hover: { size: 9 } },
   grid: { show: false }, // LOẠI BỎ GRID
-  labels: ['01/15/2002', '01/16/2002', '01/17/2002', '01/18/2002', '01/19/2002', '01/20/2002'],
+  labels: mediaLabels,
   xaxis: {
     tooltip: { enabled: false },
     labels: { style: { colors: '#565c66' } }
@@ -101,40 +127,57 @@ var chartLine = new ApexCharts(document.querySelector('#line-adwords'), optionsL
 chartLine.render();
 
 
-// === RADIAL BAR CHART ===
+// === DONUT CHART ===
 var optionsCircle4 = {
   chart: {
-    type: 'radialBar',
+    type: 'donut',
     height: 345,
     width: 380,
   },
-  plotOptions: {
-    radialBar: {
-      inverseOrder: true,
-      hollow: { margin: 5, size: '48%', background: 'transparent' },
-      track: { show: false },
-      startAngle: -180,
-      endAngle: 180
-    },
+  title: {
+    text: 'Thống kê khách hàng, công xưởng',
+    align: 'left',
+    margin: 30,
+    style: { color: '#565c66', fontSize: '16px', fontWeight: 600 }
   },
-  stroke: { lineCap: 'round' },
+  plotOptions: {
+    pie: {
+      donut: {
+        size: '75%',
+        labels: {
+          show: true,
+          name: { 
+            show: true,
+            fontSize: '12px'
+          },
+          value: { 
+            show: true,
+            fontSize: '20px'
+          },
+          total: {
+            show: true,
+            showAlways: true,
+            label: 'Tổng khách hàng',
+            fontSize: '12px',
+            formatter: function (w) {
+              return w.globals.seriesTotals[0];
+            }
+          }
+        }
+      }
+    }
+  },
+  stroke: { width: 0 },
   colors: chartColors,
-  series: [71, 63, 77],
-  labels: ['June', 'May', 'April'],
+  series: [],
+  labels: ['Tổng khách hàng', 'Tổng công xưởng đã duyệt', 'Tổng công xưởng chờ duyệt'],
   legend: {
     show: true,
-    floating: true,
-    position: 'right',
-    offsetX: 70,
-    offsetY: 230,
+    floating: false,
+    position: 'bottom',
     labels: { colors: '#565c66' }
   },
-  dataLabels: {
-    enabled: true,
-    style: { colors: ['#565c66'] },
-    formatter: (val) => `${val}%`
-  },
-  grid: { show: false } // LOẠI BỎ GRID (Radial không có grid, nhưng an toàn)
+  grid: { show: false } // LOẠI BỎ GRID
 };
 
 var chartCircle4 = new ApexCharts(document.querySelector('#radialBarBottom'), optionsCircle4);
@@ -153,12 +196,11 @@ var optionsBar = {
   },
   colors: chartColors,
   series: [
-    { name: 'PRODUCT A', data: [14, 25, 21, 17, 12, 13, 11, 19] },
-    { name: 'PRODUCT B', data: [13, 23, 20, 8, 13, 27, 33, 12] },
-    { name: 'PRODUCT C', data: [11, 17, 15, 15, 21, 14, 15, 13] }
+    { name: 'Sản lượng tổ yến đã thu hoạch', data: [] },
+    { name: 'Sản lượng tổ yến còn lại', data: [] }
   ],
   xaxis: {
-    categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2', '2012 Q3', '2012 Q4'],
+    categories: mediaLabels,
     labels: { style: { colors: '#565c66' } }
   },
   yaxis: { labels: { style: { colors: '#565c66' } } },
@@ -181,12 +223,12 @@ var optionsArea = {
   stroke: { curve: 'straight', width: 2 },
   colors: chartColors,
   series: [
-    { name: "Music", data: [11, 15, 26, 20, 33, 27] },
-    { name: "Photos", data: [32, 33, 21, 42, 19, 32] },
-    { name: "Files", data: [20, 39, 52, 11, 29, 43] }
+    { name: "Yêu cầu QR chờ duyệt", data: [] },
+    { name: "Yêu cầu QR đã duyệt", data: [] },
+    { name: "QR đã được đăng bán", data: [] }
   ],
   xaxis: {
-    categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2'],
+    categories: mediaLabels,
     labels: { style: { colors: '#565c66' } }
   },
   yaxis: { labels: { style: { colors: '#565c66' } } },
@@ -199,14 +241,55 @@ var optionsArea = {
 var chartArea = new ApexCharts(document.querySelector("#areachart"), optionsArea);
 chartArea.render();
 
+// TODO: API
 async function fetchOverview() {
   try {
     const res = await axios.get('/api/admin/report/getOverview', axiosAuth());
     if (res.data) {
-      document.getElementById('totalUser').innerText = res.data.totalUser;
-      document.getElementById('totalUserHome').innerText = res.data.totalUserHome;
+      document.getElementById('totalDoctor').innerText = res.data.totalDoctor;
+      document.getElementById('totalSightseeing').innerText = res.data.totalSightseeing;
       document.getElementById('totalGuestConsulation').innerText = res.data.totalGuestConsulation;
       document.getElementById('totalConsignment').innerText = res.data.totalConsignment;
+
+      if (res.data.totalDoctorSeries) {
+        ApexCharts.exec('spark1', 'updateSeries', [{ data: res.data.totalDoctorSeries }]);
+      }
+      if (res.data.totalSightseeingSeries) {
+        ApexCharts.exec('spark2', 'updateSeries', [{ data: res.data.totalSightseeingSeries }]);
+      }
+      if (res.data.totalGuestConsulationSeries) {
+        ApexCharts.exec('spark3', 'updateSeries', [{ data: res.data.totalGuestConsulationSeries }]);
+      }
+      if (res.data.totalConsignmentSeries) {
+        ApexCharts.exec('spark4', 'updateSeries', [{ data: res.data.totalConsignmentSeries }]);
+      }
+
+      if (res.data.mediaUserHomeSeries && res.data.mediaSaleHomeApprovedSeries && res.data.mediaSaleHomeWaitingSeries) {
+        chartLine.updateSeries([
+          { name: "Nhà yến của khách hàng (Tổng: " + res.data.totalUserHome + ")", data: res.data.mediaUserHomeSeries },
+          { name: "Nhà yến SCT đã duyệt (Tổng: " + res.data.totalSaleHomeApproved + ")", data: res.data.mediaSaleHomeApprovedSeries },
+          { name: "Nhà yến SCT chờ duyệt (Tổng: " + res.data.totalSaleHomeWaiting + ")", data: res.data.mediaSaleHomeWaitingSeries }
+        ]);
+      }
+
+      if (res.data.radialUserSeries) {
+        chartCircle4.updateSeries(res.data.radialUserSeries);
+      }
+
+      if (res.data.areaQrWaitingSeries && res.data.areaQrApprovedSeries && res.data.areaQrSellingSeries) {
+        chartArea.updateSeries([
+          { name: "Yêu cầu QR chờ duyệt", data: res.data.areaQrWaitingSeries },
+          { name: "Yêu cầu QR đã duyệt", data: res.data.areaQrApprovedSeries },
+          { name: "QR Code đã đăng bán", data: res.data.areaQrSellingSeries }
+        ]);
+      }
+
+      if (res.data.barHarvestCollectedSeries && res.data.barHarvestRemainSeries) {
+        chartBar.updateSeries([
+          { name: "Sản lượng tổ yến đã thu hoạch", data: res.data.barHarvestCollectedSeries },
+          { name: "Sản lượng tổ yến còn lại", data: res.data.barHarvestRemainSeries }
+        ]);
+      }
     }
   } catch (error) {
     console.error("Failed to fetch overview data", error);
