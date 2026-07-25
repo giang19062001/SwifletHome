@@ -6,6 +6,9 @@
   
   .card-header {
     font-family: 'PretendardBold';
+    &.text-white {
+      background-color: #121927b3;
+    }
   }
 
   h5, h6 {

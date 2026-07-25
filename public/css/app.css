@@ -11962,7 +11962,7 @@ textarea.form-control-lg {
   font-weight: 600;
 }
 .topbar-info .topbar-info-gr .topbar-userid {
-  color: #505050;
+  color: #3c3c44;
   font-family: "PretendardSemiBold";
   font-size: 16px;
   line-height: 20px;
@@ -12006,7 +12006,7 @@ textarea.form-control-lg {
   font-weight: 900;
 }
 .topbar-icon-menu .dropdown-topbar-info .topbar-info-gr .topbar-userid {
-  color: #505050;
+  color: #3c3c44;
   font-family: "PretendardSemiBold";
   font-size: 18px;
   font-weight: 900;
@@ -12206,7 +12206,7 @@ textarea.form-control-lg {
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: #505050;
+  color: #3c3c44;
   font-size: 17px;
   font-family: "Pretendard";
   transition: all 0.4s;
@@ -18402,7 +18402,7 @@ select {
 .title-page {
   font-family: PretendardBold !important;
   font-size: 1.3rem;
-  color: #565c66;
+  color: #3c3c44;
 }
 
 #btn, #page-blockchain .btn-deposit, .btn-error-out, .btn-error-lg, .btn-error, .btn-edit-out, .btn-edit, .btn-add-out, .btn-add, .btn-info-out, .btn-info-video, .btn-info-audio, .btn-info-image, .btn-info, .btn-sub, .btn-submit-lg, .btn-submit, .btn-main, .btn-closed {
@@ -18876,6 +18876,19 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
   border-collapse: separate;
   border-spacing: 0;
 }
+.common-table-container .table .table-light {
+  --bs-table-bg: #f6f7f9 !important;
+}
+.common-table-container .table .table-light tr th {
+  font-family: "Pretendard";
+  font-size: 16px;
+  line-height: 20px;
+  color: #414548;
+  font-weight: 600;
+  border: none;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
 .common-table-container .table .table-dark {
   --bs-table-bg: #121927b3 !important;
 }
@@ -18924,7 +18937,7 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
   font-weight: 700;
   font-size: 22px;
   line-height: 32px;
-  color: #505050;
+  color: #3c3c44;
 }
 .common-modal .modal-content .modal-header .close {
   padding: 0px;
@@ -18937,7 +18950,7 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
   font-weight: 700;
   font-size: 22px;
   line-height: 32px;
-  color: #505050;
+  color: #3c3c44;
 }
 .common-modal .modal-content .modal-body {
   padding-left: 0px;
@@ -19562,6 +19575,12 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
 .doctor-update-modal .card.bg-light {
   background-color: #f8fafc !important;
 }
+.doctor-update-modal h6, .doctor-update-modal .h6 {
+  color: #565c66;
+}
+.doctor-update-modal h6 i, .doctor-update-modal .h6 i {
+  color: #3c3c44;
+}
 
 .page-main .content-area {
   margin: 0 auto;
@@ -19719,7 +19738,7 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
   font-weight: 700;
   font-size: 20px;
   line-height: 32px;
-  color: #505050;
+  color: #3c3c44;
   padding-bottom: 10px;
   border-bottom: 1px solid #bdbdbd;
 }
@@ -19963,7 +19982,7 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
   font-weight: 700;
   font-size: 20px;
   line-height: 32px;
-  color: #505050;
+  color: #3c3c44;
   padding-bottom: 10px;
   border-bottom: 1px solid #bdbdbd;
 }
@@ -20594,6 +20613,9 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
 .page-qrcode-update .card-header {
   font-family: "PretendardBold";
 }
+.page-qrcode-update .card-header.text-white {
+  background-color: rgba(18, 25, 39, 0.7019607843);
+}
 .page-qrcode-update h5, .page-qrcode-update .h5, .page-qrcode-update h6, .page-qrcode-update .h6 {
   color: #565c66 !important;
 }
@@ -20664,6 +20686,18 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
 .consignment-update-modal .card.bg-light {
   background-color: #f8fafc !important;
 }
+.consignment-update-modal h6, .consignment-update-modal .h6 {
+  color: #565c66;
+}
+.consignment-update-modal h6 i, .consignment-update-modal .h6 i {
+  color: #3c3c44;
+}
+.consignment-update-modal .notice-section label {
+  color: #565c66;
+}
+.consignment-update-modal .notice-section label i {
+  color: #3c3c44;
+}
 .consignment-update-modal #deliveringAddressList .border {
   border-color: #f1f5f9 !important;
   transition: all 0.2s ease;
@@ -20696,6 +20730,9 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
 .home-sightseeing-update-modal .card.bg-light {
   background-color: #f8fafc !important;
 }
+.home-sightseeing-update-modal h5, .home-sightseeing-update-modal .h5, .home-sightseeing-update-modal h6, .home-sightseeing-update-modal .h6 {
+  color: #565c66;
+}
 .home-sightseeing-update-modal .homeImage {
   transition: transform 0.3s ease;
 }
@@ -20715,17 +20752,17 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
 #page-blockchain .transaction-card {
   margin-bottom: 20px;
 }
+#page-blockchain .sub-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #414548;
+  font-family: PretendardBold !important;
+}
 #page-blockchain .wallet-card {
   padding: 10px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-#page-blockchain .wallet-card .wallet-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #565c66;
-  font-family: PretendardBold !important;
 }
 #page-blockchain .wallet-card .wallet-info {
   padding: 10px 0;
@@ -20828,7 +20865,7 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
   font-weight: 700;
   font-size: 20px;
   line-height: 32px;
-  color: #505050;
+  color: #3c3c44;
   padding-bottom: 10px;
   border-bottom: 1px solid #bdbdbd;
 }
