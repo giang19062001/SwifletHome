@@ -30,18 +30,6 @@ export class TeamAppController {
   ) {}
 
   // TODO: TEAM
-  @ApiOperation({
-    summary:
-      'Kiểm tra trạng thái đăng ký nhóm ( chưa đăng ký sẽ trả về null ) ⚠️ API này tự động lấy userTypeCode từ token nhưng không còn chuyển đổi token cho xưởng kỹ thuật, đội gia công nữa nên API này sẽ bị xóa ⚠️',
-  })
-  @Get('checkAvailable')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(CheckAvailableTeamResDto) })
-  @ApiBadRequestResponse({ type: NullResponseDto })
-  async checkAvailable(@GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.teamUserAppService.checkAvailableTeam(user.userCode, user.userTypeKeyWord);
-    return result;
-  }
   @ApiOperation({ summary: 'Kiểm tra trạng thái đăng ký nhóm ( chưa đăng ký sẽ trả về null )', description: '**userTypeKeyWord**: enum(FACTORY, TECHNICAL)' })
   @Get('checkAvailable/:userTypeKeyWord')
   @HttpCode(HttpStatus.OK)
@@ -55,17 +43,6 @@ export class TeamAppController {
       });
     }
     const result = await this.teamUserAppService.checkAvailableTeam(user.userCode, userTypeKeyWord);
-    return result;
-  }
-
-  @ApiOperation({
-    summary: 'Lấy thông tin khởi tạo form đăng ký team ⚠️ API này tự động lấy userTypeCode từ token nhưng không còn chuyển đổi token cho xưởng kỹ thuật, đội gia công nữa nên API này sẽ bị xóa ⚠️',
-  })
-  @Get('getInitFormCreateTeam')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(InitFormCreateTeamAppResDto) })
-  async getInitFormCreateTeam(@GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.teamUserAppService.getInitFormCreateTeam(user.userTypeCode, user.userTypeKeyWord);
     return result;
   }
 

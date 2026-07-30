@@ -34,29 +34,6 @@ export class TeamUserAppService {
     return { total, list };
   }
 
-  async getInitFormCreateTeam(userTypeCode: string, userTypeKeyWord: string): Promise<InitFormCreateTeamAppResDto> {
-    const formUuid = uuidv4();
-    const teamFileTypes = await this.teamUserAppRepository.getTeamFileTypes(userTypeKeyWord);
-    const provinces = await this.provinceService.getAll();
-
-    const serviceOptions = await this.teamUserAppRepository.getTeamServiceTypes(userTypeKeyWord);
-    const services = serviceOptions.map((opt) => ({
-      serviceTypeCode: opt.serviceTypeCode,
-      serviceDescription: opt.serviceTypeName,
-      uniqueId: uuidv4(),
-    }));
-
-    return {
-      uniqueId: formUuid,
-      teamFileTypes,
-      services,
-      provinces: provinces.map((p) => ({
-        provinceCode: String(p.provinceCode),
-        provinceName: p.provinceName,
-      })),
-    };
-  }
-
   async getInitFormSubmitTeam(userCode: string, userTypeCode: string, userTypeKeyWord: string): Promise<InitFormCreateTeamAppResDto> {
     const draft = await this.teamUserAppRepository.getDraft(userCode, userTypeKeyWord);
     const formUuid = draft?.uniqueId || uuidv4();
