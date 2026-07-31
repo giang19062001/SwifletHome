@@ -15,6 +15,7 @@ import { TeamReviewAppService } from 'src/modules/team/app/team-review.service';
 import { TeamUserAppService } from 'src/modules/team/app/team-user.service';
 import { TodoAlarmAppService } from 'src/modules/todo/app/todo-alarm.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
+import { TraceabilityAppService } from 'src/modules/traceability/app/traceability.service';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
@@ -34,6 +35,7 @@ export class CornService implements OnModuleInit {
     private readonly todoAlarmAppService: TodoAlarmAppService,
     private readonly qrRequestAppService: QrRequestAppService,
     private readonly adsAdminService: AdsAdminService,
+    private readonly traceabilityAppService: TraceabilityAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
@@ -50,6 +52,7 @@ export class CornService implements OnModuleInit {
       await this.deleteTeamFilesNotUse();
       await this.deleteSaleHomeFilesNotUse();
       await this.deleteAdsFilesNotUse();
+      await this.deleteTraceabilityFilesNotUse();
       await this.deleteOrphanedLocalFiles();
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
@@ -364,6 +367,25 @@ export class CornService implements OnModuleInit {
       this.logger.log(logbase, `Hoàn tất dọn rác local. Đã xử lý ${deletedCount} file rác.`);
     } catch (error) {
       this.logger.error(logbase, `Lỗi trong quá trình quét đệ quy file rác: ${JSON.stringify(error)}`);
+    }
+  }
+
+  async deleteTraceabilityFilesNotUse() {
+    const logbase = `${this.SERVICE_NAME}/deleteTraceabilityFilesNotUse`;
+    this.logger.log(logbase, `Chuẩn bị xóa các file traceability không dùng theo lịch trình....`);
+    try {
+      const filesNotUse = await this.traceabilityAppService.getFilesNotUse();
+      if (filesNotUse.length) {
+        for (const file of filesNotUse) {
+          await this.traceabilityAppService.deleteFileCron(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file traceability không dùng đã được xóa thành công`);
+      } else {
+        this.logger.log(logbase, `Không có file traceability nào cần được xóa`);
+      }
+    } catch (error) {
+      this.logger.error(logbase, `Có lỗi khi xóa các file traceability không dùng theo lịch trình: ${JSON.stringify(error)}`);
     }
   }
 }

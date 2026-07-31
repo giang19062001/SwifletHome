@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { AUDIO_TYPES, IMG_TYPES, VIDEO_TYPES } from 'src/helpers/const.helper';
+import { AUDIO_TYPES, DOCS_TYPES, IMG_TYPES, VIDEO_TYPES } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -58,6 +58,8 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'images/reviews';
     } else if (fieldname.includes('qrcode')) {
       result = 'images/qrcodes';
+    } else if (fieldname.includes('traceabilityFiles')) {
+      result = 'images/trace';
     }
   } else if (mimetype.startsWith('video/')) {
     if (fieldname.includes('doctorFiles')) {
@@ -68,12 +70,18 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'videos/requestQrcodes';
     } else if (fieldname.includes('teamFiles') || fieldname.includes('teamServiceFiles')) {
       result = 'videos/teams';
+    } else if (fieldname.includes('traceabilityFiles')) {
+      result = 'videos/trace';
     }
   } else if (mimetype.startsWith('audio/')) {
     if (fieldname.includes('editorAudio')) {
       result = 'audios/editors';
     } else if (fieldname.includes('mediaAudio')) {
       result = 'audios/medias';
+    }
+  } else {
+    if (fieldname.includes('traceabilityFiles')) {
+      result = 'docs/trace';
     }
   }
 
@@ -138,3 +146,5 @@ export const multerVideoConfig = createMulterConfig(VIDEO_TYPES, {
 });
 
 export const getImgVideoMulterConfig = (files: number) => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES], { fileSize: FILE_SIZE_LIMITS.mix, files: files });
+
+export const getTraceabilityMulterConfig = (files: number) => createMulterConfig([...IMG_TYPES, ...VIDEO_TYPES, ...DOCS_TYPES], { fileSize: FILE_SIZE_LIMITS.mix, files: files });

@@ -10,6 +10,7 @@ export const ROUTER = {
 export const IMG_TYPES = ['.png', '.jpg', '.jpeg'];
 export const AUDIO_TYPES = ['.mp3'];
 export const VIDEO_TYPES = ['.mp4', '.mov', '.webm'];
+export const DOCS_TYPES = ['.pdf', '.doc', '.docx', '.xls', '.xlsx'];
 
 export const APP_SCREENS = {
   ACCOUNT_SCREEN: 'ACCOUNT_SCREEN',
@@ -121,5 +122,10 @@ export const CODES = {
     PRE: 'SLH',
     LEN: 6,
     FRIST_CODE: 'SLH000001',
+  },
+  traceabilityCode: {
+    PRE: 'TRC',
+    LEN: 6,
+    FRIST_CODE: 'TRC000001',
   },
 };

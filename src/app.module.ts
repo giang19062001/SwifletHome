@@ -66,6 +66,7 @@ import { UploadAdminModule } from './modules/upload/admin/upload.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
+import { TraceabilityAppModule } from './modules/traceability/app/traceability.module';
 
 @Module({
   imports: [
@@ -132,6 +133,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
     CheckoutAppModule,
     ShareAppModule,
     AdsAppModule,
+    TraceabilityAppModule,
     // front
     GuestModule,
     // eater - app
