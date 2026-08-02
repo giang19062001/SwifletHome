@@ -49,8 +49,8 @@ async function bootstrap() {
   app.set('trust proxy', true);
 
   // (CSS, JS, IMG), views , engine
-  app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.useStaticAssets(join(process.cwd(), 'public'));
+  app.setBaseViewsDir(join(process.cwd(), 'views'));
   app.setViewEngine('ejs');
   app.use(expressLayouts);
   app.set('layout', 'layout/layout'); // file layout (views/layout/layout.ejs)
