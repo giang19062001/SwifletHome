@@ -67,6 +67,7 @@ import { UserAdminModule } from './modules/user/admin/user.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { TraceabilityAppModule } from './modules/traceability/app/traceability.module';
+import { TraceabilityAdminModule } from './modules/traceability/admin/traceability.module';
 
 @Module({
   imports: [
@@ -161,6 +162,7 @@ import { TraceabilityAppModule } from './modules/traceability/app/traceability.m
     GuestAdminModule,
     ReportAdminModule,
     AdsAdminModule,
+    TraceabilityAdminModule,
   ],
   controllers: [AppController],
   providers: [

@@ -12,6 +12,7 @@ import { ScreenAdminService } from './modules/screen/admin/screen.service';
 import { TeamAdminService } from './modules/team/admin/team.service';
 import { TodoAdminService } from './modules/todo/admin/todo.service';
 import { UserAdminService } from './modules/user/admin/user.service';
+import { TraceabilityAdminService } from './modules/traceability/admin/traceability.service';
 
 @Injectable()
 export class AppService {
@@ -28,6 +29,7 @@ export class AppService {
     private readonly qrAdminService: QrAdminService,
     private readonly userAdminService: UserAdminService,
     private readonly optionService: OptionService,
+    private readonly traceabilityAdminService: TraceabilityAdminService,
   ) {}
 
   async renderAnswerCreate(): Promise<any> {
@@ -241,6 +243,13 @@ export class AppService {
     const transactions = await this.qrAdminService.getBlockchainTransactions();
     return {
       transactions: transactions,
+    };
+  }
+
+  async renderTraceabilityQrcodeGlobal(traceabilityId: string): Promise<any> {
+    const data = await this.traceabilityAdminService.getFormForGlobalView(traceabilityId);
+    return {
+      traceData: data,
     };
   }
 }

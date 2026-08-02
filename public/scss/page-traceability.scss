@@ -1,0 +1,202 @@
+.page-qrcode-update {
+  --bs-primary: #71AB33;
+  --bs-primary-rgb: 113, 171, 51;
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #2b2b2b;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+
+  .trace-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  // Optimize cards for mobile
+  .card {
+    border-radius: 12px !important;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef !important;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+  }
+
+  .card-header {
+    border-top-left-radius: 12px !important;
+    border-top-right-radius: 12px !important;
+    padding: 16px !important;
+    background-color: #ffffff;
+    border-bottom: 1px solid #f1f3f5 !important;
+  }
+
+  .card-body {
+    padding: 16px !important;
+  }
+
+  // Home Info Section
+  .info-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .icon-box {
+    background-color: rgba(113, 171, 51, 0.08) !important;
+    color: #71AB33 !important;
+    border-radius: 10px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // Form Section
+  .form-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #1a1a1a;
+  }
+
+  .form-description {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  // Field styling - very clear and readable for mobile
+  .field-container {
+    background-color: #fafbfc !important;
+    border: 1px solid #eef1f5 !important;
+    border-left: 4px solid #71AB33 !important;
+    border-radius: 8px;
+    padding: 14px 16px !important;
+    margin-bottom: 10px;
+    height: 100%;
+
+    .field-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #6c757d;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .field-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #212529;
+      word-break: break-word;
+      line-height: 1.4;
+    }
+  }
+
+  // Group title
+  .group-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #71AB33 !important;
+    border-bottom: 2px solid rgba(113, 171, 51, 0.15);
+    padding-bottom: 6px;
+    margin-top: 20px;
+    margin-bottom: 14px;
+  }
+
+  .text-primary {
+    color: #71AB33 !important;
+  }
+
+  .bg-primary {
+    background-color: #71AB33 !important;
+  }
+
+  .border-primary {
+    border-color: #71AB33 !important;
+  }
+
+  .btn-outline-primary {
+    color: #71AB33 !important;
+    border-color: #71AB33 !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #71AB33 !important;
+      color: #fff !important;
+    }
+  }
+
+  // Badge Custom styling
+  .badge {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    padding: 8px 14px !important;
+    border-radius: 8px !important;
+  }
+}
+
+// Media Query for mobile screen optimization
+@media (max-width: 576px) {
+  .page-qrcode-update {
+    padding-top: 16px !important;
+    padding-bottom: 30px !important;
+
+    .trace-container {
+      padding-left: 6px !important;
+      padding-right: 6px !important;
+    }
+
+    .card {
+      border-radius: 12px !important;
+      margin-bottom: 16px;
+    }
+
+    .card-header {
+      padding: 14px 12px !important;
+    }
+
+    .card-body {
+      padding: 14px 12px !important;
+    }
+
+    .icon-box {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+    }
+
+    .field-container {
+      padding: 12px 14px !important;
+      margin-bottom: 8px;
+    }
+
+    .field-label {
+      font-size: 0.8rem;
+      margin-bottom: 2px;
+    }
+
+    .field-value {
+      font-size: 0.975rem;
+    }
+
+    .form-title {
+      font-size: 1.1rem;
+    }
+
+    .group-title {
+      font-size: 0.95rem;
+      margin-top: 16px;
+      margin-bottom: 10px;
+    }
+  }
+}

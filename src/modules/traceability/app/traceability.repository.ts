@@ -10,17 +10,18 @@ export class TraceabilityAppRepository {
   private readonly tableFields = 'tbl_traceability_forms_fields';
   private readonly tableSubmissions = 'tbl_traceability_submissions';
   private readonly tableFile = 'tbl_traceability_file';
+  private readonly tableUserHome = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getFormByKey(formKey: string): Promise<RowDataPacket | null> {
-    const sql = `SELECT seq, formKey, formName FROM ${this.tableForms} WHERE formKey = ? AND isActive = 'Y' LIMIT 1`;
+    const sql = `SELECT seq, formKey, formName, formDescription FROM ${this.tableForms} WHERE formKey = ? AND isActive = 'Y' LIMIT 1`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [formKey]);
     return rows[0] || null;
   }
 
   async getAllForms(): Promise<RowDataPacket[]> {
-    const sql = `SELECT seq, formKey, formName, sortOrder FROM ${this.tableForms} WHERE isActive = 'Y' ORDER BY sortOrder ASC`;
+    const sql = `SELECT seq, formKey, formName, formDescription, sortOrder FROM ${this.tableForms} WHERE isActive = 'Y' ORDER BY sortOrder ASC`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql);
     return rows;
   }
@@ -49,7 +50,7 @@ export class TraceabilityAppRepository {
 
   async getSubmissionByCode(traceabilityCode: string, userHomeCode?: string): Promise<RowDataPacket | null> {
     let sql = `
-      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status 
+      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId 
       FROM ${this.tableSubmissions} 
       WHERE traceabilityCode = ? AND isActive = 'Y'
     `;
@@ -65,7 +66,7 @@ export class TraceabilityAppRepository {
 
   async getSubmissionByUserHomeForm(userCode: string, userHomeCode: string, formSeq: number): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status 
+      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId 
       FROM ${this.tableSubmissions} 
       WHERE userCode = ? AND userHomeCode = ? AND formSeq = ? AND isActive = 'Y' 
       LIMIT 1
@@ -127,13 +128,30 @@ export class TraceabilityAppRepository {
     return traceabilityCode;
   }
 
-  async insertSubmission(traceabilityCode: string, formSeq: number, userCode: string, userHomeCode: string, formData: string, uniqueId: string, createdId: string): Promise<number> {
+  async getUserHomeProvince(userHomeCode: string): Promise<string | null> {
+    const sql = `SELECT userHomeProvince FROM ${this.tableUserHome} WHERE userHomeCode = ? AND isActive = 'Y' LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userHomeCode]);
+    return rows[0]?.userHomeProvince || null;
+  }
+
+  async insertSubmission(
+    traceabilityCode: string,
+    formSeq: number,
+    userCode: string,
+    userHomeCode: string,
+    formData: string,
+    uniqueId: string,
+    status: string,
+    qrUrl: string | null,
+    traceabilityId: string,
+    createdId: string,
+  ): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableSubmissions} 
-        (traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, createdId) 
-      VALUES (?, ?, ?, ?, ?, ?, 'WAITING', ?)
+        (traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId, createdId) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId, createdId]);
     return result.insertId;
   }
 

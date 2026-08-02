@@ -1,0 +1,188 @@
+<% if (values && values.traceData) { %>
+<div class="page-qrcode-update py-4">
+    <div class="trace-container">
+        <!-- Thông tin chung của nhà yến -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm overflow-hidden">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h4 class="mb-0 fw-bold d-flex align-items-center">
+                            <i class="fa fa-home me-2"></i> Thông tin cơ sở chính
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box bg-light text-primary p-3 rounded me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa fa-qrcode fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Mã Truy xuất nguồn gốc:</div>
+                                        <div class="fw-bold text-break"><%= values.traceData.traceabilityId %></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box bg-light text-primary p-3 rounded me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa fa-home fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Tên nhà yến:</div>
+                                        <div class="fw-bold"><%= values.traceData.homeInfo.userHomeName %></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box bg-light text-primary p-3 rounded me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa fa-user fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Chủ sở hữu:</div>
+                                        <div class="fw-bold"><%= values.traceData.homeInfo.userName %></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box bg-light text-primary p-3 rounded me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa fa-map-marker-alt fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Địa chỉ sản xuất:</div>
+                                        <div class="fw-bold"><%= values.traceData.homeInfo.userHomeAddress %></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Các biểu mẫu truy xuất nguồn gốc -->
+        <div class="card border-0 shadow-sm overflow-hidden mb-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="fa fa-file-alt me-2"></i> Nhật ký biểu mẫu truy xuất nguồn gốc
+                </h4>
+            </div>
+            <div class="card-body bg-light p-3">
+                <div class="row g-3">
+                    <% values.traceData.forms.forEach((form, idx) => { %>
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm overflow-hidden h-100 mb-3">
+                                <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                    <div>
+                                        <h5 class="form-title mb-1">
+                                            <%= idx + 1 %>. <%= form.formName %>
+                                        </h5>
+                                        <% if (form.formDescription) { %>
+                                            <p class="form-description mb-0"><%= form.formDescription %></p>
+                                        <% } %>
+                                    </div>
+                                    <% if (form.hasData) { %>
+                                        <span class="badge py-2 px-3 rounded-pill text-uppercase 
+                                            <%= form.submission.status === 'APPROVED' ? 'bg-success' : (form.submission.status === 'REFUSED' ? 'bg-danger' : 'bg-warning text-dark') %>">
+                                            <i class="fa 
+                                                <%= form.submission.status === 'APPROVED' ? 'fa-check-circle' : (form.submission.status === 'REFUSED' ? 'fa-times-circle' : 'fa-spinner fa-spin') %> me-1"></i>
+                                            <%= form.submission.statusLabel %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary py-2 px-3 rounded-pill text-uppercase">
+                                            <i class="fa fa-info-circle me-1"></i> Chưa có dữ liệu
+                                        </span>
+                                    <% } %>
+                                </div>
+                                <div class="card-body">
+                                    <% if (form.hasData) { %>
+                                        <div class="row g-3">
+                                            <% form.submission.groups.forEach(group => { %>
+                                                <div class="col-12">
+                                                    <h6 class="group-title">
+                                                        <i class="fa fa-caret-right me-1"></i> <%= group.groupName %>
+                                                    </h6>
+                                                    <div class="row g-2">
+                                                        <% group.fields.forEach(field => { %>
+                                                            <div class="col-md-6 col-12">
+                                                                <div class="field-container">
+                                                                    <div class="field-label"><%= field.fieldName %></div>
+                                                                    <div class="field-value">
+                                                                        <% if (field.fieldType === 'file_single') { %>
+                                                                            <% if (field.currentValue && field.currentValue.url) { %>
+                                                                                <% const isImg = field.currentValue.url.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                                <% if (isImg) { %>
+                                                                                    <a href="/<%= field.currentValue.url %>" target="_blank" class="d-inline-block mt-2">
+                                                                                        <img src="/<%= field.currentValue.url %>" class="img-thumbnail rounded shadow-sm" style="max-height: 120px;" alt="<%= field.fieldName %>">
+                                                                                    </a>
+                                                                                <% } else { %>
+                                                                                    <a href="/<%= field.currentValue.url %>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                                                                        <i class="fa fa-file-download me-1"></i> Tải tài liệu
+                                                                                    </a>
+                                                                                <% } %>
+                                                                            <% } else { %>
+                                                                                <span class="text-muted small">Chưa có tệp đính kèm</span>
+                                                                            <% } %>
+                                                                        <% } else if (field.fieldType === 'file_multiple') { %>
+                                                                            <% if (field.currentValue && field.currentValue.length > 0) { %>
+                                                                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                                                                    <% field.currentValue.forEach(file => { %>
+                                                                                        <% const isImg = file.url.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                                        <% if (isImg) { %>
+                                                                                            <a href="/<%= file.url %>" target="_blank" class="d-inline-block">
+                                                                                                <img src="/<%= file.url %>" class="img-thumbnail rounded shadow-sm" style="max-height: 80px;" alt="<%= field.fieldName %>">
+                                                                                            </a>
+                                                                                        <% } else { %>
+                                                                                            <a href="/<%= file.url %>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                                                <i class="fa fa-file-download me-1"></i> Tải file
+                                                                                            </a>
+                                                                                        <% } %>
+                                                                                    <% }) %>
+                                                                                </div>
+                                                                            <% } else { %>
+                                                                                <span class="text-muted small">Chưa có tệp đính kèm</span>
+                                                                            <% } %>
+                                                                        <% } else { %>
+                                                                            <% if (field.currentValue !== null && field.currentValue !== undefined && field.currentValue !== '') { %>
+                                                                                <% if (Array.isArray(field.currentValue)) { %>
+                                                                                    <span><%= field.currentValue.join(', ') %></span>
+                                                                                <% } else { %>
+                                                                                    <span><%= field.currentValue %></span>
+                                                                                <% } %>
+                                                                            <% } else { %>
+                                                                                <span class="text-muted small">Chưa nhập thông tin</span>
+                                                                            <% } %>
+                                                                        <% } %>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        <% }) %>
+                                                    </div>
+                                                </div>
+                                            <% }) %>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="alert alert-light border text-center py-4 mb-0">
+                                            <i class="fa fa-info-circle text-muted me-2"></i> Chưa có dữ liệu ghi nhận cho biểu mẫu này.
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% } else { %>
+<div class="trace-container py-5">
+    <div class="alert alert-warning text-center shadow-sm">
+        <i class="fa fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
+        <h4>Không tìm thấy dữ liệu Truy xuất nguồn gốc</h4>
+        <p class="mb-0 text-muted">Vui lòng kiểm tra lại liên kết hoặc mã QR của bạn.</p>
+    </div>
+</div>
+<% } %>

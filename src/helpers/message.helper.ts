@@ -59,6 +59,7 @@ export const Msg = {
   // Người dùng / Nhà yến
   UserNotFound: notFound('Người dùng'),
   HomeNotFound: notFound('Thông tin nhà yến'),
+  FormNotFound: notFound('Biểu mẫu'),
   HomeIsMainCannotDelete: cannotDo('nhà yến đang được chọn là chính'),
   HomeAlreadyRegistered: 'Dữ liệu này đã được tạo trước đó',
 

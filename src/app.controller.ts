@@ -465,6 +465,23 @@ export class AppController {
       values: values,
     };
   }
+
+  @Get('/traceability-qrcode-global/:traceabilityId')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/traceability-qrcode-global')
+  async renderTraceabilityQrcodeGlobal(@Req() req: Request) {
+    let traceabilityId = req.params.traceabilityId || '';
+    if (traceabilityId.toLowerCase().endsWith('.png')) {
+      traceabilityId = traceabilityId.slice(0, -4);
+    }
+    const values = await this.appService.renderTraceabilityQrcodeGlobal(traceabilityId);
+    return {
+      title: 'Truy xuất nguồn gốc sản phẩm',
+      isLayout: false,
+      user: req.session.user,
+      values: values,
+    };
+  }
   //guest
   @Get('/dashboard/guest')
   @UseGuards(PageAuthAdminGuard)

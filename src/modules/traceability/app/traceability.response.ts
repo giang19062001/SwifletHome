@@ -9,6 +9,9 @@ export class TraceabilityFormSimpleResDto {
 
   @ApiProperty({ example: 'Nhật ký thu hoạch' })
   formName!: string;
+
+  @ApiProperty({ example: 'Mô tả ngắn gọn về biểu mẫu', required: false })
+  formDescription?: string;
 }
 
 export class TraceabilityFileItemResDto {
@@ -71,6 +74,21 @@ export class TraceabilityFormResDto {
 
   @ApiProperty({ example: 'Nhật ký thu hoạch' })
   formName!: string;
+
+  @ApiProperty({ example: 'Mô tả ngắn gọn về biểu mẫu', required: false })
+  formDescription?: string;
+
+  @ApiProperty({ example: 'uploads/images/traceQrcodes/3FAM-NY-92-HOM000001.png', required: false })
+  qrUrl?: string;
+
+  @ApiProperty({ example: '3FAM-NY-92-HOM000001', required: false })
+  traceabilityId?: string;
+
+  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED'] })
+  status!: string;
+
+  @ApiProperty({ example: 'Đang xử lý' })
+  statusLabel!: string;
 
   @ApiProperty({ type: [TraceabilityGroupResDto] })
   groups!: TraceabilityGroupResDto[];

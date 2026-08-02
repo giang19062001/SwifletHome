@@ -2,9 +2,16 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { v4 as uuidv4 } from 'uuid';
+import { existsSync, mkdirSync } from 'fs';
+import * as path from 'path';
+import * as QRCode from 'qrcode';
 import { GetFormDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
 import { TraceabilityAppRepository } from './traceability.repository';
 import { TraceabilityFormResDto, TraceabilityGroupResDto, TraceabilityFieldResDto, UploadTraceabilityFileResDto } from './traceability.response';
+import { generateTraceabilityId, generateTraceabilityQr, generateTraceabilityQrLink } from './traceability.func';
+import { TraceabilityStatusEnum } from './traceability.enum';
+import { TRACE_CONST } from './traceability.const';
+import { Msg } from 'src/helpers/message.helper';
 
 @Injectable()
 export class TraceabilityAppService {
@@ -13,19 +20,20 @@ export class TraceabilityAppService {
     private readonly fileLocalService: FileLocalService,
   ) {}
 
-  async getAllForms(): Promise<{ seq: number; formKey: string; formName: string }[]> {
+  async getAllForms(): Promise<{ seq: number; formKey: string; formName: string; formDescription: string | null }[]> {
     const rows = await this.repository.getAllForms();
     return rows.map((r) => ({
       seq: r.seq,
       formKey: r.formKey,
       formName: r.formName,
+      formDescription: r.formDescription || '',
     }));
   }
 
   async getForm(dto: GetFormDto, userCode: string): Promise<TraceabilityFormResDto> {
     const form = await this.repository.getFormByKey(dto.formKey);
     if (!form) {
-      throw new BadRequestException({ message: `Form key '${dto.formKey}' không tồn tại.`, data: null });
+      throw new BadRequestException({ message: Msg.FormNotFound, data: null });
     }
 
     const groups = await this.repository.getGroupsByFormSeq(form.seq);
@@ -35,17 +43,43 @@ export class TraceabilityAppService {
     let traceabilityCode: string | null = null;
     let savedData: any = null;
     let files: any[] = [];
+    let qrUrl: string | null = null;
+    let traceabilityId: string | null = null;
+    let status = 'PROCESSING';
+
+    const provinceCode = await this.repository.getUserHomeProvince(dto.userHomeCode);
+    if (!provinceCode) {
+      throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
+    }
+
+    traceabilityId = generateTraceabilityId(provinceCode, dto.userHomeCode);
 
     const submission = await this.repository.getSubmissionByUserHomeForm(userCode, dto.userHomeCode, form.seq);
     if (submission) {
       uniqueId = submission.uniqueId;
       traceabilityCode = submission.traceabilityCode;
       files = await this.repository.getFilesByUniqueId(uniqueId);
+      qrUrl = submission.qrUrl || null;
+      status = submission.status || 'PROCESSING';
       try {
         savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
       } catch (e) {
         savedData = null;
       }
+    }
+
+    if (!qrUrl) {
+      qrUrl = generateTraceabilityQr(provinceCode, dto.userHomeCode);
+      const dirPath = path.join(process.cwd(), 'public', TRACE_CONST.QR_CODE_PATH);
+      if (!existsSync(dirPath)) {
+        mkdirSync(dirPath, { recursive: true });
+      }
+      const fullPath = path.join(dirPath, `${traceabilityId}.png`);
+      const targetUrl = generateTraceabilityQrLink(provinceCode, dto.userHomeCode);
+      await QRCode.toFile(fullPath, targetUrl, {
+        width: 300,
+        margin: 1,
+      });
     }
 
     // Map fields to groups
@@ -104,6 +138,11 @@ export class TraceabilityAppService {
     response.uniqueId = uniqueId;
     response.formKey = form.formKey;
     response.formName = form.formName;
+    response.formDescription = form.formDescription || null;
+    response.qrUrl = qrUrl;
+    response.traceabilityId = traceabilityId;
+    response.status = status;
+    response.statusLabel = TRACE_CONST.STATUS[status]?.text || '';
     response.groups = mappedGroups;
     if (traceabilityCode) {
       response.traceabilityCode = traceabilityCode;
@@ -159,7 +198,17 @@ export class TraceabilityAppService {
 
     // Tạo mới form
     const traceabilityCode = await this.repository.generateTraceabilityCode();
-    const insertId = await this.repository.insertSubmission(traceabilityCode, dto.formSeq, userCode, dto.userHomeCode, formDataStr, dto.uniqueId, userCode);
+
+    const provinceCode = await this.repository.getUserHomeProvince(dto.userHomeCode);
+    if (!provinceCode) {
+      throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
+    }
+
+    const traceabilityId = generateTraceabilityId(provinceCode, dto.userHomeCode);
+    const qrUrl = generateTraceabilityQr(provinceCode, dto.userHomeCode);
+    const status = TraceabilityStatusEnum.PROCESSING;
+
+    const insertId = await this.repository.insertSubmission(traceabilityCode, dto.formSeq, userCode, dto.userHomeCode, formDataStr, dto.uniqueId, status, qrUrl, traceabilityId, userCode);
 
     if (insertId) {
       await this.repository.bindFilesToSubmission(insertId, dto.uniqueId, userCode);
