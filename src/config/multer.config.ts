@@ -59,7 +59,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     } else if (fieldname.includes('qrcode')) {
       result = 'images/qrcodes';
     } else if (fieldname.includes('traceabilityFiles')) {
-      result = 'images/trace';
+      result = 'images/traces';
     }
   } else if (mimetype.startsWith('video/')) {
     if (fieldname.includes('doctorFiles')) {
@@ -71,7 +71,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     } else if (fieldname.includes('teamFiles') || fieldname.includes('teamServiceFiles')) {
       result = 'videos/teams';
     } else if (fieldname.includes('traceabilityFiles')) {
-      result = 'videos/trace';
+      result = 'videos/traces';
     }
   } else if (mimetype.startsWith('audio/')) {
     if (fieldname.includes('editorAudio')) {
@@ -81,7 +81,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     }
   } else {
     if (fieldname.includes('traceabilityFiles')) {
-      result = 'docs/trace';
+      result = 'docs/traces';
     }
   }
 

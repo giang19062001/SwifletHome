@@ -7,7 +7,6 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
-import { ImageOptimizerInterceptor } from 'src/interceptors/image-optimizer.interceptor';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
@@ -88,7 +87,7 @@ export class TeamReviewAppController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadReviewFilesDto })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('reviewImg', 5, multerImgConfig), ImageOptimizerInterceptor)
+  @UseInterceptors(FilesInterceptor('reviewImg', 5, multerImgConfig))
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadReviewFilesResDto]) })
   async uploadReviewFiles(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadReviewFilesDto, @UploadedFiles() reviewImgs: Express.Multer.File[]) {

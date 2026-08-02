@@ -9,7 +9,6 @@ import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/c
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ImageOptimizerInterceptor } from 'src/interceptors/image-optimizer.interceptor';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { USER_CONST } from 'src/modules/user/app/user.const';
@@ -206,7 +205,7 @@ export default class QrAppController {
     type: UploadRequestVideoDto,
   })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('requestQrcodeFiles', 5, getImgVideoMulterConfig(5)), ImageOptimizerInterceptor, VideoConverterInterceptor)
+  @UseInterceptors(FilesInterceptor('requestQrcodeFiles', 5, getImgVideoMulterConfig(5)), VideoConverterInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadRequestVideoResDto]) })
   async uploadRequestFile(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadRequestVideoDto, @UploadedFiles() requestQrcodeFiles: Express.Multer.File[]) {

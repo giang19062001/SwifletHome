@@ -8,7 +8,6 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
-import { ImageOptimizerInterceptor } from 'src/interceptors/image-optimizer.interceptor';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { UserAppService } from 'src/modules/user/app/user.service';
@@ -165,7 +164,7 @@ Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uui
     description: `Dùng cho cả */api/app/user/createHome* và */api/app/user/updateHome* `,
   })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FileInterceptor('userHomeImage', multerImgConfig), ImageOptimizerInterceptor)
+  @UseInterceptors(FileInterceptor('userHomeImage', multerImgConfig))
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(UserHomeImageResDto) })
   async uploadHomeImage(@GetUserApp() user: TokenUserAppResDto, @Body() dto: UploadUserHomeImageDto, @UploadedFile() userHomeImage: Express.Multer.File) {

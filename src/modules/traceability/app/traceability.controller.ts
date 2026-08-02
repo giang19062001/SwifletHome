@@ -7,7 +7,6 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
-import { ImageOptimizerInterceptor } from 'src/interceptors/image-optimizer.interceptor';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
@@ -62,7 +61,7 @@ export class TraceabilityAppController {
   @ApiBody({ type: UploadTraceabilityFilesDto })
   @ApiOkResponse({ type: ApiAppResponseDto([UploadTraceabilityFileResDto]) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  @UseInterceptors(FilesInterceptor('traceabilityFiles', 5, getTraceabilityMulterConfig(5)), ImageOptimizerInterceptor, VideoConverterInterceptor)
+  @UseInterceptors(FilesInterceptor('traceabilityFiles', 5, getTraceabilityMulterConfig(5)), VideoConverterInterceptor)
   async uploadFiles(@Body() dto: UploadTraceabilityFilesDto, @GetUserApp() user: TokenUserAppResDto, @UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) {
       throw new BadRequestException({ message: Msg.FileEmpty, data: null });

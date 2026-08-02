@@ -6,7 +6,6 @@ import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NumberOkResponseDto } from 'src/dto/common.dto';
 import { MulterBadRequestFilter } from 'src/filter/uploadError.filter';
 import { Msg } from 'src/helpers/message.helper';
-import { ImageOptimizerInterceptor } from 'src/interceptors/image-optimizer.interceptor';
 import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
@@ -55,7 +54,7 @@ export class DoctorAppController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: DoctorFileDto })
   @UseFilters(MulterBadRequestFilter)
-  @UseInterceptors(FilesInterceptor('doctorFiles', 5, getImgVideoMulterConfig(5)), ImageOptimizerInterceptor, VideoConverterInterceptor)
+  @UseInterceptors(FilesInterceptor('doctorFiles', 5, getImgVideoMulterConfig(5)), VideoConverterInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([UploadFileDoctorResDto]) })
   async uploadRequestFile(@GetUserApp() user: TokenUserAppResDto, @Body() dto: DoctorFileDto, @UploadedFiles() doctorFiles: Express.Multer.File[]) {

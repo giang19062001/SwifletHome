@@ -15,7 +15,7 @@ export class TraceabilityFileItemResDto {
   @ApiProperty({ example: 1 })
   seq!: number;
 
-  @ApiProperty({ example: 'uploads/images/trace/trace-xxx.jpg' })
+  @ApiProperty({ example: 'uploads/images/traces/trace-xxx.jpg' })
   url!: string;
 
   @ApiProperty({ example: 'giay_CN.jpg' })
@@ -80,7 +80,7 @@ export class UploadTraceabilityFileResDto {
   @ApiProperty({ example: 15 })
   seq!: number;
 
-  @ApiProperty({ example: 'uploads/images/traceability/trace-xxx.jpg' })
+  @ApiProperty({ example: 'uploads/images/traces/trace-xxx.jpg' })
   url!: string;
 
   @ApiProperty({ example: 'image/jpeg' })
