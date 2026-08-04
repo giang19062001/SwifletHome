@@ -284,16 +284,20 @@ export class TraceabilityAppService {
 
         if (!qrUrl) {
           qrUrl = generateTraceabilityQr(userCode, userHomeCode);
+
+          // kiểm tra QR code đã tồn tại chưa, nếu chưa thì tạo mới
           const dirPath = path.join(process.cwd(), 'public', TRACE_CONST.QR_CODE_PATH);
-          if (!existsSync(dirPath)) {
-            mkdirSync(dirPath, { recursive: true });
-          }
           const fullPath = path.join(dirPath, `${traceabilityId}.png`);
-          const targetUrl = generateTraceabilityQrLink(userCode, userHomeCode);
-          await QRCode.toFile(fullPath, targetUrl, {
-            width: 300,
-            margin: 1,
-          });
+          if (!existsSync(fullPath)) {
+            if (!existsSync(dirPath)) {
+              mkdirSync(dirPath, { recursive: true });
+            }
+            const targetUrl = generateTraceabilityQrLink(userCode, userHomeCode);
+            await QRCode.toFile(fullPath, targetUrl, {
+              width: 300,
+              margin: 1,
+            });
+          }
         }
 
         return {
