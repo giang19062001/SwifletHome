@@ -24,7 +24,11 @@ export enum RequestStatusEnum {
 
 export enum RequestSellStatusEnum {
   SOLD = 'SOLD',
-  PURCHARSER = 'PURCHARSER',
+  PURCHASED = 'PURCHASED',
+  DELIVERING = 'DELIVERING',
+  PROCESSING = 'PROCESSING',
+  PACKING = 'PACKING',
+  RECALL = 'RECALL',
 }
 
 export enum FetchSellingByEnum {
