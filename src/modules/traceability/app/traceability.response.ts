@@ -104,3 +104,32 @@ export class UploadTraceabilityFileResDto {
   @ApiProperty({ example: 'image/jpeg' })
   mimetype!: string;
 }
+
+export class TraceabilityHouseInfoResDto {
+  @ApiProperty({ example: 'USR000001' })
+  userCode!: string;
+
+  @ApiProperty({ example: 'HOM000001' })
+  userHomeCode!: string;
+
+  @ApiProperty({ example: 'Nhà yến Cần Giờ 1' })
+  userHomeName!: string;
+
+  @ApiProperty({ example: 'Số 12 Đường số 5, Cần Giờ, TP.HCM' })
+  userHomeAddress!: string;
+
+  @ApiProperty({ example: 'uploads/images/traceQrcodes/3FAM-NY-92-HOM000001.png' })
+  qrUrl!: string;
+
+  @ApiProperty({ example: '3FAM-NY-92-HOM000001' })
+  traceabilityId!: string;
+
+  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED'] })
+  status!: string;
+
+  @ApiProperty({ example: 'Đang xử lý' })
+  statusLabel!: string;
+
+  @ApiProperty({ example: 'N', enum: ['Y', 'N'] })
+  isMain!: string;
+}

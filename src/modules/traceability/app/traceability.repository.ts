@@ -190,4 +190,33 @@ export class TraceabilityAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(sql);
     return rows as { seq: number; filename: string }[];
   }
+
+  async getDynamicOptions(sql: string, userCode: string, userHomeCode: string): Promise<RowDataPacket[]> {
+    const values: any[] = [];
+    const parsedSql = sql.replace(/:([a-zA-Z0-9_]+)/g, (match, key) => {
+      if (key === 'userCode') {
+        values.push(userCode);
+        return '?';
+      }
+      if (key === 'userHomeCode') {
+        values.push(userHomeCode);
+        return '?';
+      }
+      return match;
+    });
+
+    const [rows] = await this.db.execute<RowDataPacket[]>(parsedSql, values);
+    return rows;
+  }
+
+  async getUserHouses(userCode: string): Promise<RowDataPacket[]> {
+    const sql = `
+      SELECT userCode, userHomeCode, userHomeName, userHomeAddress, userHomeProvince, isMain 
+      FROM ${this.tableUserHome} 
+      WHERE userCode = ? AND isActive = 'Y'
+      ORDER BY isMain DESC
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode]);
+    return rows;
+  }
 }

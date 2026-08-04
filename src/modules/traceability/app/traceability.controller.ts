@@ -11,7 +11,7 @@ import { VideoConverterInterceptor } from 'src/interceptors/video-converter.inte
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { GetFormDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
-import { TraceabilityFormResDto, TraceabilityFormSimpleResDto, UploadTraceabilityFileResDto } from './traceability.response';
+import { TraceabilityFormResDto, TraceabilityFormSimpleResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto } from './traceability.response';
 import { TraceabilityAppService } from './traceability.service';
 
 @ApiTags('app/traceability')
@@ -45,6 +45,21 @@ export class TraceabilityAppController {
   @ApiOkResponse({ type: ApiAppResponseDto(TraceabilityFormResDto) })
   async getForm(@Query() query: GetFormDto, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.service.getForm(query, user.userCode);
+    return {
+      message: Msg.GetOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Lấy thông tin truy xuất nguồn gốc của từng nhà yến thuộc người dùng',
+    description: 'Trả về danh sách đối tượng chứa thông tin cơ bản và trạng thái truy xuất nguồn gốc của từng nhà yến hiện có của user.',
+  })
+  @Get('getTraceInfoEachHouse')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto([TraceabilityHouseInfoResDto]) })
+  async getTraceInfoEachHouse(@GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.service.getTraceInfoEachHouse(user.userCode);
     return {
       message: Msg.GetOk,
       data: result,
