@@ -4,7 +4,7 @@ import { PagingDto } from 'src/dto/admin.dto';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { QR_CODE_CONST } from '../common/qr.const';
-import { RequestStatusEnum } from '../common/qr.enum';
+import { RequestStatusEnum, RequestSellStatusEnum } from '../common/qr.enum';
 import { GetApprovedRequestQrCodeResDto, GetRequestQrCodeDetailResDto, GetRequestQrCodeListResDto, QrRequestFileResDto, RequestQrCodeResDto, ValidateHarvestItemResDto } from './qr.response';
 
 @Injectable()
@@ -52,7 +52,7 @@ export class QrRequestAppRepository {
         ELSE ''
       END AS requestStatusLabel,
        CASE
-          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' AND D.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
           ELSE 'N'
       END AS isSold
       FROM ${this.table}  A
@@ -95,7 +95,7 @@ export class QrRequestAppRepository {
         ELSE ''
       END AS requestStatusLabel,
        CASE
-          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' AND D.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
           ELSE 'N'
       END AS isSold
       FROM ${this.table}  A
@@ -145,7 +145,7 @@ export class QrRequestAppRepository {
           JSON_ARRAY()
         ) AS requestQrcodeFiles, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
        CASE
-          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' AND D.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
           ELSE 'N'
       END AS isSold
       FROM ${this.table}  A 
@@ -193,7 +193,7 @@ export class QrRequestAppRepository {
           JSON_ARRAY()
         ) AS requestQrcodeFiles, IFNULL(C.qrCodeUrl,'') AS qrCodeUrl,
        CASE
-          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+          WHEN D.seq IS NOT NULL AND D.isActive = 'Y' AND D.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
           ELSE 'N'
       END AS isSold,
       D.priceOptionCode,

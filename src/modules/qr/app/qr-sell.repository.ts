@@ -34,7 +34,7 @@ export class QrSellAppRepository {
   async checkIsApprovedAndIsSold(requestCode: string): Promise<{ seq: number; isSold: YnEnum } | null> {
     const query = ` SELECT A.seq,
          CASE
-            WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+            WHEN D.seq IS NOT NULL AND D.isActive = 'Y' AND D.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
             ELSE 'N'
         END AS isSold
         FROM ${this.table}  A 
@@ -55,7 +55,7 @@ export class QrSellAppRepository {
     // prettier-ignore
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       userCode, dto.requestCode, dto.userName,  dto.userPhone, dto.priceOptionCode, 0, dto.priceForPurchaser, dto.priceForEater, priceVatHistory ? JSON.stringify(priceVatHistory) : null, dto.volumeForSell,
-      dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, RequestSellStatusEnum.WAITING, userCode,
+      dto.nestQuantity,  dto.humidity,  dto.ingredientNestOptionCode, RequestSellStatusEnum.SOLD, userCode,
     ]);
 
     return result.insertId;
@@ -97,7 +97,7 @@ export class QrSellAppRepository {
         F.valueOption AS priceOptionLabel, D.pricePerKg, D.priceForPurchaser, D.priceForEater, D.priceVatHistory, D.volumeForSell, D.nestQuantity, D.humidity, 
         D.ingredientNestOptionCode, G.valueOption AS ingredientNestOptionLabel,
         CASE
-            WHEN D.seq IS NOT NULL AND D.isActive = 'Y' THEN 'Y'
+            WHEN D.seq IS NOT NULL AND D.isActive = 'Y' AND D.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
             ELSE 'N'
         END AS isSold
         FROM ${this.table}  A

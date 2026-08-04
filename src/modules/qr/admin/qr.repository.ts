@@ -3,7 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { PagingDto } from 'src/dto/admin.dto';
 import { UPDATOR } from 'src/helpers/const.helper';
 import { QR_CODE_CONST } from '../common/qr.const';
-import { RequestStatusEnum } from '../common/qr.enum';
+import { RequestStatusEnum, RequestSellStatusEnum } from '../common/qr.enum';
 import { WriteQrBlockchainDto } from './qr.dto';
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
 
@@ -27,7 +27,7 @@ export class QrAdminRepository {
         A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
         IFNULL(JSON_LENGTH(A.taskMedicineList), 0) AS taskMedicineCount,
         CASE
-          WHEN E.seq IS NOT NULL AND E.isActive = 'Y' THEN 'Y'
+          WHEN E.seq IS NOT NULL AND E.isActive = 'Y' AND E.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
           ELSE 'N'
         END AS isSold,
         A.createdAt
@@ -66,7 +66,7 @@ export class QrAdminRepository {
         ELSE ''
       END AS requestStatusLabel,
         CASE
-          WHEN E.seq IS NOT NULL AND E.isActive = 'Y' THEN 'Y'
+          WHEN E.seq IS NOT NULL AND E.isActive = 'Y' AND E.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
           ELSE 'N'
         END AS isSold,
         A.taskMedicineList, A.taskHarvestList,

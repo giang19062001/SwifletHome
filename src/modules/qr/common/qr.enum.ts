@@ -23,9 +23,8 @@ export enum RequestStatusEnum {
 }
 
 export enum RequestSellStatusEnum {
-  WAITING = 'WAITING',
-  APPROVED = 'APPROVED',
-  REFUSE = 'REFUSE',
+  SOLD = 'SOLD',
+  PURCHARSER = 'PURCHARSER',
 }
 
 export enum FetchSellingByEnum {
