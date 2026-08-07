@@ -21197,6 +21197,36 @@ img:not(.normal):not([id^=icon-]):hover, video:not(.normal):not([id^=icon-]):hov
   padding: 8px 14px !important;
   border-radius: 8px !important;
 }
+.page-qrcode-update .pdf-floating-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 9999;
+}
+.page-qrcode-update.printing-pdf .bg-primary, .page-qrcode-update .printing-pdf .bg-primary {
+  background-color: #71AB33 !important;
+}
+.page-qrcode-update.printing-pdf .text-primary, .page-qrcode-update .printing-pdf .text-primary {
+  color: #71AB33 !important;
+}
+.page-qrcode-update.printing-pdf .border-primary, .page-qrcode-update .printing-pdf .border-primary {
+  border-color: #71AB33 !important;
+}
+.page-qrcode-update.printing-pdf .btn-outline-primary, .page-qrcode-update .printing-pdf .btn-outline-primary {
+  color: #71AB33 !important;
+  border-color: #71AB33 !important;
+}
+.page-qrcode-update.printing-pdf .group-title, .page-qrcode-update .printing-pdf .group-title {
+  color: #71AB33 !important;
+  border-bottom-color: rgba(113, 171, 51, 0.15) !important;
+}
+.page-qrcode-update.printing-pdf .field-container, .page-qrcode-update .printing-pdf .field-container {
+  border-left-color: #71AB33 !important;
+}
+.page-qrcode-update.printing-pdf .icon-box, .page-qrcode-update .printing-pdf .icon-box {
+  background-color: rgba(113, 171, 51, 0.08) !important;
+  color: #71AB33 !important;
+}
 
 @media (max-width: 576px) {
   .page-qrcode-update {

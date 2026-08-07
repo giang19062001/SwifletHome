@@ -1,5 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { OnModuleDestroy } from '@nestjs/common';
 import { Job } from 'bullmq';
+import * as puppeteer from 'puppeteer';
 import ffmpegStatic from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 import * as fs from 'fs';
@@ -98,5 +100,75 @@ export class VideoQueueService extends WorkerHost {
         })
         .run();
     });
+  }
+}
+
+// PROCESSOR CHO PDF GENERATOR (PUPPETEER - MAX 2 TABS CONCURRENCY)
+@Processor('pdf', {
+  concurrency: 2, // Tối đa 2 tab Chrome / job xử lý đồng thời để tránh quá tải CPU/RAM
+})
+export class PdfQueueService extends WorkerHost implements OnModuleDestroy {
+  private readonly loggerName = 'PdfQueue';
+  private browser: puppeteer.Browser | null = null;
+
+  constructor(private readonly logger: LoggingService) {
+    super();
+  }
+
+  private async getBrowser(): Promise<puppeteer.Browser> {
+    if (!this.browser || !this.browser.isConnected()) {
+      this.browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+      });
+    }
+    return this.browser;
+  }
+
+  async process(job: Job<{ targetUrl: string }>): Promise<string> {
+    const logbase = `${this.loggerName}/process`;
+    const { targetUrl } = job.data;
+
+    this.logger.log(logbase, `Đang xử lý tạo file PDF trong hàng đợi BullMQ: ${targetUrl}`);
+
+    let page: puppeteer.Page | null = null;
+    try {
+      const browser = await this.getBrowser();
+      page = await browser.newPage();
+
+      await page.setViewport({ width: 1200, height: 800, deviceScaleFactor: 2 });
+      await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+
+      // Ẩn nút bấm tải PDF trôi nổi nếu có trên giao diện
+      await page.evaluate(() => {
+        const btn = document.querySelector('.pdf-floating-btn');
+        if (btn) {
+          (btn as HTMLElement).style.display = 'none';
+        }
+      });
+
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '10mm', right: '10mm', bottom: '10mm', left: '10mm' },
+      });
+
+      this.logger.log(logbase, `Tạo file PDF thành công trong hàng đợi cho: ${targetUrl}`);
+      return Buffer.from(pdfBuffer).toString('base64');
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      this.logger.error(logbase, `Lỗi khi tạo PDF trong hàng đợi: ${error.message}`);
+      throw error;
+    } finally {
+      if (page) {
+        await page.close().catch(() => {});
+      }
+    }
+  }
+
+  async onModuleDestroy() {
+    if (this.browser) {
+      await this.browser.close().catch(() => {});
+    }
   }
 }

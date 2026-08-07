@@ -9,7 +9,7 @@ function loadEnv() {
   const envConfig = {};
   if (fs.existsSync(envPath)) {
     const content = fs.readFileSync(envPath, 'utf8');
-    content.split('\n').forEach(line => {
+    content.split('\n').forEach((line) => {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith('#')) return;
       const parts = trimmed.split('=');
@@ -28,24 +28,11 @@ function loadEnv() {
 }
 
 // Allowed enum values for fieldType
-const VALID_FIELD_TYPES = [
-  'text',
-  'textarea',
-  'number',
-  'email',
-  'phone',
-  'date',
-  'datetime',
-  'select',
-  'radio',
-  'checkbox',
-  'file_single',
-  'file_multiple'
-];
+const VALID_FIELD_TYPES = ['text', 'textarea', 'number', 'email', 'phone', 'date', 'datetime', 'select', 'radio', 'checkbox', 'file_single', 'file_multiple'];
 
 async function run() {
   const env = loadEnv();
-  
+
   // Database configuration with fallback defaults
   const dbConfig = {
     host: env.DB_HOST || '127.0.0.1',
@@ -72,15 +59,16 @@ async function run() {
     await connection.beginTransaction();
     console.log('Database transaction started.');
 
+    // Truncate the tables before inserting new data
+    await connection.execute('TRUNCATE TABLE tbl_traceability_forms_groups');
+    await connection.execute('TRUNCATE TABLE tbl_traceability_forms_fields');
+
     for (const sheetName of workbook.SheetNames) {
       console.log(`\n----------------------------------------`);
       console.log(`Processing sheet: "${sheetName}"`);
 
       // Find matching form in DB by formKey (which is the sheetName)
-      const [forms] = await connection.execute(
-        `SELECT seq FROM tbl_traceability_forms WHERE formKey = ? LIMIT 1`,
-        [sheetName]
-      );
+      const [forms] = await connection.execute(`SELECT seq FROM tbl_traceability_forms WHERE formKey = ? LIMIT 1`, [sheetName]);
 
       if (forms.length === 0) {
         console.log(`Warning: Sheet name "${sheetName}" does not match any formKey in tbl_traceability_forms. Skipping this sheet.`);
@@ -148,15 +136,12 @@ async function run() {
         }
 
         // Normalize isRequired to 'Y' or 'N'
-        const normalizedIsRequired = (isRequired === 'Y' || isRequired === 'y' || isRequired === 'true' || isRequired === '1') ? 'Y' : 'N';
+        const normalizedIsRequired = isRequired === 'Y' || isRequired === 'y' || isRequired === 'true' || isRequired === '1' ? 'Y' : 'N';
 
         let groupSeq = null;
         if (groupKey) {
           // Step 2: Upsert group
-          const [groups] = await connection.execute(
-            `SELECT seq FROM tbl_traceability_forms_groups WHERE formSeq = ? AND groupKey = ? LIMIT 1`,
-            [formSeq, groupKey]
-          );
+          const [groups] = await connection.execute(`SELECT seq FROM tbl_traceability_forms_groups WHERE formSeq = ? AND groupKey = ? LIMIT 1`, [formSeq, groupKey]);
 
           if (groups.length > 0) {
             groupSeq = groups[0].seq;
@@ -164,13 +149,13 @@ async function run() {
               `UPDATE tbl_traceability_forms_groups 
                SET groupName = ?, sortOrder = ?, isActive = 'Y', updatedAt = NOW(), updatedId = 'SYSTEM' 
                WHERE seq = ?`,
-              [groupName, groupSortOrder, groupSeq]
+              [groupName, groupSortOrder, groupSeq],
             );
           } else {
             const [insertResult] = await connection.execute(
               `INSERT INTO tbl_traceability_forms_groups (formSeq, groupKey, groupName, sortOrder, isActive, createdId) 
                VALUES (?, ?, ?, ?, 'Y', 'SYSTEM')`,
-              [formSeq, groupKey, groupName, groupSortOrder]
+              [formSeq, groupKey, groupName, groupSortOrder],
             );
             groupSeq = insertResult.insertId;
           }
@@ -178,10 +163,7 @@ async function run() {
 
         if (fieldKey && groupSeq) {
           // Step 3: Upsert field
-          const [fields] = await connection.execute(
-            `SELECT seq FROM tbl_traceability_forms_fields WHERE formSeq = ? AND groupSeq = ? AND fieldKey = ? LIMIT 1`,
-            [formSeq, groupSeq, fieldKey]
-          );
+          const [fields] = await connection.execute(`SELECT seq FROM tbl_traceability_forms_fields WHERE formSeq = ? AND groupSeq = ? AND fieldKey = ? LIMIT 1`, [formSeq, groupSeq, fieldKey]);
 
           if (fields.length > 0) {
             const fieldSeq = fields[0].seq;
@@ -189,29 +171,13 @@ async function run() {
               `UPDATE tbl_traceability_forms_fields 
                SET fieldName = ?, fieldType = ?, isRequired = ?, sortOrder = ?, config = CAST(? AS JSON), isActive = 'Y', updatedAt = NOW(), updatedId = 'SYSTEM' 
                WHERE seq = ?`,
-              [
-                fieldName,
-                finalFieldType,
-                normalizedIsRequired,
-                fieldSortOrder,
-                configObj ? JSON.stringify(configObj) : null,
-                fieldSeq
-              ]
+              [fieldName, finalFieldType, normalizedIsRequired, fieldSortOrder, configObj ? JSON.stringify(configObj) : null, fieldSeq],
             );
           } else {
             await connection.execute(
               `INSERT INTO tbl_traceability_forms_fields (formSeq, groupSeq, fieldKey, fieldName, fieldType, isRequired, sortOrder, config, isActive, createdId) 
                VALUES (?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), 'Y', 'SYSTEM')`,
-              [
-                formSeq,
-                groupSeq,
-                fieldKey,
-                fieldName,
-                finalFieldType,
-                normalizedIsRequired,
-                fieldSortOrder,
-                configObj ? JSON.stringify(configObj) : null
-              ]
+              [formSeq, groupSeq, fieldKey, fieldName, finalFieldType, normalizedIsRequired, fieldSortOrder, configObj ? JSON.stringify(configObj) : null],
             );
           }
         }
@@ -222,7 +188,6 @@ async function run() {
     await connection.commit();
     console.log('Transaction committed successfully.');
     console.log('Successfully completed inserting/updating all data from Excel sheets.');
-
   } catch (error) {
     console.error('Error occurred, rolling back database changes...');
     try {

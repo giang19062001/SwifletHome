@@ -1,5 +1,10 @@
 <% if (values && values.traceData) { %>
-<div class="page-qrcode-update py-4">
+<div class="page-qrcode-update py-4" id="pdf-content">
+    <div class="pdf-floating-btn" data-html2canvas-ignore="true">
+        <button id="btn-download-pdf" class="btn btn-danger shadow-lg rounded-pill px-4 py-2 d-flex align-items-center">
+            <i class="fa fa-file-pdf me-2 fa-lg"></i> <span class="fw-bold">Tải bản PDF</span>
+        </button>
+    </div>
     <div class="trace-container">
         <!-- Thông tin chung của nhà yến -->
         <div class="row mb-4">
@@ -176,6 +181,17 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('btn-download-pdf');
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    window.location.href = '/api/app/traceability/downloadPdf/<%= values.traceData.traceabilityId %>';
+                });
+            }
+        });
+    </script>
 </div>
 <% } else { %>
 <div class="trace-container py-5">

@@ -1,6 +1,8 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext, SetMetadata } from '@nestjs/common';
 import { TokenUserAdminResDto } from '../modules/auth/admin/auth.response';
 import { TokenEaterAppResDto, TokenUserAppResDto } from '../modules/auth/app/auth.response';
+
+export const Public = () => SetMetadata('isPublic', true);
 
 export const GetUserApp = createParamDecorator<TokenUserAppResDto>((data: unknown, ctx: ExecutionContext): TokenUserAppResDto => {
   const req = ctx.switchToHttp().getRequest();

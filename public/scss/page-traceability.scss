@@ -143,6 +143,25 @@
     padding: 8px 14px !important;
     border-radius: 8px !important;
   }
+
+  // Floating PDF button
+  .pdf-floating-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+  }
+
+  // Fix html2canvas color issue (forcing styles during print)
+  &.printing-pdf, .printing-pdf {
+    .bg-primary { background-color: #71AB33 !important; }
+    .text-primary { color: #71AB33 !important; }
+    .border-primary { border-color: #71AB33 !important; }
+    .btn-outline-primary { color: #71AB33 !important; border-color: #71AB33 !important; }
+    .group-title { color: #71AB33 !important; border-bottom-color: rgba(113, 171, 51, 0.15) !important; }
+    .field-container { border-left-color: #71AB33 !important; }
+    .icon-box { background-color: rgba(113, 171, 51, 0.08) !important; color: #71AB33 !important; }
+  }
 }
 
 // Media Query for mobile screen optimization

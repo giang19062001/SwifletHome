@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { Msg } from 'src/helpers/message.helper';
@@ -10,9 +11,15 @@ export class ApiAuthAppGuard implements CanActivate {
   constructor(
     private readonly authAppService: AuthAppService,
     private readonly logger: LoggingService,
+    private readonly reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [context.getHandler(), context.getClass()]);
+    if (isPublic) {
+      return true;
+    }
+
     const req = context.switchToHttp().getRequest<Request>();
     const token = req.headers.authorization?.replace('Bearer ', '');
 

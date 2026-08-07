@@ -1,8 +1,12 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, OnModuleInit, Param, Post, Query, Req, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { ConfigService } from '@nestjs/config';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Queue, QueueEvents } from 'bullmq';
+import type { Request, Response } from 'express';
 import { getTraceabilityMulterConfig } from 'src/config/multer.config';
-import { GetUserApp } from 'src/decorator/auth.decorator';
+import { GetUserApp, Public } from 'src/decorator/auth.decorator';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
 import { Msg } from 'src/helpers/message.helper';
@@ -19,8 +23,22 @@ import { TraceabilityAppService } from './traceability.service';
 @ApiBearerAuth('app-auth')
 @UseGuards(ApiAuthAppGuard)
 @UseInterceptors(ResponseAppInterceptor)
-export class TraceabilityAppController {
-  constructor(private readonly service: TraceabilityAppService) {}
+export class TraceabilityAppController implements OnModuleInit {
+  private queueEvents!: QueueEvents;
+
+  constructor(
+    private readonly service: TraceabilityAppService,
+    @InjectQueue('pdf') private readonly pdfQueue: Queue,
+    private readonly configService: ConfigService,
+  ) {}
+
+  onModuleInit() {
+    const host = this.configService.get<string>('REDIS_HOST') || 'localhost';
+    const port = this.configService.get<number>('REDIS_PORT') || 6379;
+    this.queueEvents = new QueueEvents('pdf', {
+      connection: { host, port },
+    });
+  }
 
   @ApiOperation({
     summary: 'Lấy danh sách tất cả các form mẫu truy xuất nguồn gốc',
@@ -116,5 +134,33 @@ export class TraceabilityAppController {
       message: Msg.CreateOk,
       data: result,
     };
+  }
+
+  @ApiOperation({
+    summary: 'Tải file PDF hồ sơ truy xuất nguồn gốc (Hàng đợi BullMQ + Redis + Puppeteer max 2 concurrency)',
+  })
+  @Public()
+  @Get('downloadPdf/:traceabilityId')
+  async downloadPdf(@Param('traceabilityId') traceabilityId: string, @Req() req: Request, @Res() res: Response) {
+    let cleanId = traceabilityId || '';
+    if (cleanId.toLowerCase().endsWith('.png')) {
+      cleanId = cleanId.slice(0, -4);
+    }
+
+    const host = req.get('host') || `127.0.0.1:${process.env.PORT || 3000}`;
+    const protocol = req.protocol || 'http';
+    const targetUrl = `${protocol}://${host}/traceability-qrcode-global/${cleanId}`;
+
+    try {
+      const job = await this.pdfQueue.add('generate-pdf', { targetUrl });
+      const base64Data = (await job.waitUntilFinished(this.queueEvents)) as string;
+      const pdfBuffer = Buffer.from(base64Data, 'base64');
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="3FAM_Bo_ho_so_TXNG_${cleanId}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error: any) {
+      res.status(500).send('Lỗi máy chủ khi tạo file PDF từ hàng đợi BullMQ');
+    }
   }
 }

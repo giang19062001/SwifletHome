@@ -12,8 +12,7 @@ import { generateTraceabilityId, generateTraceabilityQr, generateTraceabilityQrL
 import { TraceabilityStatusEnum } from './traceability.enum';
 import { TRACE_CONST } from './traceability.const';
 import { Msg } from 'src/helpers/message.helper';
-import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL } from './traceability.query';
-
+import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE } from './traceability.query';
 @Injectable()
 export class TraceabilityAppService {
   constructor(
@@ -105,6 +104,13 @@ export class TraceabilityAppService {
             } else {
               // Lấy từ JSON data (hỗ trợ cả nested groupKey và flat key)
               currentValue = savedData?.[g.groupKey]?.[f.fieldKey] ?? savedData?.[f.fieldKey] ?? null;
+            }
+          }
+
+          if (currentValue === null || currentValue === undefined || currentValue === '') {
+            const generator = (TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE as any)[f.fieldKey];
+            if (generator) {
+              currentValue = typeof generator === 'function' ? generator(traceabilityId) : generator;
             }
           }
 
