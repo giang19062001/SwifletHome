@@ -68,6 +68,7 @@ import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { TraceabilityAppModule } from './modules/traceability/app/traceability.module';
 import { TraceabilityAdminModule } from './modules/traceability/admin/traceability.module';
+import { ExportModule } from './common/export/export.module';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { TraceabilityAdminModule } from './modules/traceability/admin/traceabili
     BlacklistModule,
     GeoModule,
     QueueModule,
+    ExportModule,
     // commmon
     OptionModule,
     ProvinceModule,

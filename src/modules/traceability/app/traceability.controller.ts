@@ -137,7 +137,7 @@ export class TraceabilityAppController implements OnModuleInit {
   }
 
   @ApiOperation({
-    summary: 'Tải file PDF hồ sơ truy xuất nguồn gốc (Hàng đợi BullMQ + Redis + Puppeteer max 2 concurrency)',
+    summary: 'Tải file PDF hồ sơ truy xuất nguồn gốc',
   })
   @Public()
   @Get('downloadPdf/:traceabilityId')
