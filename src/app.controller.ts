@@ -434,7 +434,7 @@ export class AppController {
   @Render('pages/qrcode')
   renderQrcode(@Req() req: Request) {
     return {
-      title: 'Danh sách yêu cầu QRcode',
+      title: 'Danh sách yêu cầu QR cho lô yến',
       isLayout: true,
       user: req.session.user,
     };
@@ -445,7 +445,7 @@ export class AppController {
   async renderQrcodeUpdate(@Req() req: Request) {
     const values = await this.appService.renderQrcodeUpdate(req.params.id);
     return {
-      title: 'Xem xét yêu cầu Qr Code',
+      title: 'Xem xét yêu cầu Qr cho lô yến',
       isLayout: true,
       user: req.session.user,
       values: values,
@@ -463,6 +463,17 @@ export class AppController {
       isLayout: false,
       user: req.session.user,
       values: values,
+    };
+  }
+
+  @Get('/dashboard/qrcode-selling')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/qrcode-selling')
+  renderQrcodeSelling(@Req() req: Request) {
+    return {
+      title: 'Danh sách đăng bán lô yến',
+      isLayout: true,
+      user: req.session.user,
     };
   }
 

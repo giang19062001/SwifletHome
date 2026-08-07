@@ -8,7 +8,7 @@ console.log('CURRENT_URL', CURRENT_URL);
 console.log('CURRENT_PARAMS', CURRENT_PARAMS);
 
 const VARIABLE_ENUM = {
-  TODO_TASK:{
+  TODO_TASK: {
     MEDICINE: 'MEDICINE',
     HARVEST: 'HARVEST',
     LURING: 'LURING',
@@ -32,6 +32,14 @@ const VARIABLE_ENUM = {
     REFUSE: 'Từ chối duyệt',
     CANCEL: 'Đã hủy',
   },
+  QR_SELLING_REQUEST_STATUS: {
+    SOLD: 'Đang đăng bán',
+    PURCHASED: 'Đang có người liên hệ mua',
+    PROCESSING: 'Đang chế biến',
+    PACKING: 'Đang đóng gói',
+    DELIVERING: 'Đang giao hàng',
+    RECALL: 'Có yêu cầu thu hồi',
+  },
   HOME_SALE_SIGHTSEEING_STATUS: {
     WAITING: 'Đang chờ duyệt',
     APPROVED: 'Đã duyệt',
@@ -42,7 +50,7 @@ const VARIABLE_ENUM = {
     ANSWERED: 'Đã xác nhận phản hồi',
     // CANCEL: 'Hủy',
   },
-  CONSIGNMENT_STATUS : {
+  CONSIGNMENT_STATUS: {
     WAITING: { TEXT: 'Chờ xác nhận', VALUE: 'WAITING' },
     CONFIRMED: { TEXT: 'Đã xác nhận', VALUE: 'CONFIRMED' },
     DELIVERING: { TEXT: 'Đang giao', VALUE: 'DELIVERING' },
@@ -75,10 +83,10 @@ const VARIABLE_ENUM = {
   ADS_POSITIONS: {
     TOP: 'Đầu màn hình',
     MIDDLE: 'Giữa màn hình',
-    BOTTOM: 'Đáy màn hình'
+    BOTTOM: 'Đáy màn hình',
   },
-   ADS_BANNER_TYPE: {
+  ADS_BANNER_TYPE: {
     LARGE: 'Loại ảnh lớn',
     SMALL: 'Loại ảnh nhỏ',
-  }
+  },
 };

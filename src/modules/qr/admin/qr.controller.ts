@@ -6,6 +6,7 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from '../../auth/admin/auth.response';
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
 import { QrAdminService } from './qr.service';
+import { GetQrCodeSellingAdminResDto } from './qr-sell.response';
 
 @ApiBearerAuth('admin-auth')
 @ApiTags('admin/qrcode')
@@ -21,6 +22,16 @@ export class QrAdminController {
   @HttpCode(HttpStatus.OK)
   async getAll(@Body() dto: PagingDto): Promise<{ total: number; list: GetInfoRequestQrCodeAdminResDto[] }> {
     const result = await this.qrAdminService.getAll(dto);
+    return result;
+  }
+
+  @ApiBody({
+    type: PagingDto,
+  })
+  @Post('getAllSelling')
+  @HttpCode(HttpStatus.OK)
+  async getAllSelling(@Body() dto: PagingDto): Promise<{ total: number; list: GetQrCodeSellingAdminResDto[] }> {
+    const result = await this.qrAdminService.getAllSelling(dto);
     return result;
   }
 

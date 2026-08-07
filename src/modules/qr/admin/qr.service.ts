@@ -11,6 +11,7 @@ import { RequestStatusEnum } from '../common/qr.enum';
 import { WriteQrBlockchainDto } from './qr.dto';
 import { QrAdminRepository } from './qr.repository';
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
+import { GetQrCodeSellingAdminResDto } from './qr-sell.response';
 
 @Injectable()
 export class QrAdminService {
@@ -31,6 +32,12 @@ export class QrAdminService {
   async getDetail(requestCode: string): Promise<GetInfoRequestQrCodeAdminResDto | null> {
     const result = await this.qrAdminRepository.getDetail(requestCode);
     return result;
+  }
+  // TODO: SELLING
+  async getAllSelling(dto: PagingDto): Promise<{ total: number; list: GetQrCodeSellingAdminResDto[] }> {
+    const total = await this.qrAdminRepository.getTotalSelling();
+    const list = await this.qrAdminRepository.getAllSelling(dto);
+    return { total, list };
   }
 
   // TODO: BLOCKCHAIN

@@ -21,11 +21,4 @@ export class GetInfoRequestQrCodeAdminResDto extends OmitType(RequestQrCodeResDt
   @ApiProperty({ example: '' })
   @IsString()
   qrCodeUrl: string;
-
-  @ApiProperty({
-    example: YnEnum.N,
-    enum: YnEnum,
-  })
-  @IsEnum(YnEnum)
-  isSold: YnEnum;
 }

@@ -256,7 +256,11 @@
   color: $main-color;
 }
 .txt-status-waiting,
-.txt-status-delivering {
+.txt-status-sold,
+.txt-status-purchased,
+.txt-status-delivering,
+.txt-status-processing,
+.txt-status-packing {
   @extend .badge;
   @extend .bg-waiting;
 }
@@ -272,6 +276,7 @@
 }
 .txt-status-cancel,
 .txt-status-refuse,
+.txt-status-recall,
 .txt-pay,
 .txt-not-ok {
   @extend .badge;

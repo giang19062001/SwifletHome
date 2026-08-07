@@ -6,6 +6,7 @@ import { QR_CODE_CONST } from '../common/qr.const';
 import { RequestStatusEnum, RequestSellStatusEnum } from '../common/qr.enum';
 import { WriteQrBlockchainDto } from './qr.dto';
 import { GetInfoRequestQrCodeAdminResDto } from './qr.response';
+import { GetQrCodeSellingAdminResDto } from './qr-sell.response';
 
 @Injectable()
 export class QrAdminRepository {
@@ -25,12 +26,7 @@ export class QrAdminRepository {
   async getAll(dto: PagingDto): Promise<GetInfoRequestQrCodeAdminResDto[]> {
     let query = ` SELECT A.seq, A.requestCode, A.userCode, A.userName, A.userHomeCode, B.userHomeName, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
         A.userHomeAddress, A.temperature, A.humidity, F.harvestPhase, A.requestStatus,
-        IFNULL(JSON_LENGTH(A.taskMedicineList), 0) AS taskMedicineCount,
-        CASE
-          WHEN E.seq IS NOT NULL AND E.isActive = 'Y' AND E.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
-          ELSE 'N'
-        END AS isSold,
-        A.createdAt
+        IFNULL(JSON_LENGTH(A.taskMedicineList), 0) AS taskMedicineCount, A.createdAt
         FROM ${this.table}  A
         LEFT JOIN ${this.tableUserHome} B
         ON A.userHomeCode = B.userHomeCode  
@@ -65,12 +61,7 @@ export class QrAdminRepository {
           THEN '${QR_CODE_CONST.REQUEST_STATUS.REFUSE.text}'
         ELSE ''
       END AS requestStatusLabel,
-        CASE
-          WHEN E.seq IS NOT NULL AND E.isActive = 'Y' AND E.requestSellStatus = '${RequestSellStatusEnum.SOLD}' THEN 'Y'
-          ELSE 'N'
-        END AS isSold,
-        A.taskMedicineList, A.taskHarvestList,
-        
+      A.taskMedicineList, A.taskHarvestList,
          COALESCE(
           (
             SELECT JSON_ARRAYAGG(
@@ -113,6 +104,36 @@ export class QrAdminRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [requestStatus, updatedId, requestCode]);
 
     return result.affectedRows;
+  }
+  // TODO: SELLING
+  
+  async getTotalSelling(): Promise<number> {
+    const [rows] = await this.db.query<RowDataPacket[]>(` SELECT COUNT(seq) AS TOTAL FROM ${this.tableSelling} WHERE isActive = 'Y'`);
+    return rows.length ? (rows[0].TOTAL as number) : 0;
+  }
+  async getAllSelling(dto: PagingDto): Promise<GetQrCodeSellingAdminResDto[]> {
+    let query = ` SELECT A.seq, A.requestCode, A.userCode, E.userName, A.userHomeCode, B.userHomeName, E.userPhone, E.volumeForSell,
+        E.nestQuantity, E.requestSellStatus, 
+        GREATEST(
+          IFNULL(E.priceForPurchaser, 0),
+          IFNULL(E.priceForEater, 0)
+        ) AS priceForSelling, E.createdAt
+        FROM ${this.table}  A
+        JOIN ${this.tableSelling} E
+        ON A.requestCode = E.requestCode
+        LEFT JOIN ${this.tableUserHome} B
+        ON A.userHomeCode = B.userHomeCode  
+        WHERE  A.isActive = 'Y' 
+        ORDER BY A.createdAt DESC `;
+
+    const params: any[] = [];
+    if (dto.limit > 0 && dto.page > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(dto.limit, (dto.page - 1) * dto.limit);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(query, params);
+    return rows as GetQrCodeSellingAdminResDto[];
   }
 
   // TODO: BLOCKCHAIN

@@ -1,6 +1,6 @@
 let page = 1;
 let limit = 10;
-let pageElement = 'page-qrcode';
+let pageElement = 'page-qrcode-selling';
 let categories = [];
 let objects = [];
 
@@ -15,9 +15,6 @@ function changePage(p) {
   document.getElementById('privacy-main-pager').innerHTML = '';
   getAllRequestQrcode(page, limit);
 }
-function gotoQrcodeDetail(answerCode) {
-  gotoPage('/dashboard/qrcode/update/' + answerCode);
-}
 
 // TODO: RENDER
 function renderRequestQrcode(data, objElement) {
@@ -30,12 +27,21 @@ function renderRequestQrcode(data, objElement) {
             <td><p>${(page - 1) * limit + i++}</p></td>
             <td><p>${ele.userName}</p></td>
             <td><p>${ele.userHomeName}</p></td>
-            <td><p>${ele.taskMedicineCount}</p></td>
-            <td><p>${ele.harvestPhase}</p></td>
-            <td><b class="txt-status-${String(ele.requestStatus).toLocaleLowerCase()}">${VARIABLE_ENUM.QR_REQUEST_STATUS[ele.requestStatus] ?? ''}</b></td>
+            <td><p>${ele.nestQuantity}</p></td>
+            <td><p>${ele.volumeForSell}</p></td>
+            <td>
+              <p>
+                ${new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                  maximumFractionDigits: 0,
+                }).format(Number(ele.priceForSelling))}
+              </p>
+            </td>
+            <td><b class="txt-status-${String(ele.requestSellStatus).toLocaleLowerCase()}">${VARIABLE_ENUM.QR_SELLING_REQUEST_STATUS[ele.requestSellStatus] ?? ''}</b></td>
             <td><p>${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm:ss') : ''}</p></td>
             <td>
-                <button class="btn-edit"  onclick="gotoQrcodeDetail('${ele.requestCode}')">Chi tiết</button>
+                
             </td>
          </tr>`;
       HTML += rowHtml;
@@ -47,7 +53,7 @@ function renderRequestQrcode(data, objElement) {
     document.getElementById('privacy-main-pager').innerHTML = pagerHTML;
   } else {
     // dữ liệu trống
-    renderEmptyRowTable(objElement, 7);
+    renderEmptyRowTable(objElement, 8);
   }
   // xóa skeleton
   hideSkeleton(objElement);
@@ -56,11 +62,11 @@ function renderRequestQrcode(data, objElement) {
 async function getAllRequestQrcode(currentPage, limit) {
   const objElement = document.querySelector(`#${pageElement} .body-table`);
   // Hiển thị skeleton
-  showSkeleton(objElement, limit, 7);
+  showSkeleton(objElement, limit, 8);
 
   await axios
     .post(
-      CURRENT_URL + '/api/admin/qrcode/getAll',
+      CURRENT_URL + '/api/admin/qrcode/getAllSelling',
       {
         page: currentPage,
         limit: limit,

@@ -12,7 +12,7 @@ import { generateTraceabilityId, generateTraceabilityQr, generateTraceabilityQrL
 import { TraceabilityStatusEnum } from './traceability.enum';
 import { TRACE_CONST } from './traceability.const';
 import { Msg } from 'src/helpers/message.helper';
-import { TRACE_FORM_OPTIONS_SQL } from './traceability.query';
+import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL } from './traceability.query';
 
 @Injectable()
 export class TraceabilityAppService {
@@ -125,22 +125,54 @@ export class TraceabilityAppService {
       };
     });
 
-    // Lấy các tùy chọn động cho các trường hỗ trợ thông qua TRACE_FORM_OPTIONS_SQL
-    const dynamicOptionsPromises: Promise<void>[] = [];
+    const promises: Promise<void>[] = [];
     for (const group of mappedGroups) {
+      // Xử lý currentValue mặc định
+      const defaultSql = TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL[group.groupKey as keyof typeof TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL];
+      if (defaultSql) {
+        const needsDefaultValue = group.fields.some((f) => f.currentValue === null || f.currentValue === undefined || f.currentValue === '');
+        if (needsDefaultValue) {
+          promises.push(
+            (async () => {
+              try {
+                const rows = await this.repository.getDynamicOptions(defaultSql, userCode, dto.userHomeCode);
+                if (rows && rows.length > 0) {
+                  const defaultData = rows[0]; // { fieldKey1: value1, fieldKey2: value2 }
+                  for (const field of group.fields) {
+                    if (field.currentValue === null || field.currentValue === undefined || field.currentValue === '') {
+                      if (defaultData[field.fieldKey] !== undefined) {
+                        field.currentValue = defaultData[field.fieldKey];
+                      }
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error(`Error fetching default current value for group "${group.groupKey}":`, error);
+              }
+            })(),
+          );
+        }
+      }
+
       for (const field of group.fields) {
-        const sqlQuery = TRACE_FORM_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_OPTIONS_SQL];
+        // Xử lý options động
+        const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];
         if (sqlQuery) {
-          dynamicOptionsPromises.push(
+          promises.push(
             (async () => {
               try {
                 const rows = await this.repository.getDynamicOptions(sqlQuery, userCode, dto.userHomeCode);
                 const options = rows.map((row, idx) => {
-                  return {
-                    value: row.value,
-                    label: row.label,
+                  const { value, label, ...rest } = row;
+                  const option: any = {
+                    value: value,
+                    label: label,
                     sortOrder: idx + 1,
                   };
+                  if (Object.keys(rest).length > 0) {
+                    option.linkedValues = rest;
+                  }
+                  return option;
                 });
 
                 if (!field.config) {
@@ -168,8 +200,8 @@ export class TraceabilityAppService {
       }
     }
 
-    if (dynamicOptionsPromises.length > 0) {
-      await Promise.all(dynamicOptionsPromises);
+    if (promises.length > 0) {
+      await Promise.all(promises);
     }
 
     const response = new TraceabilityFormResDto();
