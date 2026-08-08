@@ -14,6 +14,7 @@ import { ResponseAppInterceptor } from 'src/interceptors/response.interceptor';
 import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
+import { TraceabilityAdminService } from '../admin/traceability.service';
 import { GetFormDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
 import { TraceabilityFormResDto, TraceabilityFormSimpleResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto } from './traceability.response';
 import { TraceabilityAppService } from './traceability.service';
@@ -28,6 +29,7 @@ export class TraceabilityAppController implements OnModuleInit {
 
   constructor(
     private readonly service: TraceabilityAppService,
+    private readonly traceabilityAdminService: TraceabilityAdminService,
     @InjectQueue('pdf') private readonly pdfQueue: Queue,
     private readonly configService: ConfigService,
   ) {}
@@ -151,8 +153,10 @@ export class TraceabilityAppController implements OnModuleInit {
     const protocol = req.protocol || 'http';
     const targetUrl = `${protocol}://${host}/traceability-qrcode-global/${cleanId}`;
 
+    const traceData = await this.traceabilityAdminService.getFormForGlobalView(cleanId);
+
     try {
-      const job = await this.pdfQueue.add('generate-pdf', { targetUrl });
+      const job = await this.pdfQueue.add('generate-pdf', { targetUrl, traceData });
       const base64Data = (await job.waitUntilFinished(this.queueEvents)) as string;
       const pdfBuffer = Buffer.from(base64Data, 'base64');
 

@@ -1,14 +1,14 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ethers } from 'ethers';
-import { contractABI } from 'src/config/contract.config';
+import { contractABI } from 'src/common/contract/contract.config';
 import { LoggingService } from '../logger/logger.service';
 
 @Injectable()
 export class ContractService implements OnModuleInit {
-  private provider: ethers.JsonRpcProvider;
-  private wallet: ethers.Wallet;
-  private contract: ethers.Contract;
+  private provider!: ethers.JsonRpcProvider;
+  private wallet!: ethers.Wallet;
+  private contract!: ethers.Contract;
   private readonly SERVICE_NAME = 'ContractService';
 
   constructor(
