@@ -43,7 +43,7 @@ export const TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL = {
   OWNER_INFO: ` SELECT userName AS representative, userPhone AS ownerPhone FROM tbl_user_app WHERE userCode = :userCode `,
   EXPORT_INFO: ` SELECT A.userName AS exporter, B.userHomeName AS facilityCodeExport FROM tbl_user_app A
                LEFT JOIN tbl_user_home B ON A.userCode = B.userCode
-              WHERE userCode = :userCode AND userHomeCode = :userHomeCode `,
+              WHERE A.userCode = :userCode AND B.userHomeCode = :userHomeCode `,
   FACILITY_INFO: ` SELECT 
         A.userHomeName AS facilityName, 
         A.userHomeAddress AS facilityAddress, 

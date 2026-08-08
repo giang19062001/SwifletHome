@@ -28,7 +28,7 @@ function loadEnv() {
 }
 
 // Allowed enum values for fieldType
-const VALID_FIELD_TYPES = ['text', 'textarea', 'number', 'email', 'phone', 'date', 'datetime', 'select', 'radio', 'checkbox', 'file_single', 'file_multiple'];
+const VALID_FIELD_TYPES = ['text', 'textarea', 'number', 'email', 'phone', 'date', 'datetime', 'select', 'radio', 'checkbox', 'file_single', 'file_multiple', 'link_download'];
 
 async function run() {
   const env = loadEnv();
