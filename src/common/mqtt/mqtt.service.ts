@@ -58,6 +58,9 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
             temperature: payload.temperature ?? 0,
             humidity: payload.humidity ?? 0,
             current: payload.current ?? 0,
+            light: payload.light ?? 0,
+            fan: payload.fan ?? 0,
+            pump: payload.pump ?? 0,
             timestamp: Date.now(),
           };
 

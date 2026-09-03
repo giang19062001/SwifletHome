@@ -2,6 +2,9 @@ export interface ISensor {
   temperature: number;
   humidity: number;
   current: number;
+  light?: number;
+  fan?: number;
+  pump?: number;
   timestamp?: number;
 }
 
@@ -16,4 +19,7 @@ export interface ISensorHome {
   temperature: number;
   humidity: number;
   current: number;
+  light?: number;
+  fan?: number;
+  pump?: number;
 }

@@ -173,6 +173,9 @@ export class HomesOfUserGateway implements OnGatewayConnection, OnGatewayDisconn
       temperature: data.temperature,
       humidity: data.humidity,
       current: data.current,
+      light: data.light ?? 0,
+      fan: data.fan ?? 0,
+      pump: data.pump ?? 0,
     };
     this.latestSensorDataOfHomes.set(cacheKey, homeData);
 

@@ -88,6 +88,9 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
       temperature: 0,
       humidity: 0,
       current: 0,
+      light: 0,
+      fan: 0,
+      pump: 0,
     });
   }
 
@@ -111,6 +114,9 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
       temperature: data.temperature,
       humidity: data.humidity,
       current: data.current,
+      light: data.light ?? 0,
+      fan: data.fan ?? 0,
+      pump: data.pump ?? 0,
     };
 
     const room = `HOME-${userCode}-${homeCode}-ROOM`;
