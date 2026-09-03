@@ -103,4 +103,23 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
       console.log(this.SERVICE_NAME, 'Đã đóng kết nối MQTT');
     }
   }
+
+  publishCommand(macId: string, payload: Record<string, any>): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.client || !this.client.connected) {
+        return reject(new Error('MQTT client chưa sẵn sàng hoặc mất kết nối'));
+      }
+      const topic = `sensor/${macId}/command`;
+      const message = JSON.stringify(payload);
+
+      this.client.publish(topic, message, { qos: 0, retain: false }, (err) => {
+        if (err) {
+          this.logger.error(this.SERVICE_NAME, `Gửi lệnh MQTT thất bại: ${err.message}`);
+          return reject(err);
+        }
+        console.log(this.SERVICE_NAME, `==> [COMMAND] Gửi lệnh thành công tới topic ${topic}: ${message}`);
+        resolve();
+      });
+    });
+  }
 }

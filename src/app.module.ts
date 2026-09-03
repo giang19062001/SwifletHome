@@ -66,6 +66,7 @@ import { UploadAdminModule } from './modules/upload/admin/upload.module';
 import { UserAdminModule } from './modules/user/admin/user.module';
 import { UserHomeAdminModule } from './modules/userHome/admin/userHome.module';
 import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
+import { UserHomeIotModule } from './modules/userHome/iot/userHome-iot.module';
 import { TraceabilityAppModule } from './modules/traceability/app/traceability.module';
 import { TraceabilityAdminModule } from './modules/traceability/admin/traceability.module';
 import { ExportModule } from './common/export/export.module';
@@ -127,6 +128,7 @@ import { ExportModule } from './common/export/export.module';
     SaleHomeAppModule,
     ScreenAppModule,
     UserHomeAppModule,
+    UserHomeIotModule,
     BlogAppModule,
     TodoAppModule,
     QrAppModule,

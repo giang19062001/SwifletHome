@@ -12,7 +12,6 @@ export class UserHomeAppRepository {
   private readonly table = 'tbl_user_home';
   private readonly tableImg = 'tbl_user_home_img';
   private readonly tableUserApp = 'tbl_user_app';
-  private readonly tableSensor = 'tbl_user_home_sensor';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotalHomes(userCode: string): Promise<number> {
@@ -234,17 +233,5 @@ export class UserHomeAppRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [uniqueId]);
 
     return result.affectedRows;
-  }
-
-  // TODO: SENSOR
-  async getSensorConfigByMachineCode(machineCode: string): Promise<{ machineCode: string; macId: string; userHomeCode: string; userCode: string } | null> {
-    const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT machineCode, macId, userHomeCode, userCode
-        FROM ${this.tableSensor}
-        WHERE machineCode = ? AND isActive = 'Y'
-        LIMIT 1 `,
-      [machineCode],
-    );
-    return rows.length ? (rows[0] as any) : null;
   }
 }
