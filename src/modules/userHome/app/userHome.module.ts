@@ -5,10 +5,11 @@ import { UserHomeAppRepository } from './userHome.repository';
 import { AuthAppModule } from 'src/modules/auth/app/auth.module';
 import { FileLocalModule } from 'src/common/fileLocal/fileLocal.module';
 import { UserAppModule } from 'src/modules/user/app/user.module';
+import { UserHomeSensorAppController } from './userHome-sensor.controller';
 
 @Module({
   imports: [AuthAppModule, FileLocalModule, UserAppModule],
-  controllers: [UserHomeAppController],
+  controllers: [UserHomeAppController, UserHomeSensorAppController],
   providers: [UserHomeAppService, UserHomeAppRepository],
   exports: [UserHomeAppService],
 })

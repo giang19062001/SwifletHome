@@ -174,20 +174,4 @@ Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uui
       data: result,
     };
   }
-
-  // TODO: SENSOR
-  @ApiOperation({
-    summary: 'Cung cấp mã macId cho thiết bị cảm biến dựa vào machineCode',
-  })
-  @Public()
-  @ApiParam({ name: 'machineCode', type: String })
-  @Get('sensorConfig/:machineCode')
-  @HttpCode(HttpStatus.OK)
-  async getSensorConfigByMachineCode(@Param('machineCode') machineCode: string) {
-    const data = await this.userHomeAppService.getSensorConfigByMachineCode(machineCode);
-    return {
-      message: 'Lấy cấu hình cảm biến thành công',
-      data,
-    };
-  }
 }
