@@ -5,7 +5,7 @@ import { UserHomeResDto } from '../../userHome/app/userHome.response';
 import { TaskLeftEventEnum, TaskRightEventEnum, TaskStatusEnum } from '../common/todo.enum';
 import { HarvestDataInputDto } from './todo.dto';
 
-export class TodoHomeDataResDto extends OmitType(UserHomeResDto, ['isIntegateTempHum', 'isIntegateCurrent', 'isTriggered', 'uniqueId'] as const) {}
+export class TodoHomeDataResDto extends OmitType(UserHomeResDto, ['isIntegateTempHum', 'isIntegateCurrent', 'isIntegateIOT', 'isTriggered', 'uniqueId'] as const) {}
 
 export class GetTaskResDto {
   @ApiProperty({ example: 0 })

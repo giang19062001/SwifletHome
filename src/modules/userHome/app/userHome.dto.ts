@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class UploadUserHomeImageDto {
@@ -53,16 +53,25 @@ export class MutationUserHomeDto {
     enum: YnEnum,
   })
   @IsEnum(YnEnum)
-  @IsNotEmpty()
-  isIntegateTempHum: YnEnum;
+  @IsOptional()
+  isIntegateTempHum?: YnEnum;
 
   @ApiProperty({
     example: YnEnum.N,
     enum: YnEnum,
   })
   @IsEnum(YnEnum)
-  @IsNotEmpty()
-  isIntegateCurrent: YnEnum;
+  @IsOptional()
+  isIntegateCurrent?: YnEnum;
+
+  @ApiProperty({
+    example: YnEnum.N,
+    enum: YnEnum,
+    required: false,
+  })
+  @IsEnum(YnEnum)
+  @IsOptional()
+  isIntegateIOT?: YnEnum;
 
   @ApiProperty({ example: 25.75, description: 'Chiều dài nhà (m)' })
   @Type(() => Number)

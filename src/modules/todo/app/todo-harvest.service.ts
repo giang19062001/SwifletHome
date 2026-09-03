@@ -352,7 +352,7 @@ export class TodoHarvestAppService {
     // Nếu tìm thấy, lấy chi tiết tầng/ô, nếu không trả về mảng trống
     const harvestData = taskHarvestComplete ? await this.arrangeHarvestRows(taskHarvestComplete.seq, homeInfo.userHomeFloor) : [];
 
-    const { isIntegateTempHum, isIntegateCurrent, isTriggered, uniqueId, ...cleanHomeData } = homeInfo;
+    const { isIntegateTempHum, isIntegateCurrent, isIntegateIOT, isTriggered, uniqueId, ...cleanHomeData } = homeInfo;
 
     return {
       seq: dto.seq,

@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatu
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { multerImgConfig } from 'src/config/multer.config';
-import { GetUserApp } from 'src/decorator/auth.decorator';
+import { GetUserApp, Public } from 'src/decorator/auth.decorator';
 import { PagingDto } from 'src/dto/admin.dto';
 import { ApiAppResponseDto } from 'src/dto/app.dto';
 import { ListResponseDto, NullResponseDto, NumberOkResponseDto } from 'src/dto/common.dto';
@@ -172,6 +172,22 @@ Nếu có upload ảnh trước đó thì **uniqueId** sẽ là giá trị **uui
     return {
       message: result.filename != '' ? Msg.UploadOk : Msg.UploadErr,
       data: result,
+    };
+  }
+
+  // TODO: SENSOR
+  @ApiOperation({
+    summary: 'Cung cấp mã macId cho thiết bị cảm biến dựa vào machineCode',
+  })
+  @Public()
+  @ApiParam({ name: 'machineCode', type: String })
+  @Get('sensorConfig/:machineCode')
+  @HttpCode(HttpStatus.OK)
+  async getSensorConfigByMachineCode(@Param('machineCode') machineCode: string) {
+    const data = await this.userHomeAppService.getSensorConfigByMachineCode(machineCode);
+    return {
+      message: 'Lấy cấu hình cảm biến thành công',
+      data,
     };
   }
 }

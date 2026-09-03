@@ -51,6 +51,9 @@ export class UserHomeSensorResDto {
   isIntegateCurrent: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
+  isIntegateIOT: YnEnum;
+
+  @ApiProperty({ example: YnEnum.N })
   isTriggered: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
@@ -67,6 +70,9 @@ export class UserHomeSensorResDto {
 
   @ApiProperty({ example: '' })
   updatedId: string;
+
+  @ApiProperty({ example: '' })
+  machineCode: string;
 
   @ApiProperty({ example: '' })
   macId: string;

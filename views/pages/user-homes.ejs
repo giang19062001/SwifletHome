@@ -85,11 +85,7 @@
                            </th>
                            <th>
                               <p>Tích hợp</p> 
-                              <p>độ ẩm/ nhiệt độ</p>
-                           </th>
-                           <th>
-                              <p>Tích hợp</p> 
-                              <p>dòng điện</p>
+                              <p>IOT</p>
                            </th>
                            <th>
                               <p>Tình trạng</p> 
@@ -137,19 +133,25 @@
                <input type="hidden" id="userHomeCode" value="">
 
                <div class="mb-3">
-                  <label for="macId" class="form-label">MAC Id của cảm biến</label>
+                  <label for="macId" class="form-label">MAC Id</label>
                   <input type="text" class="form-control" id="macId" name="macId" placeholder="" disabled>
                   <div class="error-message" data-error="macId"></div>
                </div>
 
                <div class="mb-3">
-                  <label for="wifiId" class="form-label">Id của Wifi</label>
+                  <label for="machineCode" class="form-label">Mã máy / Cảm biến <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="machineCode" name="machineCode" placeholder="Nhập mã máy / mã cảm biến">
+                  <div class="error-message" data-error="machineCode"></div>
+               </div>
+
+               <div class="mb-3 d-none">
+                  <label for="wifiId" class="form-label">Id của Wifi (Không bắt buộc)</label>
                   <input type="text" class="form-control" id="wifiId" name="wifiId" placeholder="wificuatoi">
                   <div class="error-message" data-error="wifiId"></div>
                </div>
 
-               <div class="mb-3">
-                  <label for="wifiPassword" class="form-label">Mật khẩu của Wifi</label>
+               <div class="mb-3 d-none">
+                  <label for="wifiPassword" class="form-label">Mật khẩu của Wifi (Không bắt buộc)</label>
                   <input type="text" class="form-control" id="wifiPassword" name="wifiPassword" placeholder="123456">
                   <div class="error-message" data-error="wifiPassword"></div>
                </div>
@@ -182,19 +184,25 @@
                <input type="hidden" id="userHomeCode" value="">
 
                <div class="mb-3">
-                  <label for="macId" class="form-label">MAC Id của cảm biến</label>
+                  <label for="macId" class="form-label">MAC Id</label>
                   <input type="text" class="form-control" id="macId" name="macId" placeholder="" disabled>
                   <div class="error-message" data-error="macId"></div>
                </div>
 
                <div class="mb-3">
-                  <label for="wifiId" class="form-label">Id của Wifi</label>
+                  <label for="machineCode" class="form-label">Mã máy / Cảm biến <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="machineCode" name="machineCode" placeholder="Nhập mã máy / mã cảm biến">
+                  <div class="error-message" data-error="machineCode"></div>
+               </div>
+
+               <div class="mb-3 d-none">
+                  <label for="wifiId" class="form-label">Id của Wifi (Không bắt buộc)</label>
                   <input type="text" class="form-control" id="wifiId" name="wifiId" placeholder="wificuatoi">
                   <div class="error-message" data-error="wifiId"></div>
                </div>
 
-               <div class="mb-3">
-                  <label for="wifiPassword" class="form-label">Mật khẩu của Wifi</label>
+               <div class="mb-3 d-none">
+                  <label for="wifiPassword" class="form-label">Mật khẩu của Wifi (Không bắt buộc)</label>
                   <input type="text" class="form-control" id="wifiPassword" name="wifiPassword" placeholder="123456">
                   <div class="error-message" data-error="wifiPassword"></div>
                </div>
@@ -226,18 +234,24 @@
                <input type="hidden" id="userHomeCode" value="">
 
                <div class="mb-3">
-                  <label for="macId" class="form-label">MAC Id của cảm biến</label>
+                  <label for="macId" class="form-label">MAC Id</label>
                   <input type="text" class="form-control" id="macId" name="macId" disabled>
                   <div class="error-message" data-error="macId"></div>
                </div>
 
                <div class="mb-3">
+                  <label for="machineCode" class="form-label">Mã máy / Cảm biến</label>
+                  <input type="text" class="form-control" id="machineCode" name="machineCode" disabled>
+                  <div class="error-message" data-error="machineCode"></div>
+               </div>
+
+               <div class="mb-3 d-none">
                   <label for="wifiId" class="form-label">Id của Wifi</label>
                   <input type="text" class="form-control" id="wifiId" name="wifiId" disabled>
                   <div class="error-message" data-error="wifiId"></div>
                </div>
 
-               <div class="mb-3">
+               <div class="mb-3 d-none">
                   <label for="wifiPassword" class="form-label">Mật khẩu của Wifi</label>
                   <input type="text" class="form-control" id="wifiPassword" name="wifiPassword" disabled>
                   <div class="error-message" data-error="wifiPassword"></div>

@@ -190,4 +190,20 @@ export class UserHomeAppService {
   async deleteFile(seq: number) {
     return await this.userHomeAppRepository.deleteFile(seq);
   }
+
+  // TODO: SENSOR
+  async getSensorConfigByMachineCode(machineCode: string) {
+    const logbase = `${this.SERVICE_NAME}/getSensorConfigByMachineCode:`;
+    this.logger.log(logbase, `Lấy cấu hình cảm biến cho mã máy: ${machineCode}`);
+    try {
+      const config = await this.userHomeAppRepository.getSensorConfigByMachineCode(machineCode);
+      if (!config) {
+        throw new BadRequestException('Không tìm thấy cấu hình cảm biến cho mã máy này');
+      }
+      return config;
+    } catch (error) {
+      this.logger.error(logbase, error);
+      throw error;
+    }
+  }
 }

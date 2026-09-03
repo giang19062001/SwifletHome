@@ -12,6 +12,7 @@ export class UserHomeAppRepository {
   private readonly table = 'tbl_user_home';
   private readonly tableImg = 'tbl_user_home_img';
   private readonly tableUserApp = 'tbl_user_app';
+  private readonly tableSensor = 'tbl_user_home_sensor';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
   async getTotalHomes(userCode: string): Promise<number> {
@@ -27,7 +28,7 @@ export class UserHomeAppRepository {
   async getAllHomes(dto: PagingDto, userCode: string): Promise<UserHomeResDto[]> {
     let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, B.provinceName AS userHomeProvince,
      A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-    A.isIntegateTempHum, A.isIntegateCurrent, A.isTriggered, A.isMain
+    A.isIntegateTempHum, A.isIntegateCurrent, A.isIntegateIOT, A.isTriggered, A.isMain
     FROM ${this.table} A 
     INNER JOIN  ${this.tableUserApp} AU
     ON A.userCode = AU.userCode
@@ -62,7 +63,7 @@ export class UserHomeAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince,
        A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-       A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
+       A.isIntegateTempHum, A.isIntegateCurrent, A.isIntegateIOT, A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
           INNER JOIN  ${this.tableUserApp} B
           ON A.userCode = B.userCode
@@ -76,7 +77,7 @@ export class UserHomeAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode,  A.userHomeCode,  A.userHomeName, A.userHomeAddress, A.userHomeProvince,
        A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-       A.isIntegateTempHum, A.isIntegateCurrent,  A.isTriggered, A.isMain, A.uniqueId
+       A.isIntegateTempHum, A.isIntegateCurrent, A.isIntegateIOT, A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
           INNER JOIN  ${this.tableUserApp} B
           ON A.userCode = B.userCode
@@ -97,8 +98,8 @@ export class UserHomeAppRepository {
 
     const sql = `
       INSERT INTO ${this.table}  (userCode, userHomeCode, userHomeName, userHomeAddress, userHomeProvince, userHomeDescription, userHomeImage,
-       userHomeLength, userHomeWidth, userHomeFloor, isIntegateTempHum, isIntegateCurrent, isTriggered, isMain, uniqueId, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       userHomeLength, userHomeWidth, userHomeFloor, isIntegateTempHum, isIntegateCurrent, isIntegateIOT, isTriggered, isMain, uniqueId, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       userCode,
@@ -111,8 +112,9 @@ export class UserHomeAppRepository {
       dto.userHomeLength,
       dto.userHomeWidth,
       dto.userHomeFloor,
-      dto.isIntegateTempHum,
-      dto.isIntegateCurrent,
+      dto.isIntegateTempHum ?? YnEnum.N,
+      dto.isIntegateCurrent ?? YnEnum.N,
+      dto.isIntegateIOT ?? YnEnum.N,
       'N', // isTriggered
       isMain,
       dto.uniqueId,
@@ -141,7 +143,7 @@ export class UserHomeAppRepository {
     UPDATE ${this.table}
     SET 
       userHomeName = ?, userHomeAddress = ?, userHomeProvince = ?, userHomeDescription = ?, 
-      userHomeImage = ?, userHomeLength = ?, userHomeWidth = ?, userHomeFloor = ?, isIntegateTempHum = ?, isIntegateCurrent = ?,
+      userHomeImage = ?, userHomeLength = ?, userHomeWidth = ?, userHomeFloor = ?, isIntegateTempHum = ?, isIntegateCurrent = ?, isIntegateIOT = ?,
       uniqueId = ?,  updatedId = ?, updatedAt = ?
       WHERE userHomeCode = ?
   `;
@@ -155,8 +157,9 @@ export class UserHomeAppRepository {
       dto.userHomeLength,
       dto.userHomeWidth,
       dto.userHomeFloor,
-      dto.isIntegateTempHum,
-      dto.isIntegateCurrent,
+      dto.isIntegateTempHum ?? YnEnum.N,
+      dto.isIntegateCurrent ?? YnEnum.N,
+      dto.isIntegateIOT ?? YnEnum.N,
       dto.uniqueId,
       userCode, // updatedId
       new Date(),
@@ -231,5 +234,17 @@ export class UserHomeAppRepository {
     const [result] = await this.db.execute<ResultSetHeader>(sql, [uniqueId]);
 
     return result.affectedRows;
+  }
+
+  // TODO: SENSOR
+  async getSensorConfigByMachineCode(machineCode: string): Promise<{ machineCode: string; macId: string; userHomeCode: string; userCode: string } | null> {
+    const [rows] = await this.db.query<RowDataPacket[]>(
+      ` SELECT machineCode, macId, userHomeCode, userCode
+        FROM ${this.tableSensor}
+        WHERE machineCode = ? AND isActive = 'Y'
+        LIMIT 1 `,
+      [machineCode],
+    );
+    return rows.length ? (rows[0] as any) : null;
   }
 }

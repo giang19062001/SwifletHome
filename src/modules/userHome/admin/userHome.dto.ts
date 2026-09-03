@@ -30,12 +30,13 @@ export class TriggerUserHomeSensorDto {
   @IsNotEmpty()
   userCode: string;
 
-  // @ApiProperty({
-  //   example: '',
-  // })
-  // @IsString()
-  // @IsNotEmpty()
-  // userHomeCode: string;
+  @ApiProperty({
+    example: '',
+    description: 'Mã máy / Mã cảm biến',
+  })
+  @IsString()
+  @IsNotEmpty()
+  machineCode: string;
 
   @ApiProperty({
     example: '',
@@ -46,15 +47,17 @@ export class TriggerUserHomeSensorDto {
 
   @ApiProperty({
     example: '',
+    required: false,
   })
   @IsString()
-  @IsNotEmpty()
-  wifiId: string;
+  @IsOptional()
+  wifiId?: string;
 
   @ApiProperty({
     example: '',
+    required: false,
   })
   @IsString()
-  @IsNotEmpty()
-  wifiPassword: string;
+  @IsOptional()
+  wifiPassword?: string;
 }

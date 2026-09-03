@@ -50,6 +50,9 @@ export class GetHomeUserResDto {
   isIntegateCurrent: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
+  isIntegateIOT: YnEnum;
+
+  @ApiProperty({ example: YnEnum.N })
   isTriggered: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
@@ -128,6 +131,9 @@ export class UserHomeResDto {
 
   @ApiProperty({ example: YnEnum.N })
   isIntegateCurrent: YnEnum;
+
+  @ApiProperty({ example: YnEnum.N })
+  isIntegateIOT: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
   isTriggered: YnEnum;

@@ -7,14 +7,11 @@ let filterValueDefault = {
   provinceCode: '',
 };
 const TriggerHomeConstraints = {
+  machineCode: {
+    presence: { allowEmpty: false, message: '^Vui lòng nhập Mã máy / cảm biến.' },
+  },
   macId: {
     presence: { allowEmpty: false, message: '^Vui lòng nhập Mac Id của  bộ thiết bị cảm biến.' },
-  },
-  wifiId: {
-    presence: { allowEmpty: false, message: '^Vui lòng nhập Id wifi.' },
-  },
-  wifiPassword: {
-    presence: { allowEmpty: false, message: '^Vui lòng nhập mật khẩu wifi.' },
   },
 };
 
@@ -101,9 +98,10 @@ async function openModal(userCode, userHomeCode, type, data = null) {
 
   // hiện giá trị cho modal detail
   if ((type == 'detail' || type == 'reset') && data) {
-    modalForm.querySelector('#macId').value = data.macId;
-    modalForm.querySelector('#wifiId').value = data.wifiId;
-    modalForm.querySelector('#wifiPassword').value = data.wifiPassword;
+    modalForm.querySelector('#machineCode').value = data.machineCode || '';
+    modalForm.querySelector('#macId').value = data.macId || '';
+    modalForm.querySelector('#wifiId').value = data.wifiId || '';
+    modalForm.querySelector('#wifiPassword').value = data.wifiPassword || '';
   }
 
   // chỉ mở modal nếu nó chưa mở
@@ -148,15 +146,14 @@ const renderAllUserHomes = (data, objElement) => {
             <p class="mt-2">Chiều rộng: ${ele.userHomeWidth} (m)</p>
             <p class="mt-2">Số tầng: ${ele.userHomeFloor}</p>
         </td>
-        <td class="py-3"><p>${ele.isIntegateTempHum == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
-        <td class="py-3"><p>${ele.isIntegateCurrent == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
+        <td class="py-3"><p>${ele.isIntegateIOT == 'Y' ? `<span class="txt-ok">Có</span>` : `<span class="txt-not-ok">Không</span>`}</p></td>
         <td class="py-3"><p>${ele.isTriggered == 'Y' ? `<span class="txt-ok">Đã kích hoạt</span>` : `<span class="txt-not-ok">Chưa kích hoạt</span>`}</p></td>
         <td class="py-3" style="max-width: 125px;"><p>${ele.createdAt ? formatDateTime(ele.createdAt) : ''}</p></td>
         <td class="py-3" style="max-width: 125px;"><p>${ele.updatedAt ? formatDateTime(ele.updatedAt) : ''}</p></td>
         <td class="py-3">
           <div class="d-grid gap-2">
             ${
-              ele.isIntegateTempHum == 'Y' || ele.isIntegateCurrent == 'Y'
+              ele.isIntegateIOT == 'Y'
                 ? ele.isTriggered == 'N'
                   ? `<button class="btn-edit" onclick="openModal('${ele.userCode}', '${ele.userHomeCode}', 'trigger')">Kích hoạt</button>`
                   : `<button class="btn-info" onclick="getDetailHome('${ele.userCode}', '${ele.userHomeCode}', 'detail')">Thông tin cảm biến</button>
@@ -234,6 +231,7 @@ async function triggerHome(modalForm) {
   const userHomeCode = modalForm.querySelector('#userHomeCode').value;
 
   const formData = {
+    machineCode: modalForm.querySelector('#machineCode').value,
     macId: modalForm.querySelector('#macId').value,
     wifiId: modalForm.querySelector('#wifiId').value,
     wifiPassword: modalForm.querySelector('#wifiPassword').value,
@@ -277,6 +275,7 @@ async function resetTriggeringHome(modalForm) {
   const userHomeCode = modalForm.querySelector('#userHomeCode').value;
 
   const formData = {
+    machineCode: modalForm.querySelector('#machineCode').value,
     macId: modalForm.querySelector('#macId').value,
     wifiId: modalForm.querySelector('#wifiId').value,
     wifiPassword: modalForm.querySelector('#wifiPassword').value,

@@ -43,7 +43,7 @@ export class ShareAppService {
       throw new BadRequestException({ message: 'Token không hợp lệ hoặc đã hết hạn', data: null });
     }
 
-    switch (shareMaster.shareType) {
+    switch (shareMaster.shareType as unknown as ShareTypeEnum) {
       case ShareTypeEnum.HARVEST: {
         const harvestPhaseDetail = await this.shareRepository.getHarvestPhaseBySeq(shareMaster.seqShare);
         if (!harvestPhaseDetail) {
@@ -55,12 +55,12 @@ export class ShareAppService {
           throw new BadRequestException({ message: 'Không tìm thấy thông tin nhà yến', data: null });
         }
 
-        const { isIntegateTempHum, isIntegateCurrent, isTriggered, uniqueId, ...cleanHomeData } = homeData;
+        const { isIntegateTempHum, isIntegateCurrent, isIntegateIOT, isTriggered, uniqueId, ...cleanHomeData } = homeData;
 
         const harvestData = await this.todoHarvestAppService.arrangeHarvestRows(harvestPhaseDetail.seq, homeData.userHomeFloor);
 
         return {
-          shareType: shareMaster.shareType,
+          shareType: shareMaster.shareType as ShareTypeEnum,
           shareData: {
             seq: harvestPhaseDetail.seq,
             harvestPhase: harvestPhaseDetail.harvestPhase,
