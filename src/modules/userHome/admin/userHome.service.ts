@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoggingService } from 'src/common/logger/logger.service';
 import { UserHomeResDto } from '../app/userHome.response';
 import { GetHomesAdminDto, TriggerUserHomeSensorDto } from './userHome.dto';
@@ -21,8 +21,14 @@ export class UserHomeAdminService {
     const result = await this.userHomeAdminRepository.getDetail(userHomeCode);
     return result;
   }
+  // TODO: SENSOR
   async triggerHome(dto: TriggerUserHomeSensorDto, updatedId: string, userHomeCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/triggerHome`;
+
+    const isExistMachineCode = await this.userHomeAdminRepository.checkExistMachineCode(dto.machineCode);
+    if (isExistMachineCode) {
+      throw new BadRequestException('Mã máy (machineCode) đã bị trùng');
+    }
 
     let res = 0;
     // insert giá trị sensor vào db
@@ -38,11 +44,18 @@ export class UserHomeAdminService {
   }
   async resetTriggeringHome(dto: TriggerUserHomeSensorDto, updatedId: string, userHomeCode: string): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/resetTriggeringHome`;
+
+    const isExistMachineCode = await this.userHomeAdminRepository.checkExistMachineCode(dto.machineCode, userHomeCode);
+    if (isExistMachineCode) {
+      throw new BadRequestException('Mã máy (machineCode) đã bị trùng');
+    }
+
     const result = await this.userHomeAdminRepository.updateSensorForHome(dto, userHomeCode, updatedId);
     this.logger.log(logbase, `Cập nhập cảm biến với Mac ${dto.macId} cho nhà yến ${userHomeCode} của khách hàng ${dto.userCode}`);
     return result;
   }
 
+  // TODO: FILTER
   async getUserHomesByUser(userCodes?: string[]) {
     return await this.userHomeAdminRepository.getUserHomesByUser(userCodes);
   }

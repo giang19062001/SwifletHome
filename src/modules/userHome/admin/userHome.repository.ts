@@ -197,4 +197,18 @@ export class UserHomeAdminRepository {
 
     return result.affectedRows;
   }
+
+  async checkExistMachineCode(machineCode: string, excludeUserHomeCode?: string): Promise<boolean> {
+    if (!machineCode) return false;
+    let sql = `SELECT seq FROM ${this.tableSensor} WHERE machineCode = ? AND isActive = 'Y'`;
+    const params: any[] = [machineCode.trim()];
+
+    if (excludeUserHomeCode) {
+      sql += ` AND userHomeCode != ?`;
+      params.push(excludeUserHomeCode);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
+    return rows.length > 0;
+  }
 }

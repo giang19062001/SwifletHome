@@ -266,6 +266,8 @@ async function triggerHome(modalForm) {
       })
       .catch(function (err) {
         console.log('err', err);
+        const msg = err?.response?.data?.message;
+        toastErr(Array.isArray(msg) ? msg[0] : (msg || 'Chỉnh sửa thất bại'));
       });
   }
 }
@@ -310,6 +312,8 @@ async function resetTriggeringHome(modalForm) {
       })
       .catch(function (err) {
         console.log('err', err);
+        const msg = err?.response?.data?.message;
+        toastErr(Array.isArray(msg) ? msg[0] : (msg || 'Chỉnh sửa thất bại'));
       });
   }
 }
