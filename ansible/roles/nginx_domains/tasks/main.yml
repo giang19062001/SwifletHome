@@ -1,0 +1,81 @@
+---
+- name: Ensure sites-available and sites-enabled directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "{{ nginx_sites_available }}"
+    - "{{ nginx_sites_enabled }}"
+
+- name: Copy domain configuration files from local/nginx/ to server sites-available
+  copy:
+    src: "{{ item }}"
+    dest: "{{ nginx_sites_available }}/{{ item | basename }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_fileglob:
+    - "{{ local_nginx_dir }}/*.conf"
+  notify:
+    - Test and reload Nginx
+
+- name: Generate Nginx config from template for domains without custom file
+  template:
+    src: domain.conf.j2
+    dest: "{{ nginx_sites_available }}/{{ item.name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ nginx_domains | default([]) }}"
+  when:
+    - item.custom_conf is not defined
+  notify:
+    - Test and reload Nginx
+
+- name: Enable domain sites by creating symlinks in sites-enabled
+  file:
+    src: "{{ nginx_sites_available }}/{{ item | basename }}"
+    dest: "{{ nginx_sites_enabled }}/{{ item | basename }}"
+    state: link
+    force: yes
+  with_fileglob:
+    - "{{ local_nginx_dir }}/*.conf"
+  notify:
+    - Test and reload Nginx
+
+- name: Enable template-generated sites in sites-enabled
+  file:
+    src: "{{ nginx_sites_available }}/{{ item.name }}.conf"
+    dest: "{{ nginx_sites_enabled }}/{{ item.name }}.conf"
+    state: link
+    force: yes
+  loop: "{{ nginx_domains | default([]) }}"
+  when:
+    - item.custom_conf is not defined
+  notify:
+    - Test and reload Nginx
+
+# --- AUTOMATIC SSL CERTBOT TASKS ---
+
+- name: Ensure Certbot and Nginx plugin are installed
+  apt:
+    name:
+      - certbot
+      - python3-certbot-nginx
+    state: present
+    update_cache: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Automatically issue/renew SSL certificate via Certbot for domains
+  command: >
+    certbot --nginx -d {{ item.name }} --non-interactive --agree-tos -m {{ certbot_email | default('admin@3fam.ai') }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ item.name }}/fullchain.pem"
+  loop: "{{ nginx_domains | default([]) }}"
+  when:
+    - item.enable_ssl | default(false)
+  notify:
+    - Test and reload Nginx

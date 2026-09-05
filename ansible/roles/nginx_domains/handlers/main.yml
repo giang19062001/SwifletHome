@@ -1,0 +1,11 @@
+---
+- name: Test and reload Nginx
+  block:
+    - name: Validate Nginx configuration syntax
+      command: nginx -t
+      changed_when: false
+
+    - name: Reload Nginx service
+      service:
+        name: nginx
+        state: reloaded

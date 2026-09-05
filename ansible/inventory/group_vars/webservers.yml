@@ -1,0 +1,45 @@
+---
+# Đường dẫn cấu hình Nginx trên server
+nginx_sites_available: "/etc/nginx/sites-available"
+nginx_sites_enabled: "/etc/nginx/sites-enabled"
+
+# Đường dẫn thư mục chứa file conf ở local (tính từ vị trí playbook site.yml)
+local_nginx_dir: "../local/nginx"
+
+# Email dùng để đăng ký SSL Certbot Let's Encrypt
+certbot_email: "admin@3fam.ai"
+
+# Danh sách cấu hình các Domain Nginx
+nginx_domains:
+  - name: 3fam.ai
+    server_name: "3fam.ai www.3fam.ai"
+    upstream_url: "http://127.0.0.1:3502"
+    custom_conf: "3fam.ai.conf"
+    enable_ssl: true
+
+  - name: 3fam.vn
+    server_name: "3fam.vn www.3fam.vn"
+    upstream_url: "http://127.0.0.1:8081"
+    custom_conf: "3fam.vn.conf"
+    enable_ssl: true
+
+  - name: mqtt.3fam.ai
+    server_name: "mqtt.3fam.ai"
+    upstream_url: "http://127.0.0.1:1883"
+    websocket: true
+    custom_conf: "mqtt.3fam.ai.conf"
+    enable_ssl: true
+
+  - name: jenkins.3fam.ai
+    server_name: "jenkins.3fam.ai"
+    upstream_url: "http://127.0.0.1:8080"
+    websocket: true
+    custom_conf: "jenkins.3fam.ai.conf"
+    enable_ssl: true
+
+  - name: grafana.3fam.ai
+    server_name: "grafana.3fam.ai"
+    upstream_url: "http://127.0.0.1:3000"
+    websocket: true
+    custom_conf: "grafana.3fam.ai.conf"
+    enable_ssl: true

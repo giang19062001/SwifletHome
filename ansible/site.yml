@@ -1,0 +1,6 @@
+---
+- name: Synchronize and Configure Nginx Domains
+  hosts: webservers
+  become: yes
+  roles:
+    - nginx_domains

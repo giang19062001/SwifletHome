@@ -117,6 +117,7 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
       light: data.light ?? 0,
       fan: data.fan ?? 0,
       pump: data.pump ?? 0,
+      status: 'online',
     };
 
     const room = `HOME-${userCode}-${homeCode}-ROOM`;
@@ -144,10 +145,16 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
         temperature: 0,
         humidity: 0,
         current: 0,
+        light: 0,
+        fan: 0,
+        pump: 0,
+        status: 'offline',
       };
 
       this.sendSensorData(room, offlineData);
-      console.log(this.SERVICE_NAME, `Thiết bị offline  ${key}`);
+      console.log(this.SERVICE_NAME, `Thiết bị offline ${key}`);
+    } else if (status === 'online') {
+      console.log(this.SERVICE_NAME, `Thiết bị online ${key}`);
     }
   }
 }

@@ -74,3 +74,6 @@ uploads/*
 AGENTS.md
 CLAUDE.md
 .vscode
+
+# Ansible
+ansible/inventory/hosts.ini

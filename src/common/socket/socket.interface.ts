@@ -5,6 +5,7 @@ export interface ISensor {
   light?: number;
   fan?: number;
   pump?: number;
+  status?: 'online' | 'offline';
   timestamp?: number;
 }
 
@@ -22,4 +23,5 @@ export interface ISensorHome {
   light?: number;
   fan?: number;
   pump?: number;
+  status?: 'online' | 'offline';
 }

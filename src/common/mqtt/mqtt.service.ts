@@ -125,4 +125,22 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
       });
     });
   }
+
+  publishStatus(macId: string, status: 'online' | 'offline'): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.client || !this.client.connected) {
+        return reject(new Error('MQTT client chưa sẵn sàng hoặc mất kết nối'));
+      }
+      const topic = `sensor/${macId}/status`;
+
+      this.client.publish(topic, status, { qos: 0, retain: true }, (err) => {
+        if (err) {
+          this.logger.error(this.SERVICE_NAME, `Cập nhật status MQTT thất bại: ${err.message}`);
+          return reject(err);
+        }
+        console.log(this.SERVICE_NAME, `==> [STATUS OVERRIDE] Cập nhật ${topic} thành ${status}`);
+        resolve();
+      });
+    });
+  }
 }
