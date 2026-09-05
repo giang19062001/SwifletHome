@@ -10,7 +10,6 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
   private client: mqtt.MqttClient;
   private brokerUrl: string;
   private sensorTimeouts: Map<string, NodeJS.Timeout> = new Map();
-  private deviceStatusMap: Map<string, ISensor> = new Map();
   private readonly SENSOR_TIMEOUT_MS = 15_000; // 15s không nhận được telemetry -> TỰ ĐỘNG CHUYỂN OFFLINE
 
   // Topic duy nhất cần theo dõi dữ liệu cảm biến
@@ -37,7 +36,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     this.client.on('connect', () => {
       console.log(this.SERVICE_NAME, ` ==> Connect ${this.brokerUrl} successfully`);
 
-      // Subscribe topic data duy nhất
+      // Subscribe topic data
       this.client.subscribe(this.dataTopic, (err) => {
         if (!err) {
           console.log(this.SERVICE_NAME, ` ==> Subscribed: ${this.dataTopic}`);
@@ -66,9 +65,6 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
             timestamp: Date.now(),
           };
 
-          // Lưu cache trạng thái thiết bị
-          this.deviceStatusMap.set(key, sensorData);
-
           // Reset đếm ngược 15s Heartbeat
           this.updateSensorHeartbeat(key);
 
@@ -89,27 +85,26 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     this.client.on('error', (err) => this.logger.error(this.SERVICE_NAME, `MQTT error ${JSON.stringify(err)}`));
   }
 
-  // Quản lý Heartbeat Timeout: Tự phát hiện offline
+  // Quản lý Heartbeat Timeout: Tự phát hiện offline dựa trên duy nhất sensorTimeouts Map
   private updateSensorHeartbeat(key: string) {
+    const isFirstTimeOnline = !this.sensorTimeouts.has(key);
+
     if (this.sensorTimeouts.has(key)) {
       clearTimeout(this.sensorTimeouts.get(key));
+    }
+
+    // Nếu vừa mới online lại sau khi offline -> Cập nhật "online" lên MQTT Broker
+    if (isFirstTimeOnline) {
+      this.publishStatus(key, 'online').catch(() => {});
     }
 
     const timeout = setTimeout(() => {
       console.log(this.SERVICE_NAME, `Thiết bị ${key} quá 15s không gửi data -> CHUYỂN OFFLINE`);
 
-      const offlineState: ISensor = {
-        temperature: 0,
-        humidity: 0,
-        current: 0,
-        light: 0,
-        fan: 0,
-        pump: 0,
-        status: 'offline',
-        timestamp: Date.now(),
-      };
+      this.sensorTimeouts.delete(key);
 
-      this.deviceStatusMap.set(key, offlineState);
+      // Cập nhật "offline" lên MQTT Broker
+      this.publishStatus(key, 'offline').catch(() => {});
 
       // Bắn sự kiện chuyển sang OFFLINE cho Socket Gateway
       this.eventEmitter.emit('sensor.status.changed', {
@@ -117,44 +112,29 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
         status: 'offline',
         timestamp: Date.now(),
       });
-
-      this.sensorTimeouts.delete(key);
     }, this.SENSOR_TIMEOUT_MS);
 
     this.sensorTimeouts.set(key, timeout);
   }
 
-  // Lấy trạng thái hiện tại của thiết bị
+  // Lấy trạng thái hiện tại của thiết bị (Chỉ cần phụ thuộc sensorTimeouts)
   getDeviceStatus(key: string): ISensor {
-    const last = this.deviceStatusMap.get(key);
-    if (!last) {
-      return {
-        temperature: 0,
-        humidity: 0,
-        current: 0,
-        light: 0,
-        fan: 0,
-        pump: 0,
-        status: 'offline',
-        timestamp: Date.now(),
-      };
-    }
-
-    const isTimeout = Date.now() - (last.timestamp || 0) > this.SENSOR_TIMEOUT_MS;
-    if (isTimeout) {
-      return {
-        ...last,
-        status: 'offline',
-      };
-    }
-
-    return last;
+    const isOnline = this.sensorTimeouts.has(key);
+    return {
+      temperature: 0,
+      humidity: 0,
+      current: 0,
+      light: 0,
+      fan: 0,
+      pump: 0,
+      status: isOnline ? 'online' : 'offline',
+      timestamp: Date.now(),
+    };
   }
 
   onApplicationShutdown() {
     this.sensorTimeouts.forEach((timer) => clearTimeout(timer));
     this.sensorTimeouts.clear();
-    this.deviceStatusMap.clear();
     if (this.client) {
       this.client.end();
       console.log(this.SERVICE_NAME, 'Đã đóng kết nối MQTT');
@@ -176,6 +156,25 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
           return reject(err);
         }
         console.log(this.SERVICE_NAME, `==> [COMMAND] Gửi lệnh thành công tới topic ${topic}: ${message}`);
+        resolve();
+      });
+    });
+  }
+
+  // Phát trạng thái (online / offline) lên MQTT Broker
+  publishStatus(macId: string, status: 'online' | 'offline'): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.client || !this.client.connected) {
+        return resolve();
+      }
+      const topic = `sensor/${macId}/status`;
+
+      this.client.publish(topic, status, { qos: 0, retain: true }, (err) => {
+        if (err) {
+          this.logger.error(this.SERVICE_NAME, `Cập nhật status MQTT thất bại: ${err.message}`);
+          return resolve();
+        }
+        console.log(this.SERVICE_NAME, `==> [STATUS MQTT] Cập nhật ${topic} thành ${status}`);
         resolve();
       });
     });
