@@ -10,6 +10,7 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
   private client: mqtt.MqttClient;
   private brokerUrl: string;
   private sensorTimeouts: Map<string, NodeJS.Timeout> = new Map();
+  private deviceStatusMap: Map<string, ISensor> = new Map();
   private readonly SENSOR_TIMEOUT_MS = 15_000; // 15s không nhận được telemetry -> TỰ ĐỘNG CHUYỂN OFFLINE
 
   // Topic duy nhất cần theo dõi dữ liệu cảm biến
@@ -65,6 +66,9 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
             timestamp: Date.now(),
           };
 
+          // Lưu cache trạng thái thiết bị
+          this.deviceStatusMap.set(key, sensorData);
+
           // Reset đếm ngược 15s Heartbeat
           this.updateSensorHeartbeat(key);
 
@@ -94,6 +98,19 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     const timeout = setTimeout(() => {
       console.log(this.SERVICE_NAME, `Thiết bị ${key} quá 15s không gửi data -> CHUYỂN OFFLINE`);
 
+      const offlineState: ISensor = {
+        temperature: 0,
+        humidity: 0,
+        current: 0,
+        light: 0,
+        fan: 0,
+        pump: 0,
+        status: 'offline',
+        timestamp: Date.now(),
+      };
+
+      this.deviceStatusMap.set(key, offlineState);
+
       // Bắn sự kiện chuyển sang OFFLINE cho Socket Gateway
       this.eventEmitter.emit('sensor.status.changed', {
         key,
@@ -107,9 +124,37 @@ export class MqttService implements OnModuleInit, OnApplicationShutdown {
     this.sensorTimeouts.set(key, timeout);
   }
 
+  // Lấy trạng thái hiện tại của thiết bị
+  getDeviceStatus(key: string): ISensor {
+    const last = this.deviceStatusMap.get(key);
+    if (!last) {
+      return {
+        temperature: 0,
+        humidity: 0,
+        current: 0,
+        light: 0,
+        fan: 0,
+        pump: 0,
+        status: 'offline',
+        timestamp: Date.now(),
+      };
+    }
+
+    const isTimeout = Date.now() - (last.timestamp || 0) > this.SENSOR_TIMEOUT_MS;
+    if (isTimeout) {
+      return {
+        ...last,
+        status: 'offline',
+      };
+    }
+
+    return last;
+  }
+
   onApplicationShutdown() {
     this.sensorTimeouts.forEach((timer) => clearTimeout(timer));
     this.sensorTimeouts.clear();
+    this.deviceStatusMap.clear();
     if (this.client) {
       this.client.end();
       console.log(this.SERVICE_NAME, 'Đã đóng kết nối MQTT');

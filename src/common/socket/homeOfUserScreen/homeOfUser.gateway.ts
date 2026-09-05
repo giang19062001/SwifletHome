@@ -60,8 +60,11 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
 
     console.log(this.SERVICE_NAME, `${client.id} đã vào phòng: ${room}`);
 
-    // Gửi dữ liệu khởi tạo ( là 0 )
-    this.sendInitialData(client);
+    // Gửi dữ liệu trạng thái thực tế hiện tại của cảm biến ngay khi vừa vào phòng
+    const macKey = `MAC-${userCode}-${userHomeCode}`;
+    const initialStatus = this.mqttService.getDeviceStatus(macKey);
+    console.log(this.SERVICE_NAME, `Gửi trạng thái ban đầu cho ${client.id}: ${JSON.stringify(initialStatus)}`);
+    client.emit('streamSensorData', initialStatus);
   }
 
   @SubscribeMessage('leaveRoom')
@@ -81,17 +84,6 @@ export class HomeOfUserGateway implements OnGatewayConnection, OnGatewayDisconne
   private sendSensorData(room: string, payload: ISensor) {
     console.log(this.SERVICE_NAME, `streamSensorData: ${room} - ${JSON.stringify(payload)}`);
     this.server.to(room).emit('streamSensorData', payload);
-  }
-
-  private sendInitialData(client: Socket) {
-    client.emit('streamSensorData', {
-      temperature: 0,
-      humidity: 0,
-      current: 0,
-      light: 0,
-      fan: 0,
-      pump: 0,
-    });
   }
 
   // Nhận dữ liệu cảm biến realtime từ MQTT
