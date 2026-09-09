@@ -1,20 +1,31 @@
 import { TeamStatusEnum } from 'src/interfaces/admin.interface';
 import { generateSeriCode } from './traceability.func';
+import { TEXTS } from 'src/helpers/text.helper';
 
 export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
   hiNumberHarvest: ` SELECT 
-                B.harvestPhase AS value, 
-                B.harvestPhase AS label,
-                DATE_FORMAT(B.createdAt, '%Y-%m-%d') AS hiStartDateHarvest,
-                COALESCE(DATE_FORMAT(B.updatedAt, '%Y-%m-%d'), '') AS hiEndDateHarvest,
-                CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED) AS hmNumberNests
-            FROM tbl_user_home A
-            LEFT JOIN tbl_todo_task_harvest_phase B ON A.userCode = B.userCode AND A.userHomeCode = B.userHomeCode
-            LEFT JOIN tbl_todo_task_harvest C ON B.seq = C.seqHarvestPhase
-            WHERE B.seq IS NOT NULL AND B.isUse = 'Y' AND A.userCode = :userCode AND A.userHomeCode = :userHomeCode 
-            GROUP BY  B.harvestPhase,  B.createdAt, B.updatedAt;`,
-  rmTeamExecution: ` SELECT teamCode as value, teamName as label FROM tbl_team_user
-            WHERE status = '${TeamStatusEnum.APPROVE}' AND isActive =  'Y' `,
+                    B.harvestPhase AS value,
+                    CONCAT(
+                        '${TEXTS.PHASE} ', B.harvestPhase,
+                        ' - ',
+                        CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED),
+                         ' ${TEXTS.NEST_TITLE} '
+                        ' - ${TEXTS.HARVEST_DATE} ',
+                        DATE_FORMAT(B.createdAt, '%Y/%m/%d')
+                    ) AS label
+                FROM tbl_user_home A
+                LEFT JOIN tbl_todo_task_harvest_phase B 
+                    ON A.userCode = B.userCode 
+                    AND A.userHomeCode = B.userHomeCode
+                LEFT JOIN tbl_todo_task_harvest C 
+                    ON B.seq = C.seqHarvestPhase
+                WHERE B.seq IS NOT NULL
+                    AND A.userCode = :userCode
+                    AND A.userHomeCode = :userHomeCode
+                GROUP BY 
+                    B.harvestPhase,
+                    B.createdAt,
+                    B.updatedAt; `,
   diLotCode: ` SELECT A.requestCode AS value, A.requestCode AS label  FROM tbl_qr_request A
             JOIN tbl_qr_request_selling B 
             ON A.requestCode = B.requestCode

@@ -41,6 +41,9 @@ export const NOTIFICATIONS = {
 
 export const TEXTS = {
   PACKAGE_FREE: 'Gói dùng thử',
+  PHASE: 'Đợt thu hoạch',
+  NEST_TITLE: 'Tổ',
+  HARVEST_DATE: 'Ngày thu hoạch',
 };
 
 export const EMAIL = {
