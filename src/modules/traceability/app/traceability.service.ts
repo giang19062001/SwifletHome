@@ -12,12 +12,15 @@ import { generateTraceabilityId, generateTraceabilityQr, generateTraceabilityQrL
 import { TraceabilityStatusEnum } from './traceability.enum';
 import { TRACE_CONST } from './traceability.const';
 import { Msg } from 'src/helpers/message.helper';
-import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE } from './traceability.query';
+import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL } from './traceability.query';
+import { TraceabilityFieldsService } from './traceability-fields.service';
+
 @Injectable()
 export class TraceabilityAppService {
   constructor(
     private readonly repository: TraceabilityAppRepository,
     private readonly fileLocalService: FileLocalService,
+    private readonly traceabilityFieldsService: TraceabilityFieldsService,
   ) {}
 
   async getAllForms(): Promise<{ seq: number; formKey: string; formName: string; formDescription: string | null }[]> {
@@ -108,9 +111,9 @@ export class TraceabilityAppService {
           }
 
           if (currentValue === null || currentValue === undefined || currentValue === '') {
-            const generator = (TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE as any)[f.fieldKey];
-            if (generator) {
-              currentValue = typeof generator === 'function' ? generator(traceabilityId) : generator;
+            const defaultValue = this.traceabilityFieldsService.getDefaultCurrentValue(f.fieldKey, traceabilityId);
+            if (defaultValue !== null && defaultValue !== undefined) {
+              currentValue = defaultValue;
             }
           }
 
@@ -159,50 +162,59 @@ export class TraceabilityAppService {
           );
         }
       }
+    }
 
-      // dùng linkValues để fill trường khác tự động từ 1 trường select/radio
+    const submissionsFormData = await this.repository.getSubmissionsFormDataByUserHome(userCode, dto.userHomeCode);
+    const activeHarvestPhases = this.traceabilityFieldsService.collectHarvestPhases(savedData, submissionsFormData);
+
+    // dùng linkValues để fill trường khác tự động từ 1 trường select/radio
+    for (const group of mappedGroups) {
       for (const field of group.fields) {
-        // Xử lý options động
-        const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];
-        if (sqlQuery) {
-          promises.push(
-            (async () => {
-              try {
-                const rows = await this.repository.getDynamicOptions(sqlQuery, userCode, dto.userHomeCode);
-                const options = rows.map((row, idx) => {
-                  const { value, label, ...rest } = row;
-                  const option: any = {
-                    value: value,
-                    label: label,
-                    sortOrder: idx + 1,
-                  };
-                  if (Object.keys(rest).length > 0) {
-                    option.linkedValues = rest;
-                  }
-                  return option;
-                });
+        if (this.traceabilityFieldsService.isLotCodeField(field.fieldKey)) {
+          this.traceabilityFieldsService.applyLotCodeValueToField(field, dto.userHomeCode, activeHarvestPhases);
+        } else {
+          // Xử lý options động
+          const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];
+          if (sqlQuery) {
+            promises.push(
+              (async () => {
+                try {
+                  const rows = await this.repository.getDynamicOptions(sqlQuery, userCode, dto.userHomeCode);
+                  const options = rows.map((row, idx) => {
+                    const { value, label, ...rest } = row;
+                    const option: any = {
+                      value: value,
+                      label: label,
+                      sortOrder: idx + 1,
+                    };
+                    if (Object.keys(rest).length > 0) {
+                      option.linkedValues = rest;
+                    }
+                    return option;
+                  });
 
-                if (!field.config) {
-                  field.config = {};
-                } else if (typeof field.config === 'string') {
-                  try {
-                    field.config = JSON.parse(field.config);
-                  } catch (e) {
+                  if (!field.config) {
                     field.config = {};
+                  } else if (typeof field.config === 'string') {
+                    try {
+                      field.config = JSON.parse(field.config);
+                    } catch (e) {
+                      field.config = {};
+                    }
+                  }
+
+                  field.config.options = options;
+                } catch (error) {
+                  console.error(`Error fetching dynamic options for field "${field.fieldKey}":`, error);
+                  if (!field.config) {
+                    field.config = { options: [] };
+                  } else {
+                    field.config.options = [];
                   }
                 }
-
-                field.config.options = options;
-              } catch (error) {
-                console.error(`Error fetching dynamic options for field "${field.fieldKey}":`, error);
-                if (!field.config) {
-                  field.config = { options: [] };
-                } else {
-                  field.config.options = [];
-                }
-              }
-            })(),
-          );
+              })(),
+            );
+          }
         }
       }
     }
@@ -264,11 +276,13 @@ export class TraceabilityAppService {
 
     if (isExist) {
       // Cập nhật form
-      const [submission] = await (this.repository as any).db.execute(`SELECT seq, traceabilityCode FROM tbl_traceability_submissions WHERE uniqueId = ? LIMIT 1`, [dto.uniqueId]);
-      if (submission && submission[0]) {
-        const seq = submission[0].seq;
+      const [rows] = await (this.repository as any).db.execute(`SELECT seq, traceabilityCode, formData FROM tbl_traceability_submissions WHERE uniqueId = ? LIMIT 1`, [dto.uniqueId]);
+      if (rows && rows[0]) {
+        const seq = rows[0].seq;
+
         await this.repository.updateSubmission(seq, formDataStr, userCode);
         await this.repository.bindFilesToSubmission(seq, dto.uniqueId, userCode);
+
         return 1;
       }
     }

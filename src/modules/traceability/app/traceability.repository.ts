@@ -219,4 +219,22 @@ export class TraceabilityAppRepository {
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode]);
     return rows;
   }
+
+  async getSubmissionsFormDataByUserHome(userCode: string, userHomeCode: string): Promise<any[]> {
+    const sql = `
+      SELECT formData 
+      FROM ${this.tableSubmissions} 
+      WHERE userCode = ? AND userHomeCode = ? AND isActive = 'Y'
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode, userHomeCode]);
+    return rows
+      .map((r) => {
+        try {
+          return typeof r.formData === 'string' ? JSON.parse(r.formData) : r.formData;
+        } catch (e) {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  }
 }

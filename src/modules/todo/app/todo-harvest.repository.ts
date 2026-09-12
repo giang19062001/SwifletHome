@@ -101,8 +101,8 @@ export class TodoHarvestAppRepository {
     const sql = `
       UPDATE ${this.tableTaskHarvestPhase}
       SET isUse = 'Y', updatedId = ?
-      WHERE seq = ? AND userHomeCode = ? AND userCode = ?`;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqHarvestPhase, userHomeCode, userCode]);
+      WHERE (seq = ? OR harvestPhase = ?) AND userHomeCode = ? AND userCode = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqHarvestPhase, seqHarvestPhase, userHomeCode, userCode]);
     return result.affectedRows;
   }
 
@@ -110,8 +110,8 @@ export class TodoHarvestAppRepository {
     const sql = `
       UPDATE ${this.tableTaskHarvestPhase}
       SET isUse = 'N', updatedId = ?
-      WHERE seq = ? AND userHomeCode = ? AND userCode = ?`;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqHarvestPhase, userHomeCode, userCode]);
+      WHERE (seq = ? OR harvestPhase = ?) AND userHomeCode = ? AND userCode = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqHarvestPhase, seqHarvestPhase, userHomeCode, userCode]);
     return result.affectedRows;
   }
 
