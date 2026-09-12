@@ -428,54 +428,6 @@ export class AppController {
       user: req.session.user,
     };
   }
-  //qrcode
-  @Get('/dashboard/qrcode')
-  @UseGuards(PageAuthAdminGuard)
-  @Render('pages/qrcode')
-  renderQrcode(@Req() req: Request) {
-    return {
-      title: 'Danh sách yêu cầu QR cho lô yến',
-      isLayout: true,
-      user: req.session.user,
-    };
-  }
-  @Get('/dashboard/qrcode/update/:id')
-  @UseGuards(PageAuthAdminGuard)
-  @Render('pages/qrcode-update')
-  async renderQrcodeUpdate(@Req() req: Request) {
-    const values = await this.appService.renderQrcodeUpdate(req.params.id);
-    return {
-      title: 'Xem xét yêu cầu Qr cho lô yến',
-      isLayout: true,
-      user: req.session.user,
-      values: values,
-    };
-  }
-
-  // cho user có thể xem ko cần đăng nhập
-  @Get('/qrcode-global/:id')
-  @UseGuards(PageAuthAdminGuard)
-  @Render('pages/qrcode-global')
-  async renderQrcodeGlobal(@Req() req: Request) {
-    const values = await this.appService.renderQrcodeUpdate(req.params.id);
-    return {
-      title: 'Thông tin Qr code',
-      isLayout: false,
-      user: req.session.user,
-      values: values,
-    };
-  }
-
-  @Get('/dashboard/qrcode-selling')
-  @UseGuards(PageAuthAdminGuard)
-  @Render('pages/qrcode-selling')
-  renderQrcodeSelling(@Req() req: Request) {
-    return {
-      title: 'Danh sách đăng bán lô yến',
-      isLayout: true,
-      user: req.session.user,
-    };
-  }
 
   @Get('/traceability-qrcode-global/:traceabilityId')
   @UseGuards(PageAuthAdminGuard)
@@ -504,7 +456,7 @@ export class AppController {
       user: req.session.user,
     };
   }
-  //qrcode
+  //consignment
   @Get('/dashboard/consignment')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/consignment')

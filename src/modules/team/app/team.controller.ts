@@ -90,7 +90,7 @@ export class TeamAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(GetDetailTeamResDto) })
   @ApiBadRequestResponse({ type: NullResponseDto })
-  async getInfoToRequestQrcode(@Param('teamCode') teamCode: string, @GetUserApp() user: TokenUserAppResDto) {
+  async getDetailTeam(@Param('teamCode') teamCode: string, @GetUserApp() user: TokenUserAppResDto) {
     const result = await this.teamUserAppService.getDetailTeam(teamCode);
     return result;
   }

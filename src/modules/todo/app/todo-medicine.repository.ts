@@ -3,11 +3,10 @@ import moment from 'moment';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { TaskMedicineQrResDto } from 'src/modules/qr/app/qr.response';
 import { TODO_CONST } from '../common/todo.const';
 import { TaskStatusEnum } from '../common/todo.enum';
 import { SetTaskMedicineDto } from './todo.dto';
-import { GetTaskAlarmResDto, GetTasksMedicineRowResDto } from './todo.response';
+import { GetTaskAlarmResDto, GetTasksMedicineRowResDto, TaskMedicineResDto } from './todo.response';
 
 @Injectable()
 export class TodoMedicineAppRepository {
@@ -77,7 +76,7 @@ export class TodoMedicineAppRepository {
     return result.affectedRows;
   }
 
-  async useTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string): Promise<number> {
+  async useTaskMedicineForTrace(userCode: string, userHomeCode: string, medicineCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableTaskMedicine}
       SET isUse = 'Y', updatedId = ?
@@ -86,7 +85,7 @@ export class TodoMedicineAppRepository {
     return result.affectedRows;
   }
 
-  async unuseTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string): Promise<number> {
+  async unuseTaskMedicineForTrace(userCode: string, userHomeCode: string, medicineCode: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableTaskMedicine}
       SET isUse = 'N', updatedId = ?
@@ -110,7 +109,7 @@ export class TodoMedicineAppRepository {
     return rows.length ? (rows[0] as { medicineCode: string; taskDate: string; taskStatus: string }) : null;
   }
 
-  async getTaskMedicineCompleteAndNotUseList(userHomeCode: string): Promise<TaskMedicineQrResDto[]> {
+  async getTaskMedicineCompleteAndNotUseList(userHomeCode: string): Promise<TaskMedicineResDto[]> {
     const currentYear = moment().year();
     const query = `
       SELECT
@@ -128,7 +127,7 @@ export class TodoMedicineAppRepository {
         AND YEAR(A.createdAt) = ?
         AND A.isUse = 'N'`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, [userHomeCode, currentYear]);
-    return rows as TaskMedicineQrResDto[];
+    return rows as TaskMedicineResDto[];
   }
 
   // CORN

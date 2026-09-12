@@ -14,7 +14,6 @@ export const DOCS_TYPES = ['.pdf', '.doc', '.docx', '.xls', '.xlsx'];
 
 export const APP_SCREENS = {
   ACCOUNT_SCREEN: 'ACCOUNT_SCREEN',
-  QR_SCREEN: 'QR_SCREEN',
   REMINDER_SCREEN: 'REMINDER_SCREEN',
   NOTIFICATION_SCREEN: 'NOTIFICATION_SCREEN',
   CONSIGNMENT_SCREEN: 'CONSIGNMENT_SCREEN',
@@ -22,7 +21,6 @@ export const APP_SCREENS = {
   REQUEST_DOCTOR: 'REQUEST_DOCTOR',
   USER_TYPE_NOT_REGISTER: 'USER_TYPE_NOT_REGISTER',
   // MODAL
-  REQUEST_QR_GUIDE: 'REQUEST_QR_GUIDE',
   CONSIGNMENT_GUIDE: 'CONSIGNMENT_GUIDE',
 };
 
@@ -31,8 +29,6 @@ export const GetAppScreenForPush = (notificationType: NotificationTypeEnum): str
     return APP_SCREENS.REMINDER_SCREEN;
   } else if (notificationType === 'ADMIN') {
     return APP_SCREENS.NOTIFICATION_SCREEN;
-  } else if (notificationType === 'ADMIN_QR') {
-    return APP_SCREENS.QR_SCREEN;
   } else if (notificationType === 'ADMIN_CONSIGNMENT') {
     return APP_SCREENS.CONSIGNMENT_SCREEN;
   }

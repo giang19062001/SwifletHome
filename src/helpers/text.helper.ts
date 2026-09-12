@@ -21,14 +21,6 @@ export const NOTIFICATIONS = {
     TITLE: `${userHomeName} - ${taskName}`,
     BODY: daysLeft > 0 ? `Còn ${daysLeft} ngày nữa` : `Đã đến ngày thực hiện tác vụ`,
   }),
-  QR_CODE_APPROVED: (requestCode: string) => ({
-    TITLE: `Thông báo trạng thái yêu cầu Qr code`,
-    BODY: `Yêu cầu tạo mã QR Code #${requestCode} của bạn đã được duyệt`,
-  }),
-  QR_CODE_REFUSE: (requestCode: string) => ({
-    TITLE: `Thông báo trạng thái yêu cầu Qr code`,
-    BODY: `Yêu cầu tạo mã QR Code #${requestCode} của bạn đã bị từ chối`,
-  }),
   TEAM_REGISTER_APPROVED: (teamCode: string, typeName: string) => ({
     TITLE: `Thông báo trạng thái đăng ký ${typeName}`,
     BODY: `Yêu cầu đăng ký ${typeName} #${teamCode} của bạn đã được duyệt`,
@@ -41,7 +33,7 @@ export const NOTIFICATIONS = {
 
 export const TEXTS = {
   PACKAGE_FREE: 'Gói dùng thử',
-  PHASE: 'Đợt thu hoạch',
+  PHASE: 'Đợt',
   NEST_TITLE: 'Tổ',
   HARVEST_DATE: 'Ngày thu hoạch',
 };
@@ -52,6 +44,5 @@ export const EMAIL = {
   SUBJECT_SEND_DOCTOR: 'Yêu cầu tư vấn tăng đàn nhà yến từ 3fam.vn',
   SUBJECT_SEND_CONSIGNMENT: 'Yêu cầu ký gửi từ 3fam.vn',
   SUBJECT_SEND_SIGHTSEEING: 'Yêu cầu duyệt đơn đăng ký tham quan nhà yến từ 3fam.vn',
-  SUBJECT_SEND_REQUEST_QR: 'Yêu cầu duyệt cấp mã QR Code từ 3fam.vn',
   SUBJECT_SEND_SALE_HOME: 'Yêu cầu tạo nhà yến siêu cạnh tranh từ 3fam.vn',
 };

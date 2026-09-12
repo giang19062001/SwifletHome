@@ -6,7 +6,6 @@ import { CategoryAdminService } from './modules/category/admin/category.service'
 import { ObjectAdminService } from './modules/object/admin/object.service';
 import { OptionService } from './modules/options/option.service';
 import { ProvinceService } from './modules/province/app/province.service';
-import { QrAdminService } from './modules/qr/admin/qr.service';
 import { SaleHomeAdminService } from './modules/saleHome/admin/saleHome.service';
 import { ScreenAdminService } from './modules/screen/admin/screen.service';
 import { TeamAdminService } from './modules/team/admin/team.service';
@@ -26,7 +25,6 @@ export class AppService {
     private readonly provinceService: ProvinceService,
     private readonly screenAdminService: ScreenAdminService,
     private readonly todoAdminService: TodoAdminService,
-    private readonly qrAdminService: QrAdminService,
     private readonly userAdminService: UserAdminService,
     private readonly optionService: OptionService,
     private readonly traceabilityAdminService: TraceabilityAdminService,
@@ -186,14 +184,6 @@ export class AppService {
     };
   }
 
-  // qrcode
-  async renderQrcodeUpdate(requestCode: string): Promise<any> {
-    const qrData = await this.qrAdminService.getDetail(requestCode);
-    return {
-      qrData: qrData,
-    };
-  }
-
   // team
   async renderTeamCreate(): Promise<any> {
     const provinces = await this.provinceService.getAll();
@@ -240,9 +230,8 @@ export class AppService {
   }
 
   async renderBlockchain(): Promise<any> {
-    const transactions = await this.qrAdminService.getBlockchainTransactions();
     return {
-      transactions: transactions,
+      transactions: [],
     };
   }
 

@@ -101,17 +101,8 @@ export const Msg = {
 
   // Thu hoạch
   HarvestTaskAlreadyAdded: `Lịch nhắc 'Thu hoạch' này đã được ghi chú rồi`,
-  ThisHarvestRequestQrcodeAlreadyCannotAdjust: cannotDo('đợt thu hoạch của nhà yến này đã yêu cầu QrCode rồi'),
-  ThisHarvestRequestQrcodeAlready: alreadyDone('Đợt thu hoạch của nhà yến này đã yêu cầu QrCode'),
-  ThisQrNotApproved: 'Qr không tồn tại hoặc chưa được duyệt',
-  RequestQrcodeNotFound: notFound('Thông tin Qrcode của yêu cầu bán hiện tại'),
-  RequestInfoAlreadySold: alreadyDone('Thông tin của Qr code này đã được rao bán'),
-  RequestNotAllowHarvestEmpty: 'Nhà yến chưa có dữ liệu của đợt thu hoạch này, không thể yêu cầu mã Qrcode',
+  ThisHarvestRequestTraceAlreadyCannotAdjust: cannotDo('đợt thu hoạch của nhà yến này đã yêu cầu truy xuất rồi'),
   RequestCannotCancelNotWaiting: cannotDo('chỉ có thể hủy các yêu cầu đang ở chế độ chờ'),
-
-  // QR
-  createQrRequestOk: ok('Gửi yêu cầu tạo mã QR Code'),
-  createQrRequestErr: err('Gửi yêu cầu tạo mã QR Code'),
 
   // Phân quyền / Mua bán yến
   OnlyPurcharseCanFetch: onlyCan('tài khoản nhà thu mua', 'lấy danh sách yến được bán'),

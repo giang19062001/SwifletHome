@@ -48,16 +48,12 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'images/configs';
     } else if (fieldname.includes('screenImage')) {
       result = 'images/screens';
-    } else if (fieldname.includes('requestQrcodeFiles')) {
-      result = 'images/requestQrcodes';
     } else if (fieldname.includes('adsBanner')) {
       result = 'images/ads';
     } else if (fieldname.includes('teamImage') || fieldname.includes('teamFiles') || fieldname.includes('teamServiceFiles')) {
       result = 'images/teams';
     } else if (fieldname.includes('reviewImg')) {
       result = 'images/reviews';
-    } else if (fieldname.includes('qrcode')) {
-      result = 'images/qrcodes';
     } else if (fieldname.includes('traceabilityFiles')) {
       result = 'images/traces';
     }
@@ -66,8 +62,6 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
       result = 'videos/doctors';
     } else if (fieldname.includes('saleHomeFiles')) {
       result = 'videos/saleHomes';
-    } else if (fieldname.includes('requestQrcodeFiles')) {
-      result = 'videos/requestQrcodes';
     } else if (fieldname.includes('teamFiles') || fieldname.includes('teamServiceFiles')) {
       result = 'videos/teams';
     } else if (fieldname.includes('traceabilityFiles')) {

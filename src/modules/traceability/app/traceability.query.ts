@@ -26,28 +26,11 @@ export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
                     B.harvestPhase,
                     B.createdAt,
                     B.updatedAt; `,
-  diLotCode: ` SELECT A.requestCode AS value, A.requestCode AS label  FROM tbl_qr_request A
-            JOIN tbl_qr_request_selling B 
-            ON A.requestCode = B.requestCode
-            WHERE A.userCode = :userCode AND A.userHomeCode = :userHomeCode`, //  AND B.requestSellStatus = ${RequestSellStatusEnum.PACKING}: giao nhận
-  rmInputLot: ` SELECT A.requestCode AS value, A.requestCode AS label  FROM tbl_qr_request A
-            JOIN tbl_qr_request_selling B 
-            ON A.requestCode = B.requestCode
-            WHERE A.userCode = :userCode AND A.userHomeCode = :userHomeCode`, // AND B.requestSellStatus = '${RequestSellStatusEnum.PURCHASED}': chế biến
-  lfpLotProcessings: ` SELECT A.requestCode AS value, A.requestCode AS label  FROM tbl_qr_request A
-            JOIN tbl_qr_request_selling B 
-            ON A.requestCode = B.requestCode
-            WHERE A.userCode = :userCode AND A.userHomeCode = :userHomeCode`, // AND B.requestSellStatus = '${RequestSellStatusEnum.PROCESSING}':  đóng gói
-
-  dLotFinished: ` SELECT A.requestCode AS value, A.requestCode AS label  FROM tbl_qr_request A
-            JOIN tbl_qr_request_selling B 
-            ON A.requestCode = B.requestCode
-            WHERE A.userCode = :userCode AND A.userHomeCode = :userHomeCode`, // AND B.requestSellStatus = '${RequestSellStatusEnum.DELIVERING}': phân phối / hoàn trả
-
-  rLotRecall: ` SELECT A.requestCode AS value, A.requestCode AS label  FROM tbl_qr_request A
-            JOIN tbl_qr_request_selling B 
-            ON A.requestCode = B.requestCode
-            WHERE A.userCode = :userCode AND A.userHomeCode = :userHomeCode `, // AND B.requestSellStatus = '${RequestSellStatusEnum.DELIVERING}':  phân phối / hoàn trả
+  diLotCode: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
+  rmInputLot: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
+  lfpLotProcessings: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
+  dLotFinished: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
+  rLotRecall: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
 };
 
 export const TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL = {

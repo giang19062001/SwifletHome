@@ -48,8 +48,6 @@ import { OptionModule } from './modules/options/option.module';
 import { PackageAdminModule } from './modules/package/admin/package.module';
 import { PhoneCodeModule } from './modules/phoneCode/app/phoneCode.module';
 import { ProvinceModule } from './modules/province/app/province.module';
-import { QrAdminModule } from './modules/qr/admin/qr.module';
-import { QrAppModule } from './modules/qr/app/qr.module';
 import { QuestionAdminModule } from './modules/question/admin/question.module';
 import { ReportAdminModule } from './modules/report/admin/report.module';
 import { ReportAppModule } from './modules/report/app/report.module';
@@ -131,7 +129,6 @@ import { ExportModule } from './common/export/export.module';
     UserHomeIotModule,
     BlogAppModule,
     TodoAppModule,
-    QrAppModule,
     TeamAppModule,
     ConsignmentAppModile,
     ReportAppModule,
@@ -160,7 +157,6 @@ import { ExportModule } from './common/export/export.module';
     UserHomeAdminModule,
     TodoAdminModule,
     NotificationAdminModule,
-    QrAdminModule,
     TeamAdminModule,
     ConsignmentAdminModule,
     GuestAdminModule,

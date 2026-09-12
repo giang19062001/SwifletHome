@@ -34,7 +34,7 @@ export class NotificationAppController {
     description: `
 **notificationType: enum('ADMIN','TODO')**\n
 **notificationStatus**: enum('SENT','READ')\n
-**targetScreen**: 'REMINDER_SCREEN' | 'NOTIFICATION_SCREEN' | 'QR_SCREEN'`,
+**targetScreen**: 'REMINDER_SCREEN' | 'NOTIFICATION_SCREEN'`,
   })
   async getAll(@Body() dto: PagingDto, @GetUserApp() user: TokenUserAppResDto): Promise<{ total: number; list: NotificationAppResDto[] }> {
     const result = await this.notificationAppService.getAll(dto, user.userCode);

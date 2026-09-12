@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { EMAIL } from 'src/helpers/text.helper';
 import { LoggingService } from '../logger/logger.service';
-import { getConsignmentTemplate, getDoctorTemplate, getGuestTemplate, getRequestQrTemplate, getSaleHomeTeamplate, getSightSeeingTemplate, getTeamTemplate } from './mail.teamplate';
+import { getConsignmentTemplate, getDoctorTemplate, getGuestTemplate, getSaleHomeTeamplate, getSightSeeingTemplate, getTeamTemplate } from './mail.teamplate';
 
 @Injectable()
 export class MailService {
@@ -42,11 +42,6 @@ export class MailService {
   async sendSightSeeingEmail(data: any) {
     const html = getSightSeeingTemplate(data);
     await this.sendMail(EMAIL.SUBJECT_SEND_SIGHTSEEING, html, `SightSeeing:${data.userName}`);
-  }
-
-  async sendRequestQrEmail(data: any) {
-    const html = getRequestQrTemplate(data);
-    await this.sendMail(EMAIL.SUBJECT_SEND_REQUEST_QR, html, `RequestQr:${data.userName}`);
   }
 
   async sendConsignmentEmail(data: any) {

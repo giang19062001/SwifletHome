@@ -26,20 +26,6 @@ const VARIABLE_ENUM = {
     FACTORY: 'FACTORY',
     TECHNICAL: 'TECHNICAL',
   },
-  QR_REQUEST_STATUS: {
-    WAITING: 'Đang chờ duyệt',
-    APPROVED: 'Đã chấp thuận',
-    REFUSE: 'Từ chối duyệt',
-    CANCEL: 'Đã hủy',
-  },
-  QR_SELLING_REQUEST_STATUS: {
-    SOLD: 'Đang đăng bán',
-    PURCHASED: 'Đang có người liên hệ mua',
-    PROCESSING: 'Đang chế biến',
-    PACKING: 'Đang đóng gói',
-    DELIVERING: 'Đang giao hàng',
-    RECALL: 'Có yêu cầu thu hồi',
-  },
   HOME_SALE_SIGHTSEEING_STATUS: {
     WAITING: 'Đang chờ duyệt',
     APPROVED: 'Đã duyệt',
@@ -72,7 +58,6 @@ const VARIABLE_ENUM = {
     REMINDER_SCREEN: 'Lịch nhắc việc',
     NOTIFICATION_SCREEN: 'Thông báo',
     ACCOUNT_SCREEN: 'Thông tin tài khoản',
-    QR_SCREEN: 'Danh sách mã QR code',
     CONSIGNMENT_SCREEN: 'Gửi yến đi nước ngoài',
     REQUEST_DOCTOR: 'Tăng đàn nhà yến',
   },

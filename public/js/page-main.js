@@ -223,9 +223,8 @@ var optionsArea = {
   stroke: { curve: 'straight', width: 2 },
   colors: chartColors,
   series: [
-    { name: "Yêu cầu QR chờ duyệt", data: [] },
-    { name: "Yêu cầu QR đã duyệt", data: [] },
-    { name: "QR đã được đăng bán", data: [] }
+    { name: "Yêu cầu truy xuất chờ duyệt", data: [] },
+    { name: "Yêu cầu truy xuất đã duyệt", data: [] },
   ],
   xaxis: {
     categories: mediaLabels,
@@ -276,11 +275,10 @@ async function fetchOverview() {
         chartCircle4.updateSeries(res.data.radialUserSeries);
       }
 
-      if (res.data.areaQrWaitingSeries && res.data.areaQrApprovedSeries && res.data.areaQrSellingSeries) {
+      if (res.data.areaTraceWaitingSeries && res.data.areaTraceApprovedSeries) {
         chartArea.updateSeries([
-          { name: "Yêu cầu QR chờ duyệt", data: res.data.areaQrWaitingSeries },
-          { name: "Yêu cầu QR đã duyệt", data: res.data.areaQrApprovedSeries },
-          { name: "QR Code đã đăng bán", data: res.data.areaQrSellingSeries }
+          { name: "Yêu cầu truy xuất chờ duyệt", data: res.data.areaTraceWaitingSeries },
+          { name: "Yêu cầu truy xuất đã duyệt", data: res.data.areaTraceApprovedSeries },
         ]);
       }
 

@@ -300,7 +300,7 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
   }
 
   @ApiOperation({
-    summary: 'Lấy danh sách thu hoạch chưa yêu cầu mã QRcode để điều chỉnh',
+    summary: 'Lấy danh sách thu hoạch chưa dùng cho truy xuất để điều chỉnh',
     description: `
 **userHomeCode**: Mã nhà yến`,
   })
@@ -336,7 +336,7 @@ nếu bấm vào Box thu hoạch sẽ thì truyền **taskAlarmCode** từ màn 
   }
 
   @ApiOperation({
-    summary: 'Điều chỉnh dữ liệu thu hoạch chưa được yêu cầu tạo mã Qrcode',
+    summary: 'Điều chỉnh dữ liệu thu hoạch chưa được yêu cầu truy xuất',
   })
   @Post('adjustTaskHarvest')
   @ApiBody({
@@ -368,7 +368,7 @@ Dữ liệu này được truyền giá trị từ <i>getInfoTaskHarvestForAdjus
     const result = await this.todoHarvestAppService.adjustTaskHarvest(user.userCode, dto);
     if (result == -1) {
       throw new BadRequestException({
-        message: Msg.ThisHarvestRequestQrcodeAlreadyCannotAdjust,
+        message: Msg.ThisHarvestRequestTraceAlreadyCannotAdjust,
         data: 0,
       });
     }

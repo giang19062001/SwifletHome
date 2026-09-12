@@ -12,11 +12,6 @@ export const NOTIFICATION_CONST = {
       // text: 'Việc cần làm',
       text: 'Admin',
     },
-    ADMIN_QR: {
-      value: 'ADMIN_QR',
-      // text: 'Thông tin QRcode',
-      text: 'Admin',
-    },
     ADMIN_CONSIGNMENT: {
       value: 'ADMIN_CONSIGNMENT',
       // text: 'Thông tin ký gửi',

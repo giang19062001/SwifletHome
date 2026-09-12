@@ -80,11 +80,6 @@ function mapContentFileds(data) {
         contentCenter: data.contentCenter ?? '',
       };
       break;
-    case 'REQUEST_QR_GUIDE':
-      screenContent = {
-        contentStart: data.contentStart ?? '',
-      };
-      break;
     case 'CONSIGNMENT_GUIDE':
        screenContent = {
         contentStart: data.contentStart ?? '',

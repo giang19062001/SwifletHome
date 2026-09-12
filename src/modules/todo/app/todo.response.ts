@@ -333,3 +333,28 @@ export class HandleAlarmDataAppResDto {
   taskDate: Date;
   taskStatus: TaskStatusEnum;
 }
+
+export class TaskHarvestResDto {
+  @ApiProperty({ example: '' })
+  harvestTaskAlarmCode: string;
+
+  @ApiProperty({ example: 1 })
+  harvestPhase: number;
+
+  @ApiProperty({ example: 2026 })
+  harvestYear: number;
+}
+
+export class TaskMedicineResDto {
+  @ApiProperty({ example: '' })
+  medicineTaskAlarmCode: string;
+
+  @ApiProperty({ example: '' })
+  medicineUsage: string;
+
+  @ApiProperty({ example: '' })
+  medicineName: string;
+
+  @ApiProperty({ example: new Date() })
+  timestamp: Date;
+}

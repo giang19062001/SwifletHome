@@ -22,7 +22,6 @@ export class AdsAppController {
       **REMINDER_SCREEN**: màn hình 'lịch nhắc việc'\n
       **NOTIFICATION_SCREEN**: màn hình 'thông báo'\n
       **ACCOUNT_SCREEN**: màn hình 'thông tin tài khoản'\n
-      **QR_SCREEN**: màn hình 'Danh sách mã QR code'\n
       **CONSIGNMENT_SCREEN**: màn hình 'Gửi yến đi nước ngoài'\n
       **REQUEST_DOCTOR**: màn hình 'Tăng đàn nhà yến'\n
   

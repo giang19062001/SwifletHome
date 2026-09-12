@@ -4,11 +4,10 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES, QUERY_HELPER } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { TaskHarvestQrResDto } from 'src/modules/qr/app/qr.response';
 import { TODO_CONST } from '../common/todo.const';
 import { TaskStatusEnum } from '../common/todo.enum';
 import { GetListTaskHarvestForAdjustDto, HarvestDataRowInputDto } from './todo.dto';
-import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto, GetTaskAlarmResDto } from './todo.response';
+import { GetHarvestTaskPhaseResDto, GetListTaskHarvestResDto, GetTaskAlarmResDto, TaskHarvestResDto } from './todo.response';
 
 @Injectable()
 export class TodoHarvestAppRepository {
@@ -98,7 +97,7 @@ export class TodoHarvestAppRepository {
     return result.affectedRows;
   }
 
-  async useTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
+  async useTaskHarvestForTrace(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
     const sql = `
       UPDATE ${this.tableTaskHarvestPhase}
       SET isUse = 'Y', updatedId = ?
@@ -107,7 +106,7 @@ export class TodoHarvestAppRepository {
     return result.affectedRows;
   }
 
-  async unuseTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
+  async unuseTaskHarvestForTrace(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
     const sql = `
       UPDATE ${this.tableTaskHarvestPhase}
       SET isUse = 'N', updatedId = ?
@@ -282,8 +281,6 @@ export class TodoHarvestAppRepository {
     return result.affectedRows;
   }
 
-  // ─── HARVEST FOR QR ───────────────────────────────────────────────────────
-
   async getTotalTaskHarvestForAdjust(dto: GetListTaskHarvestForAdjustDto, userCode: string): Promise<number> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT COUNT(A.seq) AS TOTAL
@@ -317,7 +314,7 @@ export class TodoHarvestAppRepository {
     return rows as GetListTaskHarvestResDto[];
   }
 
-  async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestQrResDto & { seq: number; timestamp: Date })[]> {
+  async getTaskHarvestCompleteAndNotUseList(userHomeCode: string, harvestPhase: number): Promise<(TaskHarvestResDto & { seq: number; timestamp: Date })[]> {
     const currentYear = moment().year();
     const query = `
       SELECT A.harvestCode AS harvestTaskAlarmCode, A.seq AS seq, A.harvestPhase, A.harvestYear, COALESCE(A.updatedAt, A.createdAt) AS timestamp
@@ -326,7 +323,7 @@ export class TodoHarvestAppRepository {
         AND A.harvestYear = ?
       ${harvestPhase != 0 ? 'AND A.harvestPhase = ?' : ''}`;
     const [rows] = await this.db.query<RowDataPacket[]>(query, harvestPhase != 0 ? [userHomeCode, currentYear, harvestPhase] : [userHomeCode, currentYear]);
-    return rows as (TaskHarvestQrResDto & { seq: number; timestamp: Date })[];
+    return rows as (TaskHarvestResDto & { seq: number; timestamp: Date })[];
   }
 
   async checkTaskHarvestCompleteAndNotUse(seqHarvestPhase: number): Promise<boolean> {
@@ -339,7 +336,7 @@ export class TodoHarvestAppRepository {
     return rows.length > 0;
   }
 
-  async getTaskHarvestCompleteAndNotUseOne(userHomeCode: string, harvestPhase: number, harvestYear: number): Promise<(TaskHarvestQrResDto & { seq: number }) | null> {
+  async getTaskHarvestCompleteAndNotUseOne(userHomeCode: string, harvestPhase: number, harvestYear: number): Promise<(TaskHarvestResDto & { seq: number }) | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
       `SELECT seq, harvestCode AS harvestTaskAlarmCode, harvestPhase, harvestYear
        FROM ${this.tableTaskHarvestPhase}
@@ -348,6 +345,6 @@ export class TodoHarvestAppRepository {
        LIMIT 1`,
       [userHomeCode, harvestYear, harvestPhase],
     );
-    return rows.length ? (rows[0] as TaskHarvestQrResDto & { seq: number }) : null;
+    return rows.length ? (rows[0] as TaskHarvestResDto & { seq: number }) : null;
   }
 }

@@ -160,6 +160,7 @@ export class TraceabilityAppService {
         }
       }
 
+      // dùng linkValues để fill trường khác tự động từ 1 trường select/radio
       for (const field of group.fields) {
         // Xử lý options động
         const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];

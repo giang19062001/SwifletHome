@@ -9,7 +9,6 @@ import { NOTIFICATIONS } from 'src/helpers/text.helper';
 import { AdsAdminService } from 'src/modules/ads/admin/ads.service';
 import { DoctorAppService } from 'src/modules/doctor/app/doctor.service';
 import { NotificationTypeEnum } from 'src/modules/notification/common/notification.enum';
-import { QrRequestAppService } from 'src/modules/qr/app/qr-request.service';
 import { SaleHomeAppService } from 'src/modules/saleHome/app/saleHome.service';
 import { TeamReviewAppService } from 'src/modules/team/app/team-review.service';
 import { TeamUserAppService } from 'src/modules/team/app/team-user.service';
@@ -33,7 +32,6 @@ export class CornService implements OnModuleInit {
     private readonly userHomeAppService: UserHomeAppService,
     private readonly saleHomeAppService: SaleHomeAppService,
     private readonly todoAlarmAppService: TodoAlarmAppService,
-    private readonly qrRequestAppService: QrRequestAppService,
     private readonly adsAdminService: AdsAdminService,
     private readonly traceabilityAppService: TraceabilityAppService,
     private readonly fileLocalService: FileLocalService,
@@ -47,7 +45,6 @@ export class CornService implements OnModuleInit {
     const jobDaily = new CronJob('0 1 * * *', async () => {
       await this.deleteDoctorFilesNotUse();
       await this.deleteUserHomeFilesNotUse();
-      await this.deleteQrRequestFilesNotUse();
       await this.deleteReviewFilesNotUse();
       await this.deleteTeamFilesNotUse();
       await this.deleteSaleHomeFilesNotUse();
@@ -81,7 +78,6 @@ export class CornService implements OnModuleInit {
     jobDailyAt8AM.start();
     // ! test
     // await this.deleteAdsFilesNotUse();
-    // await this.deleteQrRequestFilesNotUse();
     // await this.deleteDoctorFilesNotUse();
     // await this.deleteUserHomeFilesNotUse();
     // await this.pushNotificationsByTaskAlarms();
@@ -203,25 +199,6 @@ export class CornService implements OnModuleInit {
       }
     } catch (error) {
       this.logger.error(logbase, `Có lỗi khi xóa các file nhà yến sale không dùng theo lịch trình: ${JSON.stringify(error)}`);
-    }
-  }
-
-  async deleteQrRequestFilesNotUse() {
-    const logbase = `${this.SERVICE_NAME}/deleteQrRequestFilesNotUse`;
-    this.logger.log(logbase, `Chuẩn bị xóa các file video yêu cầu Qrcode dư thừa theo lịch trình....`);
-    try {
-      const filesNotUse = await this.qrRequestAppService.getFilesNotUse();
-      if (filesNotUse.length) {
-        for (const file of filesNotUse) {
-          await this.qrRequestAppService.deleteFile(file.seq);
-          await this.fileLocalService.deleteLocalFile(file.filename);
-        }
-        this.logger.log(logbase, `Các file video yêu cầu Qrcode dư thừa đã được xóa theo lịch trình thành công`);
-      } else {
-        this.logger.log(logbase, `Không có file video yêu cầu Qrcode dư thừa nào cần được xóa`);
-      }
-    } catch (error) {
-      this.logger.error(logbase, `Có lỗi khi xóa file video yêu cầu Qrcode dư thừa theo lịch trình: ${JSON.stringify(error)}`);
     }
   }
 

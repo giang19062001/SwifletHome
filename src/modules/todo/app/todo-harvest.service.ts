@@ -211,7 +211,7 @@ export class TodoHarvestAppService {
         if (phaseDetail.taskStatus === TaskStatusEnum.COMPLETE) {
           const isNotUsed = await this.todoHarvestAppRepository.checkTaskHarvestCompleteAndNotUse(phaseDetail.seq);
           if (!isNotUsed) {
-            this.logger.error(logbase, `Đợt này đã dùng QR, ko cho update`);
+            this.logger.error(logbase, `Đợt này đã dùng cho truy xuất, không thể cập nhập`);
             return -2;
           }
         } else {
@@ -329,7 +329,7 @@ export class TodoHarvestAppService {
   }
 
   /**
-   * Lấy thông tin đợt thu hoạch đã hoàn thành nhưng chưa được sử dụng (chưa quét QR) để thực hiện hiệu chỉnh (Adjust).
+   * Lấy thông tin đợt thu hoạch đã hoàn thành nhưng chưa được sử dụng truy xuất để thực hiện hiệu chỉnh.
    */
   async getInfoTaskHarvestForAdjust(userCode: string, dto: GetInfoTaskHarvestForAdjustDto): Promise<GetInfoTaskHarvestForAdjustResDto | null> {
     const logbase = `${this.SERVICE_NAME}/getInfoTaskHarvestForAdjust:`;
@@ -346,7 +346,7 @@ export class TodoHarvestAppService {
       throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
     }
 
-    // Tìm kiếm đợt thu hoạch đã hoàn thành (taskStatus = 'COMPLETE') và chưa liên kết với mã QR nào
+    // Tìm kiếm đợt thu hoạch đã hoàn thành (taskStatus = 'COMPLETE') và chưa liên kết với truy xuất nào
     const taskHarvestComplete = await this.todoHarvestAppRepository.getTaskHarvestCompleteAndNotUseOne(dto.userHomeCode, dto.harvestPhase, dto.harvestYear);
 
     // Nếu tìm thấy, lấy chi tiết tầng/ô, nếu không trả về mảng trống
@@ -366,17 +366,17 @@ export class TodoHarvestAppService {
 
   /**
    * Thực hiện cập nhật lại (hiệu chỉnh) dữ liệu tầng/ô cho một đợt thu hoạch đã xong.
-   * Chỉ cho phép nếu đợt đó chưa được sử dụng để tạo mã QR.
+   * Chỉ cho phép nếu đợt đó chưa được sử dụng để truy xuất.
    */
   async adjustTaskHarvest(userCode: string, dto: AdjustHarvestTaskDto): Promise<number> {
     const logbase = `${this.SERVICE_NAME}/adjustTaskHarvest:`;
     try {
       let result = 1;
 
-      // Kiểm tra xem đợt này đã được sử dụng (gắn vào QR code) hay chưa
+      // Kiểm tra xem đợt này đã được sử dụng cho truy xuất hay chưa
       const isNotUsed = await this.todoHarvestAppRepository.checkTaskHarvestCompleteAndNotUse(dto.seq);
       if (!isNotUsed) {
-        this.logger.error(logbase, `${Msg.ThisHarvestRequestQrcodeAlreadyCannotAdjust}`);
+        this.logger.error(logbase, `${Msg.ThisHarvestRequestTraceAlreadyCannotAdjust}`);
         result = -1;
         // Chỗ này không return ngay vì logic dưới vẫn gọi insUpDelHarvestRows (có thể là bug hoặc cố ý ghi đè dù đã dùng)
       }
@@ -403,11 +403,11 @@ export class TodoHarvestAppService {
     return await this.todoHarvestAppRepository.getTaskHarvestCompleteAndNotUseList(userHomeCode, harvestPhase);
   }
 
-  async useTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
-    return await this.todoHarvestAppRepository.useTaskHarvestForQr(userCode, userHomeCode, seqHarvestPhase);
+  async useTaskHarvestForTrace(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
+    return await this.todoHarvestAppRepository.useTaskHarvestForTrace(userCode, userHomeCode, seqHarvestPhase);
   }
 
-  async unuseTaskHarvestForQr(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
-    return await this.todoHarvestAppRepository.unuseTaskHarvestForQr(userCode, userHomeCode, seqHarvestPhase);
+  async unuseTaskHarvestForTrace(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
+    return await this.todoHarvestAppRepository.unuseTaskHarvestForTrace(userCode, userHomeCode, seqHarvestPhase);
   }
 }

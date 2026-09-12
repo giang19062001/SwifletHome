@@ -162,11 +162,11 @@ export class TodoMedicineAppService {
     return await this.todoMedicineAppRepository.getTaskMedicineCompleteAndNotUseList(userHomeCode);
   }
 
-  async useTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string) {
-    return await this.todoMedicineAppRepository.useTaskMedicineForQr(userCode, userHomeCode, medicineCode);
+  async useTaskMedicineForTrace(userCode: string, userHomeCode: string, medicineCode: string) {
+    return await this.todoMedicineAppRepository.useTaskMedicineForTrace(userCode, userHomeCode, medicineCode);
   }
 
-  async unuseTaskMedicineForQr(userCode: string, userHomeCode: string, medicineCode: string) {
-    return await this.todoMedicineAppRepository.unuseTaskMedicineForQr(userCode, userHomeCode, medicineCode);
+  async unuseTaskMedicineForTrace(userCode: string, userHomeCode: string, medicineCode: string) {
+    return await this.todoMedicineAppRepository.unuseTaskMedicineForTrace(userCode, userHomeCode, medicineCode);
   }
 }

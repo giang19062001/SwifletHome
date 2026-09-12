@@ -25,7 +25,7 @@ export class AdsBannerResDto {
   @ApiProperty({ example: '2023-12-31 23:59:59' })
   endTime: string;
 
-  @ApiProperty({ example: 'QR_SCREEN' })
+  @ApiProperty({ example: 'NOTIFICATION_SCREEN' })
   targetScreen: string;
 
   @ApiProperty({ example: 'OPEN_URL' })

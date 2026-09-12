@@ -56,13 +56,10 @@ export class ReportOverviewResDto {
   totalSightseeingSeries: number[];
 
   @ApiProperty()
-  areaQrWaitingSeries: number[];
+  areaTraceWaitingSeries: number[];
 
   @ApiProperty()
-  areaQrApprovedSeries: number[];
-
-  @ApiProperty()
-  areaQrSellingSeries: number[];
+  areaTraceApprovedSeries: number[];
 
   @ApiProperty()
   barHarvestCollectedSeries: number[];
