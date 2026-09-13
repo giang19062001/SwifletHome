@@ -15,8 +15,8 @@ import { VideoConverterInterceptor } from 'src/interceptors/video-converter.inte
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { TraceabilityAdminService } from '../admin/traceability.service';
-import { GetFormDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
-import { TraceabilityFormResDto, TraceabilityFormSimpleResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto } from './traceability.response';
+import { GetAllFormsDto, GetFormDto, GetTraceInfoEachHouseDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
+import { TraceabilityFormResDto, TraceabilityFormSimpleResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto, TraceabilityActorResDto } from './traceability.response';
 import { TraceabilityAppService } from './traceability.service';
 
 @ApiTags('app/traceability')
@@ -43,13 +43,28 @@ export class TraceabilityAppController implements OnModuleInit {
   }
 
   @ApiOperation({
-    summary: 'Lấy danh sách tất cả các form mẫu truy xuất nguồn gốc',
+    summary: 'Lấy danh sách tất cả các đối tượng (actor) truy xuất nguồn gốc',
+  })
+  @Get('getAllActors')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto([TraceabilityActorResDto]) })
+  async getAllActors() {
+    const result = await this.service.getAllActors();
+    return {
+      message: Msg.GetOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
+    summary: 'Lấy danh sách tất cả các form mẫu truy xuất nguồn gốc theo đối tượng (actor)',
+    description: 'Query param actor là optional, mặc định null/không truyền sẽ lấy HOUSE_OWNER_ACTOR',
   })
   @Get('getAllForms')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([TraceabilityFormSimpleResDto]) })
-  async getAllForms() {
-    const result = await this.service.getAllForms();
+  async getAllForms(@Query() query: GetAllFormsDto) {
+    const result = await this.service.getAllForms(query.actor);
     return {
       message: Msg.GetOk,
       data: result,
@@ -72,14 +87,14 @@ export class TraceabilityAppController implements OnModuleInit {
   }
 
   @ApiOperation({
-    summary: 'Lấy thông tin truy xuất nguồn gốc của từng nhà yến thuộc người dùng',
-    description: 'Trả về danh sách đối tượng chứa thông tin cơ bản và trạng thái truy xuất nguồn gốc của từng nhà yến hiện có của user.',
+    summary: 'Lấy thông tin truy xuất nguồn gốc của từng nhà yến thuộc người dùng hoặc người dùng khác theo actor',
+    description: 'Nếu actor là HOUSE_OWNER_ACTOR (mặc định) thì lấy các nhà yến của người dùng hiện tại. Nếu khác HOUSE_OWNER_ACTOR thì lấy các nhà yến của người dùng khác.',
   })
   @Get('getTraceInfoEachHouse')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([TraceabilityHouseInfoResDto]) })
-  async getTraceInfoEachHouse(@GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.service.getTraceInfoEachHouse(user.userCode);
+  async getTraceInfoEachHouse(@Query() query: GetTraceInfoEachHouseDto, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.service.getTraceInfoEachHouse(user.userCode, query.actor);
     return {
       message: Msg.GetOk,
       data: result,

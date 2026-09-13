@@ -12,6 +12,26 @@ export class TraceabilityFormSimpleResDto {
 
   @ApiProperty({ example: 'Mô tả ngắn gọn về biểu mẫu', required: false })
   formDescription?: string;
+
+  @ApiProperty({ example: 1, description: '1: Có quyền xem form, 0: Không', required: false })
+  canRead?: number;
+
+  @ApiProperty({ example: 1, description: '1: Có quyền nhập/sửa form, 0: Không', required: false })
+  canWrite?: number;
+}
+
+export class TraceabilityActorResDto {
+  @ApiProperty({ example: 1 })
+  seq!: number;
+
+  @ApiProperty({ example: 'RAT000001' })
+  actorCode!: string;
+
+  @ApiProperty({ example: 'HOUSE_OWNER_ACTOR' })
+  actorKeyWord!: string;
+
+  @ApiProperty({ example: 'Chủ nhà yến' })
+  actorName!: string;
 }
 
 export class TraceabilityFileItemResDto {
@@ -89,6 +109,12 @@ export class TraceabilityFormResDto {
 
   @ApiProperty({ example: 'Đang xử lý' })
   statusLabel!: string;
+
+  @ApiProperty({ example: 1, description: '1: Có quyền xem form, 0: Không', required: false })
+  canRead?: number;
+
+  @ApiProperty({ example: 1, description: '1: Có quyền nhập/sửa form, 0: Không', required: false })
+  canWrite?: number;
 
   @ApiProperty({ type: [TraceabilityGroupResDto] })
   groups!: TraceabilityGroupResDto[];

@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
+import { TraceabilityActorEnum } from './traceability.enum';
 
 @Injectable()
 export class TraceabilityAppRepository {
@@ -11,6 +12,8 @@ export class TraceabilityAppRepository {
   private readonly tableSubmissions = 'tbl_traceability_submissions';
   private readonly tableFile = 'tbl_traceability_file';
   private readonly tableUserHome = 'tbl_user_home';
+  private readonly tableActors = 'tbl_traceability_actor';
+  private readonly tablePermissions = 'tbl_traceability_actor_permissions';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -20,8 +23,46 @@ export class TraceabilityAppRepository {
     return rows[0] || null;
   }
 
-  async getAllForms(): Promise<RowDataPacket[]> {
-    const sql = `SELECT seq, formKey, formName, formDescription, sortOrder FROM ${this.tableForms} WHERE isActive = 'Y' ORDER BY sortOrder ASC`;
+  async getFormPermission(formKey: string, actorKeyWord: string): Promise<RowDataPacket | null> {
+    const sql = `
+      SELECT canRead, canWrite 
+      FROM ${this.tablePermissions} 
+      WHERE formKey = ? AND actorKeyWord = ? 
+      LIMIT 1
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [formKey, actorKeyWord]);
+    return rows[0] || null;
+  }
+
+  async getAllForms(actorKeyWord?: string): Promise<RowDataPacket[]> {
+    const targetActor = actorKeyWord?.trim() || TraceabilityActorEnum.HOUSE_OWNER_ACTOR;
+    const sql = `
+      SELECT 
+        F.seq, 
+        F.formKey, 
+        F.formName, 
+        F.formDescription, 
+        F.sortOrder,
+        P.canRead,
+        P.canWrite
+      FROM ${this.tableForms} F
+      INNER JOIN ${this.tablePermissions} P ON F.formKey = P.formKey
+      WHERE F.isActive = 'Y' 
+        AND P.actorKeyWord = ?
+        AND P.canRead = 1
+      ORDER BY F.sortOrder ASC
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [targetActor]);
+    return rows;
+  }
+
+  async getAllActors(): Promise<RowDataPacket[]> {
+    const sql = `
+      SELECT seq, actorCode, actorKeyWord, actorName 
+      FROM ${this.tableActors} 
+      WHERE isActive = 'Y' 
+      ORDER BY seq ASC
+    `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql);
     return rows;
   }
@@ -215,6 +256,17 @@ export class TraceabilityAppRepository {
       FROM ${this.tableUserHome} 
       WHERE userCode = ? AND isActive = 'Y'
       ORDER BY isMain DESC
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode]);
+    return rows;
+  }
+
+  async getOtherUserHouses(userCode: string): Promise<RowDataPacket[]> {
+    const sql = `
+      SELECT userCode, userHomeCode, userHomeName, userHomeAddress, userHomeProvince, isMain 
+      FROM ${this.tableUserHome} 
+      WHERE userCode != ? AND isActive = 'Y'
+      ORDER BY seq DESC
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode]);
     return rows;

@@ -9,7 +9,7 @@ import { GetFormDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from '.
 import { TraceabilityAppRepository } from './traceability.repository';
 import { TraceabilityFormResDto, TraceabilityGroupResDto, TraceabilityFieldResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto } from './traceability.response';
 import { generateTraceabilityId, generateTraceabilityQr, generateTraceabilityQrLink } from './traceability.func';
-import { TraceabilityStatusEnum } from './traceability.enum';
+import { TraceabilityActorEnum, TraceabilityStatusEnum } from './traceability.enum';
 import { TRACE_CONST } from './traceability.const';
 import { Msg } from 'src/helpers/message.helper';
 import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL } from './traceability.query';
@@ -23,13 +23,25 @@ export class TraceabilityAppService {
     private readonly traceabilityFieldsService: TraceabilityFieldsService,
   ) {}
 
-  async getAllForms(): Promise<{ seq: number; formKey: string; formName: string; formDescription: string | null }[]> {
-    const rows = await this.repository.getAllForms();
+  async getAllForms(actor?: string): Promise<{ seq: number; formKey: string; formName: string; formDescription: string | null; canRead: number; canWrite: number }[]> {
+    const rows = await this.repository.getAllForms(actor);
     return rows.map((r) => ({
       seq: r.seq,
       formKey: r.formKey,
       formName: r.formName,
       formDescription: r.formDescription || '',
+      canRead: r.canRead ?? 1,
+      canWrite: r.canWrite ?? 1,
+    }));
+  }
+
+  async getAllActors(): Promise<{ seq: number; actorCode: string; actorKeyWord: string; actorName: string }[]> {
+    const rows = await this.repository.getAllActors();
+    return rows.map((r) => ({
+      seq: r.seq,
+      actorCode: r.actorCode,
+      actorKeyWord: r.actorKeyWord,
+      actorName: r.actorName,
     }));
   }
 
@@ -37,6 +49,19 @@ export class TraceabilityAppService {
     const form = await this.repository.getFormByKey(dto.formKey);
     if (!form) {
       throw new BadRequestException({ message: Msg.FormNotFound, data: null });
+    }
+
+    const targetActor = dto.actor?.trim() || TraceabilityActorEnum.HOUSE_OWNER_ACTOR;
+    const permission = await this.repository.getFormPermission(form.formKey, targetActor);
+
+    let canRead = 1;
+    let canWrite = 1;
+    if (permission) {
+      canRead = Number.isNaN(Number(permission.canRead)) ? 1 : Number(permission.canRead);
+      canWrite = Number.isNaN(Number(permission.canWrite)) ? 1 : Number(permission.canWrite);
+    } else if (targetActor !== String(TraceabilityActorEnum.HOUSE_OWNER_ACTOR)) {
+      canRead = 0;
+      canWrite = 0;
     }
 
     const groups = await this.repository.getGroupsByFormSeq(form.seq);
@@ -48,7 +73,7 @@ export class TraceabilityAppService {
     let files: any[] = [];
     let qrUrl: string | null = null;
     let traceabilityId: string | null = null;
-    let status = 'PROCESSING';
+    let status = TraceabilityStatusEnum.PROCESSING;
 
     const provinceCode = await this.repository.getUserHomeProvince(dto.userHomeCode);
     if (!provinceCode) {
@@ -63,7 +88,7 @@ export class TraceabilityAppService {
       traceabilityCode = submission.traceabilityCode;
       files = await this.repository.getFilesByUniqueId(uniqueId);
       qrUrl = submission.qrUrl || null;
-      status = submission.status || 'PROCESSING';
+      status = submission.status || TraceabilityStatusEnum.PROCESSING;
       try {
         savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
       } catch (e) {
@@ -223,6 +248,21 @@ export class TraceabilityAppService {
       await Promise.all(promises);
     }
 
+    // Nếu không có quyền ghi (canWrite === 0), đặt disabled: true cho tất cả field chưa có disabled sẵn trong DB
+    if (!canWrite) {
+      for (const group of mappedGroups) {
+        for (const field of group.fields) {
+          if (!field.config) {
+            field.config = { disabled: true };
+          } else if (typeof field.config === 'object') {
+            if (field.config.disabled === undefined) {
+              field.config.disabled = true;
+            }
+          }
+        }
+      }
+    }
+
     const response = new TraceabilityFormResDto();
     response.uniqueId = uniqueId;
     response.formKey = form.formKey;
@@ -232,6 +272,8 @@ export class TraceabilityAppService {
     response.traceabilityId = traceabilityId;
     response.status = status;
     response.statusLabel = TRACE_CONST.STATUS[status]?.text || '';
+    response.canRead = canRead;
+    response.canWrite = canWrite;
     response.groups = mappedGroups;
     if (traceabilityCode) {
       response.traceabilityCode = traceabilityCode;
@@ -316,27 +358,31 @@ export class TraceabilityAppService {
     return await this.repository.deleteFileBySeq(seq);
   }
 
-  async getTraceInfoEachHouse(userCode: string): Promise<TraceabilityHouseInfoResDto[]> {
-    const houses = await this.repository.getUserHouses(userCode);
+  async getTraceInfoEachHouse(currentUserCode: string, actor?: string): Promise<TraceabilityHouseInfoResDto[]> {
+    const targetActor = (actor?.trim() || TraceabilityActorEnum.HOUSE_OWNER_ACTOR) as TraceabilityActorEnum;
+    const isHouseOwner = targetActor === TraceabilityActorEnum.HOUSE_OWNER_ACTOR;
+
+    const houses = isHouseOwner ? await this.repository.getUserHouses(currentUserCode) : await this.repository.getOtherUserHouses(currentUserCode);
 
     const results = await Promise.all(
       houses.map(async (house) => {
+        const houseUserCode = house.userCode;
         const userHomeCode = house.userHomeCode;
-        const traceabilityId = generateTraceabilityId(userCode, userHomeCode);
+        const traceabilityId = generateTraceabilityId(houseUserCode, userHomeCode);
 
         // Form đầu tiên trên App là 1. Chỉ cần dựa vào 1 form để biết nhà yến của user này đã có QR truy xuất hay chưa
-        const submission = await this.repository.getSubmissionByUserHomeForm(userCode, userHomeCode, 1);
+        const submission = await this.repository.getSubmissionByUserHomeForm(houseUserCode, userHomeCode, 1);
 
-        let status = 'PROCESSING';
+        let status = TraceabilityStatusEnum.PROCESSING;
         let qrUrl: string | null = null;
 
         if (submission) {
-          status = submission.status || 'PROCESSING';
+          status = submission.status || TraceabilityStatusEnum.PROCESSING;
           qrUrl = submission.qrUrl || null;
         }
 
         if (!qrUrl) {
-          qrUrl = generateTraceabilityQr(userCode, userHomeCode);
+          qrUrl = generateTraceabilityQr(houseUserCode, userHomeCode);
 
           // kiểm tra QR code đã tồn tại chưa, nếu chưa thì tạo mới
           const dirPath = path.join(process.cwd(), 'public', TRACE_CONST.QR_CODE_PATH);
@@ -345,7 +391,7 @@ export class TraceabilityAppService {
             if (!existsSync(dirPath)) {
               mkdirSync(dirPath, { recursive: true });
             }
-            const targetUrl = generateTraceabilityQrLink(userCode, userHomeCode);
+            const targetUrl = generateTraceabilityQrLink(houseUserCode, userHomeCode);
             await QRCode.toFile(fullPath, targetUrl, {
               width: 300,
               margin: 1,
@@ -354,7 +400,7 @@ export class TraceabilityAppService {
         }
 
         return {
-          userCode,
+          userCode: houseUserCode,
           userHomeCode,
           userHomeName: house.userHomeName,
           userHomeAddress: house.userHomeAddress,

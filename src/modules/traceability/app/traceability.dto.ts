@@ -1,6 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, IsUUID } from 'class-validator';
 
+export class GetAllFormsDto {
+  @ApiProperty({
+    example: 'HOUSE_OWNER_ACTOR',
+    description: 'Mã keyword của đối tượng (actorKeyWord), mặc định null/không truyền sẽ lấy HOUSE_OWNER_ACTOR',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  actor?: string;
+}
+
+export class GetTraceInfoEachHouseDto {
+  @ApiProperty({
+    example: 'HOUSE_OWNER_ACTOR',
+    description: 'Mã keyword của đối tượng (actorKeyWord), mặc định null/không truyền sẽ lấy HOUSE_OWNER_ACTOR',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  actor?: string;
+}
+
 export class GetFormDto {
   @ApiProperty({ example: 'BRIEF_SWIFT_HOUSE', description: 'formKey' })
   @IsString()
@@ -11,6 +33,15 @@ export class GetFormDto {
   @IsString()
   @IsNotEmpty()
   userHomeCode!: string;
+
+  @ApiProperty({
+    example: 'HOUSE_OWNER_ACTOR',
+    description: 'Mã keyword của đối tượng (actorKeyWord), mặc định null/không truyền sẽ lấy HOUSE_OWNER_ACTOR',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  actor?: string;
 }
 
 export class UploadTraceabilityFilesDto {
