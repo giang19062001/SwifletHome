@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
+import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
 
 @Injectable()
 export class TraceabilityAdminRepository {
@@ -24,7 +25,7 @@ export class TraceabilityAdminRepository {
       WHERE formSeq = ? AND isActive = 'Y' 
       ORDER BY sortOrder ASC
     `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [formSeq]);
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [Number(formSeq)]);
     return rows;
   }
 
@@ -35,7 +36,7 @@ export class TraceabilityAdminRepository {
       WHERE formSeq = ? AND isActive = 'Y' 
       ORDER BY groupSeq ASC, sortOrder ASC
     `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [formSeq]);
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [Number(formSeq)]);
     return rows;
   }
 
@@ -46,7 +47,7 @@ export class TraceabilityAdminRepository {
       WHERE traceabilityId = ? AND formSeq = ? AND isActive = 'Y' 
       LIMIT 1
     `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [traceabilityId, formSeq]);
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [traceabilityId, Number(formSeq)]);
     return rows[0] || null;
   }
 
@@ -71,5 +72,103 @@ export class TraceabilityAdminRepository {
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userHomeCode]);
     return rows[0] || null;
+  }
+
+  async getListTraceabilitySubmissions(dto: GetTraceabilityListAdminDto): Promise<RowDataPacket[]> {
+    let sql = `
+      SELECT 
+        S.seq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, 
+        S.uniqueId, S.status, S.qrUrl, S.traceabilityId, S.createdAt, S.updatedAt,
+        F.formKey, F.formName,
+        U.userName, U.userPhone,
+        H.userHomeName, H.userHomeAddress
+      FROM ${this.tableSubmissions} S
+      LEFT JOIN tbl_user_home H ON S.userHomeCode = H.userHomeCode
+      LEFT JOIN tbl_user_app U ON S.userCode = U.userCode
+      LEFT JOIN ${this.tableForms} F ON S.formSeq = F.seq
+      WHERE S.isActive = 'Y'
+    `;
+    const params: any[] = [];
+
+    if (dto.keyword) {
+      sql += ` AND (S.traceabilityCode LIKE ? OR S.traceabilityId LIKE ? OR U.userName LIKE ? OR U.userPhone LIKE ? OR H.userHomeName LIKE ?)`;
+      const kw = `%${dto.keyword.trim()}%`;
+      params.push(kw, kw, kw, kw, kw);
+    }
+    if (dto.formSeq) {
+      sql += ` AND S.formSeq = ?`;
+      params.push(Number(dto.formSeq));
+    }
+    if (dto.status) {
+      sql += ` AND S.status = ?`;
+      params.push(dto.status);
+    }
+    if (dto.fromDate) {
+      sql += ` AND S.createdAt >= ?`;
+      params.push(`${dto.fromDate} 00:00:00`);
+    }
+    if (dto.toDate) {
+      sql += ` AND S.createdAt <= ?`;
+      params.push(`${dto.toDate} 23:59:59`);
+    }
+
+    sql += ` ORDER BY S.seq DESC`;
+
+    const page = dto.page && Number(dto.page) > 0 ? Number(dto.page) : 1;
+    const limit = dto.limit && Number(dto.limit) > 0 ? Number(dto.limit) : 10;
+    const offset = (page - 1) * limit;
+
+    sql += ` LIMIT ? OFFSET ?`;
+    params.push(limit, offset);
+
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
+    return rows;
+  }
+
+  async getTotalTraceabilitySubmissions(dto: GetTraceabilityListAdminDto): Promise<number> {
+    let sql = `
+      SELECT COUNT(S.seq) as total
+      FROM ${this.tableSubmissions} S
+      LEFT JOIN tbl_user_home H ON S.userHomeCode = H.userHomeCode
+      LEFT JOIN tbl_user_app U ON S.userCode = U.userCode
+      LEFT JOIN ${this.tableForms} F ON S.formSeq = F.seq
+      WHERE S.isActive = 'Y'
+    `;
+    const params: any[] = [];
+
+    if (dto.keyword) {
+      sql += ` AND (S.traceabilityCode LIKE ? OR S.traceabilityId LIKE ? OR U.userName LIKE ? OR U.userPhone LIKE ? OR H.userHomeName LIKE ?)`;
+      const kw = `%${dto.keyword.trim()}%`;
+      params.push(kw, kw, kw, kw, kw);
+    }
+    if (dto.formSeq) {
+      sql += ` AND S.formSeq = ?`;
+      params.push(Number(dto.formSeq));
+    }
+    if (dto.status) {
+      sql += ` AND S.status = ?`;
+      params.push(dto.status);
+    }
+    if (dto.fromDate) {
+      sql += ` AND S.createdAt >= ?`;
+      params.push(`${dto.fromDate} 00:00:00`);
+    }
+    if (dto.toDate) {
+      sql += ` AND S.createdAt <= ?`;
+      params.push(`${dto.toDate} 23:59:59`);
+    }
+
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
+    return rows[0]?.total || 0;
+  }
+
+  async updateSubmissionStatus(seq: number, status: string, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableSubmissions}
+      SET status = ?, updatedId = ?, updatedAt = NOW()
+      WHERE seq = ? AND isActive = 'Y'
+    `;
+    const [result] = await this.db.execute<any>(sql, [status, updatedId, Number(seq)]);
+    return result.affectedRows || 0;
   }
 }

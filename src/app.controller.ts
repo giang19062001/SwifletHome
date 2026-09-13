@@ -445,6 +445,36 @@ export class AppController {
       values: values,
     };
   }
+
+  @Get('/dashboard/traceability')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/traceability')
+  async renderTraceabilityDashboard(@Req() req: Request) {
+    const values = await this.appService.renderTraceabilityDashboard();
+    return {
+      title: 'Danh sách hồ sơ truy xuất yến',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
+  @Get('/dashboard/traceability/detail/:traceabilityId')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/traceability-detail')
+  async renderTraceabilityDetail(@Req() req: Request) {
+    let traceabilityId = req.params.traceabilityId || '';
+    if (traceabilityId.toLowerCase().endsWith('.png')) {
+      traceabilityId = traceabilityId.slice(0, -4);
+    }
+    const values = await this.appService.renderTraceabilityQrcodeGlobal(traceabilityId);
+    return {
+      title: 'Chi tiết hồ sơ truy xuất yến',
+      isLayout: true,
+      user: req.session.user,
+      values: values,
+    };
+  }
   //guest
   @Get('/dashboard/guest')
   @UseGuards(PageAuthAdminGuard)

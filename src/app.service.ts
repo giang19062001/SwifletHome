@@ -241,4 +241,11 @@ export class AppService {
       traceData: data,
     };
   }
+
+  async renderTraceabilityDashboard(): Promise<any> {
+    const forms = await this.traceabilityAdminService.getAllForms();
+    return {
+      forms,
+    };
+  }
 }

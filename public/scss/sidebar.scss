@@ -117,7 +117,7 @@
 
 .main-content {
   margin-left: $sidebar-width;
-  overflow: hidden;
+  overflow: visible;
 
   .content {
     margin-top: var(--header-height);

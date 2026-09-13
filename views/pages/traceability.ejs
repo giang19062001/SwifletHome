@@ -1,0 +1,135 @@
+<div class="common-table-container row" id="page-traceability">
+  <div class="col-xl-12">
+    <!-- Header -->
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <p class="title-page mb-0"><%= title %></p>
+              <button id="btn-filter-toggle" class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse">
+                <span id="filterIcon">
+                  <i class="fa fa-chevron-up"></i>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Collapse -->
+    <div class="collapse show mb-3" id="filter-collapse">
+      <div class="card py-3">
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label">Từ khóa tìm kiếm</label>
+              <input type="text" class="form-control" id="filterKeyword" placeholder="Mã TXNG, Tên/SĐT KH, Tên nhà yến...">
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label">Biểu mẫu</label>
+              <select class="form-select" id="filterFormSeq">
+                <option value="">-- Tất cả form --</option>
+                <% if (values && values.forms) { %>
+                  <% values.forms.forEach(function(form) { %>
+                    <option value="<%= form.seq %>"><%= form.formName %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label">Trạng thái</label>
+              <select class="form-select" id="filterStatus">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="PROCESSING">Đang xử lý</option>
+                <option value="APPROVED">Đã phê duyệt</option>
+                <option value="REFUSED">Từ chối</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label">Từ ngày</label>
+              <input type="date" class="form-control" id="filterFromDate">
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end justify-content-end gap-2">
+              <button class="btn-sub" id="btn-filter-reset">Làm mới</button>
+              <button class="btn-main" id="btn-filter-apply">Tìm kiếm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="row">
+      <div class="col-12">
+        <div class="container-table">
+          <div class="table-responsive">
+            <table class="table table-striped align-middle">
+              <thead class="table-light">
+                <tr class="text-center">
+                  <th style="width: 50px;"><p>STT</p></th>
+                  <th><p>Mã TXNG</p></th>
+                  <th><p>Chủ sở hữu</p></th>
+                  <th><p>Nhà yến</p></th>
+                  <th><p>Biểu mẫu</p></th>
+                  <th><p>Trạng thái</p></th>
+                  <th><p>Ngày tạo</p></th>
+                  <th style="width: 180px;"><p>Thao tác</p></th>
+                </tr>
+              </thead>
+              <tbody class="body-table"></tbody>
+            </table>
+          </div>
+          <nav>
+            <ul class="pagination" id="privacy-main-pager"></ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cập nhật Trạng thái -->
+<div class="modal common-modal traceability-status-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <p class="modal-header-title">Cập nhật trạng thái hồ sơ</p>
+        <button type="button" class="close btn" data-bs-dismiss="modal" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M4.5 4.5L19.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+            <path d="M19.5 4.5L4.5 19.5" stroke="#212529" stroke-width="3" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="formUpdateStatus">
+          <input type="hidden" id="statusSubmissionSeq" value="">
+          <div class="mb-3">
+            <label class="form-label font-weight-bold">Mã hồ sơ:</label>
+            <p class="fw-bold text-primary mb-0" id="statusTraceabilityCode"></p>
+          </div>
+          <div class="mb-3">
+            <label for="selectSubmissionStatus" class="form-label">Trạng thái phê duyệt <span class="text-danger">*</span></label>
+            <select class="form-select" id="selectSubmissionStatus">
+              <option value="PROCESSING">Đang xử lý</option>
+              <option value="APPROVED">Đã phê duyệt</option>
+              <option value="REFUSED">Từ chối</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-main" id="btnSaveSubmissionStatus">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/common-validate.js"></script>
+<script src="/js/page-traceability.js"></script>

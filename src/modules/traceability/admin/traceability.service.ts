@@ -2,10 +2,45 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { TraceabilityAdminRepository } from './traceability.repository';
 import { TRACE_CONST } from '../app/traceability.const';
 import { Msg } from 'src/helpers/message.helper';
+import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
 
 @Injectable()
 export class TraceabilityAdminService {
   constructor(private readonly repository: TraceabilityAdminRepository) {}
+
+  async getAllForms(): Promise<any[]> {
+    return await this.repository.getAllForms();
+  }
+
+  async getListTraceabilitySubmissions(dto: GetTraceabilityListAdminDto): Promise<{ total: number; list: any[] }> {
+    const total = await this.repository.getTotalTraceabilitySubmissions(dto);
+    const rows = await this.repository.getListTraceabilitySubmissions(dto);
+    const list = rows.map((r) => ({
+      seq: r.seq,
+      traceabilityCode: r.traceabilityCode,
+      formSeq: r.formSeq,
+      formKey: r.formKey,
+      formName: r.formName,
+      userCode: r.userCode,
+      userName: r.userName || '',
+      userPhone: r.userPhone || '',
+      userHomeCode: r.userHomeCode,
+      userHomeName: r.userHomeName || '',
+      userHomeAddress: r.userHomeAddress || '',
+      uniqueId: r.uniqueId,
+      status: r.status,
+      statusLabel: TRACE_CONST.STATUS[r.status]?.text || '',
+      qrUrl: r.qrUrl,
+      traceabilityId: r.traceabilityId,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
+    }));
+    return { total, list };
+  }
+
+  async updateSubmissionStatus(seq: number, status: string, updatedId: string): Promise<number> {
+    return await this.repository.updateSubmissionStatus(seq, status, updatedId);
+  }
 
   async getFormForGlobalView(traceabilityId: string): Promise<any> {
     const parts = traceabilityId.split('-');
