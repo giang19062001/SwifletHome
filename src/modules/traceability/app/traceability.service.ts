@@ -273,6 +273,8 @@ export class TraceabilityAppService {
     const isExist = await this.repository.checkExistUniqueId(dto.uniqueId);
 
     const formDataStr = JSON.stringify(dto.formData);
+    const phases = this.traceabilityFieldsService.extractHiNumberHarvest(dto.formData);
+    const harvestPhases = phases.length > 0 ? phases.sort((a, b) => a - b).join(',') : null;
 
     if (isExist) {
       // Cập nhật form
@@ -280,7 +282,7 @@ export class TraceabilityAppService {
       if (rows && rows[0]) {
         const seq = rows[0].seq;
 
-        await this.repository.updateSubmission(seq, formDataStr, userCode);
+        await this.repository.updateSubmission(seq, formDataStr, userCode, harvestPhases);
         await this.repository.bindFilesToSubmission(seq, dto.uniqueId, userCode);
 
         return 1;
@@ -299,7 +301,19 @@ export class TraceabilityAppService {
     const qrUrl = generateTraceabilityQr(userCode, dto.userHomeCode);
     const status = TraceabilityStatusEnum.PROCESSING;
 
-    const insertId = await this.repository.insertSubmission(traceabilityCode, dto.formSeq, userCode, dto.userHomeCode, formDataStr, dto.uniqueId, status, qrUrl, traceabilityId, userCode);
+    const insertId = await this.repository.insertSubmission(
+      traceabilityCode,
+      dto.formSeq,
+      userCode,
+      dto.userHomeCode,
+      formDataStr,
+      dto.uniqueId,
+      status,
+      qrUrl,
+      traceabilityId,
+      userCode,
+      harvestPhases,
+    );
 
     if (insertId) {
       await this.repository.bindFilesToSubmission(insertId, dto.uniqueId, userCode);

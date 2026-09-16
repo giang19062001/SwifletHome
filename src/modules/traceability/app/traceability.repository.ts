@@ -59,7 +59,7 @@ export class TraceabilityAppRepository {
 
   async getSubmissionByCode(traceabilityCode: string, userHomeCode?: string): Promise<RowDataPacket | null> {
     let sql = `
-      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId 
+      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId, harvestPhases 
       FROM ${this.tableSubmissions} 
       WHERE traceabilityCode = ? AND isActive = 'Y'
     `;
@@ -75,7 +75,7 @@ export class TraceabilityAppRepository {
 
   async getSubmissionByUserHomeForm(userCode: string, userHomeCode: string, formSeq: number): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId 
+      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId, harvestPhases 
       FROM ${this.tableSubmissions} 
       WHERE userCode = ? AND userHomeCode = ? AND formSeq = ? AND isActive = 'Y' 
       LIMIT 1
@@ -154,23 +154,24 @@ export class TraceabilityAppRepository {
     qrUrl: string | null,
     traceabilityId: string,
     createdId: string,
+    harvestPhases: string | null = null,
   ): Promise<number> {
     const sql = `
       INSERT INTO ${this.tableSubmissions} 
-        (traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId, createdId) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId, createdId, harvestPhases) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId, createdId, harvestPhases]);
     return result.insertId;
   }
 
-  async updateSubmission(seq: number, formData: string, updatedId: string): Promise<number> {
+  async updateSubmission(seq: number, formData: string, updatedId: string, harvestPhases: string | null = null): Promise<number> {
     const sql = `
       UPDATE ${this.tableSubmissions} 
-      SET formData = ?, updatedId = ?, updatedAt = NOW() 
+      SET formData = ?, harvestPhases = ?, updatedId = ?, updatedAt = NOW() 
       WHERE seq = ?
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [formData, updatedId, seq]);
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [formData, harvestPhases, updatedId, seq]);
     return result.affectedRows;
   }
 
