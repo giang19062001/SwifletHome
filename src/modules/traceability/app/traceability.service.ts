@@ -352,20 +352,22 @@ export class TraceabilityAppService {
 
         if (!qrUrl) {
           qrUrl = generateTraceabilityQr(houseUserCode, userHomeCode);
+        }
 
-          // kiểm tra QR code đã tồn tại chưa, nếu chưa thì tạo mới
-          const dirPath = path.join(process.cwd(), 'public', TRACE_CONST.QR_CODE_PATH);
-          const fullPath = path.join(dirPath, `${traceabilityId}.png`);
-          if (!existsSync(fullPath)) {
-            if (!existsSync(dirPath)) {
-              mkdirSync(dirPath, { recursive: true });
-            }
-            const targetUrl = generateTraceabilityQrLink(houseUserCode, userHomeCode);
-            await QRCode.toFile(fullPath, targetUrl, {
-              width: 300,
-              margin: 1,
-            });
+        // Kiểm tra QR code PNG file đã tồn tại trên ổ đĩa chưa, nếu chưa thì tạo ở background (không await để tránh blocking API response)
+        const dirPath = path.join(process.cwd(), 'public', TRACE_CONST.QR_CODE_PATH);
+        const fullPath = path.join(dirPath, `${traceabilityId}.png`);
+        if (!existsSync(fullPath)) {
+          if (!existsSync(dirPath)) {
+            mkdirSync(dirPath, { recursive: true });
           }
+          const targetUrl = generateTraceabilityQrLink(houseUserCode, userHomeCode);
+          QRCode.toFile(fullPath, targetUrl, {
+            width: 300,
+            margin: 1,
+          }).catch((err) => {
+            console.error(`Error generating QR PNG background for ${traceabilityId}:`, err);
+          });
         }
 
         return {

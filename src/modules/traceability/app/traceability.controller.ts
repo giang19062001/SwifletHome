@@ -148,7 +148,7 @@ export class TraceabilityAppController implements OnModuleInit {
       cleanId = cleanId.slice(0, -4);
     }
 
-    const host = req.get('host') || `127.0.0.1:${process.env.PORT || 3000}`;
+    const host = req.get('host') || `127.0.0.1:${process.env.PORT!}`;
     const protocol = req.protocol || 'http';
     const targetUrl = `${protocol}://${host}/traceability-qrcode-global/${cleanId}`;
 
