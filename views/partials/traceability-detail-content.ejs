@@ -99,6 +99,7 @@
                                                     </h6>
                                                     <div class="row g-2">
                                                         <% group.fields.forEach(field => { %>
+                                                            <% if (field.fieldType === 'link_download') return; %>
                                                             <div class="col-md-6 col-12">
                                                                 <div class="field-container">
                                                                     <div class="field-label"><%= field.fieldName %></div>

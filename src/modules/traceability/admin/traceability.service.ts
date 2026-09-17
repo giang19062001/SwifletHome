@@ -43,8 +43,12 @@ export class TraceabilityAdminService {
   }
 
   async getFormForGlobalView(traceabilityId: string): Promise<any> {
-    const parts = traceabilityId.split('-');
-    const userHomeCode = parts[parts.length - 1];
+    const batch = await this.repository.getBatchByTraceabilityId(traceabilityId);
+    let userHomeCode = batch?.userHomeCode;
+    if (!userHomeCode) {
+      const parts = traceabilityId.split('-');
+      userHomeCode = parts.find((p) => p.startsWith('HOM')) || parts[parts.length - 1];
+    }
 
     const homeInfo = await this.repository.getHomeInfoByUserHomeCode(userHomeCode);
     if (!homeInfo) {

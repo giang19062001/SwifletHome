@@ -125,6 +125,7 @@ export class TraceabilityPdfTemplate {
 
                 if (group.fields) {
                   group.fields.forEach((field: any) => {
+                    if (field.fieldType === 'link_download') return;
                     if (currentY > 750) {
                       doc.addPage();
                       currentY = 40;

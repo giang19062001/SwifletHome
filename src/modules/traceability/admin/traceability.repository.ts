@@ -40,11 +40,19 @@ export class TraceabilityAdminRepository {
     return rows;
   }
 
+  async getBatchByTraceabilityId(traceabilityId: string): Promise<RowDataPacket | null> {
+    const sql = `SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases FROM tbl_traceability_batches WHERE traceabilityId = ? AND isActive = 'Y' LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [traceabilityId]);
+    return rows[0] || null;
+  }
+
   async getSubmissionByTraceabilityIdAndFormSeq(traceabilityId: string, formSeq: number): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT seq, traceabilityCode, formSeq, userCode, userHomeCode, formData, uniqueId, status, qrUrl, traceabilityId 
-      FROM ${this.tableSubmissions} 
-      WHERE traceabilityId = ? AND formSeq = ? AND isActive = 'Y' 
+      SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, S.formData, S.uniqueId, 
+             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases 
+      FROM ${this.tableSubmissions} S
+      JOIN tbl_traceability_batches B ON S.batchSeq = B.seq
+      WHERE B.traceabilityId = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
       LIMIT 1
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [traceabilityId, Number(formSeq)]);
@@ -77,21 +85,23 @@ export class TraceabilityAdminRepository {
   async getListTraceabilitySubmissions(dto: GetTraceabilityListAdminDto): Promise<RowDataPacket[]> {
     let sql = `
       SELECT 
-        S.seq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, 
-        S.uniqueId, S.status, S.qrUrl, S.traceabilityId, S.createdAt, S.updatedAt,
+        S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, 
+        S.uniqueId, S.createdAt, S.updatedAt,
+        B.status, B.qrUrl, B.traceabilityId, B.harvestPhases,
         F.formKey, F.formName,
         U.userName, U.userPhone,
         H.userHomeName, H.userHomeAddress
       FROM ${this.tableSubmissions} S
+      JOIN tbl_traceability_batches B ON S.batchSeq = B.seq
       LEFT JOIN tbl_user_home H ON S.userHomeCode = H.userHomeCode
       LEFT JOIN tbl_user_app U ON S.userCode = U.userCode
       LEFT JOIN ${this.tableForms} F ON S.formSeq = F.seq
-      WHERE S.isActive = 'Y'
+      WHERE S.isActive = 'Y' AND B.isActive = 'Y'
     `;
     const params: any[] = [];
 
     if (dto.keyword) {
-      sql += ` AND (S.traceabilityCode LIKE ? OR S.traceabilityId LIKE ? OR U.userName LIKE ? OR U.userPhone LIKE ? OR H.userHomeName LIKE ?)`;
+      sql += ` AND (S.traceabilityCode LIKE ? OR B.traceabilityId LIKE ? OR U.userName LIKE ? OR U.userPhone LIKE ? OR H.userHomeName LIKE ?)`;
       const kw = `%${dto.keyword.trim()}%`;
       params.push(kw, kw, kw, kw, kw);
     }
@@ -100,7 +110,7 @@ export class TraceabilityAdminRepository {
       params.push(Number(dto.formSeq));
     }
     if (dto.status) {
-      sql += ` AND S.status = ?`;
+      sql += ` AND B.status = ?`;
       params.push(dto.status);
     }
     if (dto.fromDate) {
@@ -129,15 +139,16 @@ export class TraceabilityAdminRepository {
     let sql = `
       SELECT COUNT(S.seq) as total
       FROM ${this.tableSubmissions} S
+      JOIN tbl_traceability_batches B ON S.batchSeq = B.seq
       LEFT JOIN tbl_user_home H ON S.userHomeCode = H.userHomeCode
       LEFT JOIN tbl_user_app U ON S.userCode = U.userCode
       LEFT JOIN ${this.tableForms} F ON S.formSeq = F.seq
-      WHERE S.isActive = 'Y'
+      WHERE S.isActive = 'Y' AND B.isActive = 'Y'
     `;
     const params: any[] = [];
 
     if (dto.keyword) {
-      sql += ` AND (S.traceabilityCode LIKE ? OR S.traceabilityId LIKE ? OR U.userName LIKE ? OR U.userPhone LIKE ? OR H.userHomeName LIKE ?)`;
+      sql += ` AND (S.traceabilityCode LIKE ? OR B.traceabilityId LIKE ? OR U.userName LIKE ? OR U.userPhone LIKE ? OR H.userHomeName LIKE ?)`;
       const kw = `%${dto.keyword.trim()}%`;
       params.push(kw, kw, kw, kw, kw);
     }
@@ -146,7 +157,7 @@ export class TraceabilityAdminRepository {
       params.push(Number(dto.formSeq));
     }
     if (dto.status) {
-      sql += ` AND S.status = ?`;
+      sql += ` AND B.status = ?`;
       params.push(dto.status);
     }
     if (dto.fromDate) {
@@ -164,11 +175,13 @@ export class TraceabilityAdminRepository {
 
   async updateSubmissionStatus(seq: number, status: string, updatedId: string): Promise<number> {
     const sql = `
-      UPDATE ${this.tableSubmissions}
+      UPDATE tbl_traceability_batches
       SET status = ?, updatedId = ?, updatedAt = NOW()
-      WHERE seq = ? AND isActive = 'Y'
+      WHERE seq = (
+        SELECT batchSeq FROM ${this.tableSubmissions} WHERE seq = ?
+      ) OR seq = ?
     `;
-    const [result] = await this.db.execute<any>(sql, [status, updatedId, Number(seq)]);
+    const [result] = await this.db.execute<any>(sql, [status, updatedId, Number(seq), Number(seq)]);
     return result.affectedRows || 0;
   }
 }

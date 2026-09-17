@@ -55,24 +55,28 @@ export class TraceabilityAppService {
       throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
     }
 
-    traceabilityId = generateTraceabilityId(userCode, dto.userHomeCode);
-
     const submission = await this.repository.getSubmissionByUserHomeForm(userCode, dto.userHomeCode, form.seq);
     if (submission) {
       uniqueId = submission.uniqueId;
       traceabilityCode = submission.traceabilityCode;
       files = await this.repository.getFilesByUniqueId(uniqueId);
       qrUrl = submission.qrUrl || null;
+      traceabilityId = submission.traceabilityId || null;
       status = submission.status || TraceabilityStatusEnum.PROCESSING;
       try {
         savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
       } catch (e) {
         savedData = null;
       }
-    }
-
-    if (!qrUrl) {
-      qrUrl = generateTraceabilityQr(userCode, dto.userHomeCode);
+    } else {
+      const latestBatch = await this.repository.getLatestBatchByUserHome(userCode, dto.userHomeCode);
+      if (latestBatch) {
+        traceabilityId = latestBatch.traceabilityId;
+        qrUrl = latestBatch.qrUrl;
+      } else {
+        traceabilityId = generateTraceabilityId(userCode, dto.userHomeCode, 1);
+        qrUrl = generateTraceabilityQr(userCode, dto.userHomeCode, 1);
+      }
     }
 
     // Map fields to groups
@@ -111,7 +115,7 @@ export class TraceabilityAppService {
           }
 
           if (currentValue === null || currentValue === undefined || currentValue === '') {
-            const defaultValue = this.traceabilityFieldsService.getDefaultCurrentValue(f.fieldKey, traceabilityId);
+            const defaultValue = this.traceabilityFieldsService.getDefaultCurrentValue(f.fieldKey, traceabilityId || '');
             if (defaultValue !== null && defaultValue !== undefined) {
               currentValue = defaultValue;
             }
@@ -228,8 +232,8 @@ export class TraceabilityAppService {
     response.formKey = form.formKey;
     response.formName = form.formName;
     response.formDescription = form.formDescription || null;
-    response.qrUrl = qrUrl;
-    response.traceabilityId = traceabilityId;
+    response.qrUrl = qrUrl || undefined;
+    response.traceabilityId = traceabilityId || undefined;
     response.status = status;
     response.statusLabel = TRACE_CONST.STATUS[status]?.text || '';
     response.groups = mappedGroups;
@@ -276,13 +280,21 @@ export class TraceabilityAppService {
     const phases = this.traceabilityFieldsService.extractHiNumberHarvest(dto.formData);
     const harvestPhases = phases.length > 0 ? phases.sort((a, b) => a - b).join(',') : null;
 
+    const provinceCode = await this.repository.getUserHomeProvince(dto.userHomeCode);
+    if (!provinceCode) {
+      throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
+    }
+
+    const batch = await this.repository.findOrCreateBatch(userCode, dto.userHomeCode, userCode, harvestPhases);
+
     if (isExist) {
       // Cập nhật form
-      const [rows] = await (this.repository as any).db.execute(`SELECT seq, traceabilityCode, formData FROM tbl_traceability_submissions WHERE uniqueId = ? LIMIT 1`, [dto.uniqueId]);
+      const [rows] = await (this.repository as any).db.execute(`SELECT seq, batchSeq, traceabilityCode, formData FROM tbl_traceability_submissions WHERE uniqueId = ? LIMIT 1`, [dto.uniqueId]);
       if (rows && rows[0]) {
         const seq = rows[0].seq;
+        const batchSeq = rows[0].batchSeq || batch.seq;
 
-        await this.repository.updateSubmission(seq, formDataStr, userCode, harvestPhases);
+        await this.repository.updateSubmission(seq, formDataStr, userCode, harvestPhases, batchSeq);
         await this.repository.bindFilesToSubmission(seq, dto.uniqueId, userCode);
 
         return 1;
@@ -292,28 +304,7 @@ export class TraceabilityAppService {
     // Tạo mới form
     const traceabilityCode = await this.repository.generateTraceabilityCode();
 
-    const provinceCode = await this.repository.getUserHomeProvince(dto.userHomeCode);
-    if (!provinceCode) {
-      throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
-    }
-
-    const traceabilityId = generateTraceabilityId(userCode, dto.userHomeCode);
-    const qrUrl = generateTraceabilityQr(userCode, dto.userHomeCode);
-    const status = TraceabilityStatusEnum.PROCESSING;
-
-    const insertId = await this.repository.insertSubmission(
-      traceabilityCode,
-      dto.formSeq,
-      userCode,
-      dto.userHomeCode,
-      formDataStr,
-      dto.uniqueId,
-      status,
-      qrUrl,
-      traceabilityId,
-      userCode,
-      harvestPhases,
-    );
+    const insertId = await this.repository.insertSubmission(batch.seq, traceabilityCode, dto.formSeq, userCode, dto.userHomeCode, formDataStr, dto.uniqueId, userCode);
 
     if (insertId) {
       await this.repository.bindFilesToSubmission(insertId, dto.uniqueId, userCode);
@@ -337,21 +328,28 @@ export class TraceabilityAppService {
       houses.map(async (house) => {
         const houseUserCode = house.userCode;
         const userHomeCode = house.userHomeCode;
-        const traceabilityId = generateTraceabilityId(houseUserCode, userHomeCode);
-
         // Form đầu tiên trên App là 1. Chỉ cần dựa vào 1 form để biết nhà yến của user này đã có QR truy xuất hay chưa
         const submission = await this.repository.getSubmissionByUserHomeForm(houseUserCode, userHomeCode, 1);
 
         let status = TraceabilityStatusEnum.PROCESSING;
         let qrUrl: string | null = null;
+        let traceabilityId: string | null = null;
 
         if (submission) {
           status = submission.status || TraceabilityStatusEnum.PROCESSING;
           qrUrl = submission.qrUrl || null;
+          traceabilityId = submission.traceabilityId || null;
         }
 
-        if (!qrUrl) {
-          qrUrl = generateTraceabilityQr(houseUserCode, userHomeCode);
+        if (!traceabilityId || !qrUrl) {
+          const latestBatch = await this.repository.getLatestBatchByUserHome(houseUserCode, userHomeCode);
+          if (latestBatch) {
+            traceabilityId = latestBatch.traceabilityId;
+            qrUrl = latestBatch.qrUrl;
+          } else {
+            traceabilityId = generateTraceabilityId(houseUserCode, userHomeCode, 1);
+            qrUrl = generateTraceabilityQr(houseUserCode, userHomeCode, 1);
+          }
         }
 
         // Kiểm tra QR code PNG file đã tồn tại trên ổ đĩa chưa, nếu chưa thì tạo ở background (không await để tránh blocking API response)
@@ -375,8 +373,8 @@ export class TraceabilityAppService {
           userHomeCode,
           userHomeName: house.userHomeName,
           userHomeAddress: house.userHomeAddress,
-          qrUrl,
-          traceabilityId,
+          qrUrl: qrUrl || '',
+          traceabilityId: traceabilityId || '',
           status,
           statusLabel: TRACE_CONST.STATUS[status]?.text || '',
           isMain: house.isMain || 'N',
