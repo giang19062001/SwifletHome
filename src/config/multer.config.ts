@@ -32,7 +32,7 @@ export const validateImgExt = (originalname) => {
   }
 };
 
-export const getFileLocation = (mimetype: string, fieldname: string) => {
+export const getFileLocation = (mimetype: string, fieldname: string, isExternal?: boolean) => {
   let result = '';
 
   if (mimetype.startsWith('image/')) {
@@ -55,7 +55,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     } else if (fieldname.includes('reviewImg')) {
       result = 'images/reviews';
     } else if (fieldname.includes('traceabilityFiles')) {
-      result = 'images/traces';
+      result = isExternal ? 'images/tracesExternal' : 'images/traces';
     }
   } else if (mimetype.startsWith('video/')) {
     if (fieldname.includes('doctorFiles')) {
@@ -65,7 +65,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     } else if (fieldname.includes('teamFiles') || fieldname.includes('teamServiceFiles')) {
       result = 'videos/teams';
     } else if (fieldname.includes('traceabilityFiles')) {
-      result = 'videos/traces';
+      result = isExternal ? 'videos/tracesExternal' : 'videos/traces';
     }
   } else if (mimetype.startsWith('audio/')) {
     if (fieldname.includes('editorAudio')) {
@@ -75,7 +75,7 @@ export const getFileLocation = (mimetype: string, fieldname: string) => {
     }
   } else {
     if (fieldname.includes('traceabilityFiles')) {
-      result = 'docs/traces';
+      result = isExternal ? 'docs/tracesExternal' : 'docs/traces';
     }
   }
 
@@ -103,8 +103,9 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
 
   return {
     storage: diskStorage({
-      destination: (req, file, cb) => {
-        const location = getFileLocation(file.mimetype, file.fieldname);
+      destination: (req: any, file, cb) => {
+        const isExternal = req.body?.isExternal === 'Y';
+        const location = getFileLocation(file.mimetype, file.fieldname, isExternal);
         const folderPath = join(process.cwd(), 'public', location);
         ensureDir(folderPath);
         cb(null, folderPath);

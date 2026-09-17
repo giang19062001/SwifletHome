@@ -3,3 +3,9 @@ export enum TraceabilityStatusEnum {
   APPROVED = 'APPROVED',
   REFUSED = 'REFUSED',
 }
+
+export enum TraceabilityDisplayActorTypeEnum {
+  BOTH = 'BOTH',
+  HOST = 'HOST',
+  EXTERNAL = 'EXTERNAL',
+}

@@ -124,4 +124,9 @@ export const CODES = {
     LEN: 6,
     FRIST_CODE: 'TRC000001',
   },
+  traceabilityCodeExt: {
+    PRE: 'TRE',
+    FIRST_CODE: 'TRE000001',
+    LEN: 6,
+  },
 };

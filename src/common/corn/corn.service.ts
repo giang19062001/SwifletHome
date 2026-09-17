@@ -19,6 +19,7 @@ import { FileLocalService } from '../fileLocal/fileLocal.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
 import { TABLE_MAPPING_TO_JOB_CLEAR } from './corn.const';
+import { TraceabilityExternalService } from 'src/modules/traceability/app/traceability-external.service';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -34,6 +35,7 @@ export class CornService implements OnModuleInit {
     private readonly todoAlarmAppService: TodoAlarmAppService,
     private readonly adsAdminService: AdsAdminService,
     private readonly traceabilityAppService: TraceabilityAppService,
+    private readonly traceabilityExternalService: TraceabilityExternalService,
     private readonly fileLocalService: FileLocalService,
     private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
@@ -349,16 +351,29 @@ export class CornService implements OnModuleInit {
 
   async deleteTraceabilityFilesNotUse() {
     const logbase = `${this.SERVICE_NAME}/deleteTraceabilityFilesNotUse`;
-    this.logger.log(logbase, `Chuẩn bị xóa các file traceability không dùng theo lịch trình....`);
+    this.logger.log(logbase, `Chuẩn bị xóa các file traceability (Nội bộ & External) không dùng theo lịch trình....`);
     try {
+      // 1. Dọn dẹp file Nội bộ (Host)
       const filesNotUse = await this.traceabilityAppService.getFilesNotUse();
       if (filesNotUse.length) {
         for (const file of filesNotUse) {
           await this.traceabilityAppService.deleteFileCron(file.seq);
           await this.fileLocalService.deleteLocalFile(file.filename);
         }
-        this.logger.log(logbase, `Các file traceability không dùng đã được xóa thành công`);
-      } else {
+        this.logger.log(logbase, `Các file traceability nội bộ không dùng đã được xóa thành công (${filesNotUse.length} files)`);
+      }
+
+      // 2. Dọn dẹp file External (VCĐP)
+      const extFilesNotUse = await this.traceabilityExternalService.getFilesNotUse();
+      if (extFilesNotUse.length) {
+        for (const file of extFilesNotUse) {
+          await this.traceabilityExternalService.deleteFileCron(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file traceability external không dùng đã được xóa thành công (${extFilesNotUse.length} files)`);
+      }
+
+      if (!filesNotUse.length && !extFilesNotUse.length) {
         this.logger.log(logbase, `Không có file traceability nào cần được xóa`);
       }
     } catch (error) {

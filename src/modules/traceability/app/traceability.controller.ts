@@ -15,8 +15,8 @@ import { VideoConverterInterceptor } from 'src/interceptors/video-converter.inte
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { TraceabilityAdminService } from '../admin/traceability.service';
-import { GetFormDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
-import { TraceabilityFormResDto, TraceabilityFormSimpleResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto } from './traceability.response';
+import { DeleteFileQueryDto, GetAllFormsDto, GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
+import { TraceabilityFormResDto, TraceabilityFormSimpleResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto, TraceabilityBatchListResDto } from './traceability.response';
 import { TraceabilityAppService } from './traceability.service';
 
 @ApiTags('app/traceability')
@@ -48,8 +48,8 @@ export class TraceabilityAppController implements OnModuleInit {
   @Get('getAllForms')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto([TraceabilityFormSimpleResDto]) })
-  async getAllForms() {
-    const result = await this.service.getAllForms();
+  async getAllForms(@Query() query?: GetAllFormsDto) {
+    const result = await this.service.getAllForms(query?.isExternal);
     return {
       message: Msg.GetOk,
       data: result,
@@ -86,6 +86,21 @@ export class TraceabilityAppController implements OnModuleInit {
   }
 
   @ApiOperation({
+    summary: 'Lấy danh sách các đợt truy xuất nguồn gốc (Batch List) có phân trang',
+    description: 'Hỗ trợ phân trang page, limit, lọc theo userHomeCode (Nội bộ) hoặc isExternal = Y/N.',
+  })
+  @Get('getSubmissionBatchList')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(TraceabilityBatchListResDto) })
+  async getSubmissionBatchList(@Query() query: GetSubmissionBatchListDto, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.service.getSubmissionBatchList(query, user.userCode);
+    return {
+      message: Msg.GetOk,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
     summary: 'Upload tài liệu/hình ảnh/video cho form truy xuất nguồn gốc',
     description: 'Liên kết thông qua uniqueId và fieldKey. Tự động vô hiệu hóa file cũ nếu fieldType = file_single.',
   })
@@ -113,8 +128,8 @@ export class TraceabilityAppController implements OnModuleInit {
   @Delete('deleteFile/:seq')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
-  async deleteFile(@Param('seq') seq: number, @GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.service.deleteFile(seq, user.userCode);
+  async deleteFile(@Param('seq') seq: number, @Query() query: DeleteFileQueryDto, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.service.deleteFile(seq, user.userCode, query?.isExternal);
     return {
       message: result > 0 ? Msg.DeleteOk : Msg.DeleteErr,
       data: result,

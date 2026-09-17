@@ -7,11 +7,13 @@ import { TraceabilityAppController } from './traceability.controller';
 import { TraceabilityAppRepository } from './traceability.repository';
 import { TraceabilityAppService } from './traceability.service';
 import { TraceabilityFieldsService } from './traceability-fields.service';
+import { TraceabilityExternalRepository } from './traceability-external.repository';
+import { TraceabilityExternalService } from './traceability-external.service';
 
 @Module({
   imports: [AuthAppModule, FileLocalModule, TraceabilityAdminModule, TodoAppModule],
   controllers: [TraceabilityAppController],
-  providers: [TraceabilityAppService, TraceabilityAppRepository, TraceabilityFieldsService],
-  exports: [TraceabilityAppService, TraceabilityFieldsService],
+  providers: [TraceabilityAppService, TraceabilityAppRepository, TraceabilityFieldsService, TraceabilityExternalService, TraceabilityExternalRepository],
+  exports: [TraceabilityAppService, TraceabilityFieldsService, TraceabilityExternalService],
 })
 export class TraceabilityAppModule {}

@@ -1,5 +1,32 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsString, IsUUID } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, IsUUID } from 'class-validator';
+
+export class GetSubmissionBatchListDto {
+  @ApiPropertyOptional({ example: 10, default: 10 })
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  limit?: number = 10;
+
+  @ApiPropertyOptional({ example: 1, default: 1 })
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  page?: number = 1;
+
+  @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ, Y = External (VCĐP)' })
+  @IsString()
+  @IsOptional()
+  isExternal?: string;
+}
+
+export class GetAllFormsDto {
+  @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,..)' })
+  @IsString()
+  @IsOptional()
+  isExternal?: string;
+}
 
 export class GetFormDto {
   @ApiProperty({ example: 'BRIEF_SWIFT_HOUSE', description: 'formKey' })
@@ -7,10 +34,15 @@ export class GetFormDto {
   @IsNotEmpty()
   formKey!: string;
 
-  @ApiProperty({ example: 'HOM000001', description: 'Nhà yến chính hiện tại của người dùng' })
+  @ApiPropertyOptional({ example: 'HOM000001', description: 'Nhà yến chính hiện tại của người dùng (Optional cho External)' })
   @IsString()
-  @IsNotEmpty()
-  userHomeCode!: string;
+  @IsOptional()
+  userHomeCode?: string;
+
+  @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,..)' })
+  @IsString()
+  @IsOptional()
+  isExternal?: string;
 }
 
 export class UploadTraceabilityFilesDto {
@@ -29,6 +61,11 @@ export class UploadTraceabilityFilesDto {
   @IsNotEmpty()
   fieldType!: 'file_single' | 'file_multiple';
 
+  @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,..)' })
+  @IsString()
+  @IsOptional()
+  isExternal?: string;
+
   @ApiProperty({
     type: 'array',
     items: {
@@ -38,6 +75,13 @@ export class UploadTraceabilityFilesDto {
     description: 'Tối đa 5 file (ảnh, video, docs)',
   })
   traceabilityFiles!: any[];
+}
+
+export class DeleteFileQueryDto {
+  @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,..)' })
+  @IsString()
+  @IsOptional()
+  isExternal?: string;
 }
 
 export class SubmitTraceabilityDto {
@@ -51,10 +95,20 @@ export class SubmitTraceabilityDto {
   @IsNotEmpty()
   formSeq!: number;
 
-  @ApiProperty({ example: 'HOM000001' })
+  @ApiPropertyOptional({ example: '3FAM-NY-USR000071-HOM000058-1', description: 'Mã đợt truy xuất nguồn gốc duy nhất' })
   @IsString()
-  @IsNotEmpty()
-  userHomeCode!: string;
+  @IsOptional()
+  traceabilityId?: string;
+
+  @ApiPropertyOptional({ example: 'HOM000001', description: 'Nhà yến chính hiện tại của người dùng (Optional cho External)' })
+  @IsString()
+  @IsOptional()
+  userHomeCode?: string;
+
+  @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,...)' })
+  @IsString()
+  @IsOptional()
+  isExternal?: string;
 
   @ApiProperty({ example: { OWNER_INFO: { subjectType: 'Cá nhân', businessRegistrationFile: 2 } } })
   @IsObject()

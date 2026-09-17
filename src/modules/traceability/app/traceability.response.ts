@@ -133,3 +133,58 @@ export class TraceabilityHouseInfoResDto {
   @ApiProperty({ example: 'N', enum: ['Y', 'N'] })
   isMain!: string;
 }
+
+export class TraceabilityBatchItemResDto {
+  @ApiProperty({ example: 1 })
+  seq!: number;
+
+  @ApiProperty({ example: '3FAM-NY-USR000071-HOM000058-1' })
+  traceabilityId!: string;
+
+  @ApiProperty({ example: 'USR000071' })
+  userCode!: string;
+
+  @ApiProperty({ example: 'HOM000058', required: false })
+  userHomeCode?: string;
+
+  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED'] })
+  status!: string;
+
+  @ApiProperty({ example: 'Đang xử lý' })
+  statusLabel!: string;
+
+  @ApiProperty({ example: 'uploads/images/traceQrcodes/3FAM-NY-USR000071-HOM000058-1.png', required: false })
+  qrUrl?: string;
+
+  @ApiProperty({ example: '2,3,4', required: false })
+  harvestPhases?: string;
+
+  @ApiProperty({ example: true, description: 'True nếu đợt đã hoàn thành FormSeq = 8' })
+  hasForm8!: boolean;
+
+  @ApiProperty({ example: 3, description: 'Số lượng form đã submit trong đợt này' })
+  submissionCount!: number;
+
+  @ApiProperty({ example: '2026-09-17T21:00:00.000Z' })
+  createdAt!: Date;
+
+  @ApiProperty({ example: '2026-09-17T21:00:00.000Z', required: false })
+  updatedAt?: Date;
+}
+
+export class TraceabilityBatchListResDto {
+  @ApiProperty({ type: [TraceabilityBatchItemResDto] })
+  list!: TraceabilityBatchItemResDto[];
+
+  @ApiProperty({ example: 25 })
+  total!: number;
+
+  @ApiProperty({ example: 1 })
+  page!: number;
+
+  @ApiProperty({ example: 10 })
+  limit!: number;
+
+  @ApiProperty({ example: 3 })
+  totalPage!: number;
+}

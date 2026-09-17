@@ -5,15 +5,24 @@ import { v4 as uuidv4 } from 'uuid';
 import { existsSync, mkdirSync } from 'fs';
 import * as path from 'path';
 import * as QRCode from 'qrcode';
-import { GetFormDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
+import { GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
 import { TraceabilityAppRepository } from './traceability.repository';
-import { TraceabilityFormResDto, TraceabilityGroupResDto, TraceabilityFieldResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto } from './traceability.response';
-import { generateTraceabilityId, generateTraceabilityQr, generateTraceabilityQrLink } from './traceability.func';
+import {
+  TraceabilityFormResDto,
+  TraceabilityGroupResDto,
+  TraceabilityFieldResDto,
+  UploadTraceabilityFileResDto,
+  TraceabilityHouseInfoResDto,
+  TraceabilityBatchItemResDto,
+  TraceabilityBatchListResDto,
+} from './traceability.response';
+import { generateTraceabilityId, generateTraceabilityQr } from './traceability.func';
 import { TraceabilityStatusEnum } from './traceability.enum';
 import { TRACE_CONST } from './traceability.const';
 import { Msg } from 'src/helpers/message.helper';
 import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL } from './traceability.query';
 import { TraceabilityFieldsService } from './traceability-fields.service';
+import { TraceabilityExternalService } from './traceability-external.service';
 
 @Injectable()
 export class TraceabilityAppService {
@@ -21,10 +30,11 @@ export class TraceabilityAppService {
     private readonly repository: TraceabilityAppRepository,
     private readonly fileLocalService: FileLocalService,
     private readonly traceabilityFieldsService: TraceabilityFieldsService,
+    private readonly externalService: TraceabilityExternalService,
   ) {}
 
-  async getAllForms(): Promise<{ seq: number; formKey: string; formName: string; formDescription: string | null }[]> {
-    const rows = await this.repository.getAllForms();
+  async getAllForms(isExternal?: string): Promise<{ seq: number; formKey: string; formName: string; formDescription: string | null }[]> {
+    const rows = await this.repository.getAllForms(isExternal);
     return rows.map((r) => ({
       seq: r.seq,
       formKey: r.formKey,
@@ -34,6 +44,10 @@ export class TraceabilityAppService {
   }
 
   async getForm(dto: GetFormDto, userCode: string): Promise<TraceabilityFormResDto> {
+    // gọi sang truy vấn external - s
+    if (dto.isExternal === 'Y' || !dto.userHomeCode) {
+      return await this.externalService.getForm(dto, userCode);
+    } // gọi sang truy vấn external - e
     const form = await this.repository.getFormByKey(dto.formKey);
     if (!form) {
       throw new BadRequestException({ message: Msg.FormNotFound, data: null });
@@ -50,12 +64,13 @@ export class TraceabilityAppService {
     let traceabilityId: string | null = null;
     let status = TraceabilityStatusEnum.PROCESSING;
 
-    const homeSeq = await this.repository.getUserHomeSeq(dto.userHomeCode);
+    const userHomeCode = dto?.userHomeCode;
+    const homeSeq = await this.repository.getUserHomeSeq(userHomeCode);
     if (!homeSeq) {
       throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
     }
 
-    const submission = await this.repository.getSubmissionByUserHomeForm(userCode, dto.userHomeCode, form.seq);
+    const submission = await this.repository.getSubmissionByUserHomeForm(userCode, userHomeCode, form.seq);
     if (submission) {
       uniqueId = submission.uniqueId;
       traceabilityCode = submission.traceabilityCode;
@@ -69,14 +84,14 @@ export class TraceabilityAppService {
         savedData = null;
       }
     } else {
-      const processingBatch = await this.repository.getProcessingBatchByUserHome(userCode, dto.userHomeCode);
+      const processingBatch = await this.repository.getProcessingBatchByUserHome(userCode, userHomeCode);
       if (processingBatch) {
         traceabilityId = processingBatch.traceabilityId;
         qrUrl = processingBatch.qrUrl;
       } else {
-        const nextIndex = await this.repository.getNextBatchIndex(userCode, dto.userHomeCode);
-        traceabilityId = generateTraceabilityId(userCode, dto.userHomeCode, nextIndex);
-        qrUrl = generateTraceabilityQr(userCode, dto.userHomeCode, nextIndex);
+        const nextIndex = await this.repository.getNextBatchIndex(userCode, userHomeCode);
+        traceabilityId = generateTraceabilityId(userCode, userHomeCode, nextIndex);
+        qrUrl = generateTraceabilityQr(userCode, userHomeCode, nextIndex);
       }
     }
 
@@ -149,7 +164,7 @@ export class TraceabilityAppService {
           promises.push(
             (async () => {
               try {
-                const rows = await this.repository.getDynamicOptions(defaultSql, userCode, dto.userHomeCode);
+                const rows = await this.repository.getDynamicOptions(defaultSql, userCode, userHomeCode);
                 if (rows && rows.length > 0) {
                   const defaultData = rows[0]; // { fieldKey1: value1, fieldKey2: value2 }
                   for (const field of group.fields) {
@@ -169,14 +184,14 @@ export class TraceabilityAppService {
       }
     }
 
-    const submissionsFormData = await this.repository.getSubmissionsFormDataByUserHome(userCode, dto.userHomeCode);
+    const submissionsFormData = await this.repository.getSubmissionsFormDataByUserHome(userCode, userHomeCode);
     const activeHarvestPhases = this.traceabilityFieldsService.collectHarvestPhases(savedData, submissionsFormData);
 
     // dùng linkValues để fill trường khác tự động từ 1 trường select/radio
     for (const group of mappedGroups) {
       for (const field of group.fields) {
         if (this.traceabilityFieldsService.isLotCodeField(field.fieldKey)) {
-          this.traceabilityFieldsService.applyLotCodeValueToField(field, dto.userHomeCode, activeHarvestPhases);
+          this.traceabilityFieldsService.applyLotCodeValueToField(field, userHomeCode, activeHarvestPhases);
         } else {
           // Xử lý options động
           const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];
@@ -184,7 +199,7 @@ export class TraceabilityAppService {
             promises.push(
               (async () => {
                 try {
-                  const rows = await this.repository.getDynamicOptions(sqlQuery, userCode, dto.userHomeCode);
+                  const rows = await this.repository.getDynamicOptions(sqlQuery, userCode, userHomeCode);
                   const options = rows.map((row, idx) => {
                     const { value, label, ...rest } = row;
                     const option: any = {
@@ -246,13 +261,17 @@ export class TraceabilityAppService {
   }
 
   async uploadFiles(dto: UploadTraceabilityFilesDto, files: Express.Multer.File[], createdId: string): Promise<UploadTraceabilityFileResDto[]> {
+    // gọi sang truy vấn external - s
+    if (dto.isExternal === 'Y') {
+      return await this.externalService.uploadFiles(dto, files, createdId);
+    } // gọi sang truy vấn external - e
     if (dto.fieldType === 'file_single') {
       await this.repository.deactivateFilesForFieldSingle(dto.uniqueId, dto.fieldKey);
     }
 
     const result = await Promise.all(
       files.map(async (file) => {
-        const relativePath = `${getFileLocation(file.mimetype, file.fieldname)}/${file.filename}`;
+        const relativePath = `${getFileLocation(file.mimetype, file.fieldname, false)}/${file.filename}`;
         const seq = await this.repository.insertFile(dto.uniqueId, dto.fieldKey, dto.fieldType, relativePath, file.originalname, file.size, file.mimetype, createdId);
         return { seq, url: relativePath, mimetype: file.mimetype };
       }),
@@ -261,7 +280,11 @@ export class TraceabilityAppService {
     return result;
   }
 
-  async deleteFile(seq: number, userCode: string): Promise<number> {
+  async deleteFile(seq: number, userCode: string, isExternal?: string): Promise<number> {
+    // gọi sang truy vấn external - s
+    if (isExternal === 'Y') {
+      return await this.externalService.deleteFile(seq, userCode);
+    } // gọi sang truy vấn external - e
     const fileInfo = await this.repository.getFileBySeq(seq);
     if (!fileInfo || fileInfo.createdId !== userCode) {
       return 0;
@@ -275,6 +298,10 @@ export class TraceabilityAppService {
   }
 
   async submit(dto: SubmitTraceabilityDto, userCode: string): Promise<number> {
+    // gọi sang truy vấn external - s
+    if (dto.isExternal === 'Y' || !dto.userHomeCode) {
+      return await this.externalService.submit(dto, userCode);
+    } // gọi sang truy vấn external - e
     const isExist = await this.repository.checkExistUniqueId(dto.uniqueId);
 
     const formDataStr = JSON.stringify(dto.formData);
@@ -286,7 +313,18 @@ export class TraceabilityAppService {
       throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
     }
 
-    const batch = await this.repository.findOrCreateBatch(userCode, dto.userHomeCode, userCode, harvestPhases);
+    let batch: any = null;
+    if (dto.traceabilityId) {
+      batch = await this.repository.getBatchByTraceabilityId(dto.traceabilityId, userCode);
+      if (batch && harvestPhases && batch.harvestPhases !== harvestPhases) {
+        await this.repository.updateBatchHarvestPhases(batch.seq, harvestPhases, userCode);
+        batch.harvestPhases = harvestPhases;
+      }
+    }
+
+    if (!batch) {
+      batch = await this.repository.findOrCreateBatch(userCode, dto.userHomeCode, userCode, harvestPhases);
+    }
 
     if (isExist) {
       // Cập nhật form
@@ -377,5 +415,44 @@ export class TraceabilityAppService {
     );
 
     return results;
+  }
+
+  async getSubmissionBatchList(dto: GetSubmissionBatchListDto, userCode: string): Promise<TraceabilityBatchListResDto> {
+    // gọi sang truy vấn external - s
+    if (dto.isExternal === 'Y') {
+      return await this.externalService.getSubmissionBatchList(dto, userCode);
+    } // gọi sang truy vấn external - e
+
+    const page = Math.max(1, dto.page || 1);
+    const limit = Math.max(1, dto.limit || 10);
+    const { list, total } = await this.repository.getSubmissionBatchList(userCode, dto);
+
+    const mappedList: TraceabilityBatchItemResDto[] = list.map((item) => {
+      const status = item.status || TraceabilityStatusEnum.PROCESSING;
+      return {
+        seq: item.seq,
+        traceabilityId: item.traceabilityId,
+        userCode: item.userCode,
+        userHomeCode: item.userHomeCode || undefined,
+        status,
+        statusLabel: TRACE_CONST.STATUS[status as keyof typeof TRACE_CONST.STATUS]?.text || '',
+        qrUrl: item.qrUrl || undefined,
+        harvestPhases: item.harvestPhases || undefined,
+        hasForm8: (item.form8Count || 0) > 0,
+        submissionCount: Number(item.submissionCount || 0),
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt || undefined,
+      };
+    });
+
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+      list: mappedList,
+      total,
+      page,
+      limit,
+      totalPage,
+    };
   }
 }
