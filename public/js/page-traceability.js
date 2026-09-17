@@ -17,11 +17,14 @@ document.addEventListener('DOMContentLoaded', function () {
   const btnReset = document.getElementById('btn-filter-reset');
   if (btnReset) {
     btnReset.addEventListener('click', function () {
-      document.getElementById('filterKeyword').value = '';
-      document.getElementById('filterFormSeq').value = '';
-      document.getElementById('filterStatus').value = '';
-      document.getElementById('filterFromDate').value = '';
-      document.getElementById('filterToDate').value = '';
+      const elKeyword = document.getElementById('filterKeyword');
+      if (elKeyword) elKeyword.value = '';
+      const elStatus = document.getElementById('filterStatus');
+      if (elStatus) elStatus.value = '';
+      const elFromDate = document.getElementById('filterFromDate');
+      if (elFromDate) elFromDate.value = '';
+      const elToDate = document.getElementById('filterToDate');
+      if (elToDate) elToDate.value = '';
       page = 1;
       getTraceabilityList(page, limit);
     });
@@ -42,7 +45,6 @@ function changePage(p) {
 
 function getFilterParams() {
   const keyword = document.getElementById('filterKeyword')?.value?.trim() || '';
-  const formSeq = document.getElementById('filterFormSeq')?.value || '';
   const status = document.getElementById('filterStatus')?.value || '';
   const fromDate = document.getElementById('filterFromDate')?.value || '';
   const toDate = document.getElementById('filterToDate')?.value || '';
@@ -53,7 +55,6 @@ function getFilterParams() {
   };
 
   if (keyword) params.keyword = keyword;
-  if (formSeq) params.formSeq = Number(formSeq);
   if (status) params.status = status;
   if (fromDate) params.fromDate = fromDate;
   if (toDate) params.toDate = toDate;
@@ -102,9 +103,6 @@ function renderTraceabilityList(data, objElement) {
         <tr class="text-center align-middle">
           <td><p class="mb-0">${(page - 1) * limit + i++}</p></td>
           <td>
-            <p class="fw-bold txt-main mb-0">${ele.traceabilityCode || ele.traceabilityId || ''}</p>
-          </td>
-          <td>
             <p class="mb-0 fw-bold">${ele.userName || 'Chưa cập nhật'}</p>
             <p class="mb-0 text-muted small">${ele.userPhone || ''}</p>
           </td>
@@ -112,19 +110,21 @@ function renderTraceabilityList(data, objElement) {
             <p class="mb-0 fw-bold">${ele.userHomeName || ''}</p>
             <p class="mb-0 text-muted small">${ele.userHomeCode || ''}</p>
           </td>
-          <td><p class="mb-0">${ele.formName || 'Form ' + ele.formSeq}</p></td>
+          <td><p class="mb-0">${ele.harvestPhases ? ('Đợt: ' + ele.harvestPhases) : 'Chưa điền dữ liệu'}</p></td>
           <td><span class="${statusBadgeClass}">${ele.statusLabel || ele.status}</span></td>
           <td><p class="mb-0">${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm') : ''}</p></td>
-          <td>
+          <td style="width: 300px;">
             <div class="d-flex justify-content-center gap-1">
               <a class="btn btn-sm btn-info text-white" href="/dashboard/traceability/detail/${ele.traceabilityId}" title="Xem chi tiết trang">
                 <i class="fa fa-eye me-1"></i> Chi tiết
               </a>
-              <!-- 
-              <button class="btn btn-sm btn-primary" onclick="openStatusModal(${ele.seq}, '${ele.status}', '${ele.traceabilityCode || ele.traceabilityId}')" title="Cập nhật trạng thái">
-                <i class="fa fa-edit"></i>
-              </button>
-              -->
+              ${
+                ele.hasForm8
+                  ? `<button class="btn btn-sm btn-info" onclick="openStatusModal(${ele.seq}, '${ele.status}', '${ele.traceabilityId}')" title="Cập nhật trạng thái">
+                <i class="fa fa-edit"></i> Duyệt
+              </button>`
+                  : ''
+              }
             </div>
           </td>
         </tr>`;

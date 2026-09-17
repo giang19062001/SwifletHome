@@ -29,18 +29,6 @@
             </div>
 
             <div class="col-md-2">
-              <label class="form-label">Biểu mẫu</label>
-              <select class="form-select" id="filterFormSeq">
-                <option value="">-- Tất cả form --</option>
-                <% if (values && values.forms) { %>
-                  <% values.forms.forEach(function(form) { %>
-                    <option value="<%= form.seq %>"><%= form.formName %></option>
-                  <% }); %>
-                <% } %>
-              </select>
-            </div>
-
-            <div class="col-md-2">
               <label class="form-label">Trạng thái</label>
               <select class="form-select" id="filterStatus">
                 <option value="">-- Tất cả trạng thái --</option>
@@ -53,6 +41,11 @@
             <div class="col-md-2">
               <label class="form-label">Từ ngày</label>
               <input type="date" class="form-control" id="filterFromDate">
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label">Đến ngày</label>
+              <input type="date" class="form-control" id="filterToDate">
             </div>
 
             <div class="col-md-3 d-flex align-items-end justify-content-end gap-2">
@@ -73,10 +66,9 @@
               <thead class="table-light">
                 <tr class="text-center">
                   <th style="width: 50px;"><p>STT</p></th>
-                  <th><p>Mã TXNG</p></th>
                   <th><p>Chủ sở hữu</p></th>
                   <th><p>Nhà yến</p></th>
-                  <th><p>Biểu mẫu</p></th>
+                  <th><p>Đợt thu hoạch</p></th>
                   <th><p>Trạng thái</p></th>
                   <th><p>Ngày tạo</p></th>
                   <th style="width: 180px;"><p>Thao tác</p></th>

@@ -3,6 +3,7 @@ import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
 import { generateTraceabilityId, generateTraceabilityQr } from './traceability.func';
+import { TraceabilityStatusEnum } from './traceability.enum';
 @Injectable()
 export class TraceabilityAppRepository {
   private readonly tableForms = 'tbl_traceability_forms';
@@ -77,11 +78,23 @@ export class TraceabilityAppRepository {
     return rows[0] || null;
   }
 
+  async getProcessingBatchByUserHome(userCode: string, userHomeCode: string): Promise<RowDataPacket | null> {
+    const sql = `
+      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases 
+      FROM ${this.tableBatches} 
+      WHERE userCode = ? AND userHomeCode = ? AND status = '${TraceabilityStatusEnum.PROCESSING}' AND isActive = 'Y' 
+      ORDER BY seq DESC 
+      LIMIT 1
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode, userHomeCode]);
+    return rows[0] || null;
+  }
+
   async findOrCreateBatch(userCode: string, userHomeCode: string, createdId: string, harvestPhases: string | null = null): Promise<RowDataPacket> {
     const selectSql = `
       SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases 
       FROM ${this.tableBatches} 
-      WHERE userCode = ? AND userHomeCode = ? AND isActive = 'Y' 
+      WHERE userCode = ? AND userHomeCode = ? AND status = '${TraceabilityStatusEnum.PROCESSING}' AND isActive = 'Y' 
       ORDER BY seq DESC 
       LIMIT 1
     `;
@@ -102,7 +115,7 @@ export class TraceabilityAppRepository {
     const insertSql = `
       INSERT INTO ${this.tableBatches} 
         (traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases, createdId) 
-      VALUES (?, ?, ?, 'PROCESSING', ?, ?, ?)
+      VALUES (?, ?, ?, '${TraceabilityStatusEnum.PROCESSING}', ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(insertSql, [traceabilityId, userCode, userHomeCode, qrUrl, harvestPhases, createdId]);
     return {
@@ -110,7 +123,7 @@ export class TraceabilityAppRepository {
       traceabilityId,
       userCode,
       userHomeCode,
-      status: 'PROCESSING',
+      status: TraceabilityStatusEnum.PROCESSING,
       qrUrl,
       harvestPhases,
     } as RowDataPacket;
@@ -140,7 +153,7 @@ export class TraceabilityAppRepository {
              B.status, B.qrUrl, B.traceabilityId, B.harvestPhases 
       FROM ${this.tableSubmissions} S
       JOIN ${this.tableBatches} B ON S.batchSeq = B.seq
-      WHERE S.userCode = ? AND S.userHomeCode = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
+      WHERE S.userCode = ? AND S.userHomeCode = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y' AND B.status = '${TraceabilityStatusEnum.PROCESSING}'
       ORDER BY S.seq DESC
       LIMIT 1
     `;
@@ -201,10 +214,10 @@ export class TraceabilityAppRepository {
     return traceabilityCode;
   }
 
-  async getUserHomeProvince(userHomeCode: string): Promise<string | null> {
-    const sql = `SELECT userHomeProvince FROM ${this.tableUserHome} WHERE userHomeCode = ? AND isActive = 'Y' LIMIT 1`;
+  async getUserHomeSeq(userHomeCode: string): Promise<string | null> {
+    const sql = `SELECT seq FROM ${this.tableUserHome} WHERE userHomeCode = ? AND isActive = 'Y' LIMIT 1`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userHomeCode]);
-    return rows[0]?.userHomeProvince || null;
+    return rows[0]?.seq || null;
   }
 
   async insertSubmission(batchSeq: number, traceabilityCode: string, formSeq: number, userCode: string, userHomeCode: string, formData: string, uniqueId: string, createdId: string): Promise<number> {

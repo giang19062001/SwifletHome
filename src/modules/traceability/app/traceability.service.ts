@@ -50,8 +50,8 @@ export class TraceabilityAppService {
     let traceabilityId: string | null = null;
     let status = TraceabilityStatusEnum.PROCESSING;
 
-    const provinceCode = await this.repository.getUserHomeProvince(dto.userHomeCode);
-    if (!provinceCode) {
+    const homeSeq = await this.repository.getUserHomeSeq(dto.userHomeCode);
+    if (!homeSeq) {
       throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
     }
 
@@ -69,13 +69,14 @@ export class TraceabilityAppService {
         savedData = null;
       }
     } else {
-      const latestBatch = await this.repository.getLatestBatchByUserHome(userCode, dto.userHomeCode);
-      if (latestBatch) {
-        traceabilityId = latestBatch.traceabilityId;
-        qrUrl = latestBatch.qrUrl;
+      const processingBatch = await this.repository.getProcessingBatchByUserHome(userCode, dto.userHomeCode);
+      if (processingBatch) {
+        traceabilityId = processingBatch.traceabilityId;
+        qrUrl = processingBatch.qrUrl;
       } else {
-        traceabilityId = generateTraceabilityId(userCode, dto.userHomeCode, 1);
-        qrUrl = generateTraceabilityQr(userCode, dto.userHomeCode, 1);
+        const nextIndex = await this.repository.getNextBatchIndex(userCode, dto.userHomeCode);
+        traceabilityId = generateTraceabilityId(userCode, dto.userHomeCode, nextIndex);
+        qrUrl = generateTraceabilityQr(userCode, dto.userHomeCode, nextIndex);
       }
     }
 
@@ -280,8 +281,8 @@ export class TraceabilityAppService {
     const phases = this.traceabilityFieldsService.extractHiNumberHarvest(dto.formData);
     const harvestPhases = phases.length > 0 ? phases.sort((a, b) => a - b).join(',') : null;
 
-    const provinceCode = await this.repository.getUserHomeProvince(dto.userHomeCode);
-    if (!provinceCode) {
+    const homeSeq = await this.repository.getUserHomeSeq(dto.userHomeCode);
+    if (!homeSeq) {
       throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
     }
 
@@ -328,28 +329,21 @@ export class TraceabilityAppService {
       houses.map(async (house) => {
         const houseUserCode = house.userCode;
         const userHomeCode = house.userHomeCode;
-        // Form đầu tiên trên App là 1. Chỉ cần dựa vào 1 form để biết nhà yến của user này đã có QR truy xuất hay chưa
-        const submission = await this.repository.getSubmissionByUserHomeForm(houseUserCode, userHomeCode, 1);
 
         let status = TraceabilityStatusEnum.PROCESSING;
         let qrUrl: string | null = null;
         let traceabilityId: string | null = null;
 
-        if (submission) {
-          status = submission.status || TraceabilityStatusEnum.PROCESSING;
-          qrUrl = submission.qrUrl || null;
-          traceabilityId = submission.traceabilityId || null;
-        }
-
-        if (!traceabilityId || !qrUrl) {
-          const latestBatch = await this.repository.getLatestBatchByUserHome(houseUserCode, userHomeCode);
-          if (latestBatch) {
-            traceabilityId = latestBatch.traceabilityId;
-            qrUrl = latestBatch.qrUrl;
-          } else {
-            traceabilityId = generateTraceabilityId(houseUserCode, userHomeCode, 1);
-            qrUrl = generateTraceabilityQr(houseUserCode, userHomeCode, 1);
-          }
+        const processingBatch = await this.repository.getProcessingBatchByUserHome(houseUserCode, userHomeCode);
+        if (processingBatch) {
+          traceabilityId = processingBatch.traceabilityId;
+          qrUrl = processingBatch.qrUrl;
+          status = processingBatch.status || TraceabilityStatusEnum.PROCESSING;
+        } else {
+          const nextIndex = await this.repository.getNextBatchIndex(houseUserCode, userHomeCode);
+          traceabilityId = generateTraceabilityId(houseUserCode, userHomeCode, nextIndex);
+          qrUrl = generateTraceabilityQr(houseUserCode, userHomeCode, nextIndex);
+          status = TraceabilityStatusEnum.PROCESSING;
         }
 
         // Kiểm tra QR code PNG file đã tồn tại trên ổ đĩa chưa, nếu chưa thì tạo ở background (không await để tránh blocking API response)
@@ -359,7 +353,7 @@ export class TraceabilityAppService {
           if (!existsSync(dirPath)) {
             mkdirSync(dirPath, { recursive: true });
           }
-          const targetUrl = generateTraceabilityQrLink(houseUserCode, userHomeCode);
+          const targetUrl = `${process.env.CURRENT_URL!}/${TRACE_CONST.QR_CODE_BASE_URL}/${traceabilityId}.png`;
           QRCode.toFile(fullPath, targetUrl, {
             width: 300,
             margin: 1,
