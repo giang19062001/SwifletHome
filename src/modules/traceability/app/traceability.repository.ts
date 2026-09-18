@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
-import { generateTraceabilityId, generateTraceabilityQr } from './traceability.func';
-import { TraceabilityDisplayActorTypeEnum, TraceabilityStatusEnum } from './traceability.enum';
+import { TraceabilityDisplayActorTypeEnum, TraceabilityStatusEnum } from '../common/traceability.enum';
 import { GetSubmissionBatchListDto } from './traceability.dto';
+import { generateTraceabilityId, generateTraceabilityQr } from './traceability.func';
 @Injectable()
 export class TraceabilityAppRepository {
   private readonly tableForms = 'tbl_traceability_forms';

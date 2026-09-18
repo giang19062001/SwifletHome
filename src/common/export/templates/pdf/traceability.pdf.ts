@@ -9,6 +9,16 @@ export class TraceabilityPdfTemplate {
   constructor(private readonly pdfBaseService: PdfBaseService) {}
 
   async generate(traceData: any, qrUrl?: string): Promise<Buffer> {
+    const qrContent = qrUrl || '';
+    let qrBuffer: Buffer | null = null;
+    if (qrContent) {
+      try {
+        qrBuffer = await QRCode.toBuffer(qrContent, { width: 80, margin: 1 });
+      } catch (e) {
+        qrBuffer = null;
+      }
+    }
+
     return new Promise<Buffer>((resolve, reject) => {
       try {
         const doc = this.pdfBaseService.createDocument();
@@ -32,20 +42,14 @@ export class TraceabilityPdfTemplate {
 
         // QR CODE & TITLE
         const traceId = traceData?.traceabilityId || 'N/A';
-        const qrContent = qrUrl || '';
 
-        // generate QR asynchronously, but don't await inside the Promise executor
-        QRCode.toBuffer(qrContent, { width: 80, margin: 1 })
-          .then((qrBuffer) => {
-            try {
-              doc.image(qrBuffer, 475, 85, { width: 80 });
-            } catch {
-              // ignore image placement errors
-            }
-          })
-          .catch(() => {
-            // ignore qr fail
-          });
+        if (qrBuffer) {
+          try {
+            doc.image(qrBuffer, 475, 85, { width: 80 });
+          } catch {
+            // ignore image placement errors
+          }
+        }
 
         doc.font(fontBold).fontSize(16).fillColor('#000000').text('HỒ SƠ TRUY XUẤT NGUỒN GỐC', 40, currentY, { align: 'center' });
         doc
@@ -61,32 +65,36 @@ export class TraceabilityPdfTemplate {
 
         currentY += 85;
 
-        // SECTION 1: FACILITY / HOUSE INFO
-        doc.font(fontBold).fontSize(12).fillColor('#71AB33').text('I. THÔNG TIN CƠ SỞ CHÍNH', 40, currentY);
+        // SECTION 1: FACILITY / HOUSE INFO (Only if homeInfo exists)
+        const hasHomeInfo = Boolean(traceData?.homeInfo);
+        if (hasHomeInfo) {
+          doc.font(fontBold).fontSize(12).fillColor('#71AB33').text('I. THÔNG TIN CƠ SỞ CHÍNH', 40, currentY);
 
-        currentY += 20;
+          currentY += 20;
 
-        doc.strokeColor('#71AB33').lineWidth(1).rect(40, currentY, 515, 80).stroke();
+          doc.strokeColor('#71AB33').lineWidth(1).rect(40, currentY, 515, 80).stroke();
 
-        const homeInfo = traceData?.homeInfo || {};
-        const houseName = homeInfo.userHomeName || 'N/A';
-        const ownerName = homeInfo.userName || 'N/A';
-        const address = homeInfo.userHomeAddress || 'N/A';
+          const homeInfo = traceData.homeInfo;
+          const houseName = homeInfo.userHomeName || 'N/A';
+          const ownerName = homeInfo.userName || 'N/A';
+          const address = homeInfo.userHomeAddress || 'N/A';
 
-        doc.font(fontBold).fontSize(10).fillColor('#000000');
-        doc.text('Tên nhà yến: ', 55, currentY + 15, { continued: true });
-        doc.font(fontRegular).text(houseName);
+          doc.font(fontBold).fontSize(10).fillColor('#000000');
+          doc.text('Tên nhà yến: ', 55, currentY + 15, { continued: true });
+          doc.font(fontRegular).text(houseName);
 
-        doc.font(fontBold).text('Chủ sở hữu: ', 55, currentY + 35, { continued: true });
-        doc.font(fontRegular).text(ownerName);
+          doc.font(fontBold).text('Chủ sở hữu: ', 55, currentY + 35, { continued: true });
+          doc.font(fontRegular).text(ownerName);
 
-        doc.font(fontBold).text('Địa chỉ sản xuất: ', 55, currentY + 55, { continued: true });
-        doc.font(fontRegular).text(address);
+          doc.font(fontBold).text('Địa chỉ sản xuất: ', 55, currentY + 55, { continued: true });
+          doc.font(fontRegular).text(address);
 
-        currentY += 105;
+          currentY += 105;
+        }
 
         // SECTION 2: FORMS & SUBMISSIONS
-        doc.font(fontBold).fontSize(12).fillColor('#71AB33').text('II. NHẬT KÝ BIỂU MẪU TRUY XUẤT NGUỒN GỐC', 40, currentY);
+        const sectionTitle = hasHomeInfo ? 'II. NHẬT KÝ BIỂU MẪU TRUY XUẤT NGUỒN GỐC' : 'I. NHẬT KÝ BIỂU MẪU TRUY XUẤT NGUỒN GỐC';
+        doc.font(fontBold).fontSize(12).fillColor('#71AB33').text(sectionTitle, 40, currentY);
 
         currentY += 25;
 

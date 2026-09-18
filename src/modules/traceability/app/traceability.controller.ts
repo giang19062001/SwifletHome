@@ -174,8 +174,9 @@ export class TraceabilityAppController implements OnModuleInit {
       const base64Data = (await job.waitUntilFinished(this.queueEvents)) as string;
       const pdfBuffer = Buffer.from(base64Data, 'base64');
 
+      const encodedFilename = encodeURIComponent(`3FAM_Bo_ho_so_TXNG_${cleanId}.pdf`);
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="3FAM_Bo_ho_so_TXNG_${cleanId}.pdf"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`);
       res.send(pdfBuffer);
     } catch (error: any) {
       res.status(500).send('Lỗi máy chủ khi tạo file PDF từ hàng đợi BullMQ');

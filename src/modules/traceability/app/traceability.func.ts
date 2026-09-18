@@ -1,5 +1,5 @@
-import { TRACE_CONST } from './traceability.const';
 import * as crypto from 'crypto';
+import { TRACE_CONST } from '../common/traceability.const';
 
 function generateRandom8Hex(): string {
   return crypto.randomBytes(4).toString('hex');

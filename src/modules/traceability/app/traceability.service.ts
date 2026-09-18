@@ -17,8 +17,8 @@ import {
   TraceabilityBatchListResDto,
 } from './traceability.response';
 import { generateTraceabilityId, generateTraceabilityQr } from './traceability.func';
-import { TraceabilityStatusEnum } from './traceability.enum';
-import { TRACE_CONST } from './traceability.const';
+import { TraceabilityStatusEnum } from '../common/traceability.enum';
+import { TRACE_CONST } from '../common/traceability.const';
 import { Msg } from 'src/helpers/message.helper';
 import { TraceabilityFieldsService } from './traceability-fields.service';
 import { TraceabilityExternalService } from './traceability-external.service';

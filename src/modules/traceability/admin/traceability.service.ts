@@ -1,12 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { TraceabilityAdminRepository } from './traceability.repository';
-import { TRACE_CONST } from '../app/traceability.const';
 import { Msg } from 'src/helpers/message.helper';
+import { TRACE_CONST } from '../common/traceability.const';
+import { TraceabilityDisplayActorTypeEnum } from '../common/traceability.enum';
 import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
+import { TraceabilityAdminRepository } from './traceability.repository';
+import { TraceabilityFieldsAdminService } from './traceability-fields.service';
 
 @Injectable()
 export class TraceabilityAdminService {
-  constructor(private readonly repository: TraceabilityAdminRepository) {}
+  constructor(
+    private readonly repository: TraceabilityAdminRepository,
+    private readonly fieldsService: TraceabilityFieldsAdminService,
+  ) {}
 
   async getAllForms(): Promise<any[]> {
     return await this.repository.getAllForms();
@@ -41,24 +46,37 @@ export class TraceabilityAdminService {
   }
 
   async getFormForGlobalView(traceabilityId: string): Promise<any> {
-    const batch = await this.repository.getBatchByTraceabilityId(traceabilityId);
-    let userHomeCode = batch?.userHomeCode;
-    if (!userHomeCode) {
-      const parts = traceabilityId.split('-');
-      userHomeCode = parts.find((p) => p.startsWith('HOM')) || parts[parts.length - 1];
+    const isExternal = traceabilityId.includes(TRACE_CONST.TRACE_EXTERNAL_PREFIX);
+
+    let homeInfo: any = null;
+    if (!isExternal) {
+      const batch = await this.repository.getBatchByTraceabilityId(traceabilityId);
+      let userHomeCode = batch?.userHomeCode;
+      if (!userHomeCode) {
+        const parts = traceabilityId.split('-');
+        userHomeCode = parts.find((p) => p.startsWith('HOM')) || parts[parts.length - 1];
+      }
+
+      homeInfo = await this.repository.getHomeInfoByUserHomeCode(userHomeCode);
+      if (!homeInfo) {
+        throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
+      }
     }
 
-    const homeInfo = await this.repository.getHomeInfoByUserHomeCode(userHomeCode);
-    if (!homeInfo) {
-      throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
+    let rawForms = await this.repository.getAllForms();
+    if (isExternal) {
+      rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
     }
 
-    const rawForms = await this.repository.getAllForms();
     const formsWithSubmissions = await Promise.all(
       rawForms.map(async (form) => {
-        const submission = await this.repository.getSubmissionByTraceabilityIdAndFormSeq(traceabilityId, form.seq);
+        const submission = isExternal
+          ? await this.repository.getSubmissionByTraceabilityIdAndFormSeqExternal(traceabilityId, form.seq)
+          : await this.repository.getSubmissionByTraceabilityIdAndFormSeq(traceabilityId, form.seq);
+
         if (submission) {
-          const files = await this.repository.getFilesByUniqueId(submission.uniqueId);
+          const files = isExternal ? await this.repository.getFilesByUniqueIdExternal(submission.uniqueId) : await this.repository.getFilesByUniqueId(submission.uniqueId);
+
           let savedData: any = null;
           try {
             savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
@@ -69,53 +87,7 @@ export class TraceabilityAdminService {
           const groups = await this.repository.getGroupsByFormSeq(form.seq);
           const fields = await this.repository.getFieldsByFormSeq(form.seq);
 
-          const mappedGroups = groups.map((g) => {
-            const groupFields = fields
-              .filter((f) => f.groupSeq === g.seq)
-              .map((f) => {
-                let config: any = null;
-                try {
-                  config = typeof f.config === 'string' ? JSON.parse(f.config) : f.config;
-                } catch (e) {
-                  config = f.config;
-                }
-
-                let currentValue: any = null;
-                if (f.fieldType === 'file_single') {
-                  const file = files.find((fileItem) => fileItem.fieldKey === f.fieldKey);
-                  currentValue = file
-                    ? {
-                        seq: file.seq,
-                        url: file.filename,
-                      }
-                    : null;
-                } else if (f.fieldType === 'file_multiple') {
-                  currentValue = files
-                    .filter((fileItem) => fileItem.fieldKey === f.fieldKey)
-                    .map((fileItem) => ({
-                      seq: fileItem.seq,
-                      url: fileItem.filename,
-                    }));
-                } else {
-                  currentValue = savedData?.[g.groupKey]?.[f.fieldKey] ?? savedData?.[f.fieldKey] ?? null;
-                }
-
-                return {
-                  fieldKey: f.fieldKey,
-                  fieldName: f.fieldName,
-                  fieldType: f.fieldType,
-                  isRequired: f.isRequired,
-                  config,
-                  currentValue,
-                };
-              });
-
-            return {
-              groupKey: g.groupKey,
-              groupName: g.groupName,
-              fields: groupFields,
-            };
-          });
+          const mappedGroups = this.fieldsService.mapGroupsAndFields(groups, fields, savedData, files);
 
           return {
             seq: form.seq,
@@ -154,15 +126,17 @@ export class TraceabilityAdminService {
 
     return {
       traceabilityId,
-      homeInfo: {
-        userHomeCode: homeInfo.userHomeCode,
-        userHomeName: homeInfo.userHomeName,
-        userHomeAddress: homeInfo.userHomeAddress,
-        userHomeLength: homeInfo.userHomeLength,
-        userHomeWidth: homeInfo.userHomeWidth,
-        userHomeFloor: homeInfo.userHomeFloor,
-        userName: homeInfo.userName || '',
-      },
+      homeInfo: isExternal
+        ? null
+        : {
+            userHomeCode: homeInfo.userHomeCode,
+            userHomeName: homeInfo.userHomeName,
+            userHomeAddress: homeInfo.userHomeAddress,
+            userHomeLength: homeInfo.userHomeLength,
+            userHomeWidth: homeInfo.userHomeWidth,
+            userHomeFloor: homeInfo.userHomeFloor,
+            userName: homeInfo.userName || '',
+          },
       forms: formsWithSubmissions,
     };
   }
