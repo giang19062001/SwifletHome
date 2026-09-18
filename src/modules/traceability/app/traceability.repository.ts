@@ -183,6 +183,24 @@ export class TraceabilityAppRepository {
     return rows[0] || null;
   }
 
+  async getSubmissionByTraceabilityIdAndFormSeq(traceabilityId: string, formSeq: number, userCode?: string): Promise<RowDataPacket | null> {
+    let sql = `
+      SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, S.formData, S.uniqueId, 
+             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases 
+      FROM ${this.tableSubmissions} S
+      JOIN ${this.tableBatches} B ON S.batchSeq = B.seq
+      WHERE B.traceabilityId = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
+    `;
+    const params: any[] = [traceabilityId, formSeq];
+    if (userCode) {
+      sql += ` AND S.userCode = ?`;
+      params.push(userCode);
+    }
+    sql += ` ORDER BY S.seq DESC LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, params);
+    return rows[0] || null;
+  }
+
   async getFilesByUniqueId(uniqueId: string): Promise<RowDataPacket[]> {
     const sql = `
       SELECT seq, submissionSeq, uniqueId, fieldKey, fieldType, filename, originalname, size, mimetype, sortOrder 
@@ -284,6 +302,12 @@ export class TraceabilityAppRepository {
     const sql = `SELECT seq FROM ${this.tableSubmissions} WHERE uniqueId = ? LIMIT 1`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
     return rows.length > 0;
+  }
+
+  async getSubmissionByUniqueId(uniqueId: string): Promise<RowDataPacket | null> {
+    const sql = `SELECT seq, batchSeq, traceabilityCode, formData FROM ${this.tableSubmissions} WHERE uniqueId = ? LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
+    return rows[0] || null;
   }
 
   async getFilesNotUse(): Promise<{ seq: number; filename: string }[]> {

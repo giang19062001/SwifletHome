@@ -1,11 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import * as crypto from 'crypto';
 import { TraceabilityStatusEnum } from './traceability.enum';
-import { TRACE_CONST } from './traceability.const';
 import { generateCode } from 'src/helpers/func.helper';
 import { GetSubmissionBatchListDto } from './traceability.dto';
 import { CODES } from 'src/helpers/const.helper';
+import { generateTraceabilityIdAndQrExternal } from './traceability.func';
 
 @Injectable()
 export class TraceabilityExternalRepository {
@@ -17,10 +16,6 @@ export class TraceabilityExternalRepository {
   private readonly tableFileExt = 'tbl_traceability_file_external';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
-
-  generateRandom8Hex(): string {
-    return crypto.randomBytes(4).toString('hex');
-  }
 
   async getProcessingBatchByUser(userCode: string): Promise<RowDataPacket | null> {
     const sql = `
@@ -45,16 +40,14 @@ export class TraceabilityExternalRepository {
     return rows[0] || null;
   }
 
-  async findOrCreateBatch(userCode: string, createdId: string): Promise<RowDataPacket> {
-    const existing = await this.getProcessingBatchByUser(userCode);
-    if (existing) {
-      return existing;
-    }
+  // async findOrCreateBatch(userCode: string, createdId: string): Promise<RowDataPacket> {
+  async createBatch(userCode: string, createdId: string): Promise<RowDataPacket> {
+    // const existing = await this.getProcessingBatchByUser(userCode);
+    // if (existing) {
+    //   return existing;
+    // }
 
-    const randomStr = this.generateRandom8Hex();
-    const traceabilityId = `${TRACE_CONST.TRACE_EXTERNAL_PREFIX}-${userCode}-${randomStr}`;
-    const qrUrl = `${TRACE_CONST.QR_CODE_PATH_EXTERNAL}/${traceabilityId}.png`;
-
+    const { traceabilityId, qrUrl } = generateTraceabilityIdAndQrExternal(userCode);
     const insertSql = `
       INSERT INTO ${this.tableBatchesExt} 
         (traceabilityId, userCode, status, qrUrl, createdId) 
@@ -109,6 +102,24 @@ export class TraceabilityExternalRepository {
       LIMIT 1
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userCode, formSeq]);
+    return rows[0] || null;
+  }
+
+  async getSubmissionByTraceabilityIdAndFormSeq(traceabilityId: string, formSeq: number, userCode?: string): Promise<RowDataPacket | null> {
+    let sql = `
+      SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.formData, S.uniqueId, 
+             B.status, B.qrUrl, B.traceabilityId 
+      FROM ${this.tableSubmissionsExt} S
+      JOIN ${this.tableBatchesExt} B ON S.batchSeq = B.seq
+      WHERE B.traceabilityId = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
+    `;
+    const params: any[] = [traceabilityId, formSeq];
+    if (userCode) {
+      sql += ` AND S.userCode = ?`;
+      params.push(userCode);
+    }
+    sql += ` ORDER BY S.seq DESC LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, params);
     return rows[0] || null;
   }
 
@@ -201,6 +212,12 @@ export class TraceabilityExternalRepository {
     return rows.length > 0;
   }
 
+  async getSubmissionByUniqueId(uniqueId: string): Promise<RowDataPacket | null> {
+    const sql = `SELECT seq, batchSeq FROM ${this.tableSubmissionsExt} WHERE uniqueId = ? LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
+    return rows[0] || null;
+  }
+
   async completeBatch(batchSeq: number, updatedId: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableBatchesExt} 
@@ -211,10 +228,7 @@ export class TraceabilityExternalRepository {
     return result.affectedRows;
   }
 
-  async getSubmissionBatchList(
-    userCode: string,
-    dto: GetSubmissionBatchListDto,
-  ): Promise<{ list: RowDataPacket[]; total: number }> {
+  async getSubmissionBatchList(userCode: string, dto: GetSubmissionBatchListDto): Promise<{ list: RowDataPacket[]; total: number }> {
     const page = Number(dto.page) > 0 ? Number(dto.page) : 1;
     const limit = Number(dto.limit) > 0 ? Number(dto.limit) : 10;
     const offset = (page - 1) * limit;

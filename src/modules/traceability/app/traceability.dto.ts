@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, IsUUID } from 'class-validator';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 export class GetSubmissionBatchListDto {
   @ApiPropertyOptional({ example: 10, default: 10 })
@@ -18,14 +19,14 @@ export class GetSubmissionBatchListDto {
   @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ, Y = External (VCĐP)' })
   @IsString()
   @IsOptional()
-  isExternal?: string;
+  isExternal?: YnEnum;
 }
 
 export class GetAllFormsDto {
   @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,..)' })
   @IsString()
   @IsOptional()
-  isExternal?: string;
+  isExternal?: YnEnum;
 }
 
 export class GetFormDto {
@@ -42,7 +43,12 @@ export class GetFormDto {
   @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,..)' })
   @IsString()
   @IsOptional()
-  isExternal?: string;
+  isExternal?: YnEnum;
+
+  @ApiPropertyOptional({ example: 'TRACE_HOM000001_00001', description: 'Mã đợt truy xuất' })
+  @IsString()
+  @IsOptional()
+  traceabilityId: string = '';
 }
 
 export class UploadTraceabilityFilesDto {
@@ -64,7 +70,7 @@ export class UploadTraceabilityFilesDto {
   @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,..)' })
   @IsString()
   @IsOptional()
-  isExternal?: string;
+  isExternal?: YnEnum;
 
   @ApiProperty({
     type: 'array',
@@ -81,7 +87,7 @@ export class DeleteFileQueryDto {
   @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,..)' })
   @IsString()
   @IsOptional()
-  isExternal?: string;
+  isExternal?: YnEnum;
 }
 
 export class SubmitTraceabilityDto {
@@ -103,12 +109,12 @@ export class SubmitTraceabilityDto {
   @ApiPropertyOptional({ example: 'HOM000001', description: 'Nhà yến chính hiện tại của người dùng (Optional cho External)' })
   @IsString()
   @IsOptional()
-  userHomeCode?: string;
+  userHomeCode?: string; // Không có -> external
 
   @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,...)' })
   @IsString()
   @IsOptional()
-  isExternal?: string;
+  isExternal?: YnEnum; // 'Y' -> external
 
   @ApiProperty({ example: { OWNER_INFO: { subjectType: 'Cá nhân', businessRegistrationFile: 2 } } })
   @IsObject()

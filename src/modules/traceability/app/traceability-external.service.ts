@@ -1,21 +1,19 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { RowDataPacket } from 'mysql2';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { YnEnum } from 'src/interfaces/admin.interface';
 import { getFileLocation } from 'src/config/multer.config';
 import { v4 as uuidv4 } from 'uuid';
 import { GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
 import { TraceabilityExternalRepository } from './traceability-external.repository';
-import {
-  TraceabilityFormResDto,
-  TraceabilityGroupResDto,
-  TraceabilityFieldResDto,
-  UploadTraceabilityFileResDto,
-  TraceabilityBatchItemResDto,
-  TraceabilityBatchListResDto,
-} from './traceability.response';
+import { TraceabilityFormResDto, TraceabilityGroupResDto, UploadTraceabilityFileResDto, TraceabilityBatchItemResDto, TraceabilityBatchListResDto } from './traceability.response';
 import { TraceabilityStatusEnum } from './traceability.enum';
 import { TRACE_CONST } from './traceability.const';
 import { Msg } from 'src/helpers/message.helper';
 import { TraceabilityFieldsService } from './traceability-fields.service';
+import * as path from 'path';
+import * as QRCode from 'qrcode';
+import { existsSync, mkdirSync } from 'fs';
 
 @Injectable()
 export class TraceabilityExternalService {
@@ -39,86 +37,56 @@ export class TraceabilityExternalService {
     let savedData: any = null;
     let files: any[] = [];
     let qrUrl: string | null = null;
-    let traceabilityId: string | null = null;
+    let traceabilityId: string | null = dto?.traceabilityId || null;
     let status = TraceabilityStatusEnum.PROCESSING;
 
-    const submission = await this.repository.getSubmissionByUserForm(userCode, form.seq);
-    if (submission) {
-      uniqueId = submission.uniqueId;
-      traceabilityCode = submission.traceabilityCode;
-      files = await this.repository.getFilesByUniqueId(uniqueId);
-      qrUrl = submission.qrUrl || null;
-      traceabilityId = submission.traceabilityId || null;
-      status = submission.status || TraceabilityStatusEnum.PROCESSING;
-      try {
-        savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
-      } catch (e) {
+    let submission: RowDataPacket | null = null;
+    // TODO: traceabilityId là optional
+    if (dto.traceabilityId) {
+      // có traceabilityId -> gọi lấy giá trị hiện tại
+      submission = await this.repository.getSubmissionByTraceabilityIdAndFormSeq(dto.traceabilityId, form.seq, userCode);
+      if (submission) {
+        uniqueId = submission.uniqueId;
+        traceabilityCode = submission.traceabilityCode;
+        files = await this.repository.getFilesByUniqueId(uniqueId);
+        qrUrl = submission.qrUrl || null;
+        traceabilityId = submission.traceabilityId || null;
+        status = submission.status || TraceabilityStatusEnum.PROCESSING;
+        try {
+          savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
+        } catch (e) {
+          savedData = null;
+        }
+      } else {
         savedData = null;
       }
     } else {
-      const processingBatch = await this.repository.findOrCreateBatch(userCode, userCode);
+      // Ko có traceabilityId -> tạo mới
+      const processingBatch = await this.repository.createBatch(userCode, userCode);
       traceabilityId = processingBatch.traceabilityId;
       qrUrl = processingBatch.qrUrl;
       status = TraceabilityStatusEnum.PROCESSING;
     }
 
     // Map fields to groups
-    const mappedGroups: TraceabilityGroupResDto[] = groups.map((g) => {
-      const groupFields: TraceabilityFieldResDto[] = fields
-        .filter((f) => f.groupSeq === g.seq)
-        .map((f) => {
-          let config: any = null;
-          try {
-            config = typeof f.config === 'string' ? JSON.parse(f.config) : f.config;
-          } catch (e) {
-            config = f.config;
-          }
+    const mappedGroups: TraceabilityGroupResDto[] = await this.traceabilityFieldsService.mapGroupsAndFields(groups, fields, savedData, files, traceabilityCode, traceabilityId, YnEnum.Y);
 
-          let currentValue: any = null;
-          if (traceabilityCode) {
-            if (f.fieldType === 'file_single') {
-              const file = files.find((fileItem) => fileItem.fieldKey === f.fieldKey);
-              currentValue = file
-                ? {
-                    seq: file.seq,
-                    url: file.filename,
-                  }
-                : null;
-            } else if (f.fieldType === 'file_multiple') {
-              currentValue = files
-                .filter((fileItem) => fileItem.fieldKey === f.fieldKey)
-                .map((fileItem) => ({
-                  seq: fileItem.seq,
-                  url: fileItem.filename,
-                }));
-            } else {
-              currentValue = savedData?.[g.groupKey]?.[f.fieldKey] ?? savedData?.[f.fieldKey] ?? null;
-            }
-          }
-
-          if (currentValue === null || currentValue === undefined || currentValue === '') {
-            const defaultValue = this.traceabilityFieldsService.getDefaultCurrentValue(f.fieldKey, traceabilityId || '');
-            if (defaultValue !== null && defaultValue !== undefined) {
-              currentValue = defaultValue;
-            }
-          }
-
-          return {
-            fieldKey: f.fieldKey,
-            fieldName: f.fieldName,
-            fieldType: f.fieldType,
-            isRequired: f.isRequired,
-            config,
-            currentValue,
-          };
-        });
-
-      return {
-        groupKey: g.groupKey,
-        groupName: g.groupName,
-        fields: groupFields,
-      };
-    });
+    // Kiểm tra QR
+    // Kiểm tra QR code PNG file đã tồn tại trên ổ đĩa chưa, nếu chưa thì tạo ở background (không await để tránh blocking API response)
+    const dirPath = path.join(process.cwd(), 'public', TRACE_CONST.QR_CODE_PATH_EXTERNAL);
+    const fullPath = path.join(dirPath, `${traceabilityId}.png`);
+    if (!existsSync(fullPath)) {
+      if (!existsSync(dirPath)) {
+        mkdirSync(dirPath, { recursive: true });
+      }
+      const targetUrl = `${process.env.CURRENT_URL!}/${TRACE_CONST.QR_CODE_BASE_URL}/${traceabilityId}.png`;
+      QRCode.toFile(fullPath, targetUrl, {
+        width: 300,
+        margin: 1,
+      }).catch((err) => {
+        console.error(`Error generating QR PNG background for ${traceabilityId}:`, err);
+      });
+    }
 
     const response = new TraceabilityFormResDto();
     response.uniqueId = uniqueId;
@@ -176,13 +144,13 @@ export class TraceabilityExternalService {
     }
 
     if (!batch) {
-      batch = await this.repository.findOrCreateBatch(userCode, userCode);
+      batch = await this.repository.createBatch(userCode, userCode);
     }
 
     if (isExist) {
-      const [rows] = await (this.repository as any).db.execute(`SELECT seq, batchSeq FROM tbl_traceability_submissions_external WHERE uniqueId = ? LIMIT 1`, [dto.uniqueId]);
-      if (rows && rows[0]) {
-        const seq = rows[0].seq;
+      const existingSubmission = await this.repository.getSubmissionByUniqueId(dto.uniqueId);
+      if (existingSubmission) {
+        const seq = existingSubmission.seq;
         await this.repository.updateSubmission(seq, formDataStr, userCode);
         await this.repository.bindFilesToSubmission(seq, dto.uniqueId, userCode);
 

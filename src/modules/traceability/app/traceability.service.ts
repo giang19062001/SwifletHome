@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { RowDataPacket } from 'mysql2';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +11,6 @@ import { TraceabilityAppRepository } from './traceability.repository';
 import {
   TraceabilityFormResDto,
   TraceabilityGroupResDto,
-  TraceabilityFieldResDto,
   UploadTraceabilityFileResDto,
   TraceabilityHouseInfoResDto,
   TraceabilityBatchItemResDto,
@@ -20,9 +20,9 @@ import { generateTraceabilityId, generateTraceabilityQr } from './traceability.f
 import { TraceabilityStatusEnum } from './traceability.enum';
 import { TRACE_CONST } from './traceability.const';
 import { Msg } from 'src/helpers/message.helper';
-import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL } from './traceability.query';
 import { TraceabilityFieldsService } from './traceability-fields.service';
 import { TraceabilityExternalService } from './traceability-external.service';
+import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class TraceabilityAppService {
@@ -45,7 +45,7 @@ export class TraceabilityAppService {
 
   async getForm(dto: GetFormDto, userCode: string): Promise<TraceabilityFormResDto> {
     // gọi sang truy vấn external - s
-    if (dto.isExternal === 'Y' || !dto.userHomeCode) {
+    if (dto.isExternal === YnEnum.Y || (!dto.userHomeCode && !dto.traceabilityId)) {
       return await this.externalService.getForm(dto, userCode);
     } // gọi sang truy vấn external - e
     const form = await this.repository.getFormByKey(dto.formKey);
@@ -63,185 +63,44 @@ export class TraceabilityAppService {
     let qrUrl: string | null = null;
     let traceabilityId: string | null = null;
     let status = TraceabilityStatusEnum.PROCESSING;
-
-    const userHomeCode = dto?.userHomeCode;
-    const homeSeq = await this.repository.getUserHomeSeq(userHomeCode);
-    if (!homeSeq) {
-      throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
+    let userHomeCode = dto?.userHomeCode || '';
+    let submission: RowDataPacket | null = null;
+    // TODO: Luôn có traceabilityId
+    const batch = await this.repository.getBatchByTraceabilityId(dto.traceabilityId, userCode);
+    if (batch) {
+      traceabilityId = batch.traceabilityId;
+      qrUrl = batch.qrUrl;
+      status = batch.status || TraceabilityStatusEnum.PROCESSING;
+      if (batch.userHomeCode) {
+        userHomeCode = batch.userHomeCode;
+      }
     }
-
-    const submission = await this.repository.getSubmissionByUserHomeForm(userCode, userHomeCode, form.seq);
+    submission = await this.repository.getSubmissionByTraceabilityIdAndFormSeq(dto.traceabilityId, form.seq, userCode);
     if (submission) {
       uniqueId = submission.uniqueId;
       traceabilityCode = submission.traceabilityCode;
       files = await this.repository.getFilesByUniqueId(uniqueId);
-      qrUrl = submission.qrUrl || null;
-      traceabilityId = submission.traceabilityId || null;
-      status = submission.status || TraceabilityStatusEnum.PROCESSING;
       try {
         savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
       } catch (e) {
         savedData = null;
       }
     } else {
-      const processingBatch = await this.repository.getProcessingBatchByUserHome(userCode, userHomeCode);
-      if (processingBatch) {
-        traceabilityId = processingBatch.traceabilityId;
-        qrUrl = processingBatch.qrUrl;
-      } else {
-        const nextIndex = await this.repository.getNextBatchIndex(userCode, userHomeCode);
-        traceabilityId = generateTraceabilityId(userCode, userHomeCode, nextIndex);
-        qrUrl = generateTraceabilityQr(userCode, userHomeCode, nextIndex);
-      }
+      savedData = null;
     }
 
     // Map fields to groups
-    const mappedGroups: TraceabilityGroupResDto[] = groups.map((g) => {
-      const groupFields: TraceabilityFieldResDto[] = fields
-        .filter((f) => f.groupSeq === g.seq)
-        .map((f) => {
-          let config: any = null;
-          try {
-            config = typeof f.config === 'string' ? JSON.parse(f.config) : f.config;
-          } catch (e) {
-            config = f.config;
-          }
-
-          let currentValue: any = null;
-          if (traceabilityCode) {
-            if (f.fieldType === 'file_single') {
-              const file = files.find((fileItem) => fileItem.fieldKey === f.fieldKey);
-              currentValue = file
-                ? {
-                    seq: file.seq,
-                    url: file.filename,
-                  }
-                : null;
-            } else if (f.fieldType === 'file_multiple') {
-              currentValue = files
-                .filter((fileItem) => fileItem.fieldKey === f.fieldKey)
-                .map((fileItem) => ({
-                  seq: fileItem.seq,
-                  url: fileItem.filename,
-                }));
-            } else {
-              // Lấy từ JSON data (hỗ trợ cả nested groupKey và flat key)
-              currentValue = savedData?.[g.groupKey]?.[f.fieldKey] ?? savedData?.[f.fieldKey] ?? null;
-            }
-          }
-
-          if (currentValue === null || currentValue === undefined || currentValue === '') {
-            const defaultValue = this.traceabilityFieldsService.getDefaultCurrentValue(f.fieldKey, traceabilityId || '');
-            if (defaultValue !== null && defaultValue !== undefined) {
-              currentValue = defaultValue;
-            }
-          }
-
-          return {
-            fieldKey: f.fieldKey,
-            fieldName: f.fieldName,
-            fieldType: f.fieldType,
-            isRequired: f.isRequired,
-            config,
-            currentValue,
-          };
-        });
-
-      return {
-        groupKey: g.groupKey,
-        groupName: g.groupName,
-        fields: groupFields,
-      };
-    });
-
-    const promises: Promise<void>[] = [];
-    for (const group of mappedGroups) {
-      // Xử lý currentValue mặc định
-      const defaultSql = TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL[group.groupKey as keyof typeof TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL];
-      if (defaultSql) {
-        const needsDefaultValue = group.fields.some((f) => f.currentValue === null || f.currentValue === undefined || f.currentValue === '');
-        if (needsDefaultValue) {
-          promises.push(
-            (async () => {
-              try {
-                const rows = await this.repository.getDynamicOptions(defaultSql, userCode, userHomeCode);
-                if (rows && rows.length > 0) {
-                  const defaultData = rows[0]; // { fieldKey1: value1, fieldKey2: value2 }
-                  for (const field of group.fields) {
-                    if (field.currentValue === null || field.currentValue === undefined || field.currentValue === '') {
-                      if (defaultData[field.fieldKey] !== undefined) {
-                        field.currentValue = defaultData[field.fieldKey];
-                      }
-                    }
-                  }
-                }
-              } catch (error) {
-                console.error(`Error fetching default current value for group "${group.groupKey}":`, error);
-              }
-            })(),
-          );
-        }
-      }
-    }
-
-    const submissionsFormData = await this.repository.getSubmissionsFormDataByUserHome(userCode, userHomeCode);
-    const activeHarvestPhases = this.traceabilityFieldsService.collectHarvestPhases(savedData, submissionsFormData);
-
-    // dùng linkValues để fill trường khác tự động từ 1 trường select/radio
-    for (const group of mappedGroups) {
-      for (const field of group.fields) {
-        if (this.traceabilityFieldsService.isLotCodeField(field.fieldKey)) {
-          this.traceabilityFieldsService.applyLotCodeValueToField(field, userHomeCode, activeHarvestPhases);
-        } else {
-          // Xử lý options động
-          const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];
-          if (sqlQuery) {
-            promises.push(
-              (async () => {
-                try {
-                  const rows = await this.repository.getDynamicOptions(sqlQuery, userCode, userHomeCode);
-                  const options = rows.map((row, idx) => {
-                    const { value, label, ...rest } = row;
-                    const option: any = {
-                      value: value,
-                      label: label,
-                      sortOrder: idx + 1,
-                    };
-                    if (Object.keys(rest).length > 0) {
-                      option.linkedValues = rest;
-                    }
-                    return option;
-                  });
-
-                  if (!field.config) {
-                    field.config = {};
-                  } else if (typeof field.config === 'string') {
-                    try {
-                      field.config = JSON.parse(field.config);
-                    } catch (e) {
-                      field.config = {};
-                    }
-                  }
-
-                  field.config.options = options;
-                } catch (error) {
-                  console.error(`Error fetching dynamic options for field "${field.fieldKey}":`, error);
-                  if (!field.config) {
-                    field.config = { options: [] };
-                  } else {
-                    field.config.options = [];
-                  }
-                }
-              })(),
-            );
-          }
-        }
-      }
-    }
-
-    if (promises.length > 0) {
-      await Promise.all(promises);
-    }
+    const mappedGroups: TraceabilityGroupResDto[] = await this.traceabilityFieldsService.mapGroupsAndFields(
+      groups,
+      fields,
+      savedData,
+      files,
+      traceabilityCode,
+      traceabilityId,
+      dto.isExternal || YnEnum.N,
+      userCode,
+      userHomeCode,
+    );
 
     const response = new TraceabilityFormResDto();
     response.uniqueId = uniqueId;
@@ -262,7 +121,7 @@ export class TraceabilityAppService {
 
   async uploadFiles(dto: UploadTraceabilityFilesDto, files: Express.Multer.File[], createdId: string): Promise<UploadTraceabilityFileResDto[]> {
     // gọi sang truy vấn external - s
-    if (dto.isExternal === 'Y') {
+    if (dto.isExternal === YnEnum.Y) {
       return await this.externalService.uploadFiles(dto, files, createdId);
     } // gọi sang truy vấn external - e
     if (dto.fieldType === 'file_single') {
@@ -282,7 +141,7 @@ export class TraceabilityAppService {
 
   async deleteFile(seq: number, userCode: string, isExternal?: string): Promise<number> {
     // gọi sang truy vấn external - s
-    if (isExternal === 'Y') {
+    if (isExternal === YnEnum.Y) {
       return await this.externalService.deleteFile(seq, userCode);
     } // gọi sang truy vấn external - e
     const fileInfo = await this.repository.getFileBySeq(seq);
@@ -299,7 +158,7 @@ export class TraceabilityAppService {
 
   async submit(dto: SubmitTraceabilityDto, userCode: string): Promise<number> {
     // gọi sang truy vấn external - s
-    if (dto.isExternal === 'Y' || !dto.userHomeCode) {
+    if (dto.isExternal === YnEnum.Y || !dto.userHomeCode) {
       return await this.externalService.submit(dto, userCode);
     } // gọi sang truy vấn external - e
     const isExist = await this.repository.checkExistUniqueId(dto.uniqueId);
@@ -328,10 +187,10 @@ export class TraceabilityAppService {
 
     if (isExist) {
       // Cập nhật form
-      const [rows] = await (this.repository as any).db.execute(`SELECT seq, batchSeq, traceabilityCode, formData FROM tbl_traceability_submissions WHERE uniqueId = ? LIMIT 1`, [dto.uniqueId]);
-      if (rows && rows[0]) {
-        const seq = rows[0].seq;
-        const batchSeq = rows[0].batchSeq || batch.seq;
+      const existingSubmission = await this.repository.getSubmissionByUniqueId(dto.uniqueId);
+      if (existingSubmission) {
+        const seq = existingSubmission.seq;
+        const batchSeq = existingSubmission.batchSeq || batch.seq;
 
         await this.repository.updateSubmission(seq, formDataStr, userCode, harvestPhases, batchSeq);
         await this.repository.bindFilesToSubmission(seq, dto.uniqueId, userCode);
@@ -350,14 +209,6 @@ export class TraceabilityAppService {
     }
 
     return 1;
-  }
-
-  async getFilesNotUse(): Promise<{ seq: number; filename: string }[]> {
-    return await this.repository.getFilesNotUse();
-  }
-
-  async deleteFileCron(seq: number): Promise<number> {
-    return await this.repository.deleteFileBySeq(seq);
   }
 
   async getTraceInfoEachHouse(currentUserCode: string): Promise<TraceabilityHouseInfoResDto[]> {
@@ -419,7 +270,7 @@ export class TraceabilityAppService {
 
   async getSubmissionBatchList(dto: GetSubmissionBatchListDto, userCode: string): Promise<TraceabilityBatchListResDto> {
     // gọi sang truy vấn external - s
-    if (dto.isExternal === 'Y') {
+    if (dto.isExternal === YnEnum.Y) {
       return await this.externalService.getSubmissionBatchList(dto, userCode);
     } // gọi sang truy vấn external - e
 
@@ -454,5 +305,13 @@ export class TraceabilityAppService {
       limit,
       totalPage,
     };
+  }
+
+  async getFilesNotUse(): Promise<{ seq: number; filename: string }[]> {
+    return await this.repository.getFilesNotUse();
+  }
+
+  async deleteFileCron(seq: number): Promise<number> {
+    return await this.repository.deleteFileBySeq(seq);
   }
 }
