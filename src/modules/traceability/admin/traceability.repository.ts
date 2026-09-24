@@ -206,6 +206,17 @@ export class TraceabilityAdminRepository {
     return rows[0]?.total || 0;
   }
 
+  async getBatchBySeq(seq: number): Promise<RowDataPacket | null> {
+    const sql = `
+      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases 
+      FROM ${this.tableBatches} 
+      WHERE seq = ? AND isActive = 'Y' 
+      LIMIT 1
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [Number(seq)]);
+    return rows[0] || null;
+  }
+
   async updateSubmissionStatus(seq: number, status: TraceabilityStatusEnum, updatedId: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableBatches}

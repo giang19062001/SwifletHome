@@ -44,10 +44,10 @@ export class TraceabilityAdminService {
   }
 
   async updateSubmissionStatus(seq: number, status: TraceabilityStatusEnum, updatedId: string): Promise<number> {
-    // đánh dấu sử dụng các đợt thu hoạch khi đơn truy xuất chứa các đợt thu hoạch đó được duyệt
-    // if (status == TraceabilityStatusEnum.APPROVED) {
-    //   this.todoHarvestService.useTaskHarvestForTraceability(seq, updatedId);
-    // }
+    const batch = await this.repository.getBatchBySeq(seq);
+    if (status === TraceabilityStatusEnum.APPROVED && batch?.harvestPhases) {
+      await this.todoHarvestService.useTaskHarvestForTraceability(seq, updatedId);
+    }
     return await this.repository.updateSubmissionStatus(seq, status, updatedId);
   }
 
@@ -72,6 +72,8 @@ export class TraceabilityAdminService {
     let rawForms = await this.repository.getAllForms();
     if (isExternal) {
       rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.EXTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
+    } else {
+      rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.INTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
     }
 
     const formsWithSubmissions = await Promise.all(

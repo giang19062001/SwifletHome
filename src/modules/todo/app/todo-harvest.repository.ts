@@ -15,6 +15,7 @@ export class TodoHarvestAppRepository {
   private readonly tableTaskHarvestPhase = 'tbl_todo_task_harvest_phase';
   private readonly tableUserApp = 'tbl_user_app';
   private readonly tableUserHome = 'tbl_user_home';
+  private readonly tableBatches = 'tbl_traceability_batches';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -112,6 +113,40 @@ export class TodoHarvestAppRepository {
       SET isUse = 'N', updatedId = ?
       WHERE (seq = ? OR harvestPhase = ?) AND userHomeCode = ? AND userCode = ?`;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, seqHarvestPhase, seqHarvestPhase, userHomeCode, userCode]);
+    return result.affectedRows;
+  }
+
+  async useTaskHarvestForTraceability(batchSeq: number, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableTaskHarvestPhase} H
+      JOIN ${this.tableBatches} B 
+        ON H.userCode = B.userCode 
+       AND H.userHomeCode = B.userHomeCode
+       AND (
+         FIND_IN_SET(H.harvestPhase, REPLACE(REPLACE(REPLACE(COALESCE(B.harvestPhases, ''), ' ', ''), '[', ''), ']', '')) > 0
+         OR FIND_IN_SET(H.seq, REPLACE(REPLACE(REPLACE(COALESCE(B.harvestPhases, ''), ' ', ''), '[', ''), ']', '')) > 0
+       )
+      SET H.isUse = 'Y', H.updatedId = ?, H.updatedAt = NOW()
+      WHERE B.seq = ? AND B.isActive = 'Y' AND H.isActive = 'Y' AND H.isUse = 'N'
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [updatedId, Number(batchSeq)]);
+    return result.affectedRows;
+  }
+
+  async unuseTaskHarvestForTraceability(batchSeq: number, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableTaskHarvestPhase} H
+      JOIN ${this.tableBatches} B 
+        ON H.userCode = B.userCode 
+       AND H.userHomeCode = B.userHomeCode
+       AND (
+         FIND_IN_SET(H.harvestPhase, REPLACE(REPLACE(REPLACE(COALESCE(B.harvestPhases, ''), ' ', ''), '[', ''), ']', '')) > 0
+         OR FIND_IN_SET(H.seq, REPLACE(REPLACE(REPLACE(COALESCE(B.harvestPhases, ''), ' ', ''), '[', ''), ']', '')) > 0
+       )
+      SET H.isUse = 'N', H.updatedId = ?, H.updatedAt = NOW()
+      WHERE B.seq = ? AND B.isActive = 'Y' AND H.isActive = 'Y' AND H.isUse = 'Y'
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [updatedId, Number(batchSeq)]);
     return result.affectedRows;
   }
 

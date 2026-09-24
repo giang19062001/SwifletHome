@@ -410,4 +410,12 @@ export class TodoHarvestAppService {
   async unuseTaskHarvestForTrace(userCode: string, userHomeCode: string, seqHarvestPhase: number): Promise<number> {
     return await this.todoHarvestAppRepository.unuseTaskHarvestForTrace(userCode, userHomeCode, seqHarvestPhase);
   }
+
+  async useTaskHarvestForTraceability(batchSeq: number, updatedId: string): Promise<number> {
+    return await this.todoHarvestAppRepository.useTaskHarvestForTraceability(batchSeq, updatedId);
+  }
+
+  async unuseTaskHarvestForTraceability(batchSeq: number, updatedId: string): Promise<number> {
+    return await this.todoHarvestAppRepository.unuseTaskHarvestForTraceability(batchSeq, updatedId);
+  }
 }
