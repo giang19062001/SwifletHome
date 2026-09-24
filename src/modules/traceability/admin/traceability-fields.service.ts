@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { INTERNAL_WHITELIST, EXTERNAL_WHITELIST } from '../common/traceability.const';
 
 @Injectable()
 export class TraceabilityFieldsAdminService {
@@ -83,5 +84,92 @@ export class TraceabilityFieldsAdminService {
         fields: groupFields,
       };
     });
+  }
+
+  cleanKey(k: string): string {
+    return (k || '').replace(/[\s_]/g, '').toUpperCase();
+  }
+
+  readonly internalWhitelist: Record<string, Record<string, string[] | 'ALL'>> = INTERNAL_WHITELIST;
+  readonly externalWhitelist: Record<string, Record<string, string[] | 'ALL'>> = EXTERNAL_WHITELIST;
+
+  getActiveWhitelist(isExternal: boolean): Record<string, Record<string, string[] | 'ALL'>> {
+    return isExternal ? this.externalWhitelist : this.internalWhitelist;
+  }
+
+  isFormAllowedInCompact(formKey: string, isExternal: boolean): boolean {
+    const activeWhitelist = this.getActiveWhitelist(isExternal);
+    return Object.keys(activeWhitelist).some((k) => this.cleanKey(k) === this.cleanKey(formKey));
+  }
+
+  filterGroupsForCompact(formKey: string, mappedGroups: any[], isExternal: boolean): any[] {
+    const activeWhitelist = this.getActiveWhitelist(isExternal);
+    const formKeyMatched = Object.keys(activeWhitelist).find((k) => this.cleanKey(k) === this.cleanKey(formKey));
+    const formAllowedGroups = formKeyMatched ? activeWhitelist[formKeyMatched] : null;
+
+    if (!formAllowedGroups) {
+      return [];
+    }
+
+    return mappedGroups
+      .filter((g) => {
+        const cGroup = this.cleanKey(g.groupKey);
+        return Object.keys(formAllowedGroups).some((k) => this.cleanKey(k) === cGroup);
+      })
+      .map((g) => {
+        const matchedKey = Object.keys(formAllowedGroups).find((k) => this.cleanKey(k) === this.cleanKey(g.groupKey));
+        const allowedFields = matchedKey ? formAllowedGroups[matchedKey] : null;
+        if (!allowedFields || allowedFields === 'ALL') {
+          return g;
+        }
+        const filteredFields = (g.fields || []).filter((f: any) => allowedFields.some((af: string) => this.cleanKey(af) === this.cleanKey(f.fieldKey)));
+        return {
+          ...g,
+          fields: filteredFields,
+        };
+      });
+  }
+
+  getFieldValue(forms: any[], formKey: string, groupKey: string, fieldKey: string): any {
+    const form = forms.find((f) => this.cleanKey(f.formKey) === this.cleanKey(formKey));
+    const group = form?.submission?.groups?.find((g: any) => this.cleanKey(g.groupKey) === this.cleanKey(groupKey));
+    const field = group?.fields?.find((f: any) => this.cleanKey(f.fieldKey) === this.cleanKey(fieldKey));
+    return field?.currentValue ?? null;
+  }
+
+  getGroupData(forms: any[], formKey: string, groupKey: string): any {
+    const form = forms.find((f) => this.cleanKey(f.formKey) === this.cleanKey(formKey));
+    return form?.submission?.groups?.find((g: any) => this.cleanKey(g.groupKey) === this.cleanKey(groupKey)) ?? null;
+  }
+
+  buildCompactData(params: { isExternal: boolean; lotcode: string; formDataExtra: any; homeInfo: any; forms: any[] }): any {
+    const { isExternal, lotcode, formDataExtra, homeInfo, forms } = params;
+
+    if (isExternal) {
+      return {
+        lotcode,
+        formDataExtra,
+        rmTeamExecution: this.getFieldValue(forms, 'PRE_PROCESSING', 'RECEIVING_MATERIAL', 'rmTeamExecution'),
+        rmAddress: this.getFieldValue(forms, 'PRE_PROCESSING', 'RECEIVING_MATERIAL', 'rmAddress'),
+        diaryProcessGroup: this.getGroupData(forms, 'PRE_PROCESSING', 'DIARY_PROCESS'),
+        pcProductName: this.getFieldValue(forms, 'PACKING_QR', 'PRODUCT_CATALOG', 'pcProductName'),
+        pcBasicSpecification: this.getFieldValue(forms, 'PACKING_QR', 'PRODUCT_CATALOG', 'pcBasicSpecification'),
+        iiApplicableStandard: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiApplicableStandard'),
+        iiInstructionUse: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiInstructionUse'),
+      };
+    }
+
+    return {
+      lotcode,
+      facilityName: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') || homeInfo?.userHomeName || '',
+      fiIdentificationCode: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiIdentificationCode') || '',
+      facilityAddress: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') || homeInfo?.userHomeAddress || '',
+      hiNumberHarvest: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiNumberHarvest'),
+      hmNumberNests: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmNumberNests'),
+      hmWeight: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeight'),
+      hmWeightingPhoto: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
+      todoListGroup: this.getGroupData(forms, 'LOGBOOK_HOUSE', 'SWIFT_HOUSE_TD'),
+      medicineGroup: this.getGroupData(forms, 'LOGBOOK_HOUSE', 'SWIFT_HOUSE_MEDICINE'),
+    };
   }
 }

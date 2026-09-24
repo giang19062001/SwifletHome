@@ -95,9 +95,6 @@ export class TraceabilityExtraLinkedInfoDto {
   @ApiProperty({ example: true, description: 'true nếu match với lô nội bộ, false nếu tự nhập' })
   isLinkedInternal!: boolean;
 
-  @ApiProperty({ example: true, description: 'true nếu các trường bị disable (lấy từ nội bộ), false nếu cho phép nhập' })
-  disabled!: boolean;
-
   @ApiProperty({ type: TraceabilityExtraLinkedDataDto, required: false })
   data?: TraceabilityExtraLinkedDataDto | null;
 }

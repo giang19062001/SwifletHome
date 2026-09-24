@@ -292,7 +292,7 @@ export class TraceabilityAppService {
 
     const page = Math.max(1, dto.page || 1);
     const limit = Math.max(1, dto.limit || 10);
-    const { list, total } = await this.repository.getSubmissionBatchList(userCode, dto);
+    const { list, total } = await this.repository.getSubmissionBatchList(userCode, { ...dto, page, limit });
 
     const mappedList: TraceabilityBatchItemResDto[] = list.map((item) => {
       const status = item.status || TraceabilityStatusEnum.PROCESSING;

@@ -37,11 +37,19 @@ export class TodoAdminService {
 
   async updateBoxTask(dtoParent: UpdateBoxTaskArrayDto, updatedId: string): Promise<number> {
     try {
+      // tạo prefix tạm thời để tránh trùng lặp taskCode khi update
+      const tempPrefix = `__TEMP_${Date.now()}_`;
+
+      for (const dto of dtoParent.boxTasksArray) {
+        await this.todoAdminRepository.updateBoxTask({ ...dto, taskCode: `${tempPrefix}${dto.seq}` }, updatedId);
+      }
+
       for (const dto of dtoParent.boxTasksArray) {
         await this.todoAdminRepository.updateBoxTask(dto, updatedId);
       }
       return 1;
     } catch (error) {
+      this.logger.error(`${this.SERVICE_NAME}/updateBoxTask:`, error);
       return 0;
     }
   }

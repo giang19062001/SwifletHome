@@ -191,7 +191,7 @@ export class TraceabilityAppController implements OnModuleInit {
     const protocol = req.protocol || 'http';
     const targetUrl = `${protocol}://${host}/traceability-qrcode-global/${cleanId}`;
 
-    const traceData = await this.traceabilityAdminService.getFormForGlobalView(cleanId);
+    const traceData = await this.traceabilityAdminService.getFormForGlobalView(cleanId, true);
 
     try {
       const job = await this.pdfQueue.add('generate-pdf', { targetUrl, traceData });

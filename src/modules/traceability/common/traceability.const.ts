@@ -30,4 +30,30 @@ export const EXTRA_LINKED_FIELDS = {
   },
 };
 
+export const INTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
+  BRIEF_SWIFT_HOUSE: {
+    FACILITY_INFO: ['facilityName', 'fiIdentificationCode', 'facilityAddress'],
+  },
+  BATCH_HARVEST: {
+    HARVEST_INFORMATION: ['hiNumberHarvest'],
+    HARVEST_MEASUREMENT: ['hmNumberNests', 'hmWeight', 'hmWeightingPhoto'],
+    'HARVEST_ MEASUREMENT': ['hmNumberNests', 'hmWeight', 'hmWeightingPhoto'],
+  },
+  LOGBOOK_HOUSE: {
+    SWIFT_HOUSE_TD: 'ALL',
+    SWIFT_HOUSE_MEDICINE: 'ALL',
+  },
+};
+
+export const EXTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
+  PRE_PROCESSING: {
+    RECEIVING_MATERIAL: ['rmTeamExecution', 'rmAddress'],
+    DIARY_PROCESS: 'ALL',
+  },
+  PACKING_QR: {
+    PRODUCT_CATALOG: ['pcProductName', 'pcBasicSpecification'],
+    INGREDIENT_INSTRUCTION: ['iiApplicableStandard', 'iiInstructionUse'],
+  },
+};
+
 export const FINAL_FORM_SEQ = 8;

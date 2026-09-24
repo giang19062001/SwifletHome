@@ -6,6 +6,7 @@ import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
 import { TraceabilityFieldsAdminService } from './traceability-fields.service';
 import { TraceabilityAdminRepository } from './traceability.repository';
 import { TodoHarvestAppService } from 'src/modules/todo/app/todo-harvest.service';
+import { IFormDataExtra } from '../common/traceability.interface';
 
 @Injectable()
 export class TraceabilityAdminService {
@@ -51,20 +52,52 @@ export class TraceabilityAdminService {
     return await this.repository.updateSubmissionStatus(seq, status, updatedId);
   }
 
-  async getFormForGlobalView(traceabilityId: string): Promise<any> {
+  async getFormForGlobalView(traceabilityId: string, isCompact: boolean = false): Promise<any> {
     const isExternal = traceabilityId.includes(TRACE_CONST.TRACE_EXTERNAL_PREFIX);
 
     let homeInfo: any = null;
-    if (!isExternal) {
-      const batch = await this.repository.getBatchByTraceabilityId(traceabilityId);
+    let batch: any = null;
+    let extraLinked: any = null;
+    let lotcode = '';
+    let formDataExtra: IFormDataExtra | null = null;
+
+    if (isExternal) {
+      batch = await this.repository.getBatchByTraceabilityIdExternal(traceabilityId);
+      if (batch) {
+        extraLinked = await this.repository.getExtraLinkedByBatchExternalSeq(batch.seq);
+      }
+      lotcode = extraLinked?.lotcode || batch?.lotcode || '';
+      if (extraLinked?.formDataExtra) {
+        try {
+          formDataExtra = typeof extraLinked.formDataExtra === 'string' ? JSON.parse(extraLinked.formDataExtra) : extraLinked.formDataExtra;
+        } catch (e) {
+          formDataExtra = null;
+        }
+      }
+      if (!formDataExtra) {
+        formDataExtra = {
+          fiIdentificationCode: '',
+          facilityName: '',
+          facilityAddress: '',
+          facilityActiveTime: '',
+          facilityArea: '',
+          facilityFloor: '',
+          hmNumberNests: '',
+        };
+      }
+    } else {
+      batch = await this.repository.getBatchByTraceabilityId(traceabilityId);
+      lotcode = batch?.lotcode || '';
       let userHomeCode = batch?.userHomeCode;
       if (!userHomeCode) {
         const parts = traceabilityId.split('-');
         userHomeCode = parts.find((p) => p.startsWith('HOM')) || parts[parts.length - 1];
       }
 
-      homeInfo = await this.repository.getHomeInfoByUserHomeCode(userHomeCode);
-      if (!homeInfo) {
+      if (userHomeCode) {
+        homeInfo = await this.repository.getHomeInfoByUserHomeCode(userHomeCode);
+      }
+      if (!homeInfo && !isCompact) {
         throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
       }
     }
@@ -74,6 +107,10 @@ export class TraceabilityAdminService {
       rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.EXTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
     } else {
       rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.INTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
+    }
+
+    if (isCompact) {
+      rawForms = rawForms.filter((f) => this.fieldsService.isFormAllowedInCompact(f.formKey, isExternal));
     }
 
     const formsWithSubmissions = await Promise.all(
@@ -95,14 +132,20 @@ export class TraceabilityAdminService {
           const groups = await this.repository.getGroupsByFormSeq(form.seq);
           const fields = await this.repository.getFieldsByFormSeq(form.seq);
 
-          const mappedGroups = this.fieldsService.mapGroupsAndFields(groups, fields, savedData, files);
+          let mappedGroups = this.fieldsService.mapGroupsAndFields(groups, fields, savedData, files);
+
+          if (isCompact) {
+            mappedGroups = this.fieldsService.filterGroupsForCompact(form.formKey, mappedGroups, isExternal);
+          }
+
+          const hasData = mappedGroups.some((g) => (g.fields && g.fields.length > 0) || (g.loopValues && g.loopValues.length > 0));
 
           return {
             seq: form.seq,
             formKey: form.formKey,
             formName: form.formName,
             formDescription: form.formDescription || null,
-            hasData: true,
+            hasData,
             submission: {
               seq: submission.seq,
               traceabilityCode: submission.traceabilityCode,
@@ -132,20 +175,36 @@ export class TraceabilityAdminService {
       }),
     );
 
+    const compactData = isCompact
+      ? this.fieldsService.buildCompactData({
+          isExternal,
+          lotcode,
+          formDataExtra,
+          homeInfo,
+          forms: formsWithSubmissions,
+        })
+      : null;
+
     return {
       traceabilityId,
+      isExternal,
+      lotcode,
+      formDataExtra: isExternal ? formDataExtra : null,
       homeInfo: isExternal
         ? null
-        : {
-            userHomeCode: homeInfo.userHomeCode,
-            userHomeName: homeInfo.userHomeName,
-            userHomeAddress: homeInfo.userHomeAddress,
-            userHomeLength: homeInfo.userHomeLength,
-            userHomeWidth: homeInfo.userHomeWidth,
-            userHomeFloor: homeInfo.userHomeFloor,
-            userName: homeInfo.userName || '',
-          },
+        : homeInfo
+          ? {
+              userHomeCode: homeInfo.userHomeCode,
+              userHomeName: homeInfo.userHomeName,
+              userHomeAddress: homeInfo.userHomeAddress,
+              userHomeLength: homeInfo.userHomeLength,
+              userHomeWidth: homeInfo.userHomeWidth,
+              userHomeFloor: homeInfo.userHomeFloor,
+              userName: homeInfo.userName || '',
+            }
+          : null,
       forms: formsWithSubmissions,
+      compactData,
     };
   }
 }

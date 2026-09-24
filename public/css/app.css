@@ -18420,6 +18420,11 @@ select {
   color: #3c3c44;
 }
 
+.bg-main {
+  background-color: #71ab33;
+  color: #ffffff;
+}
+
 #btn, #page-blockchain .btn-deposit, .btn-error-out, .btn-error-lg, .btn-error, .btn-edit-out, .btn-edit, .btn-add-out, .btn-add, .btn-info-out, .btn-info-video, .btn-info-audio, .btn-info-image, .btn-info, .btn-sub, .btn-submit-lg, .btn-submit, .btn-main, .btn-closed {
   padding: 7px 15px;
   border-radius: 15px;

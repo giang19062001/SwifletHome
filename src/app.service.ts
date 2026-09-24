@@ -235,8 +235,15 @@ export class AppService {
     };
   }
 
+  async renderTraceabilityDetail(traceabilityId: string): Promise<any> {
+    const data = await this.traceabilityAdminService.getFormForGlobalView(traceabilityId, false);
+    return {
+      traceData: data,
+    };
+  }
+
   async renderTraceabilityQrcodeGlobal(traceabilityId: string): Promise<any> {
-    const data = await this.traceabilityAdminService.getFormForGlobalView(traceabilityId);
+    const data = await this.traceabilityAdminService.getFormForGlobalView(traceabilityId, true);
     return {
       traceData: data,
     };

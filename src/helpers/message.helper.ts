@@ -132,7 +132,8 @@ export const Msg = {
   Blacklisted: 'Địa chỉ IP của bạn đã bị đưa vào danh sách chặn',
 
   // truy xuất
-  Lotcode: alreadyUsed('Mã lô'),
+  Lotcode: alreadyExist('Mã lô'),
+  LotcodeUsed: alreadyUsed('Mã lô'),
 };
 
 // ─── Helpers dùng nội bộ ───────────────────────────────────────────────────────

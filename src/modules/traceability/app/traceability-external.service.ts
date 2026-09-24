@@ -139,34 +139,24 @@ export class TraceabilityExternalService {
     // Xử lý extraLinkedInfo
     let extraLinkedInfo: TraceabilityExtraLinkedInfoDto = {
       isLinkedInternal: false,
-      disabled: false,
       data: null,
     };
 
     if (batchSeq) {
       const extraLinked = await this.repository.getExtraLinkedByBatchExternalSeq(batchSeq);
       if (extraLinked) {
-        if (extraLinked.batchInternalSeq) {
-          const submissions = await this.repository.getInternalSubmissionsForExtra(extraLinked.batchInternalSeq);
-          const data = this.traceabilityFieldsService.extractExtraFieldsFromInternalSubmissions(submissions);
-          extraLinkedInfo = {
-            isLinkedInternal: true,
-            disabled: true,
-            data,
-          };
-        } else if (extraLinked.formDataExtra) {
-          let parsedData: any = null;
+        let parsedData: any = null;
+        if (extraLinked.formDataExtra) {
           try {
             parsedData = typeof extraLinked.formDataExtra === 'string' ? JSON.parse(extraLinked.formDataExtra) : extraLinked.formDataExtra;
           } catch (e) {
             parsedData = null;
           }
-          extraLinkedInfo = {
-            isLinkedInternal: false,
-            disabled: false,
-            data: parsedData,
-          };
         }
+        extraLinkedInfo = {
+          isLinkedInternal: Boolean(extraLinked.batchInternalSeq),
+          data: parsedData,
+        };
       }
     }
     response.extraLinkedInfo = extraLinkedInfo;
@@ -228,7 +218,7 @@ export class TraceabilityExternalService {
       if (internalBatch) {
         const isAlreadyLinked = await this.repository.checkInternalBatchAlreadyLinked(internalBatch.seq, batch?.seq || null);
         if (isAlreadyLinked) {
-          throw new BadRequestException({ message: Msg.Lotcode, data: null });
+          throw new BadRequestException({ message: Msg.LotcodeUsed, data: null });
         }
       }
     }
@@ -246,7 +236,7 @@ export class TraceabilityExternalService {
 
     // Xử lý extra linked
     const batchInternalSeq = internalBatch ? internalBatch.seq : null;
-    const formDataExtraStr = !internalBatch && dto.externalInfo?.formDataExtra ? JSON.stringify(dto.externalInfo.formDataExtra) : null;
+    const formDataExtraStr = dto.externalInfo?.formDataExtra ? JSON.stringify(dto.externalInfo.formDataExtra) : null;
 
     await this.repository.saveExtraLinked(userCode, batch.seq, incomingLotcode, batchInternalSeq, formDataExtraStr, userCode);
 
@@ -284,7 +274,7 @@ export class TraceabilityExternalService {
   async getSubmissionBatchList(dto: GetSubmissionBatchListDto, userCode: string): Promise<TraceabilityBatchListResDto> {
     const page = Math.max(1, dto.page || 1);
     const limit = Math.max(1, dto.limit || 10);
-    const { list, total } = await this.repository.getSubmissionBatchList(userCode, dto);
+    const { list, total } = await this.repository.getSubmissionBatchList(userCode, { ...dto, page, limit });
 
     const mappedList: TraceabilityBatchItemResDto[] = list.map((item) => {
       const status = item.status || TraceabilityStatusEnum.PROCESSING;
@@ -351,7 +341,7 @@ export class TraceabilityExternalService {
     // Kiểm tra lô nội bộ này có đang liên kết với lô ngoại khác không
     const isAlreadyLinked = await this.repository.checkInternalBatchAlreadyLinked(internalBatch.seq, excludeBatchExternalSeq);
     if (isAlreadyLinked) {
-      throw new BadRequestException({ message: Msg.Lotcode, data: null });
+      throw new BadRequestException({ message: Msg.LotcodeUsed, data: null });
     }
 
     const submissions = await this.repository.getInternalSubmissionsForExtra(internalBatch.seq);

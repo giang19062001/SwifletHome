@@ -467,7 +467,7 @@ export class AppController {
     if (traceabilityId.toLowerCase().endsWith('.png')) {
       traceabilityId = traceabilityId.slice(0, -4);
     }
-    const values = await this.appService.renderTraceabilityQrcodeGlobal(traceabilityId);
+    const values = await this.appService.renderTraceabilityDetail(traceabilityId);
     return {
       title: 'Chi tiết hồ sơ truy xuất yến',
       isLayout: true,
