@@ -16,13 +16,13 @@ import { GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTra
 import { generateTraceabilityId, generateTraceabilityLotCodeByHarvest, generateTraceabilityQr } from './traceability.func';
 import { TraceabilityAppRepository } from './traceability.repository';
 import {
-    CheckLotcodeMatchInternalResDto,
-    TraceabilityBatchItemResDto,
-    TraceabilityBatchListResDto,
-    TraceabilityFormResDto,
-    TraceabilityGroupResDto,
-    TraceabilityHouseInfoResDto,
-    UploadTraceabilityFileResDto,
+  CheckLotcodeMatchInternalResDto,
+  TraceabilityBatchItemResDto,
+  TraceabilityBatchListResDto,
+  TraceabilityFormResDto,
+  TraceabilityGroupResDto,
+  TraceabilityHouseInfoResDto,
+  UploadTraceabilityFileResDto,
 } from './traceability.response';
 
 @Injectable()
@@ -305,7 +305,7 @@ export class TraceabilityAppService {
         statusLabel: TRACE_CONST.STATUS[status as keyof typeof TRACE_CONST.STATUS]?.text || '',
         qrUrl: item.qrUrl || undefined,
         harvestPhases: item.harvestPhases || undefined,
-        hasFinalForm: (item.form8Count || 0) > 0,
+        hasFinalForm: (item.formFinalCount || 0) > 0,
         submissionCount: Number(item.submissionCount || 0),
         createdAt: item.createdAt,
         updatedAt: item.updatedAt || undefined,

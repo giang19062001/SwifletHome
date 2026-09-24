@@ -32,6 +32,7 @@ export const TRACE_FORM_LIST_FIELD_SQL = {
 export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
   hiNumberHarvest: ` SELECT 
                     B.harvestPhase AS value,
+                    CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED) AS cellCollected,
                     CONCAT(
                         '${TEXTS.PHASE} ', B.harvestPhase,
                         ' - ',
@@ -46,9 +47,9 @@ export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
                     AND A.userHomeCode = B.userHomeCode
                 LEFT JOIN tbl_todo_task_harvest C 
                     ON B.seq = C.seqHarvestPhase
-                WHERE B.seq IS NOT NULL
+                WHERE B.seq IS NOT NULL AND B.isUse = 'N'
                     AND A.userCode = :userCode
-                    AND A.userHomeCode = :userHomeCode
+                    AND A.userHomeCode = :userHomeCode 
                 GROUP BY 
                     B.harvestPhase,
                     B.createdAt,

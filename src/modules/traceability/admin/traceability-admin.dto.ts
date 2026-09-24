@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { PagingDto } from 'src/dto/admin.dto';
+import { TraceabilityStatusEnum } from '../common/traceability.enum';
 
 export class GetTraceabilityListAdminDto extends PagingDto {
   @ApiProperty({ example: 'TRC000001', required: false, description: 'Từ khóa tìm kiếm theo mã truy xuất, mã ID, tên/SĐT khách hàng, tên nhà yến' })
@@ -30,8 +31,8 @@ export class GetTraceabilityListAdminDto extends PagingDto {
 }
 
 export class UpdateTraceabilityStatusAdminDto {
-  @ApiProperty({ example: 'APPROVED', enum: ['PROCESSING', 'APPROVED', 'REFUSED'] })
-  @IsEnum(['PROCESSING', 'APPROVED', 'REFUSED'])
+  @ApiProperty({ example: 'APPROVED', enum: Object.values(TraceabilityStatusEnum) })
+  @IsEnum(TraceabilityStatusEnum)
   @IsNotEmpty()
-  status!: string;
+  status!: TraceabilityStatusEnum;
 }

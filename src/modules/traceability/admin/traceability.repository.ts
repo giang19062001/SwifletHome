@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { FINAL_FORM_SEQ } from '../common/traceability.const';
 import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
+import { TraceabilityStatusEnum } from '../common/traceability.enum';
 
 @Injectable()
 export class TraceabilityAdminRepository {
@@ -205,7 +206,7 @@ export class TraceabilityAdminRepository {
     return rows[0]?.total || 0;
   }
 
-  async updateSubmissionStatus(seq: number, status: string, updatedId: string): Promise<number> {
+  async updateSubmissionStatus(seq: number, status: TraceabilityStatusEnum, updatedId: string): Promise<number> {
     const sql = `
       UPDATE ${this.tableBatches}
       SET status = ?, updatedId = ?, updatedAt = NOW()

@@ -2,10 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
+import { FINAL_FORM_SEQ } from '../common/traceability.const';
 import { TraceabilityDisplayActorTypeEnum, TraceabilityStatusEnum } from '../common/traceability.enum';
 import { GetSubmissionBatchListDto } from './traceability.dto';
 import { generateTraceabilityId, generateTraceabilityQr } from './traceability.func';
-import { FINAL_FORM_SEQ } from '../common/traceability.const';
 @Injectable()
 export class TraceabilityAppRepository {
   private readonly tableForms = 'tbl_traceability_forms';
@@ -425,7 +425,7 @@ export class TraceabilityAppRepository {
     const listSql = `
       SELECT B.seq, B.traceabilityId, B.userCode, B.userHomeCode, B.status, B.qrUrl, B.harvestPhases, B.createdAt, B.updatedAt,
              (SELECT COUNT(seq) FROM ${this.tableSubmissions} S WHERE S.batchSeq = B.seq AND S.isActive = 'Y') as submissionCount,
-             (SELECT COUNT(seq) FROM ${this.tableSubmissions} S WHERE S.batchSeq = B.seq AND S.formSeq = ${FINAL_FORM_SEQ} AND S.isActive = 'Y') as form8Count
+             (SELECT COUNT(seq) FROM ${this.tableSubmissions} S WHERE S.batchSeq = B.seq AND S.formSeq = ${FINAL_FORM_SEQ} AND S.isActive = 'Y') as formFinalCount
       FROM ${this.tableBatches} B
       WHERE ${whereClause}
       ORDER BY B.seq DESC

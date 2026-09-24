@@ -1,11 +1,11 @@
 import { Injectable, Optional } from '@nestjs/common';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { EXTRA_LINKED_FIELDS } from '../common/traceability.const';
+import { TraceabilityExternalRepository } from './traceability-external.repository';
 import { generateTraceabilityLotCodeByHarvest } from './traceability.func';
 import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL, TRACE_FORM_LIST_FIELD_SQL } from './traceability.query';
 import { TraceabilityAppRepository } from './traceability.repository';
-import { TraceabilityExternalRepository } from './traceability-external.repository';
 import { TraceabilityExtraLinkedDataDto, TraceabilityFieldResDto, TraceabilityGroupResDto } from './traceability.response';
-import { EXTRA_LINKED_FIELDS } from '../common/traceability.const';
 
 @Injectable()
 export class TraceabilityFieldsService {
@@ -304,6 +304,7 @@ export class TraceabilityFieldsService {
                         value: value,
                         label: label,
                         sortOrder: idx + 1,
+                        ...rest,
                       };
                       return option;
                     });

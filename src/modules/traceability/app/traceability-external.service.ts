@@ -8,7 +8,7 @@ import { getFileLocation } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { FINAL_FORM_SEQ, TRACE_CONST } from '../common/traceability.const';
+import { TRACE_CONST } from '../common/traceability.const';
 import { TraceabilityStatusEnum } from '../common/traceability.enum';
 import { TraceabilityExternalRepository } from './traceability-external.repository';
 import { TraceabilityFieldsService } from './traceability-fields.service';
@@ -257,9 +257,10 @@ export class TraceabilityExternalService {
         await this.repository.updateSubmission(seq, formDataStr, userCode);
         await this.repository.bindFilesToSubmission(seq, dto.uniqueId, userCode);
 
-        if (dto.formSeq === FINAL_FORM_SEQ) {
-          await this.repository.completeBatch(batch.seq, userCode);
-        }
+        // Hiện tại không cần xử lý cột status cho table này
+        // if (dto.formSeq === FINAL_FORM_SEQ) {
+        //   await this.repository.completeBatch(batch.seq, userCode);
+        // }
 
         return 1;
       }
@@ -272,9 +273,10 @@ export class TraceabilityExternalService {
       await this.repository.bindFilesToSubmission(insertId, dto.uniqueId, userCode);
     }
 
-    if (dto.formSeq === FINAL_FORM_SEQ) {
-      await this.repository.completeBatch(batch.seq, userCode);
-    }
+    // Hiện tại không cần xử lý cột status cho table này
+    // if (dto.formSeq === FINAL_FORM_SEQ) {
+    //   await this.repository.completeBatch(batch.seq, userCode);
+    // }
 
     return 1;
   }
@@ -293,8 +295,9 @@ export class TraceabilityExternalService {
         status,
         statusLabel: TRACE_CONST.STATUS[status as keyof typeof TRACE_CONST.STATUS]?.text || '',
         qrUrl: item.qrUrl || undefined,
-        hasFinalForm: (item.form8Count || 0) > 0,
+        hasFinalForm: (item.formFinalCount || 0) > 0,
         submissionCount: Number(item.submissionCount || 0),
+        lotcode: item.lotcode || '--',
         createdAt: item.createdAt,
         updatedAt: item.updatedAt || undefined,
       };

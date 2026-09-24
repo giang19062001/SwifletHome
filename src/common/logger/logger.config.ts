@@ -50,7 +50,7 @@ export const getWinstonConfig = () => {
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
-      maxFiles: '30d',
+      maxFiles: '7d',
     }),
     new DailyRotateFile({
       filename: 'logs/%DATE%-error.log',
@@ -58,7 +58,7 @@ export const getWinstonConfig = () => {
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
-      maxFiles: '30d',
+      maxFiles: '7d',
     }),
   ];
 

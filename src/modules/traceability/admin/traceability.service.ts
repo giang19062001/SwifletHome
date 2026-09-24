@@ -1,16 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Msg } from 'src/helpers/message.helper';
 import { TRACE_CONST } from '../common/traceability.const';
-import { TraceabilityDisplayActorTypeEnum } from '../common/traceability.enum';
+import { TraceabilityDisplayActorTypeEnum, TraceabilityStatusEnum } from '../common/traceability.enum';
 import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
 import { TraceabilityFieldsAdminService } from './traceability-fields.service';
 import { TraceabilityAdminRepository } from './traceability.repository';
+import { TodoHarvestAppService } from 'src/modules/todo/app/todo-harvest.service';
 
 @Injectable()
 export class TraceabilityAdminService {
   constructor(
     private readonly repository: TraceabilityAdminRepository,
     private readonly fieldsService: TraceabilityFieldsAdminService,
+    private readonly todoHarvestService: TodoHarvestAppService,
   ) {}
 
   async getAllForms(): Promise<any[]> {
@@ -41,7 +43,11 @@ export class TraceabilityAdminService {
     return { total, list };
   }
 
-  async updateSubmissionStatus(seq: number, status: string, updatedId: string): Promise<number> {
+  async updateSubmissionStatus(seq: number, status: TraceabilityStatusEnum, updatedId: string): Promise<number> {
+    // đánh dấu sử dụng các đợt thu hoạch khi đơn truy xuất chứa các đợt thu hoạch đó được duyệt
+    // if (status == TraceabilityStatusEnum.APPROVED) {
+    //   this.todoHarvestService.useTaskHarvestForTraceability(seq, updatedId);
+    // }
     return await this.repository.updateSubmissionStatus(seq, status, updatedId);
   }
 

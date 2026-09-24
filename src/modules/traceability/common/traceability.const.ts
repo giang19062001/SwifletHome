@@ -22,7 +22,7 @@ export const TRACE_CONST = {
 export const EXTRA_LINKED_FIELDS = {
   1: {
     key: 'FACILITY_INFO',
-    fields: ['facilityName', 'facilityAddress', 'facilityActiveTime', 'facilityArea', 'facilityFloor'],
+    fields: ['fiIdentificationCode', 'facilityName', 'facilityAddress', 'facilityActiveTime', 'facilityArea', 'facilityFloor'],
   },
   3: {
     key: 'HARVEST_MEASUREMENT',

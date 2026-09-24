@@ -69,6 +69,9 @@ export class TraceabilityGroupResDto {
 }
 
 export class TraceabilityExtraLinkedDataDto {
+  @ApiProperty({ example: 'NNN00001', required: false })
+  fiIdentificationCode?: string;
+
   @ApiProperty({ example: 'Nhà yến An Gia', required: false })
   facilityName?: string;
 
