@@ -119,7 +119,7 @@ function renderTraceabilityList(data, objElement) {
                 <i class="fa fa-eye me-1"></i> Chi tiết
               </a>
               ${
-                ele.hasForm8
+                ele.hasFinalForm
                   ? `<button class="btn btn-sm btn-info" onclick="openStatusModal(${ele.seq}, '${ele.status}', '${ele.traceabilityId}')" title="Cập nhật trạng thái">
                 <i class="fa fa-edit"></i> Duyệt
               </button>`

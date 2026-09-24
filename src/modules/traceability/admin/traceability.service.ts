@@ -3,8 +3,8 @@ import { Msg } from 'src/helpers/message.helper';
 import { TRACE_CONST } from '../common/traceability.const';
 import { TraceabilityDisplayActorTypeEnum } from '../common/traceability.enum';
 import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
-import { TraceabilityAdminRepository } from './traceability.repository';
 import { TraceabilityFieldsAdminService } from './traceability-fields.service';
+import { TraceabilityAdminRepository } from './traceability.repository';
 
 @Injectable()
 export class TraceabilityAdminService {
@@ -34,7 +34,7 @@ export class TraceabilityAdminService {
       qrUrl: r.qrUrl,
       traceabilityId: r.traceabilityId,
       harvestPhases: r.harvestPhases || null,
-      hasForm8: Boolean(r.hasForm8),
+      hasFinalForm: Boolean(r.hasFinalForm),
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
     }));
@@ -65,7 +65,7 @@ export class TraceabilityAdminService {
 
     let rawForms = await this.repository.getAllForms();
     if (isExternal) {
-      rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
+      rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.EXTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
     }
 
     const formsWithSubmissions = await Promise.all(

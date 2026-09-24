@@ -1,6 +1,33 @@
-import { TeamStatusEnum } from 'src/interfaces/admin.interface';
+import { TODO_CONST } from 'src/modules/todo/common/todo.const';
 import { generateSeriCode } from './traceability.func';
 import { TEXTS } from 'src/helpers/text.helper';
+
+export const TRACE_FORM_LIST_FIELD_SQL = {
+  shtTodoList: ` SELECT 
+                  A.taskName, 
+                  DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, 
+                  CASE 
+                    WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.COMPLETE.value}' THEN '${TODO_CONST.TASK_STATUS.COMPLETE.text}'
+                    WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.WAITING.value}' THEN '${TODO_CONST.TASK_STATUS.WAITING.text}'
+                    WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.CANCEL.value}' THEN '${TODO_CONST.TASK_STATUS.CANCEL.text}'
+                    WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.SKIP.value}' THEN '${TODO_CONST.TASK_STATUS.SKIP.text}'
+                    ELSE A.taskStatus
+                  END AS taskStatus 
+                FROM tbl_todo_task_alarm A 
+                WHERE A.userCode = :userCode 
+                  AND A.userHomeCode = :userHomeCode 
+                  AND A.isActive = 'Y' AND A.taskName != 'LURING'
+                ORDER BY A.taskDate DESC, A.seq DESC `,
+
+  shmMedicine: ` SELECT  B.valueOption, A.medicineUsage, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt
+                FROM tbl_todo_task_medicine A
+                JOIN tbl_option_common B
+                ON A.medicineOptionCode = B.code 
+                WHERE A.userCode = :userCode 
+                AND A.userHomeCode = :userHomeCode 
+                AND A.isActive = 'Y'
+                ORDER BY A.taskDate DESC, A.seq DESC    `,
+};
 
 export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
   hiNumberHarvest: ` SELECT 
@@ -26,18 +53,10 @@ export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
                     B.harvestPhase,
                     B.createdAt,
                     B.updatedAt; `,
-  diLotCode: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
-  rmInputLot: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
-  lfpLotProcessings: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
-  dLotFinished: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
-  rLotRecall: ` SELECT '' AS value, '' AS label WHERE 1=0 `,
 };
 
 export const TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL = {
-  OWNER_INFO: ` SELECT userName AS representative, userPhone AS ownerPhone FROM tbl_user_app WHERE userCode = :userCode `,
-  EXPORT_INFO: ` SELECT A.userName AS exporter, B.userHomeName AS facilityCodeExport FROM tbl_user_app A
-               LEFT JOIN tbl_user_home B ON A.userCode = B.userCode
-              WHERE A.userCode = :userCode AND B.userHomeCode = :userHomeCode `,
+  EXPORT_INFO: ` SELECT A.userName AS exporter FROM tbl_user_app A WHERE A.userCode = :userCode`,
   FACILITY_INFO: ` SELECT 
         A.userHomeName AS facilityName, 
         A.userHomeAddress AS facilityAddress, 

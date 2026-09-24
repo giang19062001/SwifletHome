@@ -171,6 +171,20 @@ export class TraceabilityPdfTemplate {
                         } else {
                           valStr = 'Chưa có tệp đính kèm';
                         }
+                      } else if (field.fieldType === 'list_readonly' && Array.isArray(field.currentValue)) {
+                        const subFields = (field.config && (Array.isArray(field.config.maps) ? field.config.maps : Array.isArray(field.config.fields) ? field.config.fields : [])) || [];
+                        if (field.currentValue.length === 0) {
+                          valStr = 'Không có dữ liệu';
+                        } else {
+                          valStr =
+                            '\n' +
+                            field.currentValue
+                              .map((item: any, i: number) => {
+                                const line = subFields.map((sub: any) => `${sub.fieldName}: ${item[sub.fieldKey] || '-'}`).join(' | ');
+                                return `    ${i + 1}. ${line}`;
+                              })
+                              .join('\n');
+                        }
                       } else if (Array.isArray(field.currentValue)) {
                         valStr = field.currentValue.join(', ');
                       } else {

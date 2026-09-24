@@ -3,6 +3,7 @@ const ok = (action: string) => `${action} thành công`;
 const err = (action: string) => `${action} thất bại`;
 const notFound = (subject: string) => `${subject} không tồn tại`;
 const alreadyExist = (subject: string) => `${subject} đã tồn tại`;
+const alreadyUsed = (subject: string) => `${subject} đã được sử dụng`;
 const alreadyDone = (subject: string) => `${subject} đã được thực hiện rồi`;
 const cannotDo = (reason: string) => `Không thể thực hiện: ${reason}`;
 const onlyCan = (who: string, action: string) => `Chỉ có ${who} mới có thể ${action}`;
@@ -129,6 +130,9 @@ export const Msg = {
   ApiKeyMissing: 'Vui lòng cung cấp API Key',
   ApiKeyInvalid: 'Mã API Key không hợp lệ',
   Blacklisted: 'Địa chỉ IP của bạn đã bị đưa vào danh sách chặn',
+
+  // truy xuất
+  Lotcode: alreadyUsed('Mã lô'),
 };
 
 // ─── Helpers dùng nội bộ ───────────────────────────────────────────────────────

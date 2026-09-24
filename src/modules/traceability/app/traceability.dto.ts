@@ -90,6 +90,29 @@ export class DeleteFileQueryDto {
   isExternal?: YnEnum;
 }
 
+export class ExternalInfoDto {
+  @ApiPropertyOptional({ example: 'LOT001', description: 'Mã lô do người dùng nhập để lưu vào tbl_traceability_batches_external' })
+  @IsString()
+  @IsOptional()
+  lotcode?: string;
+
+  @ApiPropertyOptional({ description: 'Dữ liệu form extra liên kết (thông tin cơ sở & thu hoạch)' })
+  @IsOptional()
+  formDataExtra?: any;
+}
+
+export class CheckLotcodeMatchInternalQueryDto {
+  @ApiProperty({ example: 'LOT001', description: 'Mã lô cần kiểm tra với lô nội bộ' })
+  @IsString()
+  @IsNotEmpty()
+  lotcode!: string;
+
+  @ApiPropertyOptional({ example: '3FAM-EXT-24-HOM000001', description: 'Mã hồ sơ external hiện tại (nếu đang chỉnh sửa)' })
+  @IsString()
+  @IsOptional()
+  traceabilityId?: string;
+}
+
 export class SubmitTraceabilityDto {
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', format: 'uuid' })
   @IsUUID()
@@ -109,12 +132,11 @@ export class SubmitTraceabilityDto {
   @ApiPropertyOptional({ example: 'HOM000001', description: 'Nhà yến chính hiện tại của người dùng (Optional cho External)' })
   @IsString()
   @IsOptional()
-  userHomeCode?: string; // Không có -> external
+  userHomeCode?: string;
 
-  @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ (Cho chủ nhà yến), Y = External (Cho tác nhân vận chuyển, sơ chế, đóng gói,...)' })
-  @IsString()
+  @ApiPropertyOptional({ type: ExternalInfoDto, description: 'null cho internal, object cho external' })
   @IsOptional()
-  isExternal?: YnEnum; // 'Y' -> external
+  externalInfo?: ExternalInfoDto | null;
 
   @ApiProperty({ example: { OWNER_INFO: { subjectType: 'Cá nhân', businessRegistrationFile: 2 } } })
   @IsObject()

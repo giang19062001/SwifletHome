@@ -6,6 +6,6 @@ export enum TraceabilityStatusEnum {
 
 export enum TraceabilityDisplayActorTypeEnum {
   BOTH = 'BOTH',
-  HOST = 'HOST',
+  INTERNAL = 'INTERNAL',
   EXTERNAL = 'EXTERNAL',
 }

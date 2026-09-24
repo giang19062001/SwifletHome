@@ -1,28 +1,29 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { RowDataPacket } from 'mysql2';
-import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
-import { getFileLocation } from 'src/config/multer.config';
-import { v4 as uuidv4 } from 'uuid';
 import { existsSync, mkdirSync } from 'fs';
+import { RowDataPacket } from 'mysql2';
 import * as path from 'path';
 import * as QRCode from 'qrcode';
+import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
+import { getFileLocation } from 'src/config/multer.config';
+import { Msg } from 'src/helpers/message.helper';
+import { YnEnum } from 'src/interfaces/admin.interface';
+import { v4 as uuidv4 } from 'uuid';
+import { TRACE_CONST } from '../common/traceability.const';
+import { TraceabilityStatusEnum } from '../common/traceability.enum';
+import { TraceabilityExternalService } from './traceability-external.service';
+import { TraceabilityFieldsService } from './traceability-fields.service';
 import { GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
+import { generateTraceabilityId, generateTraceabilityLotCodeByHarvest, generateTraceabilityQr } from './traceability.func';
 import { TraceabilityAppRepository } from './traceability.repository';
 import {
-  TraceabilityFormResDto,
-  TraceabilityGroupResDto,
-  UploadTraceabilityFileResDto,
-  TraceabilityHouseInfoResDto,
-  TraceabilityBatchItemResDto,
-  TraceabilityBatchListResDto,
+    CheckLotcodeMatchInternalResDto,
+    TraceabilityBatchItemResDto,
+    TraceabilityBatchListResDto,
+    TraceabilityFormResDto,
+    TraceabilityGroupResDto,
+    TraceabilityHouseInfoResDto,
+    UploadTraceabilityFileResDto,
 } from './traceability.response';
-import { generateTraceabilityId, generateTraceabilityQr } from './traceability.func';
-import { TraceabilityStatusEnum } from '../common/traceability.enum';
-import { TRACE_CONST } from '../common/traceability.const';
-import { Msg } from 'src/helpers/message.helper';
-import { TraceabilityFieldsService } from './traceability-fields.service';
-import { TraceabilityExternalService } from './traceability-external.service';
-import { YnEnum } from 'src/interfaces/admin.interface';
 
 @Injectable()
 export class TraceabilityAppService {
@@ -89,6 +90,8 @@ export class TraceabilityAppService {
       savedData = null;
     }
 
+    const batchLotcode = batch?.lotcode || submission?.lotcode || null;
+
     // Map fields to groups
     const mappedGroups: TraceabilityGroupResDto[] = await this.traceabilityFieldsService.mapGroupsAndFields(
       groups,
@@ -100,6 +103,7 @@ export class TraceabilityAppService {
       dto.isExternal || YnEnum.N,
       userCode,
       userHomeCode,
+      batchLotcode,
     );
 
     const response = new TraceabilityFormResDto();
@@ -109,6 +113,7 @@ export class TraceabilityAppService {
     response.formDescription = form.formDescription || null;
     response.qrUrl = qrUrl || undefined;
     response.traceabilityId = traceabilityId || undefined;
+    response.lotcode = batchLotcode || '';
     response.status = status;
     response.statusLabel = TRACE_CONST.STATUS[status]?.text || '';
     response.groups = mappedGroups;
@@ -157,15 +162,20 @@ export class TraceabilityAppService {
   }
 
   async submit(dto: SubmitTraceabilityDto, userCode: string): Promise<number> {
-    // gọi sang truy vấn external - s
-    if (dto.isExternal === YnEnum.Y || !dto.userHomeCode) {
+    // Phân biệt external hay internal dựa vào externalInfo mang giá trị null hay object
+    const isExternal = Boolean(dto.externalInfo && typeof dto.externalInfo === 'object');
+    if (isExternal || !dto.userHomeCode) {
       return await this.externalService.submit(dto, userCode);
-    } // gọi sang truy vấn external - e
+    }
     const isExist = await this.repository.checkExistUniqueId(dto.uniqueId);
 
     const formDataStr = JSON.stringify(dto.formData);
     const phases = this.traceabilityFieldsService.extractHiNumberHarvest(dto.formData);
     const harvestPhases = phases.length > 0 ? phases.sort((a, b) => a - b).join(',') : null;
+    let generatedLotCode: string | null = null;
+    if (phases.length > 0 && dto.userHomeCode) {
+      generatedLotCode = generateTraceabilityLotCodeByHarvest(dto.userHomeCode, phases);
+    }
 
     const homeSeq = await this.repository.getUserHomeSeq(dto.userHomeCode);
     if (!homeSeq) {
@@ -175,14 +185,20 @@ export class TraceabilityAppService {
     let batch: any = null;
     if (dto.traceabilityId) {
       batch = await this.repository.getBatchByTraceabilityId(dto.traceabilityId, userCode);
-      if (batch && harvestPhases && batch.harvestPhases !== harvestPhases) {
-        await this.repository.updateBatchHarvestPhases(batch.seq, harvestPhases, userCode);
-        batch.harvestPhases = harvestPhases;
+      if (batch) {
+        if (harvestPhases && batch.harvestPhases !== harvestPhases) {
+          await this.repository.updateBatchHarvestPhases(batch.seq, harvestPhases, userCode);
+          batch.harvestPhases = harvestPhases;
+        }
+        if (generatedLotCode && batch.lotcode !== generatedLotCode) {
+          await this.repository.updateBatchLotcode(batch.seq, generatedLotCode, userCode);
+          batch.lotcode = generatedLotCode;
+        }
       }
     }
 
     if (!batch) {
-      batch = await this.repository.findOrCreateBatch(userCode, dto.userHomeCode, userCode, harvestPhases);
+      batch = await this.repository.findOrCreateBatch(userCode, dto.userHomeCode, userCode, harvestPhases, generatedLotCode);
     }
 
     if (isExist) {
@@ -289,7 +305,7 @@ export class TraceabilityAppService {
         statusLabel: TRACE_CONST.STATUS[status as keyof typeof TRACE_CONST.STATUS]?.text || '',
         qrUrl: item.qrUrl || undefined,
         harvestPhases: item.harvestPhases || undefined,
-        hasForm8: (item.form8Count || 0) > 0,
+        hasFinalForm: (item.form8Count || 0) > 0,
         submissionCount: Number(item.submissionCount || 0),
         createdAt: item.createdAt,
         updatedAt: item.updatedAt || undefined,
@@ -313,5 +329,9 @@ export class TraceabilityAppService {
 
   async deleteFileCron(seq: number): Promise<number> {
     return await this.repository.deleteFileBySeq(seq);
+  }
+
+  async checkLotcodeMatchInternal(lotcode: string, traceabilityId?: string, userCode?: string): Promise<CheckLotcodeMatchInternalResDto> {
+    return await this.externalService.checkLotcodeMatchInternal(lotcode, traceabilityId, userCode);
   }
 }

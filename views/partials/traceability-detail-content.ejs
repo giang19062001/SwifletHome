@@ -99,6 +99,48 @@
                                                     <h6 class="group-title">
                                                         <i class="fa fa-caret-right me-1"></i> <%= group.groupName %>
                                                     </h6>
+                                                    <% if (group.isLoop === 'Y' && group.loopValues && group.loopValues.length > 0) { %>
+                                                        <div class="d-flex flex-column gap-3 mt-2">
+                                                            <% group.loopValues.forEach((stage, sIdx) => { %>
+                                                                <div class="card border rounded-3 p-3 shadow-none bg-light bg-opacity-25">
+                                                                    <div class="fw-semibold text-primary mb-2">
+                                                                        <i class="fa fa-layer-group me-1"></i> Công đoạn <%= sIdx + 1 %>
+                                                                    </div>
+                                                                    <div class="row g-2">
+                                                                        <% group.fields.forEach(field => { %>
+                                                                            <% if (field.fieldType === 'link_download') return; %>
+                                                                            <% const val = stage[field.fieldKey]; %>
+                                                                            <div class="col-md-6 col-12">
+                                                                                <div class="field-container">
+                                                                                    <div class="field-label"><%= field.fieldName %></div>
+                                                                                    <div class="field-value">
+                                                                                        <% if (field.fieldType === 'file_single') { %>
+                                                                                            <% if (val && val.url) { %>
+                                                                                                <% const isImg = val.url.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                                                <% if (isImg) { %>
+                                                                                                    <a href="/<%= val.url %>" target="_blank" class="d-inline-block mt-2">
+                                                                                                        <img src="/<%= val.url %>" class="img-thumbnail rounded shadow-sm" style="max-height: 120px;" alt="<%= field.fieldName %>">
+                                                                                                    </a>
+                                                                                                <% } else { %>
+                                                                                                    <a href="/<%= val.url %>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                                                                                        <i class="fa fa-file-download me-1"></i> Tải tài liệu
+                                                                                                    </a>
+                                                                                                <% } %>
+                                                                                            <% } else { %>
+                                                                                                <span class="text-muted small">Chưa có tệp đính kèm</span>
+                                                                                            <% } %>
+                                                                                        <% } else { %>
+                                                                                            <span><%= (val !== null && val !== undefined && val !== '') ? val : '-' %></span>
+                                                                                        <% } %>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        <% }) %>
+                                                                    </div>
+                                                                </div>
+                                                            <% }) %>
+                                                        </div>
+                                                    <% } else { %>
                                                     <div class="row g-2">
                                                         <% group.fields.forEach(field => { %>
                                                             <% if (field.fieldType === 'link_download') return; %>
@@ -140,6 +182,34 @@
                                                                             <% } else { %>
                                                                                 <span class="text-muted small">Chưa có tệp đính kèm</span>
                                                                             <% } %>
+                                                                        <% } else if (field.fieldType === 'list_readonly') { %>
+                                                                            <% if (Array.isArray(field.currentValue) && field.currentValue.length > 0) { %>
+                                                                                <% const subFields = (field.config && (Array.isArray(field.config.maps) ? field.config.maps : (Array.isArray(field.config.fields) ? field.config.fields : []))) || []; %>
+                                                                                <div class="table-responsive mt-2">
+                                                                                    <table class="table table-bordered table-sm mb-0">
+                                                                                        <thead class="table-light">
+                                                                                            <tr>
+                                                                                                <th style="width: 40px; text-align: center;">#</th>
+                                                                                                <% subFields.forEach(sub => { %>
+                                                                                                    <th><%= sub.fieldName %></th>
+                                                                                                <% }) %>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            <% field.currentValue.forEach((item, itemIdx) => { %>
+                                                                                                <tr>
+                                                                                                    <td class="text-center"><%= itemIdx + 1 %></td>
+                                                                                                    <% subFields.forEach(sub => { %>
+                                                                                                        <td><%= item[sub.fieldKey] || '-' %></td>
+                                                                                                    <% }) %>
+                                                                                                </tr>
+                                                                                            <% }) %>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            <% } else { %>
+                                                                                <span class="text-muted small">Không có dữ liệu</span>
+                                                                            <% } %>
                                                                         <% } else { %>
                                                                             <% if (field.currentValue !== null && field.currentValue !== undefined && field.currentValue !== '') { %>
                                                                                 <% if (Array.isArray(field.currentValue)) { %>
@@ -156,6 +226,7 @@
                                                             </div>
                                                         <% }) %>
                                                     </div>
+                                                    <% } %>
                                                 </div>
                                             <% }) %>
                                         </div>

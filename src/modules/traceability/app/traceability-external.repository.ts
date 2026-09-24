@@ -5,6 +5,7 @@ import { generateCode } from 'src/helpers/func.helper';
 import { TraceabilityStatusEnum } from '../common/traceability.enum';
 import { GetSubmissionBatchListDto } from './traceability.dto';
 import { generateTraceabilityIdAndQrExternal } from './traceability.func';
+import { FINAL_FORM_SEQ } from '../common/traceability.const';
 
 @Injectable()
 export class TraceabilityExternalRepository {
@@ -14,12 +15,15 @@ export class TraceabilityExternalRepository {
   private readonly tableSubmissionsExt = 'tbl_traceability_submissions_external';
   private readonly tableBatchesExt = 'tbl_traceability_batches_external';
   private readonly tableFileExt = 'tbl_traceability_file_external';
+  private readonly tableBatchesExtraLinked = 'tbl_traceability_batches_extra_linked';
+  private readonly tableSubmissionsInl = 'tbl_traceability_submissions';
+  private readonly tableBatchesInl = 'tbl_traceability_batches';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
   async getProcessingBatchByUser(userCode: string): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT seq, traceabilityId, userCode, status, qrUrl 
+      SELECT seq, traceabilityId, userCode, status, qrUrl, lotcode 
       FROM ${this.tableBatchesExt} 
       WHERE userCode = ? AND status = '${TraceabilityStatusEnum.PROCESSING}' AND isActive = 'Y' 
       ORDER BY seq DESC 
@@ -29,38 +33,64 @@ export class TraceabilityExternalRepository {
     return rows[0] || null;
   }
 
-  async getBatchByTraceabilityId(traceabilityId: string, userCode: string): Promise<RowDataPacket | null> {
-    const sql = `
-      SELECT seq, traceabilityId, userCode, status, qrUrl 
+  async getBatchByTraceabilityId(traceabilityId: string, userCode?: string): Promise<RowDataPacket | null> {
+    let sql = `
+      SELECT seq, traceabilityId, userCode, status, qrUrl, lotcode 
       FROM ${this.tableBatchesExt} 
-      WHERE traceabilityId = ? AND userCode = ? AND isActive = 'Y' 
-      LIMIT 1
+      WHERE traceabilityId = ? AND isActive = 'Y' 
     `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [traceabilityId, userCode]);
+    const params: any[] = [traceabilityId];
+    if (userCode) {
+      sql += ` AND userCode = ?`;
+      params.push(userCode);
+    }
+    sql += ` LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, params);
     return rows[0] || null;
   }
 
-  // async findOrCreateBatch(userCode: string, createdId: string): Promise<RowDataPacket> {
-  async createBatch(userCode: string, createdId: string): Promise<RowDataPacket> {
-    // const existing = await this.getProcessingBatchByUser(userCode);
-    // if (existing) {
-    //   return existing;
-    // }
-
+  async createBatch(userCode: string, createdId: string, lotcode?: string): Promise<RowDataPacket> {
     const { traceabilityId, qrUrl } = generateTraceabilityIdAndQrExternal(userCode);
     const insertSql = `
       INSERT INTO ${this.tableBatchesExt} 
-        (traceabilityId, userCode, status, qrUrl, createdId) 
-      VALUES (?, ?, '${TraceabilityStatusEnum.PROCESSING}', ?, ?)
+        (traceabilityId, userCode, status, qrUrl, lotcode, createdId) 
+      VALUES (?, ?, '${TraceabilityStatusEnum.PROCESSING}', ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(insertSql, [traceabilityId, userCode, qrUrl, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(insertSql, [traceabilityId, userCode, qrUrl, lotcode || null, createdId]);
     return {
       seq: result.insertId,
       traceabilityId,
       userCode,
       status: TraceabilityStatusEnum.PROCESSING,
       qrUrl,
+      lotcode: lotcode || null,
     } as RowDataPacket;
+  }
+
+  async updateBatchLotcode(seq: number, lotcode: string, updatedId: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableBatchesExt} 
+      SET lotcode = ?, updatedAt = NOW(), updatedId = ? 
+      WHERE seq = ?
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [lotcode, updatedId, seq]);
+    return result.affectedRows;
+  }
+
+  async checkDuplicateLotcode(lotcode: string, excludeBatchSeq?: number | null): Promise<boolean> {
+    let sql = `
+      SELECT seq 
+      FROM ${this.tableBatchesExt} 
+      WHERE lotcode = ? AND isActive = 'Y'
+    `;
+    const params: any[] = [lotcode];
+    if (excludeBatchSeq) {
+      sql += ` AND seq != ?`;
+      params.push(excludeBatchSeq);
+    }
+    sql += ` LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, params);
+    return rows.length > 0;
   }
 
   async getFormByKey(formKey: string): Promise<RowDataPacket | null> {
@@ -71,7 +101,7 @@ export class TraceabilityExternalRepository {
 
   async getGroupsByFormSeq(formSeq: number): Promise<RowDataPacket[]> {
     const sql = `
-      SELECT seq, groupKey, groupName 
+      SELECT seq, groupKey, groupName, isLoop 
       FROM ${this.tableGroups} 
       WHERE formSeq = ? AND isActive = 'Y' 
       ORDER BY sortOrder ASC
@@ -94,7 +124,7 @@ export class TraceabilityExternalRepository {
   async getSubmissionByUserForm(userCode: string, formSeq: number): Promise<RowDataPacket | null> {
     const sql = `
       SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.formData, S.uniqueId, 
-             B.status, B.qrUrl, B.traceabilityId 
+             B.status, B.qrUrl, B.traceabilityId, B.lotcode 
       FROM ${this.tableSubmissionsExt} S
       JOIN ${this.tableBatchesExt} B ON S.batchSeq = B.seq
       WHERE S.userCode = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y' AND B.status = '${TraceabilityStatusEnum.PROCESSING}'
@@ -108,7 +138,7 @@ export class TraceabilityExternalRepository {
   async getSubmissionByTraceabilityIdAndFormSeq(traceabilityId: string, formSeq: number, userCode?: string): Promise<RowDataPacket | null> {
     let sql = `
       SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.formData, S.uniqueId, 
-             B.status, B.qrUrl, B.traceabilityId 
+             B.status, B.qrUrl, B.traceabilityId, B.lotcode 
       FROM ${this.tableSubmissionsExt} S
       JOIN ${this.tableBatchesExt} B ON S.batchSeq = B.seq
       WHERE B.traceabilityId = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
@@ -245,7 +275,7 @@ export class TraceabilityExternalRepository {
     const listSql = `
       SELECT B.seq, B.traceabilityId, B.userCode, B.status, B.qrUrl, B.createdAt, B.updatedAt,
              (SELECT COUNT(seq) FROM ${this.tableSubmissionsExt} S WHERE S.batchSeq = B.seq AND S.isActive = 'Y') as submissionCount,
-             (SELECT COUNT(seq) FROM ${this.tableSubmissionsExt} S WHERE S.batchSeq = B.seq AND S.formSeq = 8 AND S.isActive = 'Y') as form8Count
+             (SELECT COUNT(seq) FROM ${this.tableSubmissionsExt} S WHERE S.batchSeq = B.seq AND S.formSeq = ${FINAL_FORM_SEQ} AND S.isActive = 'Y') as form8Count
       FROM ${this.tableBatchesExt} B
       WHERE ${whereClause}
       ORDER BY B.seq DESC
@@ -268,5 +298,92 @@ export class TraceabilityExternalRepository {
 
   async deleteFileCron(seq: number): Promise<number> {
     return await this.deleteFileBySeq(seq);
+  }
+
+  async getSubmissionsFormDataByTraceabilityId(traceabilityId: string): Promise<any[]> {
+    const sql = `
+      SELECT S.formData 
+      FROM ${this.tableSubmissionsExt} S
+      JOIN ${this.tableBatchesExt} B ON S.batchSeq = B.seq
+      WHERE B.traceabilityId = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
+      ORDER BY S.seq ASC
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [traceabilityId]);
+    return rows
+      .map((r) => {
+        try {
+          return typeof r.formData === 'string' ? JSON.parse(r.formData) : r.formData;
+        } catch (e) {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  }
+
+  async getInternalBatchByLotcode(lotcode: string): Promise<RowDataPacket | null> {
+    const sql = `
+      SELECT seq, traceabilityId, userCode, userHomeCode, harvestPhases, lotcode 
+      FROM ${this.tableBatchesInl} 
+      WHERE lotcode = ? 
+      ORDER BY seq DESC 
+      LIMIT 1
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [lotcode]);
+    return rows[0] || null;
+  }
+
+  async getInternalSubmissionsForExtra(batchSeq: number): Promise<RowDataPacket[]> {
+    const sql = `
+      SELECT formSeq, formData 
+      FROM ${this.tableSubmissionsInl} 
+      WHERE batchSeq = ? AND formSeq IN (1, 3) AND isActive = 'Y'
+      ORDER BY seq DESC
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [batchSeq]);
+    return rows;
+  }
+
+  async getExtraLinkedByBatchExternalSeq(batchExternalSeq: number): Promise<RowDataPacket | null> {
+    const sql = `
+      SELECT seq, userCode, lotcode, batchExternalSeq, batchInternalSeq, formDataExtra, isActive 
+      FROM ${this.tableBatchesExtraLinked} 
+      WHERE batchExternalSeq = ? AND isActive = 'Y' 
+      LIMIT 1
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [batchExternalSeq]);
+    return rows[0] || null;
+  }
+
+  async checkInternalBatchAlreadyLinked(batchInternalSeq: number, excludeBatchExternalSeq?: number | null): Promise<boolean> {
+    let sql = `
+      SELECT E.seq 
+      FROM ${this.tableBatchesExtraLinked} E
+      JOIN ${this.tableBatchesExt} B ON E.batchExternalSeq = B.seq
+      WHERE E.batchInternalSeq = ? AND E.isActive = 'Y' AND B.isActive = 'Y'
+    `;
+    const params: any[] = [batchInternalSeq];
+    if (excludeBatchExternalSeq) {
+      sql += ` AND E.batchExternalSeq != ?`;
+      params.push(excludeBatchExternalSeq);
+    }
+    sql += ` LIMIT 1`;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, params);
+    return rows.length > 0;
+  }
+
+  async saveExtraLinked(userCode: string, batchExternalSeq: number, lotcode: string | null, batchInternalSeq: number | null, formDataExtra: string | null, userId: string): Promise<number> {
+    const sql = `
+      INSERT INTO ${this.tableBatchesExtraLinked} 
+        (userCode, batchExternalSeq, lotcode, batchInternalSeq, formDataExtra, createdId) 
+      VALUES (?, ?, ?, ?, ?, ?) 
+      ON DUPLICATE KEY UPDATE 
+        lotcode = VALUES(lotcode), 
+        batchInternalSeq = VALUES(batchInternalSeq), 
+        formDataExtra = VALUES(formDataExtra), 
+        updatedId = ?, 
+        updatedAt = NOW()
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, batchExternalSeq, lotcode, batchInternalSeq, formDataExtra, userId, userId]);
+    return result.affectedRows;
   }
 }

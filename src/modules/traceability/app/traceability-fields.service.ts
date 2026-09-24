@@ -1,18 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { YnEnum } from 'src/interfaces/admin.interface';
 import { generateTraceabilityLotCodeByHarvest } from './traceability.func';
-import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL } from './traceability.query';
+import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL, TRACE_FORM_LIST_FIELD_SQL } from './traceability.query';
 import { TraceabilityAppRepository } from './traceability.repository';
-import { TraceabilityFieldResDto, TraceabilityGroupResDto } from './traceability.response';
+import { TraceabilityExternalRepository } from './traceability-external.repository';
+import { TraceabilityExtraLinkedDataDto, TraceabilityFieldResDto, TraceabilityGroupResDto } from './traceability.response';
+import { EXTRA_LINKED_FIELDS } from '../common/traceability.const';
 
 @Injectable()
 export class TraceabilityFieldsService {
-  constructor(private readonly repository: TraceabilityAppRepository) {}
+  constructor(
+    private readonly repository: TraceabilityAppRepository,
+    @Optional() private readonly externalRepository?: TraceabilityExternalRepository,
+  ) {}
 
   /**
    * Danh sách các trường đặc biệt đại diện cho Mã Lô (LotCode)
    */
-  public readonly LOT_CODE_FIELDS = ['diLotCode', 'rmInputLot', 'lfpLotProcessings', 'dLotFinished', 'rLotRecall'];
+  public readonly LOT_CODE_FIELD_FOLLOW_HARVEST = 'hiNumberHarvest';
+  public readonly LOT_CODE_FIELDS = ['diLotCode', 'rmInputLot', 'lfpLotProcessings', 'dLotFinished', 'rLotRecall', 'eiLotCode'];
 
   /**
    * Kiểm tra một fieldKey có phải là trường đặc biệt Mã Lô (LotCode) hay không
@@ -41,28 +47,28 @@ export class TraceabilityFieldsService {
       if (val.value !== undefined) {
         return this.parsePhases(val.value);
       }
-      if (val.hiNumberHarvest !== undefined) {
-        return this.parsePhases(val.hiNumberHarvest);
+      if (val[this.LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
+        return this.parsePhases(val[this.LOT_CODE_FIELD_FOLLOW_HARVEST]);
       }
     }
     return [];
   }
 
   /**
-   * Bóc tách giá trị đợt thu hoạch (hiNumberHarvest) từ formData
+   * Bóc tách giá trị đợt thu hoạch (LOT_CODE_FIELD_FOLLOW_HARVEST) từ formData
    */
   extractHiNumberHarvest(formData: any): number[] {
     if (!formData || typeof formData !== 'object') return [];
     const phases: number[] = [];
 
-    if (formData.hiNumberHarvest !== undefined) {
-      phases.push(...this.parsePhases(formData.hiNumberHarvest));
+    if (formData[this.LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
+      phases.push(...this.parsePhases(formData[this.LOT_CODE_FIELD_FOLLOW_HARVEST]));
     }
 
     for (const key of Object.keys(formData)) {
       if (formData[key] && typeof formData[key] === 'object') {
-        if (formData[key].hiNumberHarvest !== undefined) {
-          phases.push(...this.parsePhases(formData[key].hiNumberHarvest));
+        if (formData[key][this.LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
+          phases.push(...this.parsePhases(formData[key][this.LOT_CODE_FIELD_FOLLOW_HARVEST]));
         }
       }
     }
@@ -136,8 +142,9 @@ export class TraceabilityFieldsService {
     traceabilityCode: string | null,
     traceabilityId: string | null,
     isExternal: YnEnum = YnEnum.N,
-    userCode?: string,
+    userCode: string,
     userHomeCode?: string,
+    batchLotcode?: string | null,
   ): Promise<TraceabilityGroupResDto[]> {
     const mappedGroups: TraceabilityGroupResDto[] = groups.map((g) => {
       const groupFields: TraceabilityFieldResDto[] = fields
@@ -151,7 +158,7 @@ export class TraceabilityFieldsService {
           }
 
           let currentValue: any = null;
-          if (traceabilityCode) {
+          if (traceabilityCode && g.isLoop !== 'Y') {
             if (f.fieldType === 'file_single') {
               const file = files.find((fileItem) => fileItem.fieldKey === f.fieldKey);
               currentValue = file
@@ -169,21 +176,27 @@ export class TraceabilityFieldsService {
                 }));
             } else {
               currentValue = savedData?.[g.groupKey]?.[f.fieldKey] ?? savedData?.[f.fieldKey] ?? null;
+              if (f.fieldType === 'list_readonly' && typeof currentValue === 'string') {
+                try {
+                  currentValue = JSON.parse(currentValue);
+                } catch (e) {}
+              }
             }
           }
 
-          if (currentValue === null || currentValue === undefined || currentValue === '') {
+          if (g.isLoop !== 'Y' && (currentValue === null || currentValue === undefined || currentValue === '')) {
             const defaultValue = this.getDefaultCurrentValue(f.fieldKey, traceabilityId || '');
             if (defaultValue !== null && defaultValue !== undefined) {
               currentValue = defaultValue;
             }
           }
 
-          if (isExternal === YnEnum.Y && this.isLotCodeField(f.fieldKey)) {
+          // Toàn bộ LOT_CODE_FIELDS đều bị disabled = true (chỉ hiển thị mã lô từ batch)
+          if (this.isLotCodeField(f.fieldKey)) {
             if (!config || typeof config !== 'object') {
               config = {};
             }
-            config.disabled = false;
+            config.disabled = true;
           }
 
           return {
@@ -196,52 +209,87 @@ export class TraceabilityFieldsService {
           };
         });
 
+      // Xử lý các nhóm dạng lặp (isLoop = 'Y') để lấy giá trị hiện tại từ savedData
+      let loopValues: any[] | undefined = undefined;
+      if (g.isLoop === 'Y') {
+        loopValues = [];
+        if (traceabilityCode && savedData?.[g.groupKey]) {
+          const rawArray = Array.isArray(savedData[g.groupKey]) ? savedData[g.groupKey] : [savedData[g.groupKey]];
+
+          rawArray.forEach((item: any, idx: number) => {
+            const itemObj: any = {};
+            groupFields.forEach((gf) => {
+              let val = item?.[gf.fieldKey] ?? null;
+              if (gf.fieldType === 'file_single') {
+                const matchedFile = files.find((fileItem) => fileItem.fieldKey === `${gf.fieldKey}_${idx}` || (idx === 0 && fileItem.fieldKey === gf.fieldKey));
+                val = matchedFile ? { seq: matchedFile.seq, url: matchedFile.filename } : val && typeof val === 'object' && val.url ? val : null;
+              } else if (gf.fieldType === 'file_multiple') {
+                const matchedFiles = files.filter((fileItem) => fileItem.fieldKey === `${gf.fieldKey}_${idx}` || (idx === 0 && fileItem.fieldKey === gf.fieldKey));
+                val = matchedFiles.length > 0 ? matchedFiles.map((mf) => ({ seq: mf.seq, url: mf.filename })) : Array.isArray(val) ? val : [];
+              }
+              itemObj[gf.fieldKey] = val;
+            });
+            loopValues!.push(itemObj);
+          });
+        }
+      }
+
       return {
         groupKey: g.groupKey,
         groupName: g.groupName,
+        isLoop: g.isLoop || 'N',
+        loopValues,
         fields: groupFields,
       };
     });
 
-    if (isExternal == YnEnum.N && userCode && userHomeCode) {
-      const promises: Promise<void>[] = [];
-      for (const group of mappedGroups) {
-        // Xử lý currentValue mặc định
-        const defaultSql = TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL[group.groupKey as keyof typeof TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL];
-        if (defaultSql) {
-          const needsDefaultValue = group.fields.some((f) => f.currentValue === null || f.currentValue === undefined || f.currentValue === '');
-          if (needsDefaultValue) {
-            promises.push(
-              (async () => {
-                try {
-                  const rows = await this.repository.getDynamicOptions(defaultSql, userCode, userHomeCode);
-                  if (rows && rows.length > 0) {
-                    const defaultData = rows[0]; // { fieldKey1: value1, fieldKey2: value2 }
-                    for (const field of group.fields) {
-                      if (field.currentValue === null || field.currentValue === undefined || field.currentValue === '') {
-                        if (defaultData[field.fieldKey] !== undefined) {
-                          field.currentValue = defaultData[field.fieldKey];
-                        }
+    const promises: Promise<void>[] = [];
+    for (const group of mappedGroups) {
+      // Xử lý currentValue mặc định
+      const defaultSql = TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL[group.groupKey as keyof typeof TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL];
+      if (defaultSql) {
+        const needsDefaultValue = group.fields.some((f) => f.currentValue === null || f.currentValue === undefined || f.currentValue === '');
+        if (needsDefaultValue) {
+          promises.push(
+            (async () => {
+              try {
+                const rows = await this.repository.getDynamicOptions(defaultSql, userCode, '');
+                if (rows && rows.length > 0) {
+                  const defaultData = rows[0]; // { fieldKey1: value1, fieldKey2: value2 }
+                  for (const field of group.fields) {
+                    if (field.currentValue === null || field.currentValue === undefined || field.currentValue === '') {
+                      if (defaultData[field.fieldKey] !== undefined) {
+                        field.currentValue = defaultData[field.fieldKey];
                       }
                     }
                   }
-                } catch (error) {
-                  console.error(`Error fetching default current value for group "${group.groupKey}":`, error);
                 }
-              })(),
-            );
-          }
+              } catch (error) {
+                console.error(`Error fetching default current value for group "${group.groupKey}":`, error);
+              }
+            })(),
+          );
         }
       }
-
+    }
+    if (isExternal == YnEnum.N && userCode && userHomeCode) {
       const submissionsFormData = await this.repository.getSubmissionsFormDataByUserHome(userCode, userHomeCode);
       const activeHarvestPhases = this.collectHarvestPhases(savedData, submissionsFormData);
+      let generatedLotCode: string | null = null;
+      if (activeHarvestPhases && activeHarvestPhases.length > 0) {
+        generatedLotCode = generateTraceabilityLotCodeByHarvest(userHomeCode, activeHarvestPhases);
+      }
+      const finalLotCode = batchLotcode || generatedLotCode || '';
 
-      // dùng linkValues để fill trường khác tự động từ 1 trường select/radio
       for (const group of mappedGroups) {
         for (const field of group.fields) {
           if (this.isLotCodeField(field.fieldKey)) {
-            this.applyLotCodeValueToField(field, userHomeCode, activeHarvestPhases);
+            field.currentValue = finalLotCode;
+            if (group.isLoop === 'Y' && Array.isArray(group.loopValues)) {
+              group.loopValues.forEach((row) => {
+                row[field.fieldKey] = finalLotCode;
+              });
+            }
           } else {
             // Xử lý options động
             const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];
@@ -257,9 +305,6 @@ export class TraceabilityFieldsService {
                         label: label,
                         sortOrder: idx + 1,
                       };
-                      if (Object.keys(rest).length > 0) {
-                        option.linkedValues = rest;
-                      }
                       return option;
                     });
 
@@ -285,6 +330,22 @@ export class TraceabilityFieldsService {
                 })(),
               );
             }
+
+            // Xử lý giá trị danh sách cho các trường dạng list_readonly (vd: shsTodoList)
+            const listSql = TRACE_FORM_LIST_FIELD_SQL[field.fieldKey as keyof typeof TRACE_FORM_LIST_FIELD_SQL];
+            if (listSql && (field.currentValue === null || field.currentValue === undefined || (Array.isArray(field.currentValue) && field.currentValue.length === 0))) {
+              promises.push(
+                (async () => {
+                  try {
+                    const rows = await this.repository.getDynamicOptions(listSql, userCode, userHomeCode);
+                    field.currentValue = rows || [];
+                  } catch (error) {
+                    console.error(`Error fetching list field value for "${field.fieldKey}":`, error);
+                    field.currentValue = [];
+                  }
+                })(),
+              );
+            }
           }
         }
       }
@@ -294,6 +355,71 @@ export class TraceabilityFieldsService {
       }
     }
 
+    if (isExternal == YnEnum.Y || (isExternal as any) === 'Y') {
+      let lotcodeValue = batchLotcode || '';
+
+      if (!lotcodeValue && traceabilityId) {
+        if (this.externalRepository) {
+          const batch = await this.externalRepository.getBatchByTraceabilityId(traceabilityId, userCode);
+          if (batch && batch.lotcode) {
+            lotcodeValue = batch.lotcode;
+          }
+        }
+      }
+
+      for (const group of mappedGroups) {
+        for (const field of group.fields) {
+          if (this.isLotCodeField(field.fieldKey)) {
+            field.currentValue = lotcodeValue;
+
+            if (group.isLoop === 'Y' && Array.isArray(group.loopValues)) {
+              group.loopValues.forEach((row) => {
+                row[field.fieldKey] = lotcodeValue;
+              });
+            }
+          }
+        }
+      }
+    }
+
     return mappedGroups;
+  }
+
+  // Trích xuất dữ liệu liên kết từ các đợt truy xuất nội bộ để trả về cho truy xuất ngoại
+  extractExtraFieldsFromInternalSubmissions(submissions: any[]): TraceabilityExtraLinkedDataDto {
+    const data = Object.values(EXTRA_LINKED_FIELDS)
+      .flatMap(({ fields }) => fields)
+      .reduce((acc, field) => {
+        acc[field] = '';
+        return acc;
+      }, {} as TraceabilityExtraLinkedDataDto);
+
+    submissions.forEach((sub) => {
+      const config = EXTRA_LINKED_FIELDS[sub.formSeq as keyof typeof EXTRA_LINKED_FIELDS];
+
+      if (!config) return;
+
+      let parsed: any;
+
+      try {
+        parsed = typeof sub.formData === 'string' ? JSON.parse(sub.formData) : sub.formData;
+      } catch {
+        return;
+      }
+
+      if (!parsed) return;
+
+      const section = parsed[config.key] || (config.key === 'HARVEST_MEASUREMENT' ? parsed['HARVEST_ MEASUREMENT'] : undefined);
+
+      if (!section) return;
+
+      config.fields.forEach((field) => {
+        if (section[field] !== undefined && section[field] !== null) {
+          data[field] = section[field];
+        }
+      });
+    });
+
+    return data;
   }
 }

@@ -18,3 +18,16 @@ export const TRACE_CONST = {
   QR_CODE_BASE_URL: 'traceability-qrcode-global',
   TRACE_EXTERNAL_PREFIX: '3FAM-VCĐP',
 };
+
+export const EXTRA_LINKED_FIELDS = {
+  1: {
+    key: 'FACILITY_INFO',
+    fields: ['facilityName', 'facilityAddress', 'facilityActiveTime', 'facilityArea', 'facilityFloor'],
+  },
+  3: {
+    key: 'HARVEST_MEASUREMENT',
+    fields: ['hmNumberNests'],
+  },
+};
+
+export const FINAL_FORM_SEQ = 8;

@@ -5,6 +5,7 @@ import { generateCode } from 'src/helpers/func.helper';
 import { TraceabilityDisplayActorTypeEnum, TraceabilityStatusEnum } from '../common/traceability.enum';
 import { GetSubmissionBatchListDto } from './traceability.dto';
 import { generateTraceabilityId, generateTraceabilityQr } from './traceability.func';
+import { FINAL_FORM_SEQ } from '../common/traceability.const';
 @Injectable()
 export class TraceabilityAppRepository {
   private readonly tableForms = 'tbl_traceability_forms';
@@ -27,7 +28,7 @@ export class TraceabilityAppRepository {
     const isExt = isExternal === 'Y';
     const actorFilter = isExt
       ? `('${TraceabilityDisplayActorTypeEnum.EXTERNAL}', '${TraceabilityDisplayActorTypeEnum.BOTH}')`
-      : `('${TraceabilityDisplayActorTypeEnum.HOST}', '${TraceabilityDisplayActorTypeEnum.BOTH}')`;
+      : `('${TraceabilityDisplayActorTypeEnum.INTERNAL}', '${TraceabilityDisplayActorTypeEnum.BOTH}')`;
     const sql = `
       SELECT 
         seq, 
@@ -45,7 +46,7 @@ export class TraceabilityAppRepository {
 
   async getGroupsByFormSeq(formSeq: number): Promise<RowDataPacket[]> {
     const sql = `
-      SELECT seq, groupKey, groupName 
+      SELECT seq, groupKey, groupName, isLoop 
       FROM ${this.tableGroups} 
       WHERE formSeq = ? AND isActive = 'Y' 
       ORDER BY sortOrder ASC
@@ -85,7 +86,7 @@ export class TraceabilityAppRepository {
 
   async getProcessingBatchByUserHome(userCode: string, userHomeCode: string): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases 
+      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases, lotcode 
       FROM ${this.tableBatches} 
       WHERE userCode = ? AND userHomeCode = ? AND status = '${TraceabilityStatusEnum.PROCESSING}' AND isActive = 'Y' 
       ORDER BY seq DESC 
@@ -97,7 +98,7 @@ export class TraceabilityAppRepository {
 
   async getBatchByTraceabilityId(traceabilityId: string, userCode: string): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases 
+      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases, lotcode 
       FROM ${this.tableBatches} 
       WHERE traceabilityId = ? AND userCode = ? AND isActive = 'Y' 
       LIMIT 1
@@ -112,9 +113,15 @@ export class TraceabilityAppRepository {
     return result.affectedRows;
   }
 
-  async findOrCreateBatch(userCode: string, userHomeCode: string, createdId: string, harvestPhases: string | null = null): Promise<RowDataPacket> {
+  async updateBatchLotcode(seq: number, lotcode: string, updatedId: string): Promise<number> {
+    const updateSql = `UPDATE ${this.tableBatches} SET lotcode = ?, updatedId = ?, updatedAt = NOW() WHERE seq = ?`;
+    const [result] = await this.db.execute<ResultSetHeader>(updateSql, [lotcode, updatedId, seq]);
+    return result.affectedRows;
+  }
+
+  async findOrCreateBatch(userCode: string, userHomeCode: string, createdId: string, harvestPhases: string | null = null, lotcode: string | null = null): Promise<RowDataPacket> {
     const selectSql = `
-      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases 
+      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases, lotcode 
       FROM ${this.tableBatches} 
       WHERE userCode = ? AND userHomeCode = ? AND status = '${TraceabilityStatusEnum.PROCESSING}' AND isActive = 'Y' 
       ORDER BY seq DESC 
@@ -122,10 +129,23 @@ export class TraceabilityAppRepository {
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(selectSql, [userCode, userHomeCode]);
     if (rows[0]) {
+      const updates: string[] = [];
+      const params: any[] = [];
       if (harvestPhases && rows[0].harvestPhases !== harvestPhases) {
-        const updateSql = ` UPDATE ${this.tableBatches} SET harvestPhases = ?, updatedAt = NOW() WHERE seq = ?`;
-        await this.db.execute(updateSql, [harvestPhases, rows[0].seq]);
+        updates.push('harvestPhases = ?');
+        params.push(harvestPhases);
         rows[0].harvestPhases = harvestPhases;
+      }
+      if (lotcode && rows[0].lotcode !== lotcode) {
+        updates.push('lotcode = ?');
+        params.push(lotcode);
+        rows[0].lotcode = lotcode;
+      }
+      if (updates.length > 0) {
+        updates.push('updatedAt = NOW()');
+        params.push(rows[0].seq);
+        const updateSql = `UPDATE ${this.tableBatches} SET ${updates.join(', ')} WHERE seq = ?`;
+        await this.db.execute(updateSql, params);
       }
       return rows[0];
     }
@@ -136,10 +156,10 @@ export class TraceabilityAppRepository {
 
     const insertSql = `
       INSERT INTO ${this.tableBatches} 
-        (traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases, createdId) 
-      VALUES (?, ?, ?, '${TraceabilityStatusEnum.PROCESSING}', ?, ?, ?)
+        (traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases, lotcode, createdId) 
+      VALUES (?, ?, ?, '${TraceabilityStatusEnum.PROCESSING}', ?, ?, ?, ?)
     `;
-    const [result] = await this.db.execute<ResultSetHeader>(insertSql, [traceabilityId, userCode, userHomeCode, qrUrl, harvestPhases, createdId]);
+    const [result] = await this.db.execute<ResultSetHeader>(insertSql, [traceabilityId, userCode, userHomeCode, qrUrl, harvestPhases, lotcode, createdId]);
     return {
       seq: result.insertId,
       traceabilityId,
@@ -148,13 +168,14 @@ export class TraceabilityAppRepository {
       status: TraceabilityStatusEnum.PROCESSING,
       qrUrl,
       harvestPhases,
+      lotcode,
     } as RowDataPacket;
   }
 
   async getSubmissionByCode(traceabilityCode: string, userHomeCode?: string): Promise<RowDataPacket | null> {
     let sql = `
       SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, S.formData, S.uniqueId, 
-             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases 
+             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases, B.lotcode 
       FROM ${this.tableSubmissions} S
       JOIN ${this.tableBatches} B ON S.batchSeq = B.seq
       WHERE S.traceabilityCode = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
@@ -172,7 +193,7 @@ export class TraceabilityAppRepository {
   async getSubmissionByUserHomeForm(userCode: string, userHomeCode: string, formSeq: number): Promise<RowDataPacket | null> {
     const sql = `
       SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, S.formData, S.uniqueId, 
-             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases 
+             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases, B.lotcode 
       FROM ${this.tableSubmissions} S
       JOIN ${this.tableBatches} B ON S.batchSeq = B.seq
       WHERE S.userCode = ? AND S.userHomeCode = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y' AND B.status = '${TraceabilityStatusEnum.PROCESSING}'
@@ -186,7 +207,7 @@ export class TraceabilityAppRepository {
   async getSubmissionByTraceabilityIdAndFormSeq(traceabilityId: string, formSeq: number, userCode?: string): Promise<RowDataPacket | null> {
     let sql = `
       SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, S.formData, S.uniqueId, 
-             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases 
+             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases, B.lotcode 
       FROM ${this.tableSubmissions} S
       JOIN ${this.tableBatches} B ON S.batchSeq = B.seq
       WHERE B.traceabilityId = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
@@ -367,6 +388,26 @@ export class TraceabilityAppRepository {
       .filter(Boolean);
   }
 
+  async getSubmissionsFormDataByTraceabilityId(traceabilityId: string): Promise<any[]> {
+    const sql = `
+      SELECT S.formData 
+      FROM ${this.tableSubmissions} S
+      JOIN ${this.tableBatches} B ON S.batchSeq = B.seq
+      WHERE B.traceabilityId = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
+      ORDER BY S.seq ASC
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [traceabilityId]);
+    return rows
+      .map((r) => {
+        try {
+          return typeof r.formData === 'string' ? JSON.parse(r.formData) : r.formData;
+        } catch (e) {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  }
+
   async getSubmissionBatchList(userCode: string, dto: GetSubmissionBatchListDto): Promise<{ list: RowDataPacket[]; total: number }> {
     const page = Number(dto.page) > 0 ? Number(dto.page) : 1;
     const limit = Number(dto.limit) > 0 ? Number(dto.limit) : 10;
@@ -384,7 +425,7 @@ export class TraceabilityAppRepository {
     const listSql = `
       SELECT B.seq, B.traceabilityId, B.userCode, B.userHomeCode, B.status, B.qrUrl, B.harvestPhases, B.createdAt, B.updatedAt,
              (SELECT COUNT(seq) FROM ${this.tableSubmissions} S WHERE S.batchSeq = B.seq AND S.isActive = 'Y') as submissionCount,
-             (SELECT COUNT(seq) FROM ${this.tableSubmissions} S WHERE S.batchSeq = B.seq AND S.formSeq = 8 AND S.isActive = 'Y') as form8Count
+             (SELECT COUNT(seq) FROM ${this.tableSubmissions} S WHERE S.batchSeq = B.seq AND S.formSeq = ${FINAL_FORM_SEQ} AND S.isActive = 'Y') as form8Count
       FROM ${this.tableBatches} B
       WHERE ${whereClause}
       ORDER BY B.seq DESC

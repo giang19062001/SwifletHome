@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
+import { FINAL_FORM_SEQ } from '../common/traceability.const';
 import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
 
 @Injectable()
@@ -23,7 +24,7 @@ export class TraceabilityAdminRepository {
 
   async getGroupsByFormSeq(formSeq: number): Promise<RowDataPacket[]> {
     const sql = `
-      SELECT seq, groupKey, groupName 
+      SELECT seq, groupKey, groupName, isLoop 
       FROM ${this.tableGroups} 
       WHERE formSeq = ? AND isActive = 'Y' 
       ORDER BY sortOrder ASC
@@ -123,9 +124,9 @@ export class TraceabilityAdminRepository {
         U.userName, U.userPhone,
         H.userHomeName, H.userHomeAddress,
         EXISTS (
-          SELECT 1 FROM ${this.tableSubmissions} S8 
-          WHERE S8.batchSeq = B.seq AND S8.formSeq = 8 AND S8.isActive = 'Y'
-        ) AS hasForm8
+          SELECT 1 FROM ${this.tableSubmissions} Sfinal 
+          WHERE Sfinal.batchSeq = B.seq AND Sfinal.formSeq = ${FINAL_FORM_SEQ} AND Sfinal.isActive = 'Y'
+        ) AS hasFinalForm
       FROM ${this.tableBatches} B
       LEFT JOIN ${this.tableUserHomes} H ON B.userHomeCode = H.userHomeCode
       LEFT JOIN ${this.tableUserApps} U ON B.userCode = U.userCode
