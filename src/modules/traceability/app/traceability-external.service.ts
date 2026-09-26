@@ -137,15 +137,13 @@ export class TraceabilityExternalService {
     }
 
     // Xử lý extraLinkedInfo
-    let extraLinkedInfo: TraceabilityExtraLinkedInfoDto = {
-      isLinkedInternal: false,
-      data: null,
-    };
+    let parsedData: any = null;
+    let isLinkedInternal = false;
 
     if (batchSeq) {
       const extraLinked = await this.repository.getExtraLinkedByBatchExternalSeq(batchSeq);
       if (extraLinked) {
-        let parsedData: any = null;
+        isLinkedInternal = Boolean(extraLinked.batchInternalSeq);
         if (extraLinked.formDataExtra) {
           try {
             parsedData = typeof extraLinked.formDataExtra === 'string' ? JSON.parse(extraLinked.formDataExtra) : extraLinked.formDataExtra;
@@ -153,13 +151,15 @@ export class TraceabilityExternalService {
             parsedData = null;
           }
         }
-        extraLinkedInfo = {
-          isLinkedInternal: Boolean(extraLinked.batchInternalSeq),
-          data: parsedData,
-        };
       }
     }
-    response.extraLinkedInfo = extraLinkedInfo;
+
+    const extraFields = this.traceabilityFieldsService.getExtraFieldsSchema(parsedData);
+    response.extraLinkedInfo = {
+      isLinkedInternal,
+      fields: extraFields,
+      data: parsedData,
+    };
 
     return response;
   }
@@ -314,7 +314,7 @@ export class TraceabilityExternalService {
 
   async checkLotcodeMatchInternal(lotcode: string, traceabilityId?: string, userCode?: string): Promise<CheckLotcodeMatchInternalResDto> {
     if (!lotcode || !lotcode.trim()) {
-      return { isMatched: false, data: null };
+      return { isMatched: false, fields: this.traceabilityFieldsService.getExtraFieldsSchema(), data: null };
     }
 
     const cleanLotcode = lotcode.trim();
@@ -335,7 +335,7 @@ export class TraceabilityExternalService {
 
     const internalBatch = await this.repository.getInternalBatchByLotcode(cleanLotcode);
     if (!internalBatch) {
-      return { isMatched: false, data: null };
+      return { isMatched: false, fields: this.traceabilityFieldsService.getExtraFieldsSchema(), data: null };
     }
 
     // Kiểm tra lô nội bộ này có đang liên kết với lô ngoại khác không
@@ -346,9 +346,11 @@ export class TraceabilityExternalService {
 
     const submissions = await this.repository.getInternalSubmissionsForExtra(internalBatch.seq);
     const data = this.traceabilityFieldsService.extractExtraFieldsFromInternalSubmissions(submissions);
+    const fields = this.traceabilityFieldsService.getExtraFieldsSchema(data);
 
     return {
       isMatched: true,
+      fields,
       data,
     };
   }

@@ -69,6 +69,8 @@ export class TraceabilityGroupResDto {
 }
 
 export class TraceabilityExtraLinkedDataDto {
+  [key: string]: any;
+
   @ApiProperty({ example: 'NNN00001', required: false })
   fiIdentificationCode?: string;
 
@@ -94,6 +96,9 @@ export class TraceabilityExtraLinkedDataDto {
 export class TraceabilityExtraLinkedInfoDto {
   @ApiProperty({ example: true, description: 'true nếu match với lô nội bộ, false nếu tự nhập' })
   isLinkedInternal!: boolean;
+
+  @ApiProperty({ type: [TraceabilityFieldResDto], required: false })
+  fields?: TraceabilityFieldResDto[];
 
   @ApiProperty({ type: TraceabilityExtraLinkedDataDto, required: false })
   data?: TraceabilityExtraLinkedDataDto | null;
@@ -140,6 +145,9 @@ export class TraceabilityFormResDto {
 export class CheckLotcodeMatchInternalResDto {
   @ApiProperty({ example: true })
   isMatched!: boolean;
+
+  @ApiProperty({ type: [TraceabilityFieldResDto], required: false })
+  fields?: TraceabilityFieldResDto[];
 
   @ApiProperty({ type: TraceabilityExtraLinkedDataDto, required: false })
   data?: TraceabilityExtraLinkedDataDto | null;

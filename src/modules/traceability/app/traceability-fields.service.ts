@@ -388,12 +388,11 @@ export class TraceabilityFieldsService {
 
   // Trích xuất dữ liệu liên kết từ các đợt truy xuất nội bộ để trả về cho truy xuất ngoại
   extractExtraFieldsFromInternalSubmissions(submissions: any[]): TraceabilityExtraLinkedDataDto {
-    const data = Object.values(EXTRA_LINKED_FIELDS)
-      .flatMap(({ fields }) => fields)
-      .reduce((acc, field) => {
-        acc[field] = '';
-        return acc;
-      }, {} as TraceabilityExtraLinkedDataDto);
+    const allFields = Object.values(EXTRA_LINKED_FIELDS).flatMap(({ fields }) => fields);
+    const data = allFields.reduce((acc, field) => {
+      acc[field.fieldKey] = '';
+      return acc;
+    }, {} as TraceabilityExtraLinkedDataDto);
 
     submissions.forEach((sub) => {
       const config = EXTRA_LINKED_FIELDS[sub.formSeq as keyof typeof EXTRA_LINKED_FIELDS];
@@ -415,12 +414,30 @@ export class TraceabilityFieldsService {
       if (!section) return;
 
       config.fields.forEach((field) => {
-        if (section[field] !== undefined && section[field] !== null) {
-          data[field] = section[field];
+        if (section[field.fieldKey] !== undefined && section[field.fieldKey] !== null) {
+          data[field.fieldKey] = section[field.fieldKey];
         }
       });
     });
 
     return data;
+  }
+
+  /**
+   * Sinh danh sách cấu hình động (Schema) cho các trường Thông tin cơ sở liên kết (Extra Linked Fields)
+   * Sử dụng EXTRA_LINKED_FIELDS làm Single Source of Truth
+   * Kèm theo giá trị hiện tại (currentValue) trích xuất từ dữ liệu (nếu có).
+   */
+  getExtraFieldsSchema(data?: Record<string, any>): TraceabilityFieldResDto[] {
+    const allFields = Object.values(EXTRA_LINKED_FIELDS).flatMap(({ fields }) => fields);
+
+    return allFields.map((field) => ({
+      fieldKey: field.fieldKey,
+      fieldName: field.fieldName,
+      fieldType: field.fieldType,
+      isRequired: field.isRequired,
+      config: field.config,
+      currentValue: data?.[field.fieldKey] !== undefined && data?.[field.fieldKey] !== null ? data[field.fieldKey] : null,
+    }));
   }
 }
