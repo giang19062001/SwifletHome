@@ -36,24 +36,20 @@ export const INTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>
   },
   LOGBOOK_HOUSE: {
     SWIFT_HOUSE_TD: 'ALL',
-    SWIFT_HOUSE_MEDICINE: 'ALL',
   },
 };
 
 export const EXTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
   PRODUCTION_ORIGIN: {
-    MANUFACTURER: 'ALL', //  Thông tin nhà sản xuất
+    MANUFACTURER: ['mFacilityName', 'mfacilityAddress', 'mCertificationFile'], //  Thông tin nhà sản xuất
     ORIGIN_NEST: 'ALL', // nguồn gốc sản phẩm
   },
   PRE_PROCESSING: {
-    RECEIVING_MATERIAL: ['rmTeamExecution', 'rmAddress'],
     DIARY_PROCESS: 'ALL',
   },
   PACKING_QR: {
-    LOT_FINISHED_PRODUCT: ['lfpPackagingAddress'],
     INGREDIENT_INSTRUCTION: ['iiIngredients', 'iiInstructionUse', 'iiApplicableStandard'],
   },
 };
 
 export const FINAL_FORM_SEQ = 8;
-

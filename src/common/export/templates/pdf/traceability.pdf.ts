@@ -107,11 +107,30 @@ export class TraceabilityPdfTemplate {
         };
 
         const renderKeyValue = (label: string, value: any, indent = 45) => {
-          checkPageBreak(20);
           const valStr = value !== null && value !== undefined && value !== '' ? String(value) : '-';
-          doc.font(fontBold).fontSize(9.5).fillColor('#333333').text(`${label}: `, indent, currentY, { continued: true });
-          doc.font(fontRegular).fillColor('#1A202C').text(valStr);
-          currentY += 16;
+          const lines = valStr.split(/\r?\n/);
+          checkPageBreak(16 * Math.max(1, lines.length));
+          doc
+            .font(fontBold)
+            .fontSize(9.5)
+            .fillColor('#333333')
+            .text(`${label}: `, indent, currentY, { continued: lines.length > 1 ? false : true });
+          if (lines.length > 1) {
+            currentY += 15;
+            lines.forEach((line) => {
+              checkPageBreak(16);
+              doc
+                .font(fontRegular)
+                .fontSize(9.5)
+                .fillColor('#1A202C')
+                .text(line, indent + 10, currentY);
+              currentY += 15;
+            });
+            currentY += 2;
+          } else {
+            doc.font(fontRegular).fillColor('#1A202C').text(valStr);
+            currentY += 16;
+          }
         };
 
         const renderImage = (imgUrl: string, indent = 45) => {
@@ -142,14 +161,14 @@ export class TraceabilityPdfTemplate {
             // I. THÔNG TIN CƠ SỞ
             renderSectionHeader('I. THÔNG TIN CƠ SỞ');
             renderKeyValue('Tên chủ nhà yến', compact.personInCharge);
-            renderKeyValue('Mã định danh cơ sở do bộ Nông Nghiệp cấp', compact.fiIdentificationCode);
+            renderKeyValue('Mã định danh nhà yến do bộ Nông Nghiệp cấp', compact.fiIdentificationCode);
             renderKeyValue('Địa chỉ sản xuất', compact.facilityAddress);
             currentY += 10;
 
             // II. THÔNG TIN THU HOẠCH
             renderSectionHeader('II. THÔNG TIN THU HOẠCH');
             renderKeyValue('Mã lô yến', compact.lotcode);
-            renderKeyValue('Ngày thu hoạch tổ yến', compact.hiHarvestDate);
+            renderKeyValue('Ngày thu hoạch', compact.hiHarvestDate);
 
             if (compact.hmWeightingPhoto) {
               const photoUrl = typeof compact.hmWeightingPhoto === 'object' ? compact.hmWeightingPhoto?.url : compact.hmWeightingPhoto;
@@ -165,7 +184,7 @@ export class TraceabilityPdfTemplate {
 
             // 1. Các việc đã thực hiện (SWIFT_HOUSE_TD)
             checkPageBreak(30);
-            doc.font(fontBold).fontSize(10).fillColor('#2D3748').text('1. Các việc đã thực hiện:', 45, currentY);
+            doc.font(fontBold).fontSize(10).fillColor('#2D3748').text('Các việc đã thực hiện:', 45, currentY);
             currentY += 16;
             const todoField = compact.todoListGroup?.fields?.find((f: any) => (f.fieldKey || '').toLowerCase().includes('todo') || f.fieldType === 'list_canwrite');
             const todoItems = todoField?.currentValue;
@@ -198,48 +217,11 @@ export class TraceabilityPdfTemplate {
               currentY += 15;
             }
             currentY += 8;
-
-            // 2. Lịch sử lăn thuốc (SWIFT_HOUSE_MEDICINE)
-            checkPageBreak(30);
-            doc.font(fontBold).fontSize(10).fillColor('#2D3748').text('2. Lịch sử lăn thuốc:', 45, currentY);
-            currentY += 16;
-            const medField = compact.medicineGroup?.fields?.find((f: any) => (f.fieldKey || '').toLowerCase().includes('medicine') || f.fieldType === 'list_canwrite');
-            const medItems = medField?.currentValue;
-            const medSubFields = (medField?.config && (Array.isArray(medField.config.maps) ? medField.config.maps : Array.isArray(medField.config.fields) ? medField.config.fields : [])) || [];
-
-            if (Array.isArray(medItems) && medItems.length > 0) {
-              medItems.forEach((item: any, idx: number) => {
-                checkPageBreak(18);
-                if (medSubFields.length > 0) {
-                  const line = medSubFields.map((sub: any) => `${sub.fieldName}: ${item[sub.fieldKey] || '-'}`).join(' | ');
-                  doc
-                    .font(fontRegular)
-                    .fontSize(9)
-                    .fillColor('#4A5568')
-                    .text(`  ${idx + 1}. ${line}`, 55, currentY);
-                } else {
-                  const name = item.valueOption || item.medicineName || item.name || '-';
-                  const dosage = item.medicineUsage || item.dosage || '';
-                  const time = item.createdAt || item.date || '';
-                  const detailStr = [`Tên: ${name}`, dosage ? `Liều lượng: ${dosage}` : '', time ? `Ngày: ${time}` : ''].filter(Boolean).join(' | ');
-                  doc
-                    .font(fontRegular)
-                    .fontSize(9)
-                    .fillColor('#4A5568')
-                    .text(`  ${idx + 1}. ${detailStr}`, 55, currentY);
-                }
-                currentY += 15;
-              });
-            } else {
-              doc.font(fontRegular).fontSize(9).fillColor('#718096').text('  Chưa có dữ liệu lăn thuốc.', 55, currentY);
-              currentY += 15;
-            }
           } else {
             // I. THÔNG TIN NHÀ SẢN XUẤT (MANUFACTURER)
             renderSectionHeader('I. THÔNG TIN NHÀ SẢN XUẤT');
-            renderKeyValue('Tên nhà yến sản xuất', compact.facilityName || compact.personInCharge);
-            renderKeyValue('Mã định danh cơ sở do bộ Nông Nghiệp cấp', compact.fiIdentificationCode);
-            renderKeyValue('Địa chỉ cơ sở sản xuất', compact.facilityAddress);
+            renderKeyValue('Tên nhà sản xuất', compact.facilityName || compact.personInCharge);
+            renderKeyValue('Địa chỉ', compact.facilityAddress);
 
             const certVal = compact.mCertificationFile || compact.fiCertificationFile;
             if (certVal) {
@@ -261,7 +243,7 @@ export class TraceabilityPdfTemplate {
                   }
                 }
                 checkPageBreak(20);
-                doc.font(fontBold).fontSize(9.5).fillColor('#333333').text('Giấy chứng nhận cơ sở:', 45, currentY);
+                doc.font(fontBold).fontSize(9.5).fillColor('#333333').text('Hồ sơ pháp lý', 45, currentY);
                 currentY += 16;
                 certFiles.forEach((fileUrl: string) => {
                   checkPageBreak(18);
@@ -277,7 +259,7 @@ export class TraceabilityPdfTemplate {
             renderSectionHeader('II. NGUỒN GỐC SẢN PHẨM');
             renderKeyValue('Địa chỉ khu vực sản xuất/ thu hoạch', compact.onAddressArea || compact.facilityAddress);
 
-            renderKeyValue('Ngày thu hoạch tổ yến', compact.onHarvestDate || compact.hiHarvestDate);
+            renderKeyValue('Ngày thu hoạch', compact.onHarvestDate || compact.hiHarvestDate);
 
             if (compact.onWeightingPhoto) {
               const photoUrl = typeof compact.onWeightingPhoto === 'object' ? compact.onWeightingPhoto?.url : compact.onWeightingPhoto;
@@ -288,10 +270,8 @@ export class TraceabilityPdfTemplate {
             }
             currentY += 10;
 
-            // III. TIẾP NHẬN NGUYÊN LIỆU & SƠ CHẾ (PRE_PROCESSING)
-            renderSectionHeader('III. TIẾP NHẬN NGUYÊN LIỆU & SƠ CHẾ');
-            renderKeyValue('Cơ sở thực hiện sơ chế', compact.rmTeamExecution);
-            renderKeyValue('Địa chỉ cơ sở sơ chế', compact.rmAddress);
+            // III. SƠ CHẾ & CHẾ BIẾN (PRE_PROCESSING)
+            renderSectionHeader('III. SƠ CHẾ & CHẾ BIẾN');
             currentY += 8;
 
             const stages = compact.diaryProcessGroup?.loopValues;

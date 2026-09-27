@@ -161,13 +161,6 @@ export class TraceabilityFieldsAdminService {
           (linked ? homeInfo?.userHomeName : '') ||
           formDataExtra?.facilityName ||
           '',
-        fiIdentificationCode:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mdentificationCode') ||
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mIdentificationCode') ||
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'fiIdentificationCode') ||
-          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiIdentificationCode') ||
-          formDataExtra?.fiIdentificationCode ||
-          '',
         facilityAddress:
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mfacilityAddress') ||
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityAddress') ||
@@ -187,28 +180,14 @@ export class TraceabilityFieldsAdminService {
           this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate') ||
           formDataExtra?.hiHarvestDate ||
           null,
-        onAddressArea:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onAddressArea') ||
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'addressArea') ||
-          '',
+        onAddressArea: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onAddressArea') || this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'addressArea') || '',
         onWeightingPhoto:
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightingPhoto') ||
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightPhoto') ||
           this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
-        hiHarvestDate:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onHarvestDate') ||
-          this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate') ||
-          formDataExtra?.hiHarvestDate ||
-          null,
-        hiNumberHarvestLabels: linked && harvestPhaseLabels && harvestPhaseLabels.length > 0 ? harvestPhaseLabels : null,
-        hiNumberHarvest: linked ? hiNumberHarvest : null,
-        formDataExtra,
-        // 3. PRE_PROCESSING: RECEIVING_MATERIAL, DIARY_PROCESS
-        rmTeamExecution: this.getFieldValue(forms, 'PRE_PROCESSING', 'RECEIVING_MATERIAL', 'rmTeamExecution'),
-        rmAddress: this.getFieldValue(forms, 'PRE_PROCESSING', 'RECEIVING_MATERIAL', 'rmAddress'),
+        // 3. PRE_PROCESSING: DIARY_PROCESS
         diaryProcessGroup: this.getGroupData(forms, 'PRE_PROCESSING', 'DIARY_PROCESS'),
-        // 4. PACKING_QR: LOT_FINISHED_PRODUCT, INGREDIENT_INSTRUCTION
-        lfpPackagingAddress: this.getFieldValue(forms, 'PACKING_QR', 'LOT_FINISHED_PRODUCT', 'lfpPackagingAddress'),
+        // 4. PACKING_QR: INGREDIENT_INSTRUCTION
         iiIngredients: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiIngredients'),
         iiInstructionUse: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiInstructionUse'),
         iiApplicableStandard: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiApplicableStandard'),
@@ -228,7 +207,6 @@ export class TraceabilityFieldsAdminService {
       hiHarvestDate,
       hmWeightingPhoto: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
       todoListGroup: this.getGroupData(forms, 'LOGBOOK_HOUSE', 'SWIFT_HOUSE_TD'),
-      medicineGroup: this.getGroupData(forms, 'LOGBOOK_HOUSE', 'SWIFT_HOUSE_MEDICINE'),
     };
   }
 }
