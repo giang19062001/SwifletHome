@@ -1,11 +1,11 @@
 import { Injectable, Optional } from '@nestjs/common';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { EXTRA_LINKED_FIELDS } from '../common/traceability.const';
+import { LINKED_FIELDS } from '../common/traceability.const';
 import { TraceabilityExternalRepository } from './traceability-external.repository';
 import { generateTraceabilityLotCodeByHarvest } from './traceability.func';
 import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL, TRACE_FORM_LIST_FIELD_SQL } from './traceability.query';
 import { TraceabilityAppRepository } from './traceability.repository';
-import { TraceabilityExtraLinkedDataDto, TraceabilityFieldResDto, TraceabilityGroupResDto } from './traceability.response';
+import { TraceabilityFieldResDto, TraceabilityGroupResDto } from './traceability.response';
 
 @Injectable()
 export class TraceabilityFieldsService {
@@ -176,7 +176,7 @@ export class TraceabilityFieldsService {
                 }));
             } else {
               currentValue = savedData?.[g.groupKey]?.[f.fieldKey] ?? savedData?.[f.fieldKey] ?? null;
-              if (f.fieldType === 'list_readonly' && typeof currentValue === 'string') {
+              if (f.fieldType === 'list_canwrite' && typeof currentValue === 'string') {
                 try {
                   currentValue = JSON.parse(currentValue);
                 } catch (e) {}
@@ -332,7 +332,7 @@ export class TraceabilityFieldsService {
               );
             }
 
-            // Xử lý giá trị danh sách cho các trường dạng list_readonly (vd: shsTodoList)
+            // Xử lý giá trị danh sách cho các trường dạng list_canwrite (vd: shsTodoList)
             const listSql = TRACE_FORM_LIST_FIELD_SQL[field.fieldKey as keyof typeof TRACE_FORM_LIST_FIELD_SQL];
             if (listSql && (field.currentValue === null || field.currentValue === undefined || (Array.isArray(field.currentValue) && field.currentValue.length === 0))) {
               promises.push(
@@ -386,58 +386,65 @@ export class TraceabilityFieldsService {
     return mappedGroups;
   }
 
-  // Trích xuất dữ liệu liên kết từ các đợt truy xuất nội bộ để trả về cho truy xuất ngoại
-  extractExtraFieldsFromInternalSubmissions(submissions: any[]): TraceabilityExtraLinkedDataDto {
-    const allFields = Object.values(EXTRA_LINKED_FIELDS).flatMap(({ fields }) => fields);
-    const data = allFields.reduce((acc, field) => {
-      acc[field.fieldKey] = '';
-      return acc;
-    }, {} as TraceabilityExtraLinkedDataDto);
+  /**
+   * Trích xuất các trường từ các đơn nộp nội bộ (BRIEF_SWIFT_HOUSE form 1, BATCH_HARVEST form 3)
+   * và map sang các trường của form PRODUCTION_ORIGIN (form 9) theo LINKED_FIELDS
+   */
+  extractLinkedFieldsForProductionOrigin(submissions: any[]): {
+    data: Record<string, any>;
+    groupedData: {
+      MANUFACTURER: Record<string, any>;
+      ORIGIN_NEST: Record<string, any>;
+    };
+  } {
+    const data: Record<string, any> = {};
+    const groupedData = {
+      MANUFACTURER: {} as Record<string, any>,
+      ORIGIN_NEST: {} as Record<string, any>,
+    };
 
     submissions.forEach((sub) => {
-      const config = EXTRA_LINKED_FIELDS[sub.formSeq as keyof typeof EXTRA_LINKED_FIELDS];
-
-      if (!config) return;
-
       let parsed: any;
-
       try {
         parsed = typeof sub.formData === 'string' ? JSON.parse(sub.formData) : sub.formData;
       } catch {
         return;
       }
-
       if (!parsed) return;
 
-      const section = parsed[config.key] || (config.key === 'HARVEST_MEASUREMENT' ? parsed['HARVEST_ MEASUREMENT'] : undefined);
-
-      if (!section) return;
-
-      config.fields.forEach((field) => {
-        if (section[field.fieldKey] !== undefined && section[field.fieldKey] !== null) {
-          data[field.fieldKey] = section[field.fieldKey];
+      // Form 1: BRIEF_SWIFT_HOUSE (chứa FACILITY_INFO)
+      if (sub.formSeq === 1) {
+        const facilityInfo = parsed['FACILITY_INFO'];
+        if (facilityInfo && typeof facilityInfo === 'object') {
+          if (facilityInfo.fiIdentificationCode !== undefined && facilityInfo.fiIdentificationCode !== null) {
+            data[LINKED_FIELDS.fiIdentificationCode] = facilityInfo.fiIdentificationCode;
+            groupedData.MANUFACTURER[LINKED_FIELDS.fiIdentificationCode] = facilityInfo.fiIdentificationCode;
+          }
+          if (facilityInfo.facilityName !== undefined && facilityInfo.facilityName !== null) {
+            data[LINKED_FIELDS.facilityName] = facilityInfo.facilityName;
+            groupedData.MANUFACTURER[LINKED_FIELDS.facilityName] = facilityInfo.facilityName;
+          }
+          if (facilityInfo.facilityAddress !== undefined && facilityInfo.facilityAddress !== null) {
+            data[LINKED_FIELDS.facilityAddress] = facilityInfo.facilityAddress;
+            data['mFacilityAddress'] = facilityInfo.facilityAddress;
+            groupedData.MANUFACTURER[LINKED_FIELDS.facilityAddress] = facilityInfo.facilityAddress;
+            groupedData.MANUFACTURER['mFacilityAddress'] = facilityInfo.facilityAddress;
+          }
         }
-      });
+      }
+
+      // Form 3: BATCH_HARVEST (chứa HARVEST_INFORMATION)
+      if (sub.formSeq === 3) {
+        const harvestInfo = parsed['HARVEST_INFORMATION'];
+        if (harvestInfo && typeof harvestInfo === 'object') {
+          if (harvestInfo.hiHarvestDate !== undefined && harvestInfo.hiHarvestDate !== null) {
+            data[LINKED_FIELDS.hiHarvestDate] = harvestInfo.hiHarvestDate;
+            groupedData.ORIGIN_NEST[LINKED_FIELDS.hiHarvestDate] = harvestInfo.hiHarvestDate;
+          }
+        }
+      }
     });
 
-    return data;
-  }
-
-  /**
-   * Sinh danh sách cấu hình động (Schema) cho các trường Thông tin cơ sở liên kết (Extra Linked Fields)
-   * Sử dụng EXTRA_LINKED_FIELDS làm Single Source of Truth
-   * Kèm theo giá trị hiện tại (currentValue) trích xuất từ dữ liệu (nếu có).
-   */
-  getExtraFieldsSchema(data?: Record<string, any>): TraceabilityFieldResDto[] {
-    const allFields = Object.values(EXTRA_LINKED_FIELDS).flatMap(({ fields }) => fields);
-
-    return allFields.map((field) => ({
-      fieldKey: field.fieldKey,
-      fieldName: field.fieldName,
-      fieldType: field.fieldType,
-      isRequired: field.isRequired,
-      config: field.config,
-      currentValue: data?.[field.fieldKey] !== undefined && data?.[field.fieldKey] !== null ? data[field.fieldKey] : null,
-    }));
+    return { data, groupedData };
   }
 }

@@ -79,18 +79,6 @@ export class TraceabilityExtraLinkedDataDto {
 
   @ApiProperty({ example: '123 Đường ABC, Xã XYZ', required: false })
   facilityAddress?: string;
-
-  @ApiProperty({ example: '2023-01-01', required: false })
-  facilityActiveTime?: string;
-
-  @ApiProperty({ example: '150 m2', required: false })
-  facilityArea?: string;
-
-  @ApiProperty({ example: 3, required: false })
-  facilityFloor?: number | string;
-
-  @ApiProperty({ example: 120, required: false })
-  hmNumberNests?: number | string;
 }
 
 export class TraceabilityExtraLinkedInfoDto {
@@ -140,6 +128,9 @@ export class TraceabilityFormResDto {
 
   @ApiProperty({ required: false, description: 'Thông tin cơ sở & thu hoạch liên kết (áp dụng cho external)' })
   extraLinkedInfo?: TraceabilityExtraLinkedInfoDto;
+
+  @ApiProperty({ example: true, required: false, description: 'true nếu khớp lô nội bộ' })
+  isLinkedInternal?: boolean;
 }
 
 export class CheckLotcodeMatchInternalResDto {
@@ -149,8 +140,11 @@ export class CheckLotcodeMatchInternalResDto {
   @ApiProperty({ type: [TraceabilityFieldResDto], required: false })
   fields?: TraceabilityFieldResDto[];
 
-  @ApiProperty({ type: TraceabilityExtraLinkedDataDto, required: false })
-  data?: TraceabilityExtraLinkedDataDto | null;
+  @ApiProperty({ required: false })
+  data?: any;
+
+  @ApiProperty({ required: false, description: 'Dữ liệu phân theo group của form PRODUCTION_ORIGIN' })
+  groupedData?: any;
 }
 
 export class UploadTraceabilityFileResDto {

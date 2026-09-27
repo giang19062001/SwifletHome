@@ -2,7 +2,11 @@
 <% const data = values.traceData; %>
 <% const isExternal = Boolean(data.isExternal); %>
 <% const compact = data.compactData %>
-
+<script>
+  console.log('traceData:', <%- JSON.stringify(data) %>);
+  console.log('isExternal:', <%- JSON.stringify(isExternal) %>);
+  console.log('compactData:', <%- JSON.stringify(compact) %>);
+</script>
 <div class="page-qrcode-update py-3 py-md-4" id="qrcode-global-content">
     <!-- Nút tải PDF nổi góc dưới màn hình -->
     <!-- <div class="pdf-floating-btn" data-html2canvas-ignore="true">
@@ -30,7 +34,7 @@
                                 <i class="fa fa-check-circle me-1"></i> ĐÃ XÁC THỰC HỆ THỐNG
                             </span>
                             <h3 class="mb-0 fw-bold fs-4 text-white">XÁC THỰC TRUY XUẤT NGUỒN GỐC</h3>
-                            <p class="mb-0 text-white-50 small">Hồ sơ điện tử truy xuất yến sào 3FAM</p>
+                            <p class="mb-0 text-white-50 small">Hồ sơ điện tử truy xuất sản phẩm 3FAM</p>
                         </div>
                     </div>
                     <div>
@@ -60,45 +64,37 @@
             <!-- TRUY XUẤT NỘI BỘ (INTERNAL) -->
             <!-- ========================================== -->
 
-            <!-- Thẻ 1: Thông tin cơ sở sản xuất -->
+            <!-- Thẻ 1: Thông tin cơ sở -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
                     <div class="icon-box me-3">
                         <i class="fa fa-home fa-lg"></i>
                     </div>
-                    <h5 class="mb-0 fw-bold text-dark">Thông tin cơ sở sản xuất</h5>
+                    <h5 class="mb-0 fw-bold text-dark">Thông tin cơ sở</h5>
                 </div>
                 <div class="card-body p-3 p-md-4">
                     <div class="row g-3">
-                        <div class="col-md-6 col-12">
+                        <div class="col-12">
                             <div class="field-container">
-                                <div class="field-label text-muted small">Tên cơ sở (nhà yến)</div>
+                                <div class="field-label text-muted small">Tên chủ nhà yến</div>
                                 <div class="field-value fw-bold fs-6">
-                                    <%= compact.facilityName || data.homeInfo?.userHomeName || '-' %>
+                                    <%= compact.personInCharge || data.homeInfo?.userName || '-' %>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-12">
                             <div class="field-container">
-                                <div class="field-label text-muted small">Mã định danh cơ sở</div>
+                                <div class="field-label text-muted small">Mã định danh cơ sở do bộ Nông Nghiệp cấp</div>
                                 <div class="field-value fw-bold fs-6 text-primary">
                                     <%= compact.fiIdentificationCode || '-' %>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-12">
                             <div class="field-container">
                                 <div class="field-label text-muted small">Địa chỉ sản xuất</div>
                                 <div class="field-value">
                                     <%= compact.facilityAddress || data.homeInfo?.userHomeAddress || '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Mã lô thu hoạch</div>
-                                <div class="field-value fw-bold text-dark">
-                                    <%= compact.lotcode || data.lotcode || '-' %>
                                 </div>
                             </div>
                         </div>
@@ -116,27 +112,20 @@
                 </div>
                 <div class="card-body p-3 p-md-4">
                     <div class="row g-3">
-                        <div class="col-md-4 col-12">
+                        <div class="col-12">
                             <div class="field-container">
-                                <div class="field-label text-muted small">Số đợt thu hoạch</div>
-                                <div class="field-value fw-bold fs-6">
-                                    <%= Array.isArray(compact.hiNumberHarvest) ? compact.hiNumberHarvest.join(', ') : (compact.hiNumberHarvest || '-') %>
+                                <div class="field-label text-muted small">Mã lô sản phẩm</div>
+                                <div class="field-value fw-bold text-dark">
+                                    <%= compact.lotcode || data.lotcode || '-' %>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-12">
+
+                        <div class="col-12">
                             <div class="field-container">
-                                <div class="field-label text-muted small">Số lượng tổ</div>
+                                <div class="field-label text-muted small">Ngày thu hoạch tổ yến</div>
                                 <div class="field-value fw-bold fs-6">
-                                    <%= (compact.hmNumberNests !== null && compact.hmNumberNests !== undefined && compact.hmNumberNests !== '') ? compact.hmNumberNests + ' tổ' : '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Khối lượng thu hoạch</div>
-                                <div class="field-value fw-bold fs-6 text-success">
-                                    <%= (compact.hmWeight !== null && compact.hmWeight !== undefined && compact.hmWeight !== '') ? compact.hmWeight + ' gram' : '-' %>
+                                    <%= compact.hiHarvestDate || '-' %>
                                 </div>
                             </div>
                         </div>
@@ -145,9 +134,9 @@
                             <% const photoUrl = typeof compact.hmWeightingPhoto === 'object' ? compact.hmWeightingPhoto?.url : compact.hmWeightingPhoto; %>
                             <% if (photoUrl) { %>
                                 <div class="col-12 mt-3">
-                                    <div class="field-label text-muted small mb-2">Ảnh cân thu hoạch:</div>
-                                    <a href="/<%= photoUrl %>" target="_blank" class="d-inline-block">
-                                        <img src="/<%= photoUrl %>" alt="Ảnh cân thu hoạch" class="img-thumbnail rounded shadow-sm" style="max-height: 180px; object-fit: contain;">
+                                    <div class="field-label text-muted small mb-2 fw-bold">Ảnh tổ yến thu hoạch:</div>
+                                    <a href="/<%= photoUrl %>" target="_blank" class="d-block text-center">
+                                        <img src="/<%= photoUrl %>" alt="Ảnh tổ yến thu hoạch" class="img-thumbnail rounded shadow-sm w-100" style="max-height: 380px; object-fit: contain;">
                                     </a>
                                 </div>
                             <% } %>
@@ -162,7 +151,7 @@
                     <div class="icon-box me-3">
                         <i class="fa fa-book fa-lg"></i>
                     </div>
-                    <h5 class="mb-0 fw-bold text-dark">Nhật ký nhà yến</h5>
+                    <h5 class="mb-0 fw-bold text-dark">Nhật ký chăm sóc nhà yến</h5>
                 </div>
                 <div class="card-body p-3 p-md-4">
                     <!-- 1. Các việc đã thực hiện (SWIFT_HOUSE_TD) -->
@@ -170,7 +159,7 @@
                         <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
                             <i class="fa fa-tasks me-2"></i> 1. Các việc đã thực hiện
                         </h6>
-                        <% const todoField = compact.todoListGroup?.fields?.find(f => (f.fieldKey || '').toLowerCase().includes('todo') || f.fieldType === 'list_readonly'); %>
+                        <% const todoField = compact.todoListGroup?.fields?.find(f => (f.fieldKey || '').toLowerCase().includes('todo') || f.fieldType === 'list_canwrite'); %>
                         <% const todoItems = todoField?.currentValue; %>
                         <% const todoSubFields = (todoField?.config && (Array.isArray(todoField.config.maps) ? todoField.config.maps : (Array.isArray(todoField.config.fields) ? todoField.config.fields : []))) || []; %>
                         <% if (Array.isArray(todoItems) && todoItems.length > 0) { %>
@@ -197,9 +186,7 @@
                                                 <% if (todoSubFields.length > 0) { %>
                                                     <% todoSubFields.forEach(sub => { %>
                                                         <% const val = item[sub.fieldKey]; %>
-                                                        <% if (sub.fieldKey === 'taskStatus' || sub.fieldKey === 'status' || sub.fieldKey === 'todoStatus') { %>
-                                                            <td><span class="badge bg-light text-dark border"><%= val || '-' %></span></td>
-                                                        <% } else if (sub.fieldKey === 'taskName' || sub.fieldKey === 'name') { %>
+                                                        <% if (sub.fieldKey === 'taskName' || sub.fieldKey === 'name') { %>
                                                             <td class="fw-medium"><%= val || '-' %></td>
                                                         <% } else { %>
                                                             <td class="text-muted small"><%= val || '-' %></td>
@@ -207,11 +194,6 @@
                                                     <% }) %>
                                                 <% } else { %>
                                                     <td class="fw-medium"><%= item.taskName || item.todoName || item.title || item.name || '-' %></td>
-                                                    <td>
-                                                        <span class="badge bg-light text-dark border">
-                                                            <%= item.taskStatus || item.todoStatus || item.status || '-' %>
-                                                        </span>
-                                                    </td>
                                                     <td class="text-muted small"><%= item.taskDate || item.createdAt || item.time || '-' %></td>
                                                 <% } %>
                                             </tr>
@@ -231,7 +213,7 @@
                         <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
                             <i class="fa fa-spray-can me-2"></i> 2. Lịch sử lăn thuốc
                         </h6>
-                        <% const medField = compact.medicineGroup?.fields?.find(f => (f.fieldKey || '').toLowerCase().includes('medicine') || f.fieldType === 'list_readonly'); %>
+                        <% const medField = compact.medicineGroup?.fields?.find(f => (f.fieldKey || '').toLowerCase().includes('medicine') || f.fieldType === 'list_canwrite'); %>
                         <% const medItems = medField?.currentValue; %>
                         <% const medSubFields = (medField?.config && (Array.isArray(medField.config.maps) ? medField.config.maps : (Array.isArray(medField.config.fields) ? medField.config.fields : []))) || []; %>
                         <% if (Array.isArray(medItems) && medItems.length > 0) { %>
@@ -283,99 +265,130 @@
 
         <% } else { %>
             <!-- ========================================== -->
-            <!-- TRUY XUẤT MỞ RỘNG (EXTERNAL) -->
+            <!-- ========================================== -->
+            <!-- TRUY XUẤT MỞ RỘNG (EXTERNAL) - THEO EXTERNAL_WHITELIST -->
             <!-- ========================================== -->
 
-            <!-- Thẻ 1: Thông tin cơ sở & thu hoạch ban đầu (formDataExtra) -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
-                    <div class="icon-box me-3">
-                        <i class="fa fa-warehouse fa-lg"></i>
-                    </div>
-                    <h5 class="mb-0 fw-bold text-dark">Thông tin cơ sở & Thu hoạch ban đầu</h5>
-                </div>
-                <div class="card-body p-3 p-md-4">
-                    <% const extra = compact.formDataExtra || data.formDataExtra || {}; %>
-                    <div class="row g-3">
-                        <div class="col-md-6 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Mã lô liên kết</div>
-                                <div class="field-value fw-bold text-success fs-6">
-                                    <%= compact.lotcode || data.lotcode || '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Mã định danh cơ sở (Bộ NN cấp)</div>
-                                <div class="field-value fw-bold text-primary">
-                                    <%= extra.fiIdentificationCode || '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Tên cơ sở (nhà yến)</div>
-                                <div class="field-value fw-bold">
-                                    <%= extra.facilityName || '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Địa chỉ cơ sở</div>
-                                <div class="field-value">
-                                    <%= extra.facilityAddress || '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Thời gian hoạt động</div>
-                                <div class="field-value">
-                                    <%= extra.facilityActiveTime || '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Diện tích cơ sở</div>
-                                <div class="field-value">
-                                    <%= extra.facilityArea ? extra.facilityArea : '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Số tầng</div>
-                                <div class="field-value">
-                                    <%= (extra.facilityFloor !== undefined && extra.facilityFloor !== null && extra.facilityFloor !== '') ? extra.facilityFloor : '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Số lượng tổ</div>
-                                <div class="field-value fw-bold">
-                                    <%= (extra.hmNumberNests !== undefined && extra.hmNumberNests !== null && extra.hmNumberNests !== '') ? extra.hmNumberNests : '-' %>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Thẻ 2: Tiếp nhận nguyên liệu & Sơ chế (PRE_PROCESSING) -->
+            <!-- Thẻ 1: Thông tin nhà sản xuất (MANUFACTURER) -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
                     <div class="icon-box me-3">
                         <i class="fa fa-industry fa-lg"></i>
                     </div>
-                    <h5 class="mb-0 fw-bold text-dark">Tiếp nhận & Sơ chế nguyên liệu</h5>
+                    <h5 class="mb-0 fw-bold text-dark">Thông tin nhà sản xuất</h5>
+                </div>
+                <div class="card-body p-3 p-md-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small">Tên nhà yến sản xuất</div>
+                                <div class="field-value fw-bold fs-6">
+                                    <%= compact.facilityName || compact.personInCharge || '-' %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small">Mã định danh cơ sở do bộ Nông Nghiệp cấp</div>
+                                <div class="field-value fw-bold fs-6 text-primary">
+                                    <%= compact.fiIdentificationCode || '-' %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small">Địa chỉ cơ sở sản xuất</div>
+                                <div class="field-value">
+                                    <%= compact.facilityAddress || '-' %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% const certVal = compact.mCertificationFile || compact.fiCertificationFile; %>
+                        <% if (certVal) { %>
+                            <% 
+                                let certFiles = [];
+                                if (Array.isArray(certVal)) {
+                                    certFiles = certVal.map(f => typeof f === 'object' ? f?.url : f).filter(Boolean);
+                                } else if (certVal) {
+                                    const singleUrl = typeof certVal === 'object' ? certVal?.url : certVal;
+                                    if (singleUrl) certFiles.push(singleUrl);
+                                }
+                            %>
+                            <% if (certFiles.length > 0) { %>
+                                <div class="col-12">
+                                    <div class="field-container">
+                                        <div class="field-label text-muted small mb-2">Giấy chứng nhận cơ sở:</div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <% certFiles.forEach(function(fileUrl, idx) { %>
+                                                <a href="/<%= fileUrl %>" target="_blank" class="btn btn-sm btn-outline-primary py-1 px-3 d-inline-flex align-items-center">
+                                                    <i class="fa fa-file-alt me-2"></i>Xem file chứng nhận <%= certFiles.length > 1 ? (idx + 1) : '' %>
+                                                    <i class="fa fa-external-link-alt ms-2 small"></i>
+                                                </a>
+                                            <% }); %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thẻ 2: Nguồn gốc sản phẩm (ORIGIN_NEST) -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
+                    <div class="icon-box me-3">
+                        <i class="fa fa-warehouse fa-lg"></i>
+                    </div>
+                    <h5 class="mb-0 fw-bold text-dark">Nguồn gốc sản phẩm</h5>
+                </div>
+                <div class="card-body p-3 p-md-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small">Địa chỉ khu vực sản xuất/thu hoạch</div>
+                                <div class="field-value fs-6 fw-bold text-dark">
+                                    <%= compact.onAddressArea || compact.facilityAddress || '-' %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small">Ngày thu hoạch tổ yến</div>
+                                <div class="field-value fw-bold">
+                                    <%= compact.onHarvestDate || compact.hiHarvestDate %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% if (compact.onWeightingPhoto) { %>
+                            <% const photoUrl = typeof compact.onWeightingPhoto === 'object' ? compact.onWeightingPhoto?.url : compact.onWeightingPhoto; %>
+                            <% if (photoUrl) { %>
+                                <div class="col-12 mt-3">
+                                    <div class="field-label text-muted small mb-2 fw-bold">Ảnh tổ yến thu hoạch:</div>
+                                    <a href="/<%= photoUrl %>" target="_blank" class="d-block text-center">
+                                        <img src="/<%= photoUrl %>" alt="Ảnh cân tổ yến" class="img-thumbnail rounded shadow-sm w-100" style="max-height: 380px; object-fit: contain;">
+                                    </a>
+                                </div>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thẻ 3: Tiếp nhận nguyên liệu & Sơ chế (PRE_PROCESSING) -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
+                    <div class="icon-box me-3">
+                        <i class="fa fa-industry fa-lg"></i>
+                    </div>
+                    <h5 class="mb-0 fw-bold text-dark">Tiếp nhận & Sơ chế & Chế biến</h5>
                 </div>
                 <div class="card-body p-3 p-md-4">
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6 col-12">
+                        <div class="col-12">
                             <div class="field-container">
                                 <div class="field-label text-muted small">Cơ sở thực hiện sơ chế</div>
                                 <div class="field-value fw-bold fs-6">
@@ -383,7 +396,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-12">
                             <div class="field-container">
                                 <div class="field-label text-muted small">Địa chỉ cơ sở sơ chế</div>
                                 <div class="field-value">
@@ -394,7 +407,7 @@
                     </div>
 
                     <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
-                        <i class="fa fa-stream me-2"></i> Nhật ký công đoạn sơ chế
+                        <i class="fa fa-stream me-2"></i> Nhật ký các công đoạn
                     </h6>
 
                     <% const stages = compact.diaryProcessGroup?.loopValues; %>
@@ -402,31 +415,51 @@
                         <div class="row g-3">
                             <% stages.forEach((stage, sIdx) => { %>
                                 <div class="col-12">
-                                    <div class="card border bg-light p-3 shadow-none mb-2">
-                                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom pb-2 mb-2">
+                                    <div class="card border bg-light p-3 shadow-none mb-2 rounded-3">
+                                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom pb-2 mb-3">
                                             <span class="fw-bold text-success fs-6">
-                                                <i class="fa fa-check-circle me-1"></i> Công đoạn <%= sIdx + 1 %>: <%= stage.dpProcessName || 'Không tên' %>
+                                                <i class="fa fa-tasks me-1"></i> Công đoạn <%= sIdx + 1 %>: <%= stage.dpProcessName || 'Không tên' %>
                                             </span>
-                                            <span class="text-muted small">
-                                                <i class="fa fa-user me-1"></i> <%= stage.dpProcesser || 'Người thực hiện: -' %>
-                                            </span>
+                                            <% if (stage.dpProcesser) { %>
+                                                <span class="badge bg-white text-secondary border px-2 py-1">
+                                                    <i class="fa fa-user me-1 text-primary"></i> Người thực hiện: <%= stage.dpProcesser %>
+                                                </span>
+                                            <% } %>
                                         </div>
-                                        <div class="row g-2 align-items-center">
-                                            <div class="col-md-8 col-12">
-                                                <div class="small text-muted mb-1">
-                                                    <i class="fa fa-clock me-1"></i> <strong>Thời gian:</strong> 
-                                                    <%= stage.dpProcessStartTime || '-' %> 
-                                                    <% if (stage.dpProcessEndTime) { %>
-                                                        đến <%= stage.dpProcessEndTime %>
+
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <div class="d-flex flex-column gap-2 small">
+                                                    <% if (stage.dpProcessTime) { %>
+                                                        <div>
+                                                            <span class="text-muted"><i class="fa fa-calendar-alt me-1 text-secondary"></i> Ngày thực hiện:</span>
+                                                            <strong class="text-dark ms-1"><%= stage.dpProcessTime %></strong>
+                                                        </div>
+                                                    <% } %>
+
+                                                    <% if (stage.dpAddress) { %>
+                                                        <div>
+                                                            <span class="text-muted"><i class="fa fa-map-marker-alt me-1 text-secondary"></i> Địa điểm:</span>
+                                                            <span class="text-dark ms-1"><%= stage.dpAddress %></span>
+                                                        </div>
+                                                    <% } %>
+
+                                                    <% if (stage.dpNote) { %>
+                                                        <div>
+                                                            <span class="text-muted"><i class="fa fa-sticky-note me-1 text-secondary"></i> Ghi chú:</span>
+                                                            <span class="text-dark ms-1 fst-italic"><%= stage.dpNote %></span>
+                                                        </div>
                                                     <% } %>
                                                 </div>
                                             </div>
+
                                             <% const fileVal = stage.dpProcessFile; %>
                                             <% const fileUrl = typeof fileVal === 'object' ? fileVal?.url : fileVal; %>
                                             <% if (fileUrl) { %>
-                                                <div class="col-md-4 col-12 text-md-end">
+                                                <div class="col-12">
+                                                    <div class="field-label text-muted small mb-1">Ảnh công đoạn:</div>
                                                     <a href="/<%= fileUrl %>" target="_blank" class="d-inline-block">
-                                                        <img src="/<%= fileUrl %>" alt="Ảnh công đoạn" class="img-thumbnail rounded shadow-sm" style="max-height: 80px; object-fit: contain;">
+                                                        <img src="/<%= fileUrl %>" alt="Ảnh công đoạn" class="img-thumbnail rounded shadow-sm" style="max-height: 160px; max-width: 100%; object-fit: contain;">
                                                     </a>
                                                 </div>
                                             <% } %>
@@ -441,33 +474,25 @@
                 </div>
             </div>
 
-            <!-- Thẻ 3: Thông tin sản phẩm & Đóng gói (PACKING_QR) -->
+            <!-- Thẻ 4: Thông tin sản phẩm (PACKING_QR) -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
                     <div class="icon-box me-3">
                         <i class="fa fa-box-open fa-lg"></i>
                     </div>
-                    <h5 class="mb-0 fw-bold text-dark">Thông tin sản phẩm & Đóng gói</h5>
+                    <h5 class="mb-0 fw-bold text-dark">Thông tin sản phẩm</h5>
                 </div>
                 <div class="card-body p-3 p-md-4">
                     <div class="row g-3">
-                        <div class="col-md-6 col-12">
+                        <div class="col-12">
                             <div class="field-container">
-                                <div class="field-label text-muted small">Tên sản phẩm</div>
-                                <div class="field-value fw-bold fs-6 text-primary">
-                                    <%= compact.pcProductName || '-' %>
+                                <div class="field-label text-muted small">Thành phần</div>
+                                <div class="field-value fw-bold text-dark">
+                                    <%= compact.iiIngredients || '-' %>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Quy cách cơ bản</div>
-                                <div class="field-value">
-                                    <%= compact.pcBasicSpecification || '-' %>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-12">
                             <div class="field-container">
                                 <div class="field-label text-muted small">Tiêu chuẩn áp dụng</div>
                                 <div class="field-value fw-bold text-success">
@@ -475,7 +500,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-12">
                             <div class="field-container">
                                 <div class="field-label text-muted small">Hướng dẫn sử dụng</div>
                                 <div class="field-value">
@@ -491,7 +516,7 @@
 
         <!-- Footer / Thông tin bản quyền -->
         <div class="text-center py-4 text-muted small">
-            <p class="mb-1">© <%= new Date().getFullYear() %> Hệ thống Quản trị & Truy xuất Yến sào 3FAM</p>
+            <p class="mb-1">© <%= new Date().getFullYear() %> Hệ thống Quản trị & Truy xuất sản phẩm 3FAM</p>
             <p class="mb-0">Chứng nhận xác thực nguồn gốc điện tử chính thức</p>
         </div>
     </div>

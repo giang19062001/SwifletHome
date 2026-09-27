@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { INTERNAL_WHITELIST, EXTERNAL_WHITELIST } from '../common/traceability.const';
+import { EXTERNAL_WHITELIST, INTERNAL_WHITELIST } from '../common/traceability.const';
 
 @Injectable()
 export class TraceabilityFieldsAdminService {
@@ -34,7 +34,7 @@ export class TraceabilityFieldsAdminService {
                 }));
             } else {
               currentValue = savedData?.[g.groupKey]?.[f.fieldKey] ?? savedData?.[f.fieldKey] ?? null;
-              if (f.fieldType === 'list_readonly' && typeof currentValue === 'string') {
+              if (f.fieldType === 'list_canwrite' && typeof currentValue === 'string') {
                 try {
                   currentValue = JSON.parse(currentValue);
                 } catch (e) {}
@@ -142,31 +142,90 @@ export class TraceabilityFieldsAdminService {
     return form?.submission?.groups?.find((g: any) => this.cleanKey(g.groupKey) === this.cleanKey(groupKey)) ?? null;
   }
 
-  buildCompactData(params: { isExternal: boolean; lotcode: string; formDataExtra: any; homeInfo: any; forms: any[] }): any {
-    const { isExternal, lotcode, formDataExtra, homeInfo, forms } = params;
+  buildCompactData(params: { isExternal: boolean; isLinkedInternal?: boolean; lotcode: string; formDataExtra: any; homeInfo: any; forms: any[]; harvestPhaseLabels?: string[] }): any {
+    const { isExternal, isLinkedInternal, lotcode, formDataExtra, homeInfo, forms, harvestPhaseLabels } = params;
 
     if (isExternal) {
+      const linked = Boolean(isLinkedInternal);
+      const hiNumberHarvest = formDataExtra?.hiNumberHarvest || (harvestPhaseLabels && harvestPhaseLabels.length > 0 ? harvestPhaseLabels : null);
+
       return {
+        isExternal: true,
+        isLinkedInternal: linked,
         lotcode,
+        // 1. PRODUCTION_ORIGIN: MANUFACTURER
+        facilityName:
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityName') ||
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'facilityName') ||
+          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') ||
+          (linked ? homeInfo?.userHomeName : '') ||
+          formDataExtra?.facilityName ||
+          '',
+        fiIdentificationCode:
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mdentificationCode') ||
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mIdentificationCode') ||
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'fiIdentificationCode') ||
+          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiIdentificationCode') ||
+          formDataExtra?.fiIdentificationCode ||
+          '',
+        facilityAddress:
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mfacilityAddress') ||
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityAddress') ||
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'facilityAddress') ||
+          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') ||
+          (linked ? homeInfo?.userHomeAddress : '') ||
+          formDataExtra?.facilityAddress ||
+          '',
+        mCertificationFile:
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mCertificationFile') ||
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'fiCertificationFile') ||
+          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'mCertificationFile') ||
+          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiCertificationFile'),
+        // 2. PRODUCTION_ORIGIN: ORIGIN_NEST
+        onHarvestDate:
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onHarvestDate') ||
+          this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate') ||
+          formDataExtra?.hiHarvestDate ||
+          null,
+        onAddressArea:
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onAddressArea') ||
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'addressArea') ||
+          '',
+        onWeightingPhoto:
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightingPhoto') ||
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightPhoto') ||
+          this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
+        hiHarvestDate:
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onHarvestDate') ||
+          this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate') ||
+          formDataExtra?.hiHarvestDate ||
+          null,
+        hiNumberHarvestLabels: linked && harvestPhaseLabels && harvestPhaseLabels.length > 0 ? harvestPhaseLabels : null,
+        hiNumberHarvest: linked ? hiNumberHarvest : null,
         formDataExtra,
+        // 3. PRE_PROCESSING: RECEIVING_MATERIAL, DIARY_PROCESS
         rmTeamExecution: this.getFieldValue(forms, 'PRE_PROCESSING', 'RECEIVING_MATERIAL', 'rmTeamExecution'),
         rmAddress: this.getFieldValue(forms, 'PRE_PROCESSING', 'RECEIVING_MATERIAL', 'rmAddress'),
         diaryProcessGroup: this.getGroupData(forms, 'PRE_PROCESSING', 'DIARY_PROCESS'),
-        pcProductName: this.getFieldValue(forms, 'PACKING_QR', 'PRODUCT_CATALOG', 'pcProductName'),
-        pcBasicSpecification: this.getFieldValue(forms, 'PACKING_QR', 'PRODUCT_CATALOG', 'pcBasicSpecification'),
-        iiApplicableStandard: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiApplicableStandard'),
+        // 4. PACKING_QR: LOT_FINISHED_PRODUCT, INGREDIENT_INSTRUCTION
+        lfpPackagingAddress: this.getFieldValue(forms, 'PACKING_QR', 'LOT_FINISHED_PRODUCT', 'lfpPackagingAddress'),
+        iiIngredients: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiIngredients'),
         iiInstructionUse: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiInstructionUse'),
+        iiApplicableStandard: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiApplicableStandard'),
       };
     }
 
+    const hiHarvestDate = this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate');
+
     return {
+      isExternal: false,
+      isLinkedInternal: false,
       lotcode,
+      personInCharge: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'personInCharge') || homeInfo?.userName || '',
       facilityName: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') || homeInfo?.userHomeName || '',
-      fiIdentificationCode: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiIdentificationCode') || '',
+      fiIdentificationCode: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiIdentificationCode') || homeInfo?.fiIdentificationCode || homeInfo?.userHomeCode || '',
       facilityAddress: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') || homeInfo?.userHomeAddress || '',
-      hiNumberHarvest: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiNumberHarvest'),
-      hmNumberNests: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmNumberNests'),
-      hmWeight: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeight'),
+      hiHarvestDate,
       hmWeightingPhoto: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
       todoListGroup: this.getGroupData(forms, 'LOGBOOK_HOUSE', 'SWIFT_HOUSE_TD'),
       medicineGroup: this.getGroupData(forms, 'LOGBOOK_HOUSE', 'SWIFT_HOUSE_MEDICINE'),

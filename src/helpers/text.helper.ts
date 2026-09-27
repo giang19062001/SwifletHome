@@ -34,7 +34,7 @@ export const NOTIFICATIONS = {
 export const TEXTS = {
   PACKAGE_FREE: 'Gói dùng thử',
   PHASE: 'Đợt',
-  NEST_TITLE: 'Tổ',
+  NEST_TITLE: 'Tổ yến',
   HARVEST_DATE: 'Ngày thu hoạch',
 };
 

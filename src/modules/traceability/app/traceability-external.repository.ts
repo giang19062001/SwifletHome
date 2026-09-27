@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { CODES } from 'src/helpers/const.helper';
 import { generateCode } from 'src/helpers/func.helper';
+import { TEXTS } from 'src/helpers/text.helper';
 import { FINAL_FORM_SEQ } from '../common/traceability.const';
 import { TraceabilityStatusEnum } from '../common/traceability.enum';
 import { GetSubmissionBatchListDto } from './traceability.dto';
@@ -18,6 +19,7 @@ export class TraceabilityExternalRepository {
   private readonly tableBatchesExtraLinked = 'tbl_traceability_batches_extra_linked';
   private readonly tableSubmissionsInl = 'tbl_traceability_submissions';
   private readonly tableBatchesInl = 'tbl_traceability_batches';
+  private readonly tableUserHomes = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -332,14 +334,63 @@ export class TraceabilityExternalRepository {
     return rows[0] || null;
   }
 
+  async getInternalBatchBySeq(seq: number): Promise<RowDataPacket | null> {
+    const sql = `
+      SELECT seq, traceabilityId, userCode, userHomeCode, harvestPhases, lotcode 
+      FROM ${this.tableBatchesInl} 
+      WHERE seq = ? 
+      LIMIT 1
+    `;
+    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [seq]);
+    return rows[0] || null;
+  }
+
   async getInternalSubmissionsForExtra(batchSeq: number): Promise<RowDataPacket[]> {
     const sql = `
       SELECT formSeq, formData 
       FROM ${this.tableSubmissionsInl} 
-      WHERE batchSeq = ? AND formSeq IN (1, 3) AND isActive = 'Y'
+      WHERE batchSeq = ? AND formSeq IN (1, 2, 3) AND isActive = 'Y'
       ORDER BY seq DESC
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [batchSeq]);
+    return rows;
+  }
+
+  async getHarvestPhasesInfo(userCode: string, userHomeCode: string, phases?: number[]): Promise<any[]> {
+    let sql = `
+      SELECT 
+        B.harvestPhase AS value,
+        CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED) AS cellCollected,
+        CONCAT(
+            '${TEXTS.PHASE} ', B.harvestPhase,
+            ' - ',
+            CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED),
+             ' ${TEXTS.NEST_TITLE}'
+        ) AS label
+      FROM ${this.tableUserHomes} A
+      LEFT JOIN tbl_todo_task_harvest_phase B 
+        ON A.userCode = B.userCode 
+        AND A.userHomeCode = B.userHomeCode
+      LEFT JOIN tbl_todo_task_harvest C 
+        ON B.seq = C.seqHarvestPhase
+      WHERE B.seq IS NOT NULL
+        AND A.userCode = ?
+        AND A.userHomeCode = ?
+    `;
+    const params: any[] = [userCode, userHomeCode];
+    if (phases && phases.length > 0) {
+      const placeholders = phases.map(() => '?').join(',');
+      sql += ` AND B.harvestPhase IN (${placeholders})`;
+      params.push(...phases);
+    }
+    sql += `
+      GROUP BY 
+        B.harvestPhase,
+        B.createdAt,
+        B.updatedAt
+      ORDER BY B.harvestPhase ASC
+    `;
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
     return rows;
   }
 

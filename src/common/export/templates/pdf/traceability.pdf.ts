@@ -33,7 +33,7 @@ export class TraceabilityPdfTemplate {
 
         // HEADER BANNER (Formal Legal Style)
         doc.font(fontBold).fontSize(14).fillColor('#71AB33').text('HỆ THỐNG TRUY XUẤT NGUỒN GỐC 3FAM', 40, 40);
-        doc.font(fontRegular).fontSize(10).fillColor('#555555').text('Hồ sơ điện tử truy xuất nguồn gốc sản phẩm yến sào', 40, 58);
+        doc.font(fontRegular).fontSize(10).fillColor('#555555').text('Hồ sơ điện tử truy xuất nguồn gốc sản phẩm sản phẩm', 40, 58);
 
         // Line under header
         doc.moveTo(40, 75).lineTo(555, 75).strokeColor('#71AB33').lineWidth(1.5).stroke();
@@ -127,37 +127,35 @@ export class TraceabilityPdfTemplate {
 
           if (!isExternal) {
             // === NỘI BỘ (INTERNAL) ===
-            // I. THÔNG TIN CƠ SỞ CHÍNH
-            renderSectionHeader('I. THÔNG TIN CƠ SỞ CHÍNH');
-            renderKeyValue('Tên cơ sở (nhà yến)', compact.facilityName);
-            renderKeyValue('Mã định danh cơ sở', compact.fiIdentificationCode);
+            // I. THÔNG TIN CƠ SỞ
+            renderSectionHeader('I. THÔNG TIN CƠ SỞ');
+            renderKeyValue('Tên chủ nhà yến', compact.personInCharge);
+            renderKeyValue('Mã định danh cơ sở do bộ Nông Nghiệp cấp', compact.fiIdentificationCode);
             renderKeyValue('Địa chỉ sản xuất', compact.facilityAddress);
-            renderKeyValue('Mã lô sản xuất', compact.lotcode);
             currentY += 10;
 
             // II. THÔNG TIN THU HOẠCH
             renderSectionHeader('II. THÔNG TIN THU HOẠCH');
-            renderKeyValue('Số đợt thu hoạch', Array.isArray(compact.hiNumberHarvest) ? compact.hiNumberHarvest.join(', ') : compact.hiNumberHarvest);
-            renderKeyValue('Số lượng tổ', compact.hmNumberNests ? `${compact.hmNumberNests} tổ` : '-');
-            renderKeyValue('Khối lượng', compact.hmWeight ? `${compact.hmWeight} gram` : '-');
+            renderKeyValue('Mã lô yến', compact.lotcode);
+            renderKeyValue('Ngày thu hoạch tổ yến', compact.hiHarvestDate);
 
             if (compact.hmWeightingPhoto) {
               const photoUrl = typeof compact.hmWeightingPhoto === 'object' ? compact.hmWeightingPhoto?.url : compact.hmWeightingPhoto;
               if (photoUrl) {
-                renderKeyValue('Ảnh cân thu hoạch', '');
+                renderKeyValue('Ảnh tổ yến thu hoạch', '');
                 renderImage(photoUrl);
               }
             }
             currentY += 10;
 
             // III. NHẬT KÝ NHÀ YẾN
-            renderSectionHeader('III. NHẬT KÝ NHÀ YẾN');
+            renderSectionHeader('III. NHẬT KÝ CHĂM SÓC NHÀ YẾN');
 
             // 1. Các việc đã thực hiện (SWIFT_HOUSE_TD)
             checkPageBreak(30);
             doc.font(fontBold).fontSize(10).fillColor('#2D3748').text('1. Các việc đã thực hiện:', 45, currentY);
             currentY += 16;
-            const todoField = compact.todoListGroup?.fields?.find((f: any) => (f.fieldKey || '').toLowerCase().includes('todo') || f.fieldType === 'list_readonly');
+            const todoField = compact.todoListGroup?.fields?.find((f: any) => (f.fieldKey || '').toLowerCase().includes('todo') || f.fieldType === 'list_canwrite');
             const todoItems = todoField?.currentValue;
             const todoSubFields = (todoField?.config && (Array.isArray(todoField.config.maps) ? todoField.config.maps : Array.isArray(todoField.config.fields) ? todoField.config.fields : [])) || [];
 
@@ -173,9 +171,8 @@ export class TraceabilityPdfTemplate {
                     .text(`  ${idx + 1}. ${line}`, 55, currentY);
                 } else {
                   const title = item.taskName || item.todoName || item.title || item.name || '-';
-                  const status = item.taskStatus || item.todoStatus || item.status || '';
                   const time = item.taskDate || item.createdAt || item.time || '';
-                  const details = [status, time].filter(Boolean).join(' - ');
+                  const details = [time].filter(Boolean).join(' - ');
                   doc
                     .font(fontRegular)
                     .fontSize(9)
@@ -194,7 +191,7 @@ export class TraceabilityPdfTemplate {
             checkPageBreak(30);
             doc.font(fontBold).fontSize(10).fillColor('#2D3748').text('2. Lịch sử lăn thuốc:', 45, currentY);
             currentY += 16;
-            const medField = compact.medicineGroup?.fields?.find((f: any) => (f.fieldKey || '').toLowerCase().includes('medicine') || f.fieldType === 'list_readonly');
+            const medField = compact.medicineGroup?.fields?.find((f: any) => (f.fieldKey || '').toLowerCase().includes('medicine') || f.fieldType === 'list_canwrite');
             const medItems = medField?.currentValue;
             const medSubFields = (medField?.config && (Array.isArray(medField.config.maps) ? medField.config.maps : Array.isArray(medField.config.fields) ? medField.config.fields : [])) || [];
 
@@ -226,42 +223,83 @@ export class TraceabilityPdfTemplate {
               currentY += 15;
             }
           } else {
-            // === MỞ RỘNG (EXTERNAL) ===
-            // I. THÔNG TIN CƠ SỞ & THU HOẠCH BAN ĐẦU
-            renderSectionHeader('I. THÔNG TIN CƠ SỞ & THU HOẠCH BAN ĐẦU');
-            renderKeyValue('Mã lô liên kết', compact.lotcode);
-            renderKeyValue('Mã định danh cơ sở', compact.formDataExtra?.fiIdentificationCode);
-            renderKeyValue('Tên cơ sở (nhà yến)', compact.formDataExtra?.facilityName);
-            renderKeyValue('Địa chỉ cơ sở', compact.formDataExtra?.facilityAddress);
-            renderKeyValue('Thời gian bắt đầu hoạt động', compact.formDataExtra?.facilityActiveTime);
-            renderKeyValue('Diện tích cơ sở', compact.formDataExtra?.facilityArea);
-            renderKeyValue('Số tầng', compact.formDataExtra?.facilityFloor);
-            renderKeyValue('Số lượng tổ', compact.formDataExtra?.hmNumberNests);
+            // I. THÔNG TIN NHÀ SẢN XUẤT (MANUFACTURER)
+            renderSectionHeader('I. THÔNG TIN NHÀ SẢN XUẤT');
+            renderKeyValue('Tên nhà yến sản xuất', compact.facilityName || compact.personInCharge);
+            renderKeyValue('Mã định danh cơ sở do bộ Nông Nghiệp cấp', compact.fiIdentificationCode);
+            renderKeyValue('Địa chỉ cơ sở sản xuất', compact.facilityAddress);
+
+            const certVal = compact.mCertificationFile || compact.fiCertificationFile;
+            if (certVal) {
+              let certFiles: string[] = [];
+              if (Array.isArray(certVal)) {
+                certFiles = certVal.map((f: any) => (typeof f === 'object' ? f?.url : f)).filter(Boolean);
+              } else if (certVal) {
+                const singleUrl = typeof certVal === 'object' ? certVal?.url : certVal;
+                if (singleUrl) certFiles.push(singleUrl);
+              }
+              if (certFiles.length > 0) {
+                let hostDomain = '';
+                if (qrContent) {
+                  try {
+                    const parsedUrl = new URL(qrContent);
+                    hostDomain = parsedUrl.origin;
+                  } catch (e) {
+                    hostDomain = '';
+                  }
+                }
+                checkPageBreak(20);
+                doc.font(fontBold).fontSize(9.5).fillColor('#333333').text('Giấy chứng nhận cơ sở:', 45, currentY);
+                currentY += 16;
+                certFiles.forEach((fileUrl: string) => {
+                  checkPageBreak(18);
+                  const fullUrl = `${hostDomain}/${fileUrl.replace(/^\/+/, '')}`;
+                  doc.font(fontRegular).fontSize(8.5).fillColor('#2B6CB0').text(`  • ${fullUrl}`, 55, currentY);
+                  currentY += 15;
+                });
+              }
+            }
             currentY += 10;
 
-            // II. TIẾP NHẬN NGUYÊN LIỆU & NHẬT KÝ SƠ CHẾ
-            renderSectionHeader('II. TIẾP NHẬN NGUYÊN LIỆU & NHẬT KÝ SƠ CHẾ');
-            renderKeyValue('Cơ sở thực hiện', compact.rmTeamExecution);
-            renderKeyValue('Địa chỉ cơ sở', compact.rmAddress);
-            currentY += 8;
+            // II. NGUỒN GỐC SẢN PHẨM (ORIGIN_NEST)
+            renderSectionHeader('II. NGUỒN GỐC SẢN PHẨM');
+            renderKeyValue('Địa chỉ khu vực sản xuất/ thu hoạch', compact.onAddressArea || compact.facilityAddress);
 
-            checkPageBreak(30);
-            doc.font(fontBold).fontSize(10).fillColor('#2D3748').text('Nhật ký các công đoạn sơ chế:', 45, currentY);
-            currentY += 16;
+            renderKeyValue('Ngày thu hoạch tổ yến', compact.onHarvestDate || compact.hiHarvestDate);
+
+            if (compact.onWeightingPhoto) {
+              const photoUrl = typeof compact.onWeightingPhoto === 'object' ? compact.onWeightingPhoto?.url : compact.onWeightingPhoto;
+              if (photoUrl) {
+                renderKeyValue('Ảnh cân tổ yến thu hoạch', '');
+                renderImage(photoUrl);
+              }
+            }
+            currentY += 10;
+
+            // III. TIẾP NHẬN NGUYÊN LIỆU & SƠ CHẾ (PRE_PROCESSING)
+            renderSectionHeader('III. TIẾP NHẬN NGUYÊN LIỆU & SƠ CHẾ');
+            renderKeyValue('Cơ sở thực hiện sơ chế', compact.rmTeamExecution);
+            renderKeyValue('Địa chỉ cơ sở sơ chế', compact.rmAddress);
+            currentY += 8;
 
             const stages = compact.diaryProcessGroup?.loopValues;
             if (Array.isArray(stages) && stages.length > 0) {
+              checkPageBreak(30);
+              doc.font(fontBold).fontSize(10).fillColor('#2D3748').text('Nhật ký các công đoạn:', 45, currentY);
+              currentY += 16;
+
               stages.forEach((stage: any, sIdx: number) => {
-                checkPageBreak(45);
+                checkPageBreak(50);
                 doc
                   .font(fontBold)
                   .fontSize(9.5)
                   .fillColor('#71AB33')
                   .text(`• Công đoạn ${sIdx + 1}: ${stage.dpProcessName || '-'}`, 55, currentY);
                 currentY += 16;
-                const timeRange = [stage.dpProcessStartTime, stage.dpProcessEndTime].filter(Boolean).join('  đến  ');
-                if (timeRange) renderKeyValue('Thời gian thực hiện', timeRange, 65);
+                if (stage.dpProcessTime) renderKeyValue('Ngày thực hiện', stage.dpProcessTime, 65);
                 if (stage.dpProcesser) renderKeyValue('Người thực hiện', stage.dpProcesser, 65);
+                if (stage.dpAddress) renderKeyValue('Địa điểm', stage.dpAddress, 65);
+                if (stage.dpNote) renderKeyValue('Ghi chú', stage.dpNote, 65);
 
                 const fileVal = stage.dpProcessFile;
                 const fileUrl = typeof fileVal === 'object' ? fileVal?.url : fileVal;
@@ -270,16 +308,12 @@ export class TraceabilityPdfTemplate {
                 }
                 currentY += 6;
               });
-            } else {
-              doc.font(fontRegular).fontSize(9).fillColor('#718096').text('  Chưa có dữ liệu công đoạn sơ chế.', 55, currentY);
-              currentY += 15;
             }
             currentY += 10;
 
-            // III. THÔNG TIN SẢN PHẨM & ĐÓNG GÓI
-            renderSectionHeader('III. THÔNG TIN SẢN PHẨM & ĐÓNG GÓI');
-            renderKeyValue('Tên sản phẩm', compact.pcProductName);
-            renderKeyValue('Quy cách cơ bản', compact.pcBasicSpecification);
+            // IV. THÔNG TIN SẢN PHẨM (PACKING_QR)
+            renderSectionHeader('IV. THÔNG TIN SẢN PHẨM');
+            renderKeyValue('Thành phần', compact.iiIngredients);
             renderKeyValue('Tiêu chuẩn áp dụng', compact.iiApplicableStandard);
             renderKeyValue('Hướng dẫn sử dụng', compact.iiInstructionUse);
           }
@@ -390,7 +424,7 @@ export class TraceabilityPdfTemplate {
                           } else {
                             valStr = 'Chưa có tệp đính kèm';
                           }
-                        } else if (field.fieldType === 'list_readonly' && Array.isArray(field.currentValue)) {
+                        } else if (field.fieldType === 'list_canwrite' && Array.isArray(field.currentValue)) {
                           const subFields = (field.config && (Array.isArray(field.config.maps) ? field.config.maps : Array.isArray(field.config.fields) ? field.config.fields : [])) || [];
                           if (field.currentValue.length === 0) {
                             valStr = 'Không có dữ liệu';

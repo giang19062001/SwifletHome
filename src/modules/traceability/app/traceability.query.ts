@@ -1,34 +1,38 @@
-import { TODO_CONST } from 'src/modules/todo/common/todo.const';
 import { generateSeriCode } from './traceability.func';
 import { TEXTS } from 'src/helpers/text.helper';
 
+// chỉ lấy 6 tháng gần nhất
 export const TRACE_FORM_LIST_FIELD_SQL = {
-  shtTodoList: ` SELECT 
-                  A.taskName, 
-                  DATE_FORMAT(A.taskDate, '%Y-%m-%d') AS taskDate, 
-                  CASE 
-                    WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.COMPLETE.value}' THEN '${TODO_CONST.TASK_STATUS.COMPLETE.text}'
-                    WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.WAITING.value}' THEN '${TODO_CONST.TASK_STATUS.WAITING.text}'
-                    WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.CANCEL.value}' THEN '${TODO_CONST.TASK_STATUS.CANCEL.text}'
-                    WHEN A.taskStatus = '${TODO_CONST.TASK_STATUS.SKIP.value}' THEN '${TODO_CONST.TASK_STATUS.SKIP.text}'
-                    ELSE A.taskStatus
-                  END AS taskStatus 
-                FROM tbl_todo_task_alarm A 
-                WHERE A.userCode = :userCode 
-                  AND A.userHomeCode = :userHomeCode 
-                  AND A.isActive = 'Y' AND A.taskName != 'LURING'
-                ORDER BY A.taskDate DESC, A.seq DESC `,
+  shtTodoList: `
+    SELECT
+      A.taskName,
+      DATE_FORMAT(A.taskDate, '%d-%m-%Y') AS taskDate
+    FROM tbl_todo_task_alarm A
+    WHERE A.userCode = :userCode
+      AND A.userHomeCode = :userHomeCode
+      AND A.isActive = 'Y'
+      AND A.taskName != 'LURING'
+      AND A.taskDate >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+      AND A.taskDate <= CURDATE()
+    ORDER BY A.taskDate DESC, A.seq DESC
+  `,
 
-  shmMedicine: ` SELECT  B.valueOption, A.medicineUsage, DATE_FORMAT(A.createdAt, '%Y-%m-%d %H:%i:%s') AS createdAt
-                FROM tbl_todo_task_medicine A
-                JOIN tbl_option_common B
-                ON A.medicineOptionCode = B.code 
-                WHERE A.userCode = :userCode 
-                AND A.userHomeCode = :userHomeCode 
-                AND A.isActive = 'Y'
-                ORDER BY A.taskDate DESC, A.seq DESC    `,
+  shmMedicine: `
+    SELECT
+      B.valueOption,
+      A.medicineUsage,
+      DATE_FORMAT(A.createdAt, '%d-%m-%Y') AS createdAt
+    FROM tbl_todo_task_medicine A
+    JOIN tbl_option_common B
+      ON A.medicineOptionCode = B.code
+    WHERE A.userCode = :userCode
+      AND A.userHomeCode = :userHomeCode
+      AND A.isActive = 'Y'
+      AND A.taskDate >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+      AND A.taskDate <= CURDATE()
+    ORDER BY A.taskDate DESC, A.seq DESC
+  `,
 };
-
 export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
   hiNumberHarvest: ` SELECT 
                     B.harvestPhase AS value,
@@ -37,9 +41,7 @@ export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
                         '${TEXTS.PHASE} ', B.harvestPhase,
                         ' - ',
                         CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED),
-                         ' ${TEXTS.NEST_TITLE} '
-                        ' - ${TEXTS.HARVEST_DATE} ',
-                        DATE_FORMAT(B.createdAt, '%Y/%m/%d')
+                         ' ${TEXTS.NEST_TITLE}'
                     ) AS label
                 FROM tbl_user_home A
                 LEFT JOIN tbl_todo_task_harvest_phase B 

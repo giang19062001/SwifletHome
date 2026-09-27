@@ -187,7 +187,7 @@
                                                                             <% } else { %>
                                                                                 <span class="text-muted small">Chưa có tệp đính kèm</span>
                                                                             <% } %>
-                                                                        <% } else if (field.fieldType === 'list_readonly') { %>
+                                                                        <% } else if (field.fieldType === 'list_canwrite') { %>
                                                                             <% if (Array.isArray(field.currentValue) && field.currentValue.length > 0) { %>
                                                                                 <% const subFields = (field.config && (Array.isArray(field.config.maps) ? field.config.maps : (Array.isArray(field.config.fields) ? field.config.fields : []))) || []; %>
                                                                                 <div class="table-responsive mt-2">

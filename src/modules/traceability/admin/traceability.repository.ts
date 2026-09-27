@@ -238,4 +238,39 @@ export class TraceabilityAdminRepository {
     const [result] = await this.db.execute<any>(sql, [status, updatedId, Number(seq)]);
     return result.affectedRows || 0;
   }
+
+  async getHarvestPhasesInfo(userCode: string, userHomeCode: string, phases: number[]): Promise<RowDataPacket[]> {
+    if (!phases || phases.length === 0) return [];
+    const placeholders = phases.map(() => '?').join(',');
+    const sql = `
+      SELECT 
+        B.harvestPhase AS value,
+        CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED) AS cellCollected,
+        CONCAT(
+          'Đợt ', B.harvestPhase,
+          ' - ',
+          CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED),
+          ' Tổ - Ngày thu hoạch ',
+          DATE_FORMAT(B.createdAt, '%Y/%m/%d')
+        ) AS label
+      FROM ${this.tableUserHomes} A
+      LEFT JOIN tbl_todo_task_harvest_phase B 
+        ON A.userCode = B.userCode 
+        AND A.userHomeCode = B.userHomeCode
+      LEFT JOIN tbl_todo_task_harvest C 
+        ON B.seq = C.seqHarvestPhase
+      WHERE B.seq IS NOT NULL
+        AND A.userCode = ?
+        AND A.userHomeCode = ?
+        AND B.harvestPhase IN (${placeholders})
+      GROUP BY 
+        B.harvestPhase,
+        B.createdAt,
+        B.updatedAt
+      ORDER BY B.harvestPhase ASC
+    `;
+    const params = [userCode, userHomeCode, ...phases];
+    const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
+    return rows;
+  }
 }

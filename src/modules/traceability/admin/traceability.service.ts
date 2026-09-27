@@ -61,6 +61,9 @@ export class TraceabilityAdminService {
     let lotcode = '';
     let formDataExtra: IFormDataExtra | null = null;
 
+    let isLinkedInternal = false;
+    let internalBatch: any = null;
+
     if (isExternal) {
       batch = await this.repository.getBatchByTraceabilityIdExternal(traceabilityId);
       if (batch) {
@@ -79,11 +82,16 @@ export class TraceabilityAdminService {
           fiIdentificationCode: '',
           facilityName: '',
           facilityAddress: '',
-          facilityActiveTime: '',
           facilityArea: '',
-          facilityFloor: '',
-          hmNumberNests: '',
         };
+      }
+
+      if (extraLinked?.batchInternalSeq) {
+        isLinkedInternal = true;
+        internalBatch = await this.repository.getBatchBySeq(extraLinked.batchInternalSeq);
+        if (internalBatch?.userHomeCode) {
+          homeInfo = await this.repository.getHomeInfoByUserHomeCode(internalBatch.userHomeCode);
+        }
       }
     } else {
       batch = await this.repository.getBatchByTraceabilityId(traceabilityId);
@@ -103,25 +111,33 @@ export class TraceabilityAdminService {
     }
 
     let rawForms = await this.repository.getAllForms();
-    if (isExternal) {
-      rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.EXTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
-    } else {
-      rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.INTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
-    }
-
     if (isCompact) {
       rawForms = rawForms.filter((f) => this.fieldsService.isFormAllowedInCompact(f.formKey, isExternal));
+    } else {
+      if (isExternal) {
+        rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.EXTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
+      } else {
+        rawForms = rawForms.filter((f) => f.displayActorType === TraceabilityDisplayActorTypeEnum.INTERNAL || f.displayActorType === TraceabilityDisplayActorTypeEnum.BOTH);
+      }
     }
 
     const formsWithSubmissions = await Promise.all(
       rawForms.map(async (form) => {
-        const submission = isExternal
+        let submission = isExternal
           ? await this.repository.getSubmissionByTraceabilityIdAndFormSeqExternal(traceabilityId, form.seq)
           : await this.repository.getSubmissionByTraceabilityIdAndFormSeq(traceabilityId, form.seq);
 
+        let files: any[] = [];
         if (submission) {
-          const files = isExternal ? await this.repository.getFilesByUniqueIdExternal(submission.uniqueId) : await this.repository.getFilesByUniqueId(submission.uniqueId);
+          files = isExternal ? await this.repository.getFilesByUniqueIdExternal(submission.uniqueId) : await this.repository.getFilesByUniqueId(submission.uniqueId);
+        } else if (isExternal && isLinkedInternal && internalBatch?.traceabilityId) {
+          submission = await this.repository.getSubmissionByTraceabilityIdAndFormSeq(internalBatch.traceabilityId, form.seq);
+          if (submission) {
+            files = await this.repository.getFilesByUniqueId(submission.uniqueId);
+          }
+        }
 
+        if (submission) {
           let savedData: any = null;
           try {
             savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
@@ -175,23 +191,85 @@ export class TraceabilityAdminService {
       }),
     );
 
+    let harvestPhaseLabels: string[] = [];
+    if (!isExternal) {
+      // Determine harvest phases from batch or from BATCH_HARVEST submission
+      let phaseNumbers: number[] = [];
+      if (batch?.harvestPhases) {
+        phaseNumbers = String(batch.harvestPhases)
+          .split(',')
+          .map((p) => Number(p.trim()))
+          .filter((p) => !isNaN(p) && p > 0);
+      }
+      if (phaseNumbers.length === 0) {
+        const rawHiVal = this.fieldsService.getFieldValue(formsWithSubmissions, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiNumberHarvest');
+        if (Array.isArray(rawHiVal)) {
+          phaseNumbers = rawHiVal.map((p) => Number(p)).filter((p) => !isNaN(p) && p > 0);
+        } else if (rawHiVal !== null && rawHiVal !== undefined && !isNaN(Number(rawHiVal))) {
+          phaseNumbers = [Number(rawHiVal)];
+        }
+      }
+
+      const userCode = batch?.userCode || homeInfo?.userCode;
+      const userHomeCode = batch?.userHomeCode || homeInfo?.userHomeCode;
+      if (userCode && userHomeCode && phaseNumbers.length > 0) {
+        const harvestPhasesData = await this.repository.getHarvestPhasesInfo(userCode, userHomeCode, phaseNumbers);
+        harvestPhaseLabels = harvestPhasesData.map((hp) => hp.label);
+      }
+    } else {
+      if (isLinkedInternal && internalBatch) {
+        let phaseNumbers: number[] = [];
+        if (internalBatch.harvestPhases) {
+          phaseNumbers = String(internalBatch.harvestPhases)
+            .split(',')
+            .map((p) => Number(p.trim()))
+            .filter((p) => !isNaN(p) && p > 0);
+        }
+        if (phaseNumbers.length === 0 && formDataExtra?.hiNumberHarvest) {
+          if (Array.isArray(formDataExtra.hiNumberHarvest)) {
+            phaseNumbers = formDataExtra.hiNumberHarvest.map((p: any) => Number(p)).filter((p: number) => !isNaN(p) && p > 0);
+          } else if (!isNaN(Number(formDataExtra.hiNumberHarvest))) {
+            phaseNumbers = [Number(formDataExtra.hiNumberHarvest)];
+          }
+        }
+
+        if (internalBatch.userCode && internalBatch.userHomeCode && phaseNumbers.length > 0) {
+          const harvestPhasesData = await this.repository.getHarvestPhasesInfo(internalBatch.userCode, internalBatch.userHomeCode, phaseNumbers);
+          harvestPhaseLabels = harvestPhasesData.map((hp) => hp.label);
+        }
+      }
+    }
+
     const compactData = isCompact
       ? this.fieldsService.buildCompactData({
           isExternal,
+          isLinkedInternal,
           lotcode,
           formDataExtra,
           homeInfo,
           forms: formsWithSubmissions,
+          harvestPhaseLabels,
         })
       : null;
 
     return {
       traceabilityId,
       isExternal,
+      isLinkedInternal,
       lotcode,
       formDataExtra: isExternal ? formDataExtra : null,
       homeInfo: isExternal
-        ? null
+        ? isLinkedInternal && homeInfo
+          ? {
+              userHomeCode: homeInfo.userHomeCode,
+              userHomeName: homeInfo.userHomeName,
+              userHomeAddress: homeInfo.userHomeAddress,
+              userHomeLength: homeInfo.userHomeLength,
+              userHomeWidth: homeInfo.userHomeWidth,
+              userHomeFloor: homeInfo.userHomeFloor,
+              userName: homeInfo.userName || '',
+            }
+          : null
         : homeInfo
           ? {
               userHomeCode: homeInfo.userHomeCode,

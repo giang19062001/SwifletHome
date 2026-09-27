@@ -26,7 +26,7 @@ export class ExportService {
             traceabilityId: cleanId || '-',
             homeInfo: {
               userHomeName: 'Hệ thống Nhà yến 3FAM',
-              userName: 'Cơ sở sản xuất yến sào',
+              userName: 'Cơ sở sản xuất sản phẩm',
               userHomeAddress: 'Chi tiết xem tại hệ thống 3FAM',
             },
             forms: [],

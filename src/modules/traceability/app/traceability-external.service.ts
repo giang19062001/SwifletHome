@@ -17,7 +17,6 @@ import {
   CheckLotcodeMatchInternalResDto,
   TraceabilityBatchItemResDto,
   TraceabilityBatchListResDto,
-  TraceabilityExtraLinkedInfoDto,
   TraceabilityFormResDto,
   TraceabilityGroupResDto,
   UploadTraceabilityFileResDto,
@@ -49,17 +48,30 @@ export class TraceabilityExternalService {
     let status = TraceabilityStatusEnum.PROCESSING;
 
     let submission: RowDataPacket | null = null;
+    let batchLotcode: string | null = null;
+    let batchSeq: number | null = null;
+
     // TODO: traceabilityId là optional
     if (dto.traceabilityId) {
+      const batch = await this.repository.getBatchByTraceabilityId(dto.traceabilityId, userCode);
+      if (batch) {
+        traceabilityId = batch.traceabilityId;
+        qrUrl = batch.qrUrl;
+        status = batch.status || TraceabilityStatusEnum.PROCESSING;
+        batchLotcode = batch.lotcode || null;
+        batchSeq = batch.seq || null;
+      }
       // có traceabilityId -> gọi lấy giá trị hiện tại
       submission = await this.repository.getSubmissionByTraceabilityIdAndFormSeq(dto.traceabilityId, form.seq, userCode);
       if (submission) {
         uniqueId = submission.uniqueId;
         traceabilityCode = submission.traceabilityCode;
         files = await this.repository.getFilesByUniqueId(uniqueId);
-        qrUrl = submission.qrUrl || null;
-        traceabilityId = submission.traceabilityId || null;
-        status = submission.status || TraceabilityStatusEnum.PROCESSING;
+        if (submission.qrUrl) qrUrl = submission.qrUrl;
+        if (submission.traceabilityId) traceabilityId = submission.traceabilityId;
+        if (submission.status) status = submission.status;
+        if (submission.lotcode) batchLotcode = submission.lotcode;
+        if (submission.batchSeq) batchSeq = submission.batchSeq;
         try {
           savedData = typeof submission.formData === 'string' ? JSON.parse(submission.formData) : submission.formData;
         } catch (e) {
@@ -74,19 +86,31 @@ export class TraceabilityExternalService {
       traceabilityId = processingBatch.traceabilityId;
       qrUrl = processingBatch.qrUrl;
       status = TraceabilityStatusEnum.PROCESSING;
+      batchSeq = processingBatch.seq;
     }
 
-    let batchLotcode = submission?.lotcode || null;
-    let batchSeq = submission?.batchSeq || null;
-    if (traceabilityId && (!batchLotcode || !batchSeq)) {
-      const batch = await this.repository.getBatchByTraceabilityId(traceabilityId, userCode);
-      if (batch) {
-        if (!batchLotcode && batch.lotcode) {
-          batchLotcode = batch.lotcode;
-        }
-        if (!batchSeq && batch.seq) {
-          batchSeq = batch.seq;
-        }
+    let isLinkedInternal = false;
+    if (batchSeq) {
+      const extraLinked = await this.repository.getExtraLinkedByBatchExternalSeq(batchSeq);
+      if (extraLinked && extraLinked.batchInternalSeq) {
+        isLinkedInternal = true;
+      }
+    }
+    if (!isLinkedInternal && batchLotcode) {
+      const internalBatch = await this.repository.getInternalBatchByLotcode(batchLotcode);
+      if (internalBatch) {
+        isLinkedInternal = true;
+      }
+    }
+
+    // Nếu là form PRODUCTION_ORIGIN và chưa có dữ liệu lưu trong submission nhưng có batchLotcode khớp lô nội bộ:
+    // Tự động load dữ liệu từ nội bộ vào savedData để mapGroupsAndFields gán currentValue
+    if (form.formKey === 'PRODUCTION_ORIGIN' && savedData === null && batchLotcode) {
+      const internalBatch = await this.repository.getInternalBatchByLotcode(batchLotcode);
+      if (internalBatch) {
+        const internalSubmissions = await this.repository.getInternalSubmissionsForExtra(internalBatch.seq);
+        const { groupedData } = this.traceabilityFieldsService.extractLinkedFieldsForProductionOrigin(internalSubmissions);
+        savedData = groupedData;
       }
     }
 
@@ -132,34 +156,10 @@ export class TraceabilityExternalService {
     response.statusLabel = TRACE_CONST.STATUS[status]?.text || '';
     response.groups = mappedGroups;
     response.lotcode = batchLotcode || '';
+    response.isLinkedInternal = isLinkedInternal;
     if (traceabilityCode) {
       response.traceabilityCode = traceabilityCode;
     }
-
-    // Xử lý extraLinkedInfo
-    let parsedData: any = null;
-    let isLinkedInternal = false;
-
-    if (batchSeq) {
-      const extraLinked = await this.repository.getExtraLinkedByBatchExternalSeq(batchSeq);
-      if (extraLinked) {
-        isLinkedInternal = Boolean(extraLinked.batchInternalSeq);
-        if (extraLinked.formDataExtra) {
-          try {
-            parsedData = typeof extraLinked.formDataExtra === 'string' ? JSON.parse(extraLinked.formDataExtra) : extraLinked.formDataExtra;
-          } catch (e) {
-            parsedData = null;
-          }
-        }
-      }
-    }
-
-    const extraFields = this.traceabilityFieldsService.getExtraFieldsSchema(parsedData);
-    response.extraLinkedInfo = {
-      isLinkedInternal,
-      fields: extraFields,
-      data: parsedData,
-    };
 
     return response;
   }
@@ -314,7 +314,7 @@ export class TraceabilityExternalService {
 
   async checkLotcodeMatchInternal(lotcode: string, traceabilityId?: string, userCode?: string): Promise<CheckLotcodeMatchInternalResDto> {
     if (!lotcode || !lotcode.trim()) {
-      return { isMatched: false, fields: this.traceabilityFieldsService.getExtraFieldsSchema(), data: null };
+      return { isMatched: false, data: null, groupedData: null };
     }
 
     const cleanLotcode = lotcode.trim();
@@ -335,7 +335,7 @@ export class TraceabilityExternalService {
 
     const internalBatch = await this.repository.getInternalBatchByLotcode(cleanLotcode);
     if (!internalBatch) {
-      return { isMatched: false, fields: this.traceabilityFieldsService.getExtraFieldsSchema(), data: null };
+      return { isMatched: false, data: null, groupedData: null };
     }
 
     // Kiểm tra lô nội bộ này có đang liên kết với lô ngoại khác không
@@ -345,13 +345,12 @@ export class TraceabilityExternalService {
     }
 
     const submissions = await this.repository.getInternalSubmissionsForExtra(internalBatch.seq);
-    const data = this.traceabilityFieldsService.extractExtraFieldsFromInternalSubmissions(submissions);
-    const fields = this.traceabilityFieldsService.getExtraFieldsSchema(data);
+    const { data, groupedData } = this.traceabilityFieldsService.extractLinkedFieldsForProductionOrigin(submissions);
 
     return {
       isMatched: true,
-      fields,
       data,
+      groupedData,
     };
   }
 }
