@@ -32,8 +32,16 @@ export class TraceabilityPdfTemplate {
         const fontBold = fonts.bold;
 
         // HEADER BANNER (Formal Legal Style)
-        doc.font(fontBold).fontSize(14).fillColor('#71AB33').text('HỆ THỐNG TRUY XUẤT NGUỒN GỐC 3FAM', 40, 40);
-        doc.font(fontRegular).fontSize(10).fillColor('#555555').text('Hồ sơ điện tử truy xuất nguồn gốc sản phẩm sản phẩm', 40, 58);
+        doc
+          .font(fontBold)
+          .fontSize(14)
+          .fillColor('#71AB33')
+          .text(traceData?.isExternal ? 'HỆ THỐNG TRUY XUẤT SẢN PHẨM' : 'HỆ THỐNG TRUY XUẤT TỔ YẾN', 40, 40);
+        doc
+          .font(fontRegular)
+          .fontSize(10)
+          .fillColor('#555555')
+          .text(traceData?.isExternal ? 'Hồ sơ điện tử truy xuất nguồn gốc sản phẩm' : 'Hồ sơ điện tử truy xuất nguồn gốc tổ yến', 40, 58);
 
         // Line under header
         doc.moveTo(40, 75).lineTo(555, 75).strokeColor('#71AB33').lineWidth(1.5).stroke();
@@ -52,7 +60,11 @@ export class TraceabilityPdfTemplate {
           }
         }
 
-        doc.font(fontBold).fontSize(16).fillColor('#000000').text('HỒ SƠ TRUY XUẤT NGUỒN GỐC', 40, currentY, { align: 'center' });
+        doc
+          .font(fontBold)
+          .fontSize(16)
+          .fillColor('#000000')
+          .text(traceData?.isExternal ? 'HỆ THỐNG TRUY XUẤT SẢN PHẨM' : 'HỆ THỐNG TRUY XUẤT TỔ YẾN', 40, currentY, { align: 'center' });
         doc
           .font(fontRegular)
           .fontSize(10.5)

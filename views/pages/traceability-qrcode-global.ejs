@@ -33,8 +33,15 @@
                             <span class="badge bg-white text-success fw-bold px-2 py-1 mb-1">
                                 <i class="fa fa-check-circle me-1"></i> ĐÃ XÁC THỰC HỆ THỐNG
                             </span>
-                            <h3 class="mb-0 fw-bold fs-4 text-white">XÁC THỰC TRUY XUẤT NGUỒN GỐC</h3>
-                            <p class="mb-0 text-white-50 small">Hồ sơ điện tử truy xuất sản phẩm 3FAM</p>
+                            <h3 class="mb-0 fw-bold fs-4 text-white">  
+                                <%= isExternal
+                                    ? 'TRUY XUẤT NGUỒN GỐC SẢN PHẨM'
+                                    : 'TRUY XUẤT NGUỒN GỐC TỔ YẾN' %></h3>
+                            <p class="mb-0 text-white-50 small">
+                                  <%= isExternal
+                                    ? 'Hồ sơ điện tử truy xuất sản phẩm'
+                                    : 'Hồ sơ điện tử truy xuất tổ yến' %>
+                                </p>
                         </div>
                     </div>
                     <div>
