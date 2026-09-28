@@ -156,29 +156,14 @@ export class TraceabilityFieldsAdminService {
         isLinkedInternal: false,
         lotcode,
         // 1. PRODUCTION_ORIGIN: MANUFACTURER
-        facilityName:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityName') ||
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'facilityName') ||
-          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') ||
-          '',
-        facilityAddress:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mfacilityAddress') ||
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityAddress') ||
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'facilityAddress') ||
-          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') ||
-          '',
+        facilityName: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityName') || this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') || '',
+        facilityAddress: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityAddress') || this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') || '',
         mCertificationFile:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mCertificationFile') ||
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'fiCertificationFile') ||
-          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'mCertificationFile') ||
-          this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiCertificationFile'),
+          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mCertificationFile') || this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiCertificationFile'),
         // 2. PRODUCTION_ORIGIN: ORIGIN_NEST
         onHarvestDate: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onHarvestDate') || this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate') || null,
         onAddressArea: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onAddressArea') || this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'addressArea') || '',
-        onWeightingPhoto:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightingPhoto') ||
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightPhoto') ||
-          this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
+        onWeightingPhoto: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightingPhoto') || this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
         // 3. PRE_PROCESSING: DIARY_PROCESS
         diaryProcessGroup: this.getGroupData(forms, 'PRE_PROCESSING', 'DIARY_PROCESS'),
         // 4. PACKING_QR: INGREDIENT_INSTRUCTION
@@ -194,10 +179,10 @@ export class TraceabilityFieldsAdminService {
       isExternal: false,
       isLinkedInternal: false,
       lotcode,
-      personInCharge: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'personInCharge') || homeInfo?.userName || '',
-      facilityName: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') || homeInfo?.userHomeName || '',
-      fiIdentificationCode: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiIdentificationCode') || homeInfo?.fiIdentificationCode || homeInfo?.userHomeCode || '',
-      facilityAddress: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') || homeInfo?.userHomeAddress || '',
+      personInCharge: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'personInCharge') || '',
+      facilityName: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') || '',
+      fiIdentificationCode: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiIdentificationCode') || '',
+      facilityAddress: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') || '',
       hiHarvestDate,
       hmWeightingPhoto: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
       todoListGroup: this.getGroupData(forms, 'LOGBOOK_HOUSE', 'SWIFT_HOUSE_TD'),

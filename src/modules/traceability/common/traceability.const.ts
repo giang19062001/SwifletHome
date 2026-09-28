@@ -34,7 +34,7 @@ export const INTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>
 
 export const EXTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
   PRODUCTION_ORIGIN: {
-    MANUFACTURER: ['mFacilityName', 'mfacilityAddress', 'mCertificationFile'], //  Thông tin nhà sản xuất
+    MANUFACTURER: ['mFacilityName', 'mFacilityAddress', 'mCertificationFile'], //  Thông tin nhà sản xuất
     ORIGIN_NEST: 'ALL', // nguồn gốc sản phẩm
   },
   PRE_PROCESSING: {

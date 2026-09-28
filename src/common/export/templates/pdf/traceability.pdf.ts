@@ -158,9 +158,9 @@ export class TraceabilityPdfTemplate {
 
           if (!isExternal) {
             // === NỘI BỘ (INTERNAL) ===
-            // I. THÔNG TIN CƠ SỞ
-            renderSectionHeader('I. THÔNG TIN CƠ SỞ');
-            renderKeyValue('Tên chủ nhà yến', compact.personInCharge);
+            // I. THÔNG TIN NHÀ YẾN
+            renderSectionHeader('I. THÔNG TIN NHÀ YẾN');
+            renderKeyValue('Tên chủ sở hữu nhà yến', compact.personInCharge);
             renderKeyValue('Mã định danh nhà yến do bộ Nông Nghiệp cấp', compact.fiIdentificationCode);
             renderKeyValue('Địa chỉ sản xuất', compact.facilityAddress);
             currentY += 10;
