@@ -17,21 +17,21 @@ export const TRACE_FORM_LIST_FIELD_SQL = {
     ORDER BY A.taskDate DESC, A.seq DESC
   `,
 
-  shmMedicine: `
-    SELECT
-      B.valueOption,
-      A.medicineUsage,
-      DATE_FORMAT(A.createdAt, '%d-%m-%Y') AS createdAt
-    FROM tbl_todo_task_medicine A
-    JOIN tbl_option_common B
-      ON A.medicineOptionCode = B.code
-    WHERE A.userCode = :userCode
-      AND A.userHomeCode = :userHomeCode
-      AND A.isActive = 'Y'
-      AND A.taskDate >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-      AND A.taskDate <= CURDATE()
-    ORDER BY A.taskDate DESC, A.seq DESC
-  `,
+  // shmMedicine: `
+  //   SELECT
+  //     B.valueOption,
+  //     A.medicineUsage,
+  //     DATE_FORMAT(A.createdAt, '%d-%m-%Y') AS createdAt
+  //   FROM tbl_todo_task_medicine A
+  //   JOIN tbl_option_common B
+  //     ON A.medicineOptionCode = B.code
+  //   WHERE A.userCode = :userCode
+  //     AND A.userHomeCode = :userHomeCode
+  //     AND A.isActive = 'Y'
+  //     AND A.taskDate >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+  //     AND A.taskDate <= CURDATE()
+  //   ORDER BY A.taskDate DESC, A.seq DESC
+  // `,
 };
 export const TRACE_FORM_CONFIG_OPTIONS_SQL = {
   hiNumberHarvest: ` SELECT 

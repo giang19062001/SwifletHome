@@ -1,6 +1,6 @@
+import { LOOP_GROUP_INFO, LOT_CODE_FIELD_FOLLOW_HARVEST, LOT_CODE_FIELDS } from './../common/traceability.const';
 import { Injectable, Optional } from '@nestjs/common';
 import { YnEnum } from 'src/interfaces/admin.interface';
-import { LINKED_FIELDS } from '../common/traceability.const';
 import { TraceabilityExternalRepository } from './traceability-external.repository';
 import { generateTraceabilityLotCodeByHarvest } from './traceability.func';
 import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL, TRACE_FORM_LIST_FIELD_SQL } from './traceability.query';
@@ -15,16 +15,10 @@ export class TraceabilityFieldsService {
   ) {}
 
   /**
-   * Danh sách các trường đặc biệt đại diện cho Mã Lô (LotCode)
-   */
-  public readonly LOT_CODE_FIELD_FOLLOW_HARVEST = 'hiNumberHarvest';
-  public readonly LOT_CODE_FIELDS = ['diLotCode', 'rmInputLot', 'lfpLotProcessings', 'dLotFinished', 'rLotRecall', 'eiLotCode'];
-
-  /**
    * Kiểm tra một fieldKey có phải là trường đặc biệt Mã Lô (LotCode) hay không
    */
   isLotCodeField(fieldKey: string): boolean {
-    return this.LOT_CODE_FIELDS.includes(fieldKey);
+    return LOT_CODE_FIELDS.includes(fieldKey);
   }
 
   private parsePhases(val: any): number[] {
@@ -47,8 +41,8 @@ export class TraceabilityFieldsService {
       if (val.value !== undefined) {
         return this.parsePhases(val.value);
       }
-      if (val[this.LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
-        return this.parsePhases(val[this.LOT_CODE_FIELD_FOLLOW_HARVEST]);
+      if (val[LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
+        return this.parsePhases(val[LOT_CODE_FIELD_FOLLOW_HARVEST]);
       }
     }
     return [];
@@ -61,14 +55,14 @@ export class TraceabilityFieldsService {
     if (!formData || typeof formData !== 'object') return [];
     const phases: number[] = [];
 
-    if (formData[this.LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
-      phases.push(...this.parsePhases(formData[this.LOT_CODE_FIELD_FOLLOW_HARVEST]));
+    if (formData[LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
+      phases.push(...this.parsePhases(formData[LOT_CODE_FIELD_FOLLOW_HARVEST]));
     }
 
     for (const key of Object.keys(formData)) {
       if (formData[key] && typeof formData[key] === 'object') {
-        if (formData[key][this.LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
-          phases.push(...this.parsePhases(formData[key][this.LOT_CODE_FIELD_FOLLOW_HARVEST]));
+        if (formData[key][LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
+          phases.push(...this.parsePhases(formData[key][LOT_CODE_FIELD_FOLLOW_HARVEST]));
         }
       }
     }
@@ -234,11 +228,14 @@ export class TraceabilityFieldsService {
         }
       }
 
+      const loopMetadata = (LOOP_GROUP_INFO as Record<string, any>)[g.groupKey] || (g.isLoop === 'Y' ? { title: 'Công đoạn' } : undefined);
+
       return {
         groupKey: g.groupKey,
         groupName: g.groupName,
         isLoop: g.isLoop || 'N',
         loopValues,
+        loopMetadata,
         fields: groupFields,
       };
     });
@@ -384,67 +381,5 @@ export class TraceabilityFieldsService {
     }
 
     return mappedGroups;
-  }
-
-  /**
-   * Trích xuất các trường từ các đơn nộp nội bộ (BRIEF_SWIFT_HOUSE form 1, BATCH_HARVEST form 3)
-   * và map sang các trường của form PRODUCTION_ORIGIN (form 9) theo LINKED_FIELDS
-   */
-  extractLinkedFieldsForProductionOrigin(submissions: any[]): {
-    data: Record<string, any>;
-    groupedData: {
-      MANUFACTURER: Record<string, any>;
-      ORIGIN_NEST: Record<string, any>;
-    };
-  } {
-    const data: Record<string, any> = {};
-    const groupedData = {
-      MANUFACTURER: {} as Record<string, any>,
-      ORIGIN_NEST: {} as Record<string, any>,
-    };
-
-    submissions.forEach((sub) => {
-      let parsed: any;
-      try {
-        parsed = typeof sub.formData === 'string' ? JSON.parse(sub.formData) : sub.formData;
-      } catch {
-        return;
-      }
-      if (!parsed) return;
-
-      // Form 1: BRIEF_SWIFT_HOUSE (chứa FACILITY_INFO)
-      if (sub.formSeq === 1) {
-        const facilityInfo = parsed['FACILITY_INFO'];
-        if (facilityInfo && typeof facilityInfo === 'object') {
-          if (facilityInfo.fiIdentificationCode !== undefined && facilityInfo.fiIdentificationCode !== null) {
-            data[LINKED_FIELDS.fiIdentificationCode] = facilityInfo.fiIdentificationCode;
-            groupedData.MANUFACTURER[LINKED_FIELDS.fiIdentificationCode] = facilityInfo.fiIdentificationCode;
-          }
-          if (facilityInfo.facilityName !== undefined && facilityInfo.facilityName !== null) {
-            data[LINKED_FIELDS.facilityName] = facilityInfo.facilityName;
-            groupedData.MANUFACTURER[LINKED_FIELDS.facilityName] = facilityInfo.facilityName;
-          }
-          if (facilityInfo.facilityAddress !== undefined && facilityInfo.facilityAddress !== null) {
-            data[LINKED_FIELDS.facilityAddress] = facilityInfo.facilityAddress;
-            data['mFacilityAddress'] = facilityInfo.facilityAddress;
-            groupedData.MANUFACTURER[LINKED_FIELDS.facilityAddress] = facilityInfo.facilityAddress;
-            groupedData.MANUFACTURER['mFacilityAddress'] = facilityInfo.facilityAddress;
-          }
-        }
-      }
-
-      // Form 3: BATCH_HARVEST (chứa HARVEST_INFORMATION)
-      if (sub.formSeq === 3) {
-        const harvestInfo = parsed['HARVEST_INFORMATION'];
-        if (harvestInfo && typeof harvestInfo === 'object') {
-          if (harvestInfo.hiHarvestDate !== undefined && harvestInfo.hiHarvestDate !== null) {
-            data[LINKED_FIELDS.hiHarvestDate] = harvestInfo.hiHarvestDate;
-            groupedData.ORIGIN_NEST[LINKED_FIELDS.hiHarvestDate] = harvestInfo.hiHarvestDate;
-          }
-        }
-      }
-    });
-
-    return { data, groupedData };
   }
 }

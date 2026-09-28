@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EXTERNAL_WHITELIST, INTERNAL_WHITELIST } from '../common/traceability.const';
+import { EXTERNAL_WHITELIST, INTERNAL_WHITELIST, LOOP_GROUP_INFO } from '../common/traceability.const';
 
 @Injectable()
 export class TraceabilityFieldsAdminService {
@@ -76,11 +76,14 @@ export class TraceabilityFieldsAdminService {
         }
       }
 
+      const loopMetadata = (LOOP_GROUP_INFO as Record<string, any>)[g.groupKey] || (g.isLoop === 'Y' ? { title: 'Công đoạn' } : undefined);
+
       return {
         groupKey: g.groupKey,
         groupName: g.groupName,
         isLoop: g.isLoop || 'N',
         loopValues,
+        loopMetadata,
         fields: groupFields,
       };
     });
@@ -142,32 +145,27 @@ export class TraceabilityFieldsAdminService {
     return form?.submission?.groups?.find((g: any) => this.cleanKey(g.groupKey) === this.cleanKey(groupKey)) ?? null;
   }
 
-  buildCompactData(params: { isExternal: boolean; isLinkedInternal?: boolean; lotcode: string; formDataExtra: any; homeInfo: any; forms: any[]; harvestPhaseLabels?: string[] }): any {
-    const { isExternal, isLinkedInternal, lotcode, formDataExtra, homeInfo, forms, harvestPhaseLabels } = params;
+  buildCompactData(params: { isExternal: boolean; isLinkedInternal?: boolean; lotcode: string; formDataExtra?: any; homeInfo: any; forms: any[]; harvestPhaseLabels?: string[] }): any {
+    const { isExternal, lotcode, homeInfo, forms, harvestPhaseLabels } = params;
 
     if (isExternal) {
-      const linked = Boolean(isLinkedInternal);
-      const hiNumberHarvest = formDataExtra?.hiNumberHarvest || (harvestPhaseLabels && harvestPhaseLabels.length > 0 ? harvestPhaseLabels : null);
+      const hiNumberHarvest = harvestPhaseLabels && harvestPhaseLabels.length > 0 ? harvestPhaseLabels : null;
 
       return {
         isExternal: true,
-        isLinkedInternal: linked,
+        isLinkedInternal: false,
         lotcode,
         // 1. PRODUCTION_ORIGIN: MANUFACTURER
         facilityName:
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityName') ||
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'facilityName') ||
           this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') ||
-          (linked ? homeInfo?.userHomeName : '') ||
-          formDataExtra?.facilityName ||
           '',
         facilityAddress:
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mfacilityAddress') ||
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityAddress') ||
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'facilityAddress') ||
           this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') ||
-          (linked ? homeInfo?.userHomeAddress : '') ||
-          formDataExtra?.facilityAddress ||
           '',
         mCertificationFile:
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mCertificationFile') ||
@@ -175,11 +173,7 @@ export class TraceabilityFieldsAdminService {
           this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'mCertificationFile') ||
           this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiCertificationFile'),
         // 2. PRODUCTION_ORIGIN: ORIGIN_NEST
-        onHarvestDate:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onHarvestDate') ||
-          this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate') ||
-          formDataExtra?.hiHarvestDate ||
-          null,
+        onHarvestDate: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onHarvestDate') || this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate') || null,
         onAddressArea: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onAddressArea') || this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'addressArea') || '',
         onWeightingPhoto:
           this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightingPhoto') ||

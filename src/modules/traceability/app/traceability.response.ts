@@ -51,6 +51,11 @@ export class TraceabilityFieldResDto {
   currentValue?: any;
 }
 
+export class TraceabilityLoopMetadataDto {
+  @ApiProperty({ example: 'Công đoạn', description: 'Tiêu đề hiển thị cho từng mục lặp' })
+  title!: string;
+}
+
 export class TraceabilityGroupResDto {
   @ApiProperty({ example: 'OWNER_INFO' })
   groupKey!: string;
@@ -58,38 +63,17 @@ export class TraceabilityGroupResDto {
   @ApiProperty({ example: 'Thông tin cơ bản' })
   groupName!: string;
 
+  @ApiProperty({ type: [TraceabilityFieldResDto] })
+  fields!: TraceabilityFieldResDto[];
+
   @ApiProperty({ example: 'N', required: false, description: 'Y: cho phép lặp nhiều công đoạn/dòng, N: form đơn' })
   isLoop?: string;
 
   @ApiProperty({ example: [], required: false, description: 'Danh sách giá trị các lần lặp nếu isLoop = Y' })
   loopValues?: any[];
 
-  @ApiProperty({ type: [TraceabilityFieldResDto] })
-  fields!: TraceabilityFieldResDto[];
-}
-
-export class TraceabilityExtraLinkedDataDto {
-  [key: string]: any;
-
-  @ApiProperty({ example: 'NNN00001', required: false })
-  fiIdentificationCode?: string;
-
-  @ApiProperty({ example: 'Nhà yến An Gia', required: false })
-  facilityName?: string;
-
-  @ApiProperty({ example: '123 Đường ABC, Xã XYZ', required: false })
-  facilityAddress?: string;
-}
-
-export class TraceabilityExtraLinkedInfoDto {
-  @ApiProperty({ example: true, description: 'true nếu match với lô nội bộ, false nếu tự nhập' })
-  isLinkedInternal!: boolean;
-
-  @ApiProperty({ type: [TraceabilityFieldResDto], required: false })
-  fields?: TraceabilityFieldResDto[];
-
-  @ApiProperty({ type: TraceabilityExtraLinkedDataDto, required: false })
-  data?: TraceabilityExtraLinkedDataDto | null;
+  @ApiProperty({ type: TraceabilityLoopMetadataDto, required: false, description: 'Metadata hiển thị cho loop group' })
+  loopMetadata?: TraceabilityLoopMetadataDto | null;
 }
 
 export class TraceabilityFormResDto {
@@ -125,26 +109,6 @@ export class TraceabilityFormResDto {
 
   @ApiProperty({ type: [TraceabilityGroupResDto] })
   groups!: TraceabilityGroupResDto[];
-
-  @ApiProperty({ required: false, description: 'Thông tin cơ sở & thu hoạch liên kết (áp dụng cho external)' })
-  extraLinkedInfo?: TraceabilityExtraLinkedInfoDto;
-
-  @ApiProperty({ example: true, required: false, description: 'true nếu khớp lô nội bộ' })
-  isLinkedInternal?: boolean;
-}
-
-export class CheckLotcodeMatchInternalResDto {
-  @ApiProperty({ example: true })
-  isMatched!: boolean;
-
-  @ApiProperty({ type: [TraceabilityFieldResDto], required: false })
-  fields?: TraceabilityFieldResDto[];
-
-  @ApiProperty({ required: false })
-  data?: any;
-
-  @ApiProperty({ required: false, description: 'Dữ liệu phân theo group của form PRODUCTION_ORIGIN' })
-  groupedData?: any;
 }
 
 export class UploadTraceabilityFileResDto {

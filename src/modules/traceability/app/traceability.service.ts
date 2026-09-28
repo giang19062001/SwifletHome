@@ -16,7 +16,6 @@ import { GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTra
 import { generateTraceabilityId, generateTraceabilityLotCodeByHarvest, generateTraceabilityQr } from './traceability.func';
 import { TraceabilityAppRepository } from './traceability.repository';
 import {
-  CheckLotcodeMatchInternalResDto,
   TraceabilityBatchItemResDto,
   TraceabilityBatchListResDto,
   TraceabilityFormResDto,
@@ -329,9 +328,5 @@ export class TraceabilityAppService {
 
   async deleteFileCron(seq: number): Promise<number> {
     return await this.repository.deleteFileBySeq(seq);
-  }
-
-  async checkLotcodeMatchInternal(lotcode: string, traceabilityId?: string, userCode?: string): Promise<CheckLotcodeMatchInternalResDto> {
-    return await this.externalService.checkLotcodeMatchInternal(lotcode, traceabilityId, userCode);
   }
 }

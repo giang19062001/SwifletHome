@@ -16,9 +16,6 @@ export class TraceabilityExternalRepository {
   private readonly tableSubmissionsExt = 'tbl_traceability_submissions_external';
   private readonly tableBatchesExt = 'tbl_traceability_batches_external';
   private readonly tableFileExt = 'tbl_traceability_file_external';
-  private readonly tableBatchesExtraLinked = 'tbl_traceability_batches_extra_linked';
-  private readonly tableSubmissionsInl = 'tbl_traceability_submissions';
-  private readonly tableBatchesInl = 'tbl_traceability_batches';
   private readonly tableUserHomes = 'tbl_user_home';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
@@ -322,40 +319,6 @@ export class TraceabilityExternalRepository {
       .filter(Boolean);
   }
 
-  async getInternalBatchByLotcode(lotcode: string): Promise<RowDataPacket | null> {
-    const sql = `
-      SELECT seq, traceabilityId, userCode, userHomeCode, harvestPhases, lotcode 
-      FROM ${this.tableBatchesInl} 
-      WHERE lotcode = ? 
-      ORDER BY seq DESC 
-      LIMIT 1
-    `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [lotcode]);
-    return rows[0] || null;
-  }
-
-  async getInternalBatchBySeq(seq: number): Promise<RowDataPacket | null> {
-    const sql = `
-      SELECT seq, traceabilityId, userCode, userHomeCode, harvestPhases, lotcode 
-      FROM ${this.tableBatchesInl} 
-      WHERE seq = ? 
-      LIMIT 1
-    `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [seq]);
-    return rows[0] || null;
-  }
-
-  async getInternalSubmissionsForExtra(batchSeq: number): Promise<RowDataPacket[]> {
-    const sql = `
-      SELECT formSeq, formData 
-      FROM ${this.tableSubmissionsInl} 
-      WHERE batchSeq = ? AND formSeq IN (1, 2, 3) AND isActive = 'Y'
-      ORDER BY seq DESC
-    `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [batchSeq]);
-    return rows;
-  }
-
   async getHarvestPhasesInfo(userCode: string, userHomeCode: string, phases?: number[]): Promise<any[]> {
     let sql = `
       SELECT 
@@ -392,49 +355,5 @@ export class TraceabilityExternalRepository {
     `;
     const [rows] = await this.db.query<RowDataPacket[]>(sql, params);
     return rows;
-  }
-
-  async getExtraLinkedByBatchExternalSeq(batchExternalSeq: number): Promise<RowDataPacket | null> {
-    const sql = `
-      SELECT seq, userCode, lotcode, batchExternalSeq, batchInternalSeq, formDataExtra, isActive 
-      FROM ${this.tableBatchesExtraLinked} 
-      WHERE batchExternalSeq = ? AND isActive = 'Y' 
-      LIMIT 1
-    `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [batchExternalSeq]);
-    return rows[0] || null;
-  }
-
-  async checkInternalBatchAlreadyLinked(batchInternalSeq: number, excludeBatchExternalSeq?: number | null): Promise<boolean> {
-    let sql = `
-      SELECT E.seq 
-      FROM ${this.tableBatchesExtraLinked} E
-      JOIN ${this.tableBatchesExt} B ON E.batchExternalSeq = B.seq
-      WHERE E.batchInternalSeq = ? AND E.isActive = 'Y' AND B.isActive = 'Y'
-    `;
-    const params: any[] = [batchInternalSeq];
-    if (excludeBatchExternalSeq) {
-      sql += ` AND E.batchExternalSeq != ?`;
-      params.push(excludeBatchExternalSeq);
-    }
-    sql += ` LIMIT 1`;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, params);
-    return rows.length > 0;
-  }
-
-  async saveExtraLinked(userCode: string, batchExternalSeq: number, lotcode: string | null, batchInternalSeq: number | null, formDataExtra: string | null, userId: string): Promise<number> {
-    const sql = `
-      INSERT INTO ${this.tableBatchesExtraLinked} 
-        (userCode, batchExternalSeq, lotcode, batchInternalSeq, formDataExtra, createdId) 
-      VALUES (?, ?, ?, ?, ?, ?) 
-      ON DUPLICATE KEY UPDATE 
-        lotcode = VALUES(lotcode), 
-        batchInternalSeq = VALUES(batchInternalSeq), 
-        formDataExtra = VALUES(formDataExtra), 
-        updatedId = ?, 
-        updatedAt = NOW()
-    `;
-    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, batchExternalSeq, lotcode, batchInternalSeq, formDataExtra, userId, userId]);
-    return result.affectedRows;
   }
 }

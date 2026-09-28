@@ -19,13 +19,6 @@ export const TRACE_CONST = {
   TRACE_EXTERNAL_PREFIX: '3FAM-VCĐP',
 };
 
-export const LINKED_FIELDS = {
-  fiIdentificationCode: 'mdentificationCode',
-  facilityName: 'mFacilityName',
-  facilityAddress: 'mfacilityAddress',
-  hiHarvestDate: 'onHarvestDate',
-} as const;
-
 export const INTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
   BRIEF_SWIFT_HOUSE: {
     FACILITY_INFO: ['personInCharge', 'fiIdentificationCode', 'facilityAddress'],
@@ -52,4 +45,16 @@ export const EXTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>
   },
 };
 
+export const LOT_CODE_FIELD_FOLLOW_HARVEST = 'hiNumberHarvest';
+export const LOT_CODE_FIELDS = ['diLotCode', 'rmInputLot', 'lfpLotProcessings', 'dLotFinished', 'rLotRecall', 'eiLotCode'];
+
+export const LOOP_GROUP_INFO = {
+  // DIARY_PROCESS, ORIGIN_NEST là groupKey
+  DIARY_PROCESS: {
+    title: 'Công đoạn',
+  },
+  ORIGIN_NEST: {
+    title: 'Lô nguyên liệu',
+  },
+};
 export const FINAL_FORM_SEQ = 8;

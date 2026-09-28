@@ -13,14 +13,7 @@ import { TraceabilityStatusEnum } from '../common/traceability.enum';
 import { TraceabilityExternalRepository } from './traceability-external.repository';
 import { TraceabilityFieldsService } from './traceability-fields.service';
 import { GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
-import {
-  CheckLotcodeMatchInternalResDto,
-  TraceabilityBatchItemResDto,
-  TraceabilityBatchListResDto,
-  TraceabilityFormResDto,
-  TraceabilityGroupResDto,
-  UploadTraceabilityFileResDto,
-} from './traceability.response';
+import { TraceabilityBatchItemResDto, TraceabilityBatchListResDto, TraceabilityFormResDto, TraceabilityGroupResDto, UploadTraceabilityFileResDto } from './traceability.response';
 
 @Injectable()
 export class TraceabilityExternalService {
@@ -89,31 +82,6 @@ export class TraceabilityExternalService {
       batchSeq = processingBatch.seq;
     }
 
-    let isLinkedInternal = false;
-    if (batchSeq) {
-      const extraLinked = await this.repository.getExtraLinkedByBatchExternalSeq(batchSeq);
-      if (extraLinked && extraLinked.batchInternalSeq) {
-        isLinkedInternal = true;
-      }
-    }
-    if (!isLinkedInternal && batchLotcode) {
-      const internalBatch = await this.repository.getInternalBatchByLotcode(batchLotcode);
-      if (internalBatch) {
-        isLinkedInternal = true;
-      }
-    }
-
-    // Nếu là form PRODUCTION_ORIGIN và chưa có dữ liệu lưu trong submission nhưng có batchLotcode khớp lô nội bộ:
-    // Tự động load dữ liệu từ nội bộ vào savedData để mapGroupsAndFields gán currentValue
-    if (form.formKey === 'PRODUCTION_ORIGIN' && savedData === null && batchLotcode) {
-      const internalBatch = await this.repository.getInternalBatchByLotcode(batchLotcode);
-      if (internalBatch) {
-        const internalSubmissions = await this.repository.getInternalSubmissionsForExtra(internalBatch.seq);
-        const { groupedData } = this.traceabilityFieldsService.extractLinkedFieldsForProductionOrigin(internalSubmissions);
-        savedData = groupedData;
-      }
-    }
-
     // Map fields to groups
     const mappedGroups: TraceabilityGroupResDto[] = await this.traceabilityFieldsService.mapGroupsAndFields(
       groups,
@@ -156,7 +124,6 @@ export class TraceabilityExternalService {
     response.statusLabel = TRACE_CONST.STATUS[status]?.text || '';
     response.groups = mappedGroups;
     response.lotcode = batchLotcode || '';
-    response.isLinkedInternal = isLinkedInternal;
     if (traceabilityCode) {
       response.traceabilityCode = traceabilityCode;
     }
@@ -211,18 +178,6 @@ export class TraceabilityExternalService {
       }
     }
 
-    // Kiểm tra lô nội bộ đã bị dành lô (đang liên kết với lô ngoại khác) chưa
-    let internalBatch: any = null;
-    if (incomingLotcode && incomingLotcode.length > 0) {
-      internalBatch = await this.repository.getInternalBatchByLotcode(incomingLotcode);
-      if (internalBatch) {
-        const isAlreadyLinked = await this.repository.checkInternalBatchAlreadyLinked(internalBatch.seq, batch?.seq || null);
-        if (isAlreadyLinked) {
-          throw new BadRequestException({ message: Msg.LotcodeUsed, data: null });
-        }
-      }
-    }
-
     if (dto.traceabilityId && batch) {
       if (incomingLotcode !== null && batch.lotcode !== incomingLotcode) {
         await this.repository.updateBatchLotcode(batch.seq, incomingLotcode, userCode);
@@ -234,23 +189,12 @@ export class TraceabilityExternalService {
       batch = await this.repository.createBatch(userCode, userCode, incomingLotcode || undefined);
     }
 
-    // Xử lý extra linked
-    const batchInternalSeq = internalBatch ? internalBatch.seq : null;
-    const formDataExtraStr = dto.externalInfo?.formDataExtra ? JSON.stringify(dto.externalInfo.formDataExtra) : null;
-
-    await this.repository.saveExtraLinked(userCode, batch.seq, incomingLotcode, batchInternalSeq, formDataExtraStr, userCode);
-
     if (isExist) {
       const existingSubmission = await this.repository.getSubmissionByUniqueId(dto.uniqueId);
       if (existingSubmission) {
         const seq = existingSubmission.seq;
         await this.repository.updateSubmission(seq, formDataStr, userCode);
         await this.repository.bindFilesToSubmission(seq, dto.uniqueId, userCode);
-
-        // Hiện tại không cần xử lý cột status cho table này
-        // if (dto.formSeq === FINAL_FORM_SEQ) {
-        //   await this.repository.completeBatch(batch.seq, userCode);
-        // }
 
         return 1;
       }
@@ -262,11 +206,6 @@ export class TraceabilityExternalService {
     if (insertId) {
       await this.repository.bindFilesToSubmission(insertId, dto.uniqueId, userCode);
     }
-
-    // Hiện tại không cần xử lý cột status cho table này
-    // if (dto.formSeq === FINAL_FORM_SEQ) {
-    //   await this.repository.completeBatch(batch.seq, userCode);
-    // }
 
     return 1;
   }
@@ -310,47 +249,5 @@ export class TraceabilityExternalService {
 
   async deleteFileCron(seq: number): Promise<number> {
     return await this.repository.deleteFileCron(seq);
-  }
-
-  async checkLotcodeMatchInternal(lotcode: string, traceabilityId?: string, userCode?: string): Promise<CheckLotcodeMatchInternalResDto> {
-    if (!lotcode || !lotcode.trim()) {
-      return { isMatched: false, data: null, groupedData: null };
-    }
-
-    const cleanLotcode = lotcode.trim();
-
-    let excludeBatchExternalSeq: number | null = null;
-    if (traceabilityId) {
-      const currentBatch = await this.repository.getBatchByTraceabilityId(traceabilityId, userCode);
-      if (currentBatch) {
-        excludeBatchExternalSeq = currentBatch.seq;
-      }
-    }
-
-    // Kiểm tra nếu mã lô đã bị trùng trong bảng external
-    const isDuplicateExt = await this.repository.checkDuplicateLotcode(cleanLotcode, excludeBatchExternalSeq);
-    if (isDuplicateExt) {
-      throw new BadRequestException({ message: Msg.Lotcode, data: null });
-    }
-
-    const internalBatch = await this.repository.getInternalBatchByLotcode(cleanLotcode);
-    if (!internalBatch) {
-      return { isMatched: false, data: null, groupedData: null };
-    }
-
-    // Kiểm tra lô nội bộ này có đang liên kết với lô ngoại khác không
-    const isAlreadyLinked = await this.repository.checkInternalBatchAlreadyLinked(internalBatch.seq, excludeBatchExternalSeq);
-    if (isAlreadyLinked) {
-      throw new BadRequestException({ message: Msg.LotcodeUsed, data: null });
-    }
-
-    const submissions = await this.repository.getInternalSubmissionsForExtra(internalBatch.seq);
-    const { data, groupedData } = this.traceabilityFieldsService.extractLinkedFieldsForProductionOrigin(submissions);
-
-    return {
-      isMatched: true,
-      data,
-      groupedData,
-    };
   }
 }

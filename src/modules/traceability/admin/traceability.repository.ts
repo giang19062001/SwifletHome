@@ -14,7 +14,6 @@ export class TraceabilityAdminRepository {
   private readonly tableBatches = 'tbl_traceability_batches';
   private readonly tableUserHomes = 'tbl_user_home';
   private readonly tableUserApps = 'tbl_user_app';
-  private readonly tableBatchesExtraLinked = 'tbl_traceability_batches_extra_linked';
 
   constructor(@Inject('MYSQL_CONNECTION') private readonly db: Pool) {}
 
@@ -55,17 +54,6 @@ export class TraceabilityAdminRepository {
   async getBatchByTraceabilityIdExternal(traceabilityId: string): Promise<RowDataPacket | null> {
     const sql = `SELECT seq, traceabilityId, userCode, status, qrUrl, lotcode FROM tbl_traceability_batches_external WHERE traceabilityId = ? AND isActive = 'Y' LIMIT 1`;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [traceabilityId]);
-    return rows[0] || null;
-  }
-
-  async getExtraLinkedByBatchExternalSeq(batchExternalSeq: number): Promise<RowDataPacket | null> {
-    const sql = `
-      SELECT seq, userCode, lotcode, batchExternalSeq, batchInternalSeq, formDataExtra, isActive 
-      FROM ${this.tableBatchesExtraLinked} 
-      WHERE batchExternalSeq = ? AND isActive = 'Y' 
-      LIMIT 1
-    `;
-    const [rows] = await this.db.execute<RowDataPacket[]>(sql, [Number(batchExternalSeq)]);
     return rows[0] || null;
   }
 

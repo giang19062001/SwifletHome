@@ -95,22 +95,6 @@ export class ExternalInfoDto {
   @IsString()
   @IsOptional()
   lotcode?: string;
-
-  @ApiPropertyOptional({ description: 'Dữ liệu form extra liên kết (thông tin cơ sở & thu hoạch)' })
-  @IsOptional()
-  formDataExtra?: any;
-}
-
-export class CheckLotcodeMatchInternalQueryDto {
-  @ApiProperty({ example: 'LOT001', description: 'Mã lô cần kiểm tra với lô nội bộ' })
-  @IsString()
-  @IsNotEmpty()
-  lotcode!: string;
-
-  @ApiPropertyOptional({ example: '3FAM-EXT-24-HOM000001', description: 'Mã hồ sơ external hiện tại (nếu đang chỉnh sửa)' })
-  @IsString()
-  @IsOptional()
-  traceabilityId?: string;
 }
 
 export class SubmitTraceabilityDto {

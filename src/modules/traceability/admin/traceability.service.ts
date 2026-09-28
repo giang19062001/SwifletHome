@@ -6,7 +6,6 @@ import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
 import { TraceabilityFieldsAdminService } from './traceability-fields.service';
 import { TraceabilityAdminRepository } from './traceability.repository';
 import { TodoHarvestAppService } from 'src/modules/todo/app/todo-harvest.service';
-import { IFormDataExtra } from '../common/traceability.interface';
 
 @Injectable()
 export class TraceabilityAdminService {
@@ -57,42 +56,11 @@ export class TraceabilityAdminService {
 
     let homeInfo: any = null;
     let batch: any = null;
-    let extraLinked: any = null;
     let lotcode = '';
-    let formDataExtra: IFormDataExtra | null = null;
-
-    let isLinkedInternal = false;
-    let internalBatch: any = null;
 
     if (isExternal) {
       batch = await this.repository.getBatchByTraceabilityIdExternal(traceabilityId);
-      if (batch) {
-        extraLinked = await this.repository.getExtraLinkedByBatchExternalSeq(batch.seq);
-      }
-      lotcode = extraLinked?.lotcode || batch?.lotcode || '';
-      if (extraLinked?.formDataExtra) {
-        try {
-          formDataExtra = typeof extraLinked.formDataExtra === 'string' ? JSON.parse(extraLinked.formDataExtra) : extraLinked.formDataExtra;
-        } catch (e) {
-          formDataExtra = null;
-        }
-      }
-      if (!formDataExtra) {
-        formDataExtra = {
-          fiIdentificationCode: '',
-          facilityName: '',
-          facilityAddress: '',
-          facilityArea: '',
-        };
-      }
-
-      if (extraLinked?.batchInternalSeq) {
-        isLinkedInternal = true;
-        internalBatch = await this.repository.getBatchBySeq(extraLinked.batchInternalSeq);
-        if (internalBatch?.userHomeCode) {
-          homeInfo = await this.repository.getHomeInfoByUserHomeCode(internalBatch.userHomeCode);
-        }
-      }
+      lotcode = batch?.lotcode || '';
     } else {
       batch = await this.repository.getBatchByTraceabilityId(traceabilityId);
       lotcode = batch?.lotcode || '';
@@ -123,18 +91,13 @@ export class TraceabilityAdminService {
 
     const formsWithSubmissions = await Promise.all(
       rawForms.map(async (form) => {
-        let submission = isExternal
+        const submission = isExternal
           ? await this.repository.getSubmissionByTraceabilityIdAndFormSeqExternal(traceabilityId, form.seq)
           : await this.repository.getSubmissionByTraceabilityIdAndFormSeq(traceabilityId, form.seq);
 
         let files: any[] = [];
         if (submission) {
           files = isExternal ? await this.repository.getFilesByUniqueIdExternal(submission.uniqueId) : await this.repository.getFilesByUniqueId(submission.uniqueId);
-        } else if (isExternal && isLinkedInternal && internalBatch?.traceabilityId) {
-          submission = await this.repository.getSubmissionByTraceabilityIdAndFormSeq(internalBatch.traceabilityId, form.seq);
-          if (submission) {
-            files = await this.repository.getFilesByUniqueId(submission.uniqueId);
-          }
         }
 
         if (submission) {
@@ -216,36 +179,14 @@ export class TraceabilityAdminService {
         const harvestPhasesData = await this.repository.getHarvestPhasesInfo(userCode, userHomeCode, phaseNumbers);
         harvestPhaseLabels = harvestPhasesData.map((hp) => hp.label);
       }
-    } else {
-      if (isLinkedInternal && internalBatch) {
-        let phaseNumbers: number[] = [];
-        if (internalBatch.harvestPhases) {
-          phaseNumbers = String(internalBatch.harvestPhases)
-            .split(',')
-            .map((p) => Number(p.trim()))
-            .filter((p) => !isNaN(p) && p > 0);
-        }
-        if (phaseNumbers.length === 0 && formDataExtra?.hiNumberHarvest) {
-          if (Array.isArray(formDataExtra.hiNumberHarvest)) {
-            phaseNumbers = formDataExtra.hiNumberHarvest.map((p: any) => Number(p)).filter((p: number) => !isNaN(p) && p > 0);
-          } else if (!isNaN(Number(formDataExtra.hiNumberHarvest))) {
-            phaseNumbers = [Number(formDataExtra.hiNumberHarvest)];
-          }
-        }
-
-        if (internalBatch.userCode && internalBatch.userHomeCode && phaseNumbers.length > 0) {
-          const harvestPhasesData = await this.repository.getHarvestPhasesInfo(internalBatch.userCode, internalBatch.userHomeCode, phaseNumbers);
-          harvestPhaseLabels = harvestPhasesData.map((hp) => hp.label);
-        }
-      }
     }
 
     const compactData = isCompact
       ? this.fieldsService.buildCompactData({
           isExternal,
-          isLinkedInternal,
+          isLinkedInternal: false,
           lotcode,
-          formDataExtra,
+          formDataExtra: null,
           homeInfo,
           forms: formsWithSubmissions,
           harvestPhaseLabels,
@@ -255,21 +196,11 @@ export class TraceabilityAdminService {
     return {
       traceabilityId,
       isExternal,
-      isLinkedInternal,
+      isLinkedInternal: false,
       lotcode,
-      formDataExtra: isExternal ? formDataExtra : null,
+      formDataExtra: null,
       homeInfo: isExternal
-        ? isLinkedInternal && homeInfo
-          ? {
-              userHomeCode: homeInfo.userHomeCode,
-              userHomeName: homeInfo.userHomeName,
-              userHomeAddress: homeInfo.userHomeAddress,
-              userHomeLength: homeInfo.userHomeLength,
-              userHomeWidth: homeInfo.userHomeWidth,
-              userHomeFloor: homeInfo.userHomeFloor,
-              userName: homeInfo.userName || '',
-            }
-          : null
+        ? null
         : homeInfo
           ? {
               userHomeCode: homeInfo.userHomeCode,

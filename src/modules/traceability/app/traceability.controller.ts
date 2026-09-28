@@ -15,15 +15,8 @@ import { VideoConverterInterceptor } from 'src/interceptors/video-converter.inte
 import { ApiAuthAppGuard } from 'src/modules/auth/app/auth.guard';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { TraceabilityAdminService } from '../admin/traceability.service';
-import { DeleteFileQueryDto, GetAllFormsDto, GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto, CheckLotcodeMatchInternalQueryDto } from './traceability.dto';
-import {
-  TraceabilityFormResDto,
-  TraceabilityFormSimpleResDto,
-  UploadTraceabilityFileResDto,
-  TraceabilityHouseInfoResDto,
-  TraceabilityBatchListResDto,
-  CheckLotcodeMatchInternalResDto,
-} from './traceability.response';
+import { DeleteFileQueryDto, GetAllFormsDto, GetFormDto, GetSubmissionBatchListDto, SubmitTraceabilityDto, UploadTraceabilityFilesDto } from './traceability.dto';
+import { TraceabilityFormResDto, TraceabilityFormSimpleResDto, UploadTraceabilityFileResDto, TraceabilityHouseInfoResDto, TraceabilityBatchListResDto } from './traceability.response';
 import { TraceabilityAppService } from './traceability.service';
 
 @ApiTags('app/traceability')
@@ -103,23 +96,6 @@ export class TraceabilityAppController implements OnModuleInit {
     const result = await this.service.getSubmissionBatchList(query, user.userCode);
     return {
       message: Msg.GetOk,
-      data: result,
-    };
-  }
-
-  @ApiOperation({
-    summary: 'Kiểm tra lotcode có khớp với lô truy xuất nội bộ không',
-    description: 'Dùng cho màn hình external khi onBlur lotcode input để tự động lấy thông tin cơ sở và sản lượng thu hoạch',
-  })
-  @Get('checkLotcodeMatchInternal')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: ApiAppResponseDto(CheckLotcodeMatchInternalResDto) })
-  async checkLotcodeMatchInternal(@Query() query: CheckLotcodeMatchInternalQueryDto, @Req() req: Request) {
-    const userCode = req['userCode'];
-    const result = await this.service.checkLotcodeMatchInternal(query.lotcode, query.traceabilityId, userCode);
-    return {
-      message: Msg.GetOk,
-      data: result,
     };
   }
 
