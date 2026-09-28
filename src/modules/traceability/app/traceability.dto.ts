@@ -118,6 +118,11 @@ export class SubmitTraceabilityDto {
   @IsOptional()
   userHomeCode?: string;
 
+  @ApiPropertyOptional({ example: 'N', description: 'N = Nội bộ, Y = External' })
+  @IsString()
+  @IsOptional()
+  isExternal?: YnEnum;
+
   @ApiPropertyOptional({ type: ExternalInfoDto, description: 'null cho internal, object cho external' })
   @IsOptional()
   externalInfo?: ExternalInfoDto | null;

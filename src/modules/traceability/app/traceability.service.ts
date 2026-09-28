@@ -161,9 +161,9 @@ export class TraceabilityAppService {
   }
 
   async submit(dto: SubmitTraceabilityDto, userCode: string): Promise<number> {
-    // Phân biệt external hay internal dựa vào externalInfo mang giá trị null hay object
-    const isExternal = Boolean(dto.externalInfo && typeof dto.externalInfo === 'object');
-    if (isExternal || !dto.userHomeCode) {
+    // Phân biệt external hay internal dựa vào isExternal === 'Y', externalInfo mang giá trị object, hoặc không có userHomeCode
+    const isExternal = Boolean(dto.isExternal === YnEnum.Y || (dto.externalInfo && typeof dto.externalInfo === 'object') || !dto.userHomeCode);
+    if (isExternal) {
       return await this.externalService.submit(dto, userCode);
     }
     const isExist = await this.repository.checkExistUniqueId(dto.uniqueId);
@@ -172,11 +172,12 @@ export class TraceabilityAppService {
     const phases = this.traceabilityFieldsService.extractHiNumberHarvest(dto.formData);
     const harvestPhases = phases.length > 0 ? phases.sort((a, b) => a - b).join(',') : null;
     let generatedLotCode: string | null = null;
-    if (phases.length > 0 && dto.userHomeCode) {
-      generatedLotCode = generateTraceabilityLotCodeByHarvest(dto.userHomeCode, phases);
+    const userHomeCode = dto.userHomeCode!;
+    if (phases.length > 0 && userHomeCode) {
+      generatedLotCode = generateTraceabilityLotCodeByHarvest(userHomeCode, phases);
     }
 
-    const homeSeq = await this.repository.getUserHomeSeq(dto.userHomeCode);
+    const homeSeq = await this.repository.getUserHomeSeq(userHomeCode);
     if (!homeSeq) {
       throw new BadRequestException({ message: Msg.HomeNotFound, data: null });
     }
@@ -197,7 +198,7 @@ export class TraceabilityAppService {
     }
 
     if (!batch) {
-      batch = await this.repository.findOrCreateBatch(userCode, dto.userHomeCode, userCode, harvestPhases, generatedLotCode);
+      batch = await this.repository.findOrCreateBatch(userCode, userHomeCode, userCode, harvestPhases, generatedLotCode);
     }
 
     if (isExist) {
@@ -217,7 +218,7 @@ export class TraceabilityAppService {
     // Tạo mới form
     const traceabilityCode = await this.repository.generateTraceabilityCode();
 
-    const insertId = await this.repository.insertSubmission(batch.seq, traceabilityCode, dto.formSeq, userCode, dto.userHomeCode, formDataStr, dto.uniqueId, userCode);
+    const insertId = await this.repository.insertSubmission(batch.seq, traceabilityCode, dto.formSeq, userCode, userHomeCode, formDataStr, dto.uniqueId, userCode);
 
     if (insertId) {
       await this.repository.bindFilesToSubmission(insertId, dto.uniqueId, userCode);

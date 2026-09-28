@@ -186,12 +186,12 @@ export class TraceabilityFieldsService {
           }
 
           // Toàn bộ LOT_CODE_FIELDS đều bị disabled = true (chỉ hiển thị mã lô từ batch)
-          if (this.isLotCodeField(f.fieldKey)) {
-            if (!config || typeof config !== 'object') {
-              config = {};
-            }
-            config.disabled = true;
-          }
+          // if (this.isLotCodeField(f.fieldKey)) {
+          //   if (!config || typeof config !== 'object') {
+          //     config = {};
+          //   }
+          //   config.disabled = true;
+          // }
 
           return {
             fieldKey: f.fieldKey,

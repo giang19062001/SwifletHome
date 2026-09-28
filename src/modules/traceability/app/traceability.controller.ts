@@ -96,6 +96,7 @@ export class TraceabilityAppController implements OnModuleInit {
     const result = await this.service.getSubmissionBatchList(query, user.userCode);
     return {
       message: Msg.GetOk,
+      data: result,
     };
   }
 
