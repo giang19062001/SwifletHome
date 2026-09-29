@@ -190,13 +190,13 @@
                                                     <% todoSubFields.forEach(sub => { %>
                                                         <% const val = item[sub.fieldKey]; %>
                                                         <% if (sub.fieldKey === 'taskName' || sub.fieldKey === 'name') { %>
-                                                            <td class="fw-medium"><%= val || '-' %></td>
+                                                            <td class="fw-medium" style="white-space: pre-line;"><%= val || '-' %></td>
                                                         <% } else { %>
                                                             <td class="text-muted small"><%= val || '-' %></td>
                                                         <% } %>
                                                     <% }) %>
                                                 <% } else { %>
-                                                    <td class="fw-medium"><%= item.taskName || item.todoName || item.title || item.name || '-' %></td>
+                                                    <td class="fw-medium" style="white-space: pre-line;"><%= item.taskName || item.todoName || item.title || item.name || '-' %></td>
                                                     <td class="text-muted small"><%= item.taskDate || item.createdAt || item.time || '-' %></td>
                                                 <% } %>
                                             </tr>

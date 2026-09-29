@@ -192,25 +192,27 @@ export class TraceabilityPdfTemplate {
 
             if (Array.isArray(todoItems) && todoItems.length > 0) {
               todoItems.forEach((item: any, idx: number) => {
-                checkPageBreak(18);
+                let lineStr = '';
                 if (todoSubFields.length > 0) {
-                  const line = todoSubFields.map((sub: any) => `${sub.fieldName}: ${item[sub.fieldKey] || '-'}`).join(' | ');
-                  doc
-                    .font(fontRegular)
-                    .fontSize(9)
-                    .fillColor('#4A5568')
-                    .text(`  ${idx + 1}. ${line}`, 55, currentY);
+                  lineStr = todoSubFields.map((sub: any) => `${sub.fieldName}: ${item[sub.fieldKey] || '-'}`).join(' | ');
                 } else {
                   const title = item.taskName || item.todoName || item.title || item.name || '-';
                   const time = item.taskDate || item.createdAt || item.time || '';
                   const details = [time].filter(Boolean).join(' - ');
-                  doc
-                    .font(fontRegular)
-                    .fontSize(9)
-                    .fillColor('#4A5568')
-                    .text(`  ${idx + 1}. ${title}${details ? ` (${details})` : ''}`, 55, currentY);
+                  lineStr = `${title}${details ? ` (${details})` : ''}`;
                 }
-                currentY += 15;
+
+                const fullItemText = `  ${idx + 1}. ${lineStr}`;
+                const itemHeight = doc.font(fontRegular).fontSize(9).heightOfString(fullItemText, { width: 490 });
+                checkPageBreak(itemHeight + 4);
+
+                doc
+                  .font(fontRegular)
+                  .fontSize(9)
+                  .fillColor('#4A5568')
+                  .text(fullItemText, 55, currentY, { width: 490 });
+
+                currentY = Math.max(currentY + 15, doc.y + 4);
               });
             } else {
               doc.font(fontRegular).fontSize(9).fillColor('#718096').text('  Chưa có dữ liệu việc thực hiện.', 55, currentY);
@@ -255,8 +257,8 @@ export class TraceabilityPdfTemplate {
             }
             currentY += 10;
 
-            // II. NGUỒN GỐC SẢN PHẨM (ORIGIN_NEST)
-            renderSectionHeader('II. NGUỒN GỐC SẢN PHẨM');
+            // II. NGUỒN GỐC NGUYÊN LIỆU (ORIGIN_NEST)
+            renderSectionHeader('II. NGUỒN GỐC NGUYÊN LIỆU');
             renderKeyValue('Địa chỉ khu vực sản xuất/ thu hoạch', compact.onAddressArea || compact.facilityAddress);
 
             renderKeyValue('Ngày thu hoạch', compact.onHarvestDate || compact.hiHarvestDate);
@@ -445,7 +447,7 @@ export class TraceabilityPdfTemplate {
 
                       if (valStr !== '') {
                         doc.font(fontRegular).fillColor('#000000').text(valStr);
-                        currentY += 15;
+                        currentY = Math.max(currentY + 15, doc.y + 4);
                       } else {
                         doc.text(''); // end the continued line
                         currentY += 15;

@@ -56,5 +56,11 @@ export const LOOP_GROUP_INFO = {
   ORIGIN_NEST: {
     title: 'Lô nguyên liệu',
   },
+  DELIVERING_INFO: {
+    title: 'Giao nhận lô nguyên liệu',
+  },
+  RECEIVING_MATERIAL: {
+    title: 'Lô nguyên liệu',
+  },
 };
 export const FINAL_FORM_SEQ = 8;
