@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
     btnReset.addEventListener('click', function () {
       const elKeyword = document.getElementById('filterKeyword');
       if (elKeyword) elKeyword.value = '';
+      const elType = document.getElementById('filterType');
+      if (elType) elType.value = '';
       const elStatus = document.getElementById('filterStatus');
       if (elStatus) elStatus.value = '';
       const elFromDate = document.getElementById('filterFromDate');
@@ -45,6 +47,7 @@ function changePage(p) {
 
 function getFilterParams() {
   const keyword = document.getElementById('filterKeyword')?.value?.trim() || '';
+  const type = document.getElementById('filterType')?.value || '';
   const status = document.getElementById('filterStatus')?.value || '';
   const fromDate = document.getElementById('filterFromDate')?.value || '';
   const toDate = document.getElementById('filterToDate')?.value || '';
@@ -55,6 +58,7 @@ function getFilterParams() {
   };
 
   if (keyword) params.keyword = keyword;
+  if (type) params.type = type;
   if (status) params.status = status;
   if (fromDate) params.fromDate = fromDate;
   if (toDate) params.toDate = toDate;
@@ -99,18 +103,27 @@ function renderTraceabilityList(data, objElement) {
       if (ele.status === 'APPROVED') statusBadgeClass = 'badge bg-success';
       if (ele.status === 'REFUSED') statusBadgeClass = 'badge bg-danger';
 
+      const isExt = Boolean(ele.isExternal || ele.batchType === 'EXTERNAL');
+      const typeBadge = isExt
+        ? `<span class="badge bg-secondary text-white px-2 py-1"><i class="fa fa-globe me-1"></i>Ngoại bộ</span>`
+        : `<span class="badge bg-primary text-white px-2 py-1"><i class="fa fa-home me-1"></i>Nội bộ</span>`;
+
+      const originInfo = isExt
+        ? `<p class="mb-0 text-muted fst-italic">Truy xuất ngoại bộ</p>`
+        : `<p class="mb-0 fw-bold">${ele.userHomeName || '-'}</p>
+           <p class="mb-0 text-muted small">${ele.userHomeCode || ''}</p>`;
+
       const rowHtml = `
         <tr class="text-center align-middle">
           <td><p class="mb-0">${(page - 1) * limit + i++}</p></td>
+          <td>${typeBadge}</td>
           <td>
             <p class="mb-0 fw-bold">${ele.userName || 'Chưa cập nhật'}</p>
             <p class="mb-0 text-muted small">${ele.userPhone || ''}</p>
           </td>
           <td>
-            <p class="mb-0 fw-bold">${ele.userHomeName || ''}</p>
-            <p class="mb-0 text-muted small">${ele.userHomeCode || ''}</p>
+            ${originInfo}
           </td>
-          <td><p class="mb-0">${ele.harvestPhases ? ('Đợt: ' + ele.harvestPhases) : 'Chưa điền dữ liệu'}</p></td>
           <td><span class="${statusBadgeClass}">${ele.statusLabel || ele.status}</span></td>
           <td><p class="mb-0">${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm') : ''}</p></td>
           <td style="width: 300px;">
@@ -119,8 +132,8 @@ function renderTraceabilityList(data, objElement) {
                 <i class="fa fa-eye me-1"></i> Chi tiết
               </a>
               ${
-                ele.hasFinalForm
-                  ? `<button class="btn btn-sm btn-info" onclick="openStatusModal(${ele.seq}, '${ele.status}', '${ele.traceabilityId}')" title="Cập nhật trạng thái">
+                ele.hasFinalForm && !isExt
+                  ? `<button class="btn btn-sm btn-info" onclick="openStatusModal(${ele.seq}, '${ele.status}', '${ele.traceabilityId}', ${isExt})" title="Cập nhật trạng thái">
                 <i class="fa fa-edit"></i> Duyệt
               </button>`
                   : ''
@@ -140,11 +153,13 @@ function renderTraceabilityList(data, objElement) {
   hideSkeleton(objElement);
 }
 
-function openStatusModal(seq, currentStatus, code) {
+function openStatusModal(seq, currentStatus, code, isExternal = false) {
   const modalEl = document.querySelector('.traceability-status-modal');
   if (!modalEl) return;
 
   modalEl.querySelector('#statusSubmissionSeq').value = seq;
+  const isExtEl = modalEl.querySelector('#statusIsExternal');
+  if (isExtEl) isExtEl.value = isExternal ? 'true' : 'false';
   modalEl.querySelector('#statusTraceabilityCode').innerText = code || '';
   modalEl.querySelector('#selectSubmissionStatus').value = currentStatus || 'PROCESSING';
 
@@ -157,6 +172,7 @@ async function updateTraceabilityStatus() {
   if (!modalEl) return;
 
   const seq = modalEl.querySelector('#statusSubmissionSeq').value;
+  const isExternal = modalEl.querySelector('#statusIsExternal')?.value === 'true';
   const status = modalEl.querySelector('#selectSubmissionStatus').value;
 
   if (!seq) {
@@ -165,7 +181,7 @@ async function updateTraceabilityStatus() {
   }
 
   await axios
-    .put(CURRENT_URL + '/api/admin/traceability/updateStatus/' + seq, { status: status }, axiosAuth())
+    .put(CURRENT_URL + '/api/admin/traceability/updateStatus/' + seq, { status: status, isExternal: isExternal }, axiosAuth())
     .then(function (response) {
       if (response.status === 200 && response.data) {
         toastOk('Cập nhật trạng thái thành công');

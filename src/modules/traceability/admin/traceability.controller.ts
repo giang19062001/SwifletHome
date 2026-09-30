@@ -30,7 +30,7 @@ export class TraceabilityAdminController {
   @Put('updateStatus/:seq')
   @HttpCode(HttpStatus.OK)
   async updateStatus(@Param('seq') seq: number, @Body() dto: UpdateTraceabilityStatusAdminDto, @GetUserAdmin() user: TokenUserAdminResDto) {
-    const affected = await this.service.updateSubmissionStatus(seq, dto.status, user.userCode || 'ADMIN');
+    const affected = await this.service.updateSubmissionStatus(seq, dto.status, user.userCode, dto.isExternal);
     return {
       message: affected > 0 ? Msg.UpdateOk : Msg.UpdateErr,
       data: affected,

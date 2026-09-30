@@ -9,6 +9,11 @@ export class GetTraceabilityListAdminDto extends PagingDto {
   @IsOptional()
   keyword?: string;
 
+  @ApiProperty({ example: 'ALL', enum: ['ALL', 'INTERNAL', 'EXTERNAL'], required: false, description: 'Loại hồ sơ (ALL, INTERNAL, EXTERNAL)' })
+  @IsString()
+  @IsOptional()
+  type?: string;
+
   @ApiProperty({ example: 1, required: false, description: 'Seq của form biểu mẫu' })
   @IsNumber()
   @IsOptional()
@@ -35,4 +40,8 @@ export class UpdateTraceabilityStatusAdminDto {
   @IsEnum(TraceabilityStatusEnum)
   @IsNotEmpty()
   status!: TraceabilityStatusEnum;
+
+  @ApiProperty({ example: false, required: false, description: 'Có phải là truy xuất ngoại bộ không' })
+  @IsOptional()
+  isExternal?: boolean;
 }

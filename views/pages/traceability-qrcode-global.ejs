@@ -214,7 +214,7 @@
         <% } else { %>
             <!-- ========================================== -->
             <!-- ========================================== -->
-            <!-- TRUY XUẤT MỞ RỘNG (EXTERNAL) - THEO EXTERNAL_WHITELIST -->
+            <!-- TRUY XUẤT MỞ RỘNG (EXTERNAL) - THEO EXTERNAL_COMPACT_WHITELIST -->
             <!-- ========================================== -->
 
             <!-- Thẻ 1: Thông tin nhà sản xuất (MANUFACTURER) -->
@@ -231,7 +231,7 @@
                             <div class="field-container">
                                 <div class="field-label text-muted small">Tên nhà sản xuất</div>
                                 <div class="field-value fw-bold fs-6">
-                                    <%= compact.facilityName || compact.personInCharge || '-' %>
+                                    <%= compact.mFacilityName || '-' %>
                                 </div>
                             </div>
                         </div>
@@ -239,38 +239,54 @@
                             <div class="field-container">
                                 <div class="field-label text-muted small">Địa chỉ</div>
                                 <div class="field-value">
-                                    <%= compact.facilityAddress || '-' %>
+                                    <%= compact.mFacilityAddress || '-' %>
                                 </div>
                             </div>
                         </div>
 
-                        <% const certVal = compact.mCertificationFile || compact.fiCertificationFile; %>
-                        <% if (certVal) { %>
-                            <% 
-                                let certFiles = [];
-                                if (Array.isArray(certVal)) {
-                                    certFiles = certVal.map(f => typeof f === 'object' ? f?.url : f).filter(Boolean);
-                                } else if (certVal) {
-                                    const singleUrl = typeof certVal === 'object' ? certVal?.url : certVal;
-                                    if (singleUrl) certFiles.push(singleUrl);
-                                }
-                            %>
-                            <% if (certFiles.length > 0) { %>
-                                <div class="col-12">
-                                    <div class="field-container">
-                                        <div class="field-label text-muted small mb-2">Hồ sơ pháp lý</div>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <% certFiles.forEach(function(fileUrl, idx) { %>
-                                                <a href="/<%= fileUrl %>" target="_blank" class="btn btn-sm btn-outline-primary py-1 px-3 d-inline-flex align-items-center">
-                                                    <i class="fa fa-file-alt me-2"></i>Xem file chứng nhận <%= certFiles.length > 1 ? (idx + 1) : '' %>
-                                                    <i class="fa fa-external-link-alt ms-2 small"></i>
-                                                </a>
-                                            <% }); %>
-                                        </div>
+                         <% const certVal = compact.mCertificationFile %>
+
+                        <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small mb-2">Hồ sơ pháp lý</div>
+
+                                <%
+                                    let certFiles = [];
+
+                                    if (Array.isArray(certVal)) {
+                                        certFiles = certVal
+                                            .map(f => typeof f === 'object' ? f?.url : f)
+                                            .filter(Boolean);
+                                    } else if (certVal) {
+                                        const singleUrl = typeof certVal === 'object'
+                                            ? certVal?.url
+                                            : certVal;
+
+                                        if (singleUrl) {
+                                            certFiles.push(singleUrl);
+                                        }
+                                    }
+                                %>
+
+                                <% if (certFiles.length > 0) { %>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <% certFiles.forEach(function(fileUrl, idx) { %>
+                                            <a
+                                                href="/<%= fileUrl %>"
+                                                target="_blank"
+                                                class="btn btn-sm btn-outline-primary py-1 px-3 d-inline-flex align-items-center"
+                                            >
+                                                <i class="fa fa-file-alt me-2"></i>
+                                                Xem file chứng nhận <%= certFiles.length > 1 ? (idx + 1) : '' %>
+                                                <i class="fa fa-external-link-alt ms-2 small"></i>
+                                            </a>
+                                        <% }); %>
                                     </div>
-                                </div>
-                            <% } %>
-                        <% } %>
+                                <% } else { %>
+                                    <span class="text-muted">-</span>
+                                <% } %>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -284,37 +300,78 @@
                     <h5 class="mb-0 fw-bold text-dark">Nguồn gốc sản phẩm</h5>
                 </div>
                 <div class="card-body p-3 p-md-4">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Sản phẩm thu hoạch tại:</div>
-                                <div class="field-value fs-6 fw-bold text-dark">
-                                    <%= compact.onAddressArea || compact.facilityAddress || '-' %>
-                                </div>
-                            </div>
-                        </div>
+                    <h6 class="fw-bold text-primary mb-3 d-flex align-items-center d-none">
+                        <i class="fa fa-warehouse me-2"></i> Nguồn gốc nguyên liệu
+                    </h6>
 
-                        <div class="col-12">
-                            <div class="field-container">
-                                <div class="field-label text-muted small">Ngày thu hoạch</div>
-                                <div class="field-value fw-bold">
-                                    <%= compact.onHarvestDate || compact.hiHarvestDate %>
-                                </div>
-                            </div>
-                        </div>
+                    <% 
+                        const rawLots = compact.originNestGroup?.loopValues;
+                        const nestLots = Array.isArray(rawLots) && rawLots.length > 0
+                            ? rawLots
+                            : (compact.onAddressArea || compact.onHarvestDate || compact.onWeightingPhoto
+                                ? [{
+                                    onAddressArea: compact.onAddressArea || compact.facilityAddress,
+                                    onHarvestDate: compact.onHarvestDate || compact.hiHarvestDate,
+                                    onWeightingPhoto: compact.onWeightingPhoto
+                                }]
+                                : []);
+                    %>
 
-                        <% if (compact.onWeightingPhoto) { %>
-                            <% const photoUrl = typeof compact.onWeightingPhoto === 'object' ? compact.onWeightingPhoto?.url : compact.onWeightingPhoto; %>
-                            <% if (photoUrl) { %>
-                                <div class="col-12 mt-3">
-                                    <div class="field-label text-muted small mb-2 fw-bold">Hình ảnh thu hoạch:</div>
-                                    <a href="/<%= photoUrl %>" target="_blank" class="d-block text-center">
-                                        <img src="/<%= photoUrl %>" alt="Ảnh cân tổ yến" class="img-thumbnail rounded shadow-sm w-100" style="max-height: 380px; object-fit: contain;">
-                                    </a>
+                    <% if (nestLots.length > 0) { %>
+                        <div class="row g-3">
+                            <% nestLots.forEach((lot, lIdx) => { %>
+                                <div class="col-12">
+                                    <div class="card border bg-light p-3 shadow-none mb-2 rounded-3">
+                                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom pb-2 mb-3">
+                                            <span class="fw-bold text-success fs-6">
+                                                <i class="fa fa-box-open me-1"></i> Lô nguyên liệu <%= lIdx + 1 %>
+                                            </span>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <div class="d-flex flex-column gap-2 small">
+                                                    <% if (lot.onAddressArea || compact.facilityAddress) { %>
+                                                        <div>
+                                                            <span class="text-muted"><i class="fa fa-map-marker-alt me-1 text-secondary"></i> Sản phẩm thu hoạch tại:</span>
+                                                            <strong class="text-dark ms-1"><%= lot.onAddressArea || compact.facilityAddress %></strong>
+                                                        </div>
+                                                    <% } %>
+
+                                                    <% if (lot.onHarvestDate || compact.hiHarvestDate) { %>
+                                                        <div>
+                                                            <span class="text-muted"><i class="fa fa-calendar-alt me-1 text-secondary"></i> Ngày thu hoạch:</span>
+                                                            <strong class="text-dark ms-1"><%= lot.onHarvestDate || compact.hiHarvestDate %></strong>
+                                                        </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+
+                                            <% 
+                                                const photoVal = lot.onWeightingPhoto;
+                                                const photoUrl = typeof photoVal === 'object' ? photoVal?.url : photoVal;
+                                            %>
+                                            <% if (photoUrl) { %>
+                                                <div class="col-12 mt-2">
+                                                    <div class="field-label text-muted small mb-1">Hình ảnh thu hoạch:</div>
+                                                    <a href="/<%= photoUrl %>" target="_blank" class="d-inline-block">
+                                                        <img
+                                                            src="/<%= photoUrl %>"
+                                                            alt="Ảnh cân tổ yến"
+                                                            class="img-thumbnail rounded shadow-sm"
+                                                            style="max-height: 220px; max-width: 100%; object-fit: contain;"
+                                                        >
+                                                    </a>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
                                 </div>
-                            <% } %>
-                        <% } %>
-                    </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted small mb-0">Chưa có thông tin lô nguyên liệu.</p>
+                    <% } %>
                 </div>
             </div>
 
@@ -430,6 +487,30 @@
                                 </div>
                             </div>
                         </div>
+                         <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small">Giá trị dinh dưỡng</div>
+                                <div class="field-value" style="white-space: pre-line;">
+                                    <%= compact.iiNutritionalValue || '-' %>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small">Hướng dẫn bảo quản</div>
+                                <div class="field-value" style="white-space: pre-line;">
+                                    <%= compact.iiStorageInstruction || '-' %>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="col-12">
+                            <div class="field-container">
+                                <div class="field-label text-muted small">Cảnh báo</div>
+                                <div class="field-value" style="white-space: pre-line;">
+                                    <%= compact.iiWarning || '-' %>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -439,7 +520,8 @@
         <!-- Footer / Thông tin bản quyền -->
         <div class="text-center py-4 text-muted small">
             <p class="mb-1">© <%= new Date().getFullYear() %> Hệ thống Quản trị & Truy xuất sản phẩm 3FAM</p>
-            <p class="mb-0">Dữ  liệu truy xuất nguồn gốc tổ yến do chủ nhà Yến cung cấp và chịu trách nhiệm.</p>
+            <p class="mb-0">Dữ  liệu truy xuất nguồn gốc 
+                   <%= isExternal ? 'sản phẩm' : 'tổ yến' %> do chủ nhà Yến cung cấp và chịu trách nhiệm.</p>
         </div>
     </div>
 </div>

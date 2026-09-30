@@ -1,6 +1,6 @@
-import { LOOP_GROUP_INFO, LOT_CODE_FIELD_FOLLOW_HARVEST, LOT_CODE_FIELDS } from './../common/traceability.const';
 import { Injectable, Optional } from '@nestjs/common';
 import { YnEnum } from 'src/interfaces/admin.interface';
+import { LOOP_GROUP_INFO, LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST } from './../common/traceability.const';
 import { TraceabilityExternalRepository } from './traceability-external.repository';
 import { generateTraceabilityLotCodeByHarvest } from './traceability.func';
 import { TRACE_FORM_CONFIG_OPTIONS_SQL, TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE, TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL, TRACE_FORM_LIST_FIELD_SQL } from './traceability.query';
@@ -13,13 +13,6 @@ export class TraceabilityFieldsService {
     private readonly repository: TraceabilityAppRepository,
     @Optional() private readonly externalRepository?: TraceabilityExternalRepository,
   ) {}
-
-  /**
-   * Kiểm tra một fieldKey có phải là trường đặc biệt Mã Lô (LotCode) hay không
-   */
-  isLotCodeField(fieldKey: string): boolean {
-    return LOT_CODE_FIELDS.includes(fieldKey);
-  }
 
   private parsePhases(val: any): number[] {
     if (val === undefined || val === null || val === '') return [];
@@ -41,28 +34,28 @@ export class TraceabilityFieldsService {
       if (val.value !== undefined) {
         return this.parsePhases(val.value);
       }
-      if (val[LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
-        return this.parsePhases(val[LOT_CODE_FIELD_FOLLOW_HARVEST]);
+      if (val[LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST] !== undefined) {
+        return this.parsePhases(val[LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST]);
       }
     }
     return [];
   }
 
   /**
-   * Bóc tách giá trị đợt thu hoạch (LOT_CODE_FIELD_FOLLOW_HARVEST) từ formData
+   * Bóc tách giá trị đợt thu hoạch (LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST) từ formData
    */
   extractHiNumberHarvest(formData: any): number[] {
     if (!formData || typeof formData !== 'object') return [];
     const phases: number[] = [];
 
-    if (formData[LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
-      phases.push(...this.parsePhases(formData[LOT_CODE_FIELD_FOLLOW_HARVEST]));
+    if (formData[LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST] !== undefined) {
+      phases.push(...this.parsePhases(formData[LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST]));
     }
 
     for (const key of Object.keys(formData)) {
       if (formData[key] && typeof formData[key] === 'object') {
-        if (formData[key][LOT_CODE_FIELD_FOLLOW_HARVEST] !== undefined) {
-          phases.push(...this.parsePhases(formData[key][LOT_CODE_FIELD_FOLLOW_HARVEST]));
+        if (formData[key][LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST] !== undefined) {
+          phases.push(...this.parsePhases(formData[key][LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST]));
         }
       }
     }
@@ -185,14 +178,6 @@ export class TraceabilityFieldsService {
             }
           }
 
-          // Toàn bộ LOT_CODE_FIELDS đều bị disabled = true (chỉ hiển thị mã lô từ batch)
-          // if (this.isLotCodeField(f.fieldKey)) {
-          //   if (!config || typeof config !== 'object') {
-          //     config = {};
-          //   }
-          //   config.disabled = true;
-          // }
-
           return {
             fieldKey: f.fieldKey,
             fieldName: f.fieldName,
@@ -270,80 +255,67 @@ export class TraceabilityFieldsService {
       }
     }
     if (isExternal == YnEnum.N && userCode && userHomeCode) {
-      const submissionsFormData = await this.repository.getSubmissionsFormDataByUserHome(userCode, userHomeCode);
-      const activeHarvestPhases = this.collectHarvestPhases(savedData, submissionsFormData);
-      let generatedLotCode: string | null = null;
-      if (activeHarvestPhases && activeHarvestPhases.length > 0) {
-        generatedLotCode = generateTraceabilityLotCodeByHarvest(userHomeCode, activeHarvestPhases);
-      }
-      const finalLotCode = batchLotcode || generatedLotCode || '';
+      // const submissionsFormData = await this.repository.getSubmissionsFormDataByUserHome(userCode, userHomeCode);
+      // const activeHarvestPhases = this.collectHarvestPhases(savedData, submissionsFormData);
+      // const generatedLotCode : string | null =   activeHarvestPhases.length > 0 ? generateTraceabilityLotCodeByHarvest(userHomeCode, activeHarvestPhases) :null
 
       for (const group of mappedGroups) {
         for (const field of group.fields) {
-          if (this.isLotCodeField(field.fieldKey)) {
-            field.currentValue = finalLotCode;
-            if (group.isLoop === 'Y' && Array.isArray(group.loopValues)) {
-              group.loopValues.forEach((row) => {
-                row[field.fieldKey] = finalLotCode;
-              });
-            }
-          } else {
-            // Xử lý options động
-            const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];
-            if (sqlQuery) {
-              promises.push(
-                (async () => {
-                  try {
-                    const rows = await this.repository.getDynamicOptions(sqlQuery, userCode, userHomeCode);
-                    const options = rows.map((row, idx) => {
-                      const { value, label, ...rest } = row;
-                      const option: any = {
-                        value: value,
-                        label: label,
-                        sortOrder: idx + 1,
-                        ...rest,
-                      };
-                      return option;
-                    });
+          // Xử lý options động
+          const sqlQuery = TRACE_FORM_CONFIG_OPTIONS_SQL[field.fieldKey as keyof typeof TRACE_FORM_CONFIG_OPTIONS_SQL];
+          if (sqlQuery) {
+            promises.push(
+              (async () => {
+                try {
+                  const rows = await this.repository.getDynamicOptions(sqlQuery, userCode, userHomeCode);
+                  const options = rows.map((row, idx) => {
+                    const { value, label, ...rest } = row;
+                    const option: any = {
+                      value: value,
+                      label: label,
+                      sortOrder: idx + 1,
+                      ...rest,
+                    };
+                    return option;
+                  });
 
-                    if (!field.config) {
+                  if (!field.config) {
+                    field.config = {};
+                  } else if (typeof field.config === 'string') {
+                    try {
+                      field.config = JSON.parse(field.config);
+                    } catch (e) {
                       field.config = {};
-                    } else if (typeof field.config === 'string') {
-                      try {
-                        field.config = JSON.parse(field.config);
-                      } catch (e) {
-                        field.config = {};
-                      }
-                    }
-
-                    field.config.options = options;
-                  } catch (error) {
-                    console.error(`Error fetching dynamic options for field "${field.fieldKey}":`, error);
-                    if (!field.config) {
-                      field.config = { options: [] };
-                    } else {
-                      field.config.options = [];
                     }
                   }
-                })(),
-              );
-            }
 
-            // Xử lý giá trị danh sách cho các trường dạng list_canwrite (vd: shsTodoList)
-            const listSql = TRACE_FORM_LIST_FIELD_SQL[field.fieldKey as keyof typeof TRACE_FORM_LIST_FIELD_SQL];
-            if (listSql && (field.currentValue === null || field.currentValue === undefined || (Array.isArray(field.currentValue) && field.currentValue.length === 0))) {
-              promises.push(
-                (async () => {
-                  try {
-                    const rows = await this.repository.getDynamicOptions(listSql, userCode, userHomeCode);
-                    field.currentValue = rows || [];
-                  } catch (error) {
-                    console.error(`Error fetching list field value for "${field.fieldKey}":`, error);
-                    field.currentValue = [];
+                  field.config.options = options;
+                } catch (error) {
+                  console.error(`Error fetching dynamic options for field "${field.fieldKey}":`, error);
+                  if (!field.config) {
+                    field.config = { options: [] };
+                  } else {
+                    field.config.options = [];
                   }
-                })(),
-              );
-            }
+                }
+              })(),
+            );
+          }
+
+          // Xử lý giá trị danh sách cho các trường dạng list_canwrite (vd: shsTodoList)
+          const listSql = TRACE_FORM_LIST_FIELD_SQL[field.fieldKey as keyof typeof TRACE_FORM_LIST_FIELD_SQL];
+          if (listSql && (field.currentValue === null || field.currentValue === undefined || (Array.isArray(field.currentValue) && field.currentValue.length === 0))) {
+            promises.push(
+              (async () => {
+                try {
+                  const rows = await this.repository.getDynamicOptions(listSql, userCode, userHomeCode);
+                  field.currentValue = rows || [];
+                } catch (error) {
+                  console.error(`Error fetching list field value for "${field.fieldKey}":`, error);
+                  field.currentValue = [];
+                }
+              })(),
+            );
           }
         }
       }
@@ -361,20 +333,6 @@ export class TraceabilityFieldsService {
           const batch = await this.externalRepository.getBatchByTraceabilityId(traceabilityId, userCode);
           if (batch && batch.lotcode) {
             lotcodeValue = batch.lotcode;
-          }
-        }
-      }
-
-      for (const group of mappedGroups) {
-        for (const field of group.fields) {
-          if (this.isLotCodeField(field.fieldKey)) {
-            field.currentValue = lotcodeValue;
-
-            if (group.isLoop === 'Y' && Array.isArray(group.loopValues)) {
-              group.loopValues.forEach((row) => {
-                row[field.fieldKey] = lotcodeValue;
-              });
-            }
           }
         }
       }

@@ -19,7 +19,14 @@ export const TRACE_CONST = {
   TRACE_EXTERNAL_PREFIX: '3FAM-VCĐP',
 };
 
-export const INTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
+// GIÁ TRỊ HIỂN THỊ Ở FRONTEND
+export const GROUP_COMPACT_ALIASES: Record<string, string> = {
+  SWIFT_HOUSE_TD: 'todoListGroup',
+  DIARY_PROCESS: 'diaryProcessGroup',
+  ORIGIN_NEST: 'originNestGroup',
+};
+
+export const INTERNAL_COMPACT_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
   BRIEF_SWIFT_HOUSE: {
     FACILITY_INFO: ['personInCharge', 'fiIdentificationCode', 'facilityAddress'],
   },
@@ -32,21 +39,20 @@ export const INTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>
   },
 };
 
-export const EXTERNAL_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
+export const EXTERNAL_COMPACT_WHITELIST: Record<string, Record<string, string[] | 'ALL'>> = {
   PRODUCTION_ORIGIN: {
     MANUFACTURER: ['mFacilityName', 'mFacilityAddress', 'mCertificationFile'], //  Thông tin nhà sản xuất
-    ORIGIN_NEST: 'ALL', // nguồn gốc sản phẩm
+    ORIGIN_NEST: 'ALL',
   },
   PRE_PROCESSING: {
     DIARY_PROCESS: 'ALL',
   },
   PACKING_QR: {
-    INGREDIENT_INSTRUCTION: ['iiIngredients', 'iiInstructionUse', 'iiApplicableStandard'],
+    INGREDIENT_INSTRUCTION: ['iiIngredients', 'iiInstructionUse', 'iiApplicableStandard', 'iiNutritionalValue', 'iiStorageInstruction', 'iiWarning'],
   },
 };
 
-export const LOT_CODE_FIELD_FOLLOW_HARVEST = 'hiNumberHarvest';
-export const LOT_CODE_FIELDS = ['diLotCode', 'rmInputLot', 'lfpLotProcessings', 'dLotFinished', 'rLotRecall', 'eiLotCode'];
+export const LOTCODE__EXTERNAL_FIELD_FOLLOW_HARVEST = 'hiNumberHarvest';
 
 export const LOOP_GROUP_INFO = {
   // DIARY_PROCESS, ORIGIN_NEST là groupKey

@@ -109,7 +109,7 @@
                                                             <% group.loopValues.forEach((stage, sIdx) => { %>
                                                                 <div class="card border rounded-3 p-3 shadow-none bg-light bg-opacity-25">
                                                                     <div class="fw-semibold text-primary mb-2">
-                                                                        <i class="fa fa-layer-group me-1"></i> Công đoạn <%= sIdx + 1 %>
+                                                                        <i class="fa fa-layer-group me-1"></i> <%= (group.loopMetadata && group.loopMetadata.title) ? group.loopMetadata.title : 'Công đoạn' %> <%= sIdx + 1 %>
                                                                     </div>
                                                                     <div class="row g-2">
                                                                         <% group.fields.forEach(field => { %>
@@ -120,22 +120,126 @@
                                                                                     <div class="field-label"><%= field.fieldName %></div>
                                                                                     <div class="field-value">
                                                                                         <% if (field.fieldType === 'file_single') { %>
-                                                                                            <% if (val && val.url) { %>
-                                                                                                <% const isImg = val.url.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                                            <% const fileUrl = (val && typeof val === 'object' && val.url) ? val.url : (typeof val === 'string' ? val : null); %>
+                                                                                            <% if (fileUrl) { %>
+                                                                                                <% const isImg = fileUrl.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                                                <% const isVideo = fileUrl.toLowerCase().match(/\.(mp4|mov|webm)$/); %>
                                                                                                 <% if (isImg) { %>
-                                                                                                    <a href="/<%= val.url %>" target="_blank" class="d-inline-block mt-2">
-                                                                                                        <img src="/<%= val.url %>" class="img-thumbnail rounded shadow-sm" style="max-height: 120px;" alt="<%= field.fieldName %>">
+                                                                                                    <a href="/<%= fileUrl %>" target="_blank" class="d-inline-block mt-2">
+                                                                                                        <img src="/<%= fileUrl %>" class="img-thumbnail rounded shadow-sm" style="max-height: 120px;" alt="<%= field.fieldName %>">
                                                                                                     </a>
+                                                                                                <% } else if (isVideo) { %>
+                                                                                                    <div class="mt-2">
+                                                                                                        <video src="/<%= fileUrl %>" controls class="rounded shadow-sm" style="max-height: 200px; max-width: 100%;"></video>
+                                                                                                    </div>
                                                                                                 <% } else { %>
-                                                                                                    <a href="/<%= val.url %>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                                                                                    <a href="/<%= fileUrl %>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
                                                                                                         <i class="fa fa-file-download me-1"></i> Tải tài liệu
                                                                                                     </a>
                                                                                                 <% } %>
                                                                                             <% } else { %>
                                                                                                 <span class="text-muted small">Chưa có tệp đính kèm</span>
                                                                                             <% } %>
+                                                                                        <% } else if (field.fieldType === 'file_multiple') { %>
+                                                                                            <% if (Array.isArray(val) && val.length > 0) { %>
+                                                                                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                                                                                    <% val.forEach(file => { %>
+                                                                                                        <% const fileUrl = (file && typeof file === 'object' && file.url) ? file.url : (typeof file === 'string' ? file : null); %>
+                                                                                                        <% if (fileUrl) { %>
+                                                                                                            <% const isImg = fileUrl.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                                                            <% const isVideo = fileUrl.toLowerCase().match(/\.(mp4|mov|webm)$/); %>
+                                                                                                            <% if (isImg) { %>
+                                                                                                                <a href="/<%= fileUrl %>" target="_blank" class="d-inline-block">
+                                                                                                                    <img src="/<%= fileUrl %>" class="img-thumbnail rounded shadow-sm" style="max-height: 80px;" alt="<%= field.fieldName %>">
+                                                                                                                </a>
+                                                                                                            <% } else if (isVideo) { %>
+                                                                                                                <div class="d-inline-block">
+                                                                                                                    <video src="/<%= fileUrl %>" controls class="rounded shadow-sm" style="max-height: 120px; max-width: 100%;"></video>
+                                                                                                                </div>
+                                                                                                            <% } else { %>
+                                                                                                                <a href="/<%= fileUrl %>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                                                                    <i class="fa fa-file-download me-1"></i> Tải tài liệu
+                                                                                                                </a>
+                                                                                                            <% } %>
+                                                                                                        <% } %>
+                                                                                                    <% }) %>
+                                                                                                </div>
+                                                                                            <% } else { %>
+                                                                                                <span class="text-muted small">Chưa có tệp đính kèm</span>
+                                                                                            <% } %>
                                                                                         <% } else { %>
-                                                                                            <span><%= (val !== null && val !== undefined && val !== '') ? val : '-' %></span>
+                                                                                            <% 
+                                                                                                let listItems = val;
+                                                                                                if (typeof listItems === 'string' && (listItems.trim().startsWith('[') || listItems.trim().startsWith('{'))) {
+                                                                                                    try { listItems = JSON.parse(listItems); } catch(e) {}
+                                                                                                }
+                                                                                                const isTable = field.fieldType === 'list_canwrite' || (Array.isArray(listItems) && listItems.length > 0 && typeof listItems[0] === 'object' && listItems[0] !== null && !listItems[0].url);
+                                                                                            %>
+                                                                                            <% if (isTable) { %>
+                                                                                                <% 
+                                                                                                    let subFields = [];
+                                                                                                    let conf = field.config;
+                                                                                                    if (typeof conf === 'string') {
+                                                                                                        try { conf = JSON.parse(conf); } catch (e) { conf = {}; }
+                                                                                                    }
+                                                                                                    if (conf) {
+                                                                                                        if (Array.isArray(conf.maps)) subFields = conf.maps;
+                                                                                                        else if (Array.isArray(conf.fields)) subFields = conf.fields;
+                                                                                                        else if (Array.isArray(conf.columns)) subFields = conf.columns;
+                                                                                                    }
+                                                                                                    if ((!subFields || subFields.length === 0) && Array.isArray(listItems) && listItems.length > 0) {
+                                                                                                        const keyMap = new Map();
+                                                                                                        listItems.forEach(it => {
+                                                                                                            if (it && typeof it === 'object') {
+                                                                                                                Object.keys(it).forEach(k => {
+                                                                                                                    if (!keyMap.has(k)) {
+                                                                                                                        keyMap.set(k, { fieldKey: k, fieldName: k });
+                                                                                                                    }
+                                                                                                                });
+                                                                                                            }
+                                                                                                        });
+                                                                                                        subFields = Array.from(keyMap.values());
+                                                                                                    }
+                                                                                                %>
+                                                                                                <% if (Array.isArray(listItems) && listItems.length > 0 && subFields.length > 0) { %>
+                                                                                                    <div class="table-responsive mt-2">
+                                                                                                        <table class="table table-bordered table-sm mb-0">
+                                                                                                            <thead class="table-light">
+                                                                                                                <tr>
+                                                                                                                    <th style="width: 40px; text-align: center;">#</th>
+                                                                                                                    <% subFields.forEach(sub => { %>
+                                                                                                                        <th><%= sub.fieldName || sub.label || sub.fieldKey %></th>
+                                                                                                                    <% }) %>
+                                                                                                                </tr>
+                                                                                                            </thead>
+                                                                                                            <tbody>
+                                                                                                                <% listItems.forEach((item, itemIdx) => { %>
+                                                                                                                    <tr>
+                                                                                                                        <td class="text-center align-top"><%= itemIdx + 1 %></td>
+                                                                                                                        <% subFields.forEach(sub => { %>
+                                                                                                                            <td class="align-top" style="white-space: pre-line;"><%= (item && typeof item === 'object') ? (item[sub.fieldKey] ?? item[sub.key] ?? '-') : (item ?? '-') %></td>
+                                                                                                                        <% }) %>
+                                                                                                                    </tr>
+                                                                                                                <% }) %>
+                                                                                                            </tbody>
+                                                                                                        </table>
+                                                                                                    </div>
+                                                                                                <% } else { %>
+                                                                                                    <span class="text-muted small">Không có dữ liệu</span>
+                                                                                                <% } %>
+                                                                                            <% } else { %>
+                                                                                                <% if (val !== null && val !== undefined && val !== '') { %>
+                                                                                                    <% if (Array.isArray(val)) { %>
+                                                                                                        <span style="white-space: pre-line;"><%= val.map(v => (typeof v === 'object' && v !== null ? (v.label || v.name || v.title || v.value || JSON.stringify(v)) : v)).join(', ') %></span>
+                                                                                                    <% } else if (typeof val === 'object' && val !== null) { %>
+                                                                                                        <span style="white-space: pre-line;"><%= val.label || val.name || val.title || val.value || JSON.stringify(val) %></span>
+                                                                                                    <% } else { %>
+                                                                                                        <span style="white-space: pre-line;"><%= val %></span>
+                                                                                                    <% } %>
+                                                                                                <% } else { %>
+                                                                                                    <span class="text-muted small">-</span>
+                                                                                                <% } %>
+                                                                                            <% } %>
                                                                                         <% } %>
                                                                                     </div>
                                                                                 </div>
@@ -144,6 +248,10 @@
                                                                     </div>
                                                                 </div>
                                                             <% }) %>
+                                                        </div>
+                                                    <% } else if (group.isLoop === 'Y') { %>
+                                                        <div class="alert alert-light border text-muted small py-2 mb-0 mt-2">
+                                                            Chưa có dữ liệu ghi nhận.
                                                         </div>
                                                     <% } else { %>
                                                     <div class="row g-2">
@@ -154,14 +262,20 @@
                                                                     <div class="field-label"><%= field.fieldName %></div>
                                                                     <div class="field-value">
                                                                         <% if (field.fieldType === 'file_single') { %>
-                                                                            <% if (field.currentValue && field.currentValue.url) { %>
-                                                                                <% const isImg = field.currentValue.url.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                            <% const fileUrl = (field.currentValue && typeof field.currentValue === 'object' && field.currentValue.url) ? field.currentValue.url : (typeof field.currentValue === 'string' ? field.currentValue : null); %>
+                                                                            <% if (fileUrl) { %>
+                                                                                <% const isImg = fileUrl.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                                <% const isVideo = fileUrl.toLowerCase().match(/\.(mp4|mov|webm)$/); %>
                                                                                 <% if (isImg) { %>
-                                                                                    <a href="/<%= field.currentValue.url %>" target="_blank" class="d-inline-block mt-2">
-                                                                                        <img src="/<%= field.currentValue.url %>" class="img-thumbnail rounded shadow-sm" style="max-height: 120px;" alt="<%= field.fieldName %>">
+                                                                                    <a href="/<%= fileUrl %>" target="_blank" class="d-inline-block mt-2">
+                                                                                        <img src="/<%= fileUrl %>" class="img-thumbnail rounded shadow-sm" style="max-height: 120px;" alt="<%= field.fieldName %>">
                                                                                     </a>
+                                                                                <% } else if (isVideo) { %>
+                                                                                    <div class="mt-2">
+                                                                                        <video src="/<%= fileUrl %>" controls class="rounded shadow-sm" style="max-height: 200px; max-width: 100%;"></video>
+                                                                                    </div>
                                                                                 <% } else { %>
-                                                                                    <a href="/<%= field.currentValue.url %>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                                                                    <a href="/<%= fileUrl %>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
                                                                                         <i class="fa fa-file-download me-1"></i> Tải tài liệu
                                                                                     </a>
                                                                                 <% } %>
@@ -172,58 +286,101 @@
                                                                             <% if (field.currentValue && field.currentValue.length > 0) { %>
                                                                                 <div class="d-flex flex-wrap gap-2 mt-2">
                                                                                     <% field.currentValue.forEach(file => { %>
-                                                                                        <% const isImg = file.url.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
-                                                                                        <% if (isImg) { %>
-                                                                                            <a href="/<%= file.url %>" target="_blank" class="d-inline-block">
-                                                                                                <img src="/<%= file.url %>" class="img-thumbnail rounded shadow-sm" style="max-height: 80px;" alt="<%= field.fieldName %>">
-                                                                                            </a>
-                                                                                        <% } else { %>
-                                                                                            <a href="/<%= file.url %>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                                                                <i class="fa fa-file-download me-1"></i> Tải file
-                                                                                            </a>
+                                                                                        <% const fileUrl = (file && typeof file === 'object' && file.url) ? file.url : (typeof file === 'string' ? file : null); %>
+                                                                                        <% if (fileUrl) { %>
+                                                                                            <% const isImg = fileUrl.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/); %>
+                                                                                            <% const isVideo = fileUrl.toLowerCase().match(/\.(mp4|mov|webm)$/); %>
+                                                                                            <% if (isImg) { %>
+                                                                                                <a href="/<%= fileUrl %>" target="_blank" class="d-inline-block">
+                                                                                                    <img src="/<%= fileUrl %>" class="img-thumbnail rounded shadow-sm" style="max-height: 80px;" alt="<%= field.fieldName %>">
+                                                                                                </a>
+                                                                                            <% } else if (isVideo) { %>
+                                                                                                <div class="d-inline-block">
+                                                                                                    <video src="/<%= fileUrl %>" controls class="rounded shadow-sm" style="max-height: 120px; max-width: 100%;"></video>
+                                                                                                </div>
+                                                                                            <% } else { %>
+                                                                                                <a href="/<%= fileUrl %>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                                                    <i class="fa fa-file-download me-1"></i> Tải tài liệu
+                                                                                                </a>
+                                                                                            <% } %>
                                                                                         <% } %>
                                                                                     <% }) %>
                                                                                 </div>
                                                                             <% } else { %>
                                                                                 <span class="text-muted small">Chưa có tệp đính kèm</span>
                                                                             <% } %>
-                                                                        <% } else if (field.fieldType === 'list_canwrite') { %>
-                                                                            <% if (Array.isArray(field.currentValue) && field.currentValue.length > 0) { %>
-                                                                                <% const subFields = (field.config && (Array.isArray(field.config.maps) ? field.config.maps : (Array.isArray(field.config.fields) ? field.config.fields : []))) || []; %>
-                                                                                <div class="table-responsive mt-2">
-                                                                                    <table class="table table-bordered table-sm mb-0">
-                                                                                        <thead class="table-light">
-                                                                                            <tr>
-                                                                                                <th style="width: 40px; text-align: center;">#</th>
-                                                                                                <% subFields.forEach(sub => { %>
-                                                                                                    <th><%= sub.fieldName %></th>
-                                                                                                <% }) %>
-                                                                                            </tr>
-                                                                                        </thead>
-                                                                                        <tbody>
-                                                                                            <% field.currentValue.forEach((item, itemIdx) => { %>
+                                                                        <% } else { %>
+                                                                            <% 
+                                                                                let listItems = field.currentValue;
+                                                                                if (typeof listItems === 'string' && (listItems.trim().startsWith('[') || listItems.trim().startsWith('{'))) {
+                                                                                    try { listItems = JSON.parse(listItems); } catch(e) {}
+                                                                                }
+                                                                                const isTable = field.fieldType === 'list_canwrite' || (Array.isArray(listItems) && listItems.length > 0 && typeof listItems[0] === 'object' && listItems[0] !== null && !listItems[0].url);
+                                                                            %>
+                                                                            <% if (isTable) { %>
+                                                                                <% 
+                                                                                    let subFields = [];
+                                                                                    let conf = field.config;
+                                                                                    if (typeof conf === 'string') {
+                                                                                        try { conf = JSON.parse(conf); } catch (e) { conf = {}; }
+                                                                                    }
+                                                                                    if (conf) {
+                                                                                        if (Array.isArray(conf.maps)) subFields = conf.maps;
+                                                                                        else if (Array.isArray(conf.fields)) subFields = conf.fields;
+                                                                                        else if (Array.isArray(conf.columns)) subFields = conf.columns;
+                                                                                    }
+                                                                                    if ((!subFields || subFields.length === 0) && Array.isArray(listItems) && listItems.length > 0) {
+                                                                                        const keyMap = new Map();
+                                                                                        listItems.forEach(it => {
+                                                                                            if (it && typeof it === 'object') {
+                                                                                                Object.keys(it).forEach(k => {
+                                                                                                    if (!keyMap.has(k)) {
+                                                                                                        keyMap.set(k, { fieldKey: k, fieldName: k });
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                        });
+                                                                                        subFields = Array.from(keyMap.values());
+                                                                                    }
+                                                                                %>
+                                                                                <% if (Array.isArray(listItems) && listItems.length > 0 && subFields.length > 0) { %>
+                                                                                    <div class="table-responsive mt-2">
+                                                                                        <table class="table table-bordered table-sm mb-0">
+                                                                                            <thead class="table-light">
                                                                                                 <tr>
-                                                                                                    <td class="text-center"><%= itemIdx + 1 %></td>
+                                                                                                    <th style="width: 40px; text-align: center;">#</th>
                                                                                                     <% subFields.forEach(sub => { %>
-                                                                                                        <td><%= item[sub.fieldKey] || '-' %></td>
+                                                                                                        <th><%= sub.fieldName || sub.label || sub.fieldKey %></th>
                                                                                                     <% }) %>
                                                                                                 </tr>
-                                                                                            <% }) %>
-                                                                                        </tbody>
-                                                                                    </table>
-                                                                                </div>
-                                                                            <% } else { %>
-                                                                                <span class="text-muted small">Không có dữ liệu</span>
-                                                                            <% } %>
-                                                                        <% } else { %>
-                                                                            <% if (field.currentValue !== null && field.currentValue !== undefined && field.currentValue !== '') { %>
-                                                                                <% if (Array.isArray(field.currentValue)) { %>
-                                                                                    <span><%= field.currentValue.join(', ') %></span>
+                                                                                            </thead>
+                                                                                            <tbody>
+                                                                                                <% listItems.forEach((item, itemIdx) => { %>
+                                                                                                    <tr>
+                                                                                                        <td class="text-center align-top"><%= itemIdx + 1 %></td>
+                                                                                                        <% subFields.forEach(sub => { %>
+                                                                                                            <td class="align-top" style="white-space: pre-line;"><%= (item && typeof item === 'object') ? (item[sub.fieldKey] ?? item[sub.key] ?? '-') : (item ?? '-') %></td>
+                                                                                                        <% }) %>
+                                                                                                    </tr>
+                                                                                                <% }) %>
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    </div>
                                                                                 <% } else { %>
-                                                                                    <span><%= field.currentValue %></span>
+                                                                                    <span class="text-muted small">Không có dữ liệu</span>
                                                                                 <% } %>
                                                                             <% } else { %>
-                                                                                <span class="text-muted small">Chưa nhập thông tin</span>
+                                                                                <% if (field.currentValue !== null && field.currentValue !== undefined && field.currentValue !== '') { %>
+                                                                                    <% if (Array.isArray(field.currentValue)) { %>
+                                                                                        <span style="white-space: pre-line;"><%= field.currentValue.map(v => (typeof v === 'object' && v !== null ? (v.label || v.name || v.title || v.value || JSON.stringify(v)) : v)).join(', ') %></span>
+                                                                                    <% } else if (typeof field.currentValue === 'object' && field.currentValue !== null) { %>
+                                                                                        <span style="white-space: pre-line;"><%= field.currentValue.label || field.currentValue.name || field.currentValue.title || field.currentValue.value || JSON.stringify(field.currentValue) %></span>
+                                                                                    <% } else { %>
+                                                                                        <span style="white-space: pre-line;"><%= field.currentValue %></span>
+                                                                                    <% } %>
+                                                                                <% } else { %>
+                                                                                    <span class="text-muted small">Chưa nhập thông tin</span>
+                                                                                <% } %>
                                                                             <% } %>
                                                                         <% } %>
                                                                     </div>

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EXTERNAL_WHITELIST, INTERNAL_WHITELIST, LOOP_GROUP_INFO } from '../common/traceability.const';
+import { EXTERNAL_COMPACT_WHITELIST, GROUP_COMPACT_ALIASES, INTERNAL_COMPACT_WHITELIST, LOOP_GROUP_INFO } from '../common/traceability.const';
 
 @Injectable()
 export class TraceabilityFieldsAdminService {
@@ -55,8 +55,22 @@ export class TraceabilityFieldsAdminService {
       let loopValues: any[] | undefined = undefined;
       if (g.isLoop === 'Y') {
         loopValues = [];
-        if (savedData?.[g.groupKey]) {
-          const rawArray = Array.isArray(savedData[g.groupKey]) ? savedData[g.groupKey] : [savedData[g.groupKey]];
+        let rawData = savedData?.[g.groupKey];
+        if (!rawData && savedData) {
+          const matchedKey = Object.keys(savedData).find((k) => this.cleanKey(k) === this.cleanKey(g.groupKey));
+          if (matchedKey) {
+            rawData = savedData[matchedKey];
+          } else if (Array.isArray(savedData)) {
+            rawData = savedData;
+          }
+        }
+        if (typeof rawData === 'string') {
+          try {
+            rawData = JSON.parse(rawData);
+          } catch (e) {}
+        }
+        if (rawData) {
+          const rawArray = Array.isArray(rawData) ? rawData : [rawData];
 
           rawArray.forEach((item: any, idx: number) => {
             const itemObj: any = {};
@@ -93,8 +107,8 @@ export class TraceabilityFieldsAdminService {
     return (k || '').replace(/[\s_]/g, '').toUpperCase();
   }
 
-  readonly internalWhitelist: Record<string, Record<string, string[] | 'ALL'>> = INTERNAL_WHITELIST;
-  readonly externalWhitelist: Record<string, Record<string, string[] | 'ALL'>> = EXTERNAL_WHITELIST;
+  readonly internalWhitelist: Record<string, Record<string, string[] | 'ALL'>> = INTERNAL_COMPACT_WHITELIST;
+  readonly externalWhitelist: Record<string, Record<string, string[] | 'ALL'>> = EXTERNAL_COMPACT_WHITELIST;
 
   getActiveWhitelist(isExternal: boolean): Record<string, Record<string, string[] | 'ALL'>> {
     return isExternal ? this.externalWhitelist : this.internalWhitelist;
@@ -145,47 +159,62 @@ export class TraceabilityFieldsAdminService {
     return form?.submission?.groups?.find((g: any) => this.cleanKey(g.groupKey) === this.cleanKey(groupKey)) ?? null;
   }
 
-  buildCompactData(params: { isExternal: boolean; isLinkedInternal?: boolean; lotcode: string; formDataExtra?: any; homeInfo: any; forms: any[]; harvestPhaseLabels?: string[] }): any {
-    const { isExternal, lotcode, homeInfo, forms, harvestPhaseLabels } = params;
+  private toCamelCase(str: string): string {
+    return str.toLowerCase().replace(/[-_]([a-z])/g, (_, letter) => letter.toUpperCase());
+  }
 
-    if (isExternal) {
-      const hiNumberHarvest = harvestPhaseLabels && harvestPhaseLabels.length > 0 ? harvestPhaseLabels : null;
+  buildCompactData(params: { isExternal: boolean; lotcode: string; homeInfo: any; forms: any[]; harvestPhaseLabels?: string[] }): any {
+    const { isExternal, lotcode, forms } = params;
+    const activeWhitelist = this.getActiveWhitelist(isExternal);
 
-      return {
-        isExternal: true,
-        isLinkedInternal: false,
-        lotcode,
-        // 1. PRODUCTION_ORIGIN: MANUFACTURER
-        facilityName: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityName') || this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') || '',
-        facilityAddress: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mFacilityAddress') || this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') || '',
-        mCertificationFile:
-          this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'MANUFACTURER', 'mCertificationFile') || this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiCertificationFile'),
-        // 2. PRODUCTION_ORIGIN: ORIGIN_NEST
-        onHarvestDate: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onHarvestDate') || this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate') || null,
-        onAddressArea: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onAddressArea') || this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'addressArea') || '',
-        onWeightingPhoto: this.getFieldValue(forms, 'PRODUCTION_ORIGIN', 'ORIGIN_NEST', 'onWeightingPhoto') || this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
-        // 3. PRE_PROCESSING: DIARY_PROCESS
-        diaryProcessGroup: this.getGroupData(forms, 'PRE_PROCESSING', 'DIARY_PROCESS'),
-        // 4. PACKING_QR: INGREDIENT_INSTRUCTION
-        iiIngredients: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiIngredients'),
-        iiInstructionUse: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiInstructionUse'),
-        iiApplicableStandard: this.getFieldValue(forms, 'PACKING_QR', 'INGREDIENT_INSTRUCTION', 'iiApplicableStandard'),
-      };
+    const result: Record<string, any> = {
+      isExternal: Boolean(isExternal),
+      lotcode,
+    };
+
+    for (const [formKey, groups] of Object.entries(activeWhitelist)) {
+      for (const [groupKey, fields] of Object.entries(groups)) {
+        if (fields === 'ALL') {
+          const groupData = this.getGroupData(forms, formKey, groupKey);
+          const camelGroupKey = this.toCamelCase(groupKey) + 'Group';
+          result[camelGroupKey] = groupData;
+          result[groupKey] = groupData;
+
+          // Aliases for backward compatibility
+          const alias = GROUP_COMPACT_ALIASES[groupKey];
+
+          if (alias) {
+            result[alias] = groupData;
+          }
+
+          if (groupData) {
+            if (Array.isArray(groupData.loopValues) && groupData.loopValues.length > 0) {
+              const firstItem = groupData.loopValues[0];
+              for (const [k, v] of Object.entries(firstItem)) {
+                if (!(k in result)) {
+                  result[k] = v;
+                }
+              }
+            }
+            if (Array.isArray(groupData.fields)) {
+              for (const f of groupData.fields) {
+                if (f.fieldKey && !(f.fieldKey in result)) {
+                  result[f.fieldKey] = f.currentValue;
+                }
+              }
+            }
+          }
+
+          continue;
+        } else if (Array.isArray(fields)) {
+          for (const fieldKey of fields) {
+            const val = this.getFieldValue(forms, formKey, groupKey, fieldKey);
+            result[fieldKey] = val;
+          }
+        }
+      }
     }
 
-    const hiHarvestDate = this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_INFORMATION', 'hiHarvestDate');
-
-    return {
-      isExternal: false,
-      isLinkedInternal: false,
-      lotcode,
-      personInCharge: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'personInCharge') || '',
-      facilityName: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityName') || '',
-      fiIdentificationCode: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'fiIdentificationCode') || '',
-      facilityAddress: this.getFieldValue(forms, 'BRIEF_SWIFT_HOUSE', 'FACILITY_INFO', 'facilityAddress') || '',
-      hiHarvestDate,
-      hmWeightingPhoto: this.getFieldValue(forms, 'BATCH_HARVEST', 'HARVEST_MEASUREMENT', 'hmWeightingPhoto'),
-      todoListGroup: this.getGroupData(forms, 'LOGBOOK_HOUSE', 'SWIFT_HOUSE_TD'),
-    };
+    return result;
   }
 }

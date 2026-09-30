@@ -11,7 +11,7 @@ export class ExportService {
   ) {}
 
   async generatePdfFromTraceData(traceData: any, qrUrl?: string): Promise<Buffer> {
-    return this.traceabilityPdfTemplate.generate(traceData, qrUrl);
+    return this.traceabilityPdfTemplate.generateCompact(traceData, qrUrl);
   }
 
   async generatePdfFromUrl(url: string): Promise<Buffer> {

@@ -28,7 +28,7 @@ export class TraceabilityAdminService {
       userCode: r.userCode,
       userName: r.userName || '',
       userPhone: r.userPhone || '',
-      userHomeCode: r.userHomeCode,
+      userHomeCode: r.userHomeCode || null,
       userHomeName: r.userHomeName || '',
       userHomeAddress: r.userHomeAddress || '',
       status: r.status,
@@ -36,6 +36,8 @@ export class TraceabilityAdminService {
       qrUrl: r.qrUrl,
       traceabilityId: r.traceabilityId,
       harvestPhases: r.harvestPhases || null,
+      isExternal: Boolean(r.isExternal),
+      batchType: r.batchType || (r.isExternal ? TraceabilityDisplayActorTypeEnum.EXTERNAL : TraceabilityDisplayActorTypeEnum.INTERNAL),
       hasFinalForm: Boolean(r.hasFinalForm),
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
@@ -43,12 +45,18 @@ export class TraceabilityAdminService {
     return { total, list };
   }
 
-  async updateSubmissionStatus(seq: number, status: TraceabilityStatusEnum, updatedId: string): Promise<number> {
-    const batch = await this.repository.getBatchBySeq(seq);
-    if (status === TraceabilityStatusEnum.APPROVED && batch?.harvestPhases) {
-      await this.todoHarvestService.useTaskHarvestForTraceability(seq, updatedId);
+  async updateSubmissionStatus(seq: number, status: TraceabilityStatusEnum, updatedId: string, isExternal?: boolean): Promise<number> {
+    if (isExternal === true) {
+      return await this.repository.updateSubmissionStatusExternal(seq, status, updatedId);
     }
-    return await this.repository.updateSubmissionStatus(seq, status, updatedId);
+    if (isExternal === false) {
+      const batch = await this.repository.getBatchBySeq(seq);
+      if (status === TraceabilityStatusEnum.APPROVED && batch?.harvestPhases) {
+        await this.todoHarvestService.useTaskHarvestForTraceability(seq, updatedId);
+      }
+      return await this.repository.updateSubmissionStatus(seq, status, updatedId);
+    }
+    return 1;
   }
 
   async getFormForGlobalView(traceabilityId: string, isCompact: boolean = false): Promise<any> {
@@ -184,9 +192,7 @@ export class TraceabilityAdminService {
     const compactData = isCompact
       ? this.fieldsService.buildCompactData({
           isExternal,
-          isLinkedInternal: false,
           lotcode,
-          formDataExtra: null,
           homeInfo,
           forms: formsWithSubmissions,
           harvestPhaseLabels,
@@ -196,9 +202,7 @@ export class TraceabilityAdminService {
     return {
       traceabilityId,
       isExternal,
-      isLinkedInternal: false,
       lotcode,
-      formDataExtra: null,
       homeInfo: isExternal
         ? null
         : homeInfo

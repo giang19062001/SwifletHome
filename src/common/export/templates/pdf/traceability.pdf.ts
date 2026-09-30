@@ -8,7 +8,7 @@ import { PdfBaseService } from '../../services/pdf-base.service';
 export class TraceabilityPdfTemplate {
   constructor(private readonly pdfBaseService: PdfBaseService) {}
 
-  async generate(traceData: any, qrUrl?: string): Promise<Buffer> {
+  async generateCompact(traceData: any, qrUrl?: string): Promise<Buffer> {
     const qrContent = qrUrl || '';
     let qrBuffer: Buffer | null = null;
     if (qrContent) {
@@ -206,11 +206,7 @@ export class TraceabilityPdfTemplate {
                 const itemHeight = doc.font(fontRegular).fontSize(9).heightOfString(fullItemText, { width: 490 });
                 checkPageBreak(itemHeight + 4);
 
-                doc
-                  .font(fontRegular)
-                  .fontSize(9)
-                  .fillColor('#4A5568')
-                  .text(fullItemText, 55, currentY, { width: 490 });
+                doc.font(fontRegular).fontSize(9).fillColor('#4A5568').text(fullItemText, 55, currentY, { width: 490 });
 
                 currentY = Math.max(currentY + 15, doc.y + 4);
               });
@@ -259,15 +255,42 @@ export class TraceabilityPdfTemplate {
 
             // II. NGUỒN GỐC NGUYÊN LIỆU (ORIGIN_NEST)
             renderSectionHeader('II. NGUỒN GỐC NGUYÊN LIỆU');
-            renderKeyValue('Địa chỉ khu vực sản xuất/ thu hoạch', compact.onAddressArea || compact.facilityAddress);
 
-            renderKeyValue('Ngày thu hoạch', compact.onHarvestDate || compact.hiHarvestDate);
+            const nestLots = compact.originNestGroup?.loopValues;
+            if (Array.isArray(nestLots) && nestLots.length > 0) {
+              nestLots.forEach((lot: any, lIdx: number) => {
+                checkPageBreak(50);
+                doc
+                  .font(fontBold)
+                  .fontSize(9.5)
+                  .fillColor('#71AB33')
+                  .text(`• Lô nguyên liệu ${lIdx + 1}`, 55, currentY);
+                currentY += 16;
+                if (lot.onAddressArea || compact.facilityAddress) {
+                  renderKeyValue('Địa chỉ khu vực sản xuất/ thu hoạch', lot.onAddressArea || compact.facilityAddress, 65);
+                }
+                if (lot.onHarvestDate || compact.hiHarvestDate) {
+                  renderKeyValue('Ngày thu hoạch', lot.onHarvestDate || compact.hiHarvestDate, 65);
+                }
 
-            if (compact.onWeightingPhoto) {
-              const photoUrl = typeof compact.onWeightingPhoto === 'object' ? compact.onWeightingPhoto?.url : compact.onWeightingPhoto;
-              if (photoUrl) {
-                renderKeyValue('Ảnh cân tổ yến thu hoạch', '');
-                renderImage(photoUrl);
+                const photoVal = lot.onWeightingPhoto;
+                const photoUrl = typeof photoVal === 'object' ? photoVal?.url : photoVal;
+                if (photoUrl) {
+                  renderKeyValue('Ảnh cân tổ yến thu hoạch', '', 65);
+                  renderImage(photoUrl, 65);
+                }
+                currentY += 6;
+              });
+            } else {
+              renderKeyValue('Địa chỉ khu vực sản xuất/ thu hoạch', compact.onAddressArea || compact.facilityAddress);
+              renderKeyValue('Ngày thu hoạch', compact.onHarvestDate || compact.hiHarvestDate);
+
+              if (compact.onWeightingPhoto) {
+                const photoUrl = typeof compact.onWeightingPhoto === 'object' ? compact.onWeightingPhoto?.url : compact.onWeightingPhoto;
+                if (photoUrl) {
+                  renderKeyValue('Ảnh cân tổ yến thu hoạch', '');
+                  renderImage(photoUrl);
+                }
               }
             }
             currentY += 10;
