@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { FINAL_FORM_SEQ } from '../common/traceability.const';
 import { GetTraceabilityListAdminDto } from './traceability-admin.dto';
-import { TraceabilityStatusEnum } from '../common/traceability.enum';
+import { TraceabilityDisplayActorTypeEnum, TraceabilityStatusEnum } from '../common/traceability.enum';
 
 @Injectable()
 export class TraceabilityAdminRepository {
@@ -14,7 +14,7 @@ export class TraceabilityAdminRepository {
   private readonly tableFile = 'tbl_traceability_file';
   private readonly tableFileExt = 'tbl_traceability_file_external';
   private readonly tableBatches = 'tbl_traceability_batches';
-  private readonly tableBatchesExt = '${this.tableBatchesExt}';
+  private readonly tableBatchesExt = 'tbl_traceability_batches_external';
   private readonly tableUserHomes = 'tbl_user_home';
   private readonly tableUserApps = 'tbl_user_app';
   private readonly tableHarvestPhase = 'tbl_todo_task_harvest_phase';
@@ -152,7 +152,7 @@ export class TraceabilityAdminRepository {
         U.userName, U.userPhone,
         NULL AS userHomeName, NULL AS userHomeAddress,
         1 AS isExternal,
-        'EXTERNAL' AS batchType,
+        '${TraceabilityDisplayActorTypeEnum.EXTERNAL}' AS batchType,
         EXISTS (
           SELECT 1 FROM ${this.tableSubmissionsExt} Sfinal 
           WHERE Sfinal.batchSeq = B.seq AND Sfinal.formSeq = ${FINAL_FORM_SEQ} AND Sfinal.isActive = 'Y'
@@ -171,9 +171,10 @@ export class TraceabilityAdminRepository {
       params.push(kw, kw, kw, kw, kw);
     }
     if (dto.type && dto.type !== 'ALL') {
-      if (dto.type === 'EXTERNAL') {
+      const type = String(dto.type);
+      if (type === String(TraceabilityDisplayActorTypeEnum.EXTERNAL)) {
         sql += ` AND T.isExternal = 1`;
-      } else if (dto.type === 'INTERNAL') {
+      } else if (type === String(TraceabilityDisplayActorTypeEnum.INTERNAL)) {
         sql += ` AND T.isExternal = 0`;
       }
     }
@@ -240,9 +241,10 @@ export class TraceabilityAdminRepository {
       params.push(kw, kw, kw, kw, kw);
     }
     if (dto.type && dto.type !== 'ALL') {
-      if (dto.type === 'EXTERNAL') {
+      const type = String(dto.type);
+      if (type === String(TraceabilityDisplayActorTypeEnum.EXTERNAL)) {
         sql += ` AND T.isExternal = 1`;
-      } else if (dto.type === 'INTERNAL') {
+      } else if (type === String(TraceabilityDisplayActorTypeEnum.INTERNAL)) {
         sql += ` AND T.isExternal = 0`;
       }
     }
