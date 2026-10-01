@@ -16,6 +16,7 @@ export const TRACE_CONST = {
   QR_CODE_PATH: 'uploads/images/traceQrcodes',
   QR_CODE_PATH_EXTERNAL: 'uploads/images/traceQrcodesExternal',
   QR_CODE_BASE_URL: 'traceability-qrcode-global',
+  FULL_INFO_LINK_URL: 'traceability-link-global',
   TRACE_EXTERNAL_PREFIX: '3FAM-VCĐP',
 };
 

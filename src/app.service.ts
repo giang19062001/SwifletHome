@@ -249,6 +249,13 @@ export class AppService {
     };
   }
 
+  async renderTraceabilityLinkGlobal(traceabilityId: string): Promise<any> {
+    const data = await this.traceabilityAdminService.getFormForGlobalView(traceabilityId, false);
+    return {
+      traceData: data,
+    };
+  }
+
   async renderTraceabilityDashboard(): Promise<any> {
     const forms = await this.traceabilityAdminService.getAllForms();
     return {

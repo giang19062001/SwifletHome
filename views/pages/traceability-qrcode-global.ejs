@@ -11,7 +11,7 @@
     <!-- Nút tải PDF nổi góc dưới màn hình -->
     <div class="pdf-floating-btn" data-html2canvas-ignore="true">
         <a
-            href="/api/app/traceability/downloadPdf/<%= data.traceabilityId %>"
+            href="/api/app/traceability/downloadCompactPdf/<%= data.traceabilityId %>"
             class="btn btn-danger shadow-lg rounded-pill px-4 py-2 d-flex align-items-center text-white text-decoration-none"
             id="btn-download-pdf"
         >
@@ -33,7 +33,7 @@
                             <span class="badge bg-white text-success fw-bold px-2 py-1 mb-1">
                                 <i class="fa fa-check-circle me-1"></i> ĐÃ XÁC THỰC HỆ THỐNG
                             </span>
-                            <h3 class="mb-0 fw-bold fs-4 text-white">  
+                            <h3 class="mb-0 fw-bold fs-4 text-white">
                                 <%= isExternal
                                     ? 'TRUY XUẤT NGUỒN GỐC SẢN PHẨM'
                                     : 'TRUY XUẤT NGUỒN GỐC TỔ YẾN' %></h3>
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div>
-                        <a href="/api/app/traceability/downloadPdf/<%= data.traceabilityId %>" class="btn btn-light text-success fw-bold px-3 py-2 rounded-pill shadow-sm">
+                        <a href="/api/app/traceability/downloadCompactPdf/<%= data.traceabilityId %>" class="btn btn-light text-success fw-bold px-3 py-2 rounded-pill shadow-sm">
                             <i class="fa fa-file-pdf me-1 text-danger"></i> Xuất chứng nhận PDF
                         </a>
                     </div>
@@ -304,7 +304,7 @@
                         <i class="fa fa-warehouse me-2"></i> Nguồn gốc nguyên liệu
                     </h6>
 
-                    <% 
+                    <%
                         const rawLots = compact.originNestGroup?.loopValues;
                         const nestLots = Array.isArray(rawLots) && rawLots.length > 0
                             ? rawLots
@@ -347,7 +347,7 @@
                                                 </div>
                                             </div>
 
-                                            <% 
+                                            <%
                                                 const photoVal = lot.onWeightingPhoto;
                                                 const photoUrl = typeof photoVal === 'object' ? photoVal?.url : photoVal;
                                             %>
@@ -520,7 +520,7 @@
         <!-- Footer / Thông tin bản quyền -->
         <div class="text-center py-4 text-muted small">
             <p class="mb-1">© <%= new Date().getFullYear() %> Hệ thống Quản trị & Truy xuất sản phẩm 3FAM</p>
-            <p class="mb-0">Dữ  liệu truy xuất nguồn gốc 
+            <p class="mb-0">Dữ  liệu truy xuất nguồn gốc
                    <%= isExternal ? 'sản phẩm' : 'tổ yến' %> do chủ nhà Yến cung cấp và chịu trách nhiệm.</p>
         </div>
     </div>

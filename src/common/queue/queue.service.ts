@@ -117,25 +117,27 @@ export class PdfQueueService extends WorkerHost {
     super();
   }
 
-  async process(job: Job<{ targetUrl?: string; traceabilityId?: string; traceData?: any }>): Promise<string> {
+  async process(job: Job<{ targetUrl?: string; traceabilityId?: string; traceData?: any; mode?: 'compact' | 'full'; isFull?: boolean }>): Promise<string> {
     const logbase = `${this.loggerName}/process`;
-    const { targetUrl, traceabilityId, traceData } = job.data;
+    const { targetUrl, traceabilityId, traceData, mode, isFull } = job.data;
+    const isFullMode = Boolean(isFull || mode === 'full' || (targetUrl && targetUrl.includes('traceability-link-global')));
+    const exportMode = isFullMode ? 'full' : 'compact';
 
-    this.logger.log(logbase, `Đang xử lý tạo file PDF trong hàng đợi BullMQ (PDFKit): ${targetUrl || traceabilityId}`);
+    this.logger.log(logbase, `Đang xử lý tạo file PDF (${exportMode}) trong hàng đợi BullMQ (PDFKit): ${targetUrl || traceabilityId}`);
 
     try {
       let pdfBuffer: Buffer;
       if (traceData) {
-        pdfBuffer = await this.exportService.generatePdfFromTraceData(traceData, targetUrl);
+        pdfBuffer = await this.exportService.generatePdfFromTraceData(traceData, targetUrl, exportMode);
       } else if (targetUrl) {
-        pdfBuffer = await this.exportService.generatePdfFromUrl(targetUrl);
+        pdfBuffer = await this.exportService.generatePdfFromUrl(targetUrl, exportMode);
       } else if (traceabilityId) {
-        pdfBuffer = await this.exportService.generatePdfFromTraceData({ traceabilityId }, targetUrl);
+        pdfBuffer = await this.exportService.generatePdfFromTraceData({ traceabilityId }, targetUrl, exportMode);
       } else {
         throw new Error('Dữ liệu tạo PDF không hợp lệ');
       }
 
-      this.logger.log(logbase, `Tạo file PDF thành công trong hàng đợi cho: ${targetUrl || traceabilityId}`);
+      this.logger.log(logbase, `Tạo file PDF (${exportMode}) thành công trong hàng đợi cho: ${targetUrl || traceabilityId}`);
       return pdfBuffer.toString('base64');
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error(String(e));

@@ -105,13 +105,17 @@ function renderTraceabilityList(data, objElement) {
 
       const isExt = Boolean(ele.isExternal || ele.batchType === 'EXTERNAL');
       const typeBadge = isExt
-        ? `<span class="badge bg-secondary text-white px-2 py-1"><i class="fa fa-globe me-1"></i>Ngoại bộ</span>`
-        : `<span class="badge bg-primary text-white px-2 py-1"><i class="fa fa-home me-1"></i>Nội bộ</span>`;
+        ? `<span class="badge bg-secondary text-white px-2 py-1">Sản phẩm</span>`
+        : `<span class="badge bg-primary text-white px-2 py-1">Tổ yến</span>`;
 
       const originInfo = isExt
-        ? `<p class="mb-0 text-muted fst-italic">Truy xuất ngoại bộ</p>`
+        ? `<p class="mb-0 text-muted fst-italic">Truy xuất sản phẩm</p>`
         : `<p class="mb-0 fw-bold">${ele.userHomeName || '-'}</p>
            <p class="mb-0 text-muted small">${ele.userHomeCode || ''}</p>`;
+
+      const harvestPhaseInfo = isExt
+        ? `<p class="mb-0 text-muted fst-italic">Truy xuất sản phẩm</p>`
+        : ele.harvestPhases ? `Đợt:  ${ele.harvestPhases}` : `Chưa điền dữ liệu`;
 
       const rowHtml = `
         <tr class="text-center align-middle">
@@ -124,6 +128,7 @@ function renderTraceabilityList(data, objElement) {
           <td>
             ${originInfo}
           </td>
+          <td><p class="mb-0">${harvestPhaseInfo}</p></td>
           <td><span class="${statusBadgeClass}">${ele.statusLabel || ele.status}</span></td>
           <td><p class="mb-0">${ele.createdAt ? moment(ele.createdAt).format('YYYY-MM-DD HH:mm') : ''}</p></td>
           <td style="width: 300px;">
@@ -132,7 +137,7 @@ function renderTraceabilityList(data, objElement) {
                 <i class="fa fa-eye me-1"></i> Chi tiết
               </a>
               ${
-                ele.hasFinalForm && !isExt
+                ele.hasFinalForm
                   ? `<button class="btn btn-sm btn-info" onclick="openStatusModal(${ele.seq}, '${ele.status}', '${ele.traceabilityId}', ${isExt})" title="Cập nhật trạng thái">
                 <i class="fa fa-edit"></i> Duyệt
               </button>`

@@ -30,9 +30,9 @@ export class TraceabilityAdminRepository {
 
   async getGroupsByFormSeq(formSeq: number): Promise<RowDataPacket[]> {
     const sql = `
-      SELECT seq, groupKey, groupName, isLoop 
-      FROM ${this.tableGroups} 
-      WHERE formSeq = ? AND isActive = 'Y' 
+      SELECT seq, groupKey, groupName, isLoop
+      FROM ${this.tableGroups}
+      WHERE formSeq = ? AND isActive = 'Y'
       ORDER BY sortOrder ASC
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [Number(formSeq)]);
@@ -41,9 +41,9 @@ export class TraceabilityAdminRepository {
 
   async getFieldsByFormSeq(formSeq: number): Promise<RowDataPacket[]> {
     const sql = `
-      SELECT seq, groupSeq, fieldKey, fieldName, fieldType, isRequired, sortOrder, config 
-      FROM ${this.tableFields} 
-      WHERE formSeq = ? AND isActive = 'Y' 
+      SELECT seq, groupSeq, fieldKey, fieldName, fieldType, isRequired, sortOrder, config
+      FROM ${this.tableFields}
+      WHERE formSeq = ? AND isActive = 'Y'
       ORDER BY groupSeq ASC, sortOrder ASC
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [Number(formSeq)]);
@@ -64,8 +64,8 @@ export class TraceabilityAdminRepository {
 
   async getSubmissionByTraceabilityIdAndFormSeq(traceabilityId: string, formSeq: number): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, S.formData, S.uniqueId, 
-             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases 
+      SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.userHomeCode, S.formData, S.uniqueId,
+             B.status, B.qrUrl, B.traceabilityId, B.harvestPhases
       FROM ${this.tableSubmissions} S
       JOIN ${this.tableBatches} B ON S.batchSeq = B.seq
       WHERE B.traceabilityId = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
@@ -77,8 +77,8 @@ export class TraceabilityAdminRepository {
 
   async getSubmissionByTraceabilityIdAndFormSeqExternal(traceabilityId: string, formSeq: number): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.formData, S.uniqueId, 
-             B.status, B.qrUrl, B.traceabilityId 
+      SELECT S.seq, S.batchSeq, S.traceabilityCode, S.formSeq, S.userCode, S.formData, S.uniqueId,
+             B.status, B.qrUrl, B.traceabilityId
       FROM ${this.tableSubmissionsExt} S
       JOIN ${this.tableBatchesExt} B ON S.batchSeq = B.seq
       WHERE B.traceabilityId = ? AND S.formSeq = ? AND S.isActive = 'Y' AND B.isActive = 'Y'
@@ -90,9 +90,9 @@ export class TraceabilityAdminRepository {
 
   async getFilesByUniqueId(uniqueId: string): Promise<RowDataPacket[]> {
     const sql = `
-      SELECT seq, submissionSeq, uniqueId, fieldKey, fieldType, filename, originalname, size, mimetype, sortOrder 
-      FROM ${this.tableFile} 
-      WHERE uniqueId = ? AND isActive = 'Y' 
+      SELECT seq, submissionSeq, uniqueId, fieldKey, fieldType, filename, originalname, size, mimetype, sortOrder
+      FROM ${this.tableFile}
+      WHERE uniqueId = ? AND isActive = 'Y'
       ORDER BY fieldKey ASC, sortOrder ASC
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
@@ -101,9 +101,9 @@ export class TraceabilityAdminRepository {
 
   async getFilesByUniqueIdExternal(uniqueId: string): Promise<RowDataPacket[]> {
     const sql = `
-      SELECT seq, submissionSeq, uniqueId, fieldKey, fieldType, filename, originalname, size, mimetype, sortOrder 
-      FROM ${this.tableFileExt} 
-      WHERE uniqueId = ? AND isActive = 'Y' 
+      SELECT seq, submissionSeq, uniqueId, fieldKey, fieldType, filename, originalname, size, mimetype, sortOrder
+      FROM ${this.tableFileExt}
+      WHERE uniqueId = ? AND isActive = 'Y'
       ORDER BY fieldKey ASC, sortOrder ASC
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [uniqueId]);
@@ -112,10 +112,10 @@ export class TraceabilityAdminRepository {
 
   async getHomeInfoByUserHomeCode(userHomeCode: string): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT H.userHomeCode, H.userHomeName, H.userHomeAddress, H.userHomeLength, H.userHomeWidth, H.userHomeFloor, U.userName 
-      FROM ${this.tableUserHomes} H 
-      LEFT JOIN ${this.tableUserApps} U ON H.userCode = U.userCode 
-      WHERE H.userHomeCode = ? AND H.isActive = 'Y' 
+      SELECT H.userHomeCode, H.userHomeName, H.userHomeAddress, H.userHomeLength, H.userHomeWidth, H.userHomeFloor, U.userName
+      FROM ${this.tableUserHomes} H
+      LEFT JOIN ${this.tableUserApps} U ON H.userCode = U.userCode
+      WHERE H.userHomeCode = ? AND H.isActive = 'Y'
       LIMIT 1
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [userHomeCode]);
@@ -128,15 +128,15 @@ export class TraceabilityAdminRepository {
     const offset = (page - 1) * limit;
 
     const unionSql = `
-      SELECT 
-        B.seq, B.traceabilityId, B.userCode, B.userHomeCode, 
+      SELECT
+        B.seq, B.traceabilityId, B.userCode, B.userHomeCode,
         B.status, B.qrUrl, B.harvestPhases, B.createdAt, B.updatedAt,
         U.userName, U.userPhone,
         H.userHomeName, H.userHomeAddress,
         0 AS isExternal,
         'INTERNAL' AS batchType,
         EXISTS (
-          SELECT 1 FROM ${this.tableSubmissions} Sfinal 
+          SELECT 1 FROM ${this.tableSubmissions} Sfinal
           WHERE Sfinal.batchSeq = B.seq AND Sfinal.formSeq = ${FINAL_FORM_SEQ} AND Sfinal.isActive = 'Y'
         ) AS hasFinalForm
       FROM ${this.tableBatches} B
@@ -146,15 +146,15 @@ export class TraceabilityAdminRepository {
 
       UNION ALL
 
-      SELECT 
-        B.seq, B.traceabilityId, B.userCode, NULL AS userHomeCode, 
+      SELECT
+        B.seq, B.traceabilityId, B.userCode, NULL AS userHomeCode,
         B.status, B.qrUrl, NULL AS harvestPhases, B.createdAt, B.updatedAt,
         U.userName, U.userPhone,
         NULL AS userHomeName, NULL AS userHomeAddress,
         1 AS isExternal,
         '${TraceabilityDisplayActorTypeEnum.EXTERNAL}' AS batchType,
         EXISTS (
-          SELECT 1 FROM ${this.tableSubmissionsExt} Sfinal 
+          SELECT 1 FROM ${this.tableSubmissionsExt} Sfinal
           WHERE Sfinal.batchSeq = B.seq AND Sfinal.formSeq = ${FINAL_FORM_SEQ} AND Sfinal.isActive = 'Y'
         ) AS hasFinalForm
       FROM ${this.tableBatchesExt} B
@@ -208,8 +208,8 @@ export class TraceabilityAdminRepository {
 
   async getTotalTraceabilitySubmissions(dto: GetTraceabilityListAdminDto): Promise<number> {
     const unionSql = `
-      SELECT 
-        B.seq, B.traceabilityId, B.userCode, B.userHomeCode, 
+      SELECT
+        B.seq, B.traceabilityId, B.userCode, B.userHomeCode,
         B.status, B.createdAt,
         U.userName, U.userPhone,
         H.userHomeName,
@@ -221,8 +221,8 @@ export class TraceabilityAdminRepository {
 
       UNION ALL
 
-      SELECT 
-        B.seq, B.traceabilityId, B.userCode, NULL AS userHomeCode, 
+      SELECT
+        B.seq, B.traceabilityId, B.userCode, NULL AS userHomeCode,
         B.status, B.createdAt,
         U.userName, U.userPhone,
         NULL AS userHomeName,
@@ -275,9 +275,9 @@ export class TraceabilityAdminRepository {
 
   async getBatchBySeq(seq: number): Promise<RowDataPacket | null> {
     const sql = `
-      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases 
-      FROM ${this.tableBatches} 
-      WHERE seq = ? AND isActive = 'Y' 
+      SELECT seq, traceabilityId, userCode, userHomeCode, status, qrUrl, harvestPhases
+      FROM ${this.tableBatches}
+      WHERE seq = ? AND isActive = 'Y'
       LIMIT 1
     `;
     const [rows] = await this.db.execute<RowDataPacket[]>(sql, [Number(seq)]);
@@ -308,7 +308,7 @@ export class TraceabilityAdminRepository {
     if (!phases || phases.length === 0) return [];
     const placeholders = phases.map(() => '?').join(',');
     const sql = `
-      SELECT 
+      SELECT
         B.harvestPhase AS value,
         CAST(SUM(COALESCE(C.cellCollected, 0)) AS SIGNED) AS cellCollected,
         CONCAT(
@@ -319,16 +319,16 @@ export class TraceabilityAdminRepository {
           DATE_FORMAT(B.createdAt, '%Y/%m/%d')
         ) AS label
       FROM ${this.tableUserHomes} A
-      LEFT JOIN ${this.tableHarvestPhase} B 
-        ON A.userCode = B.userCode 
+      LEFT JOIN ${this.tableHarvestPhase} B
+        ON A.userCode = B.userCode
         AND A.userHomeCode = B.userHomeCode
-      LEFT JOIN ${this.tableTaskHarvest} C 
+      LEFT JOIN ${this.tableTaskHarvest} C
         ON B.seq = C.seqHarvestPhase
       WHERE B.seq IS NOT NULL
         AND A.userCode = ?
         AND A.userHomeCode = ?
         AND B.harvestPhase IN (${placeholders})
-      GROUP BY 
+      GROUP BY
         B.harvestPhase,
         B.createdAt,
         B.updatedAt

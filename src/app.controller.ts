@@ -446,6 +446,23 @@ export class AppController {
     };
   }
 
+  @Get('/traceability-link-global/:traceabilityId')
+  @UseGuards(PageAuthAdminGuard)
+  @Render('pages/traceability-link-global')
+  async renderTraceabilityLinkGlobal(@Req() req: Request) {
+    let traceabilityId = req.params.traceabilityId || '';
+    if (traceabilityId.toLowerCase().endsWith('.png')) {
+      traceabilityId = traceabilityId.slice(0, -4);
+    }
+    const values = await this.appService.renderTraceabilityLinkGlobal(traceabilityId);
+    return {
+      title: 'Chi tiết hồ sơ truy xuất nguồn gốc',
+      isLayout: false,
+      user: req.session.user,
+      values: values,
+    };
+  }
+
   @Get('/dashboard/traceability')
   @UseGuards(PageAuthAdminGuard)
   @Render('pages/traceability')

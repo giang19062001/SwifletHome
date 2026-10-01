@@ -17,9 +17,6 @@ export class TokenUserAdminResDto {
   @ApiProperty({ example: YnEnum.N })
   isActive: YnEnum;
 
-  @ApiProperty({ example: '' })
-  userCode!: string;
-
   @ApiProperty({ example: 0 })
   iat!: number;
 

@@ -157,8 +157,8 @@ export class TraceabilityAppController implements OnModuleInit {
     summary: 'Tải file PDF hồ sơ truy xuất nguồn gốc',
   })
   @Public()
-  @Get('downloadPdf/:traceabilityId')
-  async downloadPdf(@Param('traceabilityId') traceabilityId: string, @Req() req: Request, @Res() res: Response) {
+  @Get('downloadCompactPdf/:traceabilityId')
+  async downloadCompactPdf(@Param('traceabilityId') traceabilityId: string, @Req() req: Request, @Res() res: Response) {
     let cleanId = traceabilityId || '';
     if (cleanId.toLowerCase().endsWith('.png')) {
       cleanId = cleanId.slice(0, -4);
@@ -176,6 +176,37 @@ export class TraceabilityAppController implements OnModuleInit {
       const pdfBuffer = Buffer.from(base64Data, 'base64');
 
       const encodedFilename = encodeURIComponent(`3FAM_Bo_ho_so_TXNG_${cleanId}.pdf`);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`);
+      res.send(pdfBuffer);
+    } catch (error: any) {
+      res.status(500).send('Lỗi máy chủ khi tạo file PDF từ hàng đợi BullMQ');
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Tải file PDF hồ sơ truy xuất nguồn gốc đầy đủ',
+  })
+  @Public()
+  @Get('downloadFullPdf/:traceabilityId')
+  async downloadFullPdf(@Param('traceabilityId') traceabilityId: string, @Req() req: Request, @Res() res: Response) {
+    let cleanId = traceabilityId || '';
+    if (cleanId.toLowerCase().endsWith('.png')) {
+      cleanId = cleanId.slice(0, -4);
+    }
+
+    const host = req.get('host') || `127.0.0.1:${process.env.PORT!}`;
+    const protocol = req.protocol || 'http';
+    const targetUrl = `${protocol}://${host}/traceability-link-global/${cleanId}`;
+
+    const traceData = await this.traceabilityAdminService.getFormForGlobalView(cleanId, false);
+
+    try {
+      const job = await this.pdfQueue.add('generate-pdf', { targetUrl, traceData, mode: 'full', isFull: true });
+      const base64Data = (await job.waitUntilFinished(this.queueEvents)) as string;
+      const pdfBuffer = Buffer.from(base64Data, 'base64');
+
+      const encodedFilename = encodeURIComponent(`3FAM_Ho_so_day_du_TXNG_${cleanId}.pdf`);
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`);
       res.send(pdfBuffer);

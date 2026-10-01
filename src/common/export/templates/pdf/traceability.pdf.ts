@@ -218,8 +218,8 @@ export class TraceabilityPdfTemplate {
           } else {
             // I. THÔNG TIN NHÀ SẢN XUẤT (MANUFACTURER)
             renderSectionHeader('I. THÔNG TIN NHÀ SẢN XUẤT');
-            renderKeyValue('Tên nhà sản xuất', compact.facilityName || compact.personInCharge);
-            renderKeyValue('Địa chỉ', compact.facilityAddress);
+            renderKeyValue('Tên nhà sản xuất', compact.mFacilityName);
+            renderKeyValue('Địa chỉ', compact.mFacilityAddress);
 
             const certVal = compact.mCertificationFile || compact.fiCertificationFile;
             if (certVal) {
@@ -333,6 +333,9 @@ export class TraceabilityPdfTemplate {
             renderKeyValue('Thành phần', compact.iiIngredients);
             renderKeyValue('Tiêu chuẩn áp dụng', compact.iiApplicableStandard);
             renderKeyValue('Hướng dẫn sử dụng', compact.iiInstructionUse);
+            renderKeyValue('Giá trị dinh dưỡng', compact.iiNutritionalValue);
+            renderKeyValue('Hướng dẫn bảo quản', compact.iiStorageInstruction);
+            renderKeyValue('Cảnh báo', compact.iiWarning);
           }
         } else {
           // SECTION 1: FACILITY / HOUSE INFO (Only if homeInfo exists)
@@ -512,6 +515,478 @@ export class TraceabilityPdfTemplate {
               currentY += 10;
             });
           }
+        }
+
+        // FOOTER / PAGE NUMBERS
+        const pageRange = doc.bufferedPageRange();
+        for (let i = pageRange.start; i < pageRange.start + pageRange.count; i++) {
+          doc.switchToPage(i);
+          doc
+            .font(fontRegular)
+            .fontSize(8)
+            .fillColor('#94A3B8')
+            .text(`Trang ${i + 1} / ${pageRange.count} - 3FAM Swiftlet Home Traceability Report`, 40, 800, { align: 'center', width: 515 });
+        }
+
+        doc.end();
+      } catch (err) {
+        reject(err instanceof Error ? err : new Error(String(err)));
+      }
+    });
+  }
+
+  async generateFull(traceData: any, qrUrl?: string): Promise<Buffer> {
+    const traceId = traceData?.traceabilityId || 'N/A';
+    const lotcode = traceData?.lotcode || '';
+    const isExternal = Boolean(traceData?.isExternal);
+
+    const baseUrl = (process.env.CURRENT_URL ?? '').replace(/\/$/, '');
+    const qrContent = qrUrl || (traceId !== 'N/A' ? `${baseUrl}/traceability-link-global/${traceId}` : '');
+
+    let qrBuffer: Buffer | null = null;
+    if (qrContent) {
+      try {
+        qrBuffer = await QRCode.toBuffer(qrContent, { width: 80, margin: 1 });
+      } catch (e) {
+        qrBuffer = null;
+      }
+    }
+
+    return new Promise<Buffer>((resolve, reject) => {
+      try {
+        const doc = this.pdfBaseService.createDocument();
+        const buffers: Buffer[] = [];
+        doc.on('data', (chunk) => buffers.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(buffers)));
+        doc.on('error', (err) => reject(err));
+
+        const fonts = this.pdfBaseService.getFontNames();
+        const fontRegular = fonts.regular;
+        const fontBold = fonts.bold;
+
+        // HEADER BANNER (Formal Legal Style)
+        doc
+          .font(fontBold)
+          .fontSize(14)
+          .fillColor('#71AB33')
+          .text(isExternal ? 'HỆ THỐNG TRUY XUẤT SẢN PHẨM' : 'HỆ THỐNG TRUY XUẤT TỔ YẾN', 40, 40);
+        doc
+          .font(fontRegular)
+          .fontSize(10)
+          .fillColor('#555555')
+          .text(isExternal ? 'Hồ sơ điện tử truy xuất nguồn gốc sản phẩm' : 'Hồ sơ điện tử truy xuất nguồn gốc tổ yến', 40, 58);
+
+        // Line under header
+        doc.moveTo(40, 75).lineTo(555, 75).strokeColor('#71AB33').lineWidth(1.5).stroke();
+
+        let currentY = 95;
+
+        // QR CODE
+        if (qrBuffer) {
+          try {
+            doc.image(qrBuffer, 475, 85, { width: 80 });
+          } catch {
+            // ignore image placement errors
+          }
+        }
+
+        // TITLE
+        doc.font(fontBold).fontSize(15).fillColor('#1A202C').text('HỒ SƠ CHI TIẾT TRUY XUẤT NGUỒN GỐC', 40, currentY, { align: 'center' });
+        doc
+          .font(fontRegular)
+          .fontSize(10)
+          .fillColor('#4A5568')
+          .text(`Mã tra cứu: ${traceId}`, 40, currentY + 22, { align: 'center' });
+        if (lotcode) {
+          doc
+            .font(fontRegular)
+            .fontSize(10)
+            .fillColor('#4A5568')
+            .text(`Mã lô: ${lotcode}`, 40, currentY + 38, { align: 'center' });
+        }
+        doc
+          .font(fontRegular)
+          .fontSize(9)
+          .fillColor('#718096')
+          .text(`Ngày xuất file: ${new Date().toLocaleString('vi-VN')}`, 40, currentY + (lotcode ? 54 : 38), { align: 'center' });
+
+        currentY += lotcode ? 78 : 62;
+
+        const checkPageBreak = (neededHeight: number = 30) => {
+          if (currentY + neededHeight > 750) {
+            doc.addPage();
+            currentY = 40;
+            doc.font(fontRegular).fontSize(7.5).fillColor('#A0AEC0').text(`3FAM - Hồ sơ chi tiết TXNG: ${traceId}`, 40, 25, { width: 515, align: 'right' });
+            doc.moveTo(40, 35).lineTo(555, 35).strokeColor('#E2E8F0').lineWidth(0.5).stroke();
+            return true;
+          }
+          return false;
+        };
+
+        const renderSectionHeader = (title: string) => {
+          checkPageBreak(35);
+          doc.font(fontBold).fontSize(11.5).fillColor('#71AB33').text(title, 40, currentY);
+          currentY += 16;
+          doc.moveTo(40, currentY).lineTo(555, currentY).strokeColor('#E2E8F0').lineWidth(1).stroke();
+          currentY += 10;
+        };
+
+        const renderKeyValue = (label: string, value: any, indent = 45) => {
+          const valStr = value !== null && value !== undefined && value !== '' ? String(value) : '-';
+          const lines = valStr.split(/\r?\n/);
+          checkPageBreak(16 * Math.max(1, lines.length));
+          doc
+            .font(fontBold)
+            .fontSize(9)
+            .fillColor('#2D3748')
+            .text(`${label}: `, indent, currentY, { continued: lines.length > 1 ? false : true });
+          if (lines.length > 1) {
+            currentY += 14;
+            lines.forEach((line) => {
+              checkPageBreak(15);
+              doc
+                .font(fontRegular)
+                .fontSize(9)
+                .fillColor('#1A202C')
+                .text(line, indent + 10, currentY, { width: 555 - (indent + 10) });
+              currentY = Math.max(currentY + 14, doc.y + 2);
+            });
+            currentY += 2;
+          } else {
+            doc
+              .font(fontRegular)
+              .fillColor('#1A202C')
+              .text(valStr, { width: 555 - indent });
+            currentY = Math.max(currentY + 15, doc.y + 2);
+          }
+        };
+
+        const renderImage = (imgUrl: string, indent = 45) => {
+          if (!imgUrl) return;
+          const cleanUrl = imgUrl.replace(/^\/+/, '');
+          const imgPath = path.join(process.cwd(), 'public', cleanUrl);
+          if (fs.existsSync(imgPath)) {
+            checkPageBreak(105);
+            try {
+              doc.image(imgPath, indent, currentY, { height: 90, fit: [180, 90] });
+              currentY += 98;
+            } catch {
+              doc.font(fontRegular).fontSize(8.5).fillColor('#64748B').text(`[Ảnh đính kèm: ${imgUrl}]`, indent, currentY);
+              currentY += 14;
+            }
+          } else {
+            const hostDomain = baseUrl || '';
+            const fullLink = hostDomain ? `${hostDomain}/${cleanUrl}` : cleanUrl;
+            doc.font(fontRegular).fontSize(8.5).fillColor('#2563EB').text(`[Tệp đính kèm: ${fullLink}]`, indent, currentY);
+            currentY += 14;
+          }
+        };
+
+        const renderTable = (headers: { key: string; name: string }[], items: any[], indent = 45) => {
+          if (!items || items.length === 0 || !headers || headers.length === 0) {
+            doc.font(fontRegular).fontSize(8.5).fillColor('#A0AEC0').text('Không có dữ liệu', indent, currentY);
+            currentY += 14;
+            return;
+          }
+
+          const tableWidth = 555 - indent;
+          const indexColWidth = 28;
+          const colWidth = (tableWidth - indexColWidth) / headers.length;
+
+          // Header Row
+          checkPageBreak(25);
+          doc.rect(indent, currentY, tableWidth, 20).fillAndStroke('#F1F5F9', '#CBD5E1');
+
+          doc
+            .font(fontBold)
+            .fontSize(8)
+            .fillColor('#334155')
+            .text('#', indent + 2, currentY + 5, { width: indexColWidth - 4, align: 'center' });
+          headers.forEach((h, hIdx) => {
+            const colX = indent + indexColWidth + hIdx * colWidth;
+            doc
+              .font(fontBold)
+              .fontSize(8)
+              .fillColor('#334155')
+              .text(h.name || h.key, colX + 4, currentY + 5, { width: colWidth - 8, align: 'left' });
+          });
+          currentY += 20;
+
+          // Data Rows
+          items.forEach((item, rIdx) => {
+            let maxCellHeight = 16;
+            headers.forEach((h) => {
+              const val = item && typeof item === 'object' ? (item[h.key] ?? '-') : '-';
+              const textH = doc
+                .font(fontRegular)
+                .fontSize(8)
+                .heightOfString(String(val), { width: colWidth - 8 });
+              if (textH + 8 > maxCellHeight) {
+                maxCellHeight = textH + 8;
+              }
+            });
+
+            checkPageBreak(maxCellHeight);
+
+            if (rIdx % 2 === 1) {
+              doc.rect(indent, currentY, tableWidth, maxCellHeight).fillColor('#F8FAFC').fill();
+            }
+            doc.rect(indent, currentY, tableWidth, maxCellHeight).strokeColor('#E2E8F0').lineWidth(0.5).stroke();
+
+            doc
+              .font(fontRegular)
+              .fontSize(8)
+              .fillColor('#475569')
+              .text(String(rIdx + 1), indent + 2, currentY + 4, { width: indexColWidth - 4, align: 'center' });
+
+            headers.forEach((h, hIdx) => {
+              const colX = indent + indexColWidth + hIdx * colWidth;
+              const val = item && typeof item === 'object' ? (item[h.key] ?? '-') : '-';
+              doc
+                .font(fontRegular)
+                .fontSize(8)
+                .fillColor('#1E293B')
+                .text(String(val), colX + 4, currentY + 4, { width: colWidth - 8, align: 'left' });
+            });
+
+            currentY += maxCellHeight;
+          });
+          currentY += 6;
+        };
+
+        const renderField = (field: any, val: any, indent = 45) => {
+          if (!field || field.fieldType === 'link_download') return;
+
+          const fieldName = field.fieldName || field.fieldKey || 'Trường dữ liệu';
+
+          // 1. File Single
+          if (field.fieldType === 'file_single') {
+            const fileUrl = val && typeof val === 'object' && val.url ? val.url : typeof val === 'string' ? val : null;
+            checkPageBreak(20);
+            doc.font(fontBold).fontSize(9).fillColor('#2D3748').text(`${fieldName}:`, indent, currentY);
+            currentY += 14;
+            if (fileUrl) {
+              const isImg = fileUrl.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/i);
+              if (isImg) {
+                renderImage(fileUrl, indent + 10);
+              } else {
+                const cleanUrl = fileUrl.replace(/^\/+/, '');
+                const fullLink = baseUrl ? `${baseUrl}/${cleanUrl}` : cleanUrl;
+                doc
+                  .font(fontRegular)
+                  .fontSize(8.5)
+                  .fillColor('#2563EB')
+                  .text(`[Tệp đính kèm: ${fullLink}]`, indent + 10, currentY);
+                currentY += 14;
+              }
+            } else {
+              doc
+                .font(fontRegular)
+                .fontSize(8.5)
+                .fillColor('#A0AEC0')
+                .text('Chưa có tệp đính kèm', indent + 10, currentY);
+              currentY += 14;
+            }
+            return;
+          }
+
+          // 2. File Multiple
+          if (field.fieldType === 'file_multiple') {
+            const files = Array.isArray(val) ? val : [];
+            checkPageBreak(20);
+            doc.font(fontBold).fontSize(9).fillColor('#2D3748').text(`${fieldName}:`, indent, currentY);
+            currentY += 14;
+
+            if (files.length > 0) {
+              files.forEach((file: any) => {
+                const fileUrl = file && typeof file === 'object' && file.url ? file.url : typeof file === 'string' ? file : null;
+                if (fileUrl) {
+                  const isImg = fileUrl.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/i);
+                  if (isImg) {
+                    renderImage(fileUrl, indent + 10);
+                  } else {
+                    const cleanUrl = fileUrl.replace(/^\/+/, '');
+                    const fullLink = baseUrl ? `${baseUrl}/${cleanUrl}` : cleanUrl;
+                    doc
+                      .font(fontRegular)
+                      .fontSize(8.5)
+                      .fillColor('#2563EB')
+                      .text(`[Tệp đính kèm: ${fullLink}]`, indent + 10, currentY);
+                    currentY += 14;
+                  }
+                }
+              });
+            } else {
+              doc
+                .font(fontRegular)
+                .fontSize(8.5)
+                .fillColor('#A0AEC0')
+                .text('Chưa có tệp đính kèm', indent + 10, currentY);
+              currentY += 14;
+            }
+            return;
+          }
+
+          // 3. Table / List canwrite
+          let listItems = val;
+          if (typeof listItems === 'string' && (listItems.trim().startsWith('[') || listItems.trim().startsWith('{'))) {
+            try {
+              listItems = JSON.parse(listItems);
+            } catch (e) {}
+          }
+          const isTable = field.fieldType === 'list_canwrite' || (Array.isArray(listItems) && listItems.length > 0 && typeof listItems[0] === 'object' && listItems[0] !== null && !listItems[0].url);
+
+          if (isTable) {
+            let subFields: Array<{ key: string; name: string }> = [];
+            let conf = field.config;
+            if (typeof conf === 'string') {
+              try {
+                conf = JSON.parse(conf);
+              } catch (e) {
+                conf = {};
+              }
+            }
+            if (conf) {
+              const maps = Array.isArray(conf.maps) ? conf.maps : Array.isArray(conf.fields) ? conf.fields : Array.isArray(conf.columns) ? conf.columns : [];
+              subFields = maps.map((m: any) => ({ key: m.fieldKey || m.key, name: m.fieldName || m.label || m.fieldKey || m.key }));
+            }
+            if (subFields.length === 0 && Array.isArray(listItems) && listItems.length > 0) {
+              const keyMap = new Map();
+              listItems.forEach((it: any) => {
+                if (it && typeof it === 'object') {
+                  Object.keys(it).forEach((k) => {
+                    if (!keyMap.has(k)) {
+                      keyMap.set(k, { key: k, name: k });
+                    }
+                  });
+                }
+              });
+              subFields = Array.from(keyMap.values());
+            }
+
+            checkPageBreak(25);
+            doc.font(fontBold).fontSize(9).fillColor('#2D3748').text(`${fieldName}:`, indent, currentY);
+            currentY += 14;
+
+            renderTable(subFields, Array.isArray(listItems) ? listItems : [], indent + 5);
+            return;
+          }
+
+          // 4. Các trường dữ liệu thông thường
+          let valStr = '';
+          if (val !== null && val !== undefined && val !== '') {
+            if (Array.isArray(val)) {
+              valStr = val.map((v) => (typeof v === 'object' && v !== null ? v.label || v.name || v.title || v.value || JSON.stringify(v) : String(v))).join(', ');
+            } else if (typeof val === 'object' && val !== null) {
+              valStr = val.label || val.name || val.title || val.value || JSON.stringify(val);
+            } else {
+              valStr = String(val);
+            }
+          } else {
+            valStr = '-';
+          }
+
+          renderKeyValue(fieldName, valStr, indent);
+        };
+
+        // SECTION I: THÔNG TIN CƠ SỞ CHÍNH
+        const hasHomeInfo = Boolean(traceData?.homeInfo);
+        if (hasHomeInfo) {
+          renderSectionHeader('I. THÔNG TIN CƠ SỞ CHÍNH');
+
+          const homeInfo = traceData.homeInfo;
+          renderKeyValue('Tên nhà yến', homeInfo.userHomeName || 'N/A', 45);
+          renderKeyValue('Chủ sở hữu', homeInfo.userName || 'N/A', 45);
+          renderKeyValue('Địa chỉ sản xuất', homeInfo.userHomeAddress || 'N/A', 45);
+
+          const dimensions = [
+            homeInfo.userHomeLength ? `Dài ${homeInfo.userHomeLength}m` : '',
+            homeInfo.userHomeWidth ? `Rộng ${homeInfo.userHomeWidth}m` : '',
+            homeInfo.userHomeFloor ? `${homeInfo.userHomeFloor} tầng` : '',
+          ]
+            .filter(Boolean)
+            .join(', ');
+          if (dimensions) {
+            renderKeyValue('Quy mô nhà yến', dimensions, 45);
+          }
+          currentY += 10;
+        }
+
+        // SECTION II: NHẬT KÝ BIỂU MẪU TRUY XUẤT NGUỒN GỐC
+        const sectionTitle = hasHomeInfo ? 'II. NHẬT KÝ BIỂU MẪU TRUY XUẤT NGUỒN GỐC' : 'I. NHẬT KÝ BIỂU MẪU TRUY XUẤT NGUỒN GỐC';
+        renderSectionHeader(sectionTitle);
+
+        const forms = traceData?.forms || [];
+        if (forms.length === 0) {
+          doc.font(fontRegular).fontSize(9.5).fillColor('#718096').text('Chưa có thông tin biểu mẫu.', 45, currentY);
+          currentY += 16;
+        } else {
+          forms.forEach((form: any, fIdx: number) => {
+            checkPageBreak(45);
+
+            // Form Title Banner
+            const formTitle = `${fIdx + 1}. ${form.formName || 'Biểu mẫu'}`;
+            doc.fillColor('#F4F9EE').strokeColor('#71AB33').lineWidth(1).rect(40, currentY, 515, 24).fillAndStroke();
+            doc
+              .font(fontBold)
+              .fontSize(10)
+              .fillColor('#2E7D32')
+              .text(formTitle, 48, currentY + 6, { width: 500 });
+            currentY += 30;
+
+            if (form.formDescription) {
+              checkPageBreak(18);
+              doc.font(fontRegular).fontSize(8.5).fillColor('#64748B').text(form.formDescription, 48, currentY, { width: 500 });
+              currentY += doc.heightOfString(form.formDescription, { width: 500 }) + 6;
+            }
+
+            if (form.hasData && form.submission?.groups && form.submission.groups.length > 0) {
+              form.submission.groups.forEach((group: any) => {
+                checkPageBreak(25);
+
+                if (group.groupName && group.groupName.trim() !== '') {
+                  doc.font(fontBold).fontSize(9.5).fillColor('#1E3A8A').text(`▸ ${group.groupName}`, 48, currentY);
+                  currentY += 16;
+                }
+
+                if (group.isLoop === 'Y' && Array.isArray(group.loopValues) && group.loopValues.length > 0) {
+                  const loopTitle = group.loopMetadata && group.loopMetadata.title ? group.loopMetadata.title : 'Công đoạn';
+                  group.loopValues.forEach((stage: any, sIdx: number) => {
+                    checkPageBreak(30);
+                    doc
+                      .font(fontBold)
+                      .fontSize(9)
+                      .fillColor('#71AB33')
+                      .text(`• ${loopTitle} ${sIdx + 1}:`, 55, currentY);
+                    currentY += 15;
+
+                    if (Array.isArray(group.fields)) {
+                      group.fields.forEach((field: any) => {
+                        const val = stage[field.fieldKey];
+                        renderField(field, val, 65);
+                      });
+                    }
+                    currentY += 4;
+                  });
+                } else if (group.isLoop === 'Y') {
+                  doc.font(fontRegular).fontSize(8.5).fillColor('#A0AEC0').text('  Chưa có dữ liệu ghi nhận.', 55, currentY);
+                  currentY += 14;
+                } else {
+                  if (Array.isArray(group.fields)) {
+                    group.fields.forEach((field: any) => {
+                      renderField(field, field.currentValue, 55);
+                    });
+                  }
+                }
+                currentY += 6;
+              });
+            } else {
+              doc.font(fontRegular).fontSize(8.5).fillColor('#A0AEC0').text('Chưa có dữ liệu ghi nhận cho biểu mẫu này.', 48, currentY);
+              currentY += 15;
+            }
+
+            currentY += 10;
+          });
         }
 
         // FOOTER / PAGE NUMBERS

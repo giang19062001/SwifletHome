@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
 import { PdfBaseService } from './services/pdf-base.service';
 import { TraceabilityPdfTemplate } from './templates/pdf/traceability.pdf';
 
@@ -10,57 +9,36 @@ export class ExportService {
     private readonly traceabilityPdfTemplate: TraceabilityPdfTemplate,
   ) {}
 
-  async generatePdfFromTraceData(traceData: any, qrUrl?: string): Promise<Buffer> {
+  async generatePdfFromTraceData(traceData: any, qrUrl?: string, mode: 'compact' | 'full' = 'compact'): Promise<Buffer> {
+    if (mode === 'full') {
+      return this.generateFullPdfFromTraceData(traceData, qrUrl);
+    }
+    return this.generateCompactPdfFromTraceData(traceData, qrUrl);
+  }
+
+  async generateCompactPdfFromTraceData(traceData: any, qrUrl?: string): Promise<Buffer> {
     return this.traceabilityPdfTemplate.generateCompact(traceData, qrUrl);
   }
 
-  async generatePdfFromUrl(url: string): Promise<Buffer> {
-    try {
-      const match = url.match(/\/traceability-qrcode-global\/([^/?#]+)/);
-      const cleanId = match && match[1] ? match[1] : '';
-
-      const response = await axios.get(url).catch(() => null);
-      if (response && response.data) {
-        return this.generatePdfFromTraceData(
-          {
-            traceabilityId: cleanId || '-',
-            homeInfo: {
-              userHomeName: 'Hệ thống Nhà yến 3FAM',
-              userName: 'Cơ sở sản xuất sản phẩm',
-              userHomeAddress: 'Chi tiết xem tại hệ thống 3FAM',
-            },
-            forms: [],
-          },
-          url,
-        );
-      }
-
-      return this.generatePdfFromTraceData({ traceabilityId: cleanId || 'TRACEABILITY' }, url);
-    } catch (e) {
-      return this.generateGenericPdfFromText('Báo cáo PDF', `URL: ${url}`);
-    }
+  async generateFullPdfFromTraceData(traceData: any, qrUrl?: string): Promise<Buffer> {
+    return this.traceabilityPdfTemplate.generateFull(traceData, qrUrl);
   }
 
-  private async generateGenericPdfFromText(title: string, content: string): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-      try {
-        const doc = this.pdfBaseService.createDocument();
-        const buffers: Buffer[] = [];
-        doc.on('data', (c) => buffers.push(c));
-        doc.on('end', () => resolve(Buffer.concat(buffers)));
-        doc.on('error', (err) => reject(err instanceof Error ? err : new Error(String(err))));
-
-        const fonts = this.pdfBaseService.getFontNames();
-        const fontRegular = fonts.regular;
-        const fontBold = fonts.bold;
-
-        doc.font(fontBold).fontSize(16).text(title, 40, 40);
-        doc.moveDown();
-        doc.font(fontRegular).fontSize(10).text(content, 40, doc.y);
-        doc.end();
-      } catch (err) {
-        reject(err instanceof Error ? err : new Error(String(err)));
+  async generatePdfFromUrl(url: string, mode?: 'compact' | 'full'): Promise<Buffer> {
+    try {
+      const match = url.match(/\/(?:traceability-qrcode-global|traceability-link-global)\/([^/?#]+)/);
+      const cleanId = match && match[1] ? match[1] : '';
+      if (!cleanId) {
+        throw new Error('Dữ liệu tạo PDF không hợp lệ');
       }
-    });
+
+      const inferredMode = mode || (url.includes('traceability-link-global') ? 'full' : 'compact');
+      return this.generatePdfFromTraceData({ traceabilityId: cleanId }, url, inferredMode);
+    } catch (e) {
+      if (e instanceof Error) {
+        throw e;
+      }
+      throw new Error(String(e));
+    }
   }
 }

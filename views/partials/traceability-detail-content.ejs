@@ -1,14 +1,15 @@
 <% if (values && values.traceData) { %>
 <div class="page-qrcode-update py-4" id="pdf-content">
     <div class="pdf-floating-btn" data-html2canvas-ignore="true">
-        <button
-        id="btn-download-pdf"
-        class="btn btn-danger shadow-lg rounded-pill px-4 py-2 d-flex align-items-center"
-        style="display: none !important;"
-    >
-        <i class="fa fa-file-pdf me-2 fa-lg"></i>
-        <span class="fw-bold">Tải bản PDF</span>
-    </button>
+        <a
+            href="/api/app/traceability/downloadFullPdf/<%= values.traceData.traceabilityId %>"
+            id="btn-download-pdf"
+            class="btn btn-danger shadow-lg rounded-pill px-4 py-2 d-flex align-items-center text-white text-decoration-none"
+            style="<%= (typeof showPdfButton !== 'undefined' && showPdfButton) ? '' : 'display: none !important;' %>"
+        >
+            <i class="fa fa-file-pdf me-2 fa-lg"></i>
+            <span class="fw-bold">Tải bản PDF</span>
+        </a>
     </div>
     <div class="trace-container">
         <!-- Thông tin chung của nhà yến -->
@@ -102,7 +103,9 @@
                                             <% form.submission.groups.forEach(group => { %>
                                                 <div class="col-12">
                                                     <h6 class="group-title">
-                                                        <i class="fa fa-caret-right me-1"></i> <%= group.groupName %>
+                                                        <% if (group.groupName && group.groupName.trim() !== '') { %>
+                                                            <i class="fa fa-caret-right me-1"></i> <%= group.groupName %>
+                                                        <% } %>
                                                     </h6>
                                                     <% if (group.isLoop === 'Y' && group.loopValues && group.loopValues.length > 0) { %>
                                                         <div class="d-flex flex-column gap-3 mt-2">
@@ -168,7 +171,7 @@
                                                                                                 <span class="text-muted small">Chưa có tệp đính kèm</span>
                                                                                             <% } %>
                                                                                         <% } else { %>
-                                                                                            <% 
+                                                                                            <%
                                                                                                 let listItems = val;
                                                                                                 if (typeof listItems === 'string' && (listItems.trim().startsWith('[') || listItems.trim().startsWith('{'))) {
                                                                                                     try { listItems = JSON.parse(listItems); } catch(e) {}
@@ -176,7 +179,7 @@
                                                                                                 const isTable = field.fieldType === 'list_canwrite' || (Array.isArray(listItems) && listItems.length > 0 && typeof listItems[0] === 'object' && listItems[0] !== null && !listItems[0].url);
                                                                                             %>
                                                                                             <% if (isTable) { %>
-                                                                                                <% 
+                                                                                                <%
                                                                                                     let subFields = [];
                                                                                                     let conf = field.config;
                                                                                                     if (typeof conf === 'string') {
@@ -310,7 +313,7 @@
                                                                                 <span class="text-muted small">Chưa có tệp đính kèm</span>
                                                                             <% } %>
                                                                         <% } else { %>
-                                                                            <% 
+                                                                            <%
                                                                                 let listItems = field.currentValue;
                                                                                 if (typeof listItems === 'string' && (listItems.trim().startsWith('[') || listItems.trim().startsWith('{'))) {
                                                                                     try { listItems = JSON.parse(listItems); } catch(e) {}
@@ -318,7 +321,7 @@
                                                                                 const isTable = field.fieldType === 'list_canwrite' || (Array.isArray(listItems) && listItems.length > 0 && typeof listItems[0] === 'object' && listItems[0] !== null && !listItems[0].url);
                                                                             %>
                                                                             <% if (isTable) { %>
-                                                                                <% 
+                                                                                <%
                                                                                     let subFields = [];
                                                                                     let conf = field.config;
                                                                                     if (typeof conf === 'string') {
@@ -405,13 +408,13 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         // document.addEventListener('DOMContentLoaded', function() {
         //     const btn = document.getElementById('btn-download-pdf');
         //     if (btn) {
         //         btn.addEventListener('click', function() {
-        //             window.location.href = '/api/app/traceability/downloadPdf/<%= values.traceData.traceabilityId %>';
+        //             window.location.href = '/api/app/traceability/downloadFullPdf/<%= values.traceData.traceabilityId %>';
         //         });
         //     }
         // });
