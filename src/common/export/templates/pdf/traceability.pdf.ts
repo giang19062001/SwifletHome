@@ -406,7 +406,7 @@ export class TraceabilityPdfTemplate {
 
                   if (group.fields) {
                     group.fields.forEach((field: any) => {
-                      if (field.fieldType === 'link_download') return;
+                      if (field.fieldType === 'link_download' || field.fieldType === 'link_share') return;
                       if (currentY > 750) {
                         doc.addPage();
                         currentY = 40;
@@ -755,7 +755,7 @@ export class TraceabilityPdfTemplate {
         };
 
         const renderField = (field: any, val: any, indent = 45) => {
-          if (!field || field.fieldType === 'link_download') return;
+          if (!field || field.fieldType === 'link_download' || field.fieldType === 'link_share') return;
 
           const fieldName = field.fieldName || field.fieldKey || 'Trường dữ liệu';
 

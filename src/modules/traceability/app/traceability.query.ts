@@ -1,3 +1,4 @@
+import { TRACE_CONST } from '../common/traceability.const';
 import { generateSeriCode } from './traceability.func';
 import { TEXTS } from 'src/helpers/text.helper';
 
@@ -107,5 +108,6 @@ export const TRACE_FORM_DEFAULT_CURRENT_VALUE_SQL = {
 export const TRACE_FORM_DEFAULT_CURRENT_VALUE_GENERATE = {
   psSeri: generateSeriCode('PS-SERI'),
   exportTime: () => new Date().toISOString().replace('T', ' ').substring(0, 19),
-  entireExportFile: (traceabilityId?: string) => (traceabilityId ? `/api/app/traceability/downloadCompactPdf/${traceabilityId}` : null),
+  // entireExportFile: (traceabilityId?: string) => (traceabilityId ? `/api/app/traceability/downloadCompactPdf/${traceabilityId}` : null),
+  entireExportFile: (traceabilityId?: string) => (traceabilityId ? `/${TRACE_CONST.FULL_INFO_LINK_URL}/${traceabilityId}` : null),
 };

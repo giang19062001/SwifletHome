@@ -171,8 +171,12 @@ export class TraceabilityFieldsService {
             }
           }
 
-          if (g.isLoop !== 'Y' && (currentValue === null || currentValue === undefined || currentValue === '')) {
+          const isEmpty = currentValue === null || currentValue === undefined || currentValue === '';
+          const shouldSetDefault = (g.isLoop !== 'Y' && isEmpty) || (f.fieldKey !== 'link_share' && f.fieldKey !== 'link_download');
+
+          if (shouldSetDefault) {
             const defaultValue = this.getDefaultCurrentValue(f.fieldKey, traceabilityId || '');
+
             if (defaultValue !== null && defaultValue !== undefined) {
               currentValue = defaultValue;
             }
