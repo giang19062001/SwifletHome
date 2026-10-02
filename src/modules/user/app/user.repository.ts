@@ -105,7 +105,7 @@ export class UserAppRepository {
   }
   async getInfo(userCode: string): Promise<GetInfoUserAppResDto | null> {
     const [rows] = await this.db.query<RowDataPacket[]>(
-      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode, F.languageCode,
+      ` SELECT A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode, A.createdAt AS registrationTime, F.languageCode,
       B.packageCode, IFNULL(C.packageName,'${TEXTS.PACKAGE_FREE}') AS packageName, IFNULL(C.packageDescription,'') AS packageDescription,
       IF(B.endDate IS NOT NULL, GREATEST(0, CEIL(TIMESTAMPDIFF(SECOND, NOW(), B.endDate) / 86400)), 0) AS packageRemainDay,  B.startDate, B.endDate,  
       COUNT(D.seq) AS homesTotal, E.userTypeCode, E.userTypeKeyWord, E.userTypeName
@@ -122,7 +122,7 @@ export class UserAppRepository {
         ON A.countryCode = F.countryCode
       WHERE A.userCode = ? AND A.isActive = 'Y' 
       GROUP BY 
-      A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode, F.languageCode,
+      A.seq, A.userCode, A.userName, A.userPhone, A.deviceToken, A.countryCode, A.createdAt, F.languageCode,
       B.startDate, B.endDate, B.packageCode,
       C.packageName, C.packageDescription
        LIMIT 1`,

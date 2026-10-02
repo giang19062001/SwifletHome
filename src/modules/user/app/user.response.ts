@@ -33,8 +33,11 @@ export class UserPackageAppResDto {
   @ApiProperty({ example: '' })
   userCode: string;
 
+  @ApiProperty({ example: false })
+  isPaidPackage: boolean;
+
   @ApiProperty({ example: '' })
-  packageCode: string | null;
+  packageCode?: string | null;
 
   @ApiProperty({ example: '' })
   packageName: string;
@@ -83,8 +86,14 @@ export class UserAppResDto {
   @ApiProperty({ example: '' })
   deviceToken!: string;
 
+  @ApiProperty({ example: false })
+  isPaidPackage: boolean;
+
+  @ApiProperty({ example: '2024-01-01 00:00:00' })
+  registrationTime?: string;
+
   @ApiProperty({ example: '' })
-  packageCode!: string;
+  packageCode?: string;
 
   @ApiProperty({ example: '' })
   packageName!: string;

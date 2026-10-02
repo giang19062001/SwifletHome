@@ -39,11 +39,28 @@ export class UserAppService {
   }
   async getInfo(userCode: string): Promise<GetInfoUserAppResDto | null> {
     const info = await this.userAppRepository.getInfo(userCode);
-    if ((info as any)?.packageCode && (info as any).packageRemainDay <= 0) {
-      // gói hết hạn -> cho 'packageCode' là null
-      return { ...info, packageCode: null, packageName: TEXTS.PACKAGE_FREE, packageDescription: '', startDate: null, endDate: null } as any;
+    if (!info) {
+      return null;
+    }
+
+    const isPaidPackage = Boolean((info as any)?.packageCode && (info as any).packageRemainDay > 0);
+    const { packageCode, ...restInfo } = info as any;
+
+    if (!isPaidPackage) {
+      // gói hết hạn hoặc chưa mua gói -> trả về gói miễn phí và isPaidPackage: false
+      return {
+        ...restInfo,
+        isPaidPackage: false,
+        packageName: TEXTS.PACKAGE_FREE,
+        packageDescription: '',
+        startDate: null,
+        endDate: null,
+      } as GetInfoUserAppResDto;
     } else {
-      return info;
+      return {
+        ...restInfo,
+        isPaidPackage: true,
+      } as GetInfoUserAppResDto;
     }
   }
 

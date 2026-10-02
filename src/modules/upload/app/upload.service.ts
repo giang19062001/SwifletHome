@@ -20,7 +20,7 @@ export class UploadAppService {
     let list: FileMediaAppResDto[] = [];
     const userPackageInfo = await this.authAppService.getInfo(userCode);
 
-    const isUpgrade = userPackageInfo?.packageCode && userPackageInfo.packageRemainDay > 0 ? 'UPGRADE' : 'NOT_UPGRADE';
+    const isUpgrade = userPackageInfo?.isPaidPackage ? 'UPGRADE' : 'NOT_UPGRADE';
     console.log('isUpgrade --->', isUpgrade);
     if (dto.mediaType == 'AUDIO') {
       const audioList = await this.uploadAppRepository.getAllMediaAudio(dto);
