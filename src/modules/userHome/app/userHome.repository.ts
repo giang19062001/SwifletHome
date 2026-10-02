@@ -27,7 +27,7 @@ export class UserHomeAppRepository {
   async getAllHomes(dto: PagingDto, userCode: string): Promise<UserHomeResDto[]> {
     let query = ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, B.provinceName AS userHomeProvince,
      A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-    A.isIntegateTempHum, A.isIntegateCurrent, A.isIntegateIOT, A.isTriggered, A.isMain
+    A.isIntegateIOT, A.isTriggered, A.isMain
     FROM ${this.table} A 
     INNER JOIN  ${this.tableUserApp} AU
     ON A.userCode = AU.userCode
@@ -62,7 +62,7 @@ export class UserHomeAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince,
        A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-       A.isIntegateTempHum, A.isIntegateCurrent, A.isIntegateIOT, A.isTriggered, A.isMain, A.uniqueId
+       A.isIntegateIOT, A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
           INNER JOIN  ${this.tableUserApp} B
           ON A.userCode = B.userCode
@@ -76,7 +76,7 @@ export class UserHomeAppRepository {
     const [rows] = await this.db.query<RowDataPacket[]>(
       ` SELECT A.seq, A.userCode,  A.userHomeCode,  A.userHomeName, A.userHomeAddress, A.userHomeProvince,
        A.userHomeDescription, A.userHomeImage, A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-       A.isIntegateTempHum, A.isIntegateCurrent, A.isIntegateIOT, A.isTriggered, A.isMain, A.uniqueId
+      A.isIntegateIOT, A.isTriggered, A.isMain, A.uniqueId
           FROM ${this.table} A 
           INNER JOIN  ${this.tableUserApp} B
           ON A.userCode = B.userCode
@@ -97,8 +97,8 @@ export class UserHomeAppRepository {
 
     const sql = `
       INSERT INTO ${this.table}  (userCode, userHomeCode, userHomeName, userHomeAddress, userHomeProvince, userHomeDescription, userHomeImage,
-       userHomeLength, userHomeWidth, userHomeFloor, isIntegateTempHum, isIntegateCurrent, isIntegateIOT, isTriggered, isMain, uniqueId, createdId) 
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       userHomeLength, userHomeWidth, userHomeFloor, isIntegateIOT, isTriggered, isMain, uniqueId, createdId) 
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await this.db.execute<ResultSetHeader>(sql, [
       userCode,
@@ -111,8 +111,6 @@ export class UserHomeAppRepository {
       dto.userHomeLength,
       dto.userHomeWidth,
       dto.userHomeFloor,
-      dto.isIntegateTempHum ?? YnEnum.N,
-      dto.isIntegateCurrent ?? YnEnum.N,
       dto.isIntegateIOT ?? YnEnum.N,
       'N', // isTriggered
       isMain,
@@ -142,7 +140,7 @@ export class UserHomeAppRepository {
     UPDATE ${this.table}
     SET 
       userHomeName = ?, userHomeAddress = ?, userHomeProvince = ?, userHomeDescription = ?, 
-      userHomeImage = ?, userHomeLength = ?, userHomeWidth = ?, userHomeFloor = ?, isIntegateTempHum = ?, isIntegateCurrent = ?, isIntegateIOT = ?,
+      userHomeImage = ?, userHomeLength = ?, userHomeWidth = ?, userHomeFloor = ?, isIntegateIOT = ?,
       uniqueId = ?,  updatedId = ?, updatedAt = ?
       WHERE userHomeCode = ?
   `;
@@ -156,8 +154,6 @@ export class UserHomeAppRepository {
       dto.userHomeLength,
       dto.userHomeWidth,
       dto.userHomeFloor,
-      dto.isIntegateTempHum ?? YnEnum.N,
-      dto.isIntegateCurrent ?? YnEnum.N,
       dto.isIntegateIOT ?? YnEnum.N,
       dto.uniqueId,
       userCode, // updatedId

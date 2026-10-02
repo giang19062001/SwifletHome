@@ -55,7 +55,7 @@ export class ShareAppService {
           throw new BadRequestException({ message: 'Không tìm thấy thông tin nhà yến', data: null });
         }
 
-        const { isIntegateTempHum, isIntegateCurrent, isIntegateIOT, isTriggered, uniqueId, ...cleanHomeData } = homeData;
+        const { isIntegateIOT, isTriggered, uniqueId, ...cleanHomeData } = homeData;
 
         const harvestData = await this.todoHarvestAppService.arrangeHarvestRows(harvestPhaseDetail.seq, homeData.userHomeFloor);
 

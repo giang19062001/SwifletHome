@@ -42,7 +42,7 @@ export class UserHomeAdminRepository {
     let query = ` SELECT A.seq, A.userCode, B.userName, B.userPhone, A.userHomeCode, A.userHomeName, A.userHomeAddress, 
     C.provinceName AS userHomeProvince, A.userHomeDescription, A.userHomeImage,
     A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-    A.isIntegateTempHum, A.isIntegateCurrent, A.isIntegateIOT, A.isTriggered, A.isMain, A.createdAt, A.updatedAt
+    A.isIntegateIOT, A.isTriggered, A.isMain, A.createdAt, A.updatedAt
     FROM ${this.table} A 
     INNER JOIN ${this.tableUser} B
       ON A.userCode = B.userCode
@@ -135,7 +135,7 @@ export class UserHomeAdminRepository {
       `
        SELECT A.seq, A.userCode, A.userHomeCode, A.userHomeName, A.userHomeAddress, A.userHomeProvince, A.userHomeDescription, A.userHomeImage,
        A.userHomeLength, A.userHomeWidth, A.userHomeFloor,
-       A.isIntegateTempHum, A.isIntegateCurrent, A.isIntegateIOT,  A.isTriggered, A.isMain, A.uniqueId, B.machineCode, B.macId, B.wifiId, B.wifiPassword
+      A.isIntegateIOT,  A.isTriggered, A.isMain, A.uniqueId, B.machineCode, B.macId, B.wifiId, B.wifiPassword
            FROM  ${this.table} A 
            LEFT JOIN ${this.tableSensor} B
            ON A.userHomeCode = B.userHomeCode

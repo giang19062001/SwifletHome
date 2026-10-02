@@ -44,12 +44,6 @@ export class GetHomeUserResDto {
   userHomeFloor: number;
 
   @ApiProperty({ example: YnEnum.N })
-  isIntegateTempHum: YnEnum;
-
-  @ApiProperty({ example: YnEnum.N })
-  isIntegateCurrent: YnEnum;
-
-  @ApiProperty({ example: YnEnum.N })
   isIntegateIOT: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
@@ -125,12 +119,6 @@ export class UserHomeResDto {
 
   @ApiProperty({ example: '' })
   uniqueId: string;
-
-  @ApiProperty({ example: YnEnum.N })
-  isIntegateTempHum: YnEnum;
-
-  @ApiProperty({ example: YnEnum.N })
-  isIntegateCurrent: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
   isIntegateIOT: YnEnum;

@@ -51,22 +51,6 @@ export class MutationUserHomeDto {
   @ApiProperty({
     example: YnEnum.N,
     enum: YnEnum,
-  })
-  @IsEnum(YnEnum)
-  @IsOptional()
-  isIntegateTempHum?: YnEnum;
-
-  @ApiProperty({
-    example: YnEnum.N,
-    enum: YnEnum,
-  })
-  @IsEnum(YnEnum)
-  @IsOptional()
-  isIntegateCurrent?: YnEnum;
-
-  @ApiProperty({
-    example: YnEnum.N,
-    enum: YnEnum,
     required: false,
   })
   @IsEnum(YnEnum)

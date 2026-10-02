@@ -45,12 +45,6 @@ export class UserHomeSensorResDto {
   uniqueId: string;
 
   @ApiProperty({ example: YnEnum.N })
-  isIntegateTempHum: YnEnum;
-
-  @ApiProperty({ example: YnEnum.N })
-  isIntegateCurrent: YnEnum;
-
-  @ApiProperty({ example: YnEnum.N })
   isIntegateIOT: YnEnum;
 
   @ApiProperty({ example: YnEnum.N })
