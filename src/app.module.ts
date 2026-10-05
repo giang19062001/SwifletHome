@@ -67,6 +67,7 @@ import { UserHomeAppModule } from './modules/userHome/app/userHome.module';
 import { UserHomeIotModule } from './modules/userHome/iot/userHome-iot.module';
 import { TraceabilityAppModule } from './modules/traceability/app/traceability.module';
 import { TraceabilityAdminModule } from './modules/traceability/admin/traceability.module';
+import { TradeAppModule } from './modules/trade/app/trade.module';
 import { ExportModule } from './common/export/export.module';
 
 @Module({
@@ -136,6 +137,7 @@ import { ExportModule } from './common/export/export.module';
     ShareAppModule,
     AdsAppModule,
     TraceabilityAppModule,
+    TradeAppModule,
     // front
     GuestModule,
     // eater - app

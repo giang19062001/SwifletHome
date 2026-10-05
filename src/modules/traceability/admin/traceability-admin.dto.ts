@@ -19,7 +19,7 @@ export class GetTraceabilityListAdminDto extends PagingDto {
   @IsOptional()
   formSeq?: number;
 
-  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED'], required: false, description: 'Trạng thái đơn' })
+  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED', 'DELETED'], required: false, description: 'Trạng thái đơn' })
   @IsString()
   @IsOptional()
   status?: string;

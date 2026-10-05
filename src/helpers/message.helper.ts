@@ -134,6 +134,10 @@ export const Msg = {
   // truy xuất
   Lotcode: alreadyExist('Mã lô'),
   LotcodeUsed: alreadyUsed('Mã lô'),
+
+  // thương mại tổ yến (trade)
+  TradeImageNotFound: 'Chưa có ảnh tổ yến được đính kèm với thông tin đăng bán',
+  TradeNotFound: notFound('Thông tin đăng bán'),
 };
 
 // ─── Helpers dùng nội bộ ───────────────────────────────────────────────────────

@@ -14,7 +14,7 @@ import { USER_CONST } from 'src/modules/user/app/user.const';
 import { TokenUserAppResDto } from '../../auth/app/auth.response';
 import { TeamReviewAppService } from './team-review.service';
 import { TeamUserAppService } from './team-user.service';
-import { SaveDraftAppDto, DeleteFileAppDto, GetAllTeamDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto, CreateTeamAppDto } from './team.dto';
+import { SaveDraftAppDto, DeleteFileAppDto, GetAllTeamDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto } from './team.dto';
 import { CheckAvailableTeamResDto, GetAllTeamResDto, GetDetailTeamResDto, InitFormCreateTeamAppResDto, UploadTeamFileResDto } from './team.response';
 
 @ApiTags('app/team')
@@ -96,49 +96,6 @@ export class TeamAppController {
   }
 
   // TODO: TEAM REGISTRATION
-  @ApiOperation({
-    summary: 'Đăng ký đội kỹ thuật / xưởng gia công mới ⚠️ Sẽ bị xóa vì chuyển sang dùng saveDraft và submitTeam API ⚠️',
-    description: `
-**servicesData**: Mảng dịch vụ [{"serviceTypeCode": "BUILD_RAW", "serviceTextInput": "nội dung", "uniqueId": "****"}] \n
-**teamDescriptionSpecial**: 
-- Dành cho xưởng gia công: {"monthlyVolumn": 1000, "minimunQuantity": 10} \n
-- Dành cho đội kỹ thuật: null \n
-**uniqueId**: uuid này phải đồng nhất với uuid của uploadTeamMainImage, uploadTeamFiles`,
-  })
-  @Post('createTeam')
-  @HttpCode(HttpStatus.OK)
-  @ApiBody({ type: CreateTeamAppDto })
-  @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
-  @ApiBadRequestResponse({ type: NumberErrResponseDto })
-  async createTeam(@Body() dto: CreateTeamAppDto, @GetUserApp() user: TokenUserAppResDto) {
-    const result = await this.teamUserAppService.createTeam(dto, user.userCode, user.userTypeCode, user.userTypeKeyWord);
-    if (result === 0) {
-      throw new BadRequestException({
-        message: Msg.RegisterErr,
-        data: 0,
-      });
-    } else if (result === -1) {
-      throw new BadRequestException({
-        message: Msg.TeamAlreadyRegistered,
-        data: 0,
-      });
-    } else if (result === -2) {
-      throw new BadRequestException({
-        message: Msg.TeamServiceRequired,
-        data: 0,
-      });
-    } else if (result === -3) {
-      throw new BadRequestException({
-        message: Msg.TeamServiceDuplicate,
-        data: 0,
-      });
-    }
-    return {
-      message: Msg.RegisterOk,
-      data: result,
-    };
-  }
-
   @ApiOperation({
     summary: 'Lưu tạm bản nháp đăng ký đội kỹ thuật / xưởng gia công mới',
     description: `
@@ -259,8 +216,8 @@ export class TeamAppController {
 
   @ApiOperation({
     summary: 'Xóa file ảnh/video đã upload cho ảnh chính, ảnh/video phụ, ảnh/video dịch vụ',
-    description: `**uploadType**: 
-  - teamImage: xóa ảnh chính \n 
+    description: `**uploadType**:
+  - teamImage: xóa ảnh chính \n
   - teamFiles: xóa ảnh/video phụ  \n
   - teamServiceFiles: xóa ảnh/video dịch vụ`,
   })

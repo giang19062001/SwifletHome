@@ -7,7 +7,7 @@ import { getFileLocation } from 'src/config/multer.config';
 import { ProvinceService } from 'src/modules/province/app/province.service';
 import { v4 as uuidv4 } from 'uuid';
 import { TeamUserAppRepository } from './team-user.repository';
-import { CreateTeamAppDto, SaveDraftAppDto, DeleteFileAppDto, GetAllTeamDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto } from './team.dto';
+import { SaveDraftAppDto, DeleteFileAppDto, GetAllTeamDto, UploadServiceFilesAppDto, UploadTeamFilesAppDto, UploadTeamMainImageAppDto } from './team.dto';
 import { CheckAvailableTeamResDto, GetAllTeamResDto, GetDetailTeamResDto, InitFormCreateTeamAppResDto } from './team.response';
 
 @Injectable()
@@ -269,60 +269,6 @@ export class TeamUserAppService {
       return draftFull.seq;
     } catch (error) {
       this.logger.error(`${this.SERVICE_NAME}/submitTeam: ${error}`);
-      return 0;
-    }
-  }
-
-  // ! WILL DELETE
-  async createTeam(dto: CreateTeamAppDto, userCode: string, userTypeCode: string, userTypeKeyWord: string): Promise<number> {
-    // Check duplicate team
-    const isDuplicate = await this.teamUserAppRepository.checkDuplicateTeam(userCode, userTypeCode);
-    if (isDuplicate) {
-      return -1; // Đã đăng ký team loại này rồi
-    }
-
-    // validate services
-    const services: any[] = dto.servicesData || [];
-
-    // Validate: Số lượng dịch vụ >= 1
-    if (!services || services.length < 1) {
-      return -2; // Phải có ít nhất 1 dịch vụ
-    }
-
-    // Validate: Không trùng dịch vụ
-    const serviceTypeCodes = services.map((s: any) => s.serviceTypeCode);
-    const uniqueServiceTypeCodes = new Set(serviceTypeCodes);
-    if (uniqueServiceTypeCodes.size !== serviceTypeCodes.length) {
-      return -3; // Có dịch vụ trùng nhau
-    }
-
-    try {
-      // Kiểm tra ảnh chính đã upload chưa (thông qua uniqueId)
-      const existingMainImg = await this.teamUserAppRepository.findMainImageByUniqueId(dto.uniqueId);
-      const teamImagePath = existingMainImg ? existingMainImg.filename : '';
-
-      // Tạo team
-      const seq = await this.teamUserAppRepository.create({ ...dto, userTypeCode }, userCode, teamImagePath, userCode);
-      if (seq) {
-        // Re-link team files
-        await this.teamUserAppRepository.updateSeqFilesTeam(seq, dto.uniqueId, userCode);
-
-        // Tạo services song song
-        await Promise.all(
-          services.map(async (svc: any) => {
-            const seqService = await this.teamUserAppRepository.createTeamService(seq, userTypeCode, svc.serviceTypeCode, svc.serviceTextInput, svc.uniqueId);
-            if (svc.uniqueId) {
-              await this.teamUserAppRepository.updateSeqFilesService(seqService, svc.uniqueId, userCode);
-            }
-          }),
-        );
-
-        // sendEmail
-        this.mailService.sendTeamEmail({ ...dto, userTypeKeyWord });
-      }
-      return seq;
-    } catch (error) {
-      this.logger.error(`${this.SERVICE_NAME}/createTeam: ${error}`);
       return 0;
     }
   }

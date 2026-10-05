@@ -56,6 +56,8 @@ export const getFileLocation = (mimetype: string, fieldname: string, isExternal?
       result = 'images/reviews';
     } else if (fieldname.includes('traceabilityFiles')) {
       result = isExternal ? 'images/tracesExternal' : 'images/traces';
+    } else if (fieldname.includes('tradeNestFile')) {
+      result = 'images/tradeNests';
     }
   } else if (mimetype.startsWith('video/')) {
     if (fieldname.includes('doctorFiles')) {

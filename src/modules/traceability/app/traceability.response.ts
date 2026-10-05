@@ -101,7 +101,7 @@ export class TraceabilityFormResDto {
   @ApiProperty({ example: 'LOT001', required: false, description: 'Mã lô của đợt truy xuất' })
   lotcode?: string;
 
-  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED'] })
+  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED', 'DELETED'] })
   status!: string;
 
   @ApiProperty({ example: 'Đang xử lý' })
@@ -141,7 +141,7 @@ export class TraceabilityHouseInfoResDto {
   @ApiProperty({ example: '3FAM-NY-92-HOM000001' })
   traceabilityId!: string;
 
-  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED'] })
+  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED', 'DELETED'] })
   status!: string;
 
   @ApiProperty({ example: 'Đang xử lý' })
@@ -164,7 +164,7 @@ export class TraceabilityBatchItemResDto {
   @ApiProperty({ example: 'HOM000058', required: false })
   userHomeCode?: string;
 
-  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED'] })
+  @ApiProperty({ example: 'PROCESSING', enum: ['PROCESSING', 'APPROVED', 'REFUSED', 'DELETED'] })
   status!: string;
 
   @ApiProperty({ example: 'Đang xử lý' })

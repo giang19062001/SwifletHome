@@ -408,12 +408,22 @@ export class TraceabilityAppRepository {
       .filter(Boolean);
   }
 
+  async deleteTraceabilityBatch(traceabilityId: string, userCode: string): Promise<number> {
+    const sql = `
+      UPDATE ${this.tableBatches} 
+      SET status = '${TraceabilityStatusEnum.DELETED}', updatedId = ?, updatedAt = NOW() 
+      WHERE traceabilityId = ? AND userCode = ? AND isActive = 'Y'
+    `;
+    const [result] = await this.db.execute<ResultSetHeader>(sql, [userCode, traceabilityId, userCode]);
+    return result.affectedRows;
+  }
+
   async getSubmissionBatchList(userCode: string, dto: GetSubmissionBatchListDto): Promise<{ list: RowDataPacket[]; total: number }> {
     const page = Number(dto.page) > 0 ? Number(dto.page) : 1;
     const limit = Number(dto.limit) > 0 ? Number(dto.limit) : 10;
     const offset = (page - 1) * limit;
 
-    const conditions: string[] = ['B.userCode = ?', "B.isActive = 'Y'"];
+    const conditions: string[] = ['B.userCode = ?', "B.isActive = 'Y'", `B.status != '${TraceabilityStatusEnum.DELETED}'`];
     const params: any[] = [userCode];
 
     const whereClause = conditions.join(' AND ');

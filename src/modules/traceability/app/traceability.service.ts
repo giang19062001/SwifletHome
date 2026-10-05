@@ -330,4 +330,20 @@ export class TraceabilityAppService {
   async deleteFileCron(seq: number): Promise<number> {
     return await this.repository.deleteFileBySeq(seq);
   }
+
+  async deleteTraceability(traceabilityId: string, userCode: string): Promise<number> {
+    if (!traceabilityId) {
+      return 0;
+    }
+
+    if (traceabilityId.includes(TRACE_CONST.TRACE_EXTERNAL_PREFIX)) {
+      return await this.externalService.deleteTraceability(traceabilityId, userCode);
+    }
+
+    if (traceabilityId.includes(TRACE_CONST.TRACE_INTERNAL_PREFIX)) {
+      return await this.repository.deleteTraceabilityBatch(traceabilityId, userCode);
+    }
+
+    return 0;
+  }
 }

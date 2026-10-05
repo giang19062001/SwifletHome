@@ -8,11 +8,12 @@ import { UserHomeAppModule } from 'src/modules/userHome/app/userHome.module';
 import { SaleHomeAppModule } from 'src/modules/saleHome/app/saleHome.module';
 import { AdsAdminModule } from 'src/modules/ads/admin/ads.module';
 import { TraceabilityAppModule } from 'src/modules/traceability/app/traceability.module';
+import { TradeAppModule } from 'src/modules/trade/app/trade.module';
 import { FileLocalModule } from '../fileLocal/fileLocal.module';
 import { CornService } from './corn.service';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), UserAppModule, FileLocalModule, DoctorAppModule, TodoAppModule, UserHomeAppModule, TeamAppModule, SaleHomeAppModule, AdsAdminModule, TraceabilityAppModule],
+  imports: [ScheduleModule.forRoot(), UserAppModule, FileLocalModule, DoctorAppModule, TodoAppModule, UserHomeAppModule, TeamAppModule, SaleHomeAppModule, AdsAdminModule, TraceabilityAppModule, TradeAppModule],
   controllers: [],
   providers: [CornService],
   exports: [],

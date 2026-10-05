@@ -12,5 +12,6 @@ export const TABLE_MAPPING_TO_JOB_CLEAR = [
   { table: 'tbl_uploads_audio', column: 'filename' },
   { table: 'tbl_media_audio', column: 'filename' },
   { table: 'tbl_traceability_file', column: 'filename' },
+  { table: 'tbl_trade_file', column: 'filename' },
 ];
 

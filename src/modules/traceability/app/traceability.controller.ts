@@ -138,6 +138,21 @@ export class TraceabilityAppController implements OnModuleInit {
   }
 
   @ApiOperation({
+    summary: 'Xóa đợt truy xuất nguồn gốc (Cập nhật trạng thái sang DELETED)',
+    description: 'Dựa vào tiền tố traceabilityId chứa -VCĐP- sẽ cập nhật status tbl_traceability_batches_external, nếu chứa -NY sẽ cập nhật tbl_traceability_batches',
+  })
+  @Delete('delete/:traceabilityId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: ApiAppResponseDto(NumberOkResponseDto) })
+  async deleteTraceability(@Param('traceabilityId') traceabilityId: string, @GetUserApp() user: TokenUserAppResDto) {
+    const result = await this.service.deleteTraceability(traceabilityId, user.userCode);
+    return {
+      message: result > 0 ? Msg.DeleteOk : Msg.DeleteErr,
+      data: result,
+    };
+  }
+
+  @ApiOperation({
     summary: 'Submit hoặc cập nhật form truy xuất nguồn gốc',
     description: 'Lưu dữ liệu form và tự động liên kết các file đã upload trước đó thông qua uniqueId.',
   })

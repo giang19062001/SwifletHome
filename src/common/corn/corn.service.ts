@@ -20,6 +20,7 @@ import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
 import { TABLE_MAPPING_TO_JOB_CLEAR } from './corn.const';
 import { TraceabilityExternalService } from 'src/modules/traceability/app/traceability-external.service';
+import { TradeAppService } from 'src/modules/trade/app/trade.service';
 
 @Injectable()
 export class CornService implements OnModuleInit {
@@ -36,6 +37,7 @@ export class CornService implements OnModuleInit {
     private readonly adsAdminService: AdsAdminService,
     private readonly traceabilityAppService: TraceabilityAppService,
     private readonly traceabilityExternalService: TraceabilityExternalService,
+    private readonly tradeAppService: TradeAppService,
     private readonly fileLocalService: FileLocalService,
     private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
@@ -52,6 +54,7 @@ export class CornService implements OnModuleInit {
       await this.deleteSaleHomeFilesNotUse();
       await this.deleteAdsFilesNotUse();
       await this.deleteTraceabilityFilesNotUse();
+      await this.deleteTradeFilesNotUse();
       await this.deleteOrphanedLocalFiles();
     });
     this.schedulerRegistry.addCronJob('dailyMidNightTask', jobDaily);
@@ -378,6 +381,25 @@ export class CornService implements OnModuleInit {
       }
     } catch (error) {
       this.logger.error(logbase, `Có lỗi khi xóa các file traceability không dùng theo lịch trình: ${JSON.stringify(error)}`);
+    }
+  }
+
+  async deleteTradeFilesNotUse() {
+    const logbase = `${this.SERVICE_NAME}/deleteTradeFilesNotUse`;
+    this.logger.log(logbase, `Chuẩn bị xóa các file trade tổ yến không dùng theo lịch trình....`);
+    try {
+      const filesNotUse = await this.tradeAppService.getFilesNotUse();
+      if (filesNotUse.length) {
+        for (const file of filesNotUse) {
+          await this.tradeAppService.deleteFileCron(file.seq);
+          await this.fileLocalService.deleteLocalFile(file.filename);
+        }
+        this.logger.log(logbase, `Các file trade tổ yến không dùng đã được xóa thành công (${filesNotUse.length} files)`);
+      } else {
+        this.logger.log(logbase, `Không có file trade nào cần được xóa`);
+      }
+    } catch (error) {
+      this.logger.error(logbase, `Có lỗi khi xóa các file trade không dùng theo lịch trình: ${JSON.stringify(error)}`);
     }
   }
 }

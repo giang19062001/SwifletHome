@@ -12,12 +12,17 @@ export const TRACE_CONST = {
       value: 'REFUSED',
       text: 'Đã từ chối',
     },
+    DELETED: {
+      value: 'DELETED',
+      text: 'Đã xóa',
+    },
   },
   QR_CODE_PATH: 'uploads/images/traceQrcodes',
   QR_CODE_PATH_EXTERNAL: 'uploads/images/traceQrcodesExternal',
   QR_CODE_BASE_URL: 'traceability-qrcode-global',
   FULL_INFO_LINK_URL: 'traceability-link-global',
   TRACE_EXTERNAL_PREFIX: '3FAM-VCĐP',
+  TRACE_INTERNAL_PREFIX: '3FAM-NY',
 };
 
 // GIÁ TRỊ HIỂN THỊ Ở FRONTEND

@@ -250,4 +250,8 @@ export class TraceabilityExternalService {
   async deleteFileCron(seq: number): Promise<number> {
     return await this.repository.deleteFileCron(seq);
   }
+
+  async deleteTraceability(traceabilityId: string, userCode: string): Promise<number> {
+    return await this.repository.deleteTraceabilityBatch(traceabilityId, userCode);
+  }
 }
