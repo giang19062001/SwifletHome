@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:minio": "cross-env NODE_ENV=local ts-node tools/test-minio-integration.ts",
-    "migrate:minio": "cross-env NODE_ENV=local ts-node tools/migrate-to-minio.ts"
+    "migrate:minio": "ts-node tools/migrate-to-minio.ts"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",

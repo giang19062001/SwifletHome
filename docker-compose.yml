@@ -102,6 +102,7 @@ services:
   minio:
     image: cgr.dev/chainguard/minio:latest
     container_name: swiftlet_minio
+    user: root
     restart: unless-stopped
     ports:
       - "9000:9000"
