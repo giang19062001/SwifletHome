@@ -10,7 +10,7 @@
     - "{{ nginx_sites_available }}"
     - "{{ nginx_sites_enabled }}"
 
-- name: Copy domain configuration files from local/nginx/ to server sites-available
+- name: Copy domain configuration files from tools/nginx/ to server sites-available
   copy:
     src: "{{ item }}"
     dest: "{{ nginx_sites_available }}/{{ item | basename }}"

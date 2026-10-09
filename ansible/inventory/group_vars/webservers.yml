@@ -3,8 +3,8 @@
 nginx_sites_available: "/etc/nginx/sites-available"
 nginx_sites_enabled: "/etc/nginx/sites-enabled"
 
-# Đường dẫn thư mục chứa file conf ở local (tính từ vị trí playbook site.yml)
-local_nginx_dir: "../local/nginx"
+# Đường dẫn thư mục chứa file conf ở tools (tính từ vị trí playbook site.yml)
+local_nginx_dir: "../tools/nginx"
 
 # Email dùng để đăng ký SSL Certbot Let's Encrypt
 certbot_email: "admin@3fam.ai"
@@ -43,3 +43,11 @@ nginx_domains:
     websocket: true
     custom_conf: "grafana.3fam.ai.conf"
     enable_ssl: true
+
+  - name: minio.3fam.ai
+    server_name: "minio.3fam.ai"
+    upstream_url: "http://127.0.0.1:9001"
+    websocket: true
+    custom_conf: "minio.3fam.ai.conf"
+    enable_ssl: true
+

@@ -1,6 +1,6 @@
 # Hướng dẫn Quản lý Nginx Domain & SSL bằng Ansible (SwifletHome)
 
-Hệ thống Ansible này giúp tự động hóa việc đồng bộ, đăng ký SSL Let's Encrypt và kích hoạt các file cấu hình Nginx domain từ thư mục `local/nginx/` lên server `103.77.160.68`.
+Hệ thống Ansible này giúp tự động hóa việc đồng bộ, đăng ký SSL Let's Encrypt và kích hoạt các file cấu hình Nginx domain từ thư mục `tools/nginx/` lên server `103.77.160.68`.
 
 ---
 
@@ -60,8 +60,8 @@ Thêm domain mới vào danh sách `nginx_domains`:
 ```
 Khi chạy Ansible, hệ thống sẽ **tự sinh file conf + tự đăng ký SSL với Certbot + kích hoạt Nginx**.
 
-### Cách 2: Thêm file `.conf` thủ công vào `local/nginx/`
-Tạo file `local/nginx/api.3fam.ai.conf` và chạy lệnh Ansible. Ansible sẽ sync file này lên server và tự động xin SSL qua Certbot.
+### Cách 2: Thêm file `.conf` thủ công vào `tools/nginx/`
+Tạo file `tools/nginx/api.3fam.ai.conf` và chạy lệnh Ansible. Ansible sẽ sync file này lên server và tự động xin SSL qua Certbot.
 
 ---
 
