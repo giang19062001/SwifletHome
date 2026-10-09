@@ -1,8 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { existsSync, mkdirSync } from 'fs';
 import { RowDataPacket } from 'mysql2';
-import * as path from 'path';
-import * as QRCode from 'qrcode';
 import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 import { getFileLocation } from 'src/config/multer.config';
 import { Msg } from 'src/helpers/message.helper';
@@ -96,22 +93,9 @@ export class TraceabilityExternalService {
       batchLotcode,
     );
 
-    // Kiểm tra QR
-    // Kiểm tra QR code PNG file đã tồn tại trên ổ đĩa chưa, nếu chưa thì tạo ở background (không await để tránh blocking API response)
-    const dirPath = path.join(process.cwd(), 'public', TRACE_CONST.QR_CODE_PATH_EXTERNAL);
-    const fullPath = path.join(dirPath, `${traceabilityId}.png`);
-    if (!existsSync(fullPath)) {
-      if (!existsSync(dirPath)) {
-        mkdirSync(dirPath, { recursive: true });
-      }
-      const targetUrl = `${process.env.CURRENT_URL!}/${TRACE_CONST.QR_CODE_BASE_URL}/${traceabilityId}.png`;
-      QRCode.toFile(fullPath, targetUrl, {
-        width: 300,
-        margin: 1,
-      }).catch((err) => {
-        console.error(`Error generating QR PNG background for ${traceabilityId}:`, err);
-      });
-    }
+    // Tạo mã QR Code ở background (upload MinIO và lưu đĩa local)
+    const targetUrl = `${process.env.CURRENT_URL!}/${TRACE_CONST.QR_CODE_BASE_URL}/${traceabilityId}.png`;
+    void this.fileLocalService.generateAndSaveQrCode(targetUrl, TRACE_CONST.QR_CODE_PATH_EXTERNAL, `${traceabilityId}.png`);
 
     const response = new TraceabilityFormResDto();
     response.uniqueId = uniqueId;
@@ -138,7 +122,7 @@ export class TraceabilityExternalService {
 
     const result = await Promise.all(
       files.map(async (file) => {
-        const relativePath = `${getFileLocation(file.mimetype, file.fieldname, true)}/${file.filename}`;
+        const relativePath = `${getFileLocation(file.mimetype, file.fieldname, { isExternal: true })}/${file.filename}`;
         const seq = await this.repository.insertFile(dto.uniqueId, dto.fieldKey, dto.fieldType, relativePath, file.originalname, file.size, file.mimetype, createdId);
         return { seq, url: relativePath, mimetype: file.mimetype };
       }),

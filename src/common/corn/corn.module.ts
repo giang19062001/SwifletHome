@@ -13,7 +13,19 @@ import { FileLocalModule } from '../fileLocal/fileLocal.module';
 import { CornService } from './corn.service';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), UserAppModule, FileLocalModule, DoctorAppModule, TodoAppModule, UserHomeAppModule, TeamAppModule, SaleHomeAppModule, AdsAdminModule, TraceabilityAppModule, TradeAppModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    UserAppModule,
+    FileLocalModule,
+    DoctorAppModule,
+    TodoAppModule,
+    UserHomeAppModule,
+    TeamAppModule,
+    SaleHomeAppModule,
+    AdsAdminModule,
+    TraceabilityAppModule,
+    TradeAppModule,
+  ],
   controllers: [],
   providers: [CornService],
   exports: [],

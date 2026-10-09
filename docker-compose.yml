@@ -99,6 +99,26 @@ services:
     networks:
       - swiflethome-network
 
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: swiftlet_minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - path: .env.production
+        required: false
+      - path: .env
+        required: false
+      - path: .env.local
+        required: false
+    volumes:
+      - minio_data:/data
+    networks:
+      - swiflethome-network
+    command: server /data --console-address ":9001"
+
 networks:
   swiflethome-network:
     driver: bridge
@@ -115,4 +135,6 @@ volumes:
   loki_data:
     driver: local
   jenkins_data:
+    driver: local
+  minio_data:
     driver: local

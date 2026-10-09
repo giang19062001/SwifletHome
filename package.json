@@ -17,7 +17,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:minio": "cross-env NODE_ENV=local ts-node tools/test-minio-integration.ts",
+    "migrate:minio": "cross-env NODE_ENV=local ts-node tools/migrate-to-minio.ts"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -54,6 +56,7 @@
     "fuse.js": "^7.1.0",
     "groq-sdk": "^1.2.0",
     "helmet": "^8.1.0",
+    "minio": "^8.0.7",
     "moment": "^2.30.1",
     "mqtt": "^5.14.1",
     "multer": "^2.0.2",
@@ -89,6 +92,7 @@
     "@types/express-session": "^1.18.2",
     "@types/fluent-ffmpeg": "^2.1.28",
     "@types/jest": "^30.0.0",
+    "@types/minio": "^7.1.0",
     "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
     "@types/nodemailer": "^8.0.0",

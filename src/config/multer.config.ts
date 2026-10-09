@@ -1,7 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
-import { existsSync, mkdirSync } from 'fs';
-import { diskStorage } from 'multer';
+import { existsSync, mkdirSync, promises as fs } from 'fs';
+import { diskStorage, StorageEngine } from 'multer';
 import { extname, join } from 'path';
+import { MinioService } from 'src/common/minio/minio.service';
 import { AUDIO_TYPES, DOCS_TYPES, IMG_TYPES, VIDEO_TYPES } from 'src/helpers/const.helper';
 import { Msg } from 'src/helpers/message.helper';
 import { v4 as uuidv4 } from 'uuid';
@@ -32,7 +33,7 @@ export const validateImgExt = (originalname) => {
   }
 };
 
-export const getFileLocation = (mimetype: string, fieldname: string, isExternal?: boolean) => {
+export const getFileLocation = (mimetype: string, fieldname: string, infoExtra?: { isExternal?: boolean }) => {
   let result = '';
 
   if (mimetype.startsWith('image/')) {
@@ -55,7 +56,7 @@ export const getFileLocation = (mimetype: string, fieldname: string, isExternal?
     } else if (fieldname.includes('reviewImg')) {
       result = 'images/reviews';
     } else if (fieldname.includes('traceabilityFiles')) {
-      result = isExternal ? 'images/tracesExternal' : 'images/traces';
+      result = infoExtra?.isExternal ? 'images/tracesExternal' : 'images/traces';
     } else if (fieldname.includes('tradeNestFile')) {
       result = 'images/tradeNests';
     }
@@ -67,7 +68,7 @@ export const getFileLocation = (mimetype: string, fieldname: string, isExternal?
     } else if (fieldname.includes('teamFiles') || fieldname.includes('teamServiceFiles')) {
       result = 'videos/teams';
     } else if (fieldname.includes('traceabilityFiles')) {
-      result = isExternal ? 'videos/tracesExternal' : 'videos/traces';
+      result = infoExtra?.isExternal ? 'videos/tracesExternal' : 'videos/traces';
     }
   } else if (mimetype.startsWith('audio/')) {
     if (fieldname.includes('editorAudio')) {
@@ -77,7 +78,7 @@ export const getFileLocation = (mimetype: string, fieldname: string, isExternal?
     }
   } else {
     if (fieldname.includes('traceabilityFiles')) {
-      result = isExternal ? 'docs/tracesExternal' : 'docs/traces';
+      result = infoExtra?.isExternal ? 'docs/tracesExternal' : 'docs/traces';
     }
   }
 
@@ -103,21 +104,76 @@ export const createMulterConfig = (allowedExts: string[], customLimits?: MulterL
 
   const limits = { ...defaultLimits, ...customLimits }; // ghi dè limits nếu có
 
+  const baseDiskStorage = diskStorage({
+    destination: (req: any, file, cb) => {
+      const isExternal = req.body?.isExternal === 'Y';
+      const location = getFileLocation(file.mimetype, file.fieldname, { isExternal });
+      const folderPath = join(process.cwd(), 'public', location);
+      ensureDir(folderPath);
+      cb(null, folderPath);
+    },
+    filename: (req, file, cb) => {
+      const ext = extname(file.originalname);
+      const uniqueName = `${file.fieldname}-${uuidv4()}${ext}`;
+      cb(null, uniqueName);
+    },
+  });
+
+  const hybridStorage: StorageEngine = {
+    _handleFile(req, file, cb) {
+      baseDiskStorage._handleFile(req, file, (err, info) => {
+        if (err) return cb(err);
+        if (!info) return cb(null, info);
+
+        const ext = extname(file.originalname).toLowerCase();
+        const isVideo = file.mimetype.startsWith('video/') || ext === '.mov' || ext === '.webm' || ext === '.mp4';
+
+        // Nếu là video: giữ file trên disk để VideoConverterInterceptor + FFmpeg nén
+        if (isVideo) {
+          return cb(null, info);
+        }
+
+        // Nếu là file ảnh, audio, doc: upload ngay lên MinIO
+        const minio = MinioService.getInstance();
+        if (!minio) {
+          return cb(null, info);
+        }
+
+        const isExternal = (req as any).body?.isExternal === 'Y';
+        const location = getFileLocation(file.mimetype, file.fieldname, { isExternal });
+        const objectKey = `${location}/${info.filename}`;
+
+        if (!info.path) {
+          return cb(null, info);
+        }
+
+        minio
+          .uploadFromPath(info.path, objectKey, file.mimetype)
+          .then(async () => {
+            // Xóa ngay file tạm trên local disk sau khi upload thành công lên MinIO
+            // (Đảm bảo lưu 1 nơi duy nhất là MinIO và không tốn ổ cứng server)
+            try {
+              if (info.path && existsSync(info.path)) {
+                await fs.unlink(info.path);
+              }
+            } catch (unlinkErr) {
+              console.error(`[MulterStorage] Không thể xóa file tạm ${info.path}:`, unlinkErr);
+            }
+            cb(null, info);
+          })
+          .catch((uploadErr) => {
+            console.error(`[MulterStorage] Lỗi upload ${objectKey} lên MinIO:`, uploadErr);
+            cb(null, info);
+          });
+      });
+    },
+    _removeFile(req, file, cb) {
+      baseDiskStorage._removeFile(req, file, cb);
+    },
+  };
+
   return {
-    storage: diskStorage({
-      destination: (req: any, file, cb) => {
-        const isExternal = req.body?.isExternal === 'Y';
-        const location = getFileLocation(file.mimetype, file.fieldname, isExternal);
-        const folderPath = join(process.cwd(), 'public', location);
-        ensureDir(folderPath);
-        cb(null, folderPath);
-      },
-      filename: (req, file, cb) => {
-        const ext = extname(file.originalname);
-        const uniqueName = `${file.fieldname}-${uuidv4()}${ext}`;
-        cb(null, uniqueName);
-      },
-    }),
+    storage: hybridStorage,
     limits,
     fileFilter: (req: any, file: { originalname: string }, cb: (arg0: BadRequestException | null, arg1: boolean) => void) => {
       const ext = extname(file.originalname).toLowerCase();

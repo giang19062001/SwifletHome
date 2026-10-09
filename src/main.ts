@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { LoggingService } from './common/logger/logger.service';
+import { MinioService } from './common/minio/minio.service';
 import { initSwagger } from './config/swagger.config';
 import { ServerExceptionsFilter } from './filter/serverException.filter';
 
@@ -48,8 +49,41 @@ async function bootstrap() {
   // IP -> trust NGINX
   app.set('trust proxy', true);
 
-  // (CSS, JS, IMG), views , engine
+  // 1. Phục vụ toàn bộ file /uploads/* trực tiếp từ MinIO (lưu trữ duy nhất trên MinIO)
+  app.use('/uploads', async (req: any, res: any, next: any) => {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      return next();
+    }
+    const minio = MinioService.getInstance();
+    if (!minio) return next();
+
+    try {
+      const stat = await minio.statObject(req.path);
+      if (!stat) return next();
+
+      if (stat.metaData && stat.metaData['content-type']) {
+        res.setHeader('Content-Type', stat.metaData['content-type']);
+      }
+      res.setHeader('Content-Length', stat.size);
+      if (stat.lastModified) {
+        res.setHeader('Last-Modified', stat.lastModified.toUTCString());
+      }
+      res.setHeader('Cache-Control', 'public, max-age=2592000');
+
+      if (req.method === 'HEAD') {
+        return res.end();
+      }
+
+      const stream = await minio.getObjectStream(req.path);
+      return stream.pipe(res);
+    } catch {
+      return next();
+    }
+  });
+
+  // 2. Phục vụ tài nguyên tĩnh giao diện (CSS, JS, Fonts) từ thư mục public
   app.useStaticAssets(join(process.cwd(), 'public'));
+
   app.setBaseViewsDir(join(process.cwd(), 'views'));
   app.setViewEngine('ejs');
   app.use(expressLayouts);

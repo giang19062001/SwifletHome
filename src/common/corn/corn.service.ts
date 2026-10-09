@@ -16,6 +16,7 @@ import { TodoAlarmAppService } from 'src/modules/todo/app/todo-alarm.service';
 import { UserHomeAppService } from 'src/modules/userHome/app/userHome.service';
 import { TraceabilityAppService } from 'src/modules/traceability/app/traceability.service';
 import { FileLocalService } from '../fileLocal/fileLocal.service';
+import { MinioService } from '../minio/minio.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
 import { TABLE_MAPPING_TO_JOB_CLEAR } from './corn.const';
@@ -39,6 +40,7 @@ export class CornService implements OnModuleInit {
     private readonly traceabilityExternalService: TraceabilityExternalService,
     private readonly tradeAppService: TradeAppService,
     private readonly fileLocalService: FileLocalService,
+    private readonly minioService: MinioService,
     private readonly firebaseService: FirebaseService,
     private readonly logger: LoggingService,
     private readonly schedulerRegistry: SchedulerRegistry,
@@ -259,97 +261,71 @@ export class CornService implements OnModuleInit {
   }
   async deleteOrphanedLocalFiles() {
     const logbase = `${this.SERVICE_NAME}/deleteOrphanedLocalFiles`;
-    this.logger.log(logbase, `Bắt đầu tiến trình quét file rác...`);
+    this.logger.log(logbase, `Bắt đầu tiến trình quét file rác trên MinIO...`);
 
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      this.logger.log(logbase, `Thư mục public/uploads không tồn tại, bỏ qua.`);
+    const IGNORED_PATHS = ['images/configs', 'images/screens'];
+    const minioFilesSet = new Set<string>();
+
+    // 1. Quét toàn bộ file từ MinIO
+    try {
+      const minioObjects = await this.minioService.listAllObjects();
+      for (const obj of minioObjects) {
+        if (!IGNORED_PATHS.some((ignored) => obj.includes(ignored))) {
+          minioFilesSet.add(obj);
+        }
+      }
+      this.logger.log(logbase, `Đã quét được ${minioFilesSet.size} files trên MinIO.`);
+    } catch (minioErr: any) {
+      this.logger.error(logbase, `Không thể quét danh sách file trên MinIO: ${minioErr.message}`);
       return;
     }
 
-    const IGNORED_PATHS = ['images/configs', 'images/screens'];
-    const localFilesSet = new Set<string>();
+    if (minioFilesSet.size === 0) {
+      this.logger.log(logbase, `Không có file nào trên MinIO.`);
+      return;
+    }
 
-    // Quét đệ quy lấy toàn bộ file trên ổ cứng vào Set
-    const walkDir = async (dir: string) => {
-      const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
-      for (const dirent of dirents) {
-        const absolutePath = path.join(dir, dirent.name);
-        const relativePath = path.relative(path.join(process.cwd(), 'public'), absolutePath).replace(/\\/g, '/');
-
-        // Bỏ qua thư mục/file rác nằm trong danh sách cấm
-        if (dirent.name.startsWith('.') || IGNORED_PATHS.some((ignored) => relativePath.includes(ignored))) {
-          continue;
-        }
-
-        if (dirent.isDirectory()) {
-          await walkDir(absolutePath);
-        } else {
-          // Thêm file vào Set
-          localFilesSet.add(relativePath);
-        }
-      }
-    };
-
-    try {
-      await walkDir(uploadsDir);
-      this.logger.log(logbase, `Đã quét được ${localFilesSet.size} files trên ổ cứng.`);
-
-      if (localFilesSet.size === 0) return;
-
-      // Danh sách tất cả các bảng và cột chứa đường dẫn file
-
-      // Truy vấn DB lấy toàn bộ path đang được sử dụng và loại bỏ khỏi Set
-      for (const mapping of TABLE_MAPPING_TO_JOB_CLEAR) {
-        const sql = ` SELECT ${mapping.column} AS filepath FROM ${mapping.table} WHERE ${mapping.column} LIKE 'uploads/%'`;
-        try {
-          const [rows]: any = await this.db.execute(sql);
-          if (rows && rows.length > 0) {
-            for (const row of rows) {
-              if (row.filepath) {
-                // Xóa khỏi Set vì file này đang được DB sử dụng (không phải rác)
-                localFilesSet.delete(row.filepath);
-              }
+    // 2. Truy vấn DB lấy toàn bộ path đang được sử dụng và loại bỏ khỏi Set
+    for (const mapping of TABLE_MAPPING_TO_JOB_CLEAR) {
+      const sql = ` SELECT ${mapping.column} AS filepath FROM ${mapping.table} WHERE ${mapping.column} LIKE 'uploads/%'`;
+      try {
+        const [rows]: any = await this.db.execute(sql);
+        if (rows && rows.length > 0) {
+          for (const row of rows) {
+            if (row.filepath) {
+              minioFilesSet.delete(row.filepath);
             }
           }
-        } catch (err) {
-          this.logger.error(logbase, `Lỗi khi lấy dữ liệu từ bảng ${mapping.table}: ${JSON.stringify(err)}`);
         }
+      } catch (err) {
+        this.logger.error(logbase, `Lỗi khi lấy dữ liệu từ bảng ${mapping.table}: ${JSON.stringify(err)}`);
       }
-
-      // Các file còn lại trong Set chính là file rác (cần xóa)
-      const orphanedFiles = Array.from(localFilesSet);
-      this.logger.log(logbase, `Phát hiện ${orphanedFiles.length} file rác không có trong DB.`);
-
-      if (orphanedFiles.length === 0) {
-        this.logger.log(logbase, `Không có file rác nào cần dọn dẹp`);
-        return;
-      }
-
-      //  Xóa hàng loạt theo chunk (50 file mỗi lượt)
-      let deletedCount = 0;
-      const CHUNK_SIZE = 50;
-
-      for (let i = 0; i < orphanedFiles.length; i += CHUNK_SIZE) {
-        const chunk = orphanedFiles.slice(i, i + CHUNK_SIZE);
-
-        await Promise.allSettled(
-          chunk.map(async (relativePath) => {
-            const absolutePath = path.join(process.cwd(), 'public', relativePath);
-            try {
-              await fs.promises.unlink(absolutePath);
-              this.logger.log(logbase, `Đã xóa: ${relativePath} dựa vào bảng ${TABLE_MAPPING_TO_JOB_CLEAR.map((m) => m.table).join(', ')}`);
-              deletedCount++;
-            } catch (err) {
-              this.logger.error(logbase, `Không thể xóa file ${relativePath}: ${JSON.stringify(err)}`);
-            }
-          }),
-        );
-      }
-      this.logger.log(logbase, `Hoàn tất dọn rác local. Đã xử lý ${deletedCount} file rác.`);
-    } catch (error) {
-      this.logger.error(logbase, `Lỗi trong quá trình quét đệ quy file rác: ${JSON.stringify(error)}`);
     }
+
+    // 3. Các file còn lại trong Set là file rác cần xóa trên MinIO
+    const orphanedFiles = Array.from(minioFilesSet);
+    this.logger.log(logbase, `Phát hiện ${orphanedFiles.length} file rác trên MinIO không có trong DB.`);
+
+    if (orphanedFiles.length === 0) {
+      this.logger.log(logbase, `Không có file rác nào cần dọn dẹp trên MinIO.`);
+      return;
+    }
+
+    // 4. Xóa hàng loạt trên MinIO theo chunk (50 file mỗi lượt)
+    let minioDeletedCount = 0;
+    const CHUNK_SIZE = 50;
+
+    for (let i = 0; i < orphanedFiles.length; i += CHUNK_SIZE) {
+      const chunk = orphanedFiles.slice(i, i + CHUNK_SIZE);
+      try {
+        await this.minioService.deleteObjects(chunk);
+        minioDeletedCount += chunk.length;
+      } catch (err: any) {
+        this.logger.error(logbase, `Lỗi khi xóa chunk file trên MinIO: ${err.message}`);
+      }
+    }
+
+    this.logger.log(logbase, `Hoàn tất dọn rác. Đã xóa ${minioDeletedCount} files rác trên MinIO.`);
   }
 
   async deleteTraceabilityFilesNotUse() {

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { MinioService } from 'src/common/minio/minio.service';
 import { PagingDto } from 'src/dto/admin.dto';
 import { UpdateScreenDto } from './screen.dto';
 import { ScreenAdminRepository } from './screen.repository';
@@ -25,7 +26,7 @@ export class ScreenAdminService {
   }
 
   async updateBanner(screenKeyword: string, bannerUrl: string, adminId: string): Promise<number> {
-    // Xóa file cũ nếu có
+    // Xóa file cũ trên MinIO nếu có
     const detail = await this.getDetail(screenKeyword);
     if (detail && detail.contentCenter) {
       let center = detail.contentCenter;
@@ -35,11 +36,9 @@ export class ScreenAdminService {
         } catch (e) {}
       }
       if (center?.banner) {
-        const oldPath = path.join(process.cwd(), 'public', center.banner);
-        if (fs.existsSync(oldPath)) {
-          try {
-            fs.unlinkSync(oldPath);
-          } catch (e) {}
+        const minio = MinioService.getInstance();
+        if (minio) {
+          await minio.deleteObject(center.banner);
         }
       }
     }

@@ -1,10 +1,11 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { OnModuleDestroy } from '@nestjs/common';
 import { Job } from 'bullmq';
 import ffmpegStatic from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 import * as fs from 'fs';
+import * as path from 'path';
 import { FFMPEG_OPTIONS } from 'src/config/ffmpeg.config';
+import { MinioService } from '../minio/minio.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { LoggingService } from '../logger/logger.service';
 import { ExportService } from '../export/export.service';
@@ -51,7 +52,10 @@ export class NotificationQueueService extends WorkerHost {
 export class VideoQueueService extends WorkerHost {
   private readonly loggerName = 'VideoQueue';
 
-  constructor(private readonly logger: LoggingService) {
+  constructor(
+    private readonly logger: LoggingService,
+    private readonly minioService: MinioService,
+  ) {
     super();
   }
 
@@ -70,24 +74,40 @@ export class VideoQueueService extends WorkerHost {
         .videoFilter(FFMPEG_OPTIONS.videoFilter)
         .outputOptions(FFMPEG_OPTIONS.outputOptions)
         .on('end', () => {
-          try {
-            // Xóa file gốc (nếu nó không phải là file đích mp4)
-            if (originalPath !== newPath && fs.existsSync(originalPath)) {
-              fs.unlinkSync(originalPath);
-            }
-            // Đổi tên file tạm thành file đích chính thức
-            if (fs.existsSync(tempPath)) {
-              fs.renameSync(tempPath, newPath);
-            }
-            this.logger.log(logbase, `Hoàn tất nén video: ${newPath}`);
-            resolve('Convert video success');
-          } catch (e: unknown) {
-            const error = e instanceof Error ? e : new Error(String(e));
+          void (async () => {
+            try {
+              // Xóa file gốc (nếu nó không phải là file đích mp4)
+              if (originalPath !== newPath && fs.existsSync(originalPath)) {
+                fs.unlinkSync(originalPath);
+              }
+              // Đổi tên file tạm thành file đích chính thức
+              if (fs.existsSync(tempPath)) {
+                fs.renameSync(tempPath, newPath);
+              }
+              this.logger.log(logbase, `Hoàn tất nén video cục bộ: ${newPath}`);
 
-            this.logger.error(logbase, `Lỗi khi đổi tên file video temp: ${error.message}`);
+              // Upload video đã nén lên MinIO
+              const relativePath = path.relative(path.join(process.cwd(), 'public'), newPath).replace(/\\/g, '/');
+              try {
+                await this.minioService.uploadFromPath(newPath, relativePath, 'video/mp4');
+                this.logger.log(logbase, `Đã upload video nén lên MinIO: ${relativePath}`);
+                // Xóa file trên disk sau khi đã đẩy lên MinIO an toàn
+                if (fs.existsSync(newPath)) {
+                  fs.unlinkSync(newPath);
+                }
+              } catch (minioErr: any) {
+                this.logger.error(logbase, `Lỗi upload MinIO cho video ${relativePath}: ${minioErr.message}, giữ lại file disk fallback`);
+              }
 
-            reject(error);
-          }
+              resolve('Convert video success');
+            } catch (e: unknown) {
+              const error = e instanceof Error ? e : new Error(String(e));
+
+              this.logger.error(logbase, `Lỗi khi xử lý file video sau nén: ${error.message}`);
+
+              reject(error);
+            }
+          })();
         })
         .on('error', (err, stdout, stderr) => {
           this.logger.error(logbase, `Lỗi khi convert video bằng FFmpeg: ${err.message}`);

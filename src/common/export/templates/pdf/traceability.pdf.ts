@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as QRCode from 'qrcode';
 import { PdfBaseService } from '../../services/pdf-base.service';
+import { FileLocalService } from 'src/common/fileLocal/fileLocal.service';
 
 @Injectable()
 export class TraceabilityPdfTemplate {
-  constructor(private readonly pdfBaseService: PdfBaseService) {}
+  constructor(
+    private readonly pdfBaseService: PdfBaseService,
+    private readonly fileLocalService: FileLocalService,
+  ) {}
 
   async generateCompact(traceData: any, qrUrl?: string): Promise<Buffer> {
     const qrContent = qrUrl || '';
@@ -18,6 +20,8 @@ export class TraceabilityPdfTemplate {
         qrBuffer = null;
       }
     }
+
+    const imageBuffers = await this.fileLocalService.preloadImageBuffers(traceData);
 
     return new Promise<Buffer>((resolve, reject) => {
       try {
@@ -135,11 +139,12 @@ export class TraceabilityPdfTemplate {
 
         const renderImage = (imgUrl: string, indent = 45) => {
           if (!imgUrl) return;
-          const imgPath = path.join(process.cwd(), 'public', imgUrl);
-          if (fs.existsSync(imgPath)) {
+          const cleanUrl = imgUrl.replace(/^\/+/, '');
+          const imgBuf = imageBuffers.get(cleanUrl) || imageBuffers.get(imgUrl);
+          if (imgBuf) {
             checkPageBreak(110);
             try {
-              doc.image(imgPath, indent, currentY, { height: 95 });
+              doc.image(imgBuf, indent, currentY, { height: 95 });
               currentY += 105;
             } catch {
               doc.font(fontRegular).fontSize(9).fillColor('#666666').text(`[Ảnh đính kèm: ${imgUrl}]`, indent, currentY);
@@ -479,14 +484,15 @@ export class TraceabilityPdfTemplate {
                         currentY += 15;
 
                         const renderImageField = (imgUrl: string) => {
-                          const imgPath = path.join(process.cwd(), 'public', imgUrl);
-                          if (fs.existsSync(imgPath)) {
+                          const cleanUrl = imgUrl.replace(/^\/+/, '');
+                          const imgBuf = imageBuffers.get(cleanUrl) || imageBuffers.get(imgUrl);
+                          if (imgBuf) {
                             if (currentY > 680) {
                               doc.addPage();
                               currentY = 40;
                             }
                             try {
-                              doc.image(imgPath, 60, currentY, { height: 100 });
+                              doc.image(imgBuf, 60, currentY, { height: 100 });
                               currentY += 110;
                             } catch (e) {
                               doc.font(fontRegular).fillColor('#000000').text(`[Lỗi hiển thị ảnh: ${imgUrl}]`, 60, currentY);
@@ -551,6 +557,8 @@ export class TraceabilityPdfTemplate {
         qrBuffer = null;
       }
     }
+
+    const imageBuffers = await this.fileLocalService.preloadImageBuffers(traceData);
 
     return new Promise<Buffer>((resolve, reject) => {
       try {
@@ -664,11 +672,11 @@ export class TraceabilityPdfTemplate {
         const renderImage = (imgUrl: string, indent = 45) => {
           if (!imgUrl) return;
           const cleanUrl = imgUrl.replace(/^\/+/, '');
-          const imgPath = path.join(process.cwd(), 'public', cleanUrl);
-          if (fs.existsSync(imgPath)) {
+          const imgBuf = imageBuffers.get(cleanUrl) || imageBuffers.get(imgUrl);
+          if (imgBuf) {
             checkPageBreak(105);
             try {
-              doc.image(imgPath, indent, currentY, { height: 90, fit: [180, 90] });
+              doc.image(imgBuf, indent, currentY, { height: 90, fit: [180, 90] });
               currentY += 98;
             } catch {
               doc.font(fontRegular).fontSize(8.5).fillColor('#64748B').text(`[Ảnh đính kèm: ${imgUrl}]`, indent, currentY);

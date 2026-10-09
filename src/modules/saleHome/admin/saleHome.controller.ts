@@ -10,6 +10,7 @@ import { ApiAuthAdminGuard } from 'src/modules/auth/admin/auth.api.guard';
 import { TokenUserAdminResDto } from '../../auth/admin/auth.response';
 import { CreateSaleHomeAdminDto, UpdateSaleHomeAdminDto, UpdateStatusSaleHomeDto, UploadFilesAdminDto } from './saleHome.dto';
 import { SaleHomeAdminService } from './saleHome.service';
+import { VideoConverterInterceptor } from 'src/interceptors/video-converter.interceptor';
 
 @ApiTags('Admin - Sale Home')
 @ApiBearerAuth()
@@ -66,7 +67,7 @@ export class SaleHomeAdminController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadFilesAdminDto })
   @Post('uploadFiles')
-  @UseInterceptors(FilesInterceptor('saleHomeFiles', 5, getImgVideoMulterConfig(5)))
+  @UseInterceptors(FilesInterceptor('saleHomeFiles', 5, getImgVideoMulterConfig(5)), VideoConverterInterceptor)
   async uploadFiles(@Body() dto: UploadFilesAdminDto, @UploadedFiles() files: Express.Multer.File[], @GetUserAdmin() admin: TokenUserAdminResDto) {
     if (!files || files.length === 0) throw new BadRequestException();
     const userCode = admin.userId; // admin

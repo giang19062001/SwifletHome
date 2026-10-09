@@ -14,6 +14,7 @@ import { GeoModule } from './common/geo/geo.module';
 import { CustomThrottlerGuard } from './common/guards/throttler.guard';
 import { LoggerModule } from './common/logger/logger.module';
 import { MailModule } from './common/mail/mail.module';
+import { MinioModule } from './common/minio/minio.module';
 import { MqttModule } from './common/mqtt/mqtt.module';
 import { QueueModule } from './common/queue/queue.module';
 import { RedisModule } from './common/redis/redis.module';
@@ -112,6 +113,7 @@ import { ExportModule } from './common/export/export.module';
     RedisModule,
     MailModule,
     MqttModule,
+    MinioModule,
     BlacklistModule,
     GeoModule,
     QueueModule,
